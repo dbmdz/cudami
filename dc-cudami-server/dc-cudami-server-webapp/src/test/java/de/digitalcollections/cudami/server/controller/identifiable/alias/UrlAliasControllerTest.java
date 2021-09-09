@@ -262,7 +262,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
       "returns a 404 for primary links, when no primary links for a given slug/webpage tuple exist")
   @Test
   public void nonexistingPrimaryLinks() throws Exception {
-    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("notexisting"))).thenReturn(null);
+    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("notexisting"), any(Locale.class)))
+        .thenReturn(null);
 
     testNotFound("/v5/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
   }
@@ -286,7 +287,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
                 new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
-    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"))).thenReturn(expected);
+    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"), eq(null)))
+        .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
   }
@@ -308,7 +310,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withUuid("12345678-1234-1234-1234-123456789012")
             .build());
 
-    when(urlAliasService.findPrimaryLinks(eq(null), eq("imprint"))).thenReturn(expected);
+    when(urlAliasService.findPrimaryLinks(eq(null), eq("imprint"), eq(null))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint.json");
   }
@@ -338,7 +340,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         .thenReturn("hurz");
 
     testGetJsonString(
-        "/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "hurz");
+        "/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "\"hurz\"");
   }
 
   @DisplayName("returns a generated slug, when no website id is provided")
@@ -347,6 +349,6 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
         .thenReturn("hurz");
 
-    testGetJsonString("/v5/urlaliases/slug/de_DE/label", "hurz");
+    testGetJsonString("/v5/urlaliases/slug/de_DE/label", "\"hurz\"");
   }
 }

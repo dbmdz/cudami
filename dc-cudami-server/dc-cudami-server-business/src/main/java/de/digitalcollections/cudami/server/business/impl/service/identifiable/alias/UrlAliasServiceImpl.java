@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.a
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -26,14 +27,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class UrlAliasServiceImpl implements UrlAliasService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasServiceImpl.class);
-
+  private final LocaleService localeService;
   private final SlugGenerator slugGenerator;
   private final UrlAliasRepository repository;
 
   @Autowired
-  public UrlAliasServiceImpl(UrlAliasRepository repository, SlugGenerator slugGenerator) {
+  public UrlAliasServiceImpl(
+      UrlAliasRepository repository, SlugGenerator slugGenerator, LocaleService localeService) {
     this.repository = repository;
     this.slugGenerator = slugGenerator;
+    this.localeService = localeService;
   }
 
   @Override
@@ -112,7 +115,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug)
+  public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug, Locale pLocale)
       throws CudamiServiceException {
     if (slug == null || slug.isBlank()) {
       throw new CudamiServiceException("Missing or empty slug");
@@ -125,11 +128,27 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       }
 
       // Try to retrieve the specific localizedUrlAliases for a website
-      LocalizedUrlAliases localizedUrlAliases =
+      final LocalizedUrlAliases localizedUrlAliases =
           repository.findPrimaryLinksForWebsite(websiteUuid, slug);
-      if (localizedUrlAliases == null) {
+      if (localizedUrlAliases.isEmpty()) {
         // Fallback to generic localizedUrlAliases
-        return repository.findPrimaryLinksForWebsite(null, slug);
+        LocalizedUrlAliases genericLocalizedUrlAliases =
+            repository.findPrimaryLinksForWebsite(null, slug);
+        if (!genericLocalizedUrlAliases.isEmpty()) {
+          localizedUrlAliases.add(genericLocalizedUrlAliases.flatten().toArray(new UrlAlias[0]));
+        }
+      }
+
+      if (localizedUrlAliases != null && pLocale != null) {
+        // Filter according to pLocale, if possible
+        if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
+          // Remove all languages, which do not match the desired pLocale
+          filterForLocale(pLocale, localizedUrlAliases);
+        } else {
+          // Remove all languages, which are not the default language
+          Locale defaultLocale = new Locale(localeService.getDefaultLanguage());
+          filterForLocale(defaultLocale, localizedUrlAliases);
+        }
       }
 
       return localizedUrlAliases;
@@ -140,6 +159,15 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
   }
 
+  protected static void filterForLocale(Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
+    localizedUrlAliases.forEach(
+        (k, v) -> {
+          if (!k.equals(pLocale)) {
+            localizedUrlAliases.remove(k, v);
+          }
+        });
+  }
+
   @Override
   public String generateSlug(Locale pLocale, String label, UUID websiteUuid)
       throws CudamiServiceException {
@@ -147,16 +175,18 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     String slug = slugGenerator.generateSlug(label);
 
     try {
-      if (!repository.hasUrlAlias(websiteUuid, slug)) {
+      if (!repository.hasUrlAlias(slug, websiteUuid, pLocale)) {
         return slug;
       }
     } catch (UrlAliasRepositoryException e) {
       throw new CudamiServiceException(
-          "Cannot check, if UrlAliase for websiteUuid="
+          "Cannot check, if UrlAliases for websiteUuid="
               + websiteUuid
               + ", slug="
               + slug
-              + " already exists: "
+              + ", locale="
+              + pLocale
+              + " already exist: "
               + e,
           e);
     }
@@ -165,15 +195,17 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     while (true) {
       String numericalSuffixedSlug = slug + "-" + suffixId;
       try {
-        if (!repository.hasUrlAlias(websiteUuid, numericalSuffixedSlug))
+        if (!repository.hasUrlAlias(numericalSuffixedSlug, websiteUuid, pLocale))
           return numericalSuffixedSlug;
       } catch (UrlAliasRepositoryException e) {
         throw new CudamiServiceException(
-            "Cannot check, if UrlAliase for websiteUuid="
+            "Cannot check, if UrlAliases for websiteUuid="
                 + websiteUuid
                 + ", slug="
                 + numericalSuffixedSlug
-                + " already exists: "
+                + ", locale="
+                + pLocale
+                + " already exist: "
                 + e,
             e);
       }

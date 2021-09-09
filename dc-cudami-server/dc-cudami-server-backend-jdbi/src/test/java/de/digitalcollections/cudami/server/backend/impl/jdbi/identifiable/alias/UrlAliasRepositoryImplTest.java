@@ -301,12 +301,16 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void hasUrlAlias() throws UrlAliasRepositoryException {
     assertThrows(
-        UrlAliasRepositoryException.class, () -> this.repo.hasUrlAlias(this.website.getUuid(), ""));
+        UrlAliasRepositoryException.class,
+        () -> this.repo.hasUrlAlias("", this.website.getUuid(), Locale.ROOT));
     assertFalse(
-        this.repo.hasUrlAlias(this.website.getUuid(), this.urlAliasWithoutWebsite.getSlug()));
-    assertTrue(this.repo.hasUrlAlias(null, this.urlAliasWithoutWebsite.getSlug()));
-    assertTrue(this.repo.hasUrlAlias(this.website.getUuid(), this.urlAliasWithWebsite.getSlug()));
-    assertFalse(this.repo.hasUrlAlias(this.website.getUuid(), "does_not_exist"));
+        this.repo.hasUrlAlias(
+            this.urlAliasWithoutWebsite.getSlug(), this.website.getUuid(), Locale.ROOT));
+    assertTrue(this.repo.hasUrlAlias(this.urlAliasWithoutWebsite.getSlug(), null, Locale.ROOT));
+    assertTrue(
+        this.repo.hasUrlAlias(
+            this.urlAliasWithWebsite.getSlug(), this.website.getUuid(), Locale.ROOT));
+    assertFalse(this.repo.hasUrlAlias("does_not_exist", this.website.getUuid(), Locale.ROOT));
   }
 
   @DisplayName("Delete an UrlAlias")

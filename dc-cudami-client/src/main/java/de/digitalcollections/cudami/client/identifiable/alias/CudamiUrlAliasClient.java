@@ -19,10 +19,31 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
     super(http, serverUrl, UrlAlias.class, mapper);
   }
 
-  public LocalizedUrlAliases findMainLinks(UUID websiteUuid, String slug) throws HttpException {
+  public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug) throws HttpException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format("/v5/urlaliases/primary/%s", slug), LocalizedUrlAliases.class);
+    }
+
     return (LocalizedUrlAliases)
         doGetRequestForObject(
-            String.format("/v5/urlaliases/%s/%s?mainLinks=true", websiteUuid, slug),
+            String.format("/v5/urlaliases/primary/%s/%s", slug, websiteUuid),
+            LocalizedUrlAliases.class);
+  }
+
+  public LocalizedUrlAliases findPrimaryLinksForLocale(
+      UUID websiteUuid, String slug, Locale pLocale) throws HttpException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format("/v5/urlaliases/primary/%s?pLocale=%s", slug, pLocale),
+              LocalizedUrlAliases.class);
+    }
+
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format("/v5/urlaliases/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
             LocalizedUrlAliases.class);
   }
 
@@ -59,7 +80,7 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
   }
 
   public boolean isMainLink(UUID websiteUuid, String slug) throws HttpException {
-    LocalizedUrlAliases localizedUrlAliases = findMainLinks(websiteUuid, slug);
+    LocalizedUrlAliases localizedUrlAliases = findPrimaryLinks(websiteUuid, slug);
     if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
       return false;
     }

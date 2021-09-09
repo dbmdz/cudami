@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
+import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.ControllerException;
@@ -11,6 +12,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
@@ -171,7 +173,9 @@ public class UrlAliasController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get the primary LocalizedUrlAliases for a given website uuid and slug")
+  @Operation(
+      summary =
+          "Get the primary LocalizedUrlAliases for a given website uuid and slug, and optionally filtered by a locale")
   @GetMapping(
       value = {
         "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
@@ -185,11 +189,19 @@ public class UrlAliasController {
               description =
                   "UUID of the website if given (otherwise not set), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable(value = "website_uuid", required = false)
-          UUID websiteUuid)
+          UUID websiteUuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale in flattened form. If unset, contents in all languages will be returned",
+              example = "de_DE",
+              schema = @Schema(implementation = Locale.class))
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
       throws ControllerException {
     LocalizedUrlAliases result;
     try {
-      result = urlAliasService.findPrimaryLinks(websiteUuid, slug);
+      result = urlAliasService.findPrimaryLinks(websiteUuid, slug, pLocale);
     } catch (CudamiServiceException e) {
       throw new ControllerException(e);
     }
@@ -237,6 +249,6 @@ public class UrlAliasController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(JSONObject.quote(result), HttpStatus.OK);
   }
 }

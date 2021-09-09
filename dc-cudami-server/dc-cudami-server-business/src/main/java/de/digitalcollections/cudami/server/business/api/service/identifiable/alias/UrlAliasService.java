@@ -120,10 +120,12 @@ public interface UrlAliasService {
    *
    * @param websiteUuid the UUID of the website, the slug belongs to, or null
    * @param slug the slug (=relative path)
+   * @param pLocale the locale for which the result is filtered. Optional.
    * @return LocalizedUrlAliases, if a primary link exists; otherwise: null.
    * @throws CudamiServiceException in case of an error
    */
-  LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug) throws CudamiServiceException;
+  LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug, Locale pLocale)
+      throws CudamiServiceException;
 
   /**
    * Generates a not yet existing slug for the provided label, language and websiteUuid. If the

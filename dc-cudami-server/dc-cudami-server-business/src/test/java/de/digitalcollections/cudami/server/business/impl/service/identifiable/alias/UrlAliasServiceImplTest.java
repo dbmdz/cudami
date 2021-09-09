@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -31,6 +32,8 @@ import org.junit.jupiter.api.Test;
 @DisplayName("The UrlAliasService implementation")
 class UrlAliasServiceImplTest {
 
+  private LocaleService localeService;
+
   private UrlAliasServiceImpl service;
 
   private UrlAliasRepository repo;
@@ -40,9 +43,11 @@ class UrlAliasServiceImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = mock(UrlAliasRepository.class);
+    localeService = mock(LocaleService.class);
+    when(localeService.getDefaultLocale()).thenReturn(Locale.ENGLISH);
     slugGenerator = mock(SlugGenerator.class);
     when(slugGenerator.generateSlug(any(String.class))).thenReturn("slug");
-    service = new UrlAliasServiceImpl(repo, slugGenerator);
+    service = new UrlAliasServiceImpl(repo, slugGenerator, localeService);
   }
 
   @DisplayName("returns null, when an nonexisting UrlAlias should be retrieved")
@@ -95,7 +100,8 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when trying to create an UrlAlias with existing UUID")
   @Test
-  public void raiseExceptionWhenSaveWithUuid() throws CudamiServiceException {
+  public void raiseExceptionWhenSaveWithUuid() throws UrlAliasRepositoryException {
+    when(repo.findOne(any(UUID.class))).thenReturn(null);
     assertThrows(
         CudamiServiceException.class,
         () -> {
@@ -152,7 +158,7 @@ class UrlAliasServiceImplTest {
   @Test
   public void raiseExceptionWhenUpdateLeadsToAnException()
       throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.update(any(UrlAlias.class))).thenThrow(new NullPointerException("foo"));
+    when(repo.findOne(any(UUID.class))).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
@@ -166,6 +172,7 @@ class UrlAliasServiceImplTest {
   public void updateUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
     UrlAlias expected = createUrlAlias("hützligrütz", true);
 
+    when(repo.findOne(any(UUID.class))).thenReturn(expected);
     when(repo.update(eq(expected))).thenReturn(expected);
 
     assertThat(service.update(expected)).isEqualTo(expected);
@@ -259,10 +266,10 @@ class UrlAliasServiceImplTest {
 
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(createUrlAlias("hützligrütz", true));
-    when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(null);
+    when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(new LocalizedUrlAliases());
     when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug))).thenReturn(expected);
 
-    assertThat(service.findPrimaryLinks(uuid, slug)).isEqualTo(expected);
+    assertThat(service.findPrimaryLinks(uuid, slug, null)).isEqualTo(expected);
   }
 
   @DisplayName(
@@ -272,12 +279,12 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), null);
+          service.findPrimaryLinks(UUID.randomUUID(), null, null);
         });
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), "");
+          service.findPrimaryLinks(UUID.randomUUID(), "", null);
         });
   }
 
@@ -292,7 +299,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz");
+          service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz", null);
         });
   }
 
@@ -303,7 +310,8 @@ class UrlAliasServiceImplTest {
     expected.add(createUrlAlias("hützligrütz", true));
     when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
 
-    assertThat(service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz")).isEqualTo(expected);
+    assertThat(service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz", null))
+        .isEqualTo(expected);
   }
 
   @DisplayName(
@@ -341,7 +349,7 @@ class UrlAliasServiceImplTest {
     UUID websiteUuid = UUID.randomUUID();
 
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label"))).thenReturn(false);
+    when(repo.hasUrlAlias(eq("label"), eq(websiteUuid), any(Locale.class))).thenReturn(false);
 
     assertThat(service.generateSlug(Locale.GERMAN, "label", websiteUuid)).isEqualTo(expected);
   }
@@ -349,7 +357,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("throws an exception, when the query for existance of a slug leads to an exception")
   @Test
   public void throwsExceptionWhenSlugQueryFails() throws UrlAliasRepositoryException {
-    when(repo.hasUrlAlias(any(UUID.class), any(String.class)))
+    when(repo.hasUrlAlias(any(String.class), any(UUID.class), any(Locale.class)))
         .thenThrow(new UrlAliasRepositoryException("foo"));
 
     assertThrows(
@@ -367,9 +375,9 @@ class UrlAliasServiceImplTest {
     UUID websiteUuid = UUID.randomUUID();
 
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-1"))).thenReturn(true);
-    when(repo.hasUrlAlias(eq(websiteUuid), eq("label-2"))).thenReturn(false);
+    when(repo.hasUrlAlias(eq("label"), eq(websiteUuid), any(Locale.class))).thenReturn(true);
+    when(repo.hasUrlAlias(eq("label-1"), eq(websiteUuid), any(Locale.class))).thenReturn(true);
+    when(repo.hasUrlAlias(eq("label-2"), eq(websiteUuid), any(Locale.class))).thenReturn(false);
 
     assertThat(service.generateSlug(Locale.GERMAN, "label", websiteUuid)).isEqualTo(expected);
   }
