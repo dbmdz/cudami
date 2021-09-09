@@ -124,32 +124,22 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     try {
       if (websiteUuid == null) {
         // We only want the unspecified primary links
-        return repository.findPrimaryLinksForWebsite(null, slug);
+        LocalizedUrlAliases unspecificLocalizedUrlAliases =
+            repository.findPrimaryLinksForWebsite(null, slug);
+        unspecificLocalizedUrlAliases =
+            filterForLocaleWithFallback(pLocale, unspecificLocalizedUrlAliases);
+        return unspecificLocalizedUrlAliases;
       }
 
       // Try to retrieve the specific localizedUrlAliases for a website
-      final LocalizedUrlAliases localizedUrlAliases =
+      LocalizedUrlAliases localizedUrlAliases =
           repository.findPrimaryLinksForWebsite(websiteUuid, slug);
       if (localizedUrlAliases.isEmpty()) {
         // Fallback to generic localizedUrlAliases
-        LocalizedUrlAliases genericLocalizedUrlAliases =
-            repository.findPrimaryLinksForWebsite(null, slug);
-        if (!genericLocalizedUrlAliases.isEmpty()) {
-          localizedUrlAliases.add(genericLocalizedUrlAliases.flatten().toArray(new UrlAlias[0]));
-        }
+        localizedUrlAliases = repository.findPrimaryLinksForWebsite(null, slug);
       }
 
-      if (localizedUrlAliases != null && pLocale != null) {
-        // Filter according to pLocale, if possible
-        if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
-          // Remove all languages, which do not match the desired pLocale
-          filterForLocale(pLocale, localizedUrlAliases);
-        } else {
-          // Remove all languages, which are not the default language
-          Locale defaultLocale = new Locale(localeService.getDefaultLanguage());
-          filterForLocale(defaultLocale, localizedUrlAliases);
-        }
-      }
+      localizedUrlAliases = filterForLocaleWithFallback(pLocale, localizedUrlAliases);
 
       return localizedUrlAliases;
     } catch (Exception e) {
@@ -159,13 +149,34 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
   }
 
-  protected static void filterForLocale(Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
-    localizedUrlAliases.forEach(
-        (k, v) -> {
-          if (!k.equals(pLocale)) {
-            localizedUrlAliases.remove(k, v);
-          }
-        });
+  protected LocalizedUrlAliases filterForLocaleWithFallback(
+      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
+    if (pLocale == null) {
+      return localizedUrlAliases;
+    }
+
+    if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
+      return localizedUrlAliases;
+    }
+
+    if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
+      // Remove all languages, which do not match the desired pLocale
+      localizedUrlAliases = filterForLocale(pLocale, localizedUrlAliases);
+    } else {
+      // Remove all languages, which are not the default language
+      localizedUrlAliases = filterForLocale(localeService.getDefaultLocale(), localizedUrlAliases);
+    }
+
+    return localizedUrlAliases;
+  }
+
+  protected LocalizedUrlAliases filterForLocale(
+      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
+    final List<UrlAlias> filteredUrlAliases =
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> pLocale.equals(u.getTargetLanguage()))
+            .collect(Collectors.toList());
+    return new LocalizedUrlAliases(filteredUrlAliases);
   }
 
   @Override
@@ -213,7 +224,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
   }
 
-  private void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
+  protected void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
     if (urlAlias.getLastPublished() != null) {
       if (urlAlias.getUuid() != null) {
         // Only the primary flag can change
