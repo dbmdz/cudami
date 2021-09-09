@@ -72,7 +72,16 @@ const UserForm = ({apiContextPath = '/'}) => {
             <h1>{t('createUser')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <ActionButtons formId={formId} />
+            <ActionButtons
+              disabled={[
+                email,
+                firstname,
+                lastname,
+                passwords.pwd1,
+                passwords.pwd2,
+              ].some((field) => !field)}
+              formId={formId}
+            />
           </Col>
         </Row>
         <Row form>
