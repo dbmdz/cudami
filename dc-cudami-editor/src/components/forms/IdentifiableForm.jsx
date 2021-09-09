@@ -270,13 +270,16 @@ class IdentifiableForm extends Component {
   }
 
   updateIdentifiable = (identifiable) => {
-    this.setState({
+    const newState = {
       identifiable: {
         ...this.state.identifiable,
         ...identifiable,
       },
-      invalidLanguages: this.getInvalidLanguages(identifiable),
-    })
+    }
+    if (identifiable.label) {
+      newState.invalidLanguages = this.getInvalidLanguages(identifiable)
+    }
+    this.setState(newState)
   }
 
   render() {
