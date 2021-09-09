@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.15.0",
-    "@fisker/prettier-config": "^4.1.1",
+    "@fisker/prettier-config": "^5.0.0",
     "eslint-plugin-react": "^7.25.0",
     "import-sort-style-module": "^6.0.0",
     "prettier": "^2.3.2",
