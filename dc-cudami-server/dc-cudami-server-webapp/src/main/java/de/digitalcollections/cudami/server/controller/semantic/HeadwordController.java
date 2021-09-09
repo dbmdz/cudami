@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
 import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -74,27 +73,26 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String label,
-      @RequestParam(name = "language", required = false) String language) {
+      @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
+      @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    if (label != null || language != null) {
+    if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
-      if (label != null) {
-        filtering.add(
-            Filtering.defaultBuilder()
-                .add(new FilterCriterion<String>("label", FilterOperation.EQUALS, label))
-                .build());
+      if (labelCriterion != null) {
+        filtering.add(Filtering.defaultBuilder().add("label", labelCriterion).build());
       }
-      if (label != null) {
+      if (localeCriterion != null) {
         filtering.add(
             Filtering.defaultBuilder()
                 .add(
                     new FilterCriterion<Locale>(
-                        "locale", FilterOperation.EQUALS, Locale.forLanguageTag(language)))
+                        "locale",
+                        localeCriterion.getOperation(),
+                        Locale.forLanguageTag(localeCriterion.getValue().toString())))
                 .build());
       }
       pageRequest.setFiltering(filtering);
