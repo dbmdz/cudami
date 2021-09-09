@@ -6,6 +6,7 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface UrlAliasRepository {
@@ -60,8 +61,15 @@ public interface UrlAliasRepository {
    */
   UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException;
 
-  /** Check whether an entry exists for the passed website UUID and slug. */
-  boolean hasUrlAlias(UUID websiteUuid, String slug) throws UrlAliasRepositoryException;
+  /**
+   * Check whether an entry exists for the passed website UUID, slug and language.
+   *
+   * @param slug not null
+   * @param websiteUuid can be null
+   * @param targetLanguage can be null
+   */
+  boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
+      throws UrlAliasRepositoryException;
 
   /**
    * Save an {@code UrlAlias} object.

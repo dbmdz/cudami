@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -329,7 +330,8 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public boolean hasUrlAlias(UUID websiteUuid, String slug) throws UrlAliasRepositoryException {
+  public boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
+      throws UrlAliasRepositoryException {
     if (!StringUtils.hasText(slug)) {
       throw new UrlAliasRepositoryException(
           "UrlAliasRepository.hasUrlAlias: Parameter 'slug' must not be null or empty.");
@@ -337,6 +339,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("websiteUuid", websiteUuid);
     bindings.put("slug", slug);
+    bindings.put("lang", targetLanguage);
     try {
       return 0
           < this.dbi.withHandle(
@@ -346,6 +349,8 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                               + this.tableName
                               + " WHERE website_uuid "
                               + (websiteUuid != null ? "= :websiteUuid " : "IS NULL ")
+                              + "AND target_language "
+                              + (targetLanguage != null ? "= :lang " : "IS NULL ")
                               + "AND slug = :slug;")
                       .bindMap(bindings)
                       .reduceRows(0, (count, row) -> ++count));
