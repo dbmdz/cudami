@@ -293,6 +293,33 @@ class UrlAliasControllerTest extends BaseControllerTest {
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
   }
 
+  @DisplayName("can return the primary links for a given slug/webpage tuple and locale filter")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {"/v5/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987?pLocale=de"})
+  public void existingPrimaryLinksWithLocale(String path) throws Exception {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(
+        new UrlAliasBuilder()
+            .createdAt("2021-08-17T15:18:01.000001")
+            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .isPrimary()
+            .withSlug("imprint")
+            .withTargetLanguage("de")
+            .withTargetType(IdentifiableType.RESOURCE, null)
+            .withTargetUuid("23456789-2345-2345-2345-234567890123")
+            .withUuid("12345678-1234-1234-1234-123456789012")
+            .withWebsite(
+                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .build());
+
+    Locale actualLocale = Locale.forLanguageTag("de");
+    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"), eq(actualLocale)))
+        .thenReturn(expected);
+
+    testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987_de.json");
+  }
+
   @DisplayName("can return the primary links for a given slug but empty website_uuid")
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/primary/imprint"})
