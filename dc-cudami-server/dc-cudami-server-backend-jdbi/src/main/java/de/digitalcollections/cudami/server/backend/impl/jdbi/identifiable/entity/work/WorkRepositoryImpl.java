@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -123,12 +124,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + ".uuid = wc.agent_uuid"
                 + " WHERE wc.work_uuid = :uuid"
                 + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
 
     List<Agent> result =
         agentRepositoryImpl.retrieveList(
             agentRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", workUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
     return result;
   }
@@ -149,12 +152,13 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 + ".uuid = iw.item_uuid"
                 + " WHERE iw.work_uuid = :uuid"
                 + " ORDER BY idx ASC");
-
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
     List<Item> result =
         itemRepositoryImpl.retrieveList(
             itemRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", workUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
     return result;
   }

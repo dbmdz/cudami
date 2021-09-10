@@ -2,14 +2,10 @@ package de.digitalcollections.cudami.server.backend.impl.database;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.Sorting;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -83,25 +79,8 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     assertEquals("ORDER BY foo->>'bar' DESC,foo ASC", query.toString().trim());
   }
 
-  @Test
-  public void testFiltering() {
-    String filteringProperty = "publicationStart";
-    PagingAndSortingRepositoryImpl repository = new PagingAndSortingRepositoryImpl();
-    repository.setColumnName(filteringProperty);
-
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter(filteringProperty)
-            .between(LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2020, Month.JANUARY, 31))
-            .build();
-    FilterCriterion<?> filterCriterion = filtering.getFilterCriterionFor(filteringProperty);
-    String whereClause = repository.getWhereClause(filterCriterion);
-    assertEquals(
-        String.format("(%s BETWEEN '2020-01-01' AND '2020-01-31')", filteringProperty),
-        whereClause);
-  }
-
   private class PagingAndSortingRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
+
     List<String> allowedOrderByFields = null;
     String columnName = null;
 
