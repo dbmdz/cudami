@@ -3,15 +3,18 @@ import {Card, CardBody, Col, Row} from 'reactstrap'
 import EditorWithLabel from './editor/EditorWithLabel'
 import InputWithLabel from './InputWithLabel'
 import TeaserPreviewImage from './TeaserPreviewImage'
+import UrlAliases from './UrlAliases'
 
 const Teaser = ({
   description,
+  enableUrlAliases = true,
   label,
   language,
   onUpdate,
   previewImage,
   previewImageRenderingHints,
   updatePreviewImage,
+  urlAliases,
 }) => {
   return (
     <Card className="bg-light mb-0">
@@ -45,6 +48,12 @@ const Teaser = ({
             />
           </Col>
         </Row>
+        {enableUrlAliases && (
+          <UrlAliases
+            aliases={urlAliases}
+            onUpdate={(aliases) => onUpdate('localizedUrlAliases', aliases)}
+          />
+        )}
       </CardBody>
     </Card>
   )

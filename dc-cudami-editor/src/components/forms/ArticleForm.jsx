@@ -98,6 +98,7 @@ const ArticleForm = ({
                     identifiable.previewImageRenderingHints
                   }
                   updatePreviewImage={onUpdate}
+                  urlAliases={identifiable.localizedUrlAliases?.[language]}
                 />
                 <Card className="border-top-0">
                   <CardBody>

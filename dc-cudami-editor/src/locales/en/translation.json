@@ -73,6 +73,7 @@
     "endDate": "End of publication",
     "noLongerPublished": "no longer published",
     "notYetPublished": "not yet published",
+    "publishedOn": "published on {{ date }}",
     "startDate": "Start of publication"
   },
   "translation": {
@@ -177,6 +178,7 @@
     },
     "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
+    "isPrimaryAlias":"is (or will be) be the primary URL",
     "label": "Label",
     "lastModified": "last modified",
     "lastname": "Lastname",
@@ -227,7 +229,9 @@
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
     },
     "setPreviewImage": "Set preview image",
+    "showAll": "Show all",
     "showInPageNavigation": "Show page navigation",
+    "showPrimaryAliases": "Show primary URLs only",
     "status": "Status",
     "text": "Long text",
     "tooltip": "Tooltip",
@@ -241,6 +245,7 @@
       "url": "embedding a file from the internet by using a valid URL"
     },
     "uploadFileResource": "Upload a new file",
+    "urlAliases": "Pretty URLs",
     "username": "Username",
     "video": "video",
     "view": "view",

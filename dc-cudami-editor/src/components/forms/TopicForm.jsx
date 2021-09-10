@@ -88,6 +88,7 @@ const TopicForm = ({
                     identifiable.previewImageRenderingHints
                   }
                   updatePreviewImage={onUpdate}
+                  urlAliases={identifiable.localizedUrlAliases?.[language]}
                 />
               </TabPane>
             ))}
