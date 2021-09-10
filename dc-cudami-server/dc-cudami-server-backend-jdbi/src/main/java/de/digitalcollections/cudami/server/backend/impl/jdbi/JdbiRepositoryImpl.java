@@ -51,6 +51,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
   }
 
+  public long count() {
+    final String sql = "SELECT count(*) FROM " + tableName;
+    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
+    return count;
+  }
+
   protected String getFilterClauses(Filtering filtering, Map<String, Object> argumentMappings) {
     if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
       return "";
@@ -67,6 +73,18 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
     String filterClauses = whereClauses.stream().collect(Collectors.joining(" AND "));
     return filterClauses;
+  }
+
+  public String getMappingPrefix() {
+    return mappingPrefix;
+  }
+
+  public String getTableAlias() {
+    return tableAlias;
+  }
+
+  public String getTableName() {
+    return tableName;
   }
 
   protected String getWhereClause(
@@ -255,7 +273,6 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
               .append(" <= ")
               .append(":")
               .append(criterionKey)
-              //                  .append(convertToSqlString(fc.getValue()))
               .append(" AND ")
               .append(leftSide)
               .append(" IS NOT NULL")
@@ -270,7 +287,6 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
               .append(" <= ")
               .append(":")
               .append(criterionKey)
-              //                  .append(convertToSqlString(fc.getValue()))
               .append(" OR ")
               .append(leftSide)
               .append(" IS NULL")
@@ -290,23 +306,5 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       }
     }
     return query.toString();
-  }
-
-  public long count() {
-    final String sql = "SELECT count(*) FROM " + tableName;
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
-    return count;
-  }
-
-  public String getMappingPrefix() {
-    return mappingPrefix;
-  }
-
-  public String getTableAlias() {
-    return tableAlias;
-  }
-
-  public String getTableName() {
-    return tableName;
   }
 }
