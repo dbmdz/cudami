@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.cudami.server.business.impl.alias.SlugGenerator;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
