@@ -90,6 +90,7 @@ const FileResourceForm = ({
                     identifiable.previewImageRenderingHints
                   }
                   updatePreviewImage={onUpdate}
+                  urlAliases={identifiable.localizedUrlAliases?.[language]}
                 />
               </TabPane>
             ))}

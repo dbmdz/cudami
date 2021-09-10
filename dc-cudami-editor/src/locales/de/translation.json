@@ -73,6 +73,7 @@
     "endDate": "Publikationsende",
     "noLongerPublished": "nicht mehr veröffentlicht",
     "notYetPublished": "noch nicht veröffentlicht",
+    "publishedOn": "veröffentlicht am {{ date }}",
     "startDate": "Publikationsstart"
   },
   "translation": {
@@ -177,6 +178,7 @@
     },
     "insertLink": "Verlinkung einfügen",
     "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus:",
+    "isPrimaryAlias": "ist (oder wird) Hauptlink",
     "label": "Titel",
     "lastModified": "letzte Änderung",
     "lastname": "Nachname",
@@ -227,7 +229,9 @@
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"
     },
     "setPreviewImage": "Vorschaubild festlegen",
+    "showAll": "Alle anzeigen",
     "showInPageNavigation": "Seitennavigation anzeigen",
+    "showPrimaryAliases": "Nur Hauptlinks anzeigen",
     "status": "Status",
     "text": "Langtext",
     "tooltip": "Tooltip",
@@ -241,6 +245,7 @@
       "url": "Einbinden einer Datei aus dem Internet durch Eingabe einer gültigen URL"
     },
     "uploadFileResource": "Neue Datei hochladen",
+    "urlAliases": "Sprechende Links",
     "username": "Benutzername",
     "video": "Video",
     "view": "anzeigen",

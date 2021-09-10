@@ -75,6 +75,9 @@ class IdentifiableForm extends Component {
       label: {
         [this.state.activeLanguage]: '',
       },
+      localizedUrlAliases: {
+        [this.state.activeLanguage]: [],
+      },
     }
     if (this.identifiablesWithRenderingHints.includes(type)) {
       initialIdentifiable.renderingHints = {showInPageNavigation: true}
@@ -121,6 +124,10 @@ class IdentifiableForm extends Component {
         label: {
           ...identifiable.label,
           [selectedLanguage.name]: '',
+        },
+        localizedUrlAliases: {
+          ...identifiable.localizedUrlAliases,
+          [selectedLanguage.name]: [],
         },
       },
       invalidLanguages: [...invalidLanguages, selectedLanguage.name],
