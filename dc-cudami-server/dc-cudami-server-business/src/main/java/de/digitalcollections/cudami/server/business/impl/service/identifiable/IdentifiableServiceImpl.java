@@ -46,6 +46,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     this.repository = repository;
   }
 
+  // TODO: Refactor this into constructor!
+  public void setUrlAliasService(UrlAliasService urlAliasService) {
+    this.urlAliasService = urlAliasService;
+  }
+
   @Override
   public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
     repository.addRelatedEntity(identifiableUuid, entityUuid);
