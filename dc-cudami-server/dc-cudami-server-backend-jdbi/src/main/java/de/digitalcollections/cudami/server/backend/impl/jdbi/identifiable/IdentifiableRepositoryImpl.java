@@ -447,9 +447,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       pageRequest.setFiltering(filtering);
     }
 
-    // FIXME is this working with new filtering mechanism? test it!
-    // TODO: test if binding works (because of single quotes done by filter expandion) or we have to
-    // put here values direktly, not passing Map.of....
     Filtering initialFiltering =
         Filtering.defaultBuilder()
             .filter(tableAlias + ".label ->> :language")
@@ -459,18 +456,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     // add special ordering
     Sorting sorting = pageRequest.getSorting();
+
+    Sorting labelSorting =
+        Sorting.defaultBuilder()
+            .order(
+                Order.defaultBuilder()
+                    .property("label")
+                    .subProperty(language)
+                    .direction(Direction.ASC)
+                    .build())
+            .build();
     if (sorting == null) {
-      sorting = Sorting.defaultBuilder().build();
-      pageRequest.setSorting(sorting);
+      sorting = labelSorting;
+    } else {
+      sorting.and(labelSorting);
     }
-    Sorting.defaultBuilder()
-        .order(
-            Order.defaultBuilder()
-                .property("label")
-                .subProperty(language)
-                .direction(Direction.ASC)
-                .build());
-    sorting.and(sorting);
+    pageRequest.setSorting(sorting);
 
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("language", language);
