@@ -98,7 +98,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       final String columnName = getColumnName(fieldName);
       final String leftSide = (columnName != null) ? columnName : fieldName;
       // basic sql injection detection:
-      if (leftSide.contains(" ") || leftSide.contains(";")) {
+      if (leftSide.contains("'") || leftSide.contains(";")) {
         throw new IllegalArgumentException(
             String.format("leftSide '%s' seems to contain malicious code!", leftSide));
       }
