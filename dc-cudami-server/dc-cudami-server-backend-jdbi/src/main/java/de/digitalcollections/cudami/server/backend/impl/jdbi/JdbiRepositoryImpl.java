@@ -319,7 +319,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
     return query.toString();
   }
-  
+
   protected Integer retrieveNextSortIndexForParentChildren(
       Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):

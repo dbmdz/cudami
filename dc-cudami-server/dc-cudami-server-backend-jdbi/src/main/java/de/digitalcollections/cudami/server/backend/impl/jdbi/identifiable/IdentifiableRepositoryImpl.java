@@ -709,7 +709,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     Map<String, Object> argumentMappings = new HashMap<>(0);
     return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings);
   }
-  
+
   public I retrieveOne(
       String fieldsSql,
       String sqlSelectAllFieldsJoins,
