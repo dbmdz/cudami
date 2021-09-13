@@ -154,10 +154,10 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           query
               .append("(")
               .append(leftSide)
-              .append(" ILIKE '%")
+              .append(" ILIKE '%' || ")
               .append(":")
               .append(criterionKey)
-              .append("%')");
+              .append(" || '%')");
           argumentMappings.put(criterionKey, fc.getValue());
           break;
         case STARTS_WITH:
