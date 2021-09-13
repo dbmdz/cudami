@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -37,6 +38,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Autowired private LocaleService localeService;
   @Autowired private UrlAliasService urlAliasService;
+
+  @Autowired private UrlAliasGenerationProperties aliasGenerationProperties;
 
   protected IdentifiableRepository<I> repository;
 
@@ -80,8 +83,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
-    if (
-    /*TODO: DigitalObject*/ false) {
+    if ((identifiable instanceof Entity)
+        && this.aliasGenerationProperties
+            .getGenerationExcludes()
+            .contains(((Entity) identifiable).getEntityType())) {
       return;
     }
     LocalizedUrlAliases urlAliases = identifiable.getLocalizedUrlAliases();
