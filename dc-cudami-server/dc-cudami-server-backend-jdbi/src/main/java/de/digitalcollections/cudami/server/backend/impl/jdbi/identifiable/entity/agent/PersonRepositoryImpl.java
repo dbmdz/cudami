@@ -191,10 +191,6 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
-    // TODO Shoud be registered in their repos. test it
-    //    dbi.registerRowMapper(BeanMapper.factory(FamilyName.class, "fn"));
-    //    dbi.registerRowMapper(BeanMapper.factory(GivenName.class, "gn"));
-
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
     this.givenNameRepositoryImpl = givenNameRepositoryImpl;
