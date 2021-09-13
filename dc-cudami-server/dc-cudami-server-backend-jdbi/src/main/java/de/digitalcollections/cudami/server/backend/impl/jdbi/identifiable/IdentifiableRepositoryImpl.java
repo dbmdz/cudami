@@ -311,15 +311,18 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       }
       if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
         UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
-        Website website =
-            new Website(
-                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
-        website.setUuid(
-            rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class));
-        website.setLabel(
-            rowView.getColumn(
-                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
-        urlAlias.setWebsite(website);
+        UUID websiteUuid =
+            rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
+        if (websiteUuid != null) {
+          Website website =
+              new Website(
+                  rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+          website.setUuid(websiteUuid);
+          website.setLabel(
+              rowView.getColumn(
+                  UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+          urlAlias.setWebsite(website);
+        }
         if (identifiable.getLocalizedUrlAliases() == null) {
           identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
         } else {
