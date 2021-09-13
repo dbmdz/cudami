@@ -50,8 +50,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   // TODO: Refactor this into constructor!
-  public void setUrlAliasService(UrlAliasService urlAliasService) {
+  void setUrlAliasService(UrlAliasService urlAliasService) {
     this.urlAliasService = urlAliasService;
+  }
+
+  void setAliasGenerationProperties(UrlAliasGenerationProperties aliasGenerationProperties) {
+    if (this.aliasGenerationProperties == null) {
+      this.aliasGenerationProperties = aliasGenerationProperties;
+    }
   }
 
   @Override

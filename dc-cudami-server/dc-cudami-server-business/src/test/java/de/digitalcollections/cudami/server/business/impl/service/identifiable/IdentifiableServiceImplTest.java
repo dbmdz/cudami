@@ -13,10 +13,12 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +42,9 @@ class IdentifiableServiceImplTest {
     urlAliasService = mock(UrlAliasService.class);
     service = new IdentifiableServiceImpl(repo);
     service.setUrlAliasService(urlAliasService);
+    var aliasGenerationProps = new UrlAliasGenerationProperties();
+    aliasGenerationProps.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
+    service.setAliasGenerationProperties(aliasGenerationProps);
   }
 
   @DisplayName("can add related entities by delegating it to the repository")
