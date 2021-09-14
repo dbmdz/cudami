@@ -13,10 +13,6 @@ Now run the following commands within `cudami/docker`:
 
 ```sh
 docker-compose down
-docker-compose exec database /bin/bash
-su - postgres
-dropdb -U cudami 'cudami'
-createdb -U cudami cudami
 docker-compose up
 ```
 

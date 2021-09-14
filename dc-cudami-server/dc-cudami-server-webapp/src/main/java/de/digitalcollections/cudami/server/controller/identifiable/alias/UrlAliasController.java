@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.alias;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.controller.ControllerException;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.Order;
@@ -51,13 +51,13 @@ public class UrlAliasController {
                   "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws ControllerException {
+      throws CudamiControllerException {
 
     UrlAlias result;
     try {
       result = urlAliasService.findOne(uuid);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     if (result == null) {
@@ -78,12 +78,12 @@ public class UrlAliasController {
                   "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws ControllerException {
+      throws CudamiControllerException {
     boolean isDeleted;
     try {
       isDeleted = urlAliasService.delete(uuid);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     if (!isDeleted) {
@@ -98,7 +98,7 @@ public class UrlAliasController {
       value = {"/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
-      throws ControllerException {
+      throws CudamiControllerException {
 
     if (urlAlias == null || urlAlias.getUuid() != null) {
       return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -108,7 +108,7 @@ public class UrlAliasController {
     try {
       result = urlAliasService.create(urlAlias);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -127,7 +127,7 @@ public class UrlAliasController {
           @PathVariable("uuid")
           UUID uuid,
       @RequestBody UrlAlias urlAlias)
-      throws ControllerException {
+      throws CudamiControllerException {
 
     if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
       return new ResponseEntity(
@@ -139,7 +139,7 @@ public class UrlAliasController {
     try {
       result = urlAliasService.update(urlAlias);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -156,7 +156,7 @@ public class UrlAliasController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws ControllerException {
+      throws CudamiControllerException {
     SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -167,7 +167,7 @@ public class UrlAliasController {
     try {
       result = urlAliasService.find(pageRequest);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -198,12 +198,12 @@ public class UrlAliasController {
               schema = @Schema(implementation = Locale.class))
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws ControllerException {
+      throws CudamiControllerException {
     LocalizedUrlAliases result;
     try {
       result = urlAliasService.findPrimaryLinks(websiteUuid, slug, pLocale);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     if (result == null) {
@@ -236,13 +236,13 @@ public class UrlAliasController {
               required = false)
           @PathVariable(value = "website_uuid", required = false)
           UUID websiteUuid)
-      throws ControllerException {
+      throws CudamiControllerException {
 
     String result;
     try {
       result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     if (result == null) {

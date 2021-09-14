@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.controller.ControllerException;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.paging.Order;
@@ -113,20 +113,20 @@ public class IdentifiableController {
                   "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws ControllerException {
+      throws CudamiControllerException {
 
     try {
       if (findById(uuid) == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
 
     try {
       return new ResponseEntity<>(urlAliasService.findLocalizedUrlAliases(uuid), HttpStatus.OK);
     } catch (CudamiServiceException e) {
-      throw new ControllerException(e);
+      throw new CudamiControllerException(e);
     }
   }
 }
