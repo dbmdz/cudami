@@ -106,6 +106,7 @@
     "chooseLanguage": "Sprache auswählen",
     "chooseRenderingTemplate": "Gestaltungsvorlage auswählen",
     "confirmLanguageRemoval": "Sind Sie sicher, dass Sie den Inhalt von \"{{ language }}\" entfernen wollen?",
+    "confirmUrlAliasRemoval": "Sind Sie sicher, dass Sie den sprechenden Link \"{{ url }}/{{ slug }}\" für die Sprache \"{{ language }}\" entfernen wollen?",
     "confirmPassword": "Passwort wiederholen",
     "confirmRemove": {
       "digitalObjectFromCollection": "Sind Sie sicher, dass Sie das Digitalisat aus der Sammlung entfernen wollen?",

@@ -2,6 +2,7 @@ import './UrlAliases.css'
 
 import groupBy from 'lodash/groupBy'
 import sortBy from 'lodash/sortBy'
+import {publish} from 'pubsub-js'
 import {useContext, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaTrashAlt} from 'react-icons/fa'
@@ -18,11 +19,6 @@ import {
 
 import AppContext from './AppContext'
 import {formatDate} from './utils'
-
-const removeAlias = (aliases, slug, website = {}) =>
-  aliases.filter(
-    (alias) => !(alias.slug === slug && alias.website?.uuid === website?.uuid),
-  )
 
 const setNewPrimary = (aliases, slug, website = {}) =>
   aliases.map((alias) => {
@@ -125,7 +121,10 @@ const UrlAliases = ({aliases = [], onUpdate}) => {
                           onUpdate(setNewPrimary(aliases, slug, website))
                         }
                         onRemove={() =>
-                          onUpdate(removeAlias(aliases, slug, website))
+                          publish('editor.show-remove-urlalias-dialog', {
+                            slug,
+                            website,
+                          })
                         }
                         primary={primary}
                         slug={slug}
