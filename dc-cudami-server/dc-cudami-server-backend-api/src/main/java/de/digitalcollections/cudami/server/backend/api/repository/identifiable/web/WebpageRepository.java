@@ -16,11 +16,11 @@ public interface WebpageRepository extends NodeRepository<Webpage> {
   Website getWebsite(UUID rootWebpageUuid);
 
   /**
-   * @param webpage newly created webpage to be saved
+   * @param webpageUuid UUID of newly created webpage to be saved
    * @param parentWebsiteUUID website the (root) webpage belongs to
    * @return saved webpage
    */
-  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUUID);
+  Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUUID);
 
   default boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
     if (webpage == null || children == null) {

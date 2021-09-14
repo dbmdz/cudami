@@ -21,9 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Webpage handling. */
 @Service
+@Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
 public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
@@ -176,6 +178,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   public Webpage saveWithParent(Webpage child, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
+      if (child.getUuid() == null) {
+        child = this.save(child);
+      }
       return ((NodeRepository<Webpage>) repository).saveWithParent(child, parentUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + child + ": ", e);
@@ -187,7 +192,11 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
       throws IdentifiableServiceException {
     try {
-      return ((WebpageRepository) repository).saveWithParentWebsite(webpage, parentWebsiteUuid);
+      if (webpage.getUuid() == null) {
+        webpage = this.save(webpage);
+      }
+      return ((WebpageRepository) repository)
+          .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

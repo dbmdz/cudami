@@ -438,7 +438,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
   @Override
   public Webpage saveWithParent(Webpage webpage, UUID parentWebpageUuid) {
-    final UUID childUuid = webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
+    final UUID childUuid = webpage.getUuid();
 
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -459,10 +459,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
-    final UUID webpageUuid =
-        webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
-
+  public Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "website_webpages", "website_uuid", parentWebsiteUuid);
