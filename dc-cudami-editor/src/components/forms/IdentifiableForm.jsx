@@ -23,6 +23,7 @@ import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
+import RemoveUrlAliasDialog from '../dialogs/RemoveUrlAliasDialog'
 import FeedbackMessage from '../FeedbackMessage'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
@@ -58,6 +59,7 @@ class IdentifiableForm extends Component {
         addTable: false,
         addVideo: false,
         removeLanguage: false,
+        removeUrlAlias: false,
       },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
@@ -235,6 +237,21 @@ class IdentifiableForm extends Component {
     this.setState(newState)
   }
 
+  removeUrlAlias = (slug, websiteUuid) => {
+    const {activeLanguage, identifiable} = this.state
+    this.updateIdentifiable({
+      localizedUrlAliases: {
+        ...identifiable.localizedUrlAliases,
+        [activeLanguage]: identifiable.localizedUrlAliases[
+          activeLanguage
+        ].filter(
+          (alias) =>
+            !(alias.slug === slug && alias.website?.uuid === websiteUuid),
+        ),
+      },
+    })
+  }
+
   submitIdentifiable = async () => {
     const {apiContextPath, parentType, parentUuid, type} = this.props
     const identifiable = {
@@ -367,6 +384,12 @@ class IdentifiableForm extends Component {
             isOpen={dialogsOpen.removeLanguage}
             onConfirm={this.removeLanguage}
             toggle={() => this.toggleDialog('removeLanguage')}
+          />
+          <RemoveUrlAliasDialog
+            activeLanguage={activeLanguage}
+            isOpen={dialogsOpen.removeUrlAlias}
+            onConfirm={this.removeUrlAlias}
+            toggle={() => this.toggleDialog('removeUrlAlias')}
           />
         </div>
       </AppContext.Provider>

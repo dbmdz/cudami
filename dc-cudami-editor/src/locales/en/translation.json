@@ -106,6 +106,7 @@
     "chooseLanguage": "Choose a language",
     "chooseRenderingTemplate": "Choose a design template",
     "confirmLanguageRemoval": "Are you sure, that you want to remove the content of \"{{ language }}\"?",
+    "confirmUrlAliasRemoval": "Are you sure, that you want to remove the pretty URL \"{{ url }}/{{ slug }}\" for the language \"{{ language }}\"?",
     "confirmPassword": "Confirm password",
     "confirmRemove": {
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
