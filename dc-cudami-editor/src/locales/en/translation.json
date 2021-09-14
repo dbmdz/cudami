@@ -178,7 +178,7 @@
     },
     "insertLink": "Insert hyperlink",
     "invalidLabels": "Please fill in the field \"$t(label)\" in the following languages:",
-    "isPrimaryAlias":"is (or will be) be the primary URL",
+    "isPrimaryAlias":"is (or will be) the primary URL",
     "label": "Label",
     "lastModified": "last modified",
     "lastname": "Lastname",

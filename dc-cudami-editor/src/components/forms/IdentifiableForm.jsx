@@ -261,18 +261,18 @@ class IdentifiableForm extends Component {
     window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuid}`
   }
 
-  toggleLanguage = (activeLanguage) => {
-    this.setState({
-      activeLanguage,
-    })
-  }
-
   toggleDialog = (name) => {
     this.setState({
       dialogsOpen: {
         ...this.state.dialogsOpen,
         [name]: !this.state.dialogsOpen[name],
       },
+    })
+  }
+
+  toggleLanguage = (activeLanguage) => {
+    this.setState({
+      activeLanguage,
     })
   }
 
