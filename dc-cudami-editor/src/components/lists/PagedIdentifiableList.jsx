@@ -503,6 +503,7 @@ class PagedIdentifiableList extends Component {
         {enableMove && (
           <AddAttachedIdentifiablesDialog
             action="move"
+            activeLanguage={activeLanguage}
             identifierTypes={identifierTypes}
             isOpen={dialogsOpen.moveAttachedIdentifiable}
             maxElements={1}
