@@ -127,7 +127,7 @@ public class HeadwordServiceImpl implements HeadwordService {
     try {
       return repository.save(headword);
     } catch (Exception e) {
-      LOGGER.error("Cannot save headword " + headword + ": ", e);
+      LOGGER.error("Cannot save headword " + headword.getLabel() + ": ", e);
       throw new ServiceException(e.getMessage());
     }
   }
