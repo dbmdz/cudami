@@ -132,8 +132,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public Topic saveWithParent(Topic child, UUID parentUuid) throws IdentifiableServiceException {
-    return ((NodeRepository<Topic>) repository).saveWithParent(child, parentUuid);
+  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws IdentifiableServiceException {
+    return ((NodeRepository<Topic>) repository).saveWithParent(childUuid, parentUuid);
   }
 
   @Override

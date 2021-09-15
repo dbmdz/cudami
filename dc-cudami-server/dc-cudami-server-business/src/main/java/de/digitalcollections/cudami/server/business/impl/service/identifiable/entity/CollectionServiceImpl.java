@@ -176,12 +176,12 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection saveWithParent(Collection child, UUID parentUuid)
+  public Collection saveWithParent(UUID childUuid, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      return ((CollectionRepository) repository).saveWithParent(child, parentUuid);
+      return ((CollectionRepository) repository).saveWithParent(childUuid, parentUuid);
     } catch (Exception e) {
-      LOGGER.error("Cannot save collection " + child + ": ", e);
+      LOGGER.error("Cannot save collection " + childUuid + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
   }

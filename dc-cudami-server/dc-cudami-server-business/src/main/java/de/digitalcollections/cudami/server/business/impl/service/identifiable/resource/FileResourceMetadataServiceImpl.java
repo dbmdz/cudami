@@ -125,7 +125,7 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
     } else if (fileResource instanceof VideoFileResource) {
       return videoFileResourceService.save((VideoFileResource) fileResource);
     }
-    return repository.save(fileResource);
+    return super.save(fileResource);
   }
 
   @Override
@@ -143,6 +143,6 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
     } else if (fileResource instanceof VideoFileResource) {
       return videoFileResourceService.update((VideoFileResource) fileResource);
     }
-    return repository.update(fileResource);
+    return super.update(fileResource);
   }
 }

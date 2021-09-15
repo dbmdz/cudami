@@ -437,9 +437,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParent(Webpage webpage, UUID parentWebpageUuid) {
-    final UUID childUuid = webpage.getUuid();
-
+  public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
@@ -451,11 +449,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         h ->
             h.createUpdate(query)
                 .bind("parent_webpage_uuid", parentWebpageUuid)
-                .bind("child_webpage_uuid", childUuid)
+                .bind("child_webpage_uuid", childWebpageUuid)
                 .bind("sortIndex", nextSortIndex)
                 .execute());
 
-    return findOne(childUuid);
+    return findOne(childWebpageUuid);
   }
 
   @Override

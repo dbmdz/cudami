@@ -175,15 +175,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage saveWithParent(Webpage child, UUID parentUuid)
+  public Webpage saveWithParent(UUID childUuid, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      if (child.getUuid() == null) {
-        child = this.save(child);
-      }
-      return ((NodeRepository<Webpage>) repository).saveWithParent(child, parentUuid);
+      return ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
     } catch (Exception e) {
-      LOGGER.error("Cannot save webpage " + child + ": ", e);
+      LOGGER.error("Cannot save webpage " + childUuid + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
