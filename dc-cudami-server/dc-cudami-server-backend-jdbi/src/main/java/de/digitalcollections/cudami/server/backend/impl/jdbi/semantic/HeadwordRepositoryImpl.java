@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -138,7 +139,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public PageResponse<Headword> find(PageRequest pageRequest) {
-    return find(pageRequest, null, null);
+    return find(pageRequest, null, new HashMap<>());
   }
 
   protected PageResponse<Headword> find(
@@ -160,7 +161,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount, argumentMappings);
-    long total = retrieveCount(sqlCount);
+    long total = retrieveCount(sqlCount, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -317,12 +318,6 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
       UUID headwordUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
-  }
-
-  public long retrieveCount(StringBuilder sqlCount) {
-    long total =
-        dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
-    return total;
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
