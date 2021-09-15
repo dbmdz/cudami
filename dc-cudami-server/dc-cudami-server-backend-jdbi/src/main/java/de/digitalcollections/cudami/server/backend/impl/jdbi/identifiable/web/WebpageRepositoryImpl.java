@@ -401,7 +401,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public Website getWebsite(UUID rootWebpageUuid) {
     String query =
-        "SELECT uuid, refid, label"
+        "SELECT uuid, refid, label, url"
             + " FROM websites"
             + " INNER JOIN website_webpages ww ON uuid = ww.website_uuid"
             + " WHERE ww.webpage_uuid = :uuid";
