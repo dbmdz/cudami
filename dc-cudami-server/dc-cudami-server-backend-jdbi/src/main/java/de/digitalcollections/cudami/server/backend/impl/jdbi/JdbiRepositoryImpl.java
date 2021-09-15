@@ -173,35 +173,25 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           break;
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          final Object equalsValue = fc.getValue();
-          if (equalsValue != null) {
-            query
-                .append("(")
-                .append(leftSide)
-                .append(" = ")
-                .append(":")
-                .append(criterionKey)
-                .append(")");
-            argumentMappings.put(criterionKey, equalsValue);
-          } else {
-            query.append("(").append(leftSide).append(" IS NULL").append(")");
-          }
+          query
+              .append("(")
+              .append(leftSide)
+              .append(" = ")
+              .append(":")
+              .append(criterionKey)
+              .append(")");
+          argumentMappings.put(criterionKey, fc.getValue());
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          final Object notEqualsValue = fc.getValue();
-          if (notEqualsValue != null) {
-            query
-                .append("(")
-                .append(leftSide)
-                .append(" != ")
-                .append(":")
-                .append(criterionKey)
-                .append(")");
-            argumentMappings.put(criterionKey, notEqualsValue);
-          } else {
-            query.append("(").append(leftSide).append(" IS NOT NULL").append(")");
-          }
+          query
+              .append("(")
+              .append(leftSide)
+              .append(" != ")
+              .append(":")
+              .append(criterionKey)
+              .append(")");
+          argumentMappings.put(criterionKey, fc.getValue());
           break;
         case GREATER_THAN:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
