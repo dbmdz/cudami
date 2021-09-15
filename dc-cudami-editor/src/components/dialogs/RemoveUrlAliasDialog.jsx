@@ -19,7 +19,7 @@ const RemoveUrlAliasDialog = ({activeLanguage, isOpen, onConfirm, toggle}) => {
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>{t('warning')}</ModalHeader>
-      <ModalBody>
+      <ModalBody className="overflow-auto">
         {t('confirmUrlAliasRemoval', {
           language: t(`languageNames:${activeLanguage}`),
           slug: state.slug,
