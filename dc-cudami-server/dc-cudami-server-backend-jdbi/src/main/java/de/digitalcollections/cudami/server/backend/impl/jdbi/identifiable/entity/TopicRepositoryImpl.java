@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -137,7 +136,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
@@ -151,7 +150,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -193,13 +192,15 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".uuid = te.entity_uuid"
                 + " WHERE te.topic_uuid = :uuid"
                 + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", topicUuid);
 
     List<Entity> result =
         entityRepositoryImpl
             .retrieveList(
                 entityRepositoryImpl.getSqlSelectReducedFields(),
                 innerQuery,
-                Map.of("uuid", topicUuid),
+                argumentMappings,
                 "ORDER BY idx ASC")
             .stream()
             .map(Entity.class::cast)
@@ -261,9 +262,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".uuid = tt.child_topic_uuid"
                 + " WHERE tt.parent_topic_uuid = :uuid"
                 + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
     List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -279,19 +282,21 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + ".uuid = tt.child_topic_uuid"
             + " WHERE tt.parent_topic_uuid = :uuid";
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", nodeUuid);
+
     StringBuilder innerQuery = new StringBuilder("SELECT tt.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Topic> result =
-        retrieveList(
-            sqlSelectReducedFields, innerQuery, Map.of("uuid", nodeUuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", nodeUuid));
+    addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -308,8 +313,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + ".uuid = te.entity_uuid"
             + " WHERE te.topic_uuid = :uuid";
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", topicUuid);
+
     StringBuilder innerQuery = new StringBuilder("SELECT te.sortindex AS idx, *" + commonSql);
-    entityRepositoryImpl.addFiltering(pageRequest, innerQuery);
+    entityRepositoryImpl.addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
@@ -318,12 +326,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         entityRepositoryImpl.retrieveList(
             entityRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", topicUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    entityRepositoryImpl.addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", topicUuid));
+    entityRepositoryImpl.addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -356,25 +364,26 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + frTableAlias
             + ".uuid = tf.fileresource_uuid"
             + " WHERE tf.topic_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", topicUuid);
 
     StringBuilder innerQuery = new StringBuilder("SELECT tf.sortindex AS idx, * ");
     innerQuery.append(commonSql);
-    this.fileResourceMetadataRepositoryImpl.addFiltering(pageRequest, innerQuery);
+    fileResourceMetadataRepositoryImpl.addFiltering(pageRequest, innerQuery, argumentMappings);
     innerQuery.append(" ORDER BY idx ASC");
     pageRequest.setSorting(null);
     this.addPageRequestParams(pageRequest, innerQuery);
 
-    Map<String, Object> argMap = Map.of("uuid", topicUuid);
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            argMap,
+            argumentMappings,
             "ORDER BY idx ASC");
 
     long total =
-        this.fileResourceMetadataRepositoryImpl.retrieveCount(
-            new StringBuilder("SELECT count(*) " + commonSql), argMap);
+        fileResourceMetadataRepositoryImpl.retrieveCount(
+            new StringBuilder("SELECT count(*) " + commonSql), argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -425,14 +434,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("tt.child_topic_uuid")
-            .isEquals(new FilterValuePlaceholder(":uuid"))
-            .build();
+        Filtering.defaultBuilder().filter("tt.child_topic_uuid").isEquals(nodeUuid).build();
 
-    Topic result =
-        retrieveOne(
-            sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", nodeUuid));
+    Topic result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 
     return result;
   }
@@ -449,9 +453,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + tableAlias
                 + ".uuid = tt.parent_topic_uuid"
                 + " WHERE tt.child_topic_uuid = :uuid");
-
-    List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -485,9 +489,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(
-        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override
@@ -520,9 +525,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + tableAlias
                 + ".uuid = te.topic_uuid"
                 + " WHERE te.entity_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", entityUuid);
 
-    List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", entityUuid), null);
+    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -538,9 +544,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + tableAlias
                 + ".uuid = tf.topic_uuid"
                 + " WHERE tf.fileresource_uuid = :uuid");
-
-    List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", fileResourceUuid), null);
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", fileResourceUuid);
+    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
   }
 

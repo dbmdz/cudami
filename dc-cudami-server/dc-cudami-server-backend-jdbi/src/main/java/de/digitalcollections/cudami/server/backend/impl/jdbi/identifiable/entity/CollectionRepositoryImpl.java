@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -177,7 +176,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
@@ -191,7 +190,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -287,9 +286,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + ".uuid = cc.child_collection_uuid"
                 + " WHERE cc.parent_collection_uuid = :uuid"
                 + " ORDER BY cc.sortindex ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -305,18 +306,21 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.child_collection_uuid"
             + " WHERE cc.parent_collection_uuid = :uuid";
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", uuid));
+    addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -364,7 +368,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
@@ -381,7 +385,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -402,9 +406,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + doTableAlias
             + ".uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", collectionUuid);
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
     innerQuery.append(" ORDER BY idx ASC");
     addPageRequestParams(pageRequest, innerQuery);
@@ -413,12 +419,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", collectionUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", collectionUuid));
+    addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -431,14 +437,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.parent_collection_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("cc.child_collection_uuid")
-            .isEquals(new FilterValuePlaceholder(":uuid"))
-            .build();
+        Filtering.defaultBuilder().filter("cc.child_collection_uuid").isEquals(uuid).build();
 
-    Collection result =
-        retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", uuid));
-
+    Collection result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
     return result;
   }
 
@@ -455,8 +456,11 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 + ".uuid = cc.parent_collection_uuid"
                 + " WHERE cc.child_collection_uuid = :uuid");
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -488,11 +492,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       innerQuery.append(predicateFilter);
     }
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
     List<CorporateBody> result =
         corporateBodyRepositoryImpl.retrieveList(
             corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", uuid),
+            argumentMappings,
             null);
 
     return result;
@@ -529,8 +535,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
 
     commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(
-        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override

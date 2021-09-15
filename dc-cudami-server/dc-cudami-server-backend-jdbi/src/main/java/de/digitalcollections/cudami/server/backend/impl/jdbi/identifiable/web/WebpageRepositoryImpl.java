@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -146,7 +145,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
@@ -160,7 +159,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -254,9 +253,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + ".uuid = ww.child_webpage_uuid"
                 + " WHERE ww.parent_webpage_uuid = :uuid"
                 + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), "ORDER BY idx ASC");
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -271,9 +272,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + tableAlias
             + ".uuid = ww.child_webpage_uuid"
             + " WHERE ww.parent_webpage_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (pageRequest.getSorting() == null) {
@@ -283,11 +286,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), orderBy);
+        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
-    long total = retrieveCount(countQuery, Map.of("uuid", uuid));
+    addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
   }
@@ -316,13 +319,9 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         " INNER JOIN webpage_webpages ww ON " + tableAlias + ".uuid = ww.parent_webpage_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("ww.child_webpage_uuid")
-            .isEquals(new FilterValuePlaceholder(":uuid"))
-            .build();
+        Filtering.defaultBuilder().filter("ww.child_webpage_uuid").isEquals(uuid).build();
 
-    Webpage result =
-        retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering, Map.of("uuid", uuid));
+    Webpage result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 
     return result;
   }
@@ -339,9 +338,10 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + tableAlias
                 + ".uuid = ww.parent_webpage_uuid"
                 + " WHERE ww.child_webpage_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
-    List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, Map.of("uuid", uuid), null);
+    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -374,10 +374,10 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(
-        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override

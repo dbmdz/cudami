@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -135,12 +136,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
                 + " LEFT JOIN article_creators AS ac ON e.uuid = ac.agent_uuid"
                 + " WHERE ac.article_uuid = :uuid"
                 + " ORDER BY ac.sortindex ASC");
-
     final String fieldsSql = entityRepositoryImpl.getSqlSelectReducedFields();
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", articleUuid);
     List<Entity> entityList =
         entityRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, Map.of("uuid", articleUuid), "ORDER BY idx ASC");
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     List<Agent> agents = null;
     if (entityList != null) {

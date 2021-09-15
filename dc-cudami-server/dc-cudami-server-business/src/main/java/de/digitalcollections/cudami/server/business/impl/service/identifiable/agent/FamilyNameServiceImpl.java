@@ -4,8 +4,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +18,5 @@ public class FamilyNameServiceImpl extends IdentifiableServiceImpl<FamilyName>
   @Autowired
   public FamilyNameServiceImpl(FamilyNameRepository repository) {
     super(repository);
-  }
-
-  @Override
-  public PageResponse<FamilyName> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
-    PageResponse<FamilyName> result =
-        ((FamilyNameRepository) repository)
-            .findByLanguageAndInitial(pageRequest, language, initial);
-    return result;
   }
 }

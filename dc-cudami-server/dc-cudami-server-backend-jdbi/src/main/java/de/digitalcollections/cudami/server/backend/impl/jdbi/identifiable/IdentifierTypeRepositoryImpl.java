@@ -6,7 +6,9 @@ import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -40,8 +42,9 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
+    Map<String, Object> argumentMappings = new HashMap<>();
     StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
     final String sql = innerQuery.toString();
@@ -50,14 +53,21 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
         dbi.withHandle(
             h ->
                 h.createQuery(sql)
+                    .bindMap(argumentMappings)
                     .mapToBean(IdentifierType.class)
                     .map(IdentifierType.class::cast)
                     .list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
-    addFiltering(pageRequest, sqlCount);
+    addFiltering(pageRequest, sqlCount, argumentMappings);
     long total =
-        dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
 
     return new PageResponse<>(result, pageRequest, total);
   }

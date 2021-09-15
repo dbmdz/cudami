@@ -191,10 +191,6 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction());
-    // TODO Shoud be registered in their repos. test it
-    //    dbi.registerRowMapper(BeanMapper.factory(FamilyName.class, "fn"));
-    //    dbi.registerRowMapper(BeanMapper.factory(GivenName.class, "gn"));
-
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
     this.givenNameRepositoryImpl = givenNameRepositoryImpl;
@@ -246,12 +242,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
                 + " LEFT JOIN item_works AS itwo ON itdi.item_uuid = itwo.item_uuid"
                 + " LEFT JOIN work_creators AS wocr ON itwo.work_uuid = wocr.work_uuid"
                 + " WHERE wocr.agent_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuidPerson);
 
     List<DigitalObject> list =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", uuidPerson),
+            argumentMappings,
             null);
 
     return list.stream().collect(Collectors.toSet());
@@ -300,12 +298,14 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
                 + ".uuid = wc.work_uuid"
                 + " WHERE wc.agent_uuid = :uuid"
                 + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuidPerson);
 
     List<Work> list =
         workRepositoryImpl.retrieveList(
             workRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", uuidPerson),
+            argumentMappings,
             "ORDER BY idx ASC");
 
     return list.stream().collect(Collectors.toSet());

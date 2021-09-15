@@ -4,11 +4,11 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -196,14 +196,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOneByRefId(long refId) {
-    Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("refid")
-            .isEquals(new FilterValuePlaceholder(":refId"))
-            .build();
+    Filtering filtering = Filtering.defaultBuilder().filter("refid").isEquals(refId).build();
 
-    return retrieveOne(
-        sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("refId", refId));
+    return retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
   }
 
   @Override
@@ -257,10 +252,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
                 + " WHERE ref.entity_uuid = :entityUuid"
                 + " ORDER BY idx ASC");
 
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("entityUuid", entityUuid);
+
     return fileResourceMetadataRepositoryImpl.retrieveList(
         fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
         innerQuery,
-        Map.of("entityUuid", entityUuid),
+        argumentMappings,
         "ORDER BY idx ASC");
   }
 

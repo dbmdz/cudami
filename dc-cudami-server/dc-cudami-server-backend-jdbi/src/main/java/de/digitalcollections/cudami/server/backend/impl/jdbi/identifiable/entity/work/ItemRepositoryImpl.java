@@ -8,6 +8,7 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -159,12 +160,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + ".uuid = ido.digitalobject_uuid"
                 + " WHERE ido.item_uuid = :uuid"
                 + " ORDER BY idx ASC");
-
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", itemUuid);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", itemUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
     return result.stream().collect(Collectors.toSet());
   }
@@ -212,12 +214,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + ".uuid = iw.work_uuid"
                 + " WHERE iw.item_uuid = :uuid"
                 + " ORDER BY idx ASC");
-
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", itemUuid);
     List<Work> result =
         workRepositoryImpl.retrieveList(
             workRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
-            Map.of("uuid", itemUuid),
+            argumentMappings,
             "ORDER BY idx ASC");
     return result.stream()
         .map(
