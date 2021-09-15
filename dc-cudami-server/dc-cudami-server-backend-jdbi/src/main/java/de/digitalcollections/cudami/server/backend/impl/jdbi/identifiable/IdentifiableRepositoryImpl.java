@@ -485,7 +485,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     if (filtering == null) {
       filtering = Filtering.defaultBuilder().build();
     }
-    // TODO works?
     filtering.add(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build());
 
     I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
@@ -501,7 +500,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
-    // TODO filtering this way works (id.identifier?) with prefix? Test it
     Filtering filtering =
         Filtering.defaultBuilder()
             .filter("id.identifier")
