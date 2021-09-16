@@ -10,6 +10,7 @@ export default function ({
   id,
   parentType,
   parentUuid,
+  parentWebsite,
   type,
   uiLocale,
   uuid,
@@ -22,6 +23,7 @@ export default function ({
       existingLanguages={existingLanguages}
       parentType={parentType}
       parentUuid={parentUuid}
+      parentWebsite={parentWebsite}
       type={type}
       uiLocale={uiLocale}
       uuid={uuid}

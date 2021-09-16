@@ -150,6 +150,7 @@
     "filesize": "Filesize",
     "firstname": "Firstname",
     "forExample": "e.g.",
+    "generatedUrlAliases": "Automatically generated pretty URLs",
     "height": "Height",
     "history": {
       "redo": "Redo last undone change",

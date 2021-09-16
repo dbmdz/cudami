@@ -1,4 +1,7 @@
-import {Card, CardBody, Col, Row} from 'reactstrap'
+import groupBy from 'lodash/groupBy'
+import {useState} from 'react'
+import {useTranslation} from 'react-i18next'
+import {Button, Card, CardBody, Col, FormGroup, Label, Row} from 'reactstrap'
 
 import EditorWithLabel from './editor/EditorWithLabel'
 import InputWithLabel from './InputWithLabel'
@@ -16,6 +19,12 @@ const Teaser = ({
   updatePreviewImage,
   urlAliases,
 }) => {
+  const [showAllUrlAliases, setShowAllUrlAliases] = useState(false)
+  const {t} = useTranslation()
+  const aliasesToRender = groupBy(urlAliases, 'website.uuid')
+  const showUrlAliasesExpandButton = Object.values(aliasesToRender).some(
+    (listOfAliases) => listOfAliases.length > 1,
+  )
   return (
     <Card className="bg-light mb-0">
       <CardBody>
@@ -49,10 +58,31 @@ const Teaser = ({
           </Col>
         </Row>
         {enableUrlAliases && (
-          <UrlAliases
-            aliases={urlAliases}
-            onUpdate={(aliases) => onUpdate('localizedUrlAliases', aliases)}
-          />
+          <Row className="mt-3">
+            <Col sm={12}>
+              <FormGroup className="mb-1">
+                <Label className="align-middle mb-0">{t('urlAliases')}</Label>
+                {showUrlAliasesExpandButton && (
+                  <Button
+                    className="ml-2"
+                    color="primary"
+                    onClick={() => setShowAllUrlAliases(!showAllUrlAliases)}
+                    size="xs"
+                  >
+                    {showAllUrlAliases ? t('showPrimaryAliases') : t('showAll')}
+                  </Button>
+                )}
+                <UrlAliases
+                  aliases={urlAliases}
+                  aliasesToRender={aliasesToRender}
+                  onUpdate={(aliases) =>
+                    onUpdate('localizedUrlAliases', aliases)
+                  }
+                  showAll={showAllUrlAliases}
+                />
+              </FormGroup>
+            </Col>
+          </Row>
         )}
       </CardBody>
     </Card>

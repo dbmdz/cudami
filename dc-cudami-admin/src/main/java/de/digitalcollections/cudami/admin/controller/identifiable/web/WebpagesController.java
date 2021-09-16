@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -43,11 +44,13 @@ public class WebpagesController extends AbstractController {
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiWebpagesClient service;
+  private final CudamiWebsitesClient websiteService;
 
   public WebpagesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = client.forLocales();
     this.service = client.forWebpages();
+    this.websiteService = client.forWebsites();
   }
 
   @ModelAttribute("menu")
@@ -59,11 +62,18 @@ public class WebpagesController extends AbstractController {
   public String create(
       Model model,
       @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") String parentUuid)
+      @RequestParam("parentUuid") UUID parentUuid)
       throws HttpException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
-    model.addAttribute("parentType", parentType);
-    model.addAttribute("parentUuid", parentUuid);
+    model
+        .addAttribute("activeLanguage", localeService.getDefaultLanguage())
+        .addAttribute("parentType", parentType)
+        .addAttribute("parentUuid", parentUuid);
+
+    Website website = getWebsite(parentUuid, parentType);
+    if (website != null) {
+      model.addAttribute("parentWebsite", website);
+    }
+
     return "webpages/create";
   }
 
@@ -89,8 +99,14 @@ public class WebpagesController extends AbstractController {
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("uuid", webpage.getUuid());
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("uuid", webpage.getUuid());
+
+    Website website = getWebsite(uuid, null);
+    if (website != null) {
+      model.addAttribute("parentWebsite", website);
+    }
 
     return "webpages/edit";
   }
@@ -111,6 +127,15 @@ public class WebpagesController extends AbstractController {
   @ResponseBody
   public Webpage get(@PathVariable UUID uuid) throws HttpException {
     return service.findOne(uuid);
+  }
+
+  private Website getWebsite(UUID uuid, String parentType) throws HttpException {
+    if (parentType == null || "webpage".equals(parentType)) {
+      return service.getWebsite(uuid);
+    } else if ("website".equals(parentType)) {
+      return websiteService.findOne(uuid);
+    }
+    return null;
   }
 
   @PostMapping("/api/webpages")
