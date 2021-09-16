@@ -6,7 +6,7 @@ cudami:
     locale: en_US
   repositoryFolderPath: '~/cudami/fileResources'
   urlalias:
-    generationExcludes: [DIGITAL_OBJECT]
+    generationExcludes: []
 
 iiif:
   image:
