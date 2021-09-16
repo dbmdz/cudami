@@ -96,7 +96,7 @@ public class CollectionsController extends AbstractController {
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
-      @RequestParam(name = "parentUuid", required = false) String parentUuid)
+      @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws HttpException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
