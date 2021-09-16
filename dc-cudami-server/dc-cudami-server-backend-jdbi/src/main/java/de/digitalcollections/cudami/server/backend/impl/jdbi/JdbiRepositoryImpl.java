@@ -64,7 +64,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
     ArrayList<String> whereClauses = new ArrayList<>();
     List<FilterCriterion> filterCriteria = filtering.getFilterCriteria();
-    int criterionCount = 1;
+    int criterionCount = argumentMappings.size() + 1;
     for (FilterCriterion filterCriterion : filterCriteria) {
       String whereClause = getWhereClause(filterCriterion, argumentMappings, criterionCount);
       whereClauses.add(whereClause);
