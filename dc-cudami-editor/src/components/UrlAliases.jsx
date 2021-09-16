@@ -1,20 +1,18 @@
 import './UrlAliases.css'
 
-import groupBy from 'lodash/groupBy'
+import classNames from 'classnames'
 import sortBy from 'lodash/sortBy'
 import {publish} from 'pubsub-js'
-import {useContext, useState} from 'react'
+import {useContext} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaTrashAlt} from 'react-icons/fa'
 import {
   Button,
-  Col,
   FormGroup,
   Input,
   Label,
   ListGroup,
   ListGroupItem,
-  Row,
 } from 'reactstrap'
 
 import AppContext from './AppContext'
@@ -47,22 +45,25 @@ const UrlAlias = ({
   onChange,
   onRemove,
   primary = false,
+  readOnly,
   slug,
   url = '',
 }) => {
   const {uiLocale} = useContext(AppContext)
   const {t} = useTranslation()
-  const showRemoveButton = !(lastPublished || primary)
+  const showRemoveButton = !(lastPublished || primary || readOnly)
   return (
     <ListGroupItem className="d-flex justify-content-between">
-      <FormGroup check>
+      <FormGroup check className={classNames({'pl-0': readOnly})}>
         <Label check>
-          <Input
-            checked={primary}
-            name={slug}
-            onChange={onChange}
-            type="radio"
-          />
+          {!readOnly && (
+            <Input
+              checked={primary}
+              name={slug}
+              onChange={onChange}
+              type="radio"
+            />
+          )}
           {`${url}/${slug}`}
         </Label>
       </FormGroup>
@@ -83,60 +84,46 @@ const UrlAlias = ({
   )
 }
 
-const UrlAliases = ({aliases = [], onUpdate}) => {
-  const [showAll, setShowAll] = useState(false)
-  const {t} = useTranslation()
-  const aliasesToRender = groupBy(aliases, 'website.uuid')
-  const showExpandButton = Object.values(aliasesToRender).some(
-    (listOfAliases) => listOfAliases.length > 1,
-  )
+const UrlAliases = ({
+  aliases = [],
+  aliasesToRender = {},
+  onUpdate,
+  readOnly = false,
+  showAll = true,
+}) => {
   return (
-    <Row className="mt-3">
-      <Col sm={12}>
-        <FormGroup className="mb-1">
-          <Label className="align-middle mb-0">{t('urlAliases')}</Label>
-          {showExpandButton && (
-            <Button
-              className="ml-2"
-              color="primary"
-              onClick={() => setShowAll(!showAll)}
-              size="xs"
-            >
-              {showAll ? t('showPrimaryAliases') : t('showAll')}
-            </Button>
-          )}
-          {Object.entries(aliasesToRender)
-            .sort(sortByWebsite)
-            .map(([, listOfAliases]) => {
-              const website = listOfAliases[0].website
-              return (
-                <ListGroup className="my-2" key={website?.uuid ?? 'default'}>
-                  {sortBy(listOfAliases, ['slug'])
-                    .filter(({primary}) => showAll || primary)
-                    .map(({lastPublished, primary, slug}) => (
-                      <UrlAlias
-                        key={slug}
-                        lastPublished={lastPublished}
-                        onChange={() =>
-                          onUpdate(setNewPrimary(aliases, slug, website))
-                        }
-                        onRemove={() =>
-                          publish('editor.show-remove-urlalias-dialog', {
-                            slug,
-                            website,
-                          })
-                        }
-                        primary={primary}
-                        slug={slug}
-                        url={website?.url}
-                      />
-                    ))}
-                </ListGroup>
-              )
-            })}
-        </FormGroup>
-      </Col>
-    </Row>
+    <>
+      {Object.entries(aliasesToRender)
+        .sort(sortByWebsite)
+        .map(([, listOfAliases]) => {
+          const website = listOfAliases[0].website
+          return (
+            <ListGroup className="my-2" key={website?.uuid ?? 'default'}>
+              {sortBy(listOfAliases, ['slug'])
+                .filter(({primary}) => showAll || primary)
+                .map(({lastPublished, primary, slug}) => (
+                  <UrlAlias
+                    key={slug}
+                    lastPublished={lastPublished}
+                    onChange={() =>
+                      onUpdate(setNewPrimary(aliases, slug, website))
+                    }
+                    onRemove={() =>
+                      publish('editor.show-remove-urlalias-dialog', {
+                        slug,
+                        website,
+                      })
+                    }
+                    primary={primary}
+                    readOnly={readOnly}
+                    slug={slug}
+                    url={website?.url}
+                  />
+                ))}
+            </ListGroup>
+          )
+        })}
+    </>
   )
 }
 

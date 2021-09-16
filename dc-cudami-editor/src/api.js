@@ -15,6 +15,7 @@ export const typeToEndpointMapping = {
   subcollection: 'subcollections',
   subtopic: 'subtopics',
   topic: 'topics',
+  urlAlias: 'urlaliases',
   user: 'users',
   webpage: 'webpages',
   website: 'websites',
@@ -86,6 +87,20 @@ export async function findByIdentifier(contextPath, id, namespace, type) {
     return await response.json()
   } catch (err) {
     return {}
+  }
+}
+
+export async function generateSlug(contextPath, language, label, websiteUuid) {
+  let url = `${contextPath}api/${typeToEndpointMapping.urlAlias}/slug/${language}/${label}`
+  if (websiteUuid) {
+    url += `/${websiteUuid}`
+  }
+  try {
+    const response = await fetch(url)
+    const slug = await response.json()
+    return slug
+  } catch (err) {
+    return label
   }
 }
 

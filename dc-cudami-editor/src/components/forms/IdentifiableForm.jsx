@@ -1,12 +1,15 @@
 import '../../polyfills'
 
 import kebabCase from 'lodash/kebabCase'
+import mergeWith from 'lodash/mergeWith'
 import omit from 'lodash/omit'
+import pick from 'lodash/pick'
 import sortBy from 'lodash/sortBy'
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 
 import {
+  generateSlug,
   loadAvailableLanguages,
   loadDefaultLanguage,
   loadIdentifiable,
@@ -22,6 +25,7 @@ import AddLinkDialog from '../dialogs/AddLinkDialog'
 import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
+import ConfirmGeneratatedUrlAliasesDialog from '../dialogs/ConfirmGeneratatedUrlAliasesDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import RemoveUrlAliasDialog from '../dialogs/RemoveUrlAliasDialog'
 import FeedbackMessage from '../FeedbackMessage'
@@ -58,6 +62,7 @@ class IdentifiableForm extends Component {
         addPreviewImage: false,
         addTable: false,
         addVideo: false,
+        confirmGeneratatedUrlAliases: false,
         removeLanguage: false,
         removeUrlAlias: false,
       },
@@ -185,11 +190,49 @@ class IdentifiableForm extends Component {
         identifiable={identifiable}
         invalidLanguages={invalidLanguages}
         onAddLanguage={() => this.toggleDialog('addLanguage')}
-        onSubmit={this.submitIdentifiable}
+        onSubmit={this.validateUrlAliases}
         onToggleLanguage={this.toggleLanguage}
         onUpdate={this.updateIdentifiable}
       />
     )
+  }
+
+  getGeneratedUrlAliases = async () => {
+    const {apiContextPath, parentWebsite, uuid} = this.props
+    const {existingLanguages, identifiable} = this.state
+    const languagesWithoutGeneratedSlug = existingLanguages.filter(
+      (language) => {
+        const listOfAliases = identifiable.localizedUrlAliases?.[language]
+        return (
+          !listOfAliases.length ||
+          listOfAliases.every(
+            ({website}) => website?.uuid !== parentWebsite?.uuid,
+          )
+        )
+      },
+    )
+    const generatedSlugs = {}
+    for (let language of languagesWithoutGeneratedSlug) {
+      const slug = await generateSlug(
+        apiContextPath,
+        language,
+        identifiable.label[language],
+      )
+      generatedSlugs[language] = [
+        {
+          primary: true,
+          slug,
+          targetEntityType: identifiable.entityType,
+          targetIdentifiableType: identifiable.type,
+          targetLanguage: language,
+          targetUuid: uuid,
+          website:
+            parentWebsite &&
+            pick(parentWebsite, ['entityType', 'type', 'uuid']),
+        },
+      ]
+    }
+    return generatedSlugs
   }
 
   getInvalidLanguages = (identifiable) =>
@@ -306,6 +349,29 @@ class IdentifiableForm extends Component {
     this.setState(newState)
   }
 
+  validateUrlAliases = async () => {
+    const {dialogsOpen, identifiable} = this.state
+    const generatedUrlAliases = await this.getGeneratedUrlAliases()
+    if (Object.keys(generatedUrlAliases).length > 0) {
+      return this.setState({
+        dialogsOpen: {
+          ...dialogsOpen,
+          confirmGeneratatedUrlAliases: true,
+        },
+        generatedUrlAliases,
+        identifiable: {
+          ...identifiable,
+          localizedUrlAliases: mergeWith(
+            identifiable.localizedUrlAliases,
+            generatedUrlAliases,
+            (objValue, srcValue) => objValue.concat(srcValue),
+          ),
+        },
+      })
+    }
+    this.submitIdentifiable()
+  }
+
   render() {
     const {apiContextPath, type, uiLocale} = this.props
     const {
@@ -314,6 +380,7 @@ class IdentifiableForm extends Component {
       defaultLanguage,
       dialogsOpen,
       feedbackMessage,
+      generatedUrlAliases,
       identifiable,
       invalidLanguages,
     } = this.state
@@ -379,6 +446,12 @@ class IdentifiableForm extends Component {
             activeLanguage={activeLanguage}
             isOpen={dialogsOpen.addPreviewImage}
             onToggle={() => this.toggleDialog('addPreviewImage')}
+          />
+          <ConfirmGeneratatedUrlAliasesDialog
+            generatedUrlAliases={generatedUrlAliases}
+            isOpen={dialogsOpen.confirmGeneratatedUrlAliases}
+            onConfirm={this.submitIdentifiable}
+            toggle={() => this.toggleDialog('confirmGeneratatedUrlAliases')}
           />
           <RemoveLanguageDialog
             isOpen={dialogsOpen.removeLanguage}
