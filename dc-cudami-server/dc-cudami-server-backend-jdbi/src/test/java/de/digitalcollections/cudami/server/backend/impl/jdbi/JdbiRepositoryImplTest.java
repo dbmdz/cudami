@@ -17,9 +17,6 @@ public class JdbiRepositoryImplTest {
   JdbiRepositoryImpl instance = new MyImpl();
 
   @Test
-  public void testGetFilterClauses() {}
-
-  @Test
   public void testGetWhereClauseBetween() {
     Map<String, Object> argumentMappings = new HashMap<>(0);
 
