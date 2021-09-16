@@ -809,7 +809,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + urlAliasAlias
                 + ".target_uuid"
                 + UrlAliasRepositoryImpl.WEBSITESJOIN);
-    addFiltering(filtering, sql);
+    addFiltering(filtering, sql, argumentMappings);
 
     I result =
         dbi.withHandle(

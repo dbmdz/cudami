@@ -140,7 +140,7 @@ public class UrlAliasRepositoryImplTest {
     LocalizedUrlAliases actual =
         this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid());
     LocalizedUrlAliases expected =
-        new LocalizedUrlAliases(this.urlAliasWithWebsite, this.urlAliasWithoutWebsite);
+        new LocalizedUrlAliases(this.urlAliasWithoutWebsite, this.urlAliasWithWebsite);
     assertTrue(actual.equals(expected));
   }
 

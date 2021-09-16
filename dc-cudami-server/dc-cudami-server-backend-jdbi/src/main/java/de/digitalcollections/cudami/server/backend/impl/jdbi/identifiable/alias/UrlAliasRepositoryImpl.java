@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -67,9 +68,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
           Stream.concat(
               selectFields,
               Stream.of("uuid", "label", "url")
-                  .map(
-                      col ->
-                          String.format("%1$s.%2$s %3$s_%2$s", WEBSITESALIAS, col, WEBSITESALIAS)));
+                  .map(col -> String.format("%1$s.%2$s %1$s_%2$s", WEBSITESALIAS, col)));
     }
     return selectFields.collect(Collectors.joining(", "));
   }
@@ -116,13 +115,15 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         new StringBuilder(" FROM " + this.tableName + " AS " + this.tableAlias + WEBSITESJOIN);
     Map<String, Object> bindings = new HashMap<>();
 
-    this.addFiltering(searchPageRequest, commonSql, bindings);
-    if (StringUtils.hasText(searchPageRequest.getQuery())) {
-      commonSql
-          .append(commonSql.toString().matches("(?i).+\\s+WHERE .*") ? " AND " : " WHERE ")
-          .append(this.tableAlias + ".slug like '%' || :searchTerm || '%' ");
-      bindings.put("searchTerm", searchPageRequest.getQuery());
+    Filtering filtering = searchPageRequest.getFiltering();
+    Filtering slug =
+        Filtering.defaultBuilder().filter("slug").contains(searchPageRequest.getQuery()).build();
+    if (filtering == null) {
+      filtering = slug;
+    } else {
+      filtering.add(slug);
     }
+    this.addFiltering(filtering, commonSql, bindings);
 
     long count;
     try {
@@ -171,23 +172,24 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (uuid == null) {
       return new LocalizedUrlAliases();
     }
-    String sql =
-        "SELECT "
-            + getSelectFields(true)
-            + " FROM "
-            + this.tableName
-            + " AS "
-            + this.tableAlias
-            + WEBSITESJOIN
-            + " WHERE "
-            + this.tableAlias
-            + ".target_uuid = :uuid ORDER BY \"primary\", slug;";
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT "
+                + getSelectFields(true)
+                + " FROM "
+                + this.tableName
+                + " AS "
+                + this.tableAlias
+                + WEBSITESJOIN);
+    Map<String, Object> bindings = new HashMap<>();
+    Filtering target = Filtering.defaultBuilder().filter("targetUuid").isEquals(uuid).build();
+    this.addFiltering(target, sql, bindings);
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
               h ->
-                  h.createQuery(sql)
-                      .bind("uuid", uuid)
+                  h.createQuery(sql.toString())
+                      .bindMap(bindings)
                       .reduceRows(this::mapRowToUrlAlias)
                       .toArray(UrlAlias[]::new));
       return new LocalizedUrlAliases(resultset);
@@ -208,16 +210,20 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     return this.findMainLinks(false, null, slug);
   }
 
-  protected LocalizedUrlAliases findMainLinks(boolean useWebsite, UUID websiteUuid, String slug)
+  private LocalizedUrlAliases findMainLinks(boolean useWebsite, UUID websiteUuid, String slug)
       throws UrlAliasRepositoryException {
     StringBuilder innerSel =
-        new StringBuilder("(SELECT target_uuid FROM " + this.tableName + " WHERE slug = :slug");
+        new StringBuilder(
+            String.format(
+                "(SELECT %2$s.target_uuid FROM %1$s AS %2$s ", this.tableName, this.tableAlias));
+    Filtering innerFiltering = Filtering.defaultBuilder().filter("slug").isEquals(slug).build();
     if (useWebsite) {
-      innerSel.append(" AND website_uuid ").append(websiteUuid != null ? "= :uuid" : "IS NULL");
+      innerFiltering.add(
+          Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build());
     }
-    innerSel.append(")");
     Map<String, Object> bindings = new HashMap<>();
-    bindings.put("slug", slug);
+    this.addFiltering(innerFiltering, innerSel, bindings);
+    innerSel.append(")");
     StringBuilder sql =
         new StringBuilder(
             "SELECT "
@@ -229,15 +235,14 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                 + WEBSITESJOIN
                 + " WHERE "
                 + this.tableAlias
-                + ".primary = true AND "
-                + this.tableAlias
                 + ".target_uuid IN "
                 + innerSel.toString());
+    Filtering outerFiltering = Filtering.defaultBuilder().filter("primary").isEquals(true).build();
     if (useWebsite) {
-      sql.append(" AND " + this.tableAlias + ".website_uuid ")
-          .append(websiteUuid != null ? "= :uuid" : "IS NULL");
-      bindings.put("uuid", websiteUuid);
+      outerFiltering.add(
+          Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build());
     }
+    this.addFiltering(outerFiltering, sql, bindings);
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
@@ -270,20 +275,23 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (uuid == null) {
       return null;
     }
-    String sql =
-        "SELECT "
-            + getSelectFields(true)
-            + " FROM "
-            + this.tableName
-            + " AS "
-            + this.tableAlias
-            + WEBSITESJOIN
-            + String.format(" WHERE %s.uuid = :uuid;", this.tableAlias);
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT "
+                + getSelectFields(true)
+                + " FROM "
+                + this.tableName
+                + " AS "
+                + this.tableAlias
+                + WEBSITESJOIN);
+    Map<String, Object> bindings = new HashMap<>();
+    this.addFiltering(
+        Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build(), sql, bindings);
     try {
       return this.dbi.withHandle(
           h ->
-              h.createQuery(sql)
-                  .bind("uuid", uuid)
+              h.createQuery(sql.toString())
+                  .bindMap(bindings)
                   .reduceRows(this::mapRowToUrlAlias)
                   .findFirst()
                   .orElse(null));
@@ -336,22 +344,20 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       throw new UrlAliasRepositoryException(
           "UrlAliasRepository.hasUrlAlias: Parameter 'slug' must not be null or empty.");
     }
+    StringBuilder sql =
+        new StringBuilder("SELECT uuid FROM " + this.tableName + " AS " + this.tableAlias);
+    Filtering filtering =
+        Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build();
+    filtering.add(
+        Filtering.defaultBuilder().filter("targetLanguage").isEquals(targetLanguage).build());
+    filtering.add(Filtering.defaultBuilder().filter("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
-    bindings.put("websiteUuid", websiteUuid);
-    bindings.put("slug", slug);
-    bindings.put("lang", targetLanguage);
+    this.addFiltering(filtering, sql, bindings);
     try {
       return 0
           < this.dbi.withHandle(
               h ->
-                  h.createQuery(
-                          "SELECT uuid FROM "
-                              + this.tableName
-                              + " WHERE website_uuid "
-                              + (websiteUuid != null ? "= :websiteUuid " : "IS NULL ")
-                              + "AND target_language "
-                              + (targetLanguage != null ? "= :lang " : "IS NULL ")
-                              + "AND slug = :slug;")
+                  h.createQuery(sql.toString())
                       .bindMap(bindings)
                       .reduceRows(0, (count, row) -> ++count));
     } catch (StatementException e) {
