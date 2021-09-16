@@ -228,7 +228,7 @@ class IdentifiableForm extends Component {
           targetUuid: uuid,
           website:
             parentWebsite &&
-            pick(parentWebsite, ['entityType', 'type', 'uuid']),
+            pick(parentWebsite, ['entityType', 'type', 'url', 'uuid']),
         },
       ]
     }
