@@ -196,7 +196,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E findOneByRefId(long refId) {
-    Filtering filtering = Filtering.defaultBuilder().filter("refid").isEquals(refId).build();
+    Filtering filtering = Filtering.defaultBuilder().filter("refId").isEquals(refId).build();
 
     return retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
   }
