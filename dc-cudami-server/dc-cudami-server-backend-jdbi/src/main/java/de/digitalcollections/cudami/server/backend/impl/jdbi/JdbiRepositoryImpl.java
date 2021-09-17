@@ -94,9 +94,19 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
-      String expression = fc.getExpression();
-      if (!fc.isNativeExpression()) {
-        expression = getColumnName(expression);
+      String givenExpression = fc.getExpression();
+      String expression;
+      if (fc.isNativeExpression()) {
+        // safe (not created using user input)
+        expression = givenExpression;
+      } else {
+        // may be created using user input: map expression to column name
+        expression = getColumnName(givenExpression);
+        if (expression == null) {
+          throw new IllegalArgumentException(
+              String.format("Given expression '%s' is invalid / can not be mapped.")
+                  + givenExpression);
+        }
       }
 
       String criterionKey = KEY_PREFIX_FILTERVALUE + criterionCount;
