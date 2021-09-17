@@ -94,18 +94,14 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
-      // @see https://www.postgresql.org/docs/11/functions.html
-      final String fieldName = fc.getFieldName();
-      final String columnName = getColumnName(fieldName);
-      final String leftSide = (columnName != null) ? columnName : fieldName;
-      // basic sql injection detection:
-      if (leftSide.contains("'") || leftSide.contains(";")) {
-        throw new IllegalArgumentException(
-            String.format("leftSide '%s' seems to contain malicious code!", leftSide));
+      String expression = fc.getExpression();
+      if (!fc.isNativeExpression()) {
+        expression = getColumnName(expression);
       }
 
       String criterionKey = KEY_PREFIX_FILTERVALUE + criterionCount;
       switch (filterOperation) {
+          // @see https://www.postgresql.org/docs/11/functions.html
         case BETWEEN:
           if (fc.getMinValue() == null || fc.getMaxValue() == null) {
             throw new IllegalArgumentException("For 'BETWEEN' operation two values are expected");
@@ -115,7 +111,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
             String keyMax = criterionKey + "_max";
             query
                 .append("(")
-                .append(leftSide)
+                .append(expression)
                 .append(" BETWEEN ")
                 .append(":")
                 .append(keyMin)
@@ -134,7 +130,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
                 "For 'IN/NOT_IN' operation at least one value is expected");
           }
           // For 'in' or 'nin' operation
-          query.append("(").append(leftSide);
+          query.append("(").append(expression);
           if (filterOperation == FilterOperation.NOT_IN) {
             query.append(" NOT");
           }
@@ -157,7 +153,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" ILIKE '%' || ")
               .append(":")
               .append(criterionKey)
@@ -168,7 +164,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" ILIKE ")
               .append(":")
               .append(criterionKey)
@@ -179,7 +175,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" = ")
               .append(":")
               .append(criterionKey)
@@ -190,7 +186,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" != ")
               .append(":")
               .append(criterionKey)
@@ -201,7 +197,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" > ")
               .append(":")
               .append(criterionKey)
@@ -212,12 +208,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" > ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(leftSide)
+              .append(expression)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -226,7 +222,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" >= ")
               .append(":")
               .append(criterionKey)
@@ -237,7 +233,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" < ")
               .append(":")
               .append(criterionKey)
@@ -248,12 +244,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" < ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(leftSide)
+              .append(expression)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -262,7 +258,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
@@ -273,12 +269,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(leftSide)
+              .append(expression)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -287,23 +283,23 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(leftSide)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(leftSide)
+              .append(expression)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(leftSide).append(" IS NOT NULL").append(")");
+          query.append("(").append(expression).append(" IS NOT NULL").append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(leftSide).append(" IS NULL").append(")");
+          query.append("(").append(expression).append(" IS NULL").append(")");
           break;
         default:
           throw new UnsupportedOperationException(filterOperation + " not supported yet");

@@ -76,10 +76,10 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
-  public C forStartDate(String fieldName, String startDate) {
+  public C forStartDate(String expression, String startDate) {
     FilterCriterion filterCriterionStart =
         new FilterCriterion(
-            fieldName, FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET, LocalDate.parse(startDate));
+            expression, FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET, LocalDate.parse(startDate));
     if (filterCriteria == null) {
       filterCriteria = new ArrayList<>();
     }
@@ -87,10 +87,10 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
-  public C forEndDate(String fieldName, String endDate) {
+  public C forEndDate(String expression, String endDate) {
     FilterCriterion filterCriterionEnd =
         new FilterCriterion(
-            fieldName, FilterOperation.GREATER_THAN_OR_NOT_SET, LocalDate.parse(endDate));
+            expression, FilterOperation.GREATER_THAN_OR_NOT_SET, LocalDate.parse(endDate));
     if (filterCriteria == null) {
       filterCriteria = new ArrayList<>();
     }
@@ -98,13 +98,13 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
-  public C forAscendingOrderedField(String fieldName, String subfield) {
+  public C forAscendingOrderedField(String expression, String subfield) {
     Order order =
         new OrderBuilder()
             .direction(Direction.ASC)
             .ignoreCase(false)
             .nullHandling(NullHandling.NATIVE)
-            .property(fieldName)
+            .property(expression)
             .subProperty(subfield)
             .build();
     if (orders == null) {
@@ -114,13 +114,13 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
-  public C forDescendingOrderedField(String fieldName, String subfield) {
+  public C forDescendingOrderedField(String expression, String subfield) {
     Order order =
         new OrderBuilder()
             .direction(Direction.DESC)
             .ignoreCase(false)
             .nullHandling(NullHandling.NATIVE)
-            .property(fieldName)
+            .property(expression)
             .subProperty(subfield)
             .build();
     if (orders == null) {
@@ -130,20 +130,20 @@ public class PageResponseBuilder<T, B extends PageResponse<T>, C extends PageRes
     return (C) this;
   }
 
-  public C forEqualPredicate(String fieldName, String predicate) {
+  public C forEqualPredicate(String expression, String predicate) {
     if (filterCriteria == null) {
       filterCriteria = new ArrayList<>();
     }
-    filterCriteria.add(new FilterCriterion(fieldName, FilterOperation.EQUALS, predicate));
+    filterCriteria.add(new FilterCriterion(expression, FilterOperation.EQUALS, predicate));
     return (C) this;
   }
 
-  public C forAscendingOrderedField(String fieldName) {
-    return forAscendingOrderedField(fieldName, "");
+  public C forAscendingOrderedField(String expression) {
+    return forAscendingOrderedField(expression, "");
   }
 
-  public C forDescendingOrderedField(String fieldName) {
-    return forDescendingOrderedField(fieldName, "");
+  public C forDescendingOrderedField(String expression) {
+    return forDescendingOrderedField(expression, "");
   }
 
   public C withTotalElements(long totalElements) {

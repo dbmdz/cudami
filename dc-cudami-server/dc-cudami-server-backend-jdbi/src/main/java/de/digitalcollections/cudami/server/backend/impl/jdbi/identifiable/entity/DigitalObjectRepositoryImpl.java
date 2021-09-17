@@ -135,7 +135,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           filtering.getFilterCriteria().stream()
               .map(
                   fc -> {
-                    fc.setFieldName(collectionRepositoryImpl.getColumnName(fc.getFieldName()));
+                    fc.setExpression(collectionRepositoryImpl.getColumnName(fc.getExpression()));
+                    fc.setNativeExpression(true);
                     return fc;
                   })
               .collect(Collectors.toList());

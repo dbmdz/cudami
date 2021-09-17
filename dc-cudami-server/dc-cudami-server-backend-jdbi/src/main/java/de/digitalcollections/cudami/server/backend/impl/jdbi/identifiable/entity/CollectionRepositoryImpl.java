@@ -437,7 +437,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.parent_collection_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filter("cc.child_collection_uuid").isEquals(uuid).build();
+        Filtering.defaultBuilder().filterNative("cc.child_collection_uuid").isEquals(uuid).build();
 
     Collection result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
     return result;
