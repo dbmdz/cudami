@@ -100,7 +100,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     StringBuilder commonSql = new StringBuilder("FROM " + TABLE_NAME + " AS " + TABLE_ALIAS);
     Map<String, Object> bindings = new HashMap<>();
 
-    this.addFiltering(searchPageRequest, commonSql);
+    this.addFiltering(searchPageRequest, commonSql, bindings);
     if (StringUtils.hasText(searchPageRequest.getQuery())) {
       commonSql
           .append(commonSql.toString().matches("(?i).+\\s+WHERE .*") ? " AND " : " WHERE ")
@@ -188,12 +188,14 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             + TABLE_NAME
             + " WHERE website_uuid = :uuid AND \"primary\" = true AND target_uuid = "
             + innerSel;
-    Map<String, Object> bindings = Map.of("uuid", websiteUuid, "slug", slug);
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", websiteUuid);
+    argumentMappings.put("slug", slug);
     try {
       UrlAlias[] resultset =
           this.dbi.withHandle(
               h ->
-                  h.createQuery(sql).bindMap(bindings).mapToBean(UrlAlias.class).stream()
+                  h.createQuery(sql).bindMap(argumentMappings).mapToBean(UrlAlias.class).stream()
                       .toArray(UrlAlias[]::new));
       return new LocalizedUrlAliases(resultset);
     } catch (StatementException e) {

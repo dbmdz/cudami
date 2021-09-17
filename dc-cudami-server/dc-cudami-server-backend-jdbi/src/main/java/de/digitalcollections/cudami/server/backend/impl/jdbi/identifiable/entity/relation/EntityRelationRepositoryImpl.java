@@ -9,7 +9,9 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -56,14 +58,17 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object"
                 + commonSql);
+    Map<String, Object> argumentMappings = new HashMap<>();
+
     // handle optional filtering params
-    addFiltering(pageRequest, query);
+    addFiltering(pageRequest, query, argumentMappings);
     addPageRequestParams(pageRequest, query);
 
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
+                    .bindMap(argumentMappings)
                     .reduceResultSet(
                         new ArrayList<EntityRelation>(),
                         (acc, rs, ctx) -> {
@@ -81,9 +86,15 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                         }));
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery);
+    addFiltering(pageRequest, countQuery, argumentMappings);
     long count =
-        dbi.withHandle(h -> h.createQuery(countQuery.toString()).mapTo(Long.class).findOne().get());
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
     PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }

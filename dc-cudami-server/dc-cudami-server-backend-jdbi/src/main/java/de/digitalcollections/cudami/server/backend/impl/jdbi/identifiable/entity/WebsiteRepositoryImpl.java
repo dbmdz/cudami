@@ -129,7 +129,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
@@ -146,7 +146,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -190,13 +190,12 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
                 + wpTableAlias
                 + ".uuid = ww.webpage_uuid"
                 + " WHERE ww.website_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
 
     List<Webpage> result =
         webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            Map.of("uuid", uuid),
-            null);
+            webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 

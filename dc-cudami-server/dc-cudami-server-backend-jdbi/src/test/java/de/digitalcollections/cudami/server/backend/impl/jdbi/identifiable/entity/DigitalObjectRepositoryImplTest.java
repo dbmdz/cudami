@@ -107,8 +107,7 @@ class DigitalObjectRepositoryImplTest {
             .build());
 
     SearchPageResponse response = repo.find(searchPageRequest);
-    // FIXME Addressed in issue https://github.com/dbmdz/digitalcollections-model/issues/215
-    // assertThat(response.getQuery()).isEqualTo(query);
+    assertThat(((SearchPageRequest) response.getPageRequest()).getQuery()).isEqualTo(query);
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);

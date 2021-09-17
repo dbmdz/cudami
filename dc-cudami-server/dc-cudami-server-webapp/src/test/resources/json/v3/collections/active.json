@@ -46,7 +46,7 @@
     "filtering": {
       "filterCriteria": [
         {
-          "fieldName": "publicationStart",
+          "expression": "publicationStart",
           "operation": "LESS_THAN_OR_EQUAL_TO_AND_SET",
           "value": [
             "java.time.LocalDate",
@@ -54,7 +54,7 @@
           ]
         },
         {
-          "fieldName": "publicationEnd",
+          "expression": "publicationEnd",
           "operation": "GREATER_THAN_OR_NOT_SET",
           "value": [
             "java.time.LocalDate",

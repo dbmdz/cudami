@@ -4,7 +4,7 @@
     "filtering": {
       "filterCriteria": [
         {
-          "fieldName": "c.publication_start",
+          "expression": "c.publication_start",
           "operation": "LESS_THAN_OR_EQUAL_TO_AND_SET",
           "value": [
             "java.time.LocalDate",
@@ -12,7 +12,7 @@
           ]
         },
         {
-          "fieldName": "c.publication_end",
+          "expression": "c.publication_end",
           "operation": "GREATER_THAN_OR_NOT_SET",
           "value": [
             "java.time.LocalDate",
