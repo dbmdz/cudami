@@ -8,6 +8,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 
@@ -64,7 +65,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
     ArrayList<String> whereClauses = new ArrayList<>();
     List<FilterCriterion> filterCriteria = filtering.getFilterCriteria();
-    int criterionCount = 1;
+    int criterionCount = argumentMappings.size() + 1;
     for (FilterCriterion filterCriterion : filterCriteria) {
       String whereClause = getWhereClause(filterCriterion, argumentMappings, criterionCount);
       whereClauses.add(whereClause);
@@ -138,15 +139,18 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
             query.append(" NOT");
           }
           query.append(" IN (");
-          int valueCount = 1;
+
           ArrayList<String> values = new ArrayList<>();
-          for (Object value : fc.getValues()) {
-            String key = criterionKey + "_" + valueCount;
-            values.add(":" + key);
-            argumentMappings.put(key, value);
-            valueCount++;
-          }
+          AtomicInteger valueCounter = new AtomicInteger(0);
+          fc.getValues()
+              .forEach(
+                  v -> {
+                    String key = criterionKey + "_" + valueCounter.incrementAndGet();
+                    values.add(":" + key);
+                    argumentMappings.put(key, v);
+                  });
           query.append(values.stream().collect(Collectors.joining(",")));
+
           query.append("))");
           break;
         case CONTAINS:

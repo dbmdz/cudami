@@ -27,12 +27,12 @@ public class JdbiRepositoryImplTest {
     Filtering filtering =
         Filtering.defaultBuilder().filter(filteringProperty).between(minDate, maxDate).build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
-    String whereClause = instance.getWhereClause(fc, argumentMappings, 17);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 42);
 
     assertEquals(
-        "(publicationStart BETWEEN :filtervalue_17_min AND :filtervalue_17_max)", whereClause);
-    assertEquals(argumentMappings.get("filtervalue_17_min"), minDate);
-    assertEquals(argumentMappings.get("filtervalue_17_max"), maxDate);
+        "(publicationStart BETWEEN :filtervalue_42_min AND :filtervalue_42_max)", whereClause);
+    assertEquals(argumentMappings.get("filtervalue_42_min"), minDate);
+    assertEquals(argumentMappings.get("filtervalue_42_max"), maxDate);
   }
 
   @Test
