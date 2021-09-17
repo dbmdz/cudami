@@ -66,19 +66,24 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
     // Convert the operation acronym to enum
     FilterOperation filterOperation = FilterOperation.fromValue(operationAcronym);
 
+    // no value operand (e.g. "set")
     if (filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
-      // no value operand (e.g. "set")
       FilterCriterion fc = new FilterCriterion(null, filterOperation, null, null, null, null);
       return fc;
-    } else if (filterOperation.getOperandCount() == FilterOperation.OperandCount.SINGLEVALUE) {
-      // single value operand (e.g. "eq")
+    }
+
+    // single value operand (e.g. "eq")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.SINGLEVALUE) {
       if (operationValue == null) {
         throw new IllegalArgumentException("No operation value found");
       }
       Object value = conversionService.convert(operationValue, targetClass);
       FilterCriterion fc = new FilterCriterion(null, filterOperation, value);
       return fc;
-    } else if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MULTIVALUE) {
+    }
+
+    // multi value operand (e.g. "in")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MULTIVALUE) {
       if (operationValue == null) {
         throw new IllegalArgumentException("No operation values found");
       }
@@ -95,7 +100,10 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
       FilterCriterion fc =
           new FilterCriterion(null, filterOperation, null, null, null, convertedValues);
       return fc;
-    } else if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MIN_MAX_VALUES) {
+    }
+
+    // min max value operand (e.g. "between")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MIN_MAX_VALUES) {
       if (operationValue == null) {
         throw new IllegalArgumentException("No operation values found");
       }
@@ -105,29 +113,29 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
       }
       if (operationValues.length != 2) {
         throw new IllegalArgumentException("For min/max operation two values are expected");
-      } else {
-        C minValue = null;
-        C maxValue = null;
-
-        // Convert
-        C value1 = (C) conversionService.convert(operationValues[0], targetClass);
-        C value2 = (C) conversionService.convert(operationValues[1], targetClass);
-
-        if (value1 != null && value2 != null) {
-          // Set min and max values
-          if (value1.compareTo(value2) > 0) {
-            minValue = value2;
-            maxValue = value1;
-          } else {
-            minValue = value1;
-            maxValue = value2;
-          }
-        }
-        FilterCriterion fc =
-            new FilterCriterion(null, filterOperation, null, minValue, maxValue, null);
-        return fc;
       }
+      C minValue = null;
+      C maxValue = null;
+
+      // Convert
+      C value1 = (C) conversionService.convert(operationValues[0], targetClass);
+      C value2 = (C) conversionService.convert(operationValues[1], targetClass);
+
+      if (value1 != null && value2 != null) {
+        // Set min and max values
+        if (value1.compareTo(value2) > 0) {
+          minValue = value2;
+          maxValue = value1;
+        } else {
+          minValue = value1;
+          maxValue = value2;
+        }
+      }
+      FilterCriterion fc =
+          new FilterCriterion(null, filterOperation, null, minValue, maxValue, null);
+      return fc;
     }
-    return null;
+
+    throw new IllegalArgumentException("Unknown operation '" + operationAcronym + "'");
   }
 }
