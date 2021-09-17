@@ -247,3 +247,22 @@ alter table schema_version rename to flyway_schema_history;
 
 - Deploy cudami 3.2.2
 - Start 3.2.2
+
+### Application Configuration
+
+The application is configured by an `application.yml`. You can either modify this file directly, or
+you can use another custom `application.yml` in another directory and/or with different name, whose
+location must be set as parameter `spring.config.additional-location` on startup time,
+e.g. `-spring.config.additional-location=file:/your/installation/application-custom.yml`
+
+Besides the familiar spring configuration parameters, cudami offers a number of proprietary parameters:
+
+- `cudami.defaults.language`: Default language for labels and UrlAliases when no limitation to a specific language was
+  requested.
+- `cudami.defaults.locale`: Similar as above, but takes the country into account, too.
+- `cudami.repositoryFolderPath`: Base directory, below which all uploaded file contents
+  are stored in a hierarchy, defined by the corresponding MIME types
+_ `cudami.urlalise.generationExcludes`: List of all content types, for which no UrlAliases should
+  be auto-generated, e.g. `[DIGITAL_OBJECT]`.  Possible values are `AGENT, ARTICLE, AUDIO, BOOK,
+  COLLECTION, CORPORATE_BODY, DIGITAL_OBJECT, ENTITY, EVENT, EXPRESSION, FAMILY, GEOLOCATION, IMAGE,
+  ITEM, MANIFESTATION, OBJECT_3D, PERSON, PLACE, PROJECT, TOPIC, VIDEO, WEBSITE, WORK`
