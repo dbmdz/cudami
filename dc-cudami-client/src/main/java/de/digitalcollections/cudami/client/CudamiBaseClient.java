@@ -619,7 +619,7 @@ public class CudamiBaseClient<T extends Object> {
     if (filterCriterion.getOperation() == null) {
       return "";
     }
-    String criterion = filterCriterion.getFieldName() + "=" + filterCriterion.getOperation() + ":";
+    String criterion = filterCriterion.getExpression() + "=" + filterCriterion.getOperation() + ":";
     switch (filterCriterion.getOperation().getOperandCount()) {
       case SINGLEVALUE:
         criterion +=

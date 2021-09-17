@@ -8,6 +8,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
@@ -124,8 +125,9 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
     if (!StringUtils.hasText(searchTerm)) {
       return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-    return find(
-        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override

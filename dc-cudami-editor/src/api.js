@@ -4,9 +4,11 @@ export const typeToEndpointMapping = {
   corporateBody: 'corporatebodies',
   digitalObject: 'digitalobjects',
   entity: 'entities',
+  file: 'files',
   fileResource: 'fileresources',
   geoLocation: 'geolocations',
   identifierType: 'identifiertypes',
+  language: 'languages',
   person: 'persons',
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
@@ -59,7 +61,7 @@ export async function addAttachedIdentifiables(
 }
 
 export async function changeUserStatus(contextPath, uuid, enabled) {
-  const url = `${contextPath}api/users/${uuid}`
+  const url = `${contextPath}api/${typeToEndpointMapping.user}/${uuid}`
   try {
     const response = await fetch(url, {
       body: JSON.stringify({enabled}),
@@ -88,7 +90,7 @@ export async function findByIdentifier(contextPath, id, namespace, type) {
 }
 
 export async function getIdentifierTypes(contextPath) {
-  const url = `${contextPath}api/identifiertypes`
+  const url = `${contextPath}api/${typeToEndpointMapping.identifierType}`
   try {
     const response = await fetch(url)
     const json = await response.json()
@@ -130,7 +132,7 @@ export async function loadAttachedIdentifiables(
 }
 
 export async function loadAvailableLanguages(contextPath) {
-  const url = `${contextPath}api/languages`
+  const url = `${contextPath}api/${typeToEndpointMapping.language}`
   try {
     const result = await fetch(url)
     return result.json()
@@ -140,7 +142,7 @@ export async function loadAvailableLanguages(contextPath) {
 }
 
 export async function loadDefaultLanguage(contextPath) {
-  const url = `${contextPath}api/languages/default`
+  const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
   try {
     const result = await fetch(url)
     return result.json()
@@ -262,7 +264,7 @@ export async function saveIdentifiable(
  * @returns `{error: flag if there was an error, json: on error an error object, the new/updated user object otherwise}`
  */
 export async function saveOrUpdateUser(contextPath, user, passwords) {
-  let url = `${contextPath}api/${typeToEndpointMapping['user']}`
+  let url = `${contextPath}api/${typeToEndpointMapping.user}`
   if (user.uuid) {
     url += `/${user.uuid}`
   }
@@ -323,7 +325,7 @@ export async function searchMedia(
   pageNumber = 0,
   pageSize = 10,
 ) {
-  const url = `${contextPath}api/fileresources/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  const url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
     const result = await fetch(url)
     const json = await result.json()
@@ -401,7 +403,11 @@ export async function uploadFile(contextPath, file, updateProgress) {
       }
     })
 
-    request.open('POST', `${contextPath}api/files`, true)
+    request.open(
+      'POST',
+      `${contextPath}api/${typeToEndpointMapping.file}`,
+      true,
+    )
     const formData = new FormData()
     formData.append('userfile', file, file.name)
     request.send(formData)

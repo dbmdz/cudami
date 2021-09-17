@@ -116,7 +116,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         new StringBuilder(" FROM " + this.tableName + " AS " + this.tableAlias + WEBSITESJOIN);
     Map<String, Object> bindings = new HashMap<>();
 
-    this.addFiltering(searchPageRequest, commonSql);
+    this.addFiltering(searchPageRequest, commonSql, bindings);
     if (StringUtils.hasText(searchPageRequest.getQuery())) {
       commonSql
           .append(commonSql.toString().matches("(?i).+\\s+WHERE .*") ? " AND " : " WHERE ")

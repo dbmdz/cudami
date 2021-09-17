@@ -39,79 +39,103 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
 
   @Override
   public Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType) {
+    Class targetClass = (Class<?>) targetType.getResolvableType().getGeneric(0).getType();
+    return convert(source, targetClass);
+  }
+
+  protected Object convert(Object source, Class targetClass) throws IllegalArgumentException {
+    if (source == null) {
+      return null;
+    }
     String operationAndValues = (String) source;
 
-    String[] filterSplit = StringUtils.tokenizeToStringArray(operationAndValues, ":");
-    if (filterSplit == null || filterSplit.length != 2) {
-      throw new IllegalArgumentException("More than one or no separator ':' found");
+    if (!operationAndValues.contains(":")) {
+      throw new IllegalArgumentException("No separator ':' found");
     }
-    String operationAcronym = filterSplit[0];
-    String operationValue = filterSplit[1];
-    // Convert the operation name to enum
+
+    int separatorPosition =
+        operationAndValues.indexOf(
+            ':'); // index of the first occurrence of ":" (operation value may contain ":", too...
+    String operationAcronym = operationAndValues.substring(0, separatorPosition);
+    if (operationAcronym == null) {
+      throw new IllegalArgumentException("No operation acronym found");
+    }
+
+    String operationValue = operationAndValues.substring(separatorPosition + 1);
+
+    // Convert the operation acronym to enum
     FilterOperation filterOperation = FilterOperation.fromValue(operationAcronym);
 
-    String[] operationValues;
-    if (!operationValue.contains(",")) {
-      operationValues = new String[] {operationValue};
-    } else {
-      // Split the filter value as comma separated.
-      operationValues = StringUtils.tokenizeToStringArray(operationValue, ",");
+    // no value operand (e.g. "set")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
+      FilterCriterion fc = new FilterCriterion(null, filterOperation, null, null, null, null);
+      return fc;
     }
-    if (operationValues == null || operationValues.length < 1) {
-      throw new IllegalArgumentException("Operation value can't be empty");
-    }
-    Collection<String> originalValues = Arrays.asList(operationValues);
 
-    Object convertedSingleValue = null;
-    C minValue = null;
-    C maxValue = null;
-    Collection convertedValues = new ArrayList<>();
-
-    Class targetClass = (Class<?>) targetType.getResolvableType().getGeneric(0).getType();
-    if (null == filterOperation) {
-      // All other operation
-      convertedSingleValue = conversionService.convert(operationValues[0], targetClass);
-    } else {
-      switch (filterOperation) {
-        case BETWEEN:
-          // For operation 'btn'
-          if (operationValues.length != 2) {
-            throw new IllegalArgumentException("For 'btn' operation two values are expected");
-          } else {
-
-            // Convert
-            C value1 = (C) conversionService.convert(operationValues[0], targetClass);
-            C value2 = (C) conversionService.convert(operationValues[1], targetClass);
-
-            if (value1 != null && value2 != null) {
-              // Set min and max values
-              if (value1.compareTo(value2) > 0) {
-                minValue = value2;
-                maxValue = value1;
-              } else {
-                minValue = value1;
-                maxValue = value2;
-              }
-            }
-          }
-          break;
-        case IN:
-        case NOT_IN:
-          // For 'in' or 'nin' operation
-          convertedValues.addAll(
-              originalValues.stream()
-                  .map(s -> conversionService.convert(s, targetClass))
-                  .collect(Collectors.toList()));
-          break;
-        default:
-          // All other operation
-          convertedSingleValue = conversionService.convert(operationValues[0], targetClass);
-          break;
+    // single value operand (e.g. "eq")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.SINGLEVALUE) {
+      if (operationValue == null) {
+        throw new IllegalArgumentException("No operation value found");
       }
+      Object value = conversionService.convert(operationValue, targetClass);
+      FilterCriterion fc = new FilterCriterion(null, filterOperation, value);
+      return fc;
     }
-    FilterCriterion fc =
-        new FilterCriterion(
-            null, filterOperation, convertedSingleValue, minValue, maxValue, convertedValues);
-    return fc;
+
+    // multi value operand (e.g. "in")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MULTIVALUE) {
+      if (operationValue == null) {
+        throw new IllegalArgumentException("No operation values found");
+      }
+      String[] operationValues = StringUtils.tokenizeToStringArray(operationValue, ",");
+      if (operationValues == null || operationValues.length < 1) {
+        throw new IllegalArgumentException("Operation values can't be empty");
+      }
+      Collection<String> originalValues = Arrays.asList(operationValues);
+      Collection convertedValues = new ArrayList<>();
+      convertedValues.addAll(
+          originalValues.stream()
+              .map(s -> conversionService.convert(s, targetClass))
+              .collect(Collectors.toList()));
+      FilterCriterion fc =
+          new FilterCriterion(null, filterOperation, null, null, null, convertedValues);
+      return fc;
+    }
+
+    // min max value operand (e.g. "between")
+    if (filterOperation.getOperandCount() == FilterOperation.OperandCount.MIN_MAX_VALUES) {
+      if (operationValue == null) {
+        throw new IllegalArgumentException("No operation values found");
+      }
+      String[] operationValues = StringUtils.tokenizeToStringArray(operationValue, ",");
+      if (operationValues == null || operationValues.length < 1) {
+        throw new IllegalArgumentException("Operation values can't be empty");
+      }
+      if (operationValues.length != 2) {
+        throw new IllegalArgumentException("For min/max operation two values are expected");
+      }
+      C minValue = null;
+      C maxValue = null;
+
+      // Convert
+      C value1 = (C) conversionService.convert(operationValues[0], targetClass);
+      C value2 = (C) conversionService.convert(operationValues[1], targetClass);
+
+      if (value1 != null && value2 != null) {
+        // Set min and max values
+        if (value1.compareTo(value2) > 0) {
+          minValue = value2;
+          maxValue = value1;
+        } else {
+          minValue = value1;
+          maxValue = value2;
+        }
+      }
+      FilterCriterion fc =
+          new FilterCriterion(null, filterOperation, null, minValue, maxValue, null);
+      return fc;
+    }
+
+    throw new IllegalArgumentException("Unknown operation '" + operationAcronym + "'");
   }
 }

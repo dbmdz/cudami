@@ -192,7 +192,7 @@
     },
     "mimeType": "MIME type",
     "move": "Move",
-    "moveSubcollections": "Move sub collection",
+    "moveSubcollections": "Move sub collection to:",
     "moveTo": {
       "collection": "move to another collection"
     },

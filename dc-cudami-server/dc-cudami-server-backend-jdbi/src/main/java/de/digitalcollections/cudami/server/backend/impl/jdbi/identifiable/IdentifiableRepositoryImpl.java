@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -403,7 +402,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       commonSql = " FROM " + tableName + " AS " + tableAlias;
     }
     StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
     String orderBy = getOrderBy(pageRequest.getSorting());
@@ -413,7 +412,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, sqlCount);
+    addFiltering(pageRequest, sqlCount, argumentMappings);
     long total = retrieveCount(sqlCount, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total);
@@ -428,14 +427,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
 
     commonSql += " WHERE " + getCommonSearchSql(tableAlias);
-    return find(
-        searchPageRequest, commonSql, Map.of("searchTerm", this.escapeTermForJsonpath(searchTerm)));
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   protected SearchPageResponse<I> find(
       SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
     addPageRequestParams(searchPageRequest, innerQuery);
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
@@ -445,7 +446,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -472,8 +473,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       filtering = Filtering.defaultBuilder().build();
       pageRequest.setFiltering(filtering);
     }
-    // TODO: test if binding works (because of single quotes done by filter expandion) or we have to
-    // put here values direktly, not passing Map.of....
+
     Filtering initialFiltering =
         Filtering.defaultBuilder()
             .filter(tableAlias + ".label ->> :language")
@@ -483,20 +483,28 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     // add special ordering
     Sorting sorting = pageRequest.getSorting();
-    if (sorting == null) {
-      sorting = Sorting.defaultBuilder().build();
-      pageRequest.setSorting(sorting);
-    }
-    Sorting.defaultBuilder()
-        .order(
-            Order.defaultBuilder()
-                .property("label")
-                .subProperty(language)
-                .direction(Direction.ASC)
-                .build());
-    sorting.and(sorting);
 
-    return this.find(pageRequest, null, Map.of("language", language, "initial", initial));
+    Sorting labelSorting =
+        Sorting.defaultBuilder()
+            .order(
+                Order.defaultBuilder()
+                    .property("label")
+                    .subProperty(language)
+                    .direction(Direction.ASC)
+                    .build())
+            .build();
+    if (sorting == null) {
+      sorting = labelSorting;
+    } else {
+      sorting.and(labelSorting);
+    }
+    pageRequest.setSorting(sorting);
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("language", language);
+    argumentMappings.put("initial", initial);
+
+    return this.find(pageRequest, null, argumentMappings);
   }
 
   @Override
@@ -504,15 +512,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     if (filtering == null) {
       filtering = Filtering.defaultBuilder().build();
     }
-    filtering.add(
-        Filtering.defaultBuilder()
-            .filter("uuid")
-            .isEquals(new FilterValuePlaceholder(":uuid"))
-            .build());
+    filtering.add(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build());
 
-    I result =
-        retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering, Map.of("uuid", uuid));
-
+    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
     return result;
   }
 
@@ -527,19 +529,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     Filtering filtering =
         Filtering.defaultBuilder()
-            .filter("id.identifier")
-            .isEquals(new FilterValuePlaceholder(":id"))
-            .filter("id.namespace")
-            .isEquals(new FilterValuePlaceholder(":namespace"))
+            .filterNative("id.identifier")
+            .isEquals(identifierId)
+            .filterNative("id.namespace")
+            .isEquals(namespace)
             .build();
 
-    I result =
-        retrieveOne(
-            sqlSelectAllFields,
-            sqlSelectAllFieldsJoins,
-            filtering,
-            Map.of("id", identifierId, "namespace", namespace));
-
+    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
     return result;
   }
 
@@ -770,6 +766,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return sortIndex;
   }
 
+  public I retrieveOne(String fieldsSql, String sqlSelectAllFieldsJoins, Filtering filtering) {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings);
+  }
+
   public I retrieveOne(
       String fieldsSql,
       String sqlSelectAllFieldsJoins,
@@ -808,7 +809,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + urlAliasAlias
                 + ".target_uuid"
                 + UrlAliasRepositoryImpl.WEBSITESJOIN);
-    addFiltering(filtering, sql);
+    addFiltering(filtering, sql, argumentMappings);
 
     I result =
         dbi.withHandle(

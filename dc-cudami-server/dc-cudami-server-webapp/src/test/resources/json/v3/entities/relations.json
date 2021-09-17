@@ -64,7 +64,7 @@
     "filtering": {
       "filterCriteria": [
         {
-          "fieldName": "predicate",
+          "expression": "predicate",
           "operation": "EQUALS",
           "value": "is_part_of"
         }

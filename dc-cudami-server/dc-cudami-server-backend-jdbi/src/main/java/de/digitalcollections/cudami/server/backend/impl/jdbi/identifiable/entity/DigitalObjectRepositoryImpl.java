@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterValuePlaceholder;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -136,13 +135,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           filtering.getFilterCriteria().stream()
               .map(
                   fc -> {
-                    fc.setFieldName(collectionRepositoryImpl.getColumnName(fc.getFieldName()));
+                    fc.setExpression(collectionRepositoryImpl.getColumnName(fc.getExpression()));
+                    fc.setNativeExpression(true);
                     return fc;
                   })
               .collect(Collectors.toList());
       filtering.setFilterCriteria(filterCriteria);
     }
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
@@ -159,7 +159,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
@@ -181,7 +181,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
                 + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
 
     List<FileResource> fileResources =
         fileResourceMetadataRepositoryImpl.retrieveList(
@@ -206,7 +207,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
                 + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = Map.of("uuid", digitalObjectUuid);
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
 
     List<ImageFileResource> fileResources =
         imageFileResourceRepositoryImpl.retrieveList(
@@ -223,16 +225,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     Filtering filtering =
         Filtering.defaultBuilder()
-            .filter("ido.digitalobject_uuid")
-            .isEquals(new FilterValuePlaceholder(":uuid"))
+            .filterNative("ido.digitalobject_uuid")
+            .isEquals(digitalObjectUuid)
             .build();
 
     Item result =
         itemRepositoryImpl.retrieveOne(
-            itemRepositoryImpl.getSqlSelectReducedFields(),
-            sqlAdditionalJoins,
-            filtering,
-            Map.of("uuid", digitalObjectUuid));
+            itemRepositoryImpl.getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
     return result;
   }
 
@@ -303,7 +302,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
@@ -320,7 +319,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);

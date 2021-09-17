@@ -8,7 +8,9 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
@@ -61,29 +63,38 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   public PageResponse<Identifier> find(PageRequest pageRequest) {
+    Map<String, Object> argumentMappings = new HashMap<>();
     StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName);
-    addFiltering(pageRequest, innerQuery);
+    addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
     final String sql = innerQuery.toString();
 
     List<Identifier> result =
-        dbi.withHandle(h -> h.createQuery(sql).mapToBean(Identifier.class).list());
+        dbi.withHandle(
+            h -> h.createQuery(sql).bindMap(argumentMappings).mapToBean(Identifier.class).list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
-    addFiltering(pageRequest, sqlCount);
+    addFiltering(pageRequest, sqlCount, argumentMappings);
     long total =
-        dbi.withHandle(h -> h.createQuery(sqlCount.toString()).mapTo(Long.class).findOne().get());
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
 
     return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
   public SearchPageResponse<Identifier> find(SearchPageRequest searchPageRequest) {
+    Map<String, Object> argumentMappings = new HashMap<>();
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM " + tableName + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
     addPageRequestParams(searchPageRequest, innerQuery);
 
     final String sql = innerQuery.toString();
@@ -93,6 +104,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             h ->
                 h.createQuery(sql)
                     .bind("searchTerm", searchPageRequest.getQuery())
+                    .bindMap(argumentMappings)
                     .mapToBean(Identifier.class)
                     .map(Identifier.class::cast)
                     .list());
@@ -102,12 +114,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             "SELECT count(*) FROM "
                 + tableName
                 + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total =
         dbi.withHandle(
             h ->
                 h.createQuery(countQuery.toString())
                     .bind("searchTerm", searchPageRequest.getQuery())
+                    .bindMap(argumentMappings)
                     .mapTo(Long.class)
                     .findOne()
                     .get());

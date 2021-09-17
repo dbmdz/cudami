@@ -137,7 +137,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
@@ -154,7 +154,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new SearchPageResponse<>(result, searchPageRequest, total);
