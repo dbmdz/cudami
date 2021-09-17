@@ -172,7 +172,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql += " AND " + getCommonSearchSql(tableAlias);
-      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+      argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
@@ -364,7 +364,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String searchTerm = searchPageRequest.getQuery();
     if (StringUtils.hasText(searchTerm)) {
       commonSql += " AND " + getCommonSearchSql(doTableAlias);
-      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+      argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
     }
 
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
@@ -537,7 +537,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     commonSql += " AND " + getCommonSearchSql(tableAlias);
 
     Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
     return find(searchPageRequest, commonSql, argumentMappings);
   }
 
