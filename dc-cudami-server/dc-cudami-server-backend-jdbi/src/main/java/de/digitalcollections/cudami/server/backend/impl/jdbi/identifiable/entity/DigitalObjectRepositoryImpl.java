@@ -225,7 +225,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     Filtering filtering =
         Filtering.defaultBuilder()
-            .filter("ido.digitalobject_uuid")
+            .filterNative("ido.digitalobject_uuid")
             .isEquals(digitalObjectUuid)
             .build();
 

@@ -502,9 +502,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     Filtering filtering =
         Filtering.defaultBuilder()
-            .filter("id.identifier")
+            .filterNative("id.identifier")
             .isEquals(identifierId)
-            .filter("id.namespace")
+            .filterNative("id.namespace")
             .isEquals(namespace)
             .build();
 

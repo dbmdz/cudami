@@ -319,7 +319,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         " INNER JOIN webpage_webpages ww ON " + tableAlias + ".uuid = ww.parent_webpage_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filter("ww.child_webpage_uuid").isEquals(uuid).build();
+        Filtering.defaultBuilder().filterNative("ww.child_webpage_uuid").isEquals(uuid).build();
 
     Webpage result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 

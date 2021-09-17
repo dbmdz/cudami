@@ -434,7 +434,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filter("tt.child_topic_uuid").isEquals(nodeUuid).build();
+        Filtering.defaultBuilder().filterNative("tt.child_topic_uuid").isEquals(nodeUuid).build();
 
     Topic result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 
