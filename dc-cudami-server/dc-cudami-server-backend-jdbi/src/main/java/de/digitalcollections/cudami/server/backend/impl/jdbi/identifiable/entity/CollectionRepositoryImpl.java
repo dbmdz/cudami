@@ -647,10 +647,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection saveWithParent(Collection collection, UUID parentUuid) {
-    final UUID childUuid =
-        collection.getUuid() == null ? save(collection).getUuid() : collection.getUuid();
-
+  public Collection saveWithParent(UUID childUuid, UUID parentUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "collection_collections", "parent_collection_uuid", parentUuid);

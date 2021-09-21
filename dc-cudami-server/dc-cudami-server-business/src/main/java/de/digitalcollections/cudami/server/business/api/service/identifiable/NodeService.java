@@ -120,7 +120,20 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
    * @return saved child node
    * @throws IdentifiableServiceException if saving fails
    */
-  N saveWithParent(N child, UUID parentUuid) throws IdentifiableServiceException;
+  default N saveWithParent(N child, UUID parentUuid) throws IdentifiableServiceException {
+    if (child.getUuid() == null) {
+      child = this.save(child);
+    }
+    return this.saveWithParent(child.getUuid(), parentUuid);
+  }
+
+  /**
+   * @param childUuid UUID of newly created child node
+   * @param parentUuid parent node the new node is child of
+   * @return saved child node
+   * @throws IdentifiableServiceException if saving fails
+   */
+  N saveWithParent(UUID childUuid, UUID parentUuid) throws IdentifiableServiceException;
 
   boolean updateChildrenOrder(UUID parentUuid, List<N> children);
 }

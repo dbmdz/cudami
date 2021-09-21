@@ -6,11 +6,15 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.Direction;
@@ -20,6 +24,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -214,6 +219,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
     // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
+    dbi.registerRowMapper(
+        BeanMapper.factory(UrlAlias.class, UrlAliasRepositoryImpl.MAPPING_PREFIX));
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
@@ -300,6 +307,26 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
         Identifier dbIdentifier = rowView.getRow(Identifier.class);
         identifiable.addIdentifier(dbIdentifier);
+      }
+      if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
+        UUID websiteUuid =
+            rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
+        if (websiteUuid != null) {
+          Website website =
+              new Website(
+                  rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+          website.setUuid(websiteUuid);
+          website.setLabel(
+              rowView.getColumn(
+                  UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+          urlAlias.setWebsite(website);
+        }
+        if (identifiable.getLocalizedUrlAliases() == null) {
+          identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
+        } else {
+          identifiable.getLocalizedUrlAliases().add(urlAlias);
+        }
       }
       return map;
     };
@@ -661,6 +688,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       StringBuilder innerQuery,
       final Map<String, Object> argumentMappings,
       String orderBy) {
+    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
+    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     final String sql =
         "SELECT "
             + fieldsSql
@@ -668,6 +697,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + SQL_FULL_FIELDS_ID
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
+            + ", "
+            + UrlAliasRepositoryImpl.getSelectFields(true)
             + " FROM "
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
@@ -679,6 +710,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + " LEFT JOIN fileresources_image AS file ON "
             + tableAlias
             + ".previewfileresource = file.uuid"
+            + " LEFT JOIN "
+            + urlAliasName
+            + " AS "
+            + urlAliasAlias
+            + " ON "
+            + this.tableAlias
+            + ".uuid = "
+            + urlAliasAlias
+            + ".target_uuid"
+            + UrlAliasRepositoryImpl.WEBSITESJOIN
             + (orderBy != null ? " " + orderBy : "");
 
     List<I> result =
@@ -735,6 +776,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlSelectAllFieldsJoins,
       Filtering filtering,
       final Map<String, Object> argumentMappings) {
+    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
+    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     StringBuilder sql =
         new StringBuilder(
             "SELECT"
@@ -743,6 +786,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + SQL_FULL_FIELDS_ID
                 + ","
                 + SQL_PREVIEW_IMAGE_FIELDS_PI
+                + ", "
+                + UrlAliasRepositoryImpl.getSelectFields(true)
                 + " FROM "
                 + tableName
                 + " AS "
@@ -753,7 +798,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ".uuid = id.identifiable"
                 + " LEFT JOIN fileresources_image AS file ON "
                 + tableAlias
-                + ".previewfileresource = file.uuid");
+                + ".previewfileresource = file.uuid"
+                + " LEFT JOIN "
+                + urlAliasName
+                + " AS "
+                + urlAliasAlias
+                + " ON "
+                + this.tableAlias
+                + ".uuid = "
+                + urlAliasAlias
+                + ".target_uuid"
+                + UrlAliasRepositoryImpl.WEBSITESJOIN);
     addFiltering(filtering, sql, argumentMappings);
 
     I result =

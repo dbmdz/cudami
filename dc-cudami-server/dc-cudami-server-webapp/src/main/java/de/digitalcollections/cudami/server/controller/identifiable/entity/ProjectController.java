@@ -100,7 +100,11 @@ public class ProjectController {
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID uuid) {
 
-    projectService.delete(uuid);
+    try {
+      projectService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     return new ResponseEntity<>(HttpStatus.OK);
   }

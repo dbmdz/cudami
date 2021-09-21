@@ -81,11 +81,11 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
   boolean removeChild(UUID parentUuid, UUID childUuid);
 
   /**
-   * @param child newly created child node to be saved
+   * @param childUuid newly created child node
    * @param parentUUID parent node the new node is child of
    * @return saved child node
    */
-  N saveWithParent(N child, UUID parentUUID);
+  N saveWithParent(UUID childUuid, UUID parentUUID);
 
   boolean updateChildrenOrder(UUID parentUuid, List<N> children);
 }

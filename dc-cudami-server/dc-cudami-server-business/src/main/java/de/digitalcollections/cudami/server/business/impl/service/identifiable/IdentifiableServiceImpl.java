@@ -2,10 +2,15 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
@@ -24,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifiableService")
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
@@ -31,6 +37,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
   @Autowired private LocaleService localeService;
+  @Autowired private UrlAliasService urlAliasService;
+
+  @Autowired private UrlAliasGenerationProperties aliasGenerationProperties;
 
   protected IdentifiableRepository<I> repository;
 
@@ -38,6 +47,17 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
     this.repository = repository;
+  }
+
+  // TODO: Refactor this into constructor!
+  void setUrlAliasService(UrlAliasService urlAliasService) {
+    this.urlAliasService = urlAliasService;
+  }
+
+  void setAliasGenerationProperties(UrlAliasGenerationProperties aliasGenerationProperties) {
+    if (this.aliasGenerationProperties == null) {
+      this.aliasGenerationProperties = aliasGenerationProperties;
+    }
   }
 
   @Override
@@ -56,8 +76,59 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) {
+  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
+  public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
+    for (UUID uuid : uuids) {
+      try {
+        this.urlAliasService.deleteAllForTarget(uuid, true);
+      } catch (CudamiServiceException e) {
+        throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
+      }
+    }
     return repository.delete(uuids);
+  }
+
+  protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
+    if ((identifiable instanceof Entity)
+        && this.aliasGenerationProperties
+            .getGenerationExcludes()
+            .contains(((Entity) identifiable).getEntityType())) {
+      return;
+    }
+    LocalizedUrlAliases urlAliases = identifiable.getLocalizedUrlAliases();
+    if (urlAliases == null) {
+      urlAliases = new LocalizedUrlAliases();
+      identifiable.setLocalizedUrlAliases(urlAliases);
+    }
+    for (Locale lang : identifiable.getLabel().getLocales()) {
+      if (!urlAliases.containsKey(lang)
+          || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
+        // there is not any default alias (w/o website); create one
+        UrlAlias defaultAlias = new UrlAlias();
+        defaultAlias.setTargetIdentifiableType(identifiable.getType());
+        defaultAlias.setTargetLanguage(lang);
+        defaultAlias.setTargetUuid(identifiable.getUuid());
+        if (identifiable instanceof Entity) {
+          defaultAlias.setTargetEntityType(((Entity) identifiable).getEntityType());
+        }
+        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
+        try {
+          defaultAlias.setSlug(
+              this.urlAliasService.generateSlug(lang, identifiable.getLabel().getText(lang), null));
+        } catch (CudamiServiceException e) {
+          throw new IdentifiableServiceException("An error occured during slug generation.", e);
+        }
+        urlAliases.add(defaultAlias);
+      }
+
+      // check that a primary alias exists for this language
+      if (!urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
+        throw new IdentifiableServiceException(
+            String.format(
+                "There is not any primary alias for language '%s' of identifiable '%s'.",
+                lang, identifiable.getUuid()));
+      }
+    }
   }
 
   @Override
@@ -166,10 +237,27 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  //  @Transactional(readOnly = false)
+  @Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
   public I save(I identifiable) throws IdentifiableServiceException {
     try {
-      return repository.save(identifiable);
+      I savedIdentifiable = this.repository.save(identifiable);
+      savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
+      this.ensureDefaultAliasesExist(savedIdentifiable);
+      if (savedIdentifiable.getLocalizedUrlAliases() != null) {
+        LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
+        for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
+          // since we have the identifiable's UUID just here
+          // the targetUuid must be set at this point
+          urlAlias.setTargetUuid(savedIdentifiable.getUuid());
+          UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
+          savedUrlAliases.add(savedAlias);
+        }
+        savedIdentifiable.setLocalizedUrlAliases(savedUrlAliases);
+      }
+      return savedIdentifiable;
+    } catch (CudamiServiceException e) {
+      LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
+      throw new IdentifiableServiceException(e.getMessage());
     } catch (Exception e) {
       LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -203,10 +291,28 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  //  @Transactional(readOnly = false)
+  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
   public I update(I identifiable) throws IdentifiableServiceException {
     try {
-      return repository.update(identifiable);
+      I updatedIdentifiable = this.repository.update(identifiable);
+      // UrlAliases
+      this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
+      this.ensureDefaultAliasesExist(identifiable);
+      if (identifiable.getLocalizedUrlAliases() != null) {
+        for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
+          if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
+            // these haven't been removed from DB so we must update them
+            this.urlAliasService.update(urlAlias);
+          } else {
+            this.urlAliasService.create(urlAlias, true);
+          }
+        }
+      }
+      LocalizedUrlAliases savedLocalizedUrlAliases =
+          this.urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
+      updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
+      //////
+      return updatedIdentifiable;
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

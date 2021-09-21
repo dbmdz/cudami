@@ -5,6 +5,8 @@ cudami:
     language: en
     locale: en_US
   repositoryFolderPath: '~/cudami/fileResources'
+  urlalias:
+    generationExcludes: []
 
 iiif:
   image:

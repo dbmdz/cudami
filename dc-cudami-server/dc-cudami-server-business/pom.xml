@@ -14,10 +14,17 @@
   <packaging>jar</packaging>
 
   <properties>
+    <version.dc-commons-web>0.1.0-SNAPSHOT</version.dc-commons-web>
+    <version.icu4j>63.1</version.icu4j>
     <version.jscience>4.3.1</version.jscience>
   </properties>
-  
+
   <dependencies>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-web</artifactId>
+      <version>${version.dc-commons-web}</version>
+    </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-api</artifactId>

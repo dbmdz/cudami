@@ -401,7 +401,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public Website getWebsite(UUID rootWebpageUuid) {
     String query =
-        "SELECT uuid, refid, label"
+        "SELECT uuid, refid, label, url"
             + " FROM websites"
             + " INNER JOIN website_webpages ww ON uuid = ww.website_uuid"
             + " WHERE ww.webpage_uuid = :uuid";
@@ -437,9 +437,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage saveWithParent(Webpage webpage, UUID parentWebpageUuid) {
-    final UUID childUuid = webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
-
+  public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "webpage_webpages", "parent_webpage_uuid", parentWebpageUuid);
@@ -451,18 +449,15 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         h ->
             h.createUpdate(query)
                 .bind("parent_webpage_uuid", parentWebpageUuid)
-                .bind("child_webpage_uuid", childUuid)
+                .bind("child_webpage_uuid", childWebpageUuid)
                 .bind("sortIndex", nextSortIndex)
                 .execute());
 
-    return findOne(childUuid);
+    return findOne(childWebpageUuid);
   }
 
   @Override
-  public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) {
-    final UUID webpageUuid =
-        webpage.getUuid() == null ? save(webpage).getUuid() : webpage.getUuid();
-
+  public Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "website_webpages", "website_uuid", parentWebsiteUuid);

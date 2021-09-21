@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.backend.api.repository.alias;
+package de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -6,6 +6,7 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface UrlAliasRepository {
@@ -33,14 +34,23 @@ public interface UrlAliasRepository {
   LocalizedUrlAliases findAllForTarget(UUID uuid) throws UrlAliasRepositoryException;
 
   /**
-   * Retrieve the main links corresponding to a slug.
+   * Retrieve all primary links corresponding to a slug. The owning website is ignored.
    *
-   * @param websiteUuid the owning website's UUID
-   * @param slug the slug to retrieve the main alias for
-   * @return all {@code UrlAlias}es with {@code isMainAlias() == true}
+   * @param slug the slug to retrieve the primary aliases for
+   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
    * @throws UrlAliasRepositoryException
    */
-  LocalizedUrlAliases findMainLinks(UUID websiteUuid, String slug)
+  LocalizedUrlAliases findAllPrimaryLinks(String slug) throws UrlAliasRepositoryException;
+
+  /**
+   * Retrieve the primary links corresponding to a slug.
+   *
+   * @param websiteUuid the owning website's UUID, can be {@code null} and will be selected as is
+   * @param slug the slug to retrieve the primary aliases for
+   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
+   * @throws UrlAliasRepositoryException
+   */
+  LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
       throws UrlAliasRepositoryException;
 
   /**
@@ -50,6 +60,16 @@ public interface UrlAliasRepository {
    * @throws UrlAliasRepositoryException
    */
   UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException;
+
+  /**
+   * Check whether an entry exists for the passed website UUID, slug and language.
+   *
+   * @param slug not null
+   * @param websiteUuid can be null
+   * @param targetLanguage can be null
+   */
+  boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
+      throws UrlAliasRepositoryException;
 
   /**
    * Save an {@code UrlAlias} object.

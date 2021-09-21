@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -12,8 +13,10 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +53,21 @@ class IdentifiableRepositoryImplTest {
   @DisplayName("is testable")
   void containerIsUpAndRunning() {
     assertThat(postgreSQLContainer.isRunning()).isTrue();
+  }
+
+  @Test
+  @DisplayName("retrieve one digital object")
+  void testFindOne() {
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(UUID.randomUUID());
+    identifiable.setCreated(LocalDateTime.now());
+    identifiable.setType(IdentifiableType.RESOURCE);
+    identifiable.setLabel("test");
+    identifiable.setLastModified(LocalDateTime.now());
+    this.repo.save(identifiable);
+
+    Identifiable actual = this.repo.findOne(identifiable.getUuid());
+    assertThat(actual).isEqualTo(identifiable);
   }
 
   @Test

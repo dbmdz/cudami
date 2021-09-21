@@ -70,11 +70,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   long count();
 
-  default boolean delete(UUID uuid) {
+  default boolean delete(UUID uuid) throws IdentifiableServiceException {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  boolean delete(List<UUID> uuids);
+  boolean delete(List<UUID> uuids) throws IdentifiableServiceException;
 
   PageResponse<I> find(PageRequest pageRequest);
 

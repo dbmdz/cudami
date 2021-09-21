@@ -19,12 +19,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /** Database configuration. */
 @Configuration
 @ComponentScan(basePackages = {"de.digitalcollections.cudami.server.backend.impl.jdbi"})
+@EnableTransactionManagement
 public class SpringConfigBackendDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfigBackendDatabase.class);
@@ -57,5 +60,10 @@ public class SpringConfigBackendDatabase {
     plugins.add(new JsonbJdbiPlugin(objectMapper));
     jdbiFactoryBean.setPlugins(plugins);
     return jdbiFactoryBean;
+  }
+
+  @Bean
+  public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+    return new DataSourceTransactionManager(dataSource);
   }
 }
