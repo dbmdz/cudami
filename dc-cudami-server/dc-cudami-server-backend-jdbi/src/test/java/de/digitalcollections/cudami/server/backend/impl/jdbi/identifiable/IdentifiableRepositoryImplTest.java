@@ -64,7 +64,8 @@ class IdentifiableRepositoryImplTest {
     identifiable.setType(IdentifiableType.RESOURCE);
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
-    this.repo.save(identifiable);
+
+    identifiable = this.repo.save(identifiable);
 
     Identifiable actual = this.repo.findOne(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
