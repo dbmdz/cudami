@@ -393,7 +393,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
-    return find(pageRequest, null, null);
+    return find(pageRequest, null, new HashMap<>());
   }
 
   protected PageResponse<I> find(
@@ -775,7 +775,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String fieldsSql,
       String sqlSelectAllFieldsJoins,
       Filtering filtering,
-      final Map<String, Object> argumentMappings) {
+      Map<String, Object> argumentMappings) {
     final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
     final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     StringBuilder sql =
@@ -809,13 +809,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + urlAliasAlias
                 + ".target_uuid"
                 + UrlAliasRepositoryImpl.WEBSITESJOIN);
+    if (argumentMappings == null) {
+      argumentMappings = new HashMap<>(0);
+    }
     addFiltering(filtering, sql, argumentMappings);
 
+    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
     I result =
         dbi.withHandle(
                 h ->
                     h.createQuery(sql.toString())
-                        .bindMap(argumentMappings)
+                        .bindMap(bindMap)
                         .reduceRows(
                             (Map<UUID, I> map, RowView rowView) -> {
                               fullReduceRowsBiFunction.apply(map, rowView);

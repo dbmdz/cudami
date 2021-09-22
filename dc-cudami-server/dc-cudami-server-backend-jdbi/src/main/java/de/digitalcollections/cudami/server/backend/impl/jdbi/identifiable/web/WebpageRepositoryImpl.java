@@ -355,7 +355,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + " WHERE NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
             + tableAlias
             + ".uuid)";
-    return find(pageRequest, commonSql, null);
+    return find(pageRequest, commonSql, new HashMap<>());
   }
 
   @Override

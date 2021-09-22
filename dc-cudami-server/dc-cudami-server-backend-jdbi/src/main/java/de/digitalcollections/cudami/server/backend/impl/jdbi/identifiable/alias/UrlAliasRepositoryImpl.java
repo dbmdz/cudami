@@ -113,7 +113,6 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       throws UrlAliasRepositoryException {
     StringBuilder commonSql =
         new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
-    Map<String, Object> bindings = new HashMap<>();
 
     Filtering filtering = searchPageRequest.getFiltering();
     Filtering slug =
@@ -123,6 +122,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     } else {
       filtering.add(slug);
     }
+    Map<String, Object> bindings = new HashMap<>();
     addFiltering(filtering, commonSql, bindings);
 
     long count;

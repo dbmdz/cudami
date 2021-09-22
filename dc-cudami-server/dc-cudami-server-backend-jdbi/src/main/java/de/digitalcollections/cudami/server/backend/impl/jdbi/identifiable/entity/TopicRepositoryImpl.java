@@ -469,7 +469,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + " WHERE NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
             + ".uuid)";
-    return find(pageRequest, commonSql, null);
+    return find(pageRequest, commonSql, new HashMap<>());
   }
 
   @Override

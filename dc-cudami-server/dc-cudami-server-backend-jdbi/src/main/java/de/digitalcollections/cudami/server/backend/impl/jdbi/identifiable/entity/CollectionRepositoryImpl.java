@@ -514,7 +514,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
             + tableAlias
             + ".uuid)";
-    return find(pageRequest, commonSql, null);
+    return find(pageRequest, commonSql, new HashMap<>());
   }
 
   @Override
