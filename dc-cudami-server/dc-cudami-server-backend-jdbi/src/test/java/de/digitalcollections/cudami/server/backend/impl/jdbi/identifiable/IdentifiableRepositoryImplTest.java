@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.impl.asserts.IdentifiableAssert;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -69,7 +68,7 @@ class IdentifiableRepositoryImplTest {
     identifiable = this.repo.save(identifiable);
 
     Identifiable actual = this.repo.findOne(identifiable.getUuid());
-    IdentifiableAssert.assertThat(actual).isEqualTo(identifiable);
+    assertThat(actual).isEqualTo(identifiable);
   }
 
   @Test
