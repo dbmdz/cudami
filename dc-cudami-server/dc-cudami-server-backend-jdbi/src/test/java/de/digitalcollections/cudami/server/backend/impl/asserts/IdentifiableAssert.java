@@ -4,7 +4,7 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import org.assertj.core.api.AbstractAssert;
 
 /**
- * The IdentifiableAssert compares to identifiables field by field with the exception of
+ * The IdentifiableAssert compares two identifiables field by field with the exception of
  * lastModified.
  */
 public class IdentifiableAssert extends AbstractAssert<IdentifiableAssert, Identifiable> {
