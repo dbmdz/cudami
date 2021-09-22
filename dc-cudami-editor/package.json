@@ -41,7 +41,7 @@
     "prosemirror-keymap": "^1.1.4",
     "prosemirror-model": "^1.14.3",
     "prosemirror-schema-basic": "^1.1.2",
-    "prosemirror-schema-list": "^1.1.5",
+    "prosemirror-schema-list": "^1.1.6",
     "prosemirror-tables": "^1.1.1",
     "pubsub-js": "^1.9.3",
     "react": "^17.0.2",
