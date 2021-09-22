@@ -16,10 +16,6 @@ public class IdentifiableAssert extends AbstractAssert<IdentifiableAssert, Ident
     actual = identifiable;
   }
 
-  public static IdentifiableAssert assertThat(Identifiable identifiable) {
-    return new IdentifiableAssert(identifiable);
-  }
-
   @Override
   public IdentifiableAssert isEqualTo(Object expected) {
     if (expected instanceof Identifiable) {
