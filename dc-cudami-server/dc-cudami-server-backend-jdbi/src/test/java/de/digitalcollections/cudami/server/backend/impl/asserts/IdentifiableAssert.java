@@ -9,7 +9,7 @@ import org.assertj.core.api.AbstractAssert;
  */
 public class IdentifiableAssert extends AbstractAssert<IdentifiableAssert, Identifiable> {
 
-  Identifiable actual;
+  private Identifiable actual;
 
   public IdentifiableAssert(Identifiable identifiable) {
     super(identifiable, IdentifiableAssert.class);
