@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -64,7 +64,8 @@ class IdentifiableRepositoryImplTest {
     identifiable.setType(IdentifiableType.RESOURCE);
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
-    this.repo.save(identifiable);
+
+    identifiable = this.repo.save(identifiable);
 
     Identifiable actual = this.repo.findOne(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
