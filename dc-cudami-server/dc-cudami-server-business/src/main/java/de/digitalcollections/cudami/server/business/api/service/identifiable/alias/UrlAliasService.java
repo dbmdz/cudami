@@ -8,6 +8,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import javax.validation.ValidationException;
 
 /** Service for UrlAliasses */
 public interface UrlAliasService {
@@ -142,4 +143,17 @@ public interface UrlAliasService {
    * @throws CudamiServiceException
    */
   String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws CudamiServiceException;
+
+  /**
+   * Validates the given localizedUrlAliases according to the following criteria:
+   *
+   * <ul>
+   *   <li>For each (website,target,language) tuple, exactly one primary UrlAlias must exist, and as
+   *       many non primary UrlAliases can exist
+   * </ul>
+   *
+   * @param localizedUrlAliases the LocalizedUrlAliases to validate
+   * @throws ValidationException when the critera are not met
+   */
+  void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException;
 }

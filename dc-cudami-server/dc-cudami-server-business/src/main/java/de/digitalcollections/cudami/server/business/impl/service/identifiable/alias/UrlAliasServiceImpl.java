@@ -11,10 +11,14 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,6 +264,35 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       return repository.update(urlAlias);
     } catch (Exception e) {
       throw new CudamiServiceException("Cannot update urlAlias: " + e, e);
+    }
+  }
+
+  @Override
+  public void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException {
+    if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
+      return;
+    }
+
+    Map<String, Integer> primaries = new HashMap<>();
+    localizedUrlAliases.flatten().stream()
+        .forEach(
+            u -> {
+              String key =
+                  u.getWebsite().getUuid() + "-" + u.getTargetUuid() + "-" + u.getTargetLanguage();
+              Integer primariesPerTuple = primaries.get(key);
+              if (primariesPerTuple == null) {
+                primariesPerTuple = 0;
+              }
+              if (u.isPrimary()) {
+                primariesPerTuple++;
+              }
+              primaries.put(key, primariesPerTuple);
+            });
+
+    // Validation is failed, if we have not only single primaries per tuple, or it we have no single
+    // primary per tuple at all
+    if ((Set.of(primaries.values()).size() != 1) || (!(primaries.values().contains(1)))) {
+      throw new ValidationException("violated single primaries: " + primaries);
     }
   }
 }

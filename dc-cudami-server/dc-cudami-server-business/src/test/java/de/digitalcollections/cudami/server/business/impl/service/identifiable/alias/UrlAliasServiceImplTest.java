@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,8 @@ class UrlAliasServiceImplTest {
   @DisplayName("returns an UrlAlias")
   @Test
   public void readExisting() throws CudamiServiceException, UrlAliasRepositoryException {
-    UrlAlias expected = createUrlAlias("hützligrütz", false, "de");
+    UrlAlias expected =
+        createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
     when(repo.findOne(any(UUID.class))).thenReturn(expected);
 
@@ -110,7 +112,9 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.create(createUrlAlias("hützligrütz", true, "de"));
+          service.create(
+              createUrlAlias(
+                  "hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
   }
 
@@ -123,14 +127,17 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.create(createUrlAlias("hützligrütz", false, "de"));
+          service.create(
+              createUrlAlias(
+                  "hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
   }
 
   @DisplayName("creates and saves an UrlAlias and returns it with set UUID")
   @Test
   public void saveUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
-    UrlAlias urlAlias = createUrlAlias("hützligrütz", false, "de");
+    UrlAlias urlAlias =
+        createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
     UrlAlias expected = deepCopy(urlAlias);
     expected.setUuid(UUID.randomUUID());
 
@@ -155,7 +162,9 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.update(createUrlAlias("hützligrütz", false, "de"));
+          service.update(
+              createUrlAlias(
+                  "hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
   }
 
@@ -168,7 +177,9 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.update(createUrlAlias("hützligrütz", true, "de"));
+          service.update(
+              createUrlAlias(
+                  "hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
   }
 
@@ -177,7 +188,8 @@ class UrlAliasServiceImplTest {
   @Test
   public void raiseExceptionWhenUpdateLeadsToAnExceptionAtPersisting()
       throws CudamiServiceException, UrlAliasRepositoryException {
-    UrlAlias expected = createUrlAlias("hützligrütz", true, "de");
+    UrlAlias expected =
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     expected.setLastPublished(null);
 
     when(repo.findOne(any(UUID.class))).thenReturn(expected);
@@ -193,7 +205,8 @@ class UrlAliasServiceImplTest {
   @DisplayName("updates and returns an UrlAlias")
   @Test
   public void updateUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
-    UrlAlias expected = createUrlAlias("hützligrütz", true, "de");
+    UrlAlias expected =
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
     when(repo.findOne(any(UUID.class))).thenReturn(expected);
     when(repo.update(eq(expected))).thenReturn(expected);
@@ -288,7 +301,8 @@ class UrlAliasServiceImplTest {
     String slug = "hützligrütz";
 
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
-    expected.add(createUrlAlias("hützligrütz", true, "de"));
+    expected.add(
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(new LocalizedUrlAliases());
     when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug))).thenReturn(expected);
 
@@ -330,7 +344,8 @@ class UrlAliasServiceImplTest {
   @Test
   public void returnPrimaryLinks() throws CudamiServiceException, UrlAliasRepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
-    expected.add(createUrlAlias("hützligrütz", true, "de"));
+    expected.add(
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
 
     assertThat(service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz", null))
@@ -355,7 +370,8 @@ class UrlAliasServiceImplTest {
   public void returnSearchPageResult() throws UrlAliasRepositoryException, CudamiServiceException {
     SearchPageResponse<LocalizedUrlAliases> expected = new SearchPageResponse();
     LocalizedUrlAliases localizedUrlAlias = new LocalizedUrlAliases();
-    localizedUrlAlias.add(createUrlAlias("hützligrütz", true, "de"));
+    localizedUrlAlias.add(
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     expected.setContent(List.of(localizedUrlAlias));
 
     when(repo.find(any(SearchPageRequest.class))).thenReturn(expected);
@@ -451,7 +467,9 @@ class UrlAliasServiceImplTest {
   @Test
   public void displayFilterExistingTargetLanguage() {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
-    expected.add(createUrlAlias("hurz", true, "de"), createUrlAlias("foo", true, "en"));
+    expected.add(
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()),
+        createUrlAlias("foo", true, "en", false, UUID.randomUUID(), UUID.randomUUID()));
 
     LocalizedUrlAliases actual =
         service.filterForLocaleWithFallback(Locale.forLanguageTag("de"), expected);
@@ -465,7 +483,9 @@ class UrlAliasServiceImplTest {
   @Test
   public void fallbackToSystemLanguage() {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
-    expected.add(createUrlAlias("hurzo", true, "it"), createUrlAlias("foo", true, "en"));
+    expected.add(
+        createUrlAlias("hurzo", true, "it", false, UUID.randomUUID(), UUID.randomUUID()),
+        createUrlAlias("foo", true, "en", false, UUID.randomUUID(), UUID.randomUUID()));
 
     LocalizedUrlAliases actual =
         service.filterForLocaleWithFallback(Locale.forLanguageTag("de"), expected);
@@ -479,7 +499,8 @@ class UrlAliasServiceImplTest {
   public void genericPrimaryLinkForNoWebsite()
       throws CudamiServiceException, UrlAliasRepositoryException {
     LocalizedUrlAliases expectedLocalizedUrlAliases = new LocalizedUrlAliases();
-    expectedLocalizedUrlAliases.add(createUrlAlias("hurz", true, "de"));
+    expectedLocalizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     when(repo.findPrimaryLinksForWebsite(eq(null), eq("hurz")))
         .thenReturn(expectedLocalizedUrlAliases);
 
@@ -502,7 +523,8 @@ class UrlAliasServiceImplTest {
       throws CudamiServiceException, UrlAliasRepositoryException {
     UUID targetUuid = UUID.randomUUID();
     LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
-    targetLocalizedUrlAliases.add(createUrlAlias("hurz", true, "de"));
+    targetLocalizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
 
     when(repo.findAllForTarget(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
     when(repo.delete(any(List.class))).thenReturn(1);
@@ -517,7 +539,8 @@ class UrlAliasServiceImplTest {
   @DisplayName("checkPublication sets date to now for primary, if unset")
   @Test
   public void checkPublicationSetsNowForPrimaryIfUnset() throws CudamiServiceException {
-    UrlAlias urlAlias = createUrlAlias("hurz", true, "de");
+    UrlAlias urlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
     urlAlias.setLastPublished(null);
     service.checkPublication(urlAlias);
@@ -528,7 +551,8 @@ class UrlAliasServiceImplTest {
   @Test
   public void checkPublicationDoesNotOverridePublicationDate()
       throws CudamiServiceException, UrlAliasRepositoryException {
-    UrlAlias urlAlias = createUrlAlias("hurz", true, "de");
+    UrlAlias urlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
@@ -542,7 +566,8 @@ class UrlAliasServiceImplTest {
   @Test
   public void checkPublicationThrowsExceptionForAlreadyPublished()
       throws UrlAliasRepositoryException, CudamiServiceException {
-    UrlAlias urlAlias = createUrlAlias("hurz", true, "de");
+    UrlAlias urlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
@@ -558,21 +583,101 @@ class UrlAliasServiceImplTest {
         });
   }
 
+  @DisplayName("can successfully validate an empty LocalizedUrlAlias")
+  @Test
+  public void allowEmptyLocalizedUrlAlias() throws ValidationException {
+    service.validate(null);
+    service.validate(new LocalizedUrlAliases());
+  }
+
+  @DisplayName("can successfully validate a LocalizedUrlAlias with one primary UrlAlias")
+  @Test
+  public void allowOnePrimaryUrlAlias() throws ValidationException {
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, UUID.randomUUID(), UUID.randomUUID()));
+    service.validate(localizedUrlAliases);
+  }
+
+  @DisplayName("throws an exception when validating a LocalizedUrlAlias with no primary UrlAlias")
+  @Test
+  public void rejectNoPrimaryUrlAlias() throws ValidationException {
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.validate(localizedUrlAliases);
+        });
+  }
+
+  @DisplayName(
+      "throws an exception when validating a LocalizedUrlAlias with two primary UrlAliases for the same website,target and language tuple")
+  @Test
+  public void rejectTwoPrimaryUrlAliasesForTheSameTuple() throws ValidationException {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid),
+        createUrlAlias("hurz2", true, "de", true, targetUuid, websiteUuid));
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.validate(localizedUrlAliases);
+        });
+  }
+
+  @DisplayName(
+      "can successfully validate a LocalizedUrlAlias with multiple UrlAliases for the same website,target,language tuple, if only one is primary")
+  @Test
+  public void allowOnePrimaryForTheSameTuple() {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid),
+        createUrlAlias("hurz2", true, "de", false, targetUuid, websiteUuid));
+    service.validate(localizedUrlAliases);
+  }
+
+  @DisplayName(
+      "can successfully validate a LocalizedUrlAlias with multiple UrlAliases for the different website,target,language tuples, if only one of each is primary")
+  @Test
+  public void allowOnePrimaryPerTuple() {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid1 = UUID.randomUUID();
+    UUID websiteUuid2 = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid1),
+        createUrlAlias("hurz2", true, "de", false, targetUuid, websiteUuid1),
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid2));
+    service.validate(localizedUrlAliases);
+  }
+
   // -------------------------------------------------------------------------
-  private UrlAlias createUrlAlias(String slug, boolean setUuid, String language) {
+  private UrlAlias createUrlAlias(
+      String slug,
+      boolean setUuid,
+      String language,
+      boolean primary,
+      UUID targetUuid,
+      UUID websiteUuid) {
     UrlAlias urlAlias = new UrlAlias();
     if (setUuid) {
       urlAlias.setUuid(UUID.randomUUID());
     }
-    urlAlias.setPrimary(false);
-    urlAlias.setTargetUuid(UUID.randomUUID());
+    urlAlias.setPrimary(primary);
+    urlAlias.setTargetUuid(targetUuid);
     urlAlias.setSlug(slug);
     urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
     urlAlias.setTargetEntityType(EntityType.COLLECTION);
     urlAlias.setLastPublished(LocalDateTime.now());
     urlAlias.setCreated(LocalDateTime.now());
     urlAlias.setTargetLanguage(Locale.forLanguageTag(language));
-    urlAlias.setWebsite(createWebsite(UUID.randomUUID()));
+    urlAlias.setWebsite(createWebsite(websiteUuid));
     return urlAlias;
   }
 
