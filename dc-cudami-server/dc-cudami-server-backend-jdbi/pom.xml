@@ -17,6 +17,7 @@
     <version.dc-commons-jdbi>4.2.1-SNAPSHOT</version.dc-commons-jdbi>
     <version.jdbi>3.20.1</version.jdbi>
     <version.testcontainers>1.16.0</version.testcontainers>
+    <version.dc-commons-web>0.1.0-SNAPSHOT</version.dc-commons-web>
   </properties>
 
   <dependencies>
@@ -28,6 +29,11 @@
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
       <version>${version.dc-commons-jdbi}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.commons</groupId>
+      <artifactId>dc-commons-web</artifactId>
+      <version>${version.dc-commons-web}</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
