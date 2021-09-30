@@ -31,6 +31,7 @@ import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.Website;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -48,8 +49,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   // Cannot be more elegant, since we want to allow null values
-  private static final Map<EntityType, String> ENTITYMIGRATIONTABLES =
-      new HashMap<EntityType, String>();
+  private static final Map<EntityType, String> ENTITYMIGRATIONTABLES = new HashMap<>();
 
   static {
     ENTITYMIGRATIONTABLES.put(AGENT, null);
@@ -89,13 +89,16 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         new SingleConnectionDataSource(context.getConnection(), true);
     JdbcTemplate jdbcTemplate = new JdbcTemplate(connectionDataSource.getConnection());
 
-    migrateIdentifiables(jdbcTemplate, "webpages", null, IdentifiableType.RESOURCE);
+    // Webpages have to be migrated individually, since their URLAliases depend on the
+    // the websites, they are bound, too
+    migrateWebpages(jdbcTemplate);
 
+    // All other entities have only generic URLAliases
     ENTITYMIGRATIONTABLES.forEach(
         (entityType, tableName) -> {
           if (tableName != null) {
             try {
-              migrateIdentifiables(jdbcTemplate, tableName, entityType, IdentifiableType.ENTITY);
+              migrateIdentifiables(jdbcTemplate, tableName, entityType);
             } catch (SQLException e) {
               throw new RuntimeException("Cannot migrate " + entityType + ": " + e, e);
             }
@@ -106,14 +109,52 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     throw new RuntimeException("Force trigger rollback");
   }
 
+  private void migrateWebpages(JdbcTemplate jdbcTemplate) throws SQLException {
+    String selectQuery =
+        "SELECT w.uuid AS w_uuid, w.label AS label, ww.website_uuid AS ws_uuid FROM webpages w, website_webpages ww WHERE ww.webpage_uuid=w.uuid ORDER BY ws_uuid,w_uuid";
+    List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+    webpages.forEach(
+        w -> {
+          JSONObject jsonObject = new JSONObject(w.toString());
+          UUID uuid = UUID.fromString(jsonObject.getString("w_uuid"));
+          UUID websiteUuid = UUID.fromString(jsonObject.getString("ws_uuid"));
+          try {
+            HashMap labels =
+                new ObjectMapper().readValue(jsonObject.getString("label"), HashMap.class);
+            labels.forEach(
+                (language, label) -> {
+                  UrlAlias urlAlias =
+                      buildUrlAlias(
+                          jdbcTemplate,
+                          null,
+                          IdentifiableType.RESOURCE,
+                          uuid,
+                          (String) language,
+                          (String) label,
+                          websiteUuid);
+                  try {
+                    saveUrlAlias(jdbcTemplate, urlAlias);
+                  } catch (SQLException e) {
+                    throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
+                  }
+                });
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException("Cannot parse " + w + ": " + e, e);
+          }
+        });
+    LOGGER.info("Successfully added {} UrlAliases for webpages", webpages.size());
+  }
+
   private void migrateIdentifiables(
-      JdbcTemplate jdbcTemplate,
-      String tableName,
-      EntityType entityType,
-      IdentifiableType identifiableType)
-      throws SQLException {
-    String selectQuery = String.format("SELECT uuid,label FROM %s", tableName);
+      JdbcTemplate jdbcTemplate, String tableName, EntityType entityType) throws SQLException {
+    String selectQuery = String.format("SELECT uuid,label FROM %s ORDER by uuid", tableName);
     List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
+
+    if (identifiables.isEmpty()) {
+      LOGGER.info("No UrlAliases to add for {}", tableName);
+      return;
+    }
+
     identifiables.forEach(
         w -> {
           JSONObject jsonObject = new JSONObject(w.toString());
@@ -128,12 +169,13 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
                       buildUrlAlias(
                           jdbcTemplate,
                           entityType,
-                          identifiableType,
+                          IdentifiableType.ENTITY,
                           uuid,
                           (String) language,
-                          (String) label);
+                          (String) label,
+                          null);
                   try {
-                    saveCommonUrlAlias(jdbcTemplate, urlAlias);
+                    saveUrlAlias(jdbcTemplate, urlAlias);
                   } catch (SQLException e) {
                     throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
                   }
@@ -151,14 +193,15 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
       IdentifiableType identifiableType,
       UUID uuid,
       String language,
-      String label) {
+      String label,
+      UUID websiteUuid) {
     Locale locale = Locale.forLanguageTag(language);
     String baseSlug = slugGenerator.generateSlug(label);
     String slug = baseSlug;
     int suffix = 0;
     while (true) {
       try {
-        if (!hasUrlAlias(jdbcTemplate, slug, uuid, locale)) break;
+        if (!hasUrlAlias(jdbcTemplate, slug, uuid, locale, websiteUuid)) break;
       } catch (SQLException e) {
         throw new RuntimeException(
             "Cannot check availability of URLAlias for uuid="
@@ -175,6 +218,10 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
       slug = String.format("%s-%d", baseSlug, suffix);
     }
 
+    if (!slug.equals(baseSlug)) {
+      LOGGER.warn("Building slug with suffix: " + slug);
+    }
+
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setUuid(UUID.randomUUID());
     urlAlias.setTargetLanguage(locale);
@@ -183,13 +230,18 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     urlAlias.setTargetIdentifiableType(identifiableType);
     urlAlias.setTargetEntityType(entityType);
     urlAlias.setSlug(slug);
+    if (websiteUuid != null) {
+      Website website = new Website();
+      website.setUuid(websiteUuid);
+      urlAlias.setWebsite(website);
+    }
+
     return urlAlias;
   }
 
-  private void saveCommonUrlAlias(JdbcTemplate jdbcTemplate, UrlAlias urlAlias)
-      throws SQLException {
+  private void saveUrlAlias(JdbcTemplate jdbcTemplate, UrlAlias urlAlias) throws SQLException {
     String updateQuery =
-        "insert into url_aliases (uuid,created,last_published,\"primary\",slug,target_entity_type,target_identifiable_type,target_language,target_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid);";
+        "insert into url_aliases (uuid,created,last_published,\"primary\",slug,target_entity_type,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
     jdbcTemplate.update(
         updateQuery,
         urlAlias.getUuid().toString(),
@@ -198,16 +250,29 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         urlAlias.getTargetEntityType() != null ? urlAlias.getTargetEntityType().toString() : null,
         urlAlias.getTargetIdentifiableType().toString(),
         urlAlias.getTargetLanguage().toString(),
-        urlAlias.getTargetUuid().toString());
+        urlAlias.getTargetUuid().toString(),
+        urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid().toString() : null);
   }
 
-  private boolean hasUrlAlias(JdbcTemplate jdbcTemplate, String slug, UUID uuid, Locale locale)
+  private boolean hasUrlAlias(
+      JdbcTemplate jdbcTemplate, String slug, UUID uuid, Locale locale, UUID websiteUuid)
       throws SQLException {
+
+    if (websiteUuid == null) {
+      return jdbcTemplate.queryForInt(
+              "SELECT count(*) from url_aliases where slug=? and target_uuid=uuid(?) and target_language=?",
+              slug,
+              uuid.toString(),
+              locale.getLanguage())
+          > 0;
+    }
+
     return jdbcTemplate.queryForInt(
-            "SELECT count(*) from url_aliases where slug=? and target_uuid=uuid(?) and target_language=?",
+            "SELECT count(*) from url_aliases where slug=? and target_uuid=uuid(?) and target_language=? and website_uuid=uuid(?)",
             slug,
             uuid.toString(),
-            locale.getLanguage())
+            locale.getLanguage(),
+            websiteUuid.toString())
         > 0;
   }
 }
