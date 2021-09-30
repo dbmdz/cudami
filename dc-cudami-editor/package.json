@@ -30,7 +30,7 @@
     "@babel/runtime": "^7.15.4",
     "classnames": "^2.3.1",
     "filesize": "^8.0.0",
-    "i18next": "^20.6.1",
+    "i18next": "^21.2.0",
     "lodash": "^4.17.21",
     "object.fromentries": "^2.0.4",
     "prosemirror-commands": "^1.1.10",
