@@ -47,9 +47,10 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 /**
  * Rollback:
+ *
  * <ul>
- *   <li>drop table url_aliases;</li>
- *   <li>delete from flyway_schema_history where version='9.02.02';</li>
+ *   <li>drop table url_aliases;
+ *   <li>delete from flyway_schema_history where version='9.02.02';
  * </ul>
  */
 @SuppressWarnings("checkstyle:typename")
@@ -65,6 +66,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     ENTITYMIGRATIONTABLES.put(BOOK, null);
     ENTITYMIGRATIONTABLES.put(COLLECTION, "collections");
     ENTITYMIGRATIONTABLES.put(CORPORATE_BODY, "corporatebodies");
+    // FIXME: This must be removed dynamically by the configuration
     // ENTITYMIGRATIONTABLES.put(DIGITAL_OBJECT, "digitalobjects");
     ENTITYMIGRATIONTABLES.put(ENTITY, null);
     ENTITYMIGRATIONTABLES.put(EVENT, null);
@@ -87,10 +89,13 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(V9_02_02__DML_Fill_urlaliases.class);
 
-  private SlugGenerator slugGenerator = new SlugGenerator();
+  private final SlugGenerator slugGenerator = new SlugGenerator();
 
   @Override
   public void migrate(Context context) throws Exception {
+
+    // TODO Retrieve configuration and filter ENTITIYMIGRATIONTABLES accordingly!  (and remove
+    // comment accordingly)
 
     final SingleConnectionDataSource connectionDataSource =
         new SingleConnectionDataSource(context.getConnection(), true);
