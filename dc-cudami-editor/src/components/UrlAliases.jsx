@@ -59,7 +59,7 @@ const UrlAlias = ({
           {!readOnly && (
             <Input
               checked={primary}
-              name={slug}
+              name={url || 'default'}
               onChange={onChange}
               type="radio"
             />
