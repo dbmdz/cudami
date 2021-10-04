@@ -278,7 +278,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
         .forEach(
             u -> {
               String key =
-                  u.getWebsite().getUuid() + "-" + u.getTargetUuid() + "-" + u.getTargetLanguage();
+                  (u.getWebsite() != null ? u.getWebsite().getUuid() : "default") + "-" + u.getTargetUuid() + "-" + u.getTargetLanguage();
               Integer primariesPerTuple = primaries.get(key);
               if (primariesPerTuple == null) {
                 primariesPerTuple = 0;
