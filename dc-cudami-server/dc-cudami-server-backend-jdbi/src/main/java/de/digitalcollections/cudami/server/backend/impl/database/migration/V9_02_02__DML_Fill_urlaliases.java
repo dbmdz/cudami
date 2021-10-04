@@ -272,7 +272,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
     if (websiteUuid == null) {
       return jdbcTemplate.queryForInt(
-              "SELECT count(*) from url_aliases where slug=? and target_uuid=uuid(?) and target_language=?",
+              "SELECT count(*) from url_aliases where website_uuid is null and slug=? and target_uuid=uuid(?) and target_language=?",
               slug,
               uuid.toString(),
               locale.getLanguage())
