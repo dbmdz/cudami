@@ -301,12 +301,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
   public I update(I identifiable) throws IdentifiableServiceException {
     try {
-      urlAliasService.validate(identifiable.getLocalizedUrlAliases());
-    } catch (Exception e) {
-      throw new IdentifiableServiceException("Validation error: " + e);
-    }
-
-    try {
       I updatedIdentifiable = this.repository.update(identifiable);
       // UrlAliases
       this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
