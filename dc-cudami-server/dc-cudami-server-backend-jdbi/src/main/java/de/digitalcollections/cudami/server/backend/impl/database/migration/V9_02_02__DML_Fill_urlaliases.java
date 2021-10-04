@@ -178,8 +178,8 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
                           entityType,
                           IdentifiableType.ENTITY,
                           uuid,
-                          (String) language,
-                          (String) label,
+                          language,
+                          label,
                           null);
                   try {
                     saveUrlAlias(jdbcTemplate, urlAlias);
