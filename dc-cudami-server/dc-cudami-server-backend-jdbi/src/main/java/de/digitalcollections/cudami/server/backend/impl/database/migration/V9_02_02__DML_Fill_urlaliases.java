@@ -168,7 +168,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
           UUID uuid = UUID.fromString(jsonObject.getString("uuid"));
 
           try {
-            HashMap labels =
+            Map<String, String> labels =
                 new ObjectMapper().readValue(jsonObject.getString("label"), HashMap.class);
             labels.forEach(
                 (language, label) -> {
