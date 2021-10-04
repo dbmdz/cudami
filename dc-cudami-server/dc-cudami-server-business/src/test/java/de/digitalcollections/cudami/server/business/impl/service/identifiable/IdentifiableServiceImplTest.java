@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,11 +20,13 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -347,5 +350,92 @@ class IdentifiableServiceImplTest {
     service.update(identifiable);
 
     verify(urlAliasService, times(1)).create(any(UrlAlias.class), eq(true));
+  }
+
+  @DisplayName(
+      "throws an exception, when two primary entries for the same (website,target,language) tuple are set")
+  @Test
+  public void exceptionOnMultiplePrimaryEntries() throws CudamiServiceException {
+    UUID targetUuid = UUID.randomUUID();
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
+
+    Website website = new Website();
+    website.setUuid(UUID.randomUUID());
+
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstPrimaryUrlAlias = new UrlAlias();
+    firstPrimaryUrlAlias.setPrimary(true);
+    firstPrimaryUrlAlias.setWebsite(website);
+    firstPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstPrimaryUrlAlias.setSlug("slug1");
+
+    UrlAlias secondPrimaryUrlAlias = new UrlAlias();
+    secondPrimaryUrlAlias.setPrimary(true);
+    secondPrimaryUrlAlias.setWebsite(website);
+    secondPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    secondPrimaryUrlAlias.setSlug("slug2");
+
+    localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
+
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(targetUuid);
+    identifiable.setLocalizedUrlAliases(localizedUrlAliases);
+    identifiable.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
+
+    doThrow(new ValidationException("no way!"))
+        .when(urlAliasService)
+        .validate(eq(localizedUrlAliases));
+
+    assertThrows(
+        IdentifiableServiceException.class,
+        () -> {
+          service.update(identifiable);
+        });
+  }
+
+  @DisplayName("allows two primary entries for different (website,target,language) tuples")
+  @Test
+  public void allowMultiplePrimariesForDifferentTuples()
+      throws CudamiServiceException, IdentifiableServiceException {
+    UUID targetUuid = UUID.randomUUID();
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
+
+    Website website = new Website();
+    website.setUuid(UUID.randomUUID());
+
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstPrimaryUrlAlias = new UrlAlias();
+    firstPrimaryUrlAlias.setPrimary(true);
+    firstPrimaryUrlAlias.setWebsite(website);
+    firstPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstPrimaryUrlAlias.setSlug("slug1");
+
+    UrlAlias secondPrimaryUrlAlias = new UrlAlias();
+    secondPrimaryUrlAlias.setPrimary(true);
+    secondPrimaryUrlAlias.setWebsite(website);
+    secondPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("en"));
+    secondPrimaryUrlAlias.setSlug("slug2");
+
+    localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
+
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(targetUuid);
+    identifiable.setLocalizedUrlAliases(localizedUrlAliases);
+
+    LocalizedText label = new LocalizedText(Locale.forLanguageTag("de"), "label");
+    label.setText(Locale.forLanguageTag("en"), "label");
+    identifiable.setLabel(label);
+
+    when(repo.update(identifiable)).thenReturn(identifiable);
+
+    service.update(identifiable);
   }
 }

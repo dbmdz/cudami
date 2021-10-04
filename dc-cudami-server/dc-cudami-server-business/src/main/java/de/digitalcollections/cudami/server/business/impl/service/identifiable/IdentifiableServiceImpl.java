@@ -243,6 +243,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       I savedIdentifiable = this.repository.save(identifiable);
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       this.ensureDefaultAliasesExist(savedIdentifiable);
+
+      try {
+        urlAliasService.validate(identifiable.getLocalizedUrlAliases());
+      } catch (Exception e) {
+        throw new IdentifiableServiceException("Validation error: " + e);
+      }
+
       if (savedIdentifiable.getLocalizedUrlAliases() != null) {
         LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
         for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
@@ -298,6 +305,15 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       // UrlAliases
       this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
       this.ensureDefaultAliasesExist(identifiable);
+
+      // Validate again, because the default aliases insurance above can alter
+      // the data
+      try {
+        urlAliasService.validate(identifiable.getLocalizedUrlAliases());
+      } catch (Exception e) {
+        throw new IdentifiableServiceException("Validation error: " + e);
+      }
+
       if (identifiable.getLocalizedUrlAliases() != null) {
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
