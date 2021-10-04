@@ -45,6 +45,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
+/**
+ * Rollback:
+ * <ul>
+ *   <li>drop table url_aliases;</li>
+ *   <li>delete from flyway_schema_history where version='9.02.02';</li>
+ * </ul>
+ */
 @SuppressWarnings("checkstyle:typename")
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
