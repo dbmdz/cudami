@@ -6,6 +6,7 @@ import static de.digitalcollections.model.identifiable.entity.EntityType.AUDIO;
 import static de.digitalcollections.model.identifiable.entity.EntityType.BOOK;
 import static de.digitalcollections.model.identifiable.entity.EntityType.COLLECTION;
 import static de.digitalcollections.model.identifiable.entity.EntityType.CORPORATE_BODY;
+import static de.digitalcollections.model.identifiable.entity.EntityType.DIGITAL_OBJECT;
 import static de.digitalcollections.model.identifiable.entity.EntityType.ENTITY;
 import static de.digitalcollections.model.identifiable.entity.EntityType.EVENT;
 import static de.digitalcollections.model.identifiable.entity.EntityType.EXPRESSION;
@@ -33,11 +34,13 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
@@ -49,42 +52,40 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
  * Rollback:
  *
  * <ul>
- *   <li>drop table url_aliases;
+ *   <li>delete from url_aliases;
  *   <li>delete from flyway_schema_history where version='9.02.02';
  * </ul>
  */
 @SuppressWarnings("checkstyle:typename")
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
-
   // Cannot be more elegant, since we want to allow null values
-  private static final Map<EntityType, String> ENTITYMIGRATIONTABLES = new HashMap<>();
+  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new HashMap<>();
 
   static {
-    ENTITYMIGRATIONTABLES.put(AGENT, null);
-    ENTITYMIGRATIONTABLES.put(ARTICLE, "articles");
-    ENTITYMIGRATIONTABLES.put(AUDIO, null);
-    ENTITYMIGRATIONTABLES.put(BOOK, null);
-    ENTITYMIGRATIONTABLES.put(COLLECTION, "collections");
-    ENTITYMIGRATIONTABLES.put(CORPORATE_BODY, "corporatebodies");
-    // FIXME: This must be removed dynamically by the configuration
-    // ENTITYMIGRATIONTABLES.put(DIGITAL_OBJECT, "digitalobjects");
-    ENTITYMIGRATIONTABLES.put(ENTITY, null);
-    ENTITYMIGRATIONTABLES.put(EVENT, null);
-    ENTITYMIGRATIONTABLES.put(EXPRESSION, null);
-    ENTITYMIGRATIONTABLES.put(FAMILY, "familynames");
-    ENTITYMIGRATIONTABLES.put(GEOLOCATION, "geolocations");
-    ENTITYMIGRATIONTABLES.put(HEADWORD_ENTRY, null);
-    ENTITYMIGRATIONTABLES.put(IMAGE, null);
-    ENTITYMIGRATIONTABLES.put(ITEM, "items");
-    ENTITYMIGRATIONTABLES.put(MANIFESTATION, null);
-    ENTITYMIGRATIONTABLES.put(OBJECT_3D, null);
-    ENTITYMIGRATIONTABLES.put(PERSON, "persons");
-    ENTITYMIGRATIONTABLES.put(PLACE, null);
-    ENTITYMIGRATIONTABLES.put(PROJECT, "projects");
-    ENTITYMIGRATIONTABLES.put(TOPIC, "topics");
-    ENTITYMIGRATIONTABLES.put(VIDEO, null);
-    ENTITYMIGRATIONTABLES.put(WEBSITE, "websites");
-    ENTITYMIGRATIONTABLES.put(WORK, "works");
+    ENTITY_MIGRATION_TABLES.put(AGENT, null);
+    ENTITY_MIGRATION_TABLES.put(ARTICLE, "articles");
+    ENTITY_MIGRATION_TABLES.put(AUDIO, null);
+    ENTITY_MIGRATION_TABLES.put(BOOK, null);
+    ENTITY_MIGRATION_TABLES.put(COLLECTION, "collections");
+    ENTITY_MIGRATION_TABLES.put(CORPORATE_BODY, "corporatebodies");
+    ENTITY_MIGRATION_TABLES.put(DIGITAL_OBJECT, "digitalobjects");
+    ENTITY_MIGRATION_TABLES.put(ENTITY, null);
+    ENTITY_MIGRATION_TABLES.put(EVENT, null);
+    ENTITY_MIGRATION_TABLES.put(EXPRESSION, null);
+    ENTITY_MIGRATION_TABLES.put(FAMILY, "familynames");
+    ENTITY_MIGRATION_TABLES.put(GEOLOCATION, "geolocations");
+    ENTITY_MIGRATION_TABLES.put(HEADWORD_ENTRY, null);
+    ENTITY_MIGRATION_TABLES.put(IMAGE, null);
+    ENTITY_MIGRATION_TABLES.put(ITEM, "items");
+    ENTITY_MIGRATION_TABLES.put(MANIFESTATION, null);
+    ENTITY_MIGRATION_TABLES.put(OBJECT_3D, null);
+    ENTITY_MIGRATION_TABLES.put(PERSON, "persons");
+    ENTITY_MIGRATION_TABLES.put(PLACE, null);
+    ENTITY_MIGRATION_TABLES.put(PROJECT, "projects");
+    ENTITY_MIGRATION_TABLES.put(TOPIC, "topics");
+    ENTITY_MIGRATION_TABLES.put(VIDEO, null);
+    ENTITY_MIGRATION_TABLES.put(WEBSITE, "websites");
+    ENTITY_MIGRATION_TABLES.put(WORK, "works");
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(V9_02_02__DML_Fill_urlaliases.class);
@@ -93,10 +94,6 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   @Override
   public void migrate(Context context) throws Exception {
-
-    // TODO Retrieve configuration and filter ENTITIYMIGRATIONTABLES accordingly!  (and remove
-    // comment accordingly)
-
     final SingleConnectionDataSource connectionDataSource =
         new SingleConnectionDataSource(context.getConnection(), true);
     JdbcTemplate jdbcTemplate = new JdbcTemplate(connectionDataSource.getConnection());
@@ -105,8 +102,10 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     // the websites, they are bound, too
     migrateWebpages(jdbcTemplate);
 
+    removeIdentifiablesNotToMigrate(context);
+
     // All other entities have only generic URLAliases
-    ENTITYMIGRATIONTABLES.forEach(
+    ENTITY_MIGRATION_TABLES.forEach(
         (entityType, tableName) -> {
           if (tableName != null) {
             try {
@@ -119,6 +118,24 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
     // FIXME Das ist nur zu Demonstrationszwecken!
     throw new RuntimeException("Force trigger rollback");
+  }
+
+  private void removeIdentifiablesNotToMigrate(Context context) {
+    String generationExcludes =
+        context.getConfiguration().getPlaceholders().get("urlalias.generationExcludes");
+    if (generationExcludes != null && !generationExcludes.isBlank()) {
+      String[] excludedIdentifiables = generationExcludes.split(",");
+      LOGGER.info("Excluding UrlAlias generation for " + Arrays.toString(excludedIdentifiables));
+      for (String excludedIdentifiable : excludedIdentifiables) {
+        ENTITY_MIGRATION_TABLES.remove(EntityType.valueOf(excludedIdentifiable));
+      }
+    }
+    LOGGER.info(
+        "To migrate="
+            + ENTITY_MIGRATION_TABLES.entrySet().stream()
+                .filter(e -> e.getValue() != null)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList()));
   }
 
   private void migrateWebpages(JdbcTemplate jdbcTemplate) throws SQLException {
@@ -166,6 +183,8 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
       LOGGER.info("No UrlAliases to add for {}", tableName);
       return;
     }
+
+    LOGGER.info("Migrating {}", tableName);
 
     identifiables.forEach(
         w -> {
@@ -231,7 +250,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     }
 
     if (!slug.equals(baseSlug)) {
-      LOGGER.warn("Building slug with suffix: " + slug);
+      LOGGER.warn("{}: Building slug with suffix={}", entityType, slug);
     }
 
     UrlAlias urlAlias = new UrlAlias();
@@ -253,17 +272,21 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private void saveUrlAlias(JdbcTemplate jdbcTemplate, UrlAlias urlAlias) throws SQLException {
     String updateQuery =
-        "insert into url_aliases (uuid,created,last_published,\"primary\",slug,target_entity_type,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
-    jdbcTemplate.update(
-        updateQuery,
-        urlAlias.getUuid().toString(),
-        urlAlias.isPrimary(),
-        urlAlias.getSlug(),
-        urlAlias.getTargetEntityType() != null ? urlAlias.getTargetEntityType().toString() : null,
-        urlAlias.getTargetIdentifiableType().toString(),
-        urlAlias.getTargetLanguage().toString(),
-        urlAlias.getTargetUuid().toString(),
-        urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid().toString() : null);
+        "INSERT INTO url_aliases (uuid,created,last_published,\"primary\",slug,target_entity_type,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
+    try {
+      jdbcTemplate.update(
+          updateQuery,
+          urlAlias.getUuid().toString(),
+          urlAlias.isPrimary(),
+          urlAlias.getSlug(),
+          urlAlias.getTargetEntityType() != null ? urlAlias.getTargetEntityType().toString() : null,
+          urlAlias.getTargetIdentifiableType().toString(),
+          urlAlias.getTargetLanguage().toString(),
+          urlAlias.getTargetUuid().toString(),
+          urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid().toString() : null);
+    } catch (SQLException e) {
+      throw new SQLException("Cannot insert " + urlAlias + ":" + e, e);
+    }
   }
 
   private boolean hasUrlAlias(
@@ -272,17 +295,15 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
     if (websiteUuid == null) {
       return jdbcTemplate.queryForInt(
-              "SELECT count(*) from url_aliases where website_uuid is null and slug=? and target_language=?",
+              "SELECT count(*) FROM url_aliases WHERE website_uuid IS NULL AND slug=? AND target_language=?",
               slug,
-              uuid.toString(),
               locale.getLanguage())
           > 0;
     }
 
     return jdbcTemplate.queryForInt(
-            "SELECT count(*) from url_aliases where slug=? and target_uuid=uuid(?) and target_language=? and website_uuid=uuid(?)",
+            "SELECT count(*) FROM url_aliases WHERE slug=? AND target_language=? AND website_uuid=uuid(?)",
             slug,
-            uuid.toString(),
             locale.getLanguage(),
             websiteUuid.toString())
         > 0;
