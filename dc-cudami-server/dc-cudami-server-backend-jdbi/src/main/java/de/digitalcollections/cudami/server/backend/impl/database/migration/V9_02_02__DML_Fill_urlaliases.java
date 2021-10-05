@@ -176,7 +176,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private void migrateIdentifiables(
       JdbcTemplate jdbcTemplate, String tableName, EntityType entityType) throws SQLException {
-    String selectQuery = String.format("SELECT uuid,label FROM %s ORDER by uuid", tableName);
+    String selectQuery = String.format("SELECT uuid,label FROM %s", tableName);
     List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
 
     if (identifiables.isEmpty()) {
