@@ -60,6 +60,8 @@ spring:
     out-of-order: true
     placeholders:
       iiifBaseUrl: "${iiif.image.baseUrl}"
+      urlalias:
+        generationExcludes: "${cudami.urlalias.generationExcludes}"
   main:
     banner-mode: 'off'
   profiles:
