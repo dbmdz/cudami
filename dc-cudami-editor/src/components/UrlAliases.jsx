@@ -3,7 +3,6 @@ import './UrlAliases.css'
 import classNames from 'classnames'
 import sortBy from 'lodash/sortBy'
 import {publish} from 'pubsub-js'
-import {useContext} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaTrashAlt} from 'react-icons/fa'
 import {
@@ -15,7 +14,6 @@ import {
   ListGroupItem,
 } from 'reactstrap'
 
-import AppContext from './AppContext'
 import {formatDate} from './utils'
 
 const setNewPrimary = (aliases, slug, website = {}) =>
@@ -49,8 +47,8 @@ const UrlAlias = ({
   slug,
   url = '',
 }) => {
-  const {uiLocale} = useContext(AppContext)
-  const {t} = useTranslation()
+  const {i18n, t} = useTranslation()
+  const uiLocale = i18n.language
   const showRemoveButton = !(lastPublished || primary || readOnly)
   return (
     <ListGroupItem className="d-flex justify-content-between">
