@@ -72,7 +72,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     ENTITY_MIGRATION_TABLES.put(ENTITY, null);
     ENTITY_MIGRATION_TABLES.put(EVENT, null);
     ENTITY_MIGRATION_TABLES.put(EXPRESSION, null);
-    ENTITY_MIGRATION_TABLES.put(FAMILY, "familynames");
+    ENTITY_MIGRATION_TABLES.put(FAMILY, null);
     ENTITY_MIGRATION_TABLES.put(GEOLOCATION, "geolocations");
     ENTITY_MIGRATION_TABLES.put(HEADWORD_ENTRY, null);
     ENTITY_MIGRATION_TABLES.put(IMAGE, null);
@@ -117,7 +117,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         });
 
     // FIXME Das ist nur zu Demonstrationszwecken!
-    throw new RuntimeException("Force trigger rollback");
+    // throw new RuntimeException("Force trigger rollback");
   }
 
   private void removeIdentifiablesNotToMigrate(Context context) {
