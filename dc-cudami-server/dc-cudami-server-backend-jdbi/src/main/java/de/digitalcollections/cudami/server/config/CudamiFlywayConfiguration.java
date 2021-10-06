@@ -11,7 +11,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class MyFlywayConfiguration extends FlywayConfiguration {
+public class CudamiFlywayConfiguration extends FlywayConfiguration {
 
   @Primary
   @Bean(name = "flywayInitializer")
