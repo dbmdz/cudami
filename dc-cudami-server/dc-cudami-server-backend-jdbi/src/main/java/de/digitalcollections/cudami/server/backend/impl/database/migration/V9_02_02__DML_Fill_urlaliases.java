@@ -29,12 +29,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.commons.web.SlugGenerator;
+import de.digitalcollections.cudami.server.config.SpringUtility;
+import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -92,6 +93,9 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private final SlugGenerator slugGenerator = new SlugGenerator();
 
+  private UrlAliasGenerationProperties urlAliasGenerationProperties =
+      SpringUtility.getBean(UrlAliasGenerationProperties.class);
+
   @Override
   public void migrate(Context context) throws Exception {
     final SingleConnectionDataSource connectionDataSource =
@@ -115,21 +119,16 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             }
           }
         });
-
-    // FIXME Das ist nur zu Demonstrationszwecken!
-    // throw new RuntimeException("Force trigger rollback");
   }
 
   private void removeIdentifiablesNotToMigrate(Context context) {
-    String generationExcludes =
-        context.getConfiguration().getPlaceholders().get("urlalias.generationExcludes");
-    if (generationExcludes != null && !generationExcludes.isBlank()) {
-      String[] excludedIdentifiables = generationExcludes.split(",");
-      LOGGER.info("Excluding UrlAlias generation for " + Arrays.toString(excludedIdentifiables));
-      for (String excludedIdentifiable : excludedIdentifiables) {
-        ENTITY_MIGRATION_TABLES.remove(EntityType.valueOf(excludedIdentifiable));
-      }
+    if (urlAliasGenerationProperties != null
+        && urlAliasGenerationProperties.getGenerationExcludes() != null) {
+      List<EntityType> excludedIdentifiables = urlAliasGenerationProperties.getGenerationExcludes();
+      LOGGER.info("Excluding UrlAlias generation for " + excludedIdentifiables);
+      excludedIdentifiables.forEach(ENTITY_MIGRATION_TABLES::remove);
     }
+
     LOGGER.info(
         "To migrate="
             + ENTITY_MIGRATION_TABLES.entrySet().stream()
