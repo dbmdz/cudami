@@ -60,7 +60,6 @@ spring:
     out-of-order: true
     placeholders:
       iiifBaseUrl: "${iiif.image.baseUrl}"
-
   main:
     banner-mode: 'off'
   profiles:
