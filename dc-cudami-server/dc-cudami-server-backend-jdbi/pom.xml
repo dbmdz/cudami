@@ -26,6 +26,10 @@
       <artifactId>openjson</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
       <version>${version.dc-commons-jdbi}</version>

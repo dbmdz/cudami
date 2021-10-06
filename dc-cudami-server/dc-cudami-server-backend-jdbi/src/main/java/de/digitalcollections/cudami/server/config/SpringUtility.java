@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -10,6 +11,7 @@ public class SpringUtility implements ApplicationContextAware {
 
   @Autowired private static ApplicationContext applicationContext;
 
+  @SuppressFBWarnings(value = {"ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
   public void setApplicationContext(final ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
   }
