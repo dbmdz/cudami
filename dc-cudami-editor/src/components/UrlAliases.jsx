@@ -57,7 +57,7 @@ const UrlAlias = ({
           {!readOnly && (
             <Input checked={primary} onChange={onChange} type="radio" />
           )}
-          {`${url}/${slug}`}
+          {`${url.replace(/\/$/, '')}/${slug}`}
         </Label>
       </FormGroup>
       {lastPublished && !primary && (
