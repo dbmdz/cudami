@@ -10,8 +10,8 @@ module.exports = {
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',
     UrlAliasesList: './src/lib/UrlAliasesList.jsx',
+    UserEditor: './src/lib/UserEditor.jsx',
     UserList: './src/lib/UserList.jsx',
-    UserEditor: './src/lib/UserEditor.jsx'
   },
   module: {
     rules: [
@@ -48,7 +48,7 @@ module.exports = {
     libraryTarget: 'umd',
     path: path.resolve(
       __dirname,
-      '../dc-cudami-admin/target/classes/static/js'
+      '../dc-cudami-admin/target/classes/static/js',
     ),
   },
   resolve: {
