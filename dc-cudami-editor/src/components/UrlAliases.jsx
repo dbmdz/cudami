@@ -55,12 +55,7 @@ const UrlAlias = ({
       <FormGroup check className={classNames({'pl-0': readOnly})}>
         <Label check>
           {!readOnly && (
-            <Input
-              checked={primary}
-              name={url || 'default'}
-              onChange={onChange}
-              type="radio"
-            />
+            <Input checked={primary} onChange={onChange} type="radio" />
           )}
           {`${url}/${slug}`}
         </Label>
