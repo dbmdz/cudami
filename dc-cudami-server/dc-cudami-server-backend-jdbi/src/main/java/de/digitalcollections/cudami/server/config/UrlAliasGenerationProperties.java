@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class UrlAliasGenerationProperties {
 
   private List<EntityType> generationExcludes;
-  private int maxLength;
+  private int maxLength = -1;
 
   public UrlAliasGenerationProperties() {}
 
