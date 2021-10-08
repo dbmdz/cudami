@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.server.config;
 
+import de.digitalcollections.commons.web.SlugGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -11,4 +14,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
       "de.digitalcollections.cudami.server.business.impl.validator"
     })
 @EnableTransactionManagement
-public class SpringConfigBusiness {}
+public class SpringConfigBusiness {
+
+  @Autowired private UrlAliasGenerationProperties urlAliasGenerationProperties;
+
+  @Bean
+  public SlugGenerator slugGenerator() {
+    SlugGenerator slugGenerator = new SlugGenerator();
+    slugGenerator.setMaxLength(urlAliasGenerationProperties.getMaxLength());
+    return slugGenerator;
+  }
+}

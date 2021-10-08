@@ -100,6 +100,8 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   public void migrate(Context context) throws Exception {
     final SingleConnectionDataSource connectionDataSource =
         new SingleConnectionDataSource(context.getConnection(), true);
+    slugGenerator.setMaxLength(urlAliasGenerationProperties.getMaxLength());
+
     JdbcTemplate jdbcTemplate = new JdbcTemplate(connectionDataSource.getConnection());
 
     // Webpages have to be migrated individually, since their URLAliases depend on the

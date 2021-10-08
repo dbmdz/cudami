@@ -7,6 +7,7 @@ cudami:
   repositoryFolderPath: '~/cudami/fileResources'
   urlalias:
     generationExcludes: []
+    maxlength: 64
 
 iiif:
   image:

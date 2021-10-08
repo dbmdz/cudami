@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
-import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.interceptors.RequestIdLoggingInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.time.format.DateTimeFormatter;
@@ -27,11 +26,6 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Primary
   public ObjectMapper objectMapper() {
     return new DigitalCollectionsObjectMapper();
-  }
-
-  @Bean
-  public SlugGenerator slugGenerator() {
-    return new SlugGenerator();
   }
 
   @Bean
