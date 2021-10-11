@@ -52,15 +52,6 @@
                 <div class="card">
                   <div class="card-body bg-light">
                     <div th:replace="fragments/identifiable::renderTeaser(${article}, ${language})"></div>
-                    <div th:id="${'list-of-url-aliases-' + language}"></div>
-                    <script th:src="@{/js/url-aliases-list.bundle.js}"></script>
-                    <script th:inline="javascript">
-                      UrlAliasesList({
-                        id: /*[[${'list-of-url-aliases-' + language}]]*/,
-                        uiLocale: /*[[${#locale.language}]]*/,
-                        urlAliases: /*[[${article.localizedUrlAliases.get(language)}]]*/,
-                      });
-                    </script>
                   </div>
                   <th:block th:if="*{text} and ${article.text.containsKey(language)}">
                     <div class="card-body long-text">
