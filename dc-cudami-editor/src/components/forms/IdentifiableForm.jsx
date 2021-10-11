@@ -269,6 +269,7 @@ class IdentifiableForm extends Component {
         ...identifiable,
         description: omit(identifiable.description, [language]),
         label: omit(identifiable.label, [language]),
+        localizedUrlAliases: omit(identifiable.localizedUrlAliases, [language]),
       },
     }
     if (language === activeLanguage) {
