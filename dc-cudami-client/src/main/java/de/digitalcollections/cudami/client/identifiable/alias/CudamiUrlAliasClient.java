@@ -7,7 +7,10 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -98,10 +101,18 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
   }
 
   public String generateSlug(Locale locale, String label, UUID websiteUuid) throws HttpException {
+    String encodedLabel;
+    try {
+      encodedLabel = URLEncoder.encode(label, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+      throw new HttpException("generateSlug", e);
+    }
+
     if (websiteUuid == null) {
-      return doGetRequestForString(String.format("/v5/urlaliases/slug/%s/%s", locale, label));
+      return doGetRequestForString(
+          String.format("/v5/urlaliases/slug/%s/%s", locale, encodedLabel));
     }
     return doGetRequestForString(
-        String.format("/v5/urlaliases/slug/%s/%s/%s", locale, label, websiteUuid));
+        String.format("/v5/urlaliases/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 }

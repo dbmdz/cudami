@@ -91,7 +91,8 @@ export async function findByIdentifier(contextPath, id, namespace, type) {
 }
 
 export async function generateSlug(contextPath, language, label, websiteUuid) {
-  let url = `${contextPath}api/${typeToEndpointMapping.urlAlias}/slug/${language}/${label}`
+  let url = `${contextPath}api/${typeToEndpointMapping.urlAlias}/slug/${language}/`;
+  url += encodeURIComponent(`${label}`)
   if (websiteUuid) {
     url += `/${websiteUuid}`
   }
