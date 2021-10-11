@@ -657,6 +657,36 @@ class UrlAliasServiceImplTest {
     service.validate(localizedUrlAliases);
   }
 
+  @DisplayName("can filter an empty list of nonmatching languages for slug without error")
+  @Test
+  public void filterEmptyListOfNonmatchingSlugs() {
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(List.of());
+    assertThat(service.removeNonmatchingLanguagesForSlug(localizedUrlAliases, "test"))
+        .isEqualTo(localizedUrlAliases);
+  }
+
+  @DisplayName("can filter nonmatching languages for a slug out of LocalizedUrlAliases")
+  @Test
+  public void filterNonmatchingLanguagesForSlug() {
+    LocalizedUrlAliases localizedUrlAliases =
+        new LocalizedUrlAliases(
+            List.of(
+                createUrlAlias("foo", true, "de", true, null, null),
+                createUrlAlias("blubb", true, "de", false, null, null),
+                createUrlAlias("bar", true, "en", true, null, null)));
+
+    // It works for primary slugs
+    LocalizedUrlAliases actual =
+        service.removeNonmatchingLanguagesForSlug(localizedUrlAliases, "foo");
+    assertThat(actual.hasTargetLanguage(Locale.forLanguageTag("de"))).isTrue();
+    assertThat(actual.hasTargetLanguage(Locale.forLanguageTag("en"))).isFalse();
+
+    // ... and it works for non primary slugs, too
+    actual = service.removeNonmatchingLanguagesForSlug(localizedUrlAliases, "blubb");
+    assertThat(actual.hasTargetLanguage(Locale.forLanguageTag("de"))).isTrue();
+    assertThat(actual.hasTargetLanguage(Locale.forLanguageTag("en"))).isFalse();
+  }
+
   // -------------------------------------------------------------------------
   private UrlAlias createUrlAlias(
       String slug,

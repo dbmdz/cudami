@@ -132,6 +132,8 @@ public class UrlAliasServiceImpl implements UrlAliasService {
             repository.findPrimaryLinksForWebsite(null, slug);
         unspecificLocalizedUrlAliases =
             filterForLocaleWithFallback(pLocale, unspecificLocalizedUrlAliases);
+        unspecificLocalizedUrlAliases =
+            removeNonmatchingLanguagesForSlug(unspecificLocalizedUrlAliases, slug);
         return unspecificLocalizedUrlAliases;
       }
 
@@ -144,6 +146,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       }
 
       localizedUrlAliases = filterForLocaleWithFallback(pLocale, localizedUrlAliases);
+      localizedUrlAliases = removeNonmatchingLanguagesForSlug(localizedUrlAliases, slug);
 
       return localizedUrlAliases;
     } catch (Exception e) {
@@ -151,6 +154,19 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
           e);
     }
+  }
+
+  protected LocalizedUrlAliases removeNonmatchingLanguagesForSlug(
+      LocalizedUrlAliases localizedUrlAliases, String slug) {
+    List<Locale> matchingLocales =
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> slug.equalsIgnoreCase(u.getSlug()))
+            .map(u -> u.getTargetLanguage())
+            .collect(Collectors.toList());
+    return new LocalizedUrlAliases(
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> matchingLocales.contains(u.getTargetLanguage()))
+            .collect(Collectors.toList()));
   }
 
   protected LocalizedUrlAliases filterForLocaleWithFallback(
