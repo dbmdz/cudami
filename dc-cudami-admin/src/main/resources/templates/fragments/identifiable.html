@@ -17,6 +17,20 @@
         </th:block>
       </div>
     </div>
+    <div class="row" th:if="${identifiable.localizedUrlAliases}">
+      <div class="col-sm-12">
+        <div th:id="${'list-of-url-aliases-' + language}"></div>
+        <script th:src="@{/js/url-aliases-list.bundle.js}"></script>
+        <script th:inline="javascript">
+          UrlAliasesList({
+            id: /*[[${'list-of-url-aliases-' + language}]]*/,
+            uiLocale: /*[[${#locale.language}]]*/,
+            urlAliases: /*[[${identifiable.localizedUrlAliases.get(language)}]]*/,
+          });
+        </script>
+      </div>
+    </div>
+
   </th:block>
 
 </body>
