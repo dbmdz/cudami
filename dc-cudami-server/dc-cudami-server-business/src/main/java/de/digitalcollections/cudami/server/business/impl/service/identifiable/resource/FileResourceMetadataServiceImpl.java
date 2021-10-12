@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -105,7 +106,8 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource save(FileResource fileResource) throws IdentifiableServiceException {
+  public FileResource save(FileResource fileResource)
+      throws IdentifiableServiceException, ValidationException {
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(
@@ -129,7 +131,8 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource update(FileResource fileResource) throws IdentifiableServiceException {
+  public FileResource update(FileResource fileResource)
+      throws IdentifiableServiceException, ValidationException {
     if (fileResource instanceof ApplicationFileResource) {
       return applicationFileResourceService.update((ApplicationFileResource) fileResource);
     } else if (fileResource instanceof AudioFileResource) {

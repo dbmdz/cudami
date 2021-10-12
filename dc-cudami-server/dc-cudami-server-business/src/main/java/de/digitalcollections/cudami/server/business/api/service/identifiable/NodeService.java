@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -120,7 +121,8 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
    * @return saved child node
    * @throws IdentifiableServiceException if saving fails
    */
-  default N saveWithParent(N child, UUID parentUuid) throws IdentifiableServiceException {
+  default N saveWithParent(N child, UUID parentUuid)
+      throws IdentifiableServiceException, ValidationException {
     if (child.getUuid() == null) {
       child = this.save(child);
     }

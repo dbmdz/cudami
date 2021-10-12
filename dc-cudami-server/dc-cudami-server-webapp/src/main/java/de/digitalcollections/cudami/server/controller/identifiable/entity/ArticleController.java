@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.paging.Order;
@@ -102,7 +103,7 @@ public class ArticleController {
       value = {"/v5/articles", "/v2/articles", "/latest/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article save(@RequestBody Article article, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return articleService.save(article);
   }
 
@@ -111,7 +112,7 @@ public class ArticleController {
       value = {"/v5/articles/{uuid}", "/v2/articles/{uuid}", "/latest/articles/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, article.getUuid());
     return articleService.update(article);
   }

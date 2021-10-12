@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -284,7 +285,7 @@ public class DigitalObjectController {
       value = {"/v5/digitalobjects", "/v2/digitalobjects", "/latest/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return digitalObjectService.save(digitalObject);
   }
 
@@ -316,7 +317,7 @@ public class DigitalObjectController {
           UUID uuid,
       @RequestBody DigitalObject digitalObject,
       BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return digitalObjectService.update(digitalObject);
   }

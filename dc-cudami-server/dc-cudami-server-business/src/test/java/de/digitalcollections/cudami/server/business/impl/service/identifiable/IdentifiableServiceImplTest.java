@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -26,7 +27,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -256,7 +256,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("can save Identifiables without UrlAliases and creates an UrlAlias for them")
   @Test
   public void saveIdentifiableWithoutUrlAliases()
-      throws IdentifiableServiceException, CudamiServiceException {
+      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
 
@@ -290,7 +290,7 @@ class IdentifiableServiceImplTest {
       "deletes all connected UrlAliases on an identifiable as first step when updating an identifiable")
   @Test
   public void deleteUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException {
+      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -313,7 +313,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("updates existing UrlAliases on an identifiable, when updating it")
   @Test
   public void updateExistingUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException {
+      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -339,7 +339,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("creates missing UrlAliases on an identifiable, when updating it")
   @Test
   public void createMissingUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException {
+      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -355,7 +355,8 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an exception, when two primary entries for the same (website,target,language) tuple are set")
   @Test
-  public void exceptionOnMultiplePrimaryEntries() throws CudamiServiceException {
+  public void exceptionOnMultiplePrimaryEntries()
+      throws CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
@@ -400,7 +401,8 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an exception, when two primary entries for the same (null,target,language) tuple are set")
   @Test
-  public void exceptionOnMultiplePrimaryEntriesBasedOnSlug() throws CudamiServiceException {
+  public void exceptionOnMultiplePrimaryEntriesBasedOnSlug()
+      throws CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
@@ -442,7 +444,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("allows two primary entries for different (website,target,language) tuples")
   @Test
   public void allowMultiplePrimariesForDifferentTuples()
-      throws CudamiServiceException, IdentifiableServiceException {
+      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);

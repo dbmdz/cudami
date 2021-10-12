@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.alias;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -8,7 +9,6 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import javax.validation.ValidationException;
 
 /** Service for UrlAliasses */
 public interface UrlAliasService {

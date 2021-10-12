@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.paging.Order;
@@ -131,7 +132,7 @@ public class GeoLocationController {
       value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return geoLocationService.save(geoLocation);
   }
 
@@ -141,7 +142,7 @@ public class GeoLocationController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, geoLocation.getUuid());
     return geoLocationService.update(geoLocation);
   }

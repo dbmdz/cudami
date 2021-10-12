@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -127,7 +128,7 @@ public interface IdentifiableService<I extends Identifiable> {
 
   List<FileResource> getRelatedFileResources(UUID identifiableUuid);
 
-  I save(I identifiable) throws IdentifiableServiceException;
+  I save(I identifiable) throws IdentifiableServiceException, ValidationException;
 
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
@@ -165,5 +166,5 @@ public interface IdentifiableService<I extends Identifiable> {
   List<FileResource> saveRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources);
 
-  I update(I identifiable) throws IdentifiableServiceException;
+  I update(I identifiable) throws IdentifiableServiceException, ValidationException;
 }

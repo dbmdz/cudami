@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
@@ -217,7 +218,7 @@ public class PersonController {
       value = {"/v5/persons", "/v2/persons", "/latest/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return personService.save(person);
   }
 
@@ -227,7 +228,7 @@ public class PersonController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, person.getUuid());
     return personService.update(person);
   }

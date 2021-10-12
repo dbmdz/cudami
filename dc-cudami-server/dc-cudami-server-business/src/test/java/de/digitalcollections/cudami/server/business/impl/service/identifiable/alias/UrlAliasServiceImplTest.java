@@ -15,6 +15,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Url
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -28,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import javax.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -615,7 +615,7 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "throws an exception when validating a LocalizedUrlAlias with two primary UrlAliases for the same website,target and language tuple")
   @Test
-  public void rejectTwoPrimaryUrlAliasesForTheSameTuple() throws ValidationException {
+  public void rejectTwoPrimaryUrlAliasesForTheSameTuple() {
     UUID targetUuid = UUID.randomUUID();
     UUID websiteUuid = UUID.randomUUID();
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -630,9 +630,43 @@ class UrlAliasServiceImplTest {
   }
 
   @DisplayName(
+      "throws an exception when validating a LocalizedUrlAlias with two primary UrlAliases for the same slug, website,target and language tuple")
+  @Test
+  public void rejectTwoPrimaryUrlAliasesForTheSameTupleAndSlug() {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid),
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid));
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.validate(localizedUrlAliases);
+        });
+  }
+
+  @DisplayName(
+      "throws an exception when validating a LocalizedUrlAlias with one primary and one non primary UrlAliase for the same slug,website,target and language tuple")
+  @Test
+  public void rejectTwoUrlAliasesForTheSameTuple() {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid),
+        createUrlAlias("hurz", true, "de", false, targetUuid, websiteUuid));
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.validate(localizedUrlAliases);
+        });
+  }
+
+  @DisplayName(
       "can successfully validate a LocalizedUrlAlias with multiple UrlAliases for the same website,target,language tuple, if only one is primary")
   @Test
-  public void allowOnePrimaryForTheSameTuple() {
+  public void allowOnePrimaryForTheSameTuple() throws ValidationException {
     UUID targetUuid = UUID.randomUUID();
     UUID websiteUuid = UUID.randomUUID();
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -645,7 +679,7 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "can successfully validate a LocalizedUrlAlias with multiple UrlAliases for the different website,target,language tuples, if only one of each is primary")
   @Test
-  public void allowOnePrimaryPerTuple() {
+  public void allowOnePrimaryPerTuple() throws ValidationException {
     UUID targetUuid = UUID.randomUUID();
     UUID websiteUuid1 = UUID.randomUUID();
     UUID websiteUuid2 = UUID.randomUUID();

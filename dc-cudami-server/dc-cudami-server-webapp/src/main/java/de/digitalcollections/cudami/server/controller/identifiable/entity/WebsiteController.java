@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -224,7 +225,7 @@ public class WebsiteController {
       value = {"/v5/websites", "/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return websiteService.save(website);
   }
 
@@ -253,7 +254,7 @@ public class WebsiteController {
           UUID uuid,
       @RequestBody Website website,
       BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, website.getUuid());
     return websiteService.update(website);
   }

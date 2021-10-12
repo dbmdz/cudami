@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
@@ -122,7 +123,7 @@ public class WorkController {
       value = {"/v5/works", "/v2/works", "/latest/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return workService.save(work);
   }
 
@@ -131,7 +132,7 @@ public class WorkController {
       value = {"/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing work");
     }

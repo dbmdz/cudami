@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.paging.Order;
@@ -114,7 +115,7 @@ public class HumanSettlementController {
       value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return humanSettlementService.save(humanSettlement);
   }
 
@@ -130,7 +131,7 @@ public class HumanSettlementController {
       @PathVariable("uuid") UUID uuid,
       @RequestBody HumanSettlement humanSettlement,
       BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
     return humanSettlementService.update(humanSettlement);
   }

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
@@ -44,7 +45,7 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
         ImageFileResource previewImage =
             imageFileResourceService.save(corporateBody.getPreviewImage());
         corporateBody.setPreviewImage(previewImage);
-      } catch (IdentifiableServiceException ex) {
+      } catch (IdentifiableServiceException | ValidationException ex) {
         LOGGER.warn(
             "Can not save previewImage of corporate body: "
                 + corporateBody.getLabel().getText()
