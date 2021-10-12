@@ -99,8 +99,7 @@ export async function generateSlug(contextPath, language, slug, websiteUuid) {
   }
   try {
     const response = await fetch(url)
-    const slug = await response.json()
-    return slug
+    return await response.json()
   } catch (err) {
     return slug
   }
@@ -151,8 +150,8 @@ export async function loadAttachedIdentifiables(
 export async function loadAvailableLanguages(contextPath) {
   const url = `${contextPath}api/${typeToEndpointMapping.language}`
   try {
-    const result = await fetch(url)
-    return result.json()
+    const response = await fetch(url)
+    return await response.json()
   } catch (err) {
     return []
   }
@@ -161,8 +160,8 @@ export async function loadAvailableLanguages(contextPath) {
 export async function loadDefaultLanguage(contextPath) {
   const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
   try {
-    const result = await fetch(url)
-    return result.json()
+    const response = await fetch(url)
+    return await response.json()
   } catch (err) {
     return 'en'
   }
@@ -323,13 +322,14 @@ export async function searchIdentifiables(
   try {
     const response = await fetch(url)
     const json = await response.json()
+    const {content, totalElements} = json
     return {
-      suggestions: json.content,
-      totalElements: json.totalElements,
+      content,
+      totalElements,
     }
   } catch (err) {
     return {
-      suggestions: [],
+      content: [],
       totalElements: 0,
     }
   }
@@ -344,15 +344,16 @@ export async function searchMedia(
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
-    const result = await fetch(url)
-    const json = await result.json()
+    const response = await fetch(url)
+    const json = await response.json()
+    const {content, totalElements} = json
     return {
-      suggestions: json.content,
-      totalElements: json.totalElements,
+      content,
+      totalElements,
     }
   } catch (err) {
     return {
-      suggestions: [],
+      content: [],
       totalElements: 0,
     }
   }
