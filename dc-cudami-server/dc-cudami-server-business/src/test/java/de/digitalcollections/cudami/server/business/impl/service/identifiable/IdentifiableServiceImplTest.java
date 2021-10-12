@@ -397,6 +397,48 @@ class IdentifiableServiceImplTest {
         });
   }
 
+  @DisplayName(
+      "throws an exception, when two primary entries for the same (null,target,language) tuple are set")
+  @Test
+  public void exceptionOnMultiplePrimaryEntriesBasedOnSlug() throws CudamiServiceException {
+    UUID targetUuid = UUID.randomUUID();
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
+
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstPrimaryUrlAlias = new UrlAlias();
+    firstPrimaryUrlAlias.setPrimary(true);
+    firstPrimaryUrlAlias.setWebsite(null);
+    firstPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstPrimaryUrlAlias.setSlug("slug1");
+
+    UrlAlias secondPrimaryUrlAlias = new UrlAlias();
+    secondPrimaryUrlAlias.setPrimary(true);
+    secondPrimaryUrlAlias.setWebsite(null);
+    secondPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    secondPrimaryUrlAlias.setSlug("slug2");
+
+    localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
+
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(targetUuid);
+    identifiable.setLocalizedUrlAliases(localizedUrlAliases);
+    identifiable.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
+
+    doThrow(new ValidationException("no way!"))
+        .when(urlAliasService)
+        .validate(eq(localizedUrlAliases));
+
+    assertThrows(
+        IdentifiableServiceException.class,
+        () -> {
+          service.update(identifiable);
+        });
+  }
+
   @DisplayName("allows two primary entries for different (website,target,language) tuples")
   @Test
   public void allowMultiplePrimariesForDifferentTuples()
