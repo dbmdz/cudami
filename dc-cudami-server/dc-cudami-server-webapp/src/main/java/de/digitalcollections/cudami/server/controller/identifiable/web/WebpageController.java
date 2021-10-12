@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
@@ -269,7 +270,7 @@ public class WebpageController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return webpageService.saveWithParent(webpage, parentWebpageUuid);
   }
 
@@ -292,7 +293,7 @@ public class WebpageController {
       value = {"/v5/webpages/{uuid}", "/v2/webpages/{uuid}", "/latest/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, webpage.getUuid());
     return webpageService.update(webpage);
   }

@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Url
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -12,13 +13,13 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -310,6 +311,32 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     // primary per tuple at all
     if ((Set.of(primaries.values()).size() != 1) || (!(primaries.values().contains(1)))) {
       throw new ValidationException("violated single primaries: " + primaries);
+    }
+
+    // Reject multiple entries for the same slug and (website,target,language) tuple
+    Set<String> tuples = new HashSet<>();
+    for (UrlAlias u : localizedUrlAliases.flatten()) {
+      String key =
+          (u.getWebsite() != null ? u.getWebsite().getUuid() : "default")
+              + "-"
+              + u.getTargetUuid()
+              + "-"
+              + u.getTargetLanguage()
+              + "-"
+              + u.getSlug();
+      if (tuples.contains(key)) {
+        throw new ValidationException(
+            "multiple entries for slug="
+                + u.getSlug()
+                + ", language="
+                + u.getTargetLanguage()
+                + ", website="
+                + u.getWebsite()
+                + ", target="
+                + u.getTargetUuid());
+      } else {
+        tuples.add(key);
+      }
     }
   }
 }

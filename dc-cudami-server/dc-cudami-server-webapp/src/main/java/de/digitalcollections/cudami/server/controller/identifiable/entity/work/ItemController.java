@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
@@ -115,7 +116,7 @@ public class ItemController {
       value = {"/v5/items", "/v2/items", "/latest/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return itemService.save(item);
   }
 
@@ -124,7 +125,7 @@ public class ItemController {
       value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing item");
     }

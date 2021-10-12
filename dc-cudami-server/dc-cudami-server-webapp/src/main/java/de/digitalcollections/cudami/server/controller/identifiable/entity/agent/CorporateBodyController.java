@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.Order;
@@ -152,7 +153,7 @@ public class CorporateBodyController {
       value = {"/v5/corporatebodies", "/v2/corporatebodies", "/latest/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return corporateBodyService.save(corporateBody);
   }
 
@@ -173,7 +174,7 @@ public class CorporateBodyController {
           UUID uuid,
       @RequestBody CorporateBody corporateBody,
       BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, corporateBody.getUuid());
     return corporateBodyService.update(corporateBody);
   }

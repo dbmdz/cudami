@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -226,7 +227,7 @@ public class ProjectController {
       value = {"/v5/projects", "/v2/projects", "/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project save(@RequestBody Project project, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return projectService.save(project);
   }
 
@@ -259,7 +260,7 @@ public class ProjectController {
       value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, project.getUuid());
     return projectService.update(project);
   }

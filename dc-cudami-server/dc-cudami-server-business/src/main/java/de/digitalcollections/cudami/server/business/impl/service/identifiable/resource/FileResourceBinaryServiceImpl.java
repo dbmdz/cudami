@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.exception.ResourceIOException;
@@ -82,7 +83,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
 
   @Override
   public FileResource save(FileResource fileResource, InputStream binaryData)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     try {
       fileResource = binaryRepository.save(fileResource, binaryData);
       fileResource = metadataService.save(fileResource);

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -29,7 +30,7 @@ class CorporateBodyServiceImplTest {
   private ImageFileResourceService imageFileResourceService;
 
   @BeforeEach
-  void setUp() throws IdentifiableServiceException {
+  void setUp() throws IdentifiableServiceException, ValidationException {
     corporateBodyRepository = mock(CorporateBodyRepository.class);
     when(corporateBodyRepository.save(any(CorporateBody.class))).thenReturn(new CorporateBody());
     when(corporateBodyRepository.save(eq(null))).thenThrow(new NullPointerException());
@@ -45,7 +46,8 @@ class CorporateBodyServiceImplTest {
 
   @Test
   @DisplayName("persists preview image for saved and retrieved corporate body")
-  void savePreviewImage() throws MalformedURLException, IdentifiableServiceException {
+  void savePreviewImage()
+      throws MalformedURLException, IdentifiableServiceException, ValidationException {
     CorporateBody corporateBody = mock(CorporateBody.class);
     ImageFileResource previewImageFileResource = mock(ImageFileResource.class);
     when(previewImageFileResource.getHttpBaseUrl()).thenReturn(new URL("file:///tmp/foo"));

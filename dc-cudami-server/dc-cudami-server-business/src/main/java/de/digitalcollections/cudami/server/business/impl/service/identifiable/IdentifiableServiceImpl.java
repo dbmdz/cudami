@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
@@ -238,7 +239,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   @Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
-  public I save(I identifiable) throws IdentifiableServiceException {
+  public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
       I savedIdentifiable = this.repository.save(identifiable);
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
@@ -247,7 +248,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       try {
         urlAliasService.validate(identifiable.getLocalizedUrlAliases());
       } catch (Exception e) {
-        throw new IdentifiableServiceException("Validation error: " + e);
+        throw new ValidationException("Validation error: " + e, e);
       }
 
       if (savedIdentifiable.getLocalizedUrlAliases() != null) {
@@ -299,7 +300,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
-  public I update(I identifiable) throws IdentifiableServiceException {
+  public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
       I updatedIdentifiable = this.repository.update(identifiable);
       // UrlAliases
@@ -311,7 +312,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       try {
         urlAliasService.validate(identifiable.getLocalizedUrlAliases());
       } catch (Exception e) {
-        throw new IdentifiableServiceException("Validation error: " + e);
+        throw new ValidationException("Validation error: " + e, e);
       }
 
       if (identifiable.getLocalizedUrlAliases() != null) {

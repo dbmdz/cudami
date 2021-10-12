@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.advice;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,10 @@ public class ExceptionAdvice {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
   public void handleHttpMediaTypeNotAcceptableException() {}
+
+  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+  @ExceptionHandler(ValidationException.class)
+  public void handleValidationException() {}
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Exception.class)

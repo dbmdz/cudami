@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
@@ -486,7 +487,7 @@ public class CollectionController {
       value = {"/v5/collections", "/v2/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return collectionService.save(collection);
   }
 
@@ -527,7 +528,7 @@ public class CollectionController {
           @PathVariable
           UUID parentUuid,
       @RequestBody Collection collection)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return collectionService.saveWithParent(collection, parentUuid);
   }
 
@@ -537,7 +538,7 @@ public class CollectionController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, collection.getUuid());
     return collectionService.update(collection);
   }

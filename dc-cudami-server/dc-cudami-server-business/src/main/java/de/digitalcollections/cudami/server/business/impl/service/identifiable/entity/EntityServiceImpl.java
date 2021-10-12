@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -100,7 +101,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public E save(E entity) throws IdentifiableServiceException {
+  public E save(E entity) throws IdentifiableServiceException, ValidationException {
     try {
       E entityDb = super.save(entity);
       sendNotification("save", "POST", entityDb.getUuid(), entityDb.getEntityType());
@@ -157,7 +158,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public E update(E entity) throws IdentifiableServiceException {
+  public E update(E entity) throws IdentifiableServiceException, ValidationException {
     try {
       E entityDb = super.update(entity);
       sendNotification("update", "PUT", entityDb.getUuid(), entityDb.getEntityType());

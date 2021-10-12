@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
@@ -378,7 +379,7 @@ public class TopicController {
       value = {"/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return topicService.save(topic);
   }
 
@@ -421,7 +422,7 @@ public class TopicController {
           UUID parentTopicUuid,
       @RequestBody Topic topic,
       BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return topicService.saveWithParent(topic, parentTopicUuid);
   }
 
@@ -430,7 +431,7 @@ public class TopicController {
       value = {"/v5/topics/{uuid}", "/v2/topics/{uuid}", "/latest/topics/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, topic.getUuid());
     return topicService.update(topic);
   }

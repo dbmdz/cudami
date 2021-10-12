@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -182,7 +183,7 @@ public class FileResourceMetadataController {
       value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     return metadataService.save(fileResource);
   }
 
@@ -196,7 +197,7 @@ public class FileResourceMetadataController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, fileResource.getUuid());
     return metadataService.update(fileResource);
   }
