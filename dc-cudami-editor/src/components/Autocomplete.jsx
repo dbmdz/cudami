@@ -12,13 +12,12 @@ import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
 
 class Autocomplete extends Component {
-  /* defines the number of suggestions to be fetched */
-  maxElements = 25
-
   constructor(props) {
     super(props)
     this.state = {
       loading: false,
+      /* defines the number of suggestions to be fetched */
+      maxElements: props.maxElements ?? 25,
       searchTerm: '',
       suggestions: [],
       totalElements: 0,
@@ -54,7 +53,7 @@ class Autocomplete extends Component {
       this.context.apiContextPath,
       searchTerm,
       0,
-      this.maxElements,
+      this.state.maxElements,
     )
     this.setState({
       loading: false,
@@ -103,15 +102,16 @@ class Autocomplete extends Component {
   }
 
   renderSuggestionsContainer = ({containerProps, children}) => {
+    const {maxElements, totalElements} = this.state
     return (
       <div {...containerProps}>
-        {this.state.totalElements > this.maxElements && (
+        {totalElements > maxElements && (
           <FeedbackMessage
             message={{
               key: 'moreElementsFound',
               values: {
-                maxElements: this.maxElements,
-                totalElements: this.state.totalElements,
+                maxElements,
+                totalElements,
               },
             }}
           />
