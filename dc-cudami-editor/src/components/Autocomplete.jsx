@@ -49,7 +49,7 @@ class Autocomplete extends Component {
       return
     }
     this.setState({loading: true})
-    const {suggestions, totalElements} = await this.props.search(
+    const {content: suggestions, totalElements} = await this.props.search(
       this.context.apiContextPath,
       searchTerm,
       0,
