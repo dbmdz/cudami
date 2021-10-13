@@ -647,7 +647,7 @@ class UrlAliasServiceImplTest {
   }
 
   @DisplayName(
-      "throws an exception when validating a LocalizedUrlAlias with one primary and one non primary UrlAliase for the same slug,website,target and language tuple")
+      "throws an exception when validating a LocalizedUrlAlias with one primary and one non primary UrlAlias for the same slug,website,target and language tuple")
   @Test
   public void rejectTwoUrlAliasesForTheSameTuple() {
     UUID targetUuid = UUID.randomUUID();
@@ -655,6 +655,23 @@ class UrlAliasServiceImplTest {
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
     localizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", true, targetUuid, websiteUuid),
+        createUrlAlias("hurz", true, "de", false, targetUuid, websiteUuid));
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.validate(localizedUrlAliases);
+        });
+  }
+
+  @DisplayName(
+      "throws an exception when validating a LocalizedUrlAlias with two non primary UrlAliases for the same slug, website,target and language tuple")
+  @Test
+  public void rejectTwoNonPrimaryUrlAliasesForTheSameTupleAndSlug() {
+    UUID targetUuid = UUID.randomUUID();
+    UUID websiteUuid = UUID.randomUUID();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    localizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", false, targetUuid, websiteUuid),
         createUrlAlias("hurz", true, "de", false, targetUuid, websiteUuid));
     assertThrows(
         ValidationException.class,

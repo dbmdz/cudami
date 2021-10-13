@@ -3,9 +3,12 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.w
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
@@ -208,5 +211,33 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
     return ((NodeRepository<Webpage>) repository).findRootNodes(searchPageRequest);
+  }
+
+  @Override
+  public Webpage save(Webpage identifiable)
+      throws IdentifiableServiceException, ValidationException {
+    if (identifiable.getLocalizedUrlAliases() != null
+        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
+      validate(identifiable.getLocalizedUrlAliases());
+    }
+    return super.save(identifiable);
+  }
+
+  @Override
+  public Webpage update(Webpage identifiable)
+      throws IdentifiableServiceException, ValidationException {
+    if (identifiable.getLocalizedUrlAliases() != null
+        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
+      validate(identifiable.getLocalizedUrlAliases());
+    }
+    return super.update(identifiable);
+  }
+
+  private void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException {
+    for (UrlAlias urlAlias : localizedUrlAliases.flatten()) {
+      if (urlAlias.getWebsite() == null) {
+        throw new ValidationException("Empty website for " + urlAlias);
+      }
+    }
   }
 }

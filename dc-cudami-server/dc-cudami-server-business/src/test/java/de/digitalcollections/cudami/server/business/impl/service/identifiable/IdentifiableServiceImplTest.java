@@ -19,6 +19,7 @@ import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -99,10 +99,9 @@ class IdentifiableServiceImplTest {
   }
 
   @DisplayName("does not guarantee URLAliases for some entity types")
-  @Disabled("Logics for skipping URLALias genration for some types is not yet implemented")
   @Test
   public void noUrlAliasesForSomeEntityTypes() throws IdentifiableServiceException {
-    Identifiable identifiable = new Identifiable();
+    DigitalObject identifiable = new DigitalObject();
     identifiable.setLabel("label");
     service.ensureDefaultAliasesExist(identifiable);
     assertThat(identifiable.getLocalizedUrlAliases()).isNull();
