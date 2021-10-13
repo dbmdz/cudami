@@ -319,8 +319,6 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       String key =
           (u.getWebsite() != null ? u.getWebsite().getUuid() : "default")
               + "-"
-              + u.getTargetUuid()
-              + "-"
               + u.getTargetLanguage()
               + "-"
               + u.getSlug();

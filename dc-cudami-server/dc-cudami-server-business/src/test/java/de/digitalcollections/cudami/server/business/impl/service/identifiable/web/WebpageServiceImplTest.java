@@ -1,13 +1,23 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Node;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -26,12 +36,16 @@ class WebpageServiceImplTest {
 
   WebpageRepository repo;
 
+  UrlAliasService urlAliasService;
+
   private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
 
   @BeforeEach
   public void beforeEach() {
     repo = mock(WebpageRepository.class);
+    urlAliasService = mock(UrlAliasService.class);
     service = new WebpageServiceImpl(repo);
+    service.setUrlAliasService(urlAliasService);
   }
 
   @Test
@@ -181,5 +195,67 @@ class WebpageServiceImplTest {
     List<Webpage> actual = service.getActiveChildrenTree(parentUuid);
     assertThat(actual.get(0).getChildren()).isNotEmpty();
     assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
+  }
+
+  @Test
+  @DisplayName("allows empty UrlAliases at save and automatically creates an UrlAlias")
+  public void saveWithEmptyUrlAliases()
+      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+    Webpage webpage = new Webpage();
+    webpage.setLabel("test");
+    when(repo.save(eq(webpage))).thenReturn(webpage);
+    UrlAlias dummyAlias = new UrlAlias();
+    Website dummyWebsite = new Website();
+    dummyWebsite.setUuid(UUID.randomUUID());
+    dummyAlias.setWebsite(dummyWebsite);
+    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(dummyAlias);
+    service.save(webpage);
+    verify(repo, times(1)).save(any(Webpage.class));
+  }
+
+  @Test
+  @DisplayName("allows empty UrlAliases at update and automatically creates an UrlAlias")
+  public void updateWithEmptyUrlAliases()
+      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+    Webpage webpage = new Webpage();
+    webpage.setLabel("test");
+    webpage.setUuid(UUID.randomUUID());
+    when(repo.update(eq(webpage))).thenReturn(webpage);
+    UrlAlias dummyAlias = new UrlAlias();
+    Website dummyWebsite = new Website();
+    dummyWebsite.setUuid(UUID.randomUUID());
+    dummyAlias.setWebsite(dummyWebsite);
+    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(dummyAlias);
+    service.update(webpage);
+    verify(repo, times(1)).update(any(Webpage.class));
+  }
+
+  @Test
+  @DisplayName("rejects UrlAliases with empty webpage at save and update")
+  public void rejectsEmptyWebpage() {
+    Webpage webpage = new Webpage();
+    UrlAlias urlAlias1 = new UrlAlias();
+    urlAlias1.setSlug("foo");
+    urlAlias1.setPrimary(true);
+    Website website = new Website();
+    website.setUuid(UUID.randomUUID());
+    urlAlias1.setWebsite(website);
+    UrlAlias urlAlias2 = new UrlAlias();
+    urlAlias2.setSlug("bar");
+    urlAlias2.setPrimary(false);
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(urlAlias1, urlAlias2);
+    webpage.setLocalizedUrlAliases(localizedUrlAliases);
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.save(webpage);
+        });
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.update(webpage);
+        });
   }
 }

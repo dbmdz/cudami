@@ -51,7 +51,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   // TODO: Refactor this into constructor!
-  void setUrlAliasService(UrlAliasService urlAliasService) {
+  public void setUrlAliasService(UrlAliasService urlAliasService) {
     this.urlAliasService = urlAliasService;
   }
 
@@ -251,7 +251,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         throw new ValidationException("Validation error: " + e, e);
       }
 
-      if (savedIdentifiable.getLocalizedUrlAliases() != null) {
+      if (!savedIdentifiable.getLocalizedUrlAliases().isEmpty()) {
         LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
         for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
@@ -267,7 +267,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
       throw new IdentifiableServiceException(e.getMessage());
     } catch (Exception e) {
-      LOGGER.error("Cannot save identifiable " + identifiable + ": ", e);
+      LOGGER.error("Cannot save identifiable " + identifiable + ": " + e, e);
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
