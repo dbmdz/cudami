@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next'
-import {FaEdit, FaPlus, FaTrash} from 'react-icons/fa'
+import {FaEdit, FaPlus, FaTrashAlt} from 'react-icons/fa'
 import {
   Button,
   FormGroup,
@@ -37,7 +37,7 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
               outline
               size="sm"
             >
-              <FaTrash />
+              <FaTrashAlt />
             </Button>
           </InputGroupAddon>
         </InputGroup>
