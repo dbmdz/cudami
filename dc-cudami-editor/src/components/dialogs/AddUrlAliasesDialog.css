@@ -1,0 +1,16 @@
+.with-center-line:after {
+  background: lightgray;
+  content: '';
+  height: 2px;
+  position: absolute;
+  top: 20px;
+  width: 100%;
+}
+
+.with-center-line.enabled:after {
+  background-color: #007bff;
+}
+
+.with-center-line > * {
+  z-index: 1;
+}

@@ -24,6 +24,7 @@ import AddLanguageDialog from '../dialogs/AddLanguageDialog'
 import AddLinkDialog from '../dialogs/AddLinkDialog'
 import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
+import AddUrlAliasesDialog from '../dialogs/AddUrlAliasesDialog'
 import AddVideoDialog from '../dialogs/AddVideoDialog'
 import ConfirmGeneratatedUrlAliasesDialog from '../dialogs/ConfirmGeneratatedUrlAliasesDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
@@ -61,6 +62,7 @@ class IdentifiableForm extends Component {
         addLink: false,
         addPreviewImage: false,
         addTable: false,
+        addUrlAliases: false,
         addVideo: false,
         confirmGeneratatedUrlAliases: false,
         removeLanguage: false,
@@ -138,6 +140,19 @@ class IdentifiableForm extends Component {
         },
       },
       invalidLanguages: [...invalidLanguages, selectedLanguage.name],
+    })
+  }
+
+  addUrlAlias = (newUrlAlias) => {
+    const {activeLanguage, identifiable} = this.state
+    this.updateIdentifiable({
+      localizedUrlAliases: {
+        ...identifiable.localizedUrlAliases,
+        [activeLanguage]: [
+          ...identifiable.localizedUrlAliases[activeLanguage],
+          newUrlAlias,
+        ],
+      },
     })
   }
 
@@ -374,7 +389,7 @@ class IdentifiableForm extends Component {
   }
 
   render() {
-    const {apiContextPath, type, uiLocale} = this.props
+    const {apiContextPath, parentWebsite, type, uiLocale, uuid} = this.props
     const {
       activeLanguage,
       availableLanguages,
@@ -437,6 +452,21 @@ class IdentifiableForm extends Component {
           <AddTableDialog
             isOpen={dialogsOpen.addTable}
             onToggle={() => this.toggleDialog('addTable')}
+          />
+          <AddUrlAliasesDialog
+            activeLanguage={activeLanguage}
+            existingUrlAliases={
+              identifiable.localizedUrlAliases[activeLanguage]
+            }
+            isOpen={dialogsOpen.addUrlAliases}
+            onSubmit={this.addUrlAlias}
+            parentWebsite={parentWebsite}
+            target={{
+              targetEntityType: identifiable.entityType,
+              targetIdentifiableType: identifiable.type,
+              targetUuid: uuid,
+            }}
+            toggle={() => this.toggleDialog('addUrlAliases')}
           />
           <AddVideoDialog
             activeLanguage={activeLanguage}
