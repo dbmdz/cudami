@@ -1,7 +1,7 @@
 import startCase from 'lodash/startCase'
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
-import {FaTrash} from 'react-icons/fa'
+import {FaTrashAlt} from 'react-icons/fa'
 import {
   Button,
   Col,
@@ -210,7 +210,7 @@ class AddAttachedIdentifiablesDialog extends Component {
                               })
                             }
                           >
-                            <FaTrash />
+                            <FaTrashAlt />
                           </Button>
                         </Col>
                       </Row>
