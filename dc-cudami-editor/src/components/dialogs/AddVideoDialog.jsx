@@ -4,7 +4,14 @@ import mapValues from 'lodash/mapValues'
 import {publish, subscribe} from 'pubsub-js'
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
-import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {
+  Button,
+  ButtonGroup,
+  Form,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'reactstrap'
 
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 import AppContext from '../AppContext'
@@ -210,9 +217,14 @@ class AddVideoDialog extends Component {
                 this.setState({previewImageOpen: !previewImageOpen})
               }
             />
-            <Button className="float-right mt-2" color="primary" type="submit">
-              {editing ? t('save') : t('add')}
-            </Button>
+            <ButtonGroup className="float-right">
+              <Button className="mr-1" color="light" onClick={this.destroy}>
+                {t('cancel')}
+              </Button>
+              <Button color="primary" type="submit">
+                {editing ? t('save') : t('add')}
+              </Button>
+            </ButtonGroup>
           </Form>
         </ModalBody>
       </Modal>
