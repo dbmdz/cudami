@@ -7,12 +7,14 @@ const Button = ({dispatch, fullWidth, item, state}) => {
   const disabled = item.enable && !item.enable(state)
   return (
     <button
-      className={classNames('menu-button', {
-        active: item.active && item.active(state),
-        disabled,
-        'full-width': fullWidth,
-        'text-left': fullWidth,
-      })}
+      className={classNames(
+        'menu-button',
+        fullWidth && ['full-width', 'text-left'],
+        {
+          active: item.active && item.active(state),
+          disabled,
+        },
+      )}
       onClick={(evt) => {
         evt.preventDefault()
         if (!disabled && item.run) {
