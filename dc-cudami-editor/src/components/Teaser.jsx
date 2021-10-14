@@ -1,6 +1,8 @@
 import groupBy from 'lodash/groupBy'
+import {publish} from 'pubsub-js'
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
+import {FaPlus} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, FormGroup, Label, Row} from 'reactstrap'
 
 import EditorWithLabel from './editor/EditorWithLabel'
@@ -81,6 +83,14 @@ const Teaser = ({
                   showAll={showAllUrlAliases}
                 />
               </FormGroup>
+              <Button
+                className="align-items-center d-flex p-1"
+                color="primary"
+                onClick={() => publish('editor.show-add-urlaliases-dialog')}
+                size="xs"
+              >
+                <FaPlus />
+              </Button>
             </Col>
           </Row>
         )}

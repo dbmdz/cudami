@@ -38,7 +38,7 @@ const sortByWebsite = (
   return website1.url > website2.url ? 1 : -1
 }
 
-const UrlAlias = ({
+export const UrlAlias = ({
   lastPublished,
   onChange,
   onRemove,
