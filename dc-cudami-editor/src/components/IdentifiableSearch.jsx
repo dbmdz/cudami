@@ -28,11 +28,9 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
             value={value}
           />
           <Button
-            className={classNames(
-              'position-absolute',
-              'position-centered',
-              !value && 'd-none',
-            )}
+            className={classNames('position-absolute', 'position-centered', {
+              'd-none': !value,
+            })}
             color="link"
             type="button"
             onClick={() => onChange('')}

@@ -11,7 +11,7 @@ const InputWithFloatingLabel = ({
   pattern,
   required,
   type = 'text',
-  value,
+  value = '',
 }) => {
   const [focussed, setFocussed] = useState(false)
   return (
@@ -30,9 +30,9 @@ const InputWithFloatingLabel = ({
       />
       <Label
         className={classNames('floating-label', {
-          'text-muted': value === '' && !focussed,
+          'text-muted': !value && !focussed,
           'text-primary': focussed,
-          'text-secondary': value !== '' && !focussed,
+          'text-secondary': value && !focussed,
         })}
         for={`${name}-input`}
       >
