@@ -4,7 +4,14 @@ import transform from 'lodash/transform'
 import {publish, subscribe} from 'pubsub-js'
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
-import {Button, Form, Modal, ModalBody, ModalHeader} from 'reactstrap'
+import {
+  Button,
+  ButtonGroup,
+  Form,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'reactstrap'
 
 import {loadIdentifiable, saveFileResource, updateFileResource} from '../../api'
 import AppContext from '../AppContext'
@@ -218,9 +225,14 @@ class AddPreviewImageDialog extends Component {
                 }
               />
             )}
-            <Button className="float-right mt-2" color="primary" type="submit">
-              {t('save')}
-            </Button>
+            <ButtonGroup className="float-right">
+              <Button className="mr-1" color="light" onClick={this.destroy}>
+                {t('cancel')}
+              </Button>
+              <Button color="primary" type="submit">
+                {t('save')}
+              </Button>
+            </ButtonGroup>
           </Form>
         </ModalBody>
       </Modal>

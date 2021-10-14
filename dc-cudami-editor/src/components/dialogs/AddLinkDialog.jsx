@@ -4,6 +4,7 @@ import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {
   Button,
+  ButtonGroup,
   Form,
   FormGroup,
   Modal,
@@ -99,9 +100,14 @@ class AddLinkDialog extends Component {
                 value={attributes.title}
               />
             </FormGroup>
-            <Button className="float-right" color="primary" type="submit">
-              {editing ? t('save') : t('add')}
-            </Button>
+            <ButtonGroup className="float-right">
+              <Button className="mr-1" color="light" onClick={this.destroy}>
+                {t('cancel')}
+              </Button>
+              <Button color="primary" type="submit">
+                {editing ? t('save') : t('add')}
+              </Button>
+            </ButtonGroup>
           </Form>
         </ModalBody>
       </Modal>

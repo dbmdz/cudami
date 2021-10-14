@@ -3,6 +3,7 @@ import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 import {
   Button,
+  ButtonGroup,
   Form,
   FormGroup,
   Input,
@@ -79,9 +80,14 @@ class AddTableDialog extends Component {
                 value={this.state.columns}
               />
             </FormGroup>
-            <Button className="float-right" color="primary" type="submit">
-              {t('add')}
-            </Button>
+            <ButtonGroup className="float-right">
+              <Button className="mr-1" color="light" onClick={this.destroy}>
+                {t('cancel')}
+              </Button>
+              <Button color="primary" type="submit">
+                {t('add')}
+              </Button>
+            </ButtonGroup>
           </Form>
         </ModalBody>
       </Modal>

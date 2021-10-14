@@ -4,6 +4,7 @@ import {withTranslation} from 'react-i18next'
 import {FaTrashAlt} from 'react-icons/fa'
 import {
   Button,
+  ButtonGroup,
   Col,
   Form,
   FormGroup,
@@ -219,14 +220,18 @@ class AddAttachedIdentifiablesDialog extends Component {
                 )}
               </ListGroup>
             )}
-            <Button
-              className="float-right"
-              color="primary"
-              disabled={identifiables.length === 0}
-              type="submit"
-            >
-              {t(action)}
-            </Button>
+            <ButtonGroup className="float-right">
+              <Button className="mr-1" color="light" onClick={this.destroy}>
+                {t('cancel')}
+              </Button>
+              <Button
+                color="primary"
+                disabled={identifiables.length === 0}
+                type="submit"
+              >
+                {t(action)}
+              </Button>
+            </ButtonGroup>
           </Form>
         </ModalBody>
       </Modal>
