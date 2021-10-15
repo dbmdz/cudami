@@ -255,7 +255,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         throw new ValidationException("Validation error: " + e, e);
       }
 
-      if (!savedIdentifiable.getLocalizedUrlAliases().isEmpty()) {
+      if (savedIdentifiable.getLocalizedUrlAliases() != null
+          && !savedIdentifiable.getLocalizedUrlAliases().isEmpty()) {
         LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
         for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
