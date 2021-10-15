@@ -229,7 +229,7 @@
     "save": "Speichern",
     "searchTerm": "Suchbegriff",
     "selectMedia": {
-      "searchTerm": "$t(searchTerm) (aus $t({{ mediaType }})-Titel, Dateiname, Kurzbeschreibung)",
+      "searchTerm": "$t(searchTerm) (in $t({{ mediaType }})-$t(label), $t(filename), $t(description))",
       "useSearch": "Vorhandenes $t({{ mediaType }}) verwenden",
       "useUpload": "$t({{ mediaType }}) hochladen",
       "useUrl": "$t({{ mediaType }}) per Weblink einbinden"
@@ -245,7 +245,7 @@
     "tooltips": {
       "altText": "wird im Screen-Reader vorgelesen bzw. ausgegeben, falls die Datei nicht angezeigt werden kann",
       "caption": "wird als Bildunterschrift ausgegeben",
-      "label": "Name der Datei (zur Wiederauffindbarkeit im System); Standardwert=Dateiname (z.B. bild.jpg); änderbar",
+      "label": "Name der Datei (zur Wiederauffindbarkeit im System); Standardwert=$t(filename) (z.B. bild.jpg); änderbar",
       "search": "Nutzung einer bereits im System vorhandenen Datei",
       "title": "wird beim Bewegen der Maus über die Datei eingeblendet",
       "upload": "Auswählen und Hochladen einer Datei von der lokalen Festplatte",
