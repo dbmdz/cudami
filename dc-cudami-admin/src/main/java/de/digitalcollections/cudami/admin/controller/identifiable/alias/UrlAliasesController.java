@@ -25,14 +25,14 @@ public class UrlAliasesController extends AbstractController {
   @GetMapping(
       produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8",
       value = {
-        "/api/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/api/urlaliases/slug/{pLocale}/{label}/{websiteUuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/api/urlaliases/slug/{pLocale}/{label}"
       })
   @ResponseBody
   public String generateSlug(
-      @PathVariable(name = "pLocale") Locale pLocale,
-      @PathVariable("label") String label,
-      @PathVariable(value = "website_uuid", required = false) UUID websiteUuid)
+      @PathVariable Locale pLocale,
+      @PathVariable String label,
+      @PathVariable(required = false) UUID websiteUuid)
       throws HttpException {
     return service.generateSlug(pLocale, label, websiteUuid);
   }
