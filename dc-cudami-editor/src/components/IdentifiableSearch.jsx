@@ -2,7 +2,7 @@ import './IdentifiableSearch.css'
 
 import classNames from 'classnames'
 import {useTranslation} from 'react-i18next'
-import {FaSearch, FaTimes} from 'react-icons/fa'
+import {FaSearch} from 'react-icons/fa'
 import {Button, Form, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
 const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
@@ -19,7 +19,7 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
         <div className="position-relative">
           <Input
             className={classNames(
-              'pr-5',
+              'pr-4',
               isHighlighted && ['border', 'border-danger'],
             )}
             onChange={(evt) => onChange(evt.target.value)}
@@ -28,14 +28,18 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
             value={value}
           />
           <Button
-            className={classNames('position-absolute', 'position-centered', {
-              'd-none': !value,
-            })}
+            className={classNames(
+              'position-absolute',
+              'position-centered',
+              'pr-2',
+              {
+                'd-none': !value,
+              },
+            )}
+            close
             color="link"
             onClick={() => onChange('')}
-          >
-            <FaTimes color="gray" />
-          </Button>
+          />
         </div>
         <InputGroupAddon addonType="append">
           <Button
