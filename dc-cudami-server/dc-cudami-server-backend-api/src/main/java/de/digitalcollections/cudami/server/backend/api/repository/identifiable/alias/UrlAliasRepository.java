@@ -43,15 +43,30 @@ public interface UrlAliasRepository {
   LocalizedUrlAliases findAllPrimaryLinks(String slug) throws UrlAliasRepositoryException;
 
   /**
+   * Retrieve the primary links corresponding to a slug and the target's language.
+   *
+   * @param websiteUuid the owning website's UUID, can be {@code null} and will be selected as is
+   * @param slug the slug to retrieve the primary aliases for
+   * @return {@code UrlAlias}es with {@code isPrimary() == true}
+   * @throws UrlAliasRepositoryException
+   */
+  default LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
+      throws UrlAliasRepositoryException {
+    return findPrimaryLinksForWebsite(websiteUuid, slug, true);
+  }
+
+  /**
    * Retrieve the primary links corresponding to a slug.
    *
    * @param websiteUuid the owning website's UUID, can be {@code null} and will be selected as is
    * @param slug the slug to retrieve the primary aliases for
-   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
+   * @param considerLanguage if true consider the language(s) of the target when searching for the
+   *     primary links
+   * @return {@code UrlAlias}es with {@code isPrimary() == true}
    * @throws UrlAliasRepositoryException
    */
-  LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
-      throws UrlAliasRepositoryException;
+  LocalizedUrlAliases findPrimaryLinksForWebsite(
+      UUID websiteUuid, String slug, boolean considerLanguage) throws UrlAliasRepositoryException;
 
   /**
    * Retrieve the {@code UrlAlias} with the supplied UUID (PK).

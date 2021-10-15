@@ -159,7 +159,7 @@ public class UrlAliasRepositoryImplTest {
     LocalizedUrlAliases
         allLinks = this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
         mainLinksWithWebsite =
-            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns"),
+            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns", false),
         mainLinksWithoutWebsite = this.repo.findAllPrimaryLinks("wir_ueber_uns");
 
     assertThat(allLinks.flatten().size()).isEqualTo(3);
