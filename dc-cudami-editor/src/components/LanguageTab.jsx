@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import {publish} from 'pubsub-js'
 import {useTranslation} from 'react-i18next'
 import {FaExclamationCircle, FaTrashAlt} from 'react-icons/fa'
@@ -14,7 +15,9 @@ const LanguageTab = ({
   return (
     <NavItem>
       <NavLink
-        className={language === activeLanguage ? 'active' : ''}
+        className={classNames('align-items-center', 'd-flex', {
+          active: language === activeLanguage,
+        })}
         href="#"
         onClick={({currentTarget, target}) => {
           if (currentTarget === target) {
