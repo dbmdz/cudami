@@ -1,6 +1,6 @@
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
-import {Button, ButtonGroup, Card, Col, Form, Input, Row} from 'reactstrap'
+import {Button, Card, Col, Form, Input, Row} from 'reactstrap'
 
 import {uploadFile} from '../../api'
 import AppContext from '../AppContext'
@@ -41,15 +41,14 @@ class FileResourceUploadForm extends Component {
             <h1>{t('uploadFileResource')}</h1>
           </Col>
           <Col xs="6" sm="3">
-            <ButtonGroup className="float-right">
-              <Button
-                color="primary"
-                disabled={!this.state.submitEnabled}
-                type="submit"
-              >
-                {t('next')}
-              </Button>
-            </ButtonGroup>
+            <Button
+              className="float-right"
+              color="primary"
+              disabled={!this.state.submitEnabled}
+              type="submit"
+            >
+              {t('next')}
+            </Button>
           </Col>
         </Row>
         <Row>
