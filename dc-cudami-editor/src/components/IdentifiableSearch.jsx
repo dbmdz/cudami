@@ -32,7 +32,6 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
               'd-none': !value,
             })}
             color="link"
-            type="button"
             onClick={() => onChange('')}
           >
             <FaTimes color="gray" />
