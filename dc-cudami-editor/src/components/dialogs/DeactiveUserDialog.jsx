@@ -8,6 +8,9 @@ const DeactiveUserDialog = ({email, isOpen, onConfirm, toggle}) => {
       <ModalHeader toggle={toggle}>{t('warning')}</ModalHeader>
       <ModalBody>{t('confirmUserDeactivation', {email})}</ModalBody>
       <ModalFooter>
+        <Button color="light" onClick={toggle}>
+          {t('no')}
+        </Button>
         <Button
           color="danger"
           onClick={() => {
@@ -16,9 +19,6 @@ const DeactiveUserDialog = ({email, isOpen, onConfirm, toggle}) => {
           }}
         >
           {t('yes')}
-        </Button>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
         </Button>
       </ModalFooter>
     </Modal>

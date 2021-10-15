@@ -16,6 +16,9 @@ const RemoveAttachedIdentifiableDialog = ({
       <ModalHeader toggle={onToggle}>{t('warning')}</ModalHeader>
       <ModalBody>{confirmMessage}</ModalBody>
       <ModalFooter>
+        <Button color="light" onClick={onToggle}>
+          {t('no')}
+        </Button>
         <Button
           color="danger"
           onClick={() => {
@@ -24,9 +27,6 @@ const RemoveAttachedIdentifiableDialog = ({
           }}
         >
           {t('yes')}
-        </Button>
-        <Button color="light" onClick={onToggle}>
-          {t('no')}
         </Button>
       </ModalFooter>
     </Modal>
