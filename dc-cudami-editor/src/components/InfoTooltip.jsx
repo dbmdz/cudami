@@ -8,11 +8,7 @@ const InfoTooltip = ({
   text,
 }) => (
   <>
-    <Button
-      className={className}
-      color={color}
-      id={`${name}-tooltip`}
-    >
+    <Button className={className} color={color} id={`${name}-tooltip`}>
       <FaQuestionCircle />
     </Button>
     <UncontrolledPopover
