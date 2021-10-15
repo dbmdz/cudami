@@ -16,6 +16,9 @@ export default function (locale) {
         if (format === 'capitalize') {
           return value.charAt(0).toUpperCase() + value.slice(1)
         }
+        if (format === 'lowercase') {
+          return value.toLowerCase()
+        }
         return value
       },
     },
