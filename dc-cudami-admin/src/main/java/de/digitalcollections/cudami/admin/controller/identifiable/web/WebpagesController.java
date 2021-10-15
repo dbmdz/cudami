@@ -130,9 +130,9 @@ public class WebpagesController extends AbstractController {
   }
 
   private Website getWebsite(UUID uuid, String parentType) throws HttpException {
-    if (parentType == null || "webpage".equals(parentType)) {
+    if (parentType == null || "webpage".equals(parentType.toLowerCase())) {
       return service.getWebsite(uuid);
-    } else if ("website".equals(parentType)) {
+    } else if ("website".equals(parentType.toLowerCase())) {
       return websiteService.findOne(uuid);
     }
     return null;
