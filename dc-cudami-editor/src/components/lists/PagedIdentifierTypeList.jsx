@@ -25,7 +25,10 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
           <h1>{t(`types:${type}_plural`)}</h1>
         </Col>
         <Col className="text-right">
-          <Button href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}>
+          <Button
+            color="primary"
+            href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}
+          >
             {t('new')}
           </Button>
         </Col>

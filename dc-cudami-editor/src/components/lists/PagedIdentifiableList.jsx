@@ -412,10 +412,15 @@ class PagedIdentifiableList extends Component {
             )}
           </Col>
           <Col className="text-right">
-            {showNew && <Button href={createUrl}>{t('new')}</Button>}
+            {showNew && (
+              <Button color="primary" href={createUrl}>
+                {t('new')}
+              </Button>
+            )}
             {enableAdd && (
               <Button
                 className={showNew ? 'ml-1' : ''}
+                color="primary"
                 onClick={() => this.toggleDialog('addAttachedIdentifiables')}
               >
                 {t('add')}
@@ -424,6 +429,7 @@ class PagedIdentifiableList extends Component {
             {showChangeOfOrder && (
               <Button
                 className={showNew || enableAdd ? 'ml-1' : ''}
+                color="primary"
                 onClick={this.activateChangeOfOrder}
               >
                 {t('changeOrder')}
@@ -432,6 +438,7 @@ class PagedIdentifiableList extends Component {
             {changeOfOrderActive && (
               <Button
                 className={showNew || enableAdd ? 'ml-1' : ''}
+                color="primary"
                 onClick={this.saveChangeOfOrder}
               >
                 {t('save')}

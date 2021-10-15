@@ -167,7 +167,7 @@ const TeaserPreviewImage = ({
             </Button>
             <Button
               className="align-items-center d-flex p-2"
-              color="light"
+              color="danger"
               onClick={() => {
                 setShowRemoveNotification(true)
                 onUpdate({

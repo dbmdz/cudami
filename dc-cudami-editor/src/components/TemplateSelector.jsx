@@ -32,7 +32,7 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
             </Button>
             <Button
               className="align-items-center d-flex p-1"
-              color="primary"
+              color="danger"
               onClick={onRemove}
               outline
               size="sm"
