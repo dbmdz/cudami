@@ -18,11 +18,11 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
         {t('types:renderingTemplate')}
       </Label>
       {templateName ? (
-        <InputGroup id={id} size="sm">
+        <InputGroup id={id}>
           <Input readOnly value={templateName} />
           <InputGroupAddon addonType="append">
             <Button
-              className="px-1"
+              className="align-items-center d-flex p-1"
               color="primary"
               onClick={onClick}
               outline
@@ -31,7 +31,7 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
               <FaEdit />
             </Button>
             <Button
-              className="px-1"
+              className="align-items-center d-flex p-1"
               color="primary"
               onClick={onRemove}
               outline
@@ -42,7 +42,12 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
           </InputGroupAddon>
         </InputGroup>
       ) : (
-        <Button color="primary" id={id} onClick={onClick} size="sm">
+        <Button
+          className="align-items-center d-flex p-2"
+          color="primary"
+          id={id}
+          onClick={onClick}
+        >
           <FaPlus />
         </Button>
       )}

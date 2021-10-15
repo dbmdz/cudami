@@ -150,6 +150,7 @@ const TeaserPreviewImage = ({
           />
           <ButtonGroup className="mt-1">
             <Button
+              className="align-items-center d-flex p-2"
               color="light"
               onClick={() => {
                 handleClick(
@@ -165,6 +166,7 @@ const TeaserPreviewImage = ({
               <FaEdit />
             </Button>
             <Button
+              className="align-items-center d-flex p-2"
               color="light"
               onClick={() => {
                 setShowRemoveNotification(true)

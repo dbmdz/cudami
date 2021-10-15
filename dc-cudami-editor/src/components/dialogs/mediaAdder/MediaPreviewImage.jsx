@@ -33,11 +33,12 @@ const MediaPreviewImage = ({isOpen, onUpdate, previewUrl, toggle}) => {
           {previewUrl ? (
             <>
               <PreviewImage
-                className="d-inline-block mb-0 mr-1"
+                className="d-inline-block"
                 image={{uri: previewUrl}}
                 width={50}
               />
               <Button
+                className="align-items-center d-flex p-2"
                 color="primary"
                 onClick={() => onUpdate(undefined, undefined)}
                 size="sm"
@@ -48,6 +49,7 @@ const MediaPreviewImage = ({isOpen, onUpdate, previewUrl, toggle}) => {
             </>
           ) : (
             <Button
+              className="align-items-center d-flex p-2"
               color="primary"
               onClick={() => handleClick(onUpdate)}
               title={t('setPreviewImage')}

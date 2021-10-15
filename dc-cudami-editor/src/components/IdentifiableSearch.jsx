@@ -38,7 +38,11 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
           </Button>
         </div>
         <InputGroupAddon addonType="append">
-          <Button color="primary" type="submit">
+          <Button
+            className="align-items-center d-flex"
+            color="primary"
+            type="submit"
+          >
             <FaSearch />
           </Button>
         </InputGroupAddon>

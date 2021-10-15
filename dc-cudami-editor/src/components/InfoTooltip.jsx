@@ -1,7 +1,12 @@
 import {FaQuestionCircle} from 'react-icons/fa'
 import {Button, PopoverBody, UncontrolledPopover} from 'reactstrap'
 
-const InfoTooltip = ({className = 'border', color = 'light', name, text}) => (
+const InfoTooltip = ({
+  className = 'align-items-center border d-flex',
+  color = 'light',
+  name,
+  text,
+}) => (
   <>
     <Button
       className={className}

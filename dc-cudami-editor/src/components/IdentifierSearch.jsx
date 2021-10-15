@@ -76,7 +76,12 @@ class IdentifierSearch extends Component {
           loading={loading}
         >
           <InputGroupAddon addonType="append">
-            <Button color="primary" disabled={!id.length} onClick={this.search}>
+            <Button
+              className="align-items-center d-flex"
+              color="primary"
+              disabled={!id.length}
+              onClick={this.search}
+            >
               <FaSearch />
             </Button>
           </InputGroupAddon>
