@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import {createPortal} from 'react-dom'
 import {useTranslation} from 'react-i18next'
 import {useInView} from 'react-intersection-observer'
-import {Button, ButtonGroup, NavItem} from 'reactstrap'
+import {Button, NavItem} from 'reactstrap'
 
 const ActionButtonsInNavbar = ({buttons, navbar}) => {
   return createPortal(
@@ -24,17 +24,15 @@ const ActionButtons = ({disabled = false, formId}) => {
   const {t} = useTranslation()
   const buttonClasses = classNames(!inView && ['border', 'border-white'])
   const buttons = (
-    <ButtonGroup>
-      <Button
-        className={buttonClasses}
-        color="primary"
-        disabled={disabled}
-        form={formId}
-        type="submit"
-      >
-        {t('save')}
-      </Button>
-    </ButtonGroup>
+    <Button
+      className={buttonClasses}
+      color="primary"
+      disabled={disabled}
+      form={formId}
+      type="submit"
+    >
+      {t('save')}
+    </Button>
   )
   const classes = classNames('float-right', {
     invisible: !inView,
