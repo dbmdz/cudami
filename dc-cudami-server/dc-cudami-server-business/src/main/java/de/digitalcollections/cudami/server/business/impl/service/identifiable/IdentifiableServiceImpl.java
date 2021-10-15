@@ -9,12 +9,12 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
@@ -106,7 +106,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       if (!urlAliases.containsKey(lang)
           || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
         // there is not any default alias (w/o website); create one. But not for a webpage!
-        if (identifiable.getType() == IdentifiableType.RESOURCE) {
+        if (identifiable instanceof Webpage) {
           continue;
         }
         UrlAlias defaultAlias = new UrlAlias();
