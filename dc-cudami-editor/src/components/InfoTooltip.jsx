@@ -7,7 +7,6 @@ const InfoTooltip = ({className = 'border', color = 'light', name, text}) => (
       className={className}
       color={color}
       id={`${name}-tooltip`}
-      type="button"
     >
       <FaQuestionCircle />
     </Button>
