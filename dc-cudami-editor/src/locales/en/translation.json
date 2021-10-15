@@ -229,7 +229,7 @@
     "save": "Save",
     "searchTerm": "Search term",
     "selectMedia": {
-      "searchTerm": "$t(searchTerm) (from label, file name, description)",
+      "searchTerm": "$t(searchTerm) (in $t({{ mediaType }}) $t(label, lowercase), $t(filename, lowercase), $t(description, lowercase))",
       "useSearch": "Use existing $t({{ mediaType }})",
       "useUpload": "Upload $t({{ mediaType }})",
       "useUrl": "Integrate $t({{ mediaType }}) via web link"
@@ -245,7 +245,7 @@
     "tooltips": {
       "altText": "is read out in the screen reader or is output if the file cannot be displayed",
       "caption": "is displayed as a caption",
-      "label": "name of the file (for retrievability in the system); default value=file name (e.g. picture.jpg); changeable",
+      "label": "name of the file (for retrievability in the system); default value=$t(filename, lowercase) (e.g. picture.jpg); changeable",
       "search": "using a file already existing in the system",
       "title": "appears when the mouse moves over the file",
       "upload": "selecting and uploading a file from the local hard disk",
