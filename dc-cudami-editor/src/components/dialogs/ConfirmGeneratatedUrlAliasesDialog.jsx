@@ -36,6 +36,9 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         ))}
       </ModalBody>
       <ModalFooter>
+        <Button color="light" onClick={toggle}>
+          {t('no')}
+        </Button>
         <Button
           color="success"
           onClick={() => {
@@ -44,9 +47,6 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
           }}
         >
           {t('yes')}
-        </Button>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
         </Button>
       </ModalFooter>
     </Modal>
