@@ -25,7 +25,9 @@ public class ExceptionAdvice {
 
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @ExceptionHandler(ValidationException.class)
-  public void handleValidationException() {}
+  public void handleValidationException(Exception exception) {
+    LOGGER.error("Cannot process request: ", exception);
+  }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Exception.class)

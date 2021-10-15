@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -104,7 +105,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     for (Locale lang : identifiable.getLabel().getLocales()) {
       if (!urlAliases.containsKey(lang)
           || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
-        // there is not any default alias (w/o website); create one
+        // there is not any default alias (w/o website); create one. But not for a webpage!
+        if (identifiable.getType() == IdentifiableType.RESOURCE) {
+          continue;
+        }
         UrlAlias defaultAlias = new UrlAlias();
         defaultAlias.setTargetIdentifiableType(identifiable.getType());
         defaultAlias.setTargetLanguage(lang);

@@ -23,6 +23,7 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -140,6 +141,23 @@ class IdentifiableServiceImplTest {
     assertThat(actual.getWebsite()).isNull(); // no default website given
     assertThat(actual.getSlug()).isEqualTo("hallo-welt");
     assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
+  }
+
+  @DisplayName("does not create a default UrlAliases for a webpage")
+  @Test
+  public void noDefaultUrlAliasCreationForWebpage()
+      throws CudamiServiceException, IdentifiableServiceException {
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
+        .thenReturn("hallo-welt");
+    UUID expectedTargetUuid = UUID.randomUUID();
+
+    Identifiable identifiable = new Webpage();
+    identifiable.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
+    identifiable.setUuid(expectedTargetUuid);
+
+    service.ensureDefaultAliasesExist(identifiable);
+
+    assertThat(identifiable.getLocalizedUrlAliases().isEmpty());
   }
 
   @DisplayName("adds an url alias for a certain language, when it's missing")

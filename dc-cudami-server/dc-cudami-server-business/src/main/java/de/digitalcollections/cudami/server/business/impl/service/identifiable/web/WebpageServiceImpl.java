@@ -235,7 +235,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   private void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException {
     for (UrlAlias urlAlias : localizedUrlAliases.flatten()) {
-      if (urlAlias.getWebsite() == null) {
+      if (urlAlias.getWebsite() == null || urlAlias.getWebsite().getUuid() == null) {
         throw new ValidationException("Empty website for " + urlAlias);
       }
     }
