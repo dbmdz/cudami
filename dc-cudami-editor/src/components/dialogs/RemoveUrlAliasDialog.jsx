@@ -27,6 +27,9 @@ const RemoveUrlAliasDialog = ({activeLanguage, isOpen, onConfirm, toggle}) => {
         })}
       </ModalBody>
       <ModalFooter>
+        <Button color="light" onClick={toggle}>
+          {t('no')}
+        </Button>
         <Button
           color="danger"
           onClick={() => {
@@ -35,9 +38,6 @@ const RemoveUrlAliasDialog = ({activeLanguage, isOpen, onConfirm, toggle}) => {
           }}
         >
           {t('yes')}
-        </Button>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
         </Button>
       </ModalFooter>
     </Modal>
