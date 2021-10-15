@@ -39,7 +39,7 @@ const MediaPreviewImage = ({isOpen, onUpdate, previewUrl, toggle}) => {
               />
               <Button
                 className="align-items-center d-flex p-2"
-                color="primary"
+                color="danger"
                 onClick={() => onUpdate(undefined, undefined)}
                 size="sm"
                 title={t('removePreviewImage')}

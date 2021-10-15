@@ -55,6 +55,7 @@ const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
                 </ListGroupItemText>
               )}
               <Button
+                color="primary"
                 onClick={() => {
                   onSelect(name)
                   toggle()
@@ -77,7 +78,7 @@ const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
         />
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle}>
+        <Button color="light" onClick={toggle}>
           {t('cancel')}
         </Button>
       </ModalFooter>
