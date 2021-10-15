@@ -73,7 +73,7 @@ const AddUrlAliasesDialog = ({
   const {t} = useTranslation()
   const steps = [
     {Icon: FaLink, label: t('slug'), name: 'slug'},
-    {Icon: FaCheck, label: t('confirmUrlAlias'), name: 'confirm'},
+    {Icon: FaCheck, name: 'confirm'},
   ]
   if (!parentWebsite) {
     steps.unshift({Icon: FaGlobe, label: t('types:website'), name: 'website'})
@@ -102,7 +102,9 @@ const AddUrlAliasesDialog = ({
                 >
                   <Icon />
                 </CircleButton>
-                <ListGroupItemText className="mb-0">{label}</ListGroupItemText>
+                <ListGroupItemText className="mb-0">
+                  {label ?? t(name)}
+                </ListGroupItemText>
               </ListGroupItem>
             )
           })}
