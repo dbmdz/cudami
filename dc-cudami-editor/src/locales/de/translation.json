@@ -8,7 +8,7 @@
     "year": "Jahr"
   },
   "feedback": {
-    "cannotBeEmpty": "Das Feld darf nicht leer sein.",
+    "cannotBeEmpty": "Dieses Feld darf nicht leer sein.",
     "collectionNotFound": "Sammlung wurde nicht gefunden.",
     "digitalObjectAddedSuccessfully": "Das gewählte Digitalisat wurde erfolgreich hinzugefügt.",
     "digitalObjectAddedSuccessfully_plural": "Die gewählten Digitalisate wurden erfolgreich hinzugefügt.",

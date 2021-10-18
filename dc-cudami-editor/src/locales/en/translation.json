@@ -8,7 +8,7 @@
     "year": "Year"
   },
   "feedback": {
-    "cannotBeEmpty": "The field cannot be empty.",
+    "cannotBeEmpty": "This field cannot be empty.",
     "collectionNotFound": "Collection was not found.",
     "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
     "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
