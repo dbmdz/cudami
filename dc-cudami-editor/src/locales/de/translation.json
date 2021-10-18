@@ -184,7 +184,6 @@
       }
     },
     "insertLink": "Verlinkung einfügen",
-    "invalidLabels": "Bitte füllen Sie in den folgenden Sprachen das Feld \"$t(label)\" noch aus:",
     "isPrimaryAlias": "ist (oder wird) Hauptlink",
     "label": "Titel",
     "lastModified": "letzte Änderung",
