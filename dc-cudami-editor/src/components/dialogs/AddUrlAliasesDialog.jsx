@@ -39,8 +39,8 @@ const AddUrlAliasesDialog = ({
   toggle,
 }) => {
   const initialUrlAlias = {
-    hasDuplicates: false,
-    isEmpty: true,
+    hasEmptySlug: true,
+    isDuplicate: false,
     slug: '',
     targetLanguage: activeLanguage,
     website:
@@ -62,12 +62,12 @@ const AddUrlAliasesDialog = ({
   useEffect(() => {
     setNewUrlAlias({
       ...newUrlAlias,
-      hasDuplicates: existingUrlAliases.some(
+      hasEmptySlug: !newUrlAlias.slug,
+      isDuplicate: existingUrlAliases.some(
         ({slug, website}) =>
           slug === newUrlAlias.slug &&
           newUrlAlias.website?.uuid === website?.uuid,
       ),
-      isEmpty: !newUrlAlias.slug,
     })
   }, [newUrlAlias.slug, newUrlAlias.website])
   const {t} = useTranslation()
@@ -78,7 +78,7 @@ const AddUrlAliasesDialog = ({
   if (!parentWebsite) {
     steps.unshift({Icon: FaGlobe, label: t('types:website'), name: 'website'})
   }
-  const isInvalid = newUrlAlias.hasDuplicates || newUrlAlias.isEmpty
+  const isInvalid = newUrlAlias.hasEmptySlug || newUrlAlias.isDuplicate
   const stepName = steps[activeStep].name
   return (
     <Modal isOpen={isOpen} size="lg" toggle={toggle}>
@@ -188,7 +188,7 @@ const AddUrlAliasesDialog = ({
             />
             {isInvalid && (
               <FormFeedback>
-                {newUrlAlias.hasDuplicates
+                {newUrlAlias.isDuplicate
                   ? t('feedback:noDuplicateSlugs')
                   : t('feedback:cannotBeEmpty')}
               </FormFeedback>
@@ -237,7 +237,7 @@ const AddUrlAliasesDialog = ({
           <Button
             color="primary"
             onClick={() => {
-              onSubmit(omit(newUrlAlias, ['hasDuplicates', 'isEmpty']))
+              onSubmit(omit(newUrlAlias, ['hasEmptySlug', 'isDuplicate']))
               toggle()
             }}
           >
