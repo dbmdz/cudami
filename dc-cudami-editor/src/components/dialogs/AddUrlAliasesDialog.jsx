@@ -39,7 +39,8 @@ const AddUrlAliasesDialog = ({
   toggle,
 }) => {
   const initialUrlAlias = {
-    invalid: true,
+    hasDuplicates: false,
+    isEmpty: true,
     slug: '',
     targetLanguage: activeLanguage,
     website:
@@ -61,13 +62,12 @@ const AddUrlAliasesDialog = ({
   useEffect(() => {
     setNewUrlAlias({
       ...newUrlAlias,
-      invalid:
-        !newUrlAlias.slug ||
-        existingUrlAliases.some(
-          ({slug, website}) =>
-            slug === newUrlAlias.slug &&
-            newUrlAlias.website?.uuid === website?.uuid,
-        ),
+      hasDuplicates: existingUrlAliases.some(
+        ({slug, website}) =>
+          slug === newUrlAlias.slug &&
+          newUrlAlias.website?.uuid === website?.uuid,
+      ),
+      isEmpty: !newUrlAlias.slug,
     })
   }, [newUrlAlias.slug, newUrlAlias.website])
   const {t} = useTranslation()
@@ -78,6 +78,7 @@ const AddUrlAliasesDialog = ({
   if (!parentWebsite) {
     steps.unshift({Icon: FaGlobe, label: t('types:website'), name: 'website'})
   }
+  const isInvalid = newUrlAlias.hasDuplicates || newUrlAlias.isEmpty
   const stepName = steps[activeStep].name
   return (
     <Modal isOpen={isOpen} size="lg" toggle={toggle}>
@@ -171,7 +172,7 @@ const AddUrlAliasesDialog = ({
             </InputGroup>
             <Input
               className="rounded"
-              invalid={newUrlAlias.invalid}
+              invalid={isInvalid}
               onChange={(evt) =>
                 setNewUrlAlias({
                   ...newUrlAlias,
@@ -185,7 +186,13 @@ const AddUrlAliasesDialog = ({
               placeholder={t('slug')}
               value={newUrlAlias.slug}
             />
-            <FormFeedback>{t('noDuplicateSlugs')}</FormFeedback>
+            {isInvalid && (
+              <FormFeedback>
+                {newUrlAlias.hasDuplicates
+                  ? t('feedback:noDuplicateSlugs')
+                  : t('feedback:cannotBeEmpty')}
+              </FormFeedback>
+            )}
           </>
         )}
         {stepName === 'confirm' && (
@@ -211,7 +218,7 @@ const AddUrlAliasesDialog = ({
         {stepName === 'slug' && (
           <Button
             color="primary"
-            disabled={newUrlAlias.invalid}
+            disabled={isInvalid}
             onClick={async () => {
               const slug = await generateSlug(
                 apiContextPath,
@@ -230,7 +237,7 @@ const AddUrlAliasesDialog = ({
           <Button
             color="primary"
             onClick={() => {
-              onSubmit(omit(newUrlAlias, 'invalid'))
+              onSubmit(omit(newUrlAlias, ['hasDuplicates', 'isEmpty']))
               toggle()
             }}
           >
