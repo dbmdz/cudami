@@ -8,6 +8,7 @@
     "year": "Jahr"
   },
   "feedback": {
+    "cannotBeEmpty": "Das Feld darf nicht leer sein.",
     "collectionNotFound": "Sammlung wurde nicht gefunden.",
     "digitalObjectAddedSuccessfully": "Das gewählte Digitalisat wurde erfolgreich hinzugefügt.",
     "digitalObjectAddedSuccessfully_plural": "Die gewählten Digitalisate wurden erfolgreich hinzugefügt.",
@@ -16,6 +17,7 @@
     "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
     "labelNotFilled": "Das Feld \"$t(label)\" muss in allen Sprachen ausgefüllt sein.",
     "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
+    "noDuplicateSlugs": "Dieser URL-Slug existiert bereits.",
     "noWebsiteNeeded": "Die Auswahl einer Website ist optional.",
     "orderChangedSuccessfully": "Reihenfolge wurde erfolgreich geändert.",
     "orderNotChangedSuccessfully": "Reihenfolge konnte nicht geändert werden.",
@@ -210,7 +212,6 @@
     "no": "Nein",
     "notSpecified": "nicht spezifiziert",
     "noAlignment": "ohne Textumlauf",
-    "noDuplicateSlugs": "",
     "noPreviewImage": "kein Vorschaubild",
     "numberOfColumns": "Anzahl an Spalten",
     "numberOfRows": "Anzahl an Zeilen",

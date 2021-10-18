@@ -8,6 +8,7 @@
     "year": "Year"
   },
   "feedback": {
+    "cannotBeEmpty": "The field cannot be empty.",
     "collectionNotFound": "Collection was not found.",
     "digitalObjectAddedSuccessfully": "The selected digital object has been added successfully.",
     "digitalObjectAddedSuccessfully_plural": "The selected digital objects have been added successfully.",
@@ -16,6 +17,7 @@
     "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
     "labelNotFilled": "The field \"$t(label)\" must be filled out in all languages.",
     "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
+    "noDuplicateSlugs": "This URL slug already exists.",
     "noWebsiteNeeded": "Choosing a website is optional.",
     "orderChangedSuccessfully": "Order has been changed successfully.",
     "orderNotChangedSuccessfully": "Order could not be changed.",
@@ -210,7 +212,6 @@
     "no": "No",
     "notSpecified": "not specified",
     "noAlignment": "without text wrapping",
-    "noDuplicateSlugs": "",
     "noPreviewImage": "no preview image",
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
