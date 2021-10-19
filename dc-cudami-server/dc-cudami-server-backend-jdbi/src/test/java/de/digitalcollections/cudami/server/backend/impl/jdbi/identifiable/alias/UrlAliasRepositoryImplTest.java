@@ -156,18 +156,32 @@ public class UrlAliasRepositoryImplTest {
     anotherMainLink.setWebsite(this.website);
     anotherMainLink = this.repo.save(anotherMainLink);
 
+    UrlAlias mainLinkInGerman = getNewUrlAliasObject();
+    mainLinkInGerman.setTargetUuid(urlAliasWithoutWebsite.getTargetUuid());
+    mainLinkInGerman.setSlug("main_link_in_german");
+    mainLinkInGerman.setTargetLanguage(Locale.GERMAN);
+    mainLinkInGerman.setPrimary(true);
+    mainLinkInGerman.setWebsite(website);
+    repo.save(mainLinkInGerman);
+
     LocalizedUrlAliases
         allLinks = this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
         mainLinksWithWebsite =
-            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns"),
+            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns", false),
+        mainLinksConsideringLang =
+            repo.findPrimaryLinksForWebsite(website.getUuid(), "wir_ueber_uns"),
         mainLinksWithoutWebsite = this.repo.findAllPrimaryLinks("wir_ueber_uns");
 
-    assertThat(allLinks.flatten().size()).isEqualTo(3);
-    assertThat(mainLinksWithWebsite.flatten().size()).isEqualTo(1);
-    assertThat(mainLinksWithoutWebsite.flatten().size()).isEqualTo(2);
-    assertThat(mainLinksWithoutWebsite.get(Locale.GERMAN).get(0))
-        .isEqualTo(this.urlAliasWithoutWebsite);
+    assertThat(allLinks.flatten().size()).isEqualTo(4);
+    assertThat(mainLinksWithWebsite.flatten().size()).isEqualTo(2);
+    assertThat(mainLinksWithoutWebsite.flatten().size()).isEqualTo(3);
+    assertThat(
+            mainLinksWithoutWebsite
+                .get(Locale.GERMAN)
+                .containsAll(List.of(mainLinkInGerman, urlAliasWithoutWebsite)))
+        .isTrue();
     assertThat(mainLinksWithoutWebsite.get(Locale.ENGLISH).get(0)).isEqualTo(anotherMainLink);
+    assertThat(mainLinksConsideringLang.flatten().size()).isEqualTo(1);
   }
 
   @DisplayName("Generic search method")

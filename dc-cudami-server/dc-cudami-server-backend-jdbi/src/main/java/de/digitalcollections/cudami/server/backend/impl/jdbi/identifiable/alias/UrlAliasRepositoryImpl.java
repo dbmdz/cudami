@@ -207,14 +207,17 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (!StringUtils.hasText(slug)) {
       return new LocalizedUrlAliases();
     }
-    return findMainLinks(false, null, slug);
+    return findMainLinks(false, null, slug, false);
   }
 
-  private LocalizedUrlAliases findMainLinks(boolean useWebsite, UUID websiteUuid, String slug)
+  private LocalizedUrlAliases findMainLinks(
+      boolean useWebsite, UUID websiteUuid, String slug, boolean considerLanguage)
       throws UrlAliasRepositoryException {
     StringBuilder innerSel =
         new StringBuilder(
-            String.format("(SELECT %2$s.target_uuid FROM %1$s AS %2$s ", tableName, tableAlias));
+            String.format(
+                "(SELECT %2$s.target_uuid, %2$s.target_language FROM %1$s AS %2$s ",
+                tableName, tableAlias));
     Filtering innerFiltering = Filtering.defaultBuilder().filter("slug").isEquals(slug).build();
     if (useWebsite) {
       innerFiltering.add(
@@ -225,7 +228,9 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     innerSel.append(")");
     StringBuilder sql =
         new StringBuilder(
-            "SELECT "
+            "WITH target (uuid, language) AS "
+                + innerSel.toString()
+                + " SELECT "
                 + getSelectFields(true)
                 + " FROM "
                 + tableName
@@ -234,8 +239,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                 + WEBSITESJOIN
                 + " WHERE "
                 + tableAlias
-                + ".target_uuid IN "
-                + innerSel.toString());
+                + ".target_uuid IN (SELECT uuid FROM target)");
+    if (considerLanguage) {
+      sql.append(" AND " + tableAlias + ".target_language IN (SELECT language FROM target)");
+    }
     Filtering outerFiltering = Filtering.defaultBuilder().filter("primary").isEquals(true).build();
     if (useWebsite) {
       outerFiltering.add(
@@ -261,12 +268,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public LocalizedUrlAliases findPrimaryLinksForWebsite(UUID websiteUuid, String slug)
-      throws UrlAliasRepositoryException {
+  public LocalizedUrlAliases findPrimaryLinksForWebsite(
+      UUID websiteUuid, String slug, boolean considerLanguage) throws UrlAliasRepositoryException {
     if (!StringUtils.hasText(slug)) {
       return new LocalizedUrlAliases();
     }
-    return findMainLinks(true, websiteUuid, slug);
+    return findMainLinks(true, websiteUuid, slug, considerLanguage);
   }
 
   @Override
