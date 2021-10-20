@@ -7,8 +7,107 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [Unreleased]
 
 ### Added
+
 - Management of UrlAliases
 - Visual improvements in admin GUI
+
+## [5.1.0](https://github.com/dbmdz/cudami/releases/tag/5.1.0) - 2021-08-17
+
+### Added
+
+- Added better error handling with display of an error message
+- Added codevov (https://about.codecov.io/) to the CI
+- Added functionality to add an attached identifiable by `refId`
+- Added display of `refId` to view page of collections
+- Added search functionality to some more identifiable lists
+
+### Changed
+
+- Improved datepicker design
+- Optimised ci caching
+- Optimised display of empty language
+- Fixed alt text of preview image
+- Refactored form for users to react
+
+## [5.0.1](https://github.com/dbmdz/cudami/releases/tag/5.0.1) - 2021-07-26
+
+### Changed
+
+- Bumped `dc-model` version to `9.0.0`
+
+## [5.0.0](https://github.com/dbmdz/cudami/releases/tag/5.0.0) - 2021-07-06
+
+### Added
+
+- Added filtering for entity-type(s) when loading lists of `Entity`
+- Added template for table of content rendering
+- Implemented list of persons and geolocations
+- Added sorting of imports in `dc-cudami-editor`
+- Added possibility to define mailto links in the editor
+- Added search functionality to many identifiable lists
+- Added many controller and repository tests
+- Added functionality to remove languages from content
+- Added `v5` endpoints
+- Added request id header (if present) to logging
+- Added possibility to build releases on the CI
+
+### Changed
+
+- Migrated to `dc-model` in version `9`
+- Restructured packages in `dc-cudami-client` to be synchronous with other modules
+- Migrated list of articles, attached entities/files corporate bodies, digital objects, file resources, identifier types, projects, (sub)topics, users to react
+- Refactored structure and names of react components
+- Fixed deletion for empty identifier lists
+- Replaced old sorting syntax with new one
+- Refactored webpack configuration
+- Refactored design to `AdminLTE` (https://adminlte.io/)
+- Refactored form for identifier types to react
+- Fixed session configuration
+- Replaced jsondoc with openapi/swagger
+- Refactored to `react` in version 17
+- Added usage of `HTTP/1.1` by default in `dc-cudami-client`
+
+### Removed
+
+- Removed `EntityPart` and `Subtopic`
+- Removed XML stuff
+- Removed development application in `dc-cudami-editor`
+
+## [4.5.3](https://github.com/dbmdz/cudami/releases/tag/4.5.3) - 2021-06-22
+
+### Changed
+
+- Added usage of `HTTP/1.1` by default in `dc-cudami-client`
+
+## [4.5.2](https://github.com/dbmdz/cudami/releases/tag/4.5.2) - 2021-06-07
+
+### Changed
+
+- Fixed an error that happens when a `searchTerm` is inserted into a jsonpath `like_regex` search that contains double quotes (#1045)
+- Fixed security restriction for `/users/updatePassword`
+- Fixed check if label should be rendered
+
+### Removed
+
+- Removed checkbox to activate `remember-me` functionality, as it is not working at the moment
+
+## [4.5.1](https://github.com/dbmdz/cudami/releases/tag/4.5.1) - 2021-05-17
+
+### Changed
+
+- Fixed sticky button in the navbar
+
+## [4.5.0](https://github.com/dbmdz/cudami/releases/tag/4.5.0) - 2021-04-08
+
+### Changed
+
+- Migrated all API calls to `latest` endpoints in `dc-cudami-client` to use the versioned endpoints
+
+## [4.4.4](https://github.com/dbmdz/cudami/releases/tag/4.4.4) - 2021-04-01
+
+### Changed
+
+- Fixed term search in description and label
 
 ## [4.4.3](https://github.com/dbmdz/cudami/releases/tag/4.4.3) - 2021-03-25
 
