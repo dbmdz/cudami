@@ -9,7 +9,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Added
 
 - Management of UrlAliases
+- Added table `url_aliases` via Flyway migration
 - Visual improvements in admin GUI
+
+### Changed
+
+- Refactor relation between business service and repository layers (will be continued)
+- Added transactions to create, update and delete operations on business service layer
+
+### Removed
+
+- Removed foreign keys that do not work with PostgreSQL table inheritance
 
 ## [5.1.0](https://github.com/dbmdz/cudami/releases/tag/5.1.0) - 2021-08-17
 
