@@ -58,7 +58,7 @@ class PagedIdentifiableList extends Component {
       pageNumber: 0,
       totalElements: 0,
       searchTerm: '',
-      showSearch: true,
+      showSearch: false,
     }
   }
 
