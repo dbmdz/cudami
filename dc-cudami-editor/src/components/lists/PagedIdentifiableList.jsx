@@ -147,7 +147,6 @@ class PagedIdentifiableList extends Component {
       webpage: WebpageList,
       website: WebsiteList,
     }
-    const ListComponent = LIST_COMPONENT_MAPPING[this.props.type]
     const {enableMove, enableRemove, parentType, showEdit, type} = this.props
     const {
       activeLanguage,
@@ -156,6 +155,7 @@ class PagedIdentifiableList extends Component {
       identifierTypes,
       pageNumber,
     } = this.state
+    const ListComponent = LIST_COMPONENT_MAPPING[type]
     return (
       <ListComponent
         changeOfOrderActive={changeOfOrderActive}
@@ -248,6 +248,7 @@ class PagedIdentifiableList extends Component {
   }
 
   handleRemove = async () => {
+    const {parentUuid, type} = this.props
     const {
       activeLanguage,
       defaultLanguage,
@@ -256,17 +257,14 @@ class PagedIdentifiableList extends Component {
       removeIndex,
     } = this.state
     const {label, uuid} = identifiables[removeIndex]
-    const successful = await this.removeIdentifiable(
-      this.props.parentUuid,
-      uuid,
-    )
+    const successful = await this.removeIdentifiable(parentUuid, uuid)
     if (!successful) {
       return console.error('an error occured while removing the identifiable')
     }
     this.setState({
       feedbackMessage: {
         color: 'success',
-        key: `${this.props.type}RemovedSuccessfully`,
+        key: `${type}RemovedSuccessfully`,
         values: {
           name: getLabelValue(label, activeLanguage, defaultLanguage),
         },
