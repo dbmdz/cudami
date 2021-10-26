@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Management of UrlAliases
 - Added and pre-filled table `url_aliases` via Flyway migration
 - Visual improvements in admin GUI
-Bumped `dc-model` dependency to version `9.1.0`
+- Bumped `dc-model` dependency to version `9.1.0`
 
 ### Changed
 
