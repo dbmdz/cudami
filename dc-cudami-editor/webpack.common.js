@@ -20,6 +20,11 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
+        exclude: /node_modules/,
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+      },
+      {
         exclude: /(node_modules)/,
         test: /\.jsx?$/,
         use: ['babel-loader'],
@@ -52,6 +57,6 @@ module.exports = {
     ),
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
 }
