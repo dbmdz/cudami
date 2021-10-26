@@ -9,8 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Added
 
 - Management of UrlAliases
-- Added table `url_aliases` via Flyway migration
+- Added and pre-filled table `url_aliases` via Flyway migration
 - Visual improvements in admin GUI
+Bumped `dc-model` dependency to version `9.1.0`
 
 ### Changed
 
@@ -43,7 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- Bumped `dc-model` version to `9.0.0`
+- Bumped `dc-model` dependency to version `9.0.0`
 
 ## [5.0.0](https://github.com/dbmdz/cudami/releases/tag/5.0.0) - 2021-07-06
 
