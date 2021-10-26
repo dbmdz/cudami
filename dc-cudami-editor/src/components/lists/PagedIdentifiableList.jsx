@@ -16,7 +16,8 @@ import {
   typeToEndpointMapping,
   updateAttachedIdentifiablesOrder,
 } from '../../api'
-import AppContext from '../AppContext'
+import {setDefaultLanguage} from '../../state/actions'
+import {AppContext} from '../../state/Store'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
 import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import FeedbackMessage from '../FeedbackMessage'
@@ -63,11 +64,12 @@ class PagedIdentifiableList extends Component {
   }
 
   async componentDidMount() {
-    const identifierTypes = await getIdentifierTypes(this.props.apiContextPath)
+    const {apiContextPath, dispatch} = this.context
+    const identifierTypes = await getIdentifierTypes(apiContextPath)
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
-    const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
+    const defaultLanguage = await loadDefaultLanguage(apiContextPath)
+    dispatch(setDefaultLanguage(defaultLanguage))
     this.setState({
-      defaultLanguage,
       identifiables: content,
       identifierTypes,
       numberOfPages: Math.ceil(totalElements / pageSize),
@@ -91,9 +93,9 @@ class PagedIdentifiableList extends Component {
   }
 
   addIdentifiable = async (parentUuid, uuid) => {
-    const {apiContextPath, parentType, type} = this.props
+    const {parentType, type} = this.props
     const successful = await addAttachedIdentifiable(
-      apiContextPath,
+      this.context.apiContextPath,
       parentType,
       parentUuid,
       type,
@@ -103,9 +105,9 @@ class PagedIdentifiableList extends Component {
   }
 
   addIdentifiables = async (identifiables) => {
-    const {apiContextPath, parentType, parentUuid, type} = this.props
+    const {parentType, parentUuid, type} = this.props
     const successful = await addAttachedIdentifiables(
-      apiContextPath,
+      this.context.apiContextPath,
       identifiables,
       parentType,
       parentUuid,
@@ -201,7 +203,7 @@ class PagedIdentifiableList extends Component {
   }
 
   handleMove = async ({label: targetLabel, uuid: targetUuid}) => {
-    const {apiContextPath, parentUuid, type} = this.props
+    const {parentUuid, type} = this.props
     const {
       activeLanguage,
       defaultLanguage,
@@ -225,7 +227,7 @@ class PagedIdentifiableList extends Component {
             color: 'success',
             key: `${type}MovedSuccessfully`,
             links: [
-              `${apiContextPath}${typeToEndpointMapping[type]}/${targetUuid}`,
+              `${this.context.apiContextPath}${typeToEndpointMapping[type]}/${targetUuid}`,
             ],
             values: {
               name: getLabelValue(label, activeLanguage, defaultLanguage),
@@ -277,10 +279,10 @@ class PagedIdentifiableList extends Component {
   }
 
   loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
-    const {apiContextPath, parentType, parentUuid, type} = this.props
+    const {parentType, parentUuid, type} = this.props
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
-        apiContextPath,
+        this.context.apiContextPath,
         parentType,
         parentUuid,
         type,
@@ -290,7 +292,7 @@ class PagedIdentifiableList extends Component {
       )
     }
     return await loadRootIdentifiables(
-      apiContextPath,
+      this.context.apiContextPath,
       type,
       pageNumber,
       pageSize,
@@ -299,9 +301,9 @@ class PagedIdentifiableList extends Component {
   }
 
   removeIdentifiable = async (parentUuid, uuid) => {
-    const {apiContextPath, parentType, type} = this.props
+    const {parentType, type} = this.props
     const successful = await removeAttachedIdentifiable(
-      apiContextPath,
+      this.context.apiContextPath,
       parentType,
       parentUuid,
       type,
@@ -311,9 +313,9 @@ class PagedIdentifiableList extends Component {
   }
 
   saveChangeOfOrder = async () => {
-    const {apiContextPath, parentType, parentUuid, type} = this.props
+    const {parentType, parentUuid, type} = this.props
     const successful = await updateAttachedIdentifiablesOrder(
-      apiContextPath,
+      this.context.apiContextPath,
       this.state.identifiables,
       parentType,
       parentUuid,
@@ -364,7 +366,6 @@ class PagedIdentifiableList extends Component {
 
   render() {
     const {
-      apiContextPath,
       enableAdd,
       enableChangeOfOrder,
       enableMove,
@@ -375,12 +376,10 @@ class PagedIdentifiableList extends Component {
       showNew,
       t,
       type,
-      uiLocale,
     } = this.props
     const {
       activeLanguage,
       changeOfOrderActive,
-      defaultLanguage,
       existingLanguages,
       feedbackMessage,
       identifierTypes,
@@ -393,12 +392,12 @@ class PagedIdentifiableList extends Component {
     } = this.state
     const showChangeOfOrder =
       enableChangeOfOrder && !changeOfOrderActive && totalElements > 1
-    let createUrl = `${apiContextPath}${typeToEndpointMapping[type]}/new`
+    let createUrl = `${this.context.apiContextPath}${typeToEndpointMapping[type]}/new`
     if (parentType && parentUuid) {
       createUrl = `${createUrl}?parentType=${parentType}&parentUuid=${parentUuid}`
     }
     return (
-      <AppContext.Provider value={{apiContextPath, defaultLanguage, uiLocale}}>
+      <>
         <Row>
           <Col>
             {/*
@@ -528,13 +527,14 @@ class PagedIdentifiableList extends Component {
             type={type}
           />
         )}
-      </AppContext.Provider>
+      </>
     )
   }
 }
 
+PagedIdentifiableList.contextType = AppContext
+
 PagedIdentifiableList.defaultProps = {
-  apiContextPath: '/',
   enableAdd: false,
   enableChangeOfOrder: false,
   enableMove: false,
