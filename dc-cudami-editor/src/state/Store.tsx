@@ -1,19 +1,19 @@
-import {createContext, useReducer, ReactNode} from 'react'
+import {ReactNode, createContext, useReducer} from 'react'
 
 import Reducer from './Reducer'
 
 interface Props {
   /* the context path of the surrounding java application */
-  apiContextPath: string;
+  apiContextPath: string
   /* the children who use the store */
-  children: ReactNode;
+  children: ReactNode
   /* the defined ui locale */
-  uiLocale: string;
+  uiLocale: string
 }
 
 interface State {
   /* the defined default language for multilanguage fields, will be fetched from the api */
-  defaultLanguage: string;
+  defaultLanguage: string
   /* the open state of the dialogs */
   dialogsOpen: {[key: string]: boolean}
 }
