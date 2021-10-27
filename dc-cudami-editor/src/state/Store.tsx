@@ -38,5 +38,6 @@ const Store = ({apiContextPath = '/', children, uiLocale = 'en'}: Props) => {
   )
 }
 
-export {AppContext, State}
+export {AppContext}
+export type {State}
 export default Store
