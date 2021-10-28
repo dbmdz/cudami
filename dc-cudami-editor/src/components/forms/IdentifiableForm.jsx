@@ -432,7 +432,7 @@ class IdentifiableForm extends Component {
           {this.getFormComponent()}
           <AddIframeDialog
             isOpen={dialogsOpen.addIframe}
-            onToggle={() => this.toggleDialog('addIframe')}
+            toggle={() => this.toggleDialog('addIframe')}
           />
           <AddImageDialog
             activeLanguage={activeLanguage}
@@ -443,15 +443,15 @@ class IdentifiableForm extends Component {
             addLanguage={this.addLanguage}
             availableLanguages={availableLanguages}
             isOpen={dialogsOpen.addLanguage}
-            onToggle={() => this.toggleDialog('addLanguage')}
+            toggle={() => this.toggleDialog('addLanguage')}
           />
           <AddLinkDialog
             isOpen={dialogsOpen.addLink}
-            onToggle={() => this.toggleDialog('addLink')}
+            toggle={() => this.toggleDialog('addLink')}
           />
           <AddTableDialog
             isOpen={dialogsOpen.addTable}
-            onToggle={() => this.toggleDialog('addTable')}
+            toggle={() => this.toggleDialog('addTable')}
           />
           <AddUrlAliasesDialog
             activeLanguage={activeLanguage}

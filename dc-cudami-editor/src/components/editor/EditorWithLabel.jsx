@@ -1,53 +1,51 @@
 import './EditorWithLabel.css'
 
 import {Editor} from '@aeaton/react-prosemirror'
-import {Component} from 'react'
-import {withTranslation} from 'react-i18next'
+import {useTranslation} from 'react-i18next'
 import {Label} from 'reactstrap'
 
 import {menu, options} from '../../config'
 import EditorMenu from './EditorMenu'
 
-class EditorWithLabel extends Component {
-  constructor(props) {
-    super(props)
-    this.editorOptions = {
-      ...options,
-      doc: props.document
-        ? options.schema.nodeFromJSON(props.document)
-        : undefined,
-    }
-  }
-
-  render() {
-    const {children, onUpdate, restrictedMenu, t, type} = this.props
-    let translatedMenu = menu(t)
-    if (restrictedMenu) {
-      translatedMenu = {
-        marks: translatedMenu.marks,
-      }
-    }
-    return (
-      <>
-        <Label className="font-weight-bold">{t(type)}</Label>
-        {children}
-        <div className="clearfix text-editor">
-          <Editor
-            options={this.editorOptions}
-            onChange={(doc) => {
-              onUpdate(JSON.parse(JSON.stringify(doc)))
-            }}
-            render={({editor, view}) => (
-              <>
-                <EditorMenu menu={translatedMenu} view={view} />
-                <div className="text-area">{editor}</div>
-              </>
-            )}
-          />
-        </div>
-      </>
-    )
-  }
+const EditorWithLabel = ({
+  children,
+  document: doc,
+  onUpdate,
+  restrictedMenu = false,
+  type,
+}) => {
+  const {t} = useTranslation()
+  const translatedMenu = menu(t)
+  return (
+    <>
+      <Label className="font-weight-bold">{t(type)}</Label>
+      {children}
+      <div className="clearfix text-editor">
+        <Editor
+          options={{
+            ...options,
+            doc: doc && options.schema.nodeFromJSON(doc),
+          }}
+          onChange={(doc) => {
+            onUpdate(JSON.parse(JSON.stringify(doc)))
+          }}
+          render={({editor, view}) => (
+            <>
+              <EditorMenu
+                menu={
+                  restrictedMenu
+                    ? {marks: translatedMenu.marks}
+                    : translatedMenu
+                }
+                view={view}
+              />
+              <div className="text-area">{editor}</div>
+            </>
+          )}
+        />
+      </div>
+    </>
+  )
 }
 
-export default withTranslation()(EditorWithLabel)
+export default EditorWithLabel

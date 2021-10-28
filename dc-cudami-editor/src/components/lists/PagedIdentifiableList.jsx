@@ -503,7 +503,7 @@ class PagedIdentifiableList extends Component {
             identifierTypes={identifierTypes}
             isOpen={dialogsOpen.addAttachedIdentifiables}
             onSubmit={this.handleAdd}
-            onToggle={() => this.toggleDialog('addAttachedIdentifiables')}
+            toggle={() => this.toggleDialog('addAttachedIdentifiables')}
             type={type}
           />
         )}
@@ -515,7 +515,7 @@ class PagedIdentifiableList extends Component {
             isOpen={dialogsOpen.moveAttachedIdentifiable}
             maxElements={1}
             onSubmit={(identifiables) => this.handleMove(identifiables[0])}
-            onToggle={() => this.toggleDialog('moveAttachedIdentifiable')}
+            toggle={() => this.toggleDialog('moveAttachedIdentifiable')}
             type={type}
           />
         )}
