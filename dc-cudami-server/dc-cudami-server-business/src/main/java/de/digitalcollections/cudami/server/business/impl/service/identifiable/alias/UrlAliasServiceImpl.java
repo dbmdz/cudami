@@ -147,7 +147,6 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       }
 
       localizedUrlAliases = filterForLocaleWithFallback(pLocale, localizedUrlAliases);
-      localizedUrlAliases = removeNonmatchingLanguagesForSlug(localizedUrlAliases, slug);
 
       return localizedUrlAliases;
     } catch (Exception e) {
