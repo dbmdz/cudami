@@ -110,7 +110,7 @@
         existingLanguages: /*[[${existingSubtopicLanguages}]]*/ [],
         id: "subtopic-list",
         parentType: "topic",
-        parentUuid: /*[[*{uuid}]]*/ '',
+        parentUuid: /*[[${topic.uuid}]]*/ '',
         showEdit: true,
         showNew: true,
         type: "subtopic",
@@ -122,7 +122,7 @@
         existingLanguages: /*[[${existingEntityLanguages}]]*/ [],
         id: "entities-list",
         parentType: "topic",
-        parentUuid: /*[[*{uuid}]]*/ '',
+        parentUuid: /*[[${topic.uuid}]]*/ '',
         type: "entity",
         uiLocale: /*[[${#locale.language}]]*/ ''
       });
@@ -132,7 +132,7 @@
         existingLanguages: /*[[${existingFileResourceLanguages}]]*/ [],
         id: "files-list",
         parentType: "topic",
-        parentUuid: /*[[*{uuid}]]*/ '',
+        parentUuid: /*[[${topic.uuid}]]*/ '',
         type: "fileResource",
         uiLocale: /*[[${#locale.language}]]*/ ''
       });
