@@ -146,7 +146,7 @@
         existingLanguages: /*[[${existingSubcollectionLanguages}]]*/,
         id: "subcollection-list",
         parentType: "collection",
-        parentUuid: /*[[*{uuid}]]*/,
+        parentUuid: /*[[${collection.uuid}]]*/,
         showEdit: true,
         showNew: true,
         type: "subcollection",
@@ -159,7 +159,7 @@
         enableSearch: true,
         id: "digitalobject-list",
         parentType: "collection",
-        parentUuid: /*[[*{uuid}]]*/,
+        parentUuid: /*[[${collection.uuid}]]*/,
         type: "digitalObject",
         uiLocale: /*[[${#locale.language}]]*/
       });
