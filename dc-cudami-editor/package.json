@@ -27,7 +27,7 @@
   "dependencies": {
     "@aeaton/prosemirror-footnotes": "^0.1.0",
     "@aeaton/react-prosemirror": "^0.22.1",
-    "@babel/runtime": "^7.15.4",
+    "@babel/runtime": "^7.16.0",
     "classnames": "^2.3.1",
     "filesize": "^8.0.3",
     "i18next": "^21.3.3",
