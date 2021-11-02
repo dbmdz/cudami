@@ -57,14 +57,14 @@ class MediaSelector extends Component {
     }
   }
 
-  updateLabel = (newValue, additionalFields = {}) => {
+  updateLabel = (newValue, isUpdate = false) => {
     this.props.onChange(
       {
         label: {
           [Object.keys(this.props.fileResource.label)[0]]: newValue,
         },
       },
-      additionalFields,
+      isUpdate,
     )
   }
 
@@ -189,11 +189,7 @@ class MediaSelector extends Component {
                 className="mt-3"
                 label={label}
                 name={`${mediaType}-label-upload`}
-                onChange={(label) =>
-                  this.updateLabel(label, {
-                    doUpdateRequest: true,
-                  })
-                }
+                onChange={(label) => this.updateLabel(label, true)}
               />
             </TabPane>
             <TabPane tabId="url">

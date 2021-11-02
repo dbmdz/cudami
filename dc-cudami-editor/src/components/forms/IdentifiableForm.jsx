@@ -19,13 +19,12 @@ import {
 } from '../../api'
 import AppContext from '../AppContext'
 import AddIframeDialog from '../dialogs/AddIframeDialog'
-import AddImageDialog from '../dialogs/AddImageDialog'
 import AddLanguageDialog from '../dialogs/AddLanguageDialog'
 import AddLinkDialog from '../dialogs/AddLinkDialog'
+import AddMediaDialog from '../dialogs/AddMediaDialog'
 import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddUrlAliasesDialog from '../dialogs/AddUrlAliasesDialog'
-import AddVideoDialog from '../dialogs/AddVideoDialog'
 import ConfirmGeneratatedUrlAliasesDialog from '../dialogs/ConfirmGeneratatedUrlAliasesDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import RemoveUrlAliasDialog from '../dialogs/RemoveUrlAliasDialog'
@@ -70,6 +69,7 @@ class IdentifiableForm extends Component {
       },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
+      initialFileResource: null,
       invalidLanguages: props.existingLanguages ? [] : [props.activeLanguage],
     }
   }
@@ -98,6 +98,10 @@ class IdentifiableForm extends Component {
       ...initialIdentifiable,
       ...identifiable,
     }
+    const initialFileResource = await loadIdentifiable(
+      apiContextPath,
+      'fileResource',
+    )
     this.setState({
       availableLanguages: availableLanguages
         .reduce((languages, language) => {
@@ -112,6 +116,7 @@ class IdentifiableForm extends Component {
         .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
       defaultLanguage,
       identifiable,
+      initialFileResource,
     })
   }
 
@@ -398,6 +403,7 @@ class IdentifiableForm extends Component {
       feedbackMessage,
       generatedUrlAliases,
       identifiable,
+      initialFileResource,
       invalidLanguages,
     } = this.state
     if (!identifiable) {
@@ -434,11 +440,6 @@ class IdentifiableForm extends Component {
             isOpen={dialogsOpen.addIframe}
             toggle={() => this.toggleDialog('addIframe')}
           />
-          <AddImageDialog
-            activeLanguage={activeLanguage}
-            isOpen={dialogsOpen.addImage}
-            onToggle={() => this.toggleDialog('addImage')}
-          />
           <AddLanguageDialog
             addLanguage={this.addLanguage}
             availableLanguages={availableLanguages}
@@ -448,6 +449,23 @@ class IdentifiableForm extends Component {
           <AddLinkDialog
             isOpen={dialogsOpen.addLink}
             toggle={() => this.toggleDialog('addLink')}
+          />
+          <AddMediaDialog
+            activeLanguage={activeLanguage}
+            initialFileResource={initialFileResource}
+            isOpen={dialogsOpen.addImage}
+            mediaType="image"
+            toggle={() => this.toggleDialog('addImage')}
+          />
+          <AddMediaDialog
+            activeLanguage={activeLanguage}
+            enableAltText={false}
+            enableLink={false}
+            enablePreviewImage={true}
+            initialFileResource={initialFileResource}
+            isOpen={dialogsOpen.addVideo}
+            mediaType="video"
+            toggle={() => this.toggleDialog('addVideo')}
           />
           <AddTableDialog
             isOpen={dialogsOpen.addTable}
@@ -467,11 +485,6 @@ class IdentifiableForm extends Component {
               targetUuid: uuid,
             }}
             toggle={() => this.toggleDialog('addUrlAliases')}
-          />
-          <AddVideoDialog
-            activeLanguage={activeLanguage}
-            isOpen={dialogsOpen.addVideo}
-            onToggle={() => this.toggleDialog('addVideo')}
           />
           <AddPreviewImageDialog
             activeLanguage={activeLanguage}

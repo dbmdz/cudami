@@ -137,13 +137,13 @@ class AddPreviewImageDialog extends Component {
     return fileResource
   }
 
-  updateFileResource = (updateFields, additionalFields = {}) => {
+  updateFileResource = (changedFileResource, doUpdateRequest = false) => {
     this.setState({
       fileResource: {
         ...this.state.fileResource,
-        ...updateFields,
+        ...changedFileResource,
       },
-      ...additionalFields,
+      doUpdateRequest,
     })
   }
 
