@@ -1,4 +1,5 @@
-import {Component} from 'react'
+import isEmpty from 'lodash/isEmpty'
+import {useContext, useEffect, useState} from 'react'
 import {FaSearch} from 'react-icons/fa'
 import {
   Button,
@@ -15,109 +16,97 @@ import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
 
-class IdentifierSearch extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      id: '',
-      loading: false,
-    }
-  }
+const search = async (
+  {fixedIdentifiers, namespace, type},
+  apiContextPath,
+  id,
+) => {
+  const isFixedIdentifier = fixedIdentifiers.some(
+    (i) => i.namespace === namespace,
+  )
+  const suggestion = await (isFixedIdentifier
+    ? loadIdentifiable(apiContextPath, type, id)
+    : findByIdentifier(apiContextPath, id, namespace, type))
+  return suggestion
+}
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.namespace !== this.props.namespace) {
-      this.setState({
-        id: '',
-        loading: false,
-        result: undefined,
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.setFeedbackMessage(undefined)
-  }
-
-  search = async () => {
-    this.setState({loading: true})
-    const {fixedIdentifiers, namespace, setFeedbackMessage, type} = this.props
-    const isFixedIdentifier = fixedIdentifiers.some(
-      (i) => i.namespace === namespace,
-    )
-    const result = await (isFixedIdentifier
-      ? loadIdentifiable(this.context.apiContextPath, type, this.state.id)
-      : findByIdentifier(
-          this.context.apiContextPath,
-          this.state.id,
-          namespace,
-          type,
-        ))
-    const isEmptyResult = Object.keys(result).length === 0
-    if (isEmptyResult) {
-      setFeedbackMessage({
+export const IdentifierSearch = (props) => {
+  const {activeLanguage, namespace, onSelect, setFeedback, type} = props
+  const {apiContextPath, defaultLanguage} = useContext(AppContext)
+  const [id, setId] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [suggestion, setSuggestion] = useState()
+  useEffect(() => {
+    setId('')
+    setLoading(false)
+    setSuggestion(undefined)
+  }, [namespace])
+  useEffect(() => {
+    if (suggestion && isEmpty(suggestion)) {
+      setFeedback({
         color: 'warning',
         key: `${type}NotFound`,
       })
     } else {
-      setFeedbackMessage(undefined)
+      setFeedback(undefined)
     }
-    this.setState({isEmptyResult, loading: false, result})
-  }
-
-  render() {
-    const {id, isEmptyResult, loading, result} = this.state
-    return (
-      <>
-        <InputWithSpinner
-          inputProps={{
-            onChange: (evt) => this.setState({id: evt.target.value}),
-            value: id,
-          }}
-          loading={loading}
-        >
-          <InputGroupAddon addonType="append">
-            <Button
-              className="align-items-center d-flex"
-              color="primary"
-              disabled={!id.length}
-              onClick={this.search}
-            >
-              <FaSearch />
-            </Button>
-          </InputGroupAddon>
-        </InputWithSpinner>
-        {result && !isEmptyResult && (
-          <ListGroup className="suggestion-container">
-            <ListGroupItem
-              onClick={() => {
-                this.props.onSelect(result)
-                this.setState({id: '', result: null})
-              }}
-            >
-              <Row>
-                <Col md="1">
-                  <PreviewImage
-                    image={result.previewImage}
-                    renderingHints={result.previewImageRenderingHints}
-                    width={50}
-                  />
-                </Col>
-                <Col md="11">
-                  {getLabelValue(
-                    result.label,
-                    this.props.activeLanguage,
-                    this.context.defaultLanguage,
-                  )}
-                </Col>
-              </Row>
-            </ListGroupItem>
-          </ListGroup>
-        )}
-      </>
-    )
-  }
+    return () => setFeedback(undefined)
+  }, [suggestion])
+  return (
+    <>
+      <InputWithSpinner
+        inputProps={{
+          onChange: (evt) => setId(evt.target.value),
+          value: id,
+        }}
+        loading={loading}
+      >
+        <InputGroupAddon addonType="append">
+          <Button
+            className="align-items-center d-flex"
+            color="primary"
+            disabled={!id.length}
+            onClick={async () => {
+              setLoading(true)
+              const suggestion = await search(props, apiContextPath, id)
+              setLoading(false)
+              setSuggestion(suggestion)
+            }}
+          >
+            <FaSearch />
+          </Button>
+        </InputGroupAddon>
+      </InputWithSpinner>
+      {!isEmpty(suggestion) && (
+        <ListGroup className="suggestion-container">
+          <ListGroupItem
+            onClick={() => {
+              onSelect(suggestion)
+              setId('')
+              setSuggestion(undefined)
+            }}
+          >
+            <Row>
+              <Col md="1">
+                <PreviewImage
+                  image={suggestion.previewImage}
+                  renderingHints={suggestion.previewImageRenderingHints}
+                  width={50}
+                />
+              </Col>
+              <Col md="11">
+                {getLabelValue(
+                  suggestion.label,
+                  activeLanguage,
+                  defaultLanguage,
+                )}
+              </Col>
+            </Row>
+          </ListGroupItem>
+        </ListGroup>
+      )}
+    </>
+  )
 }
-
-IdentifierSearch.contextType = AppContext
 
 export default IdentifierSearch

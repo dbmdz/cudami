@@ -116,10 +116,7 @@ const AddAttachedIdentifiablesDialog = ({
                 {showAutocomplete ? (
                   <Autocomplete
                     activeLanguage={activeLanguage}
-                    onSelect={(identifiable) =>
-                      setIdentifiables([...identifiables, identifiable])
-                    }
-                    search={(contextPath, searchTerm, pageNumber, pageSize) =>
+                    onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
                       searchIdentifiables(
                         contextPath,
                         searchTerm,
@@ -127,6 +124,9 @@ const AddAttachedIdentifiablesDialog = ({
                         pageNumber,
                         pageSize,
                       )
+                    }
+                    onSelect={(identifiable) =>
+                      setIdentifiables([...identifiables, identifiable])
                     }
                   />
                 ) : (
@@ -145,9 +145,7 @@ const AddAttachedIdentifiablesDialog = ({
                     onSelect={(identifiable) =>
                       setIdentifiables([...identifiables, identifiable])
                     }
-                    setFeedbackMessage={(feedbackMessage) =>
-                      setFeedbackMessage(feedbackMessage)
-                    }
+                    setFeedback={setFeedbackMessage}
                     type={type}
                   />
                 )}

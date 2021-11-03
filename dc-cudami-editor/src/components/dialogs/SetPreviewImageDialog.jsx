@@ -1,6 +1,6 @@
 import './AddMediaDialog.css'
 
-import mapValues from 'lodash/mapValues'
+import transform from 'lodash/transform'
 import {publish, subscribe} from 'pubsub-js'
 import {useContext, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
@@ -16,63 +16,57 @@ import {
 import {saveFileResource, updateFileResource} from '../../api'
 import AppContext from '../AppContext'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
-import MediaPreviewImage from './mediaAdder/MediaPreviewImage'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
 import MediaSelector from './mediaAdder/MediaSelector'
 
-const addToEditor = (attributes, mediaType, resourceId, uri) => {
-  const data = {
-    ...mapValues(attributes, (value) => (value !== '' ? value : undefined)),
-    resourceId,
-    url: uri,
-  }
-  publish(`editor.add-${mediaType}`, data)
-}
-
 const submitFileResource = async (apiContextPath, fileResource, isUpdate) => {
-  let resourceId = fileResource.uuid
-  if (!resourceId) {
-    const {uuid} = await saveFileResource(apiContextPath, fileResource)
-    resourceId = uuid
+  if (!fileResource.uuid) {
+    fileResource = await saveFileResource(apiContextPath, fileResource)
   } else if (isUpdate) {
-    updateFileResource(apiContextPath, fileResource)
+    fileResource = updateFileResource(apiContextPath, fileResource)
   }
-  return resourceId
+  return fileResource
 }
 
-const AddMediaDialog = ({
+const updatePreviewImage = (attributes, fileResource, destroy) => {
+  publish('editor.update-preview-image', {
+    previewImage: {
+      ...fileResource,
+      fileResourceType: 'IMAGE',
+    },
+    renderingHints: transform(attributes, (result, value, key) => {
+      const keyMapping = {
+        linkNewTab: 'openLinkInNewWindow',
+        linkUrl: 'targetLink',
+      }
+      result[keyMapping[key] ?? key] = value !== '' ? value : undefined
+    }),
+  })
+  destroy()
+}
+
+const SetPreviewImageDialog = ({
   activeLanguage,
-  enableAltText = true,
-  enableLink = true,
-  enablePreviewImage = false,
   initialFileResource = {},
   isOpen,
-  mediaType,
   toggle,
 }) => {
   const initialFileResourceAttributes = {
     ...initialFileResource,
-    fileResourceType: mediaType.toUpperCase(),
+    fileResourceType: 'IMAGE',
     label: {[activeLanguage]: ''},
-    mimeType: `${mediaType}/*`,
+    mimeType: 'image/*',
     uri: '',
   }
   const initialAttributes = {
-    alignment: 'left',
+    altText: '',
     caption: '',
+    linkNewTab: true,
+    linkUrl: '',
     title: '',
-    width: '33%',
-  }
-  if (enableAltText) {
-    initialAttributes.altText = ''
-  }
-  if (enableLink) {
-    initialAttributes.linkNewTab = true
-    initialAttributes.linkUrl = ''
   }
   const initialSectionsOpen = {
     metadata: true,
-    previewImage: false,
     renderingHints: false,
   }
   const {apiContextPath} = useContext(AppContext)
@@ -82,8 +76,13 @@ const AddMediaDialog = ({
     initialFileResourceAttributes,
   )
   const [isUpdate, setIsUpdate] = useState(false)
+  const [sectionsEnabled, setSectionsEnabled] = useState({
+    metadata: true,
+    renderingHints: true,
+  })
   const [sectionsOpen, setSectionsOpen] = useState(initialSectionsOpen)
   const {t} = useTranslation()
+  const mediaType = 'image'
   const destroy = () => {
     toggle()
     setAttributes(initialAttributes)
@@ -99,17 +98,29 @@ const AddMediaDialog = ({
   }
   useEffect(() => {
     subscribe(
-      `editor.show-${mediaType}-dialog`,
-      (_msg, {attributes: attrs = {}, editing = false} = {}) => {
+      'editor.show-preview-image-dialog',
+      (
+        _msg,
+        {attributes: attrs = {}, editing = false, sections, uuid} = {},
+      ) => {
         setAttributes({
           ...attributes,
-          ...mapValues(attrs, (value) => value ?? ''),
+          ...transform(attrs, (result, value, key) => {
+            const keyMapping = {
+              openLinkInNewWindow: 'linkNewTab',
+              targetLink: 'linkUrl',
+            }
+            result[keyMapping[key] ?? key] = value ?? ''
+          }),
         })
         setEditing(editing)
         setFileResource({
           ...fileResource,
-          uri: attrs.url ?? '',
-          uuid: attrs.resourceId,
+          uuid,
+        })
+        setSectionsEnabled({
+          ...sectionsEnabled,
+          ...sections,
         })
         toggle()
       },
@@ -118,19 +129,18 @@ const AddMediaDialog = ({
   return (
     <Modal isOpen={isOpen} size="lg" toggle={destroy}>
       <ModalHeader toggle={destroy}>
-        {editing ? t(`insert.${mediaType}.edit`) : t(`insert.${mediaType}.new`)}
+        {editing ? t('editPreviewImage') : t('setPreviewImage')}
       </ModalHeader>
       <ModalBody>
         <Form
           onSubmit={async (evt) => {
             evt.preventDefault()
-            const resourceId = await submitFileResource(
+            const resource = await submitFileResource(
               apiContextPath,
               fileResource,
               isUpdate,
             )
-            addToEditor(attributes, mediaType, resourceId, fileResource.uri)
-            destroy()
+            updatePreviewImage(attributes, resource, destroy)
           }}
         >
           {!editing && (
@@ -148,52 +158,35 @@ const AddMediaDialog = ({
               }}
             />
           )}
-          <MediaMetadataForm
-            altText={attributes.altText}
-            caption={attributes.caption}
-            enableAltText={enableAltText}
-            isOpen={sectionsOpen.metadata}
-            mediaType={mediaType}
-            onChange={setAttribute}
-            title={attributes.title}
-            toggle={() =>
-              setSectionsOpen({
-                ...sectionsOpen,
-                metadata: !sectionsOpen.metadata,
-              })
-            }
-          />
-          <MediaRenderingHintsForm
-            alignment={attributes.alignment}
-            enableLink={enableLink}
-            isOpen={sectionsOpen.renderingHints}
-            linkNewTab={attributes.linkNewTab}
-            linkUrl={attributes.linkUrl}
-            mediaType={mediaType}
-            onChange={setAttribute}
-            toggle={() =>
-              setSectionsOpen({
-                ...sectionsOpen,
-                renderingHints: !sectionsOpen.renderingHints,
-              })
-            }
-            width={attributes.width}
-          />
-          {enablePreviewImage && (
-            <MediaPreviewImage
-              isOpen={sectionsOpen.previewImage}
-              previewUrl={attributes.previewUrl}
-              onUpdate={(uri, uuid) =>
-                setAttributes({
-                  ...attributes,
-                  previewUrl: uri,
-                  previewResourceId: uuid,
-                })
-              }
+          {sectionsEnabled.metadata && (
+            <MediaMetadataForm
+              altText={attributes.altText}
+              caption={attributes.caption}
+              isOpen={sectionsOpen.metadata}
+              mediaType={mediaType}
+              onChange={setAttribute}
+              title={attributes.title}
               toggle={() =>
                 setSectionsOpen({
                   ...sectionsOpen,
-                  previewImage: !sectionsOpen.previewImage,
+                  metadata: !sectionsOpen.metadata,
+                })
+              }
+            />
+          )}
+          {sectionsEnabled.renderingHints && (
+            <MediaRenderingHintsForm
+              enableAlignment={false}
+              enableWidth={false}
+              isOpen={sectionsOpen.renderingHints}
+              linkNewTab={attributes.linkNewTab}
+              linkUrl={attributes.linkUrl}
+              mediaType={mediaType}
+              onChange={setAttribute}
+              toggle={() =>
+                setSectionsOpen({
+                  ...sectionsOpen,
+                  renderingHints: !sectionsOpen.renderingHints,
                 })
               }
             />
@@ -203,7 +196,7 @@ const AddMediaDialog = ({
               {t('cancel')}
             </Button>
             <Button color="primary" type="submit">
-              {editing ? t('save') : t('add')}
+              {t('save')}
             </Button>
           </ButtonGroup>
         </Form>
@@ -212,4 +205,4 @@ const AddMediaDialog = ({
   )
 }
 
-export default AddMediaDialog
+export default SetPreviewImageDialog
