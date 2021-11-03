@@ -217,7 +217,7 @@ class IdentifiableForm extends Component {
     const {existingLanguages, identifiable} = this.state
     const languagesWithoutGeneratedSlug = existingLanguages.filter(
       (language) => {
-        const listOfAliases = identifiable.localizedUrlAliases?.[language]
+        const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
         return (
           !listOfAliases.length ||
           listOfAliases.every(
@@ -380,7 +380,7 @@ class IdentifiableForm extends Component {
           localizedUrlAliases: mergeWith(
             identifiable.localizedUrlAliases,
             generatedUrlAliases,
-            (objValue, srcValue) => objValue.concat(srcValue),
+            (objValue, srcValue) => (objValue ?? []).concat(srcValue),
           ),
         },
       })

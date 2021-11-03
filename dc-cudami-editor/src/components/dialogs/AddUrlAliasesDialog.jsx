@@ -31,7 +31,7 @@ import {UrlAlias} from '../UrlAliases'
 
 const AddUrlAliasesDialog = ({
   activeLanguage,
-  existingUrlAliases,
+  existingUrlAliases = [],
   isOpen,
   onSubmit,
   parentWebsite,
