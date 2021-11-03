@@ -22,12 +22,12 @@ import AddIframeDialog from '../dialogs/AddIframeDialog'
 import AddLanguageDialog from '../dialogs/AddLanguageDialog'
 import AddLinkDialog from '../dialogs/AddLinkDialog'
 import AddMediaDialog from '../dialogs/AddMediaDialog'
-import AddPreviewImageDialog from '../dialogs/AddPreviewImageDialog'
 import AddTableDialog from '../dialogs/AddTableDialog'
 import AddUrlAliasesDialog from '../dialogs/AddUrlAliasesDialog'
 import ConfirmGeneratatedUrlAliasesDialog from '../dialogs/ConfirmGeneratatedUrlAliasesDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import RemoveUrlAliasDialog from '../dialogs/RemoveUrlAliasDialog'
+import SetPreviewImageDialog from '../dialogs/SetPreviewImageDialog'
 import FeedbackMessage from '../FeedbackMessage'
 import ArticleForm from './ArticleForm'
 import CollectionForm from './CollectionForm'
@@ -59,13 +59,13 @@ class IdentifiableForm extends Component {
         addImage: false,
         addLanguage: false,
         addLink: false,
-        addPreviewImage: false,
         addTable: false,
         addUrlAliases: false,
         addVideo: false,
         confirmGeneratatedUrlAliases: false,
         removeLanguage: false,
         removeUrlAlias: false,
+        setPreviewImage: false,
       },
       existingLanguages: props.existingLanguages ?? [props.activeLanguage],
       identifiable: null,
@@ -486,11 +486,6 @@ class IdentifiableForm extends Component {
             }}
             toggle={() => this.toggleDialog('addUrlAliases')}
           />
-          <AddPreviewImageDialog
-            activeLanguage={activeLanguage}
-            isOpen={dialogsOpen.addPreviewImage}
-            onToggle={() => this.toggleDialog('addPreviewImage')}
-          />
           <ConfirmGeneratatedUrlAliasesDialog
             generatedUrlAliases={generatedUrlAliases}
             isOpen={dialogsOpen.confirmGeneratatedUrlAliases}
@@ -507,6 +502,12 @@ class IdentifiableForm extends Component {
             isOpen={dialogsOpen.removeUrlAlias}
             onConfirm={this.removeUrlAlias}
             toggle={() => this.toggleDialog('removeUrlAlias')}
+          />
+          <SetPreviewImageDialog
+            activeLanguage={activeLanguage}
+            initialFileResource={initialFileResource}
+            isOpen={dialogsOpen.setPreviewImage}
+            toggle={() => this.toggleDialog('setPreviewImage')}
           />
         </div>
       </AppContext.Provider>

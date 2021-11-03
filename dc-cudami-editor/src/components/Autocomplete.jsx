@@ -1,8 +1,8 @@
 import './Autocomplete.css'
 
-import {Component} from 'react'
+import {useContext, useState} from 'react'
 import Autosuggest from 'react-autosuggest'
-import {withTranslation} from 'react-i18next'
+import {useTranslation} from 'react-i18next'
 import {Col, FormGroup, Row} from 'reactstrap'
 
 import AppContext from './AppContext'
@@ -11,146 +11,128 @@ import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
 
-class Autocomplete extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      loading: false,
-      /* defines the number of suggestions to be fetched */
-      maxElements: props.maxElements ?? 25,
-      searchTerm: '',
-      suggestions: [],
-      totalElements: 0,
-    }
-  }
-
-  getSuggestionAsString = ({label}) =>
-    `${getLabelValue(
-      label,
-      this.props.activeLanguage,
-      this.context.defaultLanguage,
-    )}`
-
-  onChange = (_, {newValue: searchTerm}) => {
-    this.setState({
-      searchTerm,
-    })
-  }
-
-  onSuggestionsClearRequested = () => {
-    this.setState({
-      suggestions: [],
-      totalElements: 0,
-    })
-  }
-
-  onSuggestionsFetchRequested = async ({value: searchTerm}) => {
-    if (searchTerm.length < 2) {
-      return
-    }
-    this.setState({loading: true})
-    const {content: suggestions, totalElements} = await this.props.search(
-      this.context.apiContextPath,
-      searchTerm,
-      0,
-      this.state.maxElements,
-    )
-    this.setState({
-      loading: false,
-      suggestions,
-      totalElements,
-    })
-  }
-
-  onSuggestionSelected = (_, {suggestion}) => {
-    this.setState({
-      searchTerm: '',
-    })
-    this.props.onSelect(suggestion)
-  }
-
-  renderInputComponent = (inputProps) => {
-    return (
-      <FormGroup className="mb-0">
-        <InputWithSpinner
-          inputProps={inputProps}
-          loading={this.state.loading}
-        />
-      </FormGroup>
-    )
-  }
-
-  renderSuggestion = ({label, previewImage, previewImageRenderingHints}) => {
-    return (
-      <Row>
-        <Col md="1">
-          <PreviewImage
-            image={previewImage}
-            renderingHints={previewImageRenderingHints}
-            width={50}
-          />
-        </Col>
-        <Col className="text-left" md="11">
-          {getLabelValue(
-            label,
-            this.props.activeLanguage,
-            this.context.defaultLanguage,
-          )}
-        </Col>
-      </Row>
-    )
-  }
-
-  renderSuggestionsContainer = ({containerProps, children}) => {
-    const {maxElements, totalElements} = this.state
-    return (
-      <div {...containerProps}>
-        {totalElements > maxElements && (
-          <FeedbackMessage
-            message={{
-              key: 'moreElementsFound',
-              values: {
-                maxElements,
-                totalElements,
-              },
-            }}
-          />
-        )}
-        {children}
-      </div>
-    )
-  }
-
-  render() {
-    const {searchTerm, suggestions} = this.state
-    const {placeholder, t} = this.props
-    const inputProps = {
-      onChange: this.onChange,
-      placeholder: placeholder ?? t('searchTerm'),
-      value: searchTerm,
-    }
-    return (
-      <Autosuggest
-        getSuggestionValue={this.getSuggestionAsString}
-        inputProps={inputProps}
-        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionSelected={this.onSuggestionSelected}
-        renderInputComponent={this.renderInputComponent}
-        renderSuggestion={this.renderSuggestion}
-        renderSuggestionsContainer={this.renderSuggestionsContainer}
-        suggestions={suggestions}
-        theme={{
-          suggestion: 'list-group-item',
-          suggestionHighlighted: 'active',
-          suggestionsContainer: 'suggestion-container',
-          suggestionsList: 'list-group',
-        }}
-      />
-    )
-  }
+const search = async ({maxElements, onSearch}, apiContextPath, searchTerm) => {
+  const {content: suggestions, totalElements} = await onSearch(
+    apiContextPath,
+    searchTerm,
+    0,
+    maxElements,
+  )
+  return {suggestions, totalElements}
 }
 
-Autocomplete.contextType = AppContext
+const renderInputComponent = (inputProps, loading) => (
+  <FormGroup className="mb-0">
+    <InputWithSpinner inputProps={inputProps} loading={loading} />
+  </FormGroup>
+)
 
-export default withTranslation()(Autocomplete)
+const renderSuggestion = (
+  activeLanguage,
+  defaultLanguage,
+  {label, previewImage, previewImageRenderingHints},
+) => (
+  <Row>
+    <Col md="1">
+      <PreviewImage
+        image={previewImage}
+        renderingHints={previewImageRenderingHints}
+        width={50}
+      />
+    </Col>
+    <Col className="text-left" md="11">
+      {getLabelValue(label, activeLanguage, defaultLanguage)}
+    </Col>
+  </Row>
+)
+
+const renderSuggestionsContainer = (
+  children,
+  containerProps,
+  maxElements,
+  totalElements,
+) => (
+  <div {...containerProps}>
+    {totalElements > maxElements && (
+      <FeedbackMessage
+        className="mb-0 text-center"
+        message={{
+          key: 'moreElementsFound',
+          values: {
+            maxElements,
+            totalElements,
+          },
+        }}
+      />
+    )}
+    {children}
+  </div>
+)
+
+const Autocomplete = (props) => {
+  const {activeLanguage, maxElements = 25, onSelect, placeholder} = props
+  const {apiContextPath, defaultLanguage} = useContext(AppContext)
+  const [loading, setLoading] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [totalElements, setTotalElements] = useState(0)
+  const {t} = useTranslation()
+  const inputProps = {
+    onChange: (evt) => setSearchTerm(evt.target.value),
+    placeholder: placeholder ?? t('searchTerm'),
+    value: searchTerm,
+  }
+  return (
+    <Autosuggest
+      getSuggestionValue={({label}) =>
+        `${getLabelValue(label, activeLanguage, defaultLanguage)}`
+      }
+      inputProps={inputProps}
+      onSuggestionsClearRequested={() => {
+        setSuggestions([])
+        setTotalElements(0)
+      }}
+      onSuggestionsFetchRequested={async ({value: searchTerm}) => {
+        if (searchTerm.length < 2) {
+          return
+        }
+        setLoading(true)
+        const {suggestions, totalElements} = await search(
+          props,
+          apiContextPath,
+          searchTerm,
+        )
+        setLoading(false)
+        setSuggestions(suggestions)
+        setTotalElements(totalElements)
+      }}
+      onSuggestionSelected={(_evt, {suggestion}) => {
+        setSearchTerm('')
+        onSelect(suggestion)
+      }}
+      renderInputComponent={(inputProps) =>
+        renderInputComponent(inputProps, loading)
+      }
+      renderSuggestion={(suggestion) =>
+        renderSuggestion(activeLanguage, defaultLanguage, suggestion)
+      }
+      renderSuggestionsContainer={({children, containerProps}) =>
+        renderSuggestionsContainer(
+          children,
+          containerProps,
+          maxElements,
+          totalElements,
+        )
+      }
+      suggestions={suggestions}
+      theme={{
+        suggestion: 'list-group-item',
+        suggestionHighlighted: 'active',
+        suggestionsContainer: 'suggestion-container',
+        suggestionsList: 'list-group',
+      }}
+    />
+  )
+}
+
+export default Autocomplete

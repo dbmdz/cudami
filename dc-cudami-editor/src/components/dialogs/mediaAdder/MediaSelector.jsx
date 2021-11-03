@@ -228,14 +228,7 @@ class MediaSelector extends Component {
               )}
               <Autocomplete
                 activeLanguage={activeLanguage}
-                onSelect={(suggestion) => {
-                  onChange({
-                    ...suggestion,
-                    uri: this.getMediaUrl(suggestion, mediaType),
-                  })
-                }}
-                placeholder={t('selectMedia.searchTerm', {mediaType})}
-                search={(contextPath, searchTerm, pageNumber, pageSize) =>
+                onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
                   searchMedia(
                     contextPath,
                     mediaType,
@@ -244,6 +237,13 @@ class MediaSelector extends Component {
                     pageSize,
                   )
                 }
+                onSelect={(suggestion) => {
+                  onChange({
+                    ...suggestion,
+                    uri: getMediaUrl(suggestion, mediaType),
+                  })
+                }}
+                placeholder={t('selectMedia.searchTerm', {mediaType})}
               />
             </TabPane>
           </TabContent>

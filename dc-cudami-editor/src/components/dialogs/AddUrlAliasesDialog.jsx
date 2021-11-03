@@ -122,15 +122,7 @@ const AddUrlAliasesDialog = ({
             <Autocomplete
               activeLanguage={activeLanguage}
               maxElements={5}
-              onSelect={(website) => {
-                setNewUrlAlias({
-                  ...newUrlAlias,
-                  website: pick(website, ['entityType', 'type', 'url', 'uuid']),
-                })
-                setActiveStep(activeStep + 1)
-              }}
-              placeholder={t('websiteSearchTerm')}
-              search={(contextPath, searchTerm, pageNumber, pageSize) =>
+              onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
                 loadRootIdentifiables(
                   contextPath,
                   'website',
@@ -139,6 +131,14 @@ const AddUrlAliasesDialog = ({
                   searchTerm,
                 )
               }
+              onSelect={(website) => {
+                setNewUrlAlias({
+                  ...newUrlAlias,
+                  website: pick(website, ['entityType', 'type', 'url', 'uuid']),
+                })
+                setActiveStep(activeStep + 1)
+              }}
+              placeholder={t('websiteSearchTerm')}
             />
           </>
         )}
