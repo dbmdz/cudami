@@ -205,7 +205,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             } catch (SQLException e) {
               throw new RuntimeException(
                   "Cannot migrate subpages for websiteUuid="
-                      + webpages
+                      + websiteUuid
                       + ", uuid="
                       + uuid
                       + ": "
