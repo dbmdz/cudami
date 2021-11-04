@@ -156,9 +156,9 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   private void migrateSubpages(JdbcTemplate jdbcTemplate, UUID websiteUuid, UUID parentWebpageUuid)
       throws SQLException {
     String selectQuery =
-        "SELECT w.uuid AS w_uuid, w.label AS label FROM webpages w, webpage_webpages ww WHERE ww.parent_webpage_uuid = '"
+        "SELECT w.uuid AS w_uuid, w.label AS label FROM webpages w INNER JOIN webpage_webpages ww ON ww.child_webpage_uuid=w.uuid WHERE ww.parent_webpage_uuid = '"
             + parentWebpageUuid
-            + "' and ww.child_webpage_uuid=w.uuid";
+            + "'";
     List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
     if (webpages.isEmpty()) {
       return;
