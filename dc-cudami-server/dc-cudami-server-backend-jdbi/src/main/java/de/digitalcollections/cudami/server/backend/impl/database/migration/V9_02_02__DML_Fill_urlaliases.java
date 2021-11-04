@@ -148,31 +148,67 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
           JSONObject jsonObject = new JSONObject(w.toString());
           UUID uuid = UUID.fromString(jsonObject.getString("w_uuid"));
           UUID websiteUuid = UUID.fromString(jsonObject.getString("ws_uuid"));
-          try {
-            Map<String, String> labels =
-                new ObjectMapper().readValue(jsonObject.getString("label"), HashMap.class);
-            labels.forEach(
-                (language, label) -> {
-                  UrlAlias urlAlias =
-                      buildUrlAlias(
-                          jdbcTemplate,
-                          null,
-                          IdentifiableType.RESOURCE,
-                          uuid,
-                          language,
-                          label,
-                          websiteUuid);
-                  try {
-                    saveUrlAlias(jdbcTemplate, urlAlias);
-                  } catch (SQLException e) {
-                    throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
-                  }
-                });
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException("Cannot parse " + w + ": " + e, e);
-          }
+          createUrlAliasAndMigrateSubpages(jdbcTemplate, jsonObject, uuid, websiteUuid);
         });
     LOGGER.info("Successfully added {} UrlAliases for webpages", webpages.size());
+  }
+
+  private void migrateSubpages(JdbcTemplate jdbcTemplate, UUID websiteUuid, UUID parentWebpageUuid)
+      throws SQLException {
+    String selectQuery =
+        "SELECT w.uuid AS w_uuid, w.label AS label FROM webpages w INNER JOIN webpage_webpages ww ON ww.child_webpage_uuid=w.uuid WHERE ww.parent_webpage_uuid = '"
+            + parentWebpageUuid
+            + "'";
+    List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+    if (webpages.isEmpty()) {
+      return;
+    }
+
+    webpages.forEach(
+        w -> {
+          JSONObject jsonObject = new JSONObject(w.toString());
+          UUID uuid = UUID.fromString(jsonObject.getString("w_uuid"));
+          createUrlAliasAndMigrateSubpages(jdbcTemplate, jsonObject, uuid, websiteUuid);
+        });
+  }
+
+  private void createUrlAliasAndMigrateSubpages(
+      JdbcTemplate jdbcTemplate, JSONObject jsonObject, UUID uuid, UUID websiteUuid) {
+    try {
+      Map<String, String> labels =
+          new ObjectMapper().readValue(jsonObject.getString("label"), HashMap.class);
+      labels.forEach(
+          (language, label) -> {
+            UrlAlias urlAlias =
+                buildUrlAlias(
+                    jdbcTemplate,
+                    null,
+                    IdentifiableType.RESOURCE,
+                    uuid,
+                    language,
+                    label,
+                    websiteUuid);
+            try {
+              saveUrlAlias(jdbcTemplate, urlAlias);
+            } catch (SQLException e) {
+              throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
+            }
+            try {
+              migrateSubpages(jdbcTemplate, websiteUuid, uuid);
+            } catch (SQLException e) {
+              throw new RuntimeException(
+                  "Cannot migrate subpages for websiteUuid="
+                      + websiteUuid
+                      + ", uuid="
+                      + uuid
+                      + ": "
+                      + e,
+                  e);
+            }
+          });
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Cannot parse " + jsonObject + ": " + e, e);
+    }
   }
 
   private void migrateIdentifiables(
@@ -251,7 +287,8 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     }
 
     if (!slug.equals(baseSlug)) {
-      LOGGER.warn("{}: Building slug with suffix={}", entityType, slug);
+      LOGGER.warn(
+          "{}: Building slug with suffix={}", entityType != null ? entityType : "WEBPAGE", slug);
     }
 
     UrlAlias urlAlias = new UrlAlias();
