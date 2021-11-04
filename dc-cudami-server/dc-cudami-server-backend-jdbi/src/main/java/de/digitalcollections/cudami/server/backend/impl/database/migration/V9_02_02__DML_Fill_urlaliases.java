@@ -148,8 +148,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
           JSONObject jsonObject = new JSONObject(w.toString());
           UUID uuid = UUID.fromString(jsonObject.getString("w_uuid"));
           UUID websiteUuid = UUID.fromString(jsonObject.getString("ws_uuid"));
-          createUrlAliasAndMigrateSubpages(
-              jdbcTemplate, webpages, w, jsonObject, uuid, websiteUuid);
+          createUrlAliasAndMigrateSubpages(jdbcTemplate, jsonObject, uuid, websiteUuid);
         });
     LOGGER.info("Successfully added {} UrlAliases for webpages", webpages.size());
   }
@@ -169,18 +168,12 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         w -> {
           JSONObject jsonObject = new JSONObject(w.toString());
           UUID uuid = UUID.fromString(jsonObject.getString("w_uuid"));
-          createUrlAliasAndMigrateSubpages(
-              jdbcTemplate, webpages, w, jsonObject, uuid, websiteUuid);
+          createUrlAliasAndMigrateSubpages(jdbcTemplate, jsonObject, uuid, websiteUuid);
         });
   }
 
   private void createUrlAliasAndMigrateSubpages(
-      JdbcTemplate jdbcTemplate,
-      List<Map<String, String>> webpages,
-      Map<String, String> w,
-      JSONObject jsonObject,
-      UUID uuid,
-      UUID websiteUuid) {
+      JdbcTemplate jdbcTemplate, JSONObject jsonObject, UUID uuid, UUID websiteUuid) {
     try {
       Map<String, String> labels =
           new ObjectMapper().readValue(jsonObject.getString("label"), HashMap.class);
@@ -214,7 +207,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             }
           });
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Cannot parse " + w + ": " + e, e);
+      throw new RuntimeException("Cannot parse " + jsonObject + ": " + e, e);
     }
   }
 
