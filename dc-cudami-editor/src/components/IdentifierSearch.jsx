@@ -12,6 +12,7 @@ import {
 
 import {findByIdentifier, loadIdentifiable} from '../api'
 import AppContext from './AppContext'
+import FeedbackMessage from './FeedbackMessage'
 import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
@@ -31,7 +32,7 @@ const search = async (
 }
 
 export const IdentifierSearch = (props) => {
-  const {activeLanguage, namespace, onSelect, setFeedback, type} = props
+  const {activeLanguage, namespace, onSelect, type} = props
   const {apiContextPath, defaultLanguage} = useContext(AppContext)
   const [id, setId] = useState('')
   const [loading, setLoading] = useState(false)
@@ -41,17 +42,6 @@ export const IdentifierSearch = (props) => {
     setLoading(false)
     setSuggestion(undefined)
   }, [namespace])
-  useEffect(() => {
-    if (suggestion && isEmpty(suggestion)) {
-      setFeedback({
-        color: 'warning',
-        key: `${type}NotFound`,
-      })
-    } else {
-      setFeedback(undefined)
-    }
-    return () => setFeedback(undefined)
-  }, [suggestion])
   return (
     <>
       <InputWithSpinner
@@ -77,34 +67,45 @@ export const IdentifierSearch = (props) => {
           </Button>
         </InputGroupAddon>
       </InputWithSpinner>
-      {!isEmpty(suggestion) && (
-        <ListGroup className="suggestion-container">
-          <ListGroupItem
-            onClick={() => {
-              onSelect(suggestion)
-              setId('')
-              setSuggestion(undefined)
+      <div className="suggestion-container">
+        {suggestion && isEmpty(suggestion) && (
+          <FeedbackMessage
+            className="mb-0 text-center"
+            message={{
+              color: 'warning',
+              key: `${type}NotFound`,
             }}
-          >
-            <Row>
-              <Col md="1">
-                <PreviewImage
-                  image={suggestion.previewImage}
-                  renderingHints={suggestion.previewImageRenderingHints}
-                  width={50}
-                />
-              </Col>
-              <Col md="11">
-                {getLabelValue(
-                  suggestion.label,
-                  activeLanguage,
-                  defaultLanguage,
-                )}
-              </Col>
-            </Row>
-          </ListGroupItem>
-        </ListGroup>
-      )}
+          />
+        )}
+        {!isEmpty(suggestion) && (
+          <ListGroup>
+            <ListGroupItem
+              onClick={() => {
+                onSelect(suggestion)
+                setId('')
+                setSuggestion(undefined)
+              }}
+            >
+              <Row>
+                <Col md="1">
+                  <PreviewImage
+                    image={suggestion.previewImage}
+                    renderingHints={suggestion.previewImageRenderingHints}
+                    width={50}
+                  />
+                </Col>
+                <Col md="11">
+                  {getLabelValue(
+                    suggestion.label,
+                    activeLanguage,
+                    defaultLanguage,
+                  )}
+                </Col>
+              </Row>
+            </ListGroupItem>
+          </ListGroup>
+        )}
+      </div>
     </>
   )
 }

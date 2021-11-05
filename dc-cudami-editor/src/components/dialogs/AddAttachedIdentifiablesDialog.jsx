@@ -35,13 +35,11 @@ const AddAttachedIdentifiablesDialog = ({
   type,
 }) => {
   const {defaultLanguage} = useContext(AppContext)
-  const [feedbackMessage, setFeedbackMessage] = useState()
   const [identifiables, setIdentifiables] = useState([])
   const [selectedOption, setSelectedOption] = useState(0)
   const {t} = useTranslation()
   const destroy = () => {
     toggle()
-    setFeedbackMessage(undefined)
     setIdentifiables([])
     setSelectedOption(0)
   }
@@ -64,13 +62,6 @@ const AddAttachedIdentifiablesDialog = ({
         {t(`${action}${startCase(type).replace(' ', '')}s`)}
       </ModalHeader>
       <ModalBody>
-        {feedbackMessage && (
-          <FeedbackMessage
-            className="mb-1"
-            message={feedbackMessage}
-            onClose={() => setFeedbackMessage(undefined)}
-          />
-        )}
         <Form
           onSubmit={(evt) => {
             evt.preventDefault()
@@ -79,8 +70,8 @@ const AddAttachedIdentifiablesDialog = ({
           }}
         >
           {showInputFields && (
-            <>
-              <FormGroup className="d-inline-block w-25">
+            <div className="d-flex">
+              <FormGroup className="w-25">
                 <Input
                   onChange={(evt) => {
                     setSelectedOption(parseInt(evt.target.value))
@@ -145,12 +136,11 @@ const AddAttachedIdentifiablesDialog = ({
                     onSelect={(identifiable) =>
                       setIdentifiables([...identifiables, identifiable])
                     }
-                    setFeedback={setFeedbackMessage}
                     type={type}
                   />
                 )}
               </FormGroup>
-            </>
+            </div>
           )}
           {identifiables.length > 0 && (
             <ListGroup className="mb-3">
