@@ -18,6 +18,7 @@
     "labelNotFilled": "Das Feld \"$t(label)\" muss in allen Sprachen ausgefüllt sein.",
     "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
     "noDuplicateSlugs": "Dieser URL-Slug existiert bereits.",
+    "noElementsFound": "Es wurden keine Treffer gefunden.",
     "noWebsiteNeeded": "Die Auswahl einer Website ist optional.",
     "orderChangedSuccessfully": "Reihenfolge wurde erfolgreich geändert.",
     "orderNotChangedSuccessfully": "Reihenfolge konnte nicht geändert werden.",

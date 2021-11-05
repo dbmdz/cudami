@@ -18,6 +18,7 @@
     "labelNotFilled": "The field \"$t(label)\" must be filled out in all languages.",
     "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
     "noDuplicateSlugs": "This URL slug already exists.",
+    "noElementsFound": "No results were found.",
     "noWebsiteNeeded": "Choosing a website is optional.",
     "orderChangedSuccessfully": "Order has been changed successfully.",
     "orderNotChangedSuccessfully": "Order could not be changed.",

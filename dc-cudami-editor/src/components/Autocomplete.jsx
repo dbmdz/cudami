@@ -11,16 +11,6 @@ import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
 
-const search = async ({maxElements, onSearch}, apiContextPath, searchTerm) => {
-  const {content: suggestions, totalElements} = await onSearch(
-    apiContextPath,
-    searchTerm,
-    0,
-    maxElements,
-  )
-  return {suggestions, totalElements}
-}
-
 const renderInputComponent = (inputProps, loading) => (
   <FormGroup className="mb-0">
     <InputWithSpinner inputProps={inputProps} loading={loading} />
@@ -50,6 +40,8 @@ const renderSuggestionsContainer = (
   children,
   containerProps,
   maxElements,
+  minLength,
+  searchTerm,
   totalElements,
 ) => (
   <div {...containerProps}>
@@ -65,12 +57,37 @@ const renderSuggestionsContainer = (
         }}
       />
     )}
+    {searchTerm.length >= minLength && totalElements === 0 && (
+      <FeedbackMessage
+        className="mb-0 text-center"
+        message={{
+          color: 'warning',
+          key: 'noElementsFound',
+        }}
+      />
+    )}
     {children}
   </div>
 )
 
-const Autocomplete = (props) => {
-  const {activeLanguage, maxElements = 25, onSelect, placeholder} = props
+const search = async (apiContextPath, maxElements, onSearch, searchTerm) => {
+  const {content: suggestions, totalElements} = await onSearch(
+    apiContextPath,
+    searchTerm,
+    0,
+    maxElements,
+  )
+  return {suggestions, totalElements}
+}
+
+const Autocomplete = ({
+  activeLanguage,
+  maxElements = 25,
+  minLength = 2,
+  onSearch,
+  onSelect,
+  placeholder,
+}) => {
   const {apiContextPath, defaultLanguage} = useContext(AppContext)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -93,13 +110,11 @@ const Autocomplete = (props) => {
         setTotalElements(0)
       }}
       onSuggestionsFetchRequested={async ({value: searchTerm}) => {
-        if (searchTerm.length < 2) {
-          return
-        }
         setLoading(true)
         const {suggestions, totalElements} = await search(
-          props,
           apiContextPath,
+          maxElements,
+          onSearch,
           searchTerm,
         )
         setLoading(false)
@@ -121,9 +136,12 @@ const Autocomplete = (props) => {
           children,
           containerProps,
           maxElements,
+          minLength,
+          searchTerm,
           totalElements,
         )
       }
+      shouldRenderSuggestions={(value) => value.trim().length >= minLength}
       suggestions={suggestions}
       theme={{
         suggestion: 'list-group-item',
