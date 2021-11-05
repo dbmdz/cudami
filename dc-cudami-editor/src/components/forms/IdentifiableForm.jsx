@@ -78,7 +78,7 @@ class IdentifiableForm extends Component {
     const {apiContextPath, t, type, uuid} = this.props
     const availableLanguages = await loadAvailableLanguages(apiContextPath)
     const defaultLanguage = await loadDefaultLanguage(apiContextPath)
-    let identifiable = await loadIdentifiable(apiContextPath, type, uuid)
+    const identifiable = await loadIdentifiable(apiContextPath, type, uuid)
     const initialIdentifiable = {
       description: {},
       label: {
@@ -87,15 +87,12 @@ class IdentifiableForm extends Component {
       localizedUrlAliases: {
         [this.state.activeLanguage]: [],
       },
-    }
-    if (this.identifiablesWithRenderingHints.includes(type)) {
-      initialIdentifiable.renderingHints = {showInPageNavigation: true}
-    }
-    if (this.identifiablesWithLongText.includes(type)) {
-      initialIdentifiable.text = {}
-    }
-    identifiable = {
-      ...initialIdentifiable,
+      renderingHints: this.identifiablesWithRenderingHints.includes(type)
+        ? {
+            showInPageNavigation: true,
+          }
+        : undefined,
+      text: this.identifiablesWithLongText.includes(type) ? {} : undefined,
       ...identifiable,
     }
     const initialFileResource = await loadIdentifiable(
@@ -105,7 +102,7 @@ class IdentifiableForm extends Component {
     this.setState({
       availableLanguages: availableLanguages
         .reduce((languages, language) => {
-          if (!(language in identifiable.label)) {
+          if (!(language in initialIdentifiable.label)) {
             languages.push({
               displayName: t(`languageNames:${language}`),
               name: language,
@@ -115,7 +112,7 @@ class IdentifiableForm extends Component {
         }, [])
         .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
       defaultLanguage,
-      identifiable,
+      identifiable: initialIdentifiable,
       initialFileResource,
     })
   }
