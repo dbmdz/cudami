@@ -103,6 +103,7 @@ class MediaSelector extends Component {
   }
 
   render() {
+    const {defaultLanguage} = this.context
     const {activeLanguage, fileResource, mediaType, onChange, t} = this.props
     const {activeTab, progress, feedbackMessage, tabToggleEnabled} = this.state
     const {label, previewImage, uri} = fileResource
@@ -173,7 +174,7 @@ class MediaSelector extends Component {
                   image={previewImage}
                   renderingHints={{
                     caption: {
-                      [this.context.defaultLanguage]: previewImage.filename,
+                      [defaultLanguage]: previewImage.filename,
                     },
                   }}
                   showCaption={true}
@@ -186,7 +187,9 @@ class MediaSelector extends Component {
                 progress={progress}
               />
               <MediaLabelInput
+                activeLanguage={activeLanguage}
                 className="mt-3"
+                defaultLanguage={defaultLanguage}
                 label={label}
                 name={`${mediaType}-label-upload`}
                 onChange={(label) => this.updateLabel(label, true)}
@@ -207,6 +210,8 @@ class MediaSelector extends Component {
                 />
               </FormGroup>
               <MediaLabelInput
+                activeLanguage={activeLanguage}
+                defaultLanguage={defaultLanguage}
                 label={label}
                 name={`${mediaType}-label-url`}
                 onChange={this.updateLabel}
@@ -219,7 +224,7 @@ class MediaSelector extends Component {
                   image={previewImage}
                   renderingHints={{
                     caption: {
-                      [this.context.defaultLanguage]: previewImage.filename,
+                      [defaultLanguage]: previewImage.filename,
                     },
                   }}
                   showCaption={true}

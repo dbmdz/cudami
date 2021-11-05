@@ -3,8 +3,16 @@ import {useTranslation} from 'react-i18next'
 import {FormGroup, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
 import InfoTooltip from '../../InfoTooltip'
+import {getLabelValue} from '../../utils'
 
-const MediaLabelInput = ({className, label, name, onChange}) => {
+const MediaLabelInput = ({
+  activeLanguage,
+  className,
+  defaultLanguage,
+  label,
+  name,
+  onChange,
+}) => {
   const {t} = useTranslation()
   return (
     <FormGroup className={classNames(['mb-0', className])}>
@@ -15,7 +23,7 @@ const MediaLabelInput = ({className, label, name, onChange}) => {
           placeholder={t('label')}
           required
           type="text"
-          value={label ? Object.values(label)[0] : ''}
+          value={getLabelValue(label, activeLanguage, defaultLanguage)}
         />
         <InputGroupAddon addonType="append">
           <InfoTooltip name={name} text={t('tooltips.label')} />

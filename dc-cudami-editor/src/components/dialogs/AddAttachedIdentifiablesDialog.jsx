@@ -23,6 +23,7 @@ import Autocomplete from '../Autocomplete'
 import FeedbackMessage from '../FeedbackMessage'
 import IdentifierSearch from '../IdentifierSearch'
 import PreviewImage from '../PreviewImage'
+import {getLabelValue} from '../utils'
 
 const AddAttachedIdentifiablesDialog = ({
   action,
@@ -159,7 +160,7 @@ const AddAttachedIdentifiablesDialog = ({
                         />
                       </Col>
                       <Col md="9">
-                        {label[defaultLanguage] ?? Object.values(label)[0]}
+                        {getLabelValue(label, activeLanguage, defaultLanguage)}
                       </Col>
                       <Col className="text-right" md="1">
                         <Button
