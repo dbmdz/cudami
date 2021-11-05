@@ -40,8 +40,10 @@ export const IdentifierSearch = (props) => {
   useEffect(() => {
     setId('')
     setLoading(false)
-    setSuggestion(undefined)
   }, [namespace])
+  useEffect(() => {
+    setSuggestion(undefined)
+  }, [id])
   return (
     <>
       <InputWithSpinner
