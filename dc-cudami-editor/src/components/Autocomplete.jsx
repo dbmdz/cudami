@@ -39,6 +39,7 @@ const renderSuggestion = (
 const renderSuggestionsContainer = (
   children,
   containerProps,
+  loading,
   maxElements,
   minLength,
   searchTerm,
@@ -57,7 +58,7 @@ const renderSuggestionsContainer = (
         }}
       />
     )}
-    {searchTerm.length >= minLength && totalElements === 0 && (
+    {!loading && searchTerm.length >= minLength && totalElements === 0 && (
       <FeedbackMessage
         className="mb-0 text-center"
         message={{
@@ -135,6 +136,7 @@ const Autocomplete = ({
         renderSuggestionsContainer(
           children,
           containerProps,
+          loading,
           maxElements,
           minLength,
           searchTerm,
