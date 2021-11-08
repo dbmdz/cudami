@@ -48,17 +48,33 @@ const AddUrlAliasesDialog = ({
       pick(parentWebsite, ['entityType', 'type', 'url', 'uuid']),
     ...target,
   }
+  const {apiContextPath} = useContext(AppContext)
+  const [activeStep, setActiveStep] = useState(0)
+  const [newUrlAlias, setNewUrlAlias] = useState(initialUrlAlias)
+  const {t} = useTranslation()
+  const destroy = () => {
+    toggle()
+    setActiveStep(0)
+    setNewUrlAlias(initialUrlAlias)
+  }
+  const isInvalid = newUrlAlias.hasEmptySlug || newUrlAlias.isDuplicate
+  const steps = [
+    ...(parentWebsite
+      ? []
+      : [{Icon: FaGlobe, label: t('types:website'), name: 'website'}]),
+    {Icon: FaLink, label: t('slug'), name: 'slug'},
+    {Icon: FaCheck, name: 'confirm'},
+  ]
+  const stepName = steps[activeStep].name
   useEffect(() => {
     const token = subscribe('editor.show-add-urlaliases-dialog', () => {
-      setActiveStep(0)
-      setNewUrlAlias(initialUrlAlias)
       toggle()
     })
     return () => unsubscribe(token)
   }, [])
-  const {apiContextPath} = useContext(AppContext)
-  const [activeStep, setActiveStep] = useState(0)
-  const [newUrlAlias, setNewUrlAlias] = useState(initialUrlAlias)
+  useEffect(() => {
+    setNewUrlAlias({...newUrlAlias, targetLanguage: activeLanguage})
+  }, [activeLanguage])
   useEffect(() => {
     setNewUrlAlias({
       ...newUrlAlias,
@@ -70,19 +86,9 @@ const AddUrlAliasesDialog = ({
       ),
     })
   }, [newUrlAlias.slug, newUrlAlias.website])
-  const {t} = useTranslation()
-  const steps = [
-    {Icon: FaLink, label: t('slug'), name: 'slug'},
-    {Icon: FaCheck, name: 'confirm'},
-  ]
-  if (!parentWebsite) {
-    steps.unshift({Icon: FaGlobe, label: t('types:website'), name: 'website'})
-  }
-  const isInvalid = newUrlAlias.hasEmptySlug || newUrlAlias.isDuplicate
-  const stepName = steps[activeStep].name
   return (
-    <Modal isOpen={isOpen} size="lg" toggle={toggle}>
-      <ModalHeader toggle={toggle}>{t('addUrlAlias')}</ModalHeader>
+    <Modal isOpen={isOpen} size="lg" toggle={destroy}>
+      <ModalHeader toggle={destroy}>{t('addUrlAlias')}</ModalHeader>
       <ModalBody>
         <ListGroup horizontal>
           {steps.map(({Icon, label, name}, idx) => {
@@ -207,7 +213,7 @@ const AddUrlAliasesDialog = ({
         )}
       </ModalBody>
       <ModalFooter>
-        <Button color="light" onClick={toggle}>
+        <Button color="light" onClick={destroy}>
           {t('cancel')}
         </Button>
         {stepName === 'website' && (
@@ -238,7 +244,7 @@ const AddUrlAliasesDialog = ({
             color="primary"
             onClick={() => {
               onSubmit(omit(newUrlAlias, ['hasEmptySlug', 'isDuplicate']))
-              toggle()
+              destroy()
             }}
           >
             {t('add')}
