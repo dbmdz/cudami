@@ -1,6 +1,6 @@
 import classNames from 'classnames'
-import {Component} from 'react'
-import {withTranslation} from 'react-i18next'
+import {useContext, useState} from 'react'
+import {useTranslation} from 'react-i18next'
 import {
   Card,
   CardBody,
@@ -21,243 +21,236 @@ import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
 import InfoTooltip from '../../InfoTooltip'
 import PreviewImage from '../../PreviewImage'
-import {getImageUrl, getVideoUrl} from '../../utils'
+import {getMediaUrl} from '../../utils'
 import MediaLabelInput from './MediaLabelInput'
 
-class MediaSelector extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      activeTab: 'upload',
-      progress: 0,
-      tabToggleEnabled: true,
+const upload = async (apiContextPath, file, mediaType, updateProgress) => {
+  try {
+    const response = await uploadFile(apiContextPath, file, updateProgress)
+    return {
+      message: {
+        color: 'success',
+        key: 'uploadSuccessful',
+        values: {mediaType},
+      },
+      response: {
+        ...response,
+        uri: getMediaUrl(response, mediaType),
+      },
+    }
+  } catch (err) {
+    return {
+      message: {
+        color: 'danger',
+        key: 'uploadFailed',
+        values: {
+          error: err,
+        },
+      },
     }
   }
+}
 
-  getMediaUrl = (fileResource, mediaType) => {
-    switch (mediaType) {
-      case 'image':
-        return getImageUrl(fileResource)
-      case 'video':
-        return getVideoUrl(fileResource)
-      default:
-        return null
+const MediaSelector = ({
+  activeLanguage,
+  fileResource,
+  mediaType,
+  onChange,
+  onTabChange,
+}) => {
+  const {apiContextPath, defaultLanguage} = useContext(AppContext)
+  const [activeTab, setActiveTab] = useState('upload')
+  const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [feedbackMessage, setFeedbackMessage] = useState()
+  const {t} = useTranslation()
+  const {label, previewImage, uri} = fileResource
+  const toggleTab = (tab, evt) => {
+    if (tab !== activeTab && evt.currentTarget.id === evt.target.id) {
+      onTabChange()
+      setActiveTab(tab)
+      setFeedbackMessage(undefined)
     }
   }
-
-  toggleTab = (activeTab, evt) => {
-    if (
-      activeTab !== this.state.activeTab &&
-      evt.currentTarget === evt.target
-    ) {
-      this.props.onTabChanged()
-      this.setState({
-        activeTab,
-      })
-    }
-  }
-
-  updateLabel = (newValue, isUpdate = false) => {
-    this.props.onChange(
+  const updateLabel = (newLabel, isUpdate = false) => {
+    onChange(
       {
         label: {
-          [Object.keys(this.props.fileResource.label)[0]]: newValue,
+          [Object.keys(fileResource.label)[0]]: newLabel,
         },
       },
       isUpdate,
     )
   }
-
-  uploadFile = async (file) => {
-    const {mediaType, onChange} = this.props
-    this.setState({
-      tabToggleEnabled: false,
-    })
-    let feedbackMessage = {
-      color: 'success',
-      key: 'uploadSuccessful',
-      values: {mediaType},
-    }
-    try {
-      const response = await uploadFile(
-        this.context.apiContextPath,
-        file,
-        (progress) => this.setState({progress}),
-      )
-      onChange({
-        ...response,
-        uri: this.getMediaUrl(response, mediaType),
-      })
-    } catch (err) {
-      feedbackMessage = {
-        color: 'danger',
-        key: 'uploadFailed',
-      }
-    } finally {
-      this.setState({
-        feedbackMessage,
-        tabToggleEnabled: true,
-      })
-      setTimeout(() => this.setState({feedbackMessage: undefined}), 3000)
-    }
-  }
-
-  render() {
-    const {defaultLanguage} = this.context
-    const {activeLanguage, fileResource, mediaType, onChange, t} = this.props
-    const {activeTab, progress, feedbackMessage, tabToggleEnabled} = this.state
-    const {label, previewImage, uri} = fileResource
-    return (
-      <Card className="media-adder-content">
-        <CardHeader className="font-weight-bold">
-          <Nav className="card-header-tabs" tabs>
-            <NavItem>
-              <NavLink
-                className={classNames({
-                  active: activeTab === 'upload',
-                })}
-                disabled={!tabToggleEnabled}
-                href="#"
-                onClick={(evt) => this.toggleTab('upload', evt)}
-              >
-                {t('selectMedia.useUpload', {mediaType})}
-                <InfoTooltip
-                  className="ml-1 p-0"
-                  color="link"
-                  name="upload"
-                  text={t('tooltips.upload')}
-                />
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink
-                className={classNames({active: activeTab === 'url'})}
-                disabled={!tabToggleEnabled}
-                href="#"
-                onClick={(evt) => this.toggleTab('url', evt)}
-              >
-                {t('selectMedia.useUrl', {mediaType})}
-                <InfoTooltip
-                  className="ml-1 p-0"
-                  color="link"
-                  name="url"
-                  text={t('tooltips.url')}
-                />
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink
-                className={classNames({
-                  active: activeTab === 'search',
-                })}
-                disabled={!tabToggleEnabled}
-                href="#"
-                onClick={(evt) => this.toggleTab('search', evt)}
-              >
-                {t('selectMedia.useSearch', {mediaType})}
-                <InfoTooltip
-                  className="ml-1 p-0"
-                  color="link"
-                  name="search"
-                  text={t('tooltips.search')}
-                />
-              </NavLink>
-            </NavItem>
-          </Nav>
-        </CardHeader>
-        <CardBody className="text-center">
-          <TabContent activeTab={activeTab} className="border-0 p-0">
-            <TabPane tabId="upload">
-              {previewImage && (
-                <PreviewImage
-                  className="mx-auto"
-                  image={previewImage}
-                  renderingHints={{
-                    caption: {
-                      [defaultLanguage]: previewImage.filename,
-                    },
-                  }}
-                  showCaption={true}
-                  width={250}
-                />
-              )}
-              {feedbackMessage && <FeedbackMessage message={feedbackMessage} />}
-              <FileUploadForm
-                onChange={(file) => this.uploadFile(file)}
-                progress={progress}
+  return (
+    <Card className="media-adder-content">
+      <CardHeader className="font-weight-bold">
+        <Nav className="card-header-tabs" tabs>
+          <NavItem>
+            <NavLink
+              className={classNames({
+                active: activeTab === 'upload',
+              })}
+              disabled={loading}
+              href="#"
+              id="upload"
+              onClick={(evt) => toggleTab('upload', evt)}
+            >
+              {t('selectMedia.useUpload', {mediaType})}
+              <InfoTooltip
+                className="ml-1 p-0"
+                color="link"
+                name="upload"
+                text={t('tooltips.upload')}
               />
-              <MediaLabelInput
-                activeLanguage={activeLanguage}
-                className="mt-3"
-                defaultLanguage={defaultLanguage}
-                label={label}
-                name={`${mediaType}-label-upload`}
-                onChange={(label) => this.updateLabel(label, true)}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classNames({active: activeTab === 'url'})}
+              disabled={loading}
+              href="#"
+              id="url"
+              onClick={(evt) => toggleTab('url', evt)}
+            >
+              {t('selectMedia.useUrl', {mediaType})}
+              <InfoTooltip
+                className="ml-1 p-0"
+                color="link"
+                name="url"
+                text={t('tooltips.url')}
               />
-            </TabPane>
-            <TabPane tabId="url">
-              {uri && (
-                <PreviewImage className="mx-auto" image={{uri}} width={250} />
-              )}
-              <FormGroup>
-                <Input
-                  name="url"
-                  onChange={(evt) => onChange({uri: evt.target.value.trim()})}
-                  placeholder="URL"
-                  required
-                  type="url"
-                  value={uri}
-                />
-              </FormGroup>
-              <MediaLabelInput
-                activeLanguage={activeLanguage}
-                defaultLanguage={defaultLanguage}
-                label={label}
-                name={`${mediaType}-label-url`}
-                onChange={this.updateLabel}
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classNames({
+                active: activeTab === 'search',
+              })}
+              disabled={loading}
+              href="#"
+              id="search"
+              onClick={(evt) => toggleTab('search', evt)}
+            >
+              {t('selectMedia.useSearch', {mediaType})}
+              <InfoTooltip
+                className="ml-1 p-0"
+                color="link"
+                name="search"
+                text={t('tooltips.search')}
               />
-            </TabPane>
-            <TabPane tabId="search">
-              {previewImage && (
-                <PreviewImage
-                  className="mx-auto"
-                  image={previewImage}
-                  renderingHints={{
-                    caption: {
-                      [defaultLanguage]: previewImage.filename,
-                    },
-                  }}
-                  showCaption={true}
-                  width={250}
-                />
-              )}
-              <Autocomplete
-                activeLanguage={activeLanguage}
-                onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                  searchMedia(
-                    contextPath,
-                    mediaType,
-                    searchTerm,
-                    pageNumber,
-                    pageSize,
-                  )
-                }
-                onSelect={(suggestion) => {
-                  onChange({
-                    ...suggestion,
-                    uri: getMediaUrl(suggestion, mediaType),
-                  })
+            </NavLink>
+          </NavItem>
+        </Nav>
+      </CardHeader>
+      <CardBody className="text-center">
+        <TabContent activeTab={activeTab} className="border-0 p-0">
+          <TabPane tabId="upload">
+            {previewImage && (
+              <PreviewImage
+                className="mx-auto"
+                image={previewImage}
+                renderingHints={{
+                  caption: {
+                    [defaultLanguage]: previewImage.filename,
+                  },
                 }}
-                placeholder={t('selectMedia.searchTerm', {mediaType})}
+                showCaption={true}
+                width={250}
               />
-            </TabPane>
-          </TabContent>
-        </CardBody>
-      </Card>
-    )
-  }
+            )}
+            {feedbackMessage && (
+              <FeedbackMessage
+                message={feedbackMessage}
+                onClose={() => setFeedbackMessage(undefined)}
+              />
+            )}
+            <FileUploadForm
+              onChange={async (file) => {
+                setLoading(true)
+                const {message, response} = await upload(
+                  apiContextPath,
+                  file,
+                  mediaType,
+                  setProgress,
+                )
+                setFeedbackMessage(message)
+                if (response) {
+                  onChange(response)
+                }
+                setLoading(false)
+              }}
+              progress={progress}
+            />
+            <MediaLabelInput
+              activeLanguage={activeLanguage}
+              className="mt-3"
+              defaultLanguage={defaultLanguage}
+              label={label}
+              name={`${mediaType}-label-upload`}
+              onChange={(label) => updateLabel(label, true)}
+            />
+          </TabPane>
+          <TabPane tabId="url">
+            {uri && (
+              <PreviewImage className="mx-auto" image={{uri}} width={250} />
+            )}
+            <FormGroup>
+              <Input
+                name="url"
+                onChange={(evt) => onChange({uri: evt.target.value.trim()})}
+                placeholder="URL"
+                required
+                type="url"
+                value={uri}
+              />
+            </FormGroup>
+            <MediaLabelInput
+              activeLanguage={activeLanguage}
+              defaultLanguage={defaultLanguage}
+              label={label}
+              name={`${mediaType}-label-url`}
+              onChange={updateLabel}
+            />
+          </TabPane>
+          <TabPane tabId="search">
+            {previewImage && (
+              <PreviewImage
+                className="mx-auto"
+                image={previewImage}
+                renderingHints={{
+                  caption: {
+                    [defaultLanguage]: previewImage.filename,
+                  },
+                }}
+                showCaption={true}
+                width={250}
+              />
+            )}
+            <Autocomplete
+              activeLanguage={activeLanguage}
+              onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
+                searchMedia(
+                  contextPath,
+                  mediaType,
+                  searchTerm,
+                  pageNumber,
+                  pageSize,
+                )
+              }
+              onSelect={(suggestion) => {
+                onChange({
+                  ...suggestion,
+                  uri: getMediaUrl(suggestion, mediaType),
+                })
+              }}
+              placeholder={t('selectMedia.searchTerm', {mediaType})}
+            />
+          </TabPane>
+        </TabContent>
+      </CardBody>
+    </Card>
+  )
 }
 
-MediaSelector.contextType = AppContext
-
-export default withTranslation()(MediaSelector)
+export default MediaSelector

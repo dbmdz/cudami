@@ -29,7 +29,7 @@
     "subcollectionNotFound": "Collection was not found.",
     "subcollectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
     "submitOfFormFailed": "An error occurred during saving.",
-    "uploadFailed": "An error occurred during upload.",
+    "uploadFailed": "An error occurred during upload: {{ error }}",
     "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
     "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
     "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",

@@ -36,6 +36,17 @@ export function getLabelValue(label, activeLanguage, defaultLanguage) {
   )
 }
 
+export function getMediaUrl(fileResource, mediaType) {
+  switch (mediaType) {
+    case 'image':
+      return getImageUrl(fileResource)
+    case 'video':
+      return getVideoUrl(fileResource)
+    default:
+      return null
+  }
+}
+
 export function getVideoUrl(video) {
   if (!video.httpBaseUrl || !video.mimeType) {
     return video.uri

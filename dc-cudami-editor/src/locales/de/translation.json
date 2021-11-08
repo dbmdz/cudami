@@ -29,7 +29,7 @@
     "subcollectionNotFound": "Sammlung wurde nicht gefunden.",
     "subcollectionRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
     "submitOfFormFailed": "Beim Speichern ist ein Fehler aufgetreten.",
-    "uploadFailed": "Beim Hochladen ist ein Fehler aufgetreten.",
+    "uploadFailed": "Beim Hochladen ist ein Fehler aufgetreten: {{ error }}",
     "uploadSuccessful": "$t({{ mediaType }}) erfolgreich hochgeladen.",
     "userActivatedSuccessfully": "Benutzer \"{{ email }}\" wurde erfolgreich aktiviert.",
     "userDeactivatedSuccessfully": "Benutzer \"{{ email }}\" wurde erfolgreich deaktiviert.",
