@@ -152,7 +152,7 @@ const SetPreviewImageDialog = ({
                 setFileResource({...fileResource, ...changedFileResource})
                 setIsUpdate(isUpdate)
               }}
-              onTabChanged={() => {
+              onTabChange={() => {
                 setFileResource(initialFileResourceAttributes)
                 setIsUpdate(false)
               }}
