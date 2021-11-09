@@ -11,17 +11,17 @@ import InputWithSpinner from './InputWithSpinner'
 import PreviewImage from './PreviewImage'
 import {getLabelValue} from './utils'
 
-const renderInputComponent = (inputProps, loading) => (
+const Input = ({inputProps, loading}) => (
   <FormGroup className="mb-0">
     <InputWithSpinner inputProps={inputProps} loading={loading} />
   </FormGroup>
 )
 
-const renderSuggestion = (
+const Suggestion = ({
   activeLanguage,
   defaultLanguage,
-  {label, previewImage, previewImageRenderingHints},
-) => (
+  suggestion: {label, previewImage, previewImageRenderingHints},
+}) => (
   <Row>
     <Col md="1">
       <PreviewImage
@@ -36,7 +36,7 @@ const renderSuggestion = (
   </Row>
 )
 
-const renderSuggestionsContainer = (
+const SuggestionsContainer = ({
   children,
   containerProps,
   loading,
@@ -44,7 +44,7 @@ const renderSuggestionsContainer = (
   minLength,
   searchTerm,
   totalElements,
-) => (
+}) => (
   <div {...containerProps}>
     {totalElements > maxElements && (
       <FeedbackMessage
@@ -126,23 +126,28 @@ const Autocomplete = ({
         setSearchTerm('')
         onSelect(suggestion)
       }}
-      renderInputComponent={(inputProps) =>
-        renderInputComponent(inputProps, loading)
-      }
-      renderSuggestion={(suggestion) =>
-        renderSuggestion(activeLanguage, defaultLanguage, suggestion)
-      }
-      renderSuggestionsContainer={({children, containerProps}) =>
-        renderSuggestionsContainer(
-          children,
-          containerProps,
-          loading,
-          maxElements,
-          minLength,
-          searchTerm,
-          totalElements,
-        )
-      }
+      renderInputComponent={(inputProps) => (
+        <Input inputProps={inputProps} loading={loading} />
+      )}
+      renderSuggestion={(suggestion) => (
+        <Suggestion
+          activeLanguage={activeLanguage}
+          defaultLanguage={defaultLanguage}
+          suggestion={suggestion}
+        />
+      )}
+      renderSuggestionsContainer={({children, containerProps}) => (
+        <SuggestionsContainer
+          containerProps={containerProps}
+          loading={loading}
+          maxElements={maxElements}
+          minLength={minLength}
+          searchTerm={searchTerm}
+          totalElements={totalElements}
+        >
+          {children}
+        </SuggestionsContainer>
+      )}
       shouldRenderSuggestions={(value) => value.trim().length >= minLength}
       suggestions={suggestions}
       theme={{
