@@ -1,4 +1,4 @@
-import {publish, subscribe} from 'pubsub-js'
+import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -25,9 +25,10 @@ const AddTableDialog = ({isOpen, toggle}) => {
     setAttributes(initialAttributes)
   }
   useEffect(() => {
-    subscribe('editor.show-table-dialog', () => {
+    const token = subscribe('editor.show-table-dialog', () => {
       toggle()
     })
+    return () => unsubscribe(token)
   }, [])
   return (
     <Modal isOpen={isOpen} toggle={destroy}>

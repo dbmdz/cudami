@@ -1,7 +1,7 @@
 import './AddMediaDialog.css'
 
 import transform from 'lodash/transform'
-import {publish, subscribe} from 'pubsub-js'
+import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useContext, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -97,7 +97,7 @@ const SetPreviewImageDialog = ({
     })
   }
   useEffect(() => {
-    subscribe(
+    const token = subscribe(
       'editor.show-preview-image-dialog',
       (
         _msg,
@@ -125,6 +125,7 @@ const SetPreviewImageDialog = ({
         toggle()
       },
     )
+    return () => unsubscribe(token)
   }, [])
   return (
     <Modal isOpen={isOpen} size="lg" toggle={destroy}>
