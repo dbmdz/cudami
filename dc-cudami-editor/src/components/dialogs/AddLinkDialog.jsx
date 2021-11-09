@@ -1,5 +1,5 @@
 import mapValues from 'lodash/mapValues'
-import {publish, subscribe} from 'pubsub-js'
+import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -27,7 +27,7 @@ const AddLinkDialog = ({isOpen, toggle}) => {
     setAttributes(initialAttributes)
   }
   useEffect(() => {
-    subscribe(
+    const token = subscribe(
       'editor.show-link-dialog',
       (_msg, {attributes: attrs = {}, editing = false} = {}) => {
         setAttributes({
@@ -38,6 +38,7 @@ const AddLinkDialog = ({isOpen, toggle}) => {
         toggle()
       },
     )
+    return () => unsubscribe(token)
   }, [])
   return (
     <Modal isOpen={isOpen} toggle={destroy}>

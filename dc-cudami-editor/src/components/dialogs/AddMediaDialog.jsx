@@ -1,7 +1,7 @@
 import './AddMediaDialog.css'
 
 import mapValues from 'lodash/mapValues'
-import {publish, subscribe} from 'pubsub-js'
+import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useContext, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -98,7 +98,7 @@ const AddMediaDialog = ({
     })
   }
   useEffect(() => {
-    subscribe(
+    const token = subscribe(
       `editor.show-${mediaType}-dialog`,
       (_msg, {attributes: attrs = {}, editing = false} = {}) => {
         setAttributes({
@@ -114,6 +114,7 @@ const AddMediaDialog = ({
         toggle()
       },
     )
+    return () => unsubscribe(token)
   }, [])
   return (
     <Modal isOpen={isOpen} size="lg" toggle={destroy}>
