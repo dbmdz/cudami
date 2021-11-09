@@ -39,37 +39,52 @@ const Suggestion = ({
 const SuggestionsContainer = ({
   children,
   containerProps,
+  isInputFocussed,
   loading,
   maxElements,
   minLength,
   searchTerm,
   totalElements,
-}) => (
-  <div {...containerProps}>
-    {totalElements > maxElements && (
-      <FeedbackMessage
-        className="mb-0 text-center"
-        message={{
-          key: 'moreElementsFound',
-          values: {
-            maxElements,
-            totalElements,
-          },
-        }}
-      />
-    )}
-    {!loading && searchTerm.length >= minLength && totalElements === 0 && (
-      <FeedbackMessage
-        className="mb-0 text-center"
-        message={{
-          color: 'warning',
-          key: 'noElementsFound',
-        }}
-      />
-    )}
-    {children}
-  </div>
-)
+}) => {
+  /*
+   * The message about no found elements should be shown, when
+   * - the input is focussed
+   * - the length of the search term matches the defined minimum length
+   * - the component is not loading at the moment
+   * - there are no found elements
+   */
+  const showNoElementsMessage =
+    isInputFocussed &&
+    searchTerm.length >= minLength &&
+    !loading &&
+    totalElements === 0
+  return (
+    <div {...containerProps}>
+      {totalElements > maxElements && (
+        <FeedbackMessage
+          className="mb-0 text-center"
+          message={{
+            key: 'moreElementsFound',
+            values: {
+              maxElements,
+              totalElements,
+            },
+          }}
+        />
+      )}
+      {showNoElementsMessage && (
+        <FeedbackMessage
+          className="mb-0 text-center"
+          message={{
+            color: 'warning',
+            key: 'noElementsFound',
+          }}
+        />
+      )}
+      {children}
+    </div>
+  )
+}
 
 const search = async (apiContextPath, maxElements, onSearch, searchTerm) => {
   const {content: suggestions, totalElements} = await onSearch(
@@ -90,13 +105,16 @@ const Autocomplete = ({
   placeholder,
 }) => {
   const {apiContextPath, defaultLanguage} = useContext(AppContext)
+  const [isInputFocussed, setIsInputFocussed] = useState(false)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [totalElements, setTotalElements] = useState(0)
   const {t} = useTranslation()
   const inputProps = {
+    onBlur: () => setIsInputFocussed(false),
     onChange: (evt) => setSearchTerm(evt.target.value),
+    onFocus: () => setIsInputFocussed(true),
     placeholder: placeholder ?? t('searchTerm'),
     value: searchTerm,
   }
@@ -139,6 +157,7 @@ const Autocomplete = ({
       renderSuggestionsContainer={({children, containerProps}) => (
         <SuggestionsContainer
           containerProps={containerProps}
+          isInputFocussed={isInputFocussed}
           loading={loading}
           maxElements={maxElements}
           minLength={minLength}
