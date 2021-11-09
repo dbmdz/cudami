@@ -37,10 +37,16 @@ export const IdentifierSearch = (props) => {
   const [id, setId] = useState('')
   const [loading, setLoading] = useState(false)
   const [suggestion, setSuggestion] = useState()
+  /*
+   * Resets the input value and the loading state
+   * and also the search result (see the other effect)
+   * when the namespace received from props changes
+   */
   useEffect(() => {
     setId('')
     setLoading(false)
   }, [namespace])
+  /* Resets the search result, when the input value changes */
   useEffect(() => {
     setSuggestion(undefined)
   }, [id])
