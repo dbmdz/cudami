@@ -39,7 +39,7 @@ function appendQueryParameters() {
     var currentHref = changeLocaleLink.getAttribute('href')
     changeLocaleLink.setAttribute(
       'href',
-      `${currentHref}&${existingQueryParameters.toString()}`
+      `${currentHref}&${existingQueryParameters.toString()}`,
     )
   }
 }
@@ -69,7 +69,7 @@ function moveEditButtonToNavbar() {
     {
       rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
       threshold: 1,
-    }
+    },
   )
   observer.observe(editButton)
 }
