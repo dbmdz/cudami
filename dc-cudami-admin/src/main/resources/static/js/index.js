@@ -49,7 +49,7 @@ function moveEditButtonToNavbar() {
   var editButton = document.getElementById('edit-button')
   var editButtonInNavbar = document.createElement('li')
   editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
-  editButtonInNavbar.innerHTML = `<a class="btn btn-secondary" id="sticky-edit-button">${editButton.innerText}</a>`
+  editButtonInNavbar.innerHTML = `<a class="border border-white btn btn-primary btn-sm" id="sticky-edit-button">${editButton.innerText}</a>`
   var observer = new IntersectionObserver(
     (entry, _) => {
       var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1

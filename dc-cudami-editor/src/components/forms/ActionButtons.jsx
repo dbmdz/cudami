@@ -22,7 +22,9 @@ const ActionButtons = ({disabled = false, formId}) => {
   })
 
   const {t} = useTranslation()
-  const buttonClasses = classNames(!inView && ['border', 'border-white'])
+  const buttonClasses = classNames(
+    !inView && ['border', 'border-white', 'btn-sm'],
+  )
   const buttons = (
     <Button
       className={buttonClasses}
