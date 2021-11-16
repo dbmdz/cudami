@@ -25,6 +25,7 @@ import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -304,19 +305,64 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
+  @Transactional(
+      rollbackFor = {
+        RuntimeException.class,
+        IdentifiableServiceException.class,
+        ValidationException.class
+      })
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
+    I updatedIdentifiable;
     try {
-      I updatedIdentifiable = this.repository.update(identifiable);
+      updatedIdentifiable = repository.update(identifiable);
+    } catch (Exception e) {
+      LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
+      throw new IdentifiableServiceException(e.getMessage());
+    }
+    try {
       // UrlAliases
-      this.urlAliasService.deleteAllForTarget(identifiable.getUuid());
-      this.ensureDefaultAliasesExist(identifiable);
+      if (identifiable.getLocalizedUrlAliases() == null
+          || identifiable.getLocalizedUrlAliases().isEmpty()) {
+        // if this field is unset then we check the DB
+        LocalizedUrlAliases aliasesFromDb =
+            urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
+        identifiable.setLocalizedUrlAliases(aliasesFromDb);
+      } else if (identifiable.getLocalizedUrlAliases().flatten().stream()
+          .allMatch(ua -> ua.isPrimary())) {
+        // there are only primary aliases: conflicting ones in DB must be unset
+        // conflicting aliases: equal websiteUuid & targetLanguage
+        LocalizedUrlAliases urlAliasesToUpdate = identifiable.getLocalizedUrlAliases();
+        LocalizedUrlAliases allPrimaries =
+            urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
+        if (allPrimaries != null) {
+          allPrimaries.flatten().removeIf(ua -> !ua.isPrimary());
+
+          for (UrlAlias primaryFromDb : allPrimaries.flatten()) {
+            if (urlAliasesToUpdate.flatten().stream()
+                .anyMatch(
+                    ua ->
+                        (ua.getWebsite() != null
+                                    && primaryFromDb.getWebsite() != null
+                                    && ua.getWebsite()
+                                        .getUuid()
+                                        .equals(primaryFromDb.getWebsite().getUuid())
+                                || ua.getWebsite() == primaryFromDb.getWebsite())
+                            && Objects.equals(
+                                ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
+              primaryFromDb.setPrimary(false);
+              urlAliasesToUpdate.add(primaryFromDb);
+            }
+          }
+        }
+      }
+      urlAliasService.deleteAllForTarget(identifiable.getUuid());
+      ensureDefaultAliasesExist(identifiable);
 
       // Validate again, because the default aliases insurance above can alter
       // the data
       try {
         urlAliasService.validate(identifiable.getLocalizedUrlAliases());
-      } catch (Exception e) {
+      } catch (ValidationException e) {
         throw new ValidationException("Validation error: " + e, e);
       }
 
@@ -324,20 +370,21 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
             // these haven't been removed from DB so we must update them
-            this.urlAliasService.update(urlAlias);
+            urlAliasService.update(urlAlias);
           } else {
-            this.urlAliasService.create(urlAlias, true);
+            urlAliasService.create(urlAlias, true);
           }
         }
       }
       LocalizedUrlAliases savedLocalizedUrlAliases =
-          this.urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
+          urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
       updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
       //////
       return updatedIdentifiable;
-    } catch (Exception e) {
-      LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+
+    } catch (CudamiServiceException | IdentifiableServiceException e) {
+      LOGGER.error("Error while updating URL aliases for " + identifiable, e);
+      throw new IdentifiableServiceException(e.getMessage(), e);
     }
   }
 }
