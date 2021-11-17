@@ -555,7 +555,7 @@ class IdentifiableServiceImplTest {
     firstStoredPrimaryUrlAlias.setLastPublished(LocalDateTime.now());
     firstStoredPrimaryUrlAlias.setPrimary(true);
     firstStoredPrimaryUrlAlias.setTargetUuid(targetUuid);
-    firstStoredPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstStoredPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
     firstStoredPrimaryUrlAlias.setSlug("slug1");
 
     UrlAlias secondStoredPrimaryUrlAlias = new UrlAlias();
@@ -564,10 +564,12 @@ class IdentifiableServiceImplTest {
     secondStoredPrimaryUrlAlias.setLastPublished(LocalDateTime.now());
     secondStoredPrimaryUrlAlias.setPrimary(true);
     secondStoredPrimaryUrlAlias.setTargetUuid(targetUuid);
-    secondStoredPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("en"));
+    secondStoredPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
     secondStoredPrimaryUrlAlias.setSlug("slug2");
 
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
 
     // new ones
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -575,23 +577,21 @@ class IdentifiableServiceImplTest {
     UrlAlias firstPrimaryUrlAlias = new UrlAlias();
     firstPrimaryUrlAlias.setPrimary(true);
     firstPrimaryUrlAlias.setTargetUuid(targetUuid);
-    firstPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
     firstPrimaryUrlAlias.setSlug("slug-de-new");
 
     UrlAlias secondPrimaryUrlAlias = new UrlAlias();
     secondPrimaryUrlAlias.setPrimary(true);
     secondPrimaryUrlAlias.setTargetUuid(targetUuid);
-    secondPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("en"));
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
     secondPrimaryUrlAlias.setSlug("slug-en-new");
 
     localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
 
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
-
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
-    LocalizedText label = new LocalizedText(Locale.forLanguageTag("de"), "label");
-    label.setText(Locale.forLanguageTag("en"), "label");
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
@@ -602,6 +602,9 @@ class IdentifiableServiceImplTest {
     verify(urlAliasService, times(2)).update(any());
     verify(urlAliasService).create(eq(firstPrimaryUrlAlias), eq(true));
     verify(urlAliasService).create(eq(secondPrimaryUrlAlias), eq(true));
+    // the stored UrlAliases must have been changed to primary == false
+    assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isFalse();
+    assertThat(secondStoredPrimaryUrlAlias.isPrimary()).isFalse();
     verify(urlAliasService).update(eq(firstStoredPrimaryUrlAlias));
     verify(urlAliasService).update(eq(secondStoredPrimaryUrlAlias));
   }
