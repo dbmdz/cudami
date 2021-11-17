@@ -511,13 +511,13 @@ class IdentifiableServiceImplTest {
     UrlAlias firstPrimaryUrlAlias = new UrlAlias();
     firstPrimaryUrlAlias.setPrimary(true);
     firstPrimaryUrlAlias.setTargetUuid(targetUuid);
-    firstPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
     firstPrimaryUrlAlias.setSlug("slug1");
 
     UrlAlias secondPrimaryUrlAlias = new UrlAlias();
     secondPrimaryUrlAlias.setPrimary(true);
     secondPrimaryUrlAlias.setTargetUuid(targetUuid);
-    secondPrimaryUrlAlias.setTargetLanguage(Locale.forLanguageTag("en"));
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
     secondPrimaryUrlAlias.setSlug("slug2");
 
     localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
@@ -526,8 +526,8 @@ class IdentifiableServiceImplTest {
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
-    LocalizedText label = new LocalizedText(Locale.forLanguageTag("de"), "label");
-    label.setText(Locale.forLanguageTag("en"), "label");
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
     identifiable.setLabel(label);
 
     Identifiable expected = new Identifiable();
