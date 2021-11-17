@@ -13,7 +13,7 @@ public enum SearchTermTemplates {
   // example in
   // https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH
   JSONB_PATH(
-      "jsonb_path_exists(%s.%s, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)");
+      "jsonb_path_exists(%s.%s, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)");
 
   private final String template;
 
