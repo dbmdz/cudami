@@ -12,12 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added and pre-filled table `url_aliases` via Flyway migration
 - Improved some parts of the admin GUI
 - Bumped `dc-model` dependency to version `9.1.0`
+- Added search for `url` on websites
 
 ### Changed
 
 - Refactored relation between business service and repository layers (will be continued)
 - Added transactions to create, update and delete operations on business service layer
 - Refactored most of the class components to function components in [dc-cudami-editor](dc-cudami-editor/)
+- Fixed search in nested JSONB fields
 
 ### Removed
 
