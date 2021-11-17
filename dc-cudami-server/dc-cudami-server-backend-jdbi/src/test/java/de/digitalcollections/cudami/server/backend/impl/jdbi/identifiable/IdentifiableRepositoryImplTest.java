@@ -110,6 +110,15 @@ class IdentifiableRepositoryImplTest {
     assertThat(content).hasSize(10);
   }
 
+  @Test
+  @DisplayName("returns expected sql string")
+  void testGetCommonSearchSql() {
+    String actual = repo.getCommonSearchSql("test");
+    String expected =
+        "(jsonb_path_exists(test.label, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath) OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    assertThat(actual).isEqualTo(expected);
+  }
+
   private DigitalObject createDigitalObjectWithLabels(String label) {
     DigitalObject digitalObject = new DigitalObject();
     LocalizedText labelText = new LocalizedText();
