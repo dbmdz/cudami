@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -197,6 +198,13 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         webpageRepositoryImpl.retrieveList(
             webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
+  }
+
+  @Override
+  protected List<String> getSearchTermTemplates(String tblAlias) {
+    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias);
+    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "url"));
+    return searchTermTemplates;
   }
 
   @Override

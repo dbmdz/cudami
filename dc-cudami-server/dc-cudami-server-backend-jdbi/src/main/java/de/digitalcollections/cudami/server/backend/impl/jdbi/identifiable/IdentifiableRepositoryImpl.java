@@ -570,23 +570,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   protected String getCommonSearchSql(String tblAlias) {
-    // FYI: [JSON Path
-    // Functions](https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH)
-    // and [Data type](https://www.postgresql.org/docs/12/datatype-json.html#DATATYPE-JSONPATH)
     return "("
-        + "jsonb_path_exists("
-        + tblAlias
-        // To insert `:searchTerm` into the `jsonpath` we must split it up;
-        // the cast is necessary otherwise Postgres does not recognise it as `jsonpath` (that is
-        // just a string practically).
-        // Finds (case insensitively) labels that contain the search term, see `like_regex`
-        // example in
-        // https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH
-        + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-        + " OR "
-        + "jsonb_path_exists("
-        + tblAlias
-        + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+        + getSearchTermTemplates(tblAlias).stream().collect(Collectors.joining(" OR "))
+        + ")";
   }
 
   public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
@@ -661,6 +647,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                     .map(FileResource.class::cast)
                     .list());
     return result;
+  }
+
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return new ArrayList<>(
+        Arrays.asList(
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
   }
 
   public String getSqlSelectAllFields() {
