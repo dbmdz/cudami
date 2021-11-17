@@ -3,20 +3,15 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class FileResourceMetadataRepositoryImpl<F extends FileResource>
@@ -119,18 +114,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  public SearchPageResponse<F> find(SearchPageRequest searchPageRequest) {
-    String searchTerm = searchPageRequest.getQuery();
-    String commonSql = getCommonFileResourceSearchSql(tableName, tableAlias, searchTerm);
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    return find(searchPageRequest, commonSql, argumentMappings);
-  }
-
-  @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
     allowedOrderByFields.addAll(Arrays.asList("filename", "mimeType", "sizeInBytes"));
@@ -157,24 +140,11 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
     }
   }
 
-  public String getCommonFileResourceSearchSql(
-      String tableName, String tableAlias, String searchTerm) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
-    if (!StringUtils.hasText(searchTerm)) {
-      return commonSql;
-    }
-    return commonSql
-        + " WHERE ("
-        + "jsonb_path_exists("
-        + tableAlias
-        + ".label, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-        + " OR "
-        + "jsonb_path_exists("
-        + tableAlias
-        + ".description, ('$.* ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)"
-        + " OR "
-        + tableAlias
-        + ".filename ILIKE '%' || :searchTerm || '%')";
+  @Override
+  protected List<String> getSearchTermTemplates(String tblAlias) {
+    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias);
+    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "filename"));
+    return searchTermTemplates;
   }
 
   @Override
