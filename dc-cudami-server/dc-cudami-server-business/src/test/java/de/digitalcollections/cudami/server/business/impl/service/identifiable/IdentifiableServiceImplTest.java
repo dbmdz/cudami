@@ -409,7 +409,7 @@ class IdentifiableServiceImplTest {
         .validate(eq(localizedUrlAliases));
 
     assertThrows(
-        IdentifiableServiceException.class,
+        ValidationException.class,
         () -> {
           service.update(identifiable);
         });
@@ -452,7 +452,7 @@ class IdentifiableServiceImplTest {
         .validate(eq(localizedUrlAliases));
 
     assertThrows(
-        IdentifiableServiceException.class,
+        ValidationException.class,
         () -> {
           service.update(identifiable);
         });
@@ -498,5 +498,114 @@ class IdentifiableServiceImplTest {
     when(repo.update(identifiable)).thenReturn(identifiable);
 
     service.update(identifiable);
+  }
+
+  @DisplayName("update Identifiable w/o localizedUrlAliases")
+  @Test
+  public void updateWithoutUrlAliases()
+      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+    UUID targetUuid = UUID.randomUUID();
+
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstPrimaryUrlAlias = new UrlAlias();
+    firstPrimaryUrlAlias.setPrimary(true);
+    firstPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
+    firstPrimaryUrlAlias.setSlug("slug1");
+
+    UrlAlias secondPrimaryUrlAlias = new UrlAlias();
+    secondPrimaryUrlAlias.setPrimary(true);
+    secondPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
+    secondPrimaryUrlAlias.setSlug("slug2");
+
+    localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(localizedUrlAliases);
+
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(targetUuid);
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
+    identifiable.setLabel(label);
+
+    Identifiable expected = new Identifiable();
+    expected.setUuid(targetUuid);
+    expected.setLabel(label);
+    expected.setLocalizedUrlAliases(localizedUrlAliases);
+
+    when(repo.update(eq(identifiable))).thenReturn(identifiable);
+
+    assertThat(service.update(identifiable)).isEqualTo(expected);
+  }
+
+  @DisplayName("update Identifiable with different primary localizedUrlAliases only")
+  @Test
+  public void updateWithPrimaryUrlAliasesOnly()
+      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+    UUID targetUuid = UUID.randomUUID();
+
+    // in DB (should be unset)
+    LocalizedUrlAliases storedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstStoredPrimaryUrlAlias = new UrlAlias();
+    firstStoredPrimaryUrlAlias.setUuid(UUID.randomUUID());
+    firstStoredPrimaryUrlAlias.setCreated(LocalDateTime.now());
+    firstStoredPrimaryUrlAlias.setLastPublished(LocalDateTime.now());
+    firstStoredPrimaryUrlAlias.setPrimary(true);
+    firstStoredPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstStoredPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
+    firstStoredPrimaryUrlAlias.setSlug("slug1");
+
+    UrlAlias secondStoredPrimaryUrlAlias = new UrlAlias();
+    secondStoredPrimaryUrlAlias.setUuid(UUID.randomUUID());
+    secondStoredPrimaryUrlAlias.setCreated(LocalDateTime.now());
+    secondStoredPrimaryUrlAlias.setLastPublished(LocalDateTime.now());
+    secondStoredPrimaryUrlAlias.setPrimary(true);
+    secondStoredPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondStoredPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
+    secondStoredPrimaryUrlAlias.setSlug("slug2");
+
+    storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
+
+    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+
+    // new ones
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+
+    UrlAlias firstPrimaryUrlAlias = new UrlAlias();
+    firstPrimaryUrlAlias.setPrimary(true);
+    firstPrimaryUrlAlias.setTargetUuid(targetUuid);
+    firstPrimaryUrlAlias.setTargetLanguage(Locale.GERMAN);
+    firstPrimaryUrlAlias.setSlug("slug-de-new");
+
+    UrlAlias secondPrimaryUrlAlias = new UrlAlias();
+    secondPrimaryUrlAlias.setPrimary(true);
+    secondPrimaryUrlAlias.setTargetUuid(targetUuid);
+    secondPrimaryUrlAlias.setTargetLanguage(Locale.ENGLISH);
+    secondPrimaryUrlAlias.setSlug("slug-en-new");
+
+    localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
+
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(targetUuid);
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
+    identifiable.setLabel(label);
+    identifiable.setLocalizedUrlAliases(localizedUrlAliases);
+
+    when(repo.update(eq(identifiable))).thenReturn(identifiable);
+    service.update(identifiable);
+
+    verify(urlAliasService, times(2)).create(any(), eq(true));
+    verify(urlAliasService, times(2)).update(any());
+    verify(urlAliasService).create(eq(firstPrimaryUrlAlias), eq(true));
+    verify(urlAliasService).create(eq(secondPrimaryUrlAlias), eq(true));
+    // the stored UrlAliases must have been changed to primary == false
+    assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isFalse();
+    assertThat(secondStoredPrimaryUrlAlias.isPrimary()).isFalse();
+    verify(urlAliasService).update(eq(firstStoredPrimaryUrlAlias));
+    verify(urlAliasService).update(eq(secondStoredPrimaryUrlAlias));
   }
 }
