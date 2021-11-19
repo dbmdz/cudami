@@ -350,8 +350,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
                             && Objects.equals(
                                 ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
               primaryFromDb.setPrimary(false);
-              urlAliasesToUpdate.add(primaryFromDb);
             }
+            urlAliasesToUpdate.add(primaryFromDb);
           }
         }
       }
