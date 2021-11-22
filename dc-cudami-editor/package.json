@@ -51,7 +51,7 @@
     "react-file-drop": "^3.1.2",
     "react-i18next": "^11.14.2",
     "react-icons": "^4.3.1",
-    "react-intersection-observer": "^8.32.2",
+    "react-intersection-observer": "^8.32.3",
     "react-movable": "^3.0.2",
     "react-paginate": "^8.0.0",
     "react-scripts": "4.0.3",
