@@ -352,8 +352,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
                                         .equals(primaryFromDb.getWebsite().getUuid())
                                 || ua.getWebsite() == primaryFromDb.getWebsite())
                             && Objects.equals(
-                                ua.getTargetLanguage(), primaryFromDb.getTargetLanguage())
-                            && ua.getTargetUuid() == primaryFromDb.getTargetUuid())) {
+                                ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
               primaryFromDb.setPrimary(false);
               urlAliasesToUpdate.add(primaryFromDb);
             }
