@@ -1,9 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.web;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -34,8 +36,11 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
   @Autowired
-  public WebpageServiceImpl(WebpageRepository repository) {
-    super(repository);
+  public WebpageServiceImpl(
+      WebpageRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

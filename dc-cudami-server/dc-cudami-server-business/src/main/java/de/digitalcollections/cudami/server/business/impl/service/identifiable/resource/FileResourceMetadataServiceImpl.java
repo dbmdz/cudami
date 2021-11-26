@@ -1,9 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -28,8 +30,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("fileResourceMetadataService")
+@Transactional(
+    rollbackFor = {
+      IdentifiableServiceException.class,
+      ValidationException.class,
+      RuntimeException.class
+    })
 public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<FileResource>
     implements FileResourceMetadataService<FileResource> {
 
@@ -56,8 +65,10 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
           LinkedDataFileResourceService linkedDataFileResourceService,
       @Qualifier("textFileResourceServiceImpl") TextFileResourceService textFileResourceService,
       @Qualifier("videoFileResourceServiceImpl") VideoFileResourceService videoFileResourceService,
-      LocaleService localeService) {
-    super(metadataRepository);
+      LocaleService localeService,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(metadataRepository, identifierRepository, urlAliasService);
     this.applicationFileResourceService = applicationFileResourceService;
     this.audioFileResourceService = audioFileResourceService;
     this.imageFileResourceService = imageFileResourceService;

@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -27,8 +29,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("entityService")
+@Transactional(
+    rollbackFor = {
+      IdentifiableServiceException.class,
+      ValidationException.class,
+      RuntimeException.class
+    })
 public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl<E>
     implements EntityService<E> {
 
@@ -39,8 +48,11 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   protected HttpClient httpClient = HttpClient.newHttpClient();
 
   @Autowired
-  public EntityServiceImpl(@Qualifier("entityRepositoryImpl") EntityRepository<E> repository) {
-    super(repository);
+  public EntityServiceImpl(
+      @Qualifier("entityRepositoryImpl") EntityRepository<E> repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

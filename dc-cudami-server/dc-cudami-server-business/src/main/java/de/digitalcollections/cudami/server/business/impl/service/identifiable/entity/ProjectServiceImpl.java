@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -16,18 +17,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class ProjectServiceImpl extends EntityServiceImpl<Project> implements ProjectService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
-  private final IdentifierRepository identifierRepository;
 
   @Autowired
   public ProjectServiceImpl(
-      ProjectRepository repository, IdentifierRepository identifierRepository) {
-    super(repository);
-    this.identifierRepository = identifierRepository;
+      ProjectRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

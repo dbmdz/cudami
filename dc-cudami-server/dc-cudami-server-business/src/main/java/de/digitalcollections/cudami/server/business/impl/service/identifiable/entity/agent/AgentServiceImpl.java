@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -12,16 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Agent handling. */
 @Service
+@Transactional
 public class AgentServiceImpl extends EntityServiceImpl<Agent> implements AgentService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentServiceImpl.class);
 
   @Autowired
-  public AgentServiceImpl(AgentRepository repository) {
-    super(repository);
+  public AgentServiceImpl(
+      AgentRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

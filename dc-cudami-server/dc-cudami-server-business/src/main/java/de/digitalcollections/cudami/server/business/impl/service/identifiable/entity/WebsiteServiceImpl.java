@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -12,16 +14,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Website handling. */
 @Service
+@Transactional
 public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements WebsiteService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteServiceImpl.class);
 
   @Autowired
-  public WebsiteServiceImpl(WebsiteRepository repository) {
-    super(repository);
+  public WebsiteServiceImpl(
+      WebsiteRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override
