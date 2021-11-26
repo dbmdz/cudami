@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
@@ -53,10 +52,9 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
   }
 
   @Autowired
-  public HumanSettlementRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public HumanSettlementRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -81,12 +80,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   @Autowired
   public ItemRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

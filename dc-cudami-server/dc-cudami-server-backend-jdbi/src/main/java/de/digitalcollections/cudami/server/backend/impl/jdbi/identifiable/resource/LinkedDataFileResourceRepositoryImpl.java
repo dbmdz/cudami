@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.Arrays;
@@ -55,10 +54,9 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Autowired
-  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

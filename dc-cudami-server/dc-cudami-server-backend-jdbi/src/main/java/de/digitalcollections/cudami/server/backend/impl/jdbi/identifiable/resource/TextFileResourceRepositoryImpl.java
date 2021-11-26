@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.TextFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import org.jdbi.v3.core.Jdbi;
@@ -43,10 +42,9 @@ public class TextFileResourceRepositoryImpl
   }
 
   @Autowired
-  public TextFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public TextFileResourceRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
