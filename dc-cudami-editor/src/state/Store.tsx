@@ -2,7 +2,7 @@ import {Dispatch, ReactNode, useReducer} from 'react'
 import {createContext} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
-import {Action} from './actions'
+import {Action} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'

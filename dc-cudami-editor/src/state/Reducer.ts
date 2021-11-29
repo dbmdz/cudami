@@ -1,4 +1,4 @@
-import {Action, ActionTypes} from './actions'
+import {Action, ActionTypes} from './actionTypes'
 import {State} from './Store'
 
 const Reducer = (state: State, action: Action): State => {
