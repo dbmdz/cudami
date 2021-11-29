@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
@@ -42,8 +41,6 @@ class DigitalObjectRepositoryImplTest {
 
   DigitalObjectRepositoryImpl repo;
 
-  @Autowired IdentifierRepository identifierRepository;
-
   @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
@@ -55,7 +52,7 @@ class DigitalObjectRepositoryImplTest {
 
   @BeforeEach
   public void beforeEach() {
-    repo = new DigitalObjectRepositoryImpl(jdbi, identifierRepository);
+    repo = new DigitalObjectRepositoryImpl(jdbi);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setFileResourceMetadataRepository(fileResourceMetadataRepositoryImpl);
   }
