@@ -22,14 +22,18 @@ export default function ({
 }) {
   initI18n(uiLocale)
   ReactDOM.render(
-    <Store apiContextPath={apiContextPath} uiLocale={uiLocale}>
+    <Store
+      apiContextPath={apiContextPath}
+      existingLanguages={existingLanguages}
+      type="list"
+      uiLocale={uiLocale}
+    >
       <PagedIdentifiableList
         enableAdd={enableAdd}
         enableChangeOfOrder={enableChangeOfOrder}
         enableMove={enableMove}
         enableRemove={enableRemove}
         enableSearch={enableSearch}
-        existingLanguages={existingLanguages}
         parentType={parentType}
         parentUuid={parentUuid}
         showEdit={showEdit}
