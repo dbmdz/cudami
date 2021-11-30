@@ -16,8 +16,7 @@ import {
   typeToEndpointMapping,
   updateAttachedIdentifiablesOrder,
 } from '../../api'
-import {setDefaultLanguage} from '../../state/actions'
-import {AppContext} from '../../state/Store'
+import AppContext from '../AppContext'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
 import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import FeedbackMessage from '../FeedbackMessage'
@@ -64,11 +63,10 @@ class PagedIdentifiableList extends Component {
   }
 
   async componentDidMount() {
-    const {apiContextPath, dispatch} = this.context
+    const {apiContextPath} = this.context
     const identifierTypes = await getIdentifierTypes(apiContextPath)
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(apiContextPath)
-    dispatch(setDefaultLanguage(defaultLanguage))
     this.setState({
       identifiables: content,
       identifierTypes,
