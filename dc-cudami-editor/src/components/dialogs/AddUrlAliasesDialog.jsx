@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import {subscribe, unsubscribe} from 'pubsub-js'
-import {useContext, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaCheck, FaGlobe, FaLink, FaTrashAlt} from 'react-icons/fa'
 import {
@@ -21,9 +21,11 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap'
+import {useContext} from 'use-context-selector'
 
 import {generateSlug, loadRootIdentifiables} from '../../api'
-import AppContext from '../AppContext'
+import {toggleAllUrlAliases} from '../../state/actions'
+import {Context} from '../../state/Store'
 import Autocomplete from '../Autocomplete'
 import CircleButton from '../CircleButton'
 import FeedbackMessage from '../FeedbackMessage'
@@ -48,7 +50,7 @@ const AddUrlAliasesDialog = ({
       pick(parentWebsite, ['entityType', 'type', 'url', 'uuid']),
     ...target,
   }
-  const {apiContextPath} = useContext(AppContext)
+  const {apiContextPath, dispatch} = useContext(Context)
   const [activeStep, setActiveStep] = useState(0)
   const [newUrlAlias, setNewUrlAlias] = useState(initialUrlAlias)
   const {t} = useTranslation()
@@ -204,8 +206,8 @@ const AddUrlAliasesDialog = ({
         {stepName === 'confirm' && (
           <ListGroup>
             <UrlAlias
-              readOnly={true}
               primary={newUrlAlias.primary}
+              readOnly={true}
               slug={newUrlAlias.slug}
               url={newUrlAlias.website?.url}
             />
@@ -244,6 +246,7 @@ const AddUrlAliasesDialog = ({
             color="primary"
             onClick={() => {
               onSubmit(omit(newUrlAlias, ['hasEmptySlug', 'isDuplicate']))
+              dispatch(toggleAllUrlAliases(true))
               destroy()
             }}
           >

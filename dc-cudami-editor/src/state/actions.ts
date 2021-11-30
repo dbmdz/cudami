@@ -25,6 +25,14 @@ export const setFeedbackMessage = (message: Message): Action => ({
   type: ActionTypes.SET_FEEDBACK_MESSAGE,
 })
 
+/** Toggles all url aliases */
+export const toggleAllUrlAliases = (value: boolean): Action => ({
+  payload: {
+    value,
+  },
+  type: ActionTypes.TOGGLE_ALL_URL_ALIASES,
+})
+
 /** Toggles a dialog with the given name */
 export const toggleDialog = (name: string): Action => ({
   payload: {

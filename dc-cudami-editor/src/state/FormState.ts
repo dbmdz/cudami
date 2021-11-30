@@ -1,3 +1,7 @@
-export interface FormState {}
+export interface FormState {
+  showAllUrlAliases: boolean
+}
 
-export const initialFormState: FormState = {}
+export const initialFormState: FormState = {
+  showAllUrlAliases: false,
+}

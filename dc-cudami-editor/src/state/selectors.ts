@@ -18,3 +18,9 @@ export const getFeedbackMessage = (): Message | undefined =>
 /** Checks if a dialog is open */
 export const isDialogOpen = (name: string): boolean =>
   useContextSelector(Context, ({state}) => state.dialogsOpen[name])
+
+export const getShowAllUrlAliases = (): boolean =>
+  useContextSelector(
+    Context,
+    ({state}) => state.forms?.showAllUrlAliases ?? false,
+  )

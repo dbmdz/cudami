@@ -14,6 +14,7 @@ import {
   ListGroupItem,
 } from 'reactstrap'
 
+import {getShowAllUrlAliases} from '../state/selectors'
 import {formatDate} from './utils'
 
 const setNewPrimary = (aliases, slug, website = {}) =>
@@ -82,7 +83,7 @@ const UrlAliases = ({
   aliasesToRender = {},
   onUpdate,
   readOnly = false,
-  showAll = true,
+  showAll = getShowAllUrlAliases(),
 }) => {
   return (
     <>
