@@ -1,10 +1,13 @@
 import groupBy from 'lodash/groupBy'
 import {publish} from 'pubsub-js'
-import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaPlus} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, FormGroup, Label, Row} from 'reactstrap'
+import {useContext} from 'use-context-selector'
 
+import {toggleAllUrlAliases} from '../state/actions'
+import {getShowAllUrlAliases} from '../state/selectors'
+import {Context} from '../state/Store'
 import EditorWithLabel from './editor/EditorWithLabel'
 import InputWithLabel from './InputWithLabel'
 import TeaserPreviewImage from './TeaserPreviewImage'
@@ -21,7 +24,8 @@ const Teaser = ({
   updatePreviewImage,
   urlAliases,
 }) => {
-  const [showAllUrlAliases, setShowAllUrlAliases] = useState(false)
+  const showAllUrlAliases = getShowAllUrlAliases()
+  const {dispatch} = useContext(Context)
   const {t} = useTranslation()
   const aliasesToRender = groupBy(urlAliases, 'website.uuid')
   const showUrlAliasesExpandButton = Object.values(aliasesToRender).some(
@@ -68,7 +72,9 @@ const Teaser = ({
                   <Button
                     className="ml-2"
                     color="primary"
-                    onClick={() => setShowAllUrlAliases(!showAllUrlAliases)}
+                    onClick={() =>
+                      dispatch(toggleAllUrlAliases(!showAllUrlAliases))
+                    }
                     size="xs"
                   >
                     {showAllUrlAliases
@@ -84,7 +90,6 @@ const Teaser = ({
                   onUpdate={(aliases) =>
                     onUpdate('localizedUrlAliases', aliases)
                   }
-                  showAll={showAllUrlAliases}
                 />
               </FormGroup>
               <Button

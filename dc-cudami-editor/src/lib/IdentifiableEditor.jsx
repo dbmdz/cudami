@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom'
 
 import IdentifiableForm from '../components/forms/IdentifiableForm'
 import initI18n from '../i18n'
+import Store from '../state/Store'
 
 export default function ({
   activeLanguage,
@@ -17,17 +18,24 @@ export default function ({
 }) {
   initI18n(uiLocale)
   ReactDOM.render(
-    <IdentifiableForm
-      activeLanguage={activeLanguage}
+    <Store
       apiContextPath={apiContextPath}
       existingLanguages={existingLanguages}
-      parentType={parentType}
-      parentUuid={parentUuid}
-      parentWebsite={parentWebsite}
-      type={type}
+      type="form"
       uiLocale={uiLocale}
-      uuid={uuid}
-    />,
+    >
+      <IdentifiableForm
+        activeLanguage={activeLanguage}
+        apiContextPath={apiContextPath}
+        existingLanguages={existingLanguages}
+        parentType={parentType}
+        parentUuid={parentUuid}
+        parentWebsite={parentWebsite}
+        type={type}
+        uiLocale={uiLocale}
+        uuid={uuid}
+      />
+    </Store>,
     document.getElementById(id),
   )
 }

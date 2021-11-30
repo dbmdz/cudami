@@ -31,6 +31,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
             <UrlAliases
               aliasesToRender={groupBy(aliases, 'website.uuid')}
               readOnly={true}
+              showAll={true}
             />
           </FormGroup>
         ))}

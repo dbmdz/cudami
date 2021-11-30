@@ -18,6 +18,17 @@ const Reducer = (state: State, action: Action): State => {
         ...state,
         feedbackMessage: action.payload.message,
       }
+    case ActionTypes.TOGGLE_ALL_URL_ALIASES:
+      if (!state.forms) {
+        throw new Error()
+      }
+      return {
+        ...state,
+        forms: {
+          ...state.forms,
+          showAllUrlAliases: action.payload.value,
+        },
+      }
     case ActionTypes.TOGGLE_DIALOG:
       return {
         ...state,

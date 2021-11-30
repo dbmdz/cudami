@@ -12,6 +12,7 @@ export default function ({id, uiLocale, urlAliases: urlAliasesForLanguage}) {
       aliases={urlAliasesForLanguage}
       aliasesToRender={aliasesToRender}
       readOnly={true}
+      showAll={true}
     />,
     document.getElementById(id),
   )
