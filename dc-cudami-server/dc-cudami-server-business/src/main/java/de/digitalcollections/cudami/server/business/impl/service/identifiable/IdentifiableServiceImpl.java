@@ -370,14 +370,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         LocalizedUrlAliases allPrimaries =
             urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
         if (allPrimaries != null) {
-
-          // Only look at the non primary aliases
+          // only primary aliases (as the var name suggests)
           allPrimaries.flatten().removeIf(ua -> !ua.isPrimary());
-          // and check, if there are conflicting primary aliases for the same target, which
-          // must be set to non-primary then
+          // now we check whether any primary from the DB conflict with the new ones
           for (UrlAlias primaryFromDb : allPrimaries.flatten()) {
             if (urlAliasesToUpdate.flatten().stream()
-                .filter(ua -> ua.isPrimary())
+                .filter(
+                    ua ->
+                        !ua.equals(primaryFromDb)) // if new one is equal to alias from DB -> ignore
                 .anyMatch(
                     ua ->
                         (ua.getWebsite() != null
@@ -389,6 +389,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
                             && Objects.equals(
                                 ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
               primaryFromDb.setPrimary(false);
+            }
+            // must be outside preceding `if` to avoid creation of new aliases in
+            // `ensureDefaultAliasesExist`
+            if (!urlAliasesToUpdate.containsUrlAlias(primaryFromDb)) {
               urlAliasesToUpdate.add(primaryFromDb);
             }
           }
