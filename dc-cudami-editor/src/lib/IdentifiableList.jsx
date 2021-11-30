@@ -29,16 +29,19 @@ export default function ({
       uiLocale={uiLocale}
     >
       <PagedIdentifiableList
+        apiContextPath={apiContextPath}
         enableAdd={enableAdd}
         enableChangeOfOrder={enableChangeOfOrder}
         enableMove={enableMove}
         enableRemove={enableRemove}
         enableSearch={enableSearch}
+        existingLanguages={existingLanguages}
         parentType={parentType}
         parentUuid={parentUuid}
         showEdit={showEdit}
         showNew={showNew}
         type={type}
+        uiLocale={uiLocale}
       />
     </Store>,
     document.getElementById(id),
