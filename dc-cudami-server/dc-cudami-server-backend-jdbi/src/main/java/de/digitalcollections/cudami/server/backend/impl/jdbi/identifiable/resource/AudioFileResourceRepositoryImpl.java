@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.AudioFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.AudioFileResource;
 import java.util.List;
@@ -49,10 +48,9 @@ public class AudioFileResourceRepositoryImpl
   }
 
   @Autowired
-  public AudioFileResourceRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public AudioFileResourceRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

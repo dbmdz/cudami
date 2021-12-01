@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -13,16 +15,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Article handling. */
 @Service
+@Transactional
 public class ArticleServiceImpl extends EntityServiceImpl<Article> implements ArticleService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
   @Autowired
-  public ArticleServiceImpl(ArticleRepository repository) {
-    super(repository);
+  public ArticleServiceImpl(
+      ArticleRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -38,15 +38,13 @@ class IdentifiableRepositoryImplTest {
 
   IdentifiableRepositoryImpl repo;
 
-  @Autowired IdentifierRepository identifierRepository;
-
   @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new IdentifiableRepositoryImpl(jdbi, identifierRepository);
+    repo = new IdentifiableRepositoryImpl(jdbi);
   }
 
   @Test

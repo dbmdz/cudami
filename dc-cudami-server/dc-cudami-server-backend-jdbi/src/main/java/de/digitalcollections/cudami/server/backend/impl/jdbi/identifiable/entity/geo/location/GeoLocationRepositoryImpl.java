@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.GeoLocationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
@@ -54,10 +53,9 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
   }
 
   @Autowired
-  public GeoLocationRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public GeoLocationRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

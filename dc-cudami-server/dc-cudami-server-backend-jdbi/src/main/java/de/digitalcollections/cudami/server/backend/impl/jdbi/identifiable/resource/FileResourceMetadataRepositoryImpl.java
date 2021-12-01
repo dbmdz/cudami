@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
@@ -72,10 +71,9 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Autowired
-  public FileResourceMetadataRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public FileResourceMetadataRepositoryImpl(Jdbi dbi) {
     this(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
@@ -89,7 +87,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   protected FileResourceMetadataRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -101,7 +98,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String sqlUpdateFieldValues) {
     super(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,

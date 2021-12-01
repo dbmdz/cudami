@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -68,10 +67,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
-  public ProjectRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public ProjectRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

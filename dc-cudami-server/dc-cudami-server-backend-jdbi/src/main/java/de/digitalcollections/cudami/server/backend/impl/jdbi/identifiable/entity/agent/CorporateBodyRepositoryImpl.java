@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -53,10 +52,9 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
   }
 
   @Autowired
-  public CorporateBodyRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public CorporateBodyRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

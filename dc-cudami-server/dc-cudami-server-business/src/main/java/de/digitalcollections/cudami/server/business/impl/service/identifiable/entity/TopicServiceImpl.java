@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
@@ -19,16 +21,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Topic handling. */
 @Service
+@Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
 public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicServiceImpl.class);
 
   @Autowired
-  public TopicServiceImpl(TopicRepository repository) {
-    super(repository);
+  public TopicServiceImpl(
+      TopicRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.GivenNameRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.GivenName;
@@ -47,10 +46,9 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   }
 
   @Autowired
-  public GivenNameRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  public GivenNameRepositoryImpl(Jdbi dbi) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

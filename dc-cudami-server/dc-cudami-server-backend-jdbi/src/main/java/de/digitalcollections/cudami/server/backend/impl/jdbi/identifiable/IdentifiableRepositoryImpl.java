@@ -4,7 +4,6 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
@@ -35,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -119,7 +117,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> basicReduceRowsBiFunction;
   public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> fullReduceRowsBiFunction;
   protected final Class identifiableImplClass;
-  protected final IdentifierRepository identifierRepository;
   private final String sqlInsertFields;
   private final String sqlInsertValues;
   protected String sqlSelectAllFields;
@@ -128,10 +125,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   private final String sqlUpdateFieldValues;
 
   @Autowired
-  protected IdentifiableRepositoryImpl(Jdbi dbi, IdentifierRepository identifierRepository) {
+  protected IdentifiableRepositoryImpl(Jdbi dbi) {
     this(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
@@ -145,7 +141,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   protected IdentifiableRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -157,7 +152,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlUpdateFieldValues) {
     this(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,
@@ -172,7 +166,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   protected IdentifiableRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -185,7 +178,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlSelectAllFieldsJoins) {
     this(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,
@@ -201,7 +193,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   protected IdentifiableRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -237,7 +228,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
 
     this.identifiableImplClass = identifiableImplClass;
-    this.identifierRepository = identifierRepository;
     this.sqlInsertFields = sqlInsertFields;
     this.sqlInsertValues = sqlInsertValues;
     this.sqlSelectAllFields = sqlSelectAllFields;
@@ -334,33 +324,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    // delete related data
-    uuids.stream()
-        .forEach(
-            (u) -> {
-              deleteIdentifiers(u);
-            });
-
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
                 .bindList("uuids", uuids)
                 .execute());
-    return true;
-  }
-
-  @Override
-  public boolean deleteIdentifiers(UUID identifiableUuid) {
-    I identifiable = findOne(identifiableUuid);
-    if (identifiable == null) {
-      return false;
-    }
-
-    identifierRepository.delete(
-        identifiable.getIdentifiers().stream()
-            .map(Identifier::getUuid)
-            .collect(Collectors.toList()));
-
     return true;
   }
 
@@ -848,22 +816,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     dbi.withHandle(
         h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
 
-    // save identifiers
-    Set<Identifier> identifiers = identifiable.getIdentifiers();
-    saveIdentifiers(identifiers, identifiable);
-
     return identifiable;
-  }
-
-  public void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
-    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-    // (e.g. see update))
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        identifier.setIdentifiable(identifiable.getUuid());
-        identifierRepository.save(identifier);
-      }
-    }
   }
 
   @Override
@@ -945,12 +898,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     dbi.withHandle(
         h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
-
-    // save identifiers
-    // as we store the whole list new: delete old entries
-    identifierRepository.deleteByIdentifiable(identifiable);
-    Set<Identifier> identifiers = identifiable.getIdentifiers();
-    saveIdentifiers(identifiers, identifiable);
 
     return identifiable;
   }

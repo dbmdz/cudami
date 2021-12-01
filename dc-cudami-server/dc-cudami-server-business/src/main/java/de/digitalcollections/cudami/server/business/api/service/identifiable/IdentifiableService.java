@@ -77,6 +77,8 @@ public interface IdentifiableService<I extends Identifiable> {
 
   boolean delete(List<UUID> uuids) throws IdentifiableServiceException;
 
+  boolean deleteIdentifiers(UUID identifiableUuid);
+
   PageResponse<I> find(PageRequest pageRequest);
 
   SearchPageResponse<I> find(SearchPageRequest searchPageRequest);

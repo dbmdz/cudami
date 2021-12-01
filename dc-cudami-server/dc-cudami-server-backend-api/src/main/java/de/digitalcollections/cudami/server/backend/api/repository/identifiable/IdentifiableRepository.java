@@ -42,8 +42,6 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   boolean delete(List<UUID> uuids);
 
-  boolean deleteIdentifiers(UUID identifiableUuid);
-
   PageResponse<I> find(PageRequest pageRequest);
 
   SearchPageResponse<I> find(SearchPageRequest searchPageRequest);

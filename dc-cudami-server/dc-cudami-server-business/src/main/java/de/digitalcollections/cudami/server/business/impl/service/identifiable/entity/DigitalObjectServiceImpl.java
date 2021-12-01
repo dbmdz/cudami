@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
@@ -20,9 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Digital Object handling. */
 @Service
+@Transactional
 public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     implements DigitalObjectService {
 
@@ -35,8 +39,10 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   public DigitalObjectServiceImpl(
       DigitalObjectRepository repository,
       CollectionService collectionService,
-      ProjectService projectService) {
-    super(repository);
+      ProjectService projectService,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
     this.collectionService = collectionService;
     this.projectService = projectService;
   }
@@ -59,7 +65,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     deleteFileResources(existingDigitalObject.getUuid());
 
     // Remove identifiers
-    repository.deleteIdentifiers(existingDigitalObject.getUuid());
+    deleteIdentifiers(existingDigitalObject.getUuid());
 
     // Remove the digitalObject itself
     repository.delete(uuid);

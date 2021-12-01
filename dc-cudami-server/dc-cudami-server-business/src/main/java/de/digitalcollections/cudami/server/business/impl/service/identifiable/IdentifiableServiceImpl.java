@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -26,7 +27,9 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,25 +38,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifiableService")
+@Transactional(
+    rollbackFor = {
+      IdentifiableServiceException.class,
+      ValidationException.class,
+      RuntimeException.class
+    })
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
   @Autowired private LocaleService localeService;
-  @Autowired private UrlAliasService urlAliasService;
-
   @Autowired private UrlAliasGenerationProperties aliasGenerationProperties;
 
   protected IdentifiableRepository<I> repository;
+  protected IdentifierRepository identifierRepository;
+
+  private UrlAliasService urlAliasService;
 
   @Autowired
   public IdentifiableServiceImpl(
-      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository) {
+      @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
     this.repository = repository;
-  }
-
-  // TODO: Refactor this into constructor!
-  public void setUrlAliasService(UrlAliasService urlAliasService) {
+    this.identifierRepository = identifierRepository;
     this.urlAliasService = urlAliasService;
   }
 
@@ -79,16 +88,31 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  @Transactional(rollbackFor = {RuntimeException.class, IdentifiableServiceException.class})
   public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
     for (UUID uuid : uuids) {
       try {
-        this.urlAliasService.deleteAllForTarget(uuid, true);
+        urlAliasService.deleteAllForTarget(uuid, true);
+        deleteIdentifiers(uuid);
       } catch (CudamiServiceException e) {
         throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
       }
     }
     return repository.delete(uuids);
+  }
+
+  @Override
+  public boolean deleteIdentifiers(UUID identifiableUuid) {
+    I identifiable = repository.findOne(identifiableUuid);
+    if (identifiable == null || identifiable.getIdentifiers() == null) {
+      return false;
+    }
+
+    identifierRepository.delete(
+        identifiable.getIdentifiers().stream()
+            .map(Identifier::getUuid)
+            .collect(Collectors.toList()));
+
+    return true;
   }
 
   protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
@@ -243,10 +267,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  @Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
       I savedIdentifiable = this.repository.save(identifiable);
+      saveIdentifiers(identifiable.getIdentifiers(), savedIdentifiable);
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       this.ensureDefaultAliasesExist(savedIdentifiable);
 
@@ -278,6 +302,17 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
   }
 
+  public void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
+    // we assume that identifiers (unique to object) are new (existing ones were deleted before
+    // (e.g. see update))
+    if (identifiers != null) {
+      for (Identifier identifier : identifiers) {
+        identifier.setIdentifiable(identifiable.getUuid());
+        identifierRepository.save(identifier);
+      }
+    }
+  }
+
   @Override
   public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
     return repository.saveRelatedEntities(identifiableUuid, entities);
@@ -305,16 +340,16 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  @Transactional(
-      rollbackFor = {
-        RuntimeException.class,
-        IdentifiableServiceException.class,
-        ValidationException.class
-      })
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
     I updatedIdentifiable;
     try {
       updatedIdentifiable = repository.update(identifiable);
+      // save identifiers
+      // as we store the whole list new: delete old entries
+      identifierRepository.deleteByIdentifiable(identifiable);
+      Set<Identifier> identifiers = identifiable.getIdentifiers();
+      saveIdentifiers(identifiers, identifiable);
+
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

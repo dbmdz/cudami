@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
@@ -66,13 +65,9 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
   @Autowired
   public WorkRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      AgentRepositoryImpl agentRepositoryImpl,
-      ItemRepositoryImpl itemRepositoryImpl) {
+      Jdbi dbi, AgentRepositoryImpl agentRepositoryImpl, ItemRepositoryImpl itemRepositoryImpl) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

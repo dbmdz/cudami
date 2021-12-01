@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
@@ -74,12 +73,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Autowired
   private EntityRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
+      Jdbi dbi, FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
     this(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
@@ -94,7 +90,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   protected EntityRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -106,7 +101,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String sqlUpdateFieldValues) {
     this(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,
@@ -121,7 +115,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   protected EntityRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -134,7 +127,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String sqlSelectAllFieldsJoins) {
     this(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,
@@ -150,7 +142,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   protected EntityRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       String tableName,
       String tableAlias,
       String mappingPrefix,
@@ -164,7 +155,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction) {
     super(
         dbi,
-        identifierRepository,
         tableName,
         tableAlias,
         mappingPrefix,

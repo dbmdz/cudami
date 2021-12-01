@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -68,12 +67,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   @Autowired
   public TopicRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       EntityRepositoryImpl entityRepositoryImpl,
       FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

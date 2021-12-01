@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -36,6 +37,7 @@ class WebpageServiceImplTest {
 
   WebpageRepository repo;
 
+  IdentifierRepository identifierRepository;
   UrlAliasService urlAliasService;
 
   private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
@@ -43,9 +45,9 @@ class WebpageServiceImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = mock(WebpageRepository.class);
+    identifierRepository = mock(IdentifierRepository.class);
     urlAliasService = mock(UrlAliasService.class);
-    service = new WebpageServiceImpl(repo);
-    service.setUrlAliasService(urlAliasService);
+    service = new WebpageServiceImpl(repo, identifierRepository, urlAliasService);
   }
 
   @Test

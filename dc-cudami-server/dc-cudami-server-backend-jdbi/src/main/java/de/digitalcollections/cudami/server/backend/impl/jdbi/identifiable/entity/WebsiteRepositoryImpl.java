@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
@@ -67,13 +66,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   @Autowired
-  public WebsiteRepositoryImpl(
-      Jdbi dbi,
-      IdentifierRepository identifierRepository,
-      WebpageRepositoryImpl webpageRepositoryImpl) {
+  public WebsiteRepositoryImpl(Jdbi dbi, WebpageRepositoryImpl webpageRepositoryImpl) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,

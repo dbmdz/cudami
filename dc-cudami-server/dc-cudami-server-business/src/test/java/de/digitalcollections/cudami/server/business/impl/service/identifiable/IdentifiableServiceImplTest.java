@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -39,13 +40,14 @@ class IdentifiableServiceImplTest {
   private IdentifiableServiceImpl service;
   private IdentifiableRepository repo;
   private UrlAliasService urlAliasService;
+  private IdentifierRepository identifierRepository;
 
   @BeforeEach
   public void beforeEach() {
     repo = mock(IdentifiableRepository.class);
     urlAliasService = mock(UrlAliasService.class);
-    service = new IdentifiableServiceImpl(repo);
-    service.setUrlAliasService(urlAliasService);
+    identifierRepository = mock(IdentifierRepository.class);
+    service = new IdentifiableServiceImpl(repo, identifierRepository, urlAliasService);
     var aliasGenerationProps = new UrlAliasGenerationProperties();
     aliasGenerationProps.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
     service.setAliasGenerationProperties(aliasGenerationProps);

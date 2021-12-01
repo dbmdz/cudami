@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
@@ -172,14 +171,12 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   @Autowired
   public PersonRepositoryImpl(
       Jdbi dbi,
-      IdentifierRepository identifierRepository,
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       FamilyNameRepositoryImpl familyNameRepositoryImpl,
       GivenNameRepositoryImpl givenNameRepositoryImpl,
       WorkRepositoryImpl workRepositoryImpl) {
     super(
         dbi,
-        identifierRepository,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
