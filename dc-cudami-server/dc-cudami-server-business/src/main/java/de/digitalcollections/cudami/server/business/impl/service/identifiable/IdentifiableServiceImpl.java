@@ -367,13 +367,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         // there are only primary aliases: conflicting ones in DB must be unset
         // conflicting aliases: equal websiteUuid & targetLanguage
         LocalizedUrlAliases urlAliasesToUpdate = identifiable.getLocalizedUrlAliases();
-        LocalizedUrlAliases allPrimaries =
+        LocalizedUrlAliases allPrimariesFromDb =
             urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
-        if (allPrimaries != null) {
+        if (allPrimariesFromDb != null) {
           // only primary aliases (as the var name suggests)
-          allPrimaries.flatten().removeIf(ua -> !ua.isPrimary());
+          allPrimariesFromDb.flatten().removeIf(ua -> !ua.isPrimary());
           // now we check whether any primary from the DB conflict with the new ones
-          for (UrlAlias primaryFromDb : allPrimaries.flatten()) {
+          for (UrlAlias primaryFromDb : allPrimariesFromDb.flatten()) {
             if (urlAliasesToUpdate.flatten().stream()
                 .filter(
                     ua ->
