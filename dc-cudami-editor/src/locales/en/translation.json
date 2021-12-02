@@ -185,7 +185,6 @@
       }
     },
     "insertLink": "Insert hyperlink",
-    "isPrimaryAlias":"is (or will be) the primary URL",
     "label": "Label",
     "lastModified": "last modified",
     "lastname": "Lastname",
@@ -221,6 +220,7 @@
     "passwordChangeInfo": "If you want to change the user's password then fill both of the following fields, please.",
     "pattern": "Pattern",
     "previewImage": "Preview image",
+    "primaryAlias":"Primary URL",
     "refId": "Reference ID",
     "removeFrom": {
       "collection": "remove from collection"

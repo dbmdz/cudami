@@ -67,7 +67,7 @@ const UrlAlias = ({
           })}
         </small>
       )}
-      {primary && <small>{t('isPrimaryAlias')}</small>}
+      {primary && <small>{t('primaryAlias')}</small>}
       {showRemoveButton && (
         <Button className="line-height-100 p-0" color="link" onClick={onRemove}>
           <FaTrashAlt />

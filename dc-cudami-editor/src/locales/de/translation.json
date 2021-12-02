@@ -185,7 +185,6 @@
       }
     },
     "insertLink": "Verlinkung einfügen",
-    "isPrimaryAlias": "ist (oder wird) Hauptlink",
     "label": "Titel",
     "lastModified": "letzte Änderung",
     "lastname": "Nachname",
@@ -221,6 +220,7 @@
     "passwordChangeInfo": "Wenn Sie das Passwort des Benutzers ändern wollen, füllen Sie bitte die folgenden beiden Felder aus.",
     "pattern": "Muster",
     "previewImage": "Vorschaubild",
+    "primaryAlias": "Hauptlink",
     "refId": "Referenz-ID",
     "removeFrom": {
       "collection": "aus Sammlung entfernen"
