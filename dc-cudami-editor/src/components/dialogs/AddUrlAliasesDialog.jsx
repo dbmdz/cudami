@@ -226,7 +226,7 @@ const AddUrlAliasesDialog = ({
               {t('back')}
             </Button>
           )}
-          <Button color="light" onClick={destroy}>
+          <Button className="mr-1" color="light" onClick={destroy}>
             {t('cancel')}
           </Button>
           {stepName === 'website' && (

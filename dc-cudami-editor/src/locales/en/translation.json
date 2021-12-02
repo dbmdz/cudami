@@ -94,6 +94,7 @@
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
     "altText": "Alt text",
+    "back": "Back",
     "blocks": {
       "blockquote": "Add block quote",
       "bulletList": "Change to bulleted list",
