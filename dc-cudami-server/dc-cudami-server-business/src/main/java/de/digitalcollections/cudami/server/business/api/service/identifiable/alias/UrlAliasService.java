@@ -129,6 +129,14 @@ public interface UrlAliasService {
       throws CudamiServiceException;
 
   /**
+   * Returns all primary links of the passed target identifiable.
+   *
+   * @param targetUuid UUID of the identifiable that the primaries should be found for
+   * @return {@code List}, not {@code null}
+   */
+  List<UrlAlias> findPrimaryLinksForTarget(UUID targetUuid) throws CudamiServiceException;
+
+  /**
    * Generates a not yet existing slug for the provided label, language and websiteUuid. If the
    * websiteUuid is empty, the configured default website uuid is used.
    *

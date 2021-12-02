@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -152,6 +153,24 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     } catch (Exception e) {
       throw new CudamiServiceException(
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
+          e);
+    }
+  }
+
+  @Override
+  public List<UrlAlias> findPrimaryLinksForTarget(UUID targetUuid) throws CudamiServiceException {
+    try {
+      LocalizedUrlAliases localizedUrlAliases = repository.findAllForTarget(targetUuid);
+      if (localizedUrlAliases == null) {
+        return new ArrayList<>();
+      }
+      return localizedUrlAliases.flatten().stream()
+          .filter(ua -> ua.isPrimary())
+          .collect(Collectors.toList());
+    } catch (UrlAliasRepositoryException e) {
+      throw new CudamiServiceException(
+          String.format(
+              "Cannot find all UrlAliases of a specific target. targetUuid='%s'.", targetUuid),
           e);
     }
   }

@@ -28,6 +28,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -326,6 +327,8 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
+    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
+
     service.update(identifiable);
     verify(urlAliasService, times(1)).deleteAllForTarget(eq(targetUuid));
   }
@@ -350,6 +353,7 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
+    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid))).thenReturn(List.of(urlAlias));
 
     service.update(identifiable);
 
@@ -407,6 +411,7 @@ class IdentifiableServiceImplTest {
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     identifiable.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
+    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
         .validate(eq(localizedUrlAliases));
@@ -426,6 +431,7 @@ class IdentifiableServiceImplTest {
     UUID targetUuid = UUID.randomUUID();
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
+    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
 
@@ -468,6 +474,7 @@ class IdentifiableServiceImplTest {
     UUID targetUuid = UUID.randomUUID();
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
+    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
 
     Website website = new Website();
     website.setUuid(UUID.randomUUID());
@@ -581,6 +588,8 @@ class IdentifiableServiceImplTest {
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
+        .thenReturn(List.of(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias));
 
     // new ones
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -650,6 +659,8 @@ class IdentifiableServiceImplTest {
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
+        .thenReturn(List.of(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias));
 
     // new one
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -701,6 +712,8 @@ class IdentifiableServiceImplTest {
     LocalizedUrlAliases storedUrlAliases = new LocalizedUrlAliases(firstStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
+        .thenReturn(List.of(firstStoredPrimaryUrlAlias));
 
     // aliases in object to update
     UrlAlias firstPrimaryUrlAlias = new UrlAlias(); // equals to DB
