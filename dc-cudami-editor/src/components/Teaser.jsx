@@ -71,7 +71,11 @@ const Teaser = ({
                     onClick={() => setShowAllUrlAliases(!showAllUrlAliases)}
                     size="xs"
                   >
-                    {showAllUrlAliases ? t('showPrimaryAliases') : t('showAll')}
+                    {showAllUrlAliases
+                      ? t('showPrimaryAlias', {
+                          count: Object.keys(aliasesToRender).length,
+                        })
+                      : t('showAll')}
                   </Button>
                 )}
                 <UrlAliases
