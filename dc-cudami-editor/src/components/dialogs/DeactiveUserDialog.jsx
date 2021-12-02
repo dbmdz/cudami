@@ -1,5 +1,12 @@
 import {useTranslation} from 'react-i18next'
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
+import {
+  Button,
+  ButtonGroup,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from 'reactstrap'
 
 const DeactiveUserDialog = ({email, isOpen, onConfirm, toggle}) => {
   const {t} = useTranslation()
@@ -8,18 +15,20 @@ const DeactiveUserDialog = ({email, isOpen, onConfirm, toggle}) => {
       <ModalHeader toggle={toggle}>{t('warning')}</ModalHeader>
       <ModalBody>{t('confirmUserDeactivation', {email})}</ModalBody>
       <ModalFooter>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
-        </Button>
-        <Button
-          color="danger"
-          onClick={() => {
-            onConfirm()
-            toggle()
-          }}
-        >
-          {t('yes')}
-        </Button>
+        <ButtonGroup>
+          <Button className="mr-1" color="light" onClick={toggle}>
+            {t('no')}
+          </Button>
+          <Button
+            color="danger"
+            onClick={() => {
+              onConfirm()
+              toggle()
+            }}
+          >
+            {t('yes')}
+          </Button>
+        </ButtonGroup>
       </ModalFooter>
     </Modal>
   )
