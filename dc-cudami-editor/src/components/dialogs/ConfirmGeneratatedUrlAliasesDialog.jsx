@@ -2,6 +2,7 @@ import groupBy from 'lodash/groupBy'
 import {useTranslation} from 'react-i18next'
 import {
   Button,
+  ButtonGroup,
   FormGroup,
   Label,
   Modal,
@@ -37,18 +38,20 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         ))}
       </ModalBody>
       <ModalFooter>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
-        </Button>
-        <Button
-          color="success"
-          onClick={() => {
-            onConfirm()
-            toggle()
-          }}
-        >
-          {t('yes')}
-        </Button>
+        <ButtonGroup>
+          <Button className="mr-1" color="light" onClick={toggle}>
+            {t('no')}
+          </Button>
+          <Button
+            color="success"
+            onClick={() => {
+              onConfirm()
+              toggle()
+            }}
+          >
+            {t('yes')}
+          </Button>
+        </ButtonGroup>
       </ModalFooter>
     </Modal>
   )

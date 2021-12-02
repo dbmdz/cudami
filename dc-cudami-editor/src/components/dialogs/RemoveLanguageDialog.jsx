@@ -1,7 +1,14 @@
 import {subscribe, unsubscribe} from 'pubsub-js'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap'
+import {
+  Button,
+  ButtonGroup,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from 'reactstrap'
 
 const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
   const [language, setLanguage] = useState('')
@@ -25,18 +32,20 @@ const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
         })}
       </ModalBody>
       <ModalFooter>
-        <Button color="light" onClick={toggle}>
-          {t('no')}
-        </Button>
-        <Button
-          color="danger"
-          onClick={() => {
-            onConfirm(language)
-            toggle()
-          }}
-        >
-          {t('yes')}
-        </Button>
+        <ButtonGroup>
+          <Button className="mr-1" color="light" onClick={toggle}>
+            {t('no')}
+          </Button>
+          <Button
+            color="danger"
+            onClick={() => {
+              onConfirm(language)
+              toggle()
+            }}
+          >
+            {t('yes')}
+          </Button>
+        </ButtonGroup>
       </ModalFooter>
     </Modal>
   )

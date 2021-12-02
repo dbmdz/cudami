@@ -9,6 +9,7 @@ import {useTranslation} from 'react-i18next'
 import {FaCheck, FaGlobe, FaLink, FaTrashAlt} from 'react-icons/fa'
 import {
   Button,
+  ButtonGroup,
   FormFeedback,
   Input,
   InputGroup,
@@ -215,44 +216,58 @@ const AddUrlAliasesDialog = ({
         )}
       </ModalBody>
       <ModalFooter>
-        <Button color="light" onClick={destroy}>
-          {t('cancel')}
-        </Button>
-        {stepName === 'website' && (
-          <Button color="primary" onClick={() => setActiveStep(activeStep + 1)}>
-            {t('next')}
+        <ButtonGroup>
+          {stepName === 'confirm' && (
+            <Button
+              className="mr-1"
+              color="light"
+              onClick={() => setActiveStep(activeStep - 1)}
+            >
+              {t('back')}
+            </Button>
+          )}
+          <Button color="light" onClick={destroy}>
+            {t('cancel')}
           </Button>
-        )}
-        {stepName === 'slug' && (
-          <Button
-            color="primary"
-            disabled={isInvalid}
-            onClick={async () => {
-              const slug = await generateSlug(
-                apiContextPath,
-                activeLanguage,
-                newUrlAlias.slug,
-                newUrlAlias.website?.uuid,
-              )
-              setNewUrlAlias({...newUrlAlias, slug})
-              setActiveStep(activeStep + 1)
-            }}
-          >
-            {t('next')}
-          </Button>
-        )}
-        {stepName === 'confirm' && (
-          <Button
-            color="primary"
-            onClick={() => {
-              onSubmit(omit(newUrlAlias, ['hasEmptySlug', 'isDuplicate']))
-              dispatch(toggleAllUrlAliases(true))
-              destroy()
-            }}
-          >
-            {t('add')}
-          </Button>
-        )}
+          {stepName === 'website' && (
+            <Button
+              color="primary"
+              onClick={() => setActiveStep(activeStep + 1)}
+            >
+              {t('next')}
+            </Button>
+          )}
+          {stepName === 'slug' && (
+            <Button
+              color="primary"
+              disabled={isInvalid}
+              onClick={async () => {
+                const slug = await generateSlug(
+                  apiContextPath,
+                  activeLanguage,
+                  newUrlAlias.slug,
+                  newUrlAlias.website?.uuid,
+                )
+                setNewUrlAlias({...newUrlAlias, slug})
+                setActiveStep(activeStep + 1)
+              }}
+            >
+              {t('next')}
+            </Button>
+          )}
+          {stepName === 'confirm' && (
+            <Button
+              color="primary"
+              onClick={() => {
+                onSubmit(omit(newUrlAlias, ['hasEmptySlug', 'isDuplicate']))
+                dispatch(toggleAllUrlAliases(true))
+                destroy()
+              }}
+            >
+              {t('add')}
+            </Button>
+          )}
+        </ButtonGroup>
       </ModalFooter>
     </Modal>
   )
