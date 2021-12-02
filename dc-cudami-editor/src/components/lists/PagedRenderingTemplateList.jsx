@@ -30,7 +30,8 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
     <>
       <Row>
         <Col>
-          <h1>{t(`types:${type}_plural`)}</h1>
+          {/* We want to force the usage of the plural form here */}
+          <h1>{t(`types:${type}_other`)}</h1>
         </Col>
         <Col className="text-right">
           <Button
