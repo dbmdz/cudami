@@ -408,7 +408,7 @@ class PagedIdentifiableList extends Component {
             {parentType ? (
               <h2>{t(`types:${type}`, {context: parentType, count: 0})}</h2>
             ) : (
-              <h1>{t(`types:${type}_plural`)}</h1>
+              <h1>{t(`types:${type}_other`)}</h1>
             )}
           </Col>
           <Col className="text-right">
