@@ -68,6 +68,7 @@ class PagedIdentifiableList extends Component {
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(apiContextPath)
     this.setState({
+      defaultLanguage,
       identifiables: content,
       identifierTypes,
       numberOfPages: Math.ceil(totalElements / pageSize),
