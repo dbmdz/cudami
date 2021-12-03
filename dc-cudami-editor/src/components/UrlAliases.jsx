@@ -52,7 +52,7 @@ const UrlAlias = ({
   const uiLocale = i18n.language
   const showRemoveButton = !(lastPublished || primary || readOnly)
   return (
-    <ListGroupItem className="d-flex justify-content-between">
+    <ListGroupItem className="align-items-center d-flex justify-content-between">
       <FormGroup check className={classNames({'pl-0': readOnly})}>
         <Label check>
           {!readOnly && (
