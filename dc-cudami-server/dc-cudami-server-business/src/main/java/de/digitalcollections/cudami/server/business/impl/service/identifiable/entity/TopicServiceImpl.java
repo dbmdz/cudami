@@ -21,11 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service for Topic handling. */
+// @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-@Transactional(rollbackFor = {IdentifiableServiceException.class, RuntimeException.class})
 public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicServiceImpl.class);

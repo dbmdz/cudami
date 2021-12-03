@@ -38,12 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifiableService")
-@Transactional(
-    rollbackFor = {
-      IdentifiableServiceException.class,
-      ValidationException.class,
-      RuntimeException.class
-    })
+@Transactional(rollbackFor = {Exception.class})
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
