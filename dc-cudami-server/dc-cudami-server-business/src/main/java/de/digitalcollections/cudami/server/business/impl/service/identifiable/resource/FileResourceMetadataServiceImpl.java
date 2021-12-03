@@ -30,15 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+// @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service("fileResourceMetadataService")
-@Transactional(
-    rollbackFor = {
-      IdentifiableServiceException.class,
-      ValidationException.class,
-      RuntimeException.class
-    })
 public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<FileResource>
     implements FileResourceMetadataService<FileResource> {
 

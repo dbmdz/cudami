@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** Service implementation for UrlAlias handling. */
 @Service
-@Transactional(rollbackFor = {RuntimeException.class, CudamiServiceException.class})
+@Transactional(rollbackFor = {Exception.class})
 public class UrlAliasServiceImpl implements UrlAliasService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasServiceImpl.class);
