@@ -738,6 +738,19 @@ class UrlAliasServiceImplTest {
     assertThat(actual.hasTargetLanguage(Locale.forLanguageTag("en"))).isFalse();
   }
 
+  @DisplayName("retrieve primary links of a target as List<UrlAlias>")
+  @Test
+  public void findPrimaryLinksForTarget()
+      throws UrlAliasRepositoryException, CudamiServiceException {
+    UUID targetUuid = UUID.randomUUID();
+    UrlAlias ua1 = createUrlAlias("slug1", true, "de", true, targetUuid, null);
+    UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, targetUuid, null);
+    UrlAlias ua3 = createUrlAlias("npslug", true, "de", false, targetUuid, null);
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(ua1, ua2, ua3);
+    when(repo.findAllForTarget(eq(targetUuid))).thenReturn(localizedUrlAliases);
+    assertThat(service.findPrimaryLinksForTarget(targetUuid)).containsAll(List.of(ua1, ua2));
+  }
+
   // -------------------------------------------------------------------------
   private UrlAlias createUrlAlias(
       String slug,

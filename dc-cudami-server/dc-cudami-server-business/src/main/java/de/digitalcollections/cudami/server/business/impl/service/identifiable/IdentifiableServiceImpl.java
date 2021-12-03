@@ -367,30 +367,30 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         // there are only primary aliases: conflicting ones in DB must be unset
         // conflicting aliases: equal websiteUuid & targetLanguage
         LocalizedUrlAliases urlAliasesToUpdate = identifiable.getLocalizedUrlAliases();
-        LocalizedUrlAliases allPrimaries =
-            urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
-        if (allPrimaries != null) {
-
-          // Only look at the non primary aliases
-          allPrimaries.flatten().removeIf(ua -> !ua.isPrimary());
-          // and check, if there are conflicting primary aliases for the same target, which
-          // must be set to non-primary then
-          for (UrlAlias primaryFromDb : allPrimaries.flatten()) {
-            if (urlAliasesToUpdate.flatten().stream()
-                .filter(ua -> ua.isPrimary())
-                .anyMatch(
-                    ua ->
-                        (ua.getWebsite() != null
-                                    && primaryFromDb.getWebsite() != null
-                                    && ua.getWebsite()
-                                        .getUuid()
-                                        .equals(primaryFromDb.getWebsite().getUuid())
-                                || ua.getWebsite() == primaryFromDb.getWebsite())
-                            && Objects.equals(
-                                ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
-              primaryFromDb.setPrimary(false);
-              urlAliasesToUpdate.add(primaryFromDb);
-            }
+        // only primary aliases (as the var name suggests)
+        List<UrlAlias> allPrimariesFromDb =
+            urlAliasService.findPrimaryLinksForTarget(identifiable.getUuid());
+        // now we check whether any primary from the DB conflict with the new ones
+        for (UrlAlias primaryFromDb : allPrimariesFromDb) {
+          if (urlAliasesToUpdate.flatten().stream()
+              .filter(
+                  ua -> !ua.equals(primaryFromDb)) // if new one is equal to alias from DB -> ignore
+              .anyMatch(
+                  ua ->
+                      (ua.getWebsite() != null
+                                  && primaryFromDb.getWebsite() != null
+                                  && ua.getWebsite()
+                                      .getUuid()
+                                      .equals(primaryFromDb.getWebsite().getUuid())
+                              || ua.getWebsite() == primaryFromDb.getWebsite())
+                          && Objects.equals(
+                              ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
+            primaryFromDb.setPrimary(false);
+          }
+          // must be outside preceding `if` to avoid creation of new aliases in
+          // `ensureDefaultAliasesExist`
+          if (!urlAliasesToUpdate.containsUrlAlias(primaryFromDb)) {
+            urlAliasesToUpdate.add(primaryFromDb);
           }
         }
       }
