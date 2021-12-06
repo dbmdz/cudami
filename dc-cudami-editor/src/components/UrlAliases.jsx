@@ -41,22 +41,21 @@ const sortByWebsite = (
 
 const UrlAlias = ({
   lastPublished,
-  onChange,
+  onChangePrimary,
   onRemove,
   primary = false,
-  readOnly,
   slug,
   url = '',
 }) => {
   const {i18n, t} = useTranslation()
   const uiLocale = i18n.language
-  const showRemoveButton = !(lastPublished || primary || readOnly)
+  const showRemoveButton = !(lastPublished || !onRemove || primary)
   return (
     <ListGroupItem className="align-items-center d-flex justify-content-between">
-      <FormGroup check className={classNames({'pl-0': readOnly})}>
+      <FormGroup check className={classNames({'pl-0': !onChangePrimary})}>
         <Label check>
-          {!readOnly && (
-            <Input checked={primary} onChange={onChange} type="radio" />
+          {!!onChangePrimary && (
+            <Input checked={primary} onChange={onChangePrimary} type="radio" />
           )}
           {`${url.replace(/\/$/, '')}/${slug}`}
         </Label>
@@ -99,19 +98,18 @@ const UrlAliases = ({
                   <UrlAlias
                     key={slug}
                     lastPublished={lastPublished}
-                    onChange={() =>
-                      onUpdate(setNewPrimary(aliases, slug, website))
-                    }
-                    onRemove={() =>
-                      publish('editor.show-remove-urlalias-dialog', {
-                        slug,
-                        website,
-                      })
-                    }
                     primary={primary}
-                    readOnly={readOnly}
                     slug={slug}
                     url={website?.url}
+                    {...(!readOnly && {
+                      onChangePrimary: () =>
+                        onUpdate(setNewPrimary(aliases, slug, website)),
+                      onRemove: () =>
+                        publish('editor.show-remove-urlalias-dialog', {
+                          slug,
+                          website,
+                        }),
+                    })}
                   />
                 ))}
             </ListGroup>

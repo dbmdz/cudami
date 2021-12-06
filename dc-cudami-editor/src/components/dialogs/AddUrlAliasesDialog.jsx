@@ -208,7 +208,6 @@ const AddUrlAliasesDialog = ({
           <ListGroup>
             <UrlAlias
               primary={newUrlAlias.primary}
-              readOnly={true}
               slug={newUrlAlias.slug}
               url={newUrlAlias.website?.url}
             />
