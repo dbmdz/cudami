@@ -1,47 +1,73 @@
-import groupBy from 'lodash/groupBy'
+import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
   Button,
   ButtonGroup,
   FormGroup,
   Label,
+  ListGroup,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
 } from 'reactstrap'
 
-import UrlAliases from '../UrlAliases'
+import {EditableUrlAlias, UrlAlias} from '../UrlAliases'
 
 const ConfirmGeneratatedUrlAliasesDialog = ({
   isOpen,
   generatedUrlAliases = {},
+  onChange,
   onConfirm,
   toggle,
 }) => {
+  const [editable, setEditable] = useState(false)
   const {t} = useTranslation()
   return (
-    <Modal isOpen={isOpen} size="lg" toggle={toggle}>
-      <ModalHeader toggle={toggle}>{t('generatedUrlAliases')}</ModalHeader>
+    <Modal isOpen={isOpen} size="lg">
+      <ModalHeader
+        cssModule={{
+          'modal-title': 'd-flex justify-content-between modal-title w-100',
+        }}
+      >
+        {t('generatedUrlAliases')}
+        {!editable && (
+          <Button color="primary" onClick={() => setEditable(true)} size="xs">
+            {t('edit')}
+          </Button>
+        )}
+      </ModalHeader>
       <ModalBody>
-        {Object.entries(generatedUrlAliases).map(([language, aliases]) => (
+        {Object.entries(generatedUrlAliases).map(([language, [alias]]) => (
           <FormGroup key={language}>
             <Label className="align-middle mb-0">
               {t(`languageNames:${language}`)}
             </Label>
-            <UrlAliases
-              aliasesToRender={groupBy(aliases, 'website.uuid')}
-              readOnly={true}
-              showAll={true}
-            />
+            {editable ? (
+              <EditableUrlAlias
+                onChange={(slug) =>
+                  onChange({
+                    ...generatedUrlAliases,
+                    [language]: [{...alias, slug}],
+                  })
+                }
+                slug={alias.slug}
+                url={alias.website?.url}
+              />
+            ) : (
+              <ListGroup>
+                <UrlAlias
+                  primary={alias.primary}
+                  slug={alias.slug}
+                  url={alias.website?.url}
+                />
+              </ListGroup>
+            )}
           </FormGroup>
         ))}
       </ModalBody>
       <ModalFooter>
         <ButtonGroup>
-          <Button className="mr-1" color="light" onClick={toggle}>
-            {t('no')}
-          </Button>
           <Button
             color="success"
             onClick={() => {

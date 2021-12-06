@@ -63,7 +63,7 @@ const UrlAlias = ({
   const uiLocale = i18n.language
   const showRemoveButton = !(lastPublished || !onRemove || primary)
   return (
-    <ListGroupItem className="align-items-center d-flex justify-content-between">
+    <ListGroupItem className="align-items-center d-flex justify-content-between py-2">
       <FormGroup check className={classNames({'pl-0': !onChangePrimary})}>
         <Label check>
           {!!onChangePrimary && (

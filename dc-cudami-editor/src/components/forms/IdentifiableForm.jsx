@@ -319,6 +319,11 @@ class IdentifiableForm extends Component {
     const identifiable = {
       ...this.state.identifiable,
       description: this.cleanUpJson(this.state.identifiable.description),
+      localizedUrlAliases: mergeWith(
+        this.state.identifiable.localizedUrlAliases,
+        this.state.generatedUrlAliases ?? {},
+        (objValue, srcValue) => (objValue ?? []).concat(srcValue),
+      ),
     }
     if (identifiable.text) {
       identifiable.text = this.cleanUpJson(this.state.identifiable.text)
@@ -369,23 +374,14 @@ class IdentifiableForm extends Component {
   }
 
   validateUrlAliases = async () => {
-    const {dialogsOpen, identifiable} = this.state
     const generatedUrlAliases = await this.getGeneratedUrlAliases()
     if (Object.keys(generatedUrlAliases).length > 0) {
       return this.setState({
         dialogsOpen: {
-          ...dialogsOpen,
+          ...this.state.dialogsOpen,
           confirmGeneratatedUrlAliases: true,
         },
         generatedUrlAliases,
-        identifiable: {
-          ...identifiable,
-          localizedUrlAliases: mergeWith(
-            identifiable.localizedUrlAliases,
-            generatedUrlAliases,
-            (objValue, srcValue) => (objValue ?? []).concat(srcValue),
-          ),
-        },
       })
     }
     this.submitIdentifiable()
@@ -487,6 +483,9 @@ class IdentifiableForm extends Component {
           <ConfirmGeneratatedUrlAliasesDialog
             generatedUrlAliases={generatedUrlAliases}
             isOpen={dialogsOpen.confirmGeneratatedUrlAliases}
+            onChange={(generatedUrlAliases) =>
+              this.setState({generatedUrlAliases})
+            }
             onConfirm={this.submitIdentifiable}
             toggle={() => this.toggleDialog('confirmGeneratatedUrlAliases')}
           />
