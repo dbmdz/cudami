@@ -88,7 +88,7 @@
     <version.passay>1.6.1</version.passay>
     <version.postgresql>42.2.24</version.postgresql>
     <version.slf4j>1.7.32</version.slf4j>
-    <version.spotbugs>4.2.3</version.spotbugs>
+    <version.spotbugs>4.5.0</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
     <!-- plugins -->
