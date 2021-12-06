@@ -45,7 +45,8 @@ const sortByWebsite = (
 const EditableUrlAlias = ({onChange, slug, url = ''}) => (
   <InputGroup>
     <InputGroupAddon addonType="prepend">
-      <InputGroupText>{`${url.replace(/\/$/, '')}/`}</InputGroupText>
+      {/* Ensure that the url ends with a slash */}
+      <InputGroupText>{`${url.replace(/\/*$/, '/')}`}</InputGroupText>
     </InputGroupAddon>
     <Input onChange={(evt) => onChange(evt.target.value)} value={slug} />
   </InputGroup>
@@ -69,7 +70,8 @@ const UrlAlias = ({
           {!!onChangePrimary && (
             <Input checked={primary} onChange={onChangePrimary} type="radio" />
           )}
-          {`${url.replace(/\/$/, '')}/${slug}`}
+          {/* Ensure that the url ends with a slash */}
+          {`${url.replace(/\/*$/, '/')}${slug}`}
         </Label>
       </FormGroup>
       {lastPublished && !primary && (
