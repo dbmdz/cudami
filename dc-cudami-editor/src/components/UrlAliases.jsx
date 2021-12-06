@@ -9,6 +9,9 @@ import {
   Button,
   FormGroup,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Label,
   ListGroup,
   ListGroupItem,
@@ -38,6 +41,15 @@ const sortByWebsite = (
   }
   return website1.url > website2.url ? 1 : -1
 }
+
+const EditableUrlAlias = ({onChange, slug, url = ''}) => (
+  <InputGroup>
+    <InputGroupAddon addonType="prepend">
+      <InputGroupText>{`${url.replace(/\/$/, '')}/`}</InputGroupText>
+    </InputGroupAddon>
+    <Input onChange={(evt) => onChange(evt.target.value)} value={slug} />
+  </InputGroup>
+)
 
 const UrlAlias = ({
   lastPublished,
@@ -119,5 +131,5 @@ const UrlAliases = ({
   )
 }
 
-export {UrlAlias}
+export {EditableUrlAlias, UrlAlias}
 export default UrlAliases
