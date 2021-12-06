@@ -234,6 +234,7 @@ class IdentifiableForm extends Component {
         apiContextPath,
         language,
         identifiable.label[language],
+        parentWebsite?.uuid,
       )
       generatedSlugs[language] = [
         {
