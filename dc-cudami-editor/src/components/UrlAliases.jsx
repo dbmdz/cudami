@@ -52,7 +52,7 @@ const EditableUrlAlias = ({onChange, slug, url = ''}) => (
 )
 
 const UrlAlias = ({
-  lastPublished,
+  lastPublished = false,
   onChangePrimary,
   onRemove,
   primary = false,
