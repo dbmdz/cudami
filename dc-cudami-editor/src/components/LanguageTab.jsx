@@ -15,7 +15,7 @@ const LanguageTab = ({
   return (
     <NavItem>
       <NavLink
-        className={classNames('d-flex', {
+        className={classNames('align-items-center', 'd-flex', {
           active: language === activeLanguage,
         })}
         href="#"
