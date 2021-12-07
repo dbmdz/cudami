@@ -224,6 +224,7 @@
     "pattern": "Pattern",
     "previewImage": "Preview image",
     "primaryAlias":"Primary URL",
+    "ready": "Ready",
     "refId": "Reference ID",
     "removeFrom": {
       "collection": "remove from collection"

@@ -224,6 +224,7 @@
     "pattern": "Muster",
     "previewImage": "Vorschaubild",
     "primaryAlias": "Hauptlink",
+    "ready": "Fertig",
     "refId": "Referenz-ID",
     "removeFrom": {
       "collection": "aus Sammlung entfernen"
