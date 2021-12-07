@@ -11,8 +11,26 @@ import {
   ModalFooter,
   ModalHeader,
 } from 'reactstrap'
+import {useContext} from 'use-context-selector'
 
+import {generateSlug} from '../../api'
+import {Context} from '../../state/Store'
 import {EditableUrlAlias, UrlAlias} from '../UrlAliases'
+
+const validateAliases = async (aliases, apiContextPath) => {
+  const foo = await Promise.all(
+    Object.entries(aliases).map(async ([language, [alias]]) => {
+      const slug = await generateSlug(
+        apiContextPath,
+        language,
+        alias.slug,
+        alias.website?.uuid,
+      )
+      return [language, [{...alias, slug}]]
+    }),
+  )
+  return Object.fromEntries(foo)
+}
 
 const ConfirmGeneratatedUrlAliasesDialog = ({
   isOpen,
@@ -21,6 +39,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
   onConfirm,
   toggle,
 }) => {
+  const {apiContextPath} = useContext(Context)
   const [editable, setEditable] = useState(false)
   const {t} = useTranslation()
   return (
@@ -31,7 +50,22 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         }}
       >
         {t('generatedUrlAliases')}
-        {!editable && (
+        {editable ? (
+          <Button
+            color="primary"
+            onClick={async () => {
+              const validatedAliases = await validateAliases(
+                generatedUrlAliases,
+                apiContextPath,
+              )
+              onChange(validatedAliases)
+              setEditable(false)
+            }}
+            size="xs"
+          >
+            {t('ready')}
+          </Button>
+        ) : (
           <Button color="primary" onClick={() => setEditable(true)} size="xs">
             {t('edit')}
           </Button>
@@ -70,6 +104,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         <ButtonGroup>
           <Button
             color="success"
+            disabled={editable}
             onClick={() => {
               onConfirm()
               toggle()
