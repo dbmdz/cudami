@@ -15,7 +15,7 @@ const LanguageTab = ({
   return (
     <NavItem>
       <NavLink
-        className={classNames('align-items-center', 'd-flex', {
+        className={classNames('d-flex', {
           active: language === activeLanguage,
         })}
         href="#"
@@ -31,7 +31,7 @@ const LanguageTab = ({
         {language ? t(`languageNames:${language}`) : `(${t('notSpecified')})`}
         {enableRemove && (
           <Button
-            className="ml-2 p-0"
+            className="align-items-center d-flex ml-2 p-0"
             color="link"
             onClick={() =>
               publish('editor.show-remove-language-dialog', language)
