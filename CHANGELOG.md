@@ -13,11 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Improved some parts of the admin GUI
 - Bumped `dc-model` dependency to version `9.1.0`
 - Added search for `url` on websites
+- Added transactions to all SQL statements by annotation on class level in business service layer
 
 ### Changed
 
-- Refactored relation between business service and repository layers (will be continued)
-- Added transactions to create, update and delete operations on business service layer
+- Refactored relation between business service and repository layers
 - Refactored most of the class components to function components in [dc-cudami-editor](dc-cudami-editor/)
 - Fixed search in nested JSONB fields
 
