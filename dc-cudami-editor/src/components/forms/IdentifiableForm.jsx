@@ -256,13 +256,10 @@ class IdentifiableForm extends Component {
   getInvalidLanguages = (identifiable) =>
     this.state.existingLanguages.filter((l) => !identifiable.label[l])
 
-  isEmptyContent = (content) => {
-    return (
-      content.length === 1 &&
-      content[0].type === 'paragraph' &&
-      !content[0].content
-    )
-  }
+  isEmptyContent = (content) =>
+    content.length === 1 &&
+    content[0].type === 'paragraph' &&
+    !content[0].content
 
   removeLanguage = (language) => {
     const {
