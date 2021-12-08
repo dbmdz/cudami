@@ -110,7 +110,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
               toggle()
             }}
           >
-            {t('yes')}
+            {t('apply')}
           </Button>
         </ButtonGroup>
       </ModalFooter>

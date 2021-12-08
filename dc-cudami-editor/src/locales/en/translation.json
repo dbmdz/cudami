@@ -93,6 +93,7 @@
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
+    "apply": "Apply",
     "altText": "Alt text",
     "back": "Back",
     "blocks": {
