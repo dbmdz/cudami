@@ -64,7 +64,7 @@ const AddUrlAliasesDialog = ({
   const steps = [
     ...(parentWebsite
       ? []
-      : [{Icon: FaGlobe, label: t('types:website'), name: 'website'}]),
+      : [{Icon: FaGlobe, label: t('types:website_one'), name: 'website'}]),
     {Icon: FaLink, label: t('slug'), name: 'slug'},
     {Icon: FaCheck, name: 'confirm'},
   ]
