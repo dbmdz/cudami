@@ -264,7 +264,7 @@
     "video": "Video",
     "view": "anzeigen",
     "warning": "Warnung",
-    "websiteSearchTerm": "$t(searchTerm) (in $t(label), $t(description))",
+    "websiteSearchTerm": "$t(searchTerm) (in $t(label), $t(description), URL)",
     "width": "Breite",
     "yes": "Ja"
   },
