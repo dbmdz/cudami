@@ -102,6 +102,9 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
       </ModalBody>
       <ModalFooter>
         <ButtonGroup>
+          <Button className="mr-1" color="light" onClick={toggle}>
+            {t('cancel')}
+          </Button>
           <Button
             color="success"
             disabled={editable}
