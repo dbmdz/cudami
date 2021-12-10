@@ -42,6 +42,10 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
   const {apiContextPath} = useContext(Context)
   const [editable, setEditable] = useState(false)
   const {t} = useTranslation()
+  const destroy = () => {
+    toggle()
+    setEditable(false)
+  }
   return (
     <Modal isOpen={isOpen} size="lg">
       <ModalHeader
@@ -102,7 +106,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
       </ModalBody>
       <ModalFooter>
         <ButtonGroup>
-          <Button className="mr-1" color="light" onClick={toggle}>
+          <Button className="mr-1" color="light" onClick={destroy}>
             {t('cancel')}
           </Button>
           <Button
@@ -110,7 +114,7 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
             disabled={editable}
             onClick={() => {
               onConfirm()
-              toggle()
+              destroy()
             }}
           >
             {t('apply')}
