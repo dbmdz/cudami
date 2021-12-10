@@ -18,7 +18,7 @@ import {Context} from '../../state/Store'
 import {EditableUrlAlias, UrlAlias} from '../UrlAliases'
 
 const validateAliases = async (aliases, apiContextPath) => {
-  const foo = await Promise.all(
+  const validatedAliases = await Promise.all(
     Object.entries(aliases).map(async ([language, [alias]]) => {
       const slug = await generateSlug(
         apiContextPath,
@@ -29,7 +29,7 @@ const validateAliases = async (aliases, apiContextPath) => {
       return [language, [{...alias, slug}]]
     }),
   )
-  return Object.fromEntries(foo)
+  return Object.fromEntries(validatedAliases)
 }
 
 const ConfirmGeneratatedUrlAliasesDialog = ({
