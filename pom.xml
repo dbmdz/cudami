@@ -64,6 +64,7 @@
   <modules>
     <module>dc-cudami-admin</module>
     <module>dc-cudami-client</module>
+    <module>dc-cudami-model</module>
     <module>dc-cudami-server</module>
     <module>dc-cudami-templates</module>
     <module>dc-cudami-lobid-client</module>
@@ -137,6 +138,11 @@
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
         <artifactId>dc-cudami-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>de.digitalcollections.cudami</groupId>
+        <artifactId>dc-cudami-model</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

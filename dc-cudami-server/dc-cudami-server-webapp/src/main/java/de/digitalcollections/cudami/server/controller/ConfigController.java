@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller;
 
-import de.digitalcollections.cudami.client.config.CudamiConfig;
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;

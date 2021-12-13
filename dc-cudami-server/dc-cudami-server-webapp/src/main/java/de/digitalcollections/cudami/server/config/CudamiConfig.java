@@ -6,4 +6,4 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(
     proxyBeanMethods = false) // We want the real configuration class, not the cglib proxy
 @ConfigurationProperties(prefix = "cudami")
-public class CudamiConfig extends de.digitalcollections.cudami.client.config.CudamiConfig {}
+public class CudamiConfig extends de.digitalcollections.cudami.model.config.CudamiConfig {}

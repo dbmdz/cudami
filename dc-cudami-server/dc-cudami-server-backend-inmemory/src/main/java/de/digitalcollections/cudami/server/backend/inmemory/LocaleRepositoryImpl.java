@@ -1,20 +1,22 @@
 package de.digitalcollections.cudami.server.backend.inmemory;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.LocaleRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class LocaleRepositoryImpl implements LocaleRepository {
 
-  @Value("${cudami.defaults.language:en}")
-  private String defaultLanguage;
+  private CudamiConfig cudamiConfig;
 
-  @Value("${cudami.defaults.locale}")
-  private Locale defaultLocale;
+  @Autowired
+  public LocaleRepositoryImpl(CudamiConfig cudamiConfig) {
+    this.cudamiConfig = cudamiConfig;
+  }
 
   @Override
   public List<String> findAllLanguages() {
@@ -28,11 +30,11 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   @Override
   public String getDefaultLanguage() {
-    return defaultLanguage;
+    return cudamiConfig.getDefaults().getLanguage();
   }
 
   @Override
   public Locale getDefaultLocale() {
-    return defaultLocale;
+    return cudamiConfig.getDefaults().getLocale();
   }
 }

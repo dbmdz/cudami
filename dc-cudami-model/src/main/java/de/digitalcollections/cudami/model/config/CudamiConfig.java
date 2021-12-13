@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.client.config;
+package de.digitalcollections.cudami.model.config;
 
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.List;
