@@ -25,7 +25,7 @@
     <version.thymeleaf-spring-data-dialect>3.4.1</version.thymeleaf-spring-data-dialect>
     <version.webjar-admin-lte>3.1.0</version.webjar-admin-lte>
     <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
-    <version.webjar-url-search-params-polyfill>8.1.0</version.webjar-url-search-params-polyfill>
+    <version.webjar-url-search-params-polyfill>8.1.1</version.webjar-url-search-params-polyfill>
     <version.webjar-webjars-locator>0.42</version.webjar-webjars-locator>
 
     <!-- plugins -->
