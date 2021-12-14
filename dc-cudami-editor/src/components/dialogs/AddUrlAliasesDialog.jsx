@@ -124,7 +124,6 @@ const AddUrlAliasesDialog = ({
             <FeedbackMessage
               className="mb-2"
               message={{
-                color: 'info',
                 key: 'noWebsiteNeeded',
               }}
             />
