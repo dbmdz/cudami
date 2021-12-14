@@ -197,7 +197,7 @@ const AddUrlAliasesDialog = ({
             {isInvalid && (
               <FormFeedback>
                 {newUrlAlias.isDuplicate
-                  ? t('feedback:noDuplicateSlugs')
+                  ? t('feedback:noDuplicateSlugsForObject')
                   : t('feedback:cannotBeEmpty')}
               </FormFeedback>
             )}
