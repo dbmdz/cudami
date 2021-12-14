@@ -204,13 +204,24 @@ const AddUrlAliasesDialog = ({
           </>
         )}
         {stepName === 'confirm' && (
-          <ListGroup>
-            <UrlAlias
-              primary={newUrlAlias.primary}
-              slug={newUrlAlias.slug}
-              url={newUrlAlias.website?.url}
-            />
-          </ListGroup>
+          <>
+            {/-\d+$/.test(newUrlAlias.slug) && (
+              <FeedbackMessage
+                className="mb-2"
+                message={{
+                  color: 'warning',
+                  key: 'duplicateInformation.urlAliases_one',
+                }}
+              />
+            )}
+            <ListGroup>
+              <UrlAlias
+                primary={newUrlAlias.primary}
+                slug={newUrlAlias.slug}
+                url={newUrlAlias.website?.url}
+              />
+            </ListGroup>
+          </>
         )}
       </ModalBody>
       <ModalFooter>

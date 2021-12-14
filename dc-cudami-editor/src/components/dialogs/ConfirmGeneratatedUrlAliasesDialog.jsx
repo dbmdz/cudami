@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
   Button,
@@ -15,6 +15,7 @@ import {useContext} from 'use-context-selector'
 
 import {generateSlug} from '../../api'
 import {Context} from '../../state/Store'
+import FeedbackMessage from '../FeedbackMessage'
 import {EditableUrlAlias, UrlAlias} from '../UrlAliases'
 
 const validateAliases = async (aliases, apiContextPath) => {
@@ -41,11 +42,26 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
 }) => {
   const {apiContextPath} = useContext(Context)
   const [editable, setEditable] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState()
   const {t} = useTranslation()
   const destroy = () => {
     toggle()
     setEditable(false)
   }
+  useEffect(() => {
+    const showDuplicateInformation =
+      !editable &&
+      Object.values(generatedUrlAliases).some(([{slug}]) => /-\d+$/.test(slug))
+    if (showDuplicateInformation) {
+      setFeedbackMessage({
+        color: 'warning',
+        key: 'duplicateInformation.urlAliases',
+        values: {count: Object.keys(generatedUrlAliases).length},
+      })
+    } else {
+      setFeedbackMessage(undefined)
+    }
+  }, [editable, generatedUrlAliases])
   return (
     <Modal isOpen={isOpen} size="lg">
       <ModalHeader
@@ -76,6 +92,9 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         )}
       </ModalHeader>
       <ModalBody>
+        {feedbackMessage && (
+          <FeedbackMessage className="mb-2" message={feedbackMessage} />
+        )}
         {Object.entries(generatedUrlAliases).map(([language, [alias]]) => (
           <FormGroup key={language}>
             <Label className="align-middle mb-0">

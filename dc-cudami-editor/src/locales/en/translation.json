@@ -14,7 +14,11 @@
     "digitalObjectAddedSuccessfully_other": "The selected digital objects have been added successfully.",
     "digitalObjectNotFound": "Digital object was not found.",
     "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
-    "duplicateInformation": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+    "duplicateInformation": {
+      "attachedIdentifiables": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+      "urlAliases_one": "The displayed pretty URL may have been supplemented with a numeric suffix. Please check whether there is a duplicate.",
+      "urlAliases_other": "The displayed pretty URLs may have been supplemented with a numeric suffix. Please check whether there are duplicates."
+    },
     "labelNotFilled": "The field \"$t(label)\" must be filled out in all languages.",
     "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
     "noDuplicateSlugsForObject": "This URL slug already exists for this object.",

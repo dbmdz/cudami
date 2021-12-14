@@ -146,7 +146,9 @@ const AddAttachedIdentifiablesDialog = ({
           {identifiables.length > 0 && (
             <ListGroup className="mb-3">
               {maxElements !== 1 && (
-                <FeedbackMessage message={{key: 'duplicateInformation'}} />
+                <FeedbackMessage
+                  message={{key: 'duplicateInformation.attachedIdentifiables'}}
+                />
               )}
               {identifiables.map(
                 ({label, previewImage, previewImageRenderingHints, uuid}) => (
