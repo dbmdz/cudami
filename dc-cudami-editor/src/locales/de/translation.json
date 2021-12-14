@@ -14,7 +14,11 @@
     "digitalObjectAddedSuccessfully_other": "Die gewählten Digitalisate wurden erfolgreich hinzugefügt.",
     "digitalObjectNotFound": "Digitalisat wurde nicht gefunden.",
     "digitalObjectRemovedSuccessfully": "{{ name }} wurde erfolgreich entfernt.",
-    "duplicateInformation": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+    "duplicateInformation": {
+      "attachedIdentifiables": "Werden Einträge mehrfach ausgewählt, so werden die Duplikate beim Klick auf \"$t(add)\" automatisch entfernt.",
+      "urlAliases_one": "Der angezeigte sprechende Link wurde ggf. um ein numerisches Suffix ergänzt. Bitte prüfen Sie, ob ein Duplikat vorliegt.",
+      "urlAliases_other": "Die angezeigten sprechenden Links wurden ggf. um ein numerisches Suffix ergänzt. Bitte prüfen Sie, ob Duplikate vorliegen."
+    },
     "labelNotFilled": "Das Feld \"$t(label)\" muss in allen Sprachen ausgefüllt sein.",
     "moreElementsFound": "{{ maxElements }} von {{ totalElements }} Treffern, bitte verfeinern Sie Ihre Suche.",
     "noDuplicateSlugsForObject": "Dieser URL-Slug existiert für dieses Objekt bereits.",
