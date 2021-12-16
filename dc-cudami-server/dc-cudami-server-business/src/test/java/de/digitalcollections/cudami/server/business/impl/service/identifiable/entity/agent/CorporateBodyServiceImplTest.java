@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
@@ -32,6 +33,7 @@ class CorporateBodyServiceImplTest {
   private ImageFileResourceService imageFileResourceService;
   private IdentifierRepository identifierRepository;
   private UrlAliasService urlAliasService;
+  private CudamiConfig cudamiConfig;
 
   @BeforeEach
   void setUp() throws IdentifiableServiceException, ValidationException {
@@ -46,13 +48,16 @@ class CorporateBodyServiceImplTest {
     identifierRepository = mock(IdentifierRepository.class);
     urlAliasService = mock(UrlAliasService.class);
 
+    cudamiConfig = mock(CudamiConfig.class);
+
     corporateBodyService =
         new CorporateBodyServiceImpl(
             corporateBodyRepository,
             externalCorporateBodyRepository,
             imageFileResourceService,
             identifierRepository,
-            urlAliasService);
+            urlAliasService,
+            cudamiConfig);
   }
 
   @Test

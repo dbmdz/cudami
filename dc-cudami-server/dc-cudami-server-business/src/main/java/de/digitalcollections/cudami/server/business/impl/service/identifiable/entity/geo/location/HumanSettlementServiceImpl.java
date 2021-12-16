@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.geo.location;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -22,7 +23,8 @@ public class HumanSettlementServiceImpl extends EntityServiceImpl<HumanSettlemen
   public HumanSettlementServiceImpl(
       HumanSettlementRepository repository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(repository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(repository, identifierRepository, urlAliasService, cudamiConfig);
   }
 }

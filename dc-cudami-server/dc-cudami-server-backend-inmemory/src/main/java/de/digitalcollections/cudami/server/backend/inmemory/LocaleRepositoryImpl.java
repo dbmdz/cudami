@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.LocaleReposito
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -13,7 +12,6 @@ public class LocaleRepositoryImpl implements LocaleRepository {
 
   private CudamiConfig cudamiConfig;
 
-  @Autowired
   public LocaleRepositoryImpl(CudamiConfig cudamiConfig) {
     this.cudamiConfig = cudamiConfig;
   }

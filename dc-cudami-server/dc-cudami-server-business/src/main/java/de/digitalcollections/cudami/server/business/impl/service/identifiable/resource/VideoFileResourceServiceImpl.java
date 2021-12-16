@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.VideoFileResourceRepository;
@@ -25,8 +26,9 @@ public class VideoFileResourceServiceImpl extends IdentifiableServiceImpl<VideoF
   public VideoFileResourceServiceImpl(
       VideoFileResourceRepository videoFileResourceRepository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(videoFileResourceRepository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(videoFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @Override

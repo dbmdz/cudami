@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
@@ -32,8 +33,9 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
       ExternalCorporateBodyRepository externalRepository,
       ImageFileResourceService imageFileResourceService,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(repository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(repository, identifierRepository, urlAliasService, cudamiConfig);
     this.externalRepository = externalRepository;
     this.imageFileResourceService = imageFileResourceService;
   }

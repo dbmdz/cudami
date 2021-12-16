@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ImageFileResourceRepository;
@@ -25,8 +26,9 @@ public class ImageFileResourceServiceImpl extends IdentifiableServiceImpl<ImageF
   public ImageFileResourceServiceImpl(
       ImageFileResourceRepository imageFileResourceRepository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(imageFileResourceRepository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(imageFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @Override
