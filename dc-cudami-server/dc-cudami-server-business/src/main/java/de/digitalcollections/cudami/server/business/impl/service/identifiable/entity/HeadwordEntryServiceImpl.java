@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -22,8 +24,11 @@ public class HeadwordEntryServiceImpl extends EntityServiceImpl<HeadwordEntry>
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntryServiceImpl.class);
 
   @Autowired
-  public HeadwordEntryServiceImpl(HeadwordEntryRepository repository) {
-    super(repository);
+  public HeadwordEntryServiceImpl(
+      HeadwordEntryRepository repository,
+      IdentifierRepository identifierRepository,
+      UrlAliasService urlAliasService) {
+    super(repository, identifierRepository, urlAliasService);
   }
 
   @Override
