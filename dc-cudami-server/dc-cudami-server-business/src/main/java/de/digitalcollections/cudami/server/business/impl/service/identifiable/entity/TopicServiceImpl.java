@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
@@ -33,8 +34,9 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   public TopicServiceImpl(
       TopicRepository repository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(repository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(repository, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @Override

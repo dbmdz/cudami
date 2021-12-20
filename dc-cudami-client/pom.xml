@@ -20,6 +20,10 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-model</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.model</groupId>
       <artifactId>dc-model</artifactId>
     </dependency>

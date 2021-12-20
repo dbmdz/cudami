@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ApplicationFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
@@ -27,8 +28,9 @@ public class ApplicationFileResourceServiceImpl
   public ApplicationFileResourceServiceImpl(
       ApplicationFileResourceRepository applicationFileResourceRepository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(applicationFileResourceRepository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(applicationFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @Override

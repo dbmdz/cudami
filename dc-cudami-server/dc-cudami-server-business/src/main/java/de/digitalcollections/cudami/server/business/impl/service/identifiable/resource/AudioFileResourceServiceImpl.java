@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.AudioFileResourceRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
@@ -25,8 +26,9 @@ public class AudioFileResourceServiceImpl extends IdentifiableServiceImpl<AudioF
   public AudioFileResourceServiceImpl(
       AudioFileResourceRepository audioFileResourceRepository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(audioFileResourceRepository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(audioFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @Override
