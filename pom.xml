@@ -84,7 +84,7 @@
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.8.2</version.junit>
     <version.logstash-logback-encoder>6.6</version.logstash-logback-encoder>
-    <version.mockito-core>4.1.0</version.mockito-core>
+    <version.mockito-core>4.2.0</version.mockito-core>
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.1</version.passay>
     <version.postgresql>42.2.24</version.postgresql>
