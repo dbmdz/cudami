@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Bumped `dc-model` dependency to version `9.1.0`
 - Added search for `url` on websites
 - Added transactions to all SQL statements by annotation on class level in business service layer
+- Added config endpoint, mainly for admin GUI
+- Added HeadwordEntry and Headword endpoints for management of dictionaries / encyclopedias
 
 ### Changed
 

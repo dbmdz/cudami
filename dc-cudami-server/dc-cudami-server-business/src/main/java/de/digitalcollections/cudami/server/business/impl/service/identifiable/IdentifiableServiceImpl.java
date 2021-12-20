@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -8,7 +9,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -44,27 +44,23 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
   @Autowired private LocaleService localeService;
-  @Autowired private UrlAliasGenerationProperties aliasGenerationProperties;
 
   protected IdentifiableRepository<I> repository;
   protected IdentifierRepository identifierRepository;
 
   private UrlAliasService urlAliasService;
+  private CudamiConfig cudamiConfig;
 
   @Autowired
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
     this.repository = repository;
     this.identifierRepository = identifierRepository;
     this.urlAliasService = urlAliasService;
-  }
-
-  void setAliasGenerationProperties(UrlAliasGenerationProperties aliasGenerationProperties) {
-    if (this.aliasGenerationProperties == null) {
-      this.aliasGenerationProperties = aliasGenerationProperties;
-    }
+    this.cudamiConfig = cudamiConfig;
   }
 
   @Override
@@ -112,7 +108,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
     if ((identifiable instanceof Entity)
-        && this.aliasGenerationProperties
+        && cudamiConfig
+            .getUrlAlias()
             .getGenerationExcludes()
             .contains(((Entity) identifiable).getEntityType())) {
       return;

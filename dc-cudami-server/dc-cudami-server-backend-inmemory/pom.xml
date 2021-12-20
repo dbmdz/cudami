@@ -22,5 +22,9 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-model</artifactId>
+    </dependency>
   </dependencies>
 </project>

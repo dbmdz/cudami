@@ -29,8 +29,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.commons.web.SlugGenerator;
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.config.SpringUtility;
-import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
@@ -93,14 +93,13 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private final SlugGenerator slugGenerator = new SlugGenerator();
 
-  private UrlAliasGenerationProperties urlAliasGenerationProperties =
-      SpringUtility.getBean(UrlAliasGenerationProperties.class);
+  private CudamiConfig cudamiConfig = SpringUtility.getBean(CudamiConfig.class);
 
   @Override
   public void migrate(Context context) throws Exception {
     final SingleConnectionDataSource connectionDataSource =
         new SingleConnectionDataSource(context.getConnection(), true);
-    slugGenerator.setMaxLength(urlAliasGenerationProperties.getMaxLength());
+    slugGenerator.setMaxLength(cudamiConfig.getUrlAlias().getMaxLength());
 
     JdbcTemplate jdbcTemplate = new JdbcTemplate(connectionDataSource.getConnection());
 
@@ -124,9 +123,9 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   }
 
   private void removeIdentifiablesNotToMigrate(Context context) {
-    if (urlAliasGenerationProperties != null
-        && urlAliasGenerationProperties.getGenerationExcludes() != null) {
-      List<EntityType> excludedIdentifiables = urlAliasGenerationProperties.getGenerationExcludes();
+    if (cudamiConfig.getUrlAlias() != null
+        && cudamiConfig.getUrlAlias().getGenerationExcludes() != null) {
+      List<EntityType> excludedIdentifiables = cudamiConfig.getUrlAlias().getGenerationExcludes();
       LOGGER.info("Excluding UrlAlias generation for " + excludedIdentifiables);
       excludedIdentifiables.forEach(ENTITY_MIGRATION_TABLES::remove);
     }

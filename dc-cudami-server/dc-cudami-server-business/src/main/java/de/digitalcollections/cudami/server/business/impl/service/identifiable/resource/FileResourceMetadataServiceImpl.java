@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -61,8 +62,9 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
       @Qualifier("videoFileResourceServiceImpl") VideoFileResourceService videoFileResourceService,
       LocaleService localeService,
       IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService) {
-    super(metadataRepository, identifierRepository, urlAliasService);
+      UrlAliasService urlAliasService,
+      CudamiConfig cudamiConfig) {
+    super(metadataRepository, identifierRepository, urlAliasService, cudamiConfig);
     this.applicationFileResourceService = applicationFileResourceService;
     this.audioFileResourceService = audioFileResourceService;
     this.imageFileResourceService = imageFileResourceService;

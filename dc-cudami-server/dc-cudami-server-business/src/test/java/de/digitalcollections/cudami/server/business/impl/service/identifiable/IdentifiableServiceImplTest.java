@@ -11,13 +11,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.config.UrlAliasGenerationProperties;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -49,10 +49,12 @@ class IdentifiableServiceImplTest {
     repo = mock(IdentifiableRepository.class);
     urlAliasService = mock(UrlAliasService.class);
     identifierRepository = mock(IdentifierRepository.class);
-    service = new IdentifiableServiceImpl(repo, identifierRepository, urlAliasService);
-    var aliasGenerationProps = new UrlAliasGenerationProperties();
-    aliasGenerationProps.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
-    service.setAliasGenerationProperties(aliasGenerationProps);
+    CudamiConfig cudamiConfig = new CudamiConfig();
+    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
+    urlAliasConfig.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
+    cudamiConfig.setUrlAlias(urlAliasConfig);
+    service =
+        new IdentifiableServiceImpl(repo, identifierRepository, urlAliasService, cudamiConfig);
   }
 
   @DisplayName("can add related entities by delegating it to the repository")

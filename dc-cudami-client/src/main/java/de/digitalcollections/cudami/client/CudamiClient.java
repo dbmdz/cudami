@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.config.CudamiConfigClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
 import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
@@ -36,6 +37,7 @@ public class CudamiClient {
 
   private final CudamiArticlesClient cudamiArticlesClient;
   private final CudamiCollectionsClient cudamiCollectionsClient;
+  private final CudamiConfigClient cudamiConfigClient;
   private final CudamiCorporateBodiesClient cudamiCorporateBodiesClient;
   private final CudamiDigitalObjectsClient cudamiDigitalObjectsClient;
   private final CudamiEntitiesClient cudamiEntitiesClient;
@@ -78,6 +80,7 @@ public class CudamiClient {
     this.http = http;
     this.cudamiArticlesClient = new CudamiArticlesClient(http, cudamiServerUrl, mapper);
     this.cudamiCollectionsClient = new CudamiCollectionsClient(http, cudamiServerUrl, mapper);
+    this.cudamiConfigClient = new CudamiConfigClient(http, cudamiServerUrl, mapper);
     this.cudamiCorporateBodiesClient =
         new CudamiCorporateBodiesClient(http, cudamiServerUrl, mapper);
     this.cudamiDigitalObjectsClient = new CudamiDigitalObjectsClient(http, cudamiServerUrl, mapper);
