@@ -217,7 +217,7 @@ class IdentifiableForm extends Component {
   getGeneratedUrlAliases = async () => {
     const {apiContextPath, parentWebsite, uuid} = this.props
     const {existingLanguages, identifiable} = this.state
-    const languagesWithoutGeneratedSlug = existingLanguages.filter(
+    const languagesWithoutGeneratedUrlAliases = existingLanguages.filter(
       (language) => {
         const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
         return (
@@ -228,15 +228,15 @@ class IdentifiableForm extends Component {
         )
       },
     )
-    const generatedSlugs = {}
-    for (let language of languagesWithoutGeneratedSlug) {
+    const generatedUrlAliases = {}
+    for (let language of languagesWithoutGeneratedUrlAliases) {
       const slug = await generateSlug(
         apiContextPath,
         language,
         identifiable.label[language],
         parentWebsite?.uuid,
       )
-      generatedSlugs[language] = [
+      generatedUrlAliases[language] = [
         {
           primary: true,
           slug,
@@ -250,7 +250,7 @@ class IdentifiableForm extends Component {
         },
       ]
     }
-    return generatedSlugs
+    return generatedUrlAliases
   }
 
   getInvalidLanguages = (identifiable) =>
