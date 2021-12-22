@@ -119,7 +119,6 @@ class PagedIdentifiableList extends Component {
     const {content, pageSize, totalElements} = await this.loadIdentifiables(
       0,
       this.pageSize,
-      this.state.searchTerm,
     )
     this.setState({
       identifiables: content,
