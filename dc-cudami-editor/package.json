@@ -65,7 +65,7 @@
     "@types/node": "^16.11.12",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.10",
-    "eslint-plugin-react": "^7.27.1",
+    "eslint-plugin-react": "^7.28.0",
     "import-sort-style-module": "^6.0.0",
     "prettier": "^2.5.1",
     "prettier-plugin-import-sort": "^0.0.7",
