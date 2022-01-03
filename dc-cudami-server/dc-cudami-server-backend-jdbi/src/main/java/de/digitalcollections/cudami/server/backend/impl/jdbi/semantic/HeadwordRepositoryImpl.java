@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
@@ -247,14 +248,59 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public Headword findOne(UUID uuid, Filtering filtering) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    // basic query
+    StringBuilder sqlQuery =
+        new StringBuilder(
+            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
+
+    // add filtering
+    if (filtering == null) {
+      filtering = Filtering.defaultBuilder().build();
+    }
+    filtering.add(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build());
+    Map<String, Object> argumentMappings = new HashMap<>();
+    addFiltering(filtering, sqlQuery, argumentMappings);
+
+    // get it
+    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
+    Optional<Headword> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlQuery.toString())
+                    .bindMap(bindMap)
+                    .mapToBean(Headword.class)
+                    .findFirst());
+    return result.orElse(null);
   }
 
   @Override
   public Headword findOneByLabelAndLocale(String label, Locale locale) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    // basic query
+    StringBuilder sqlQuery =
+        new StringBuilder(
+            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
+
+    // add filtering
+    Filtering filtering =
+        Filtering.defaultBuilder()
+            .filter("label")
+            .isEquals(label)
+            .filter("locale")
+            .isEquals(locale)
+            .build();
+    Map<String, Object> argumentMappings = new HashMap<>();
+    addFiltering(filtering, sqlQuery, argumentMappings);
+
+    // get it
+    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
+    Optional<Headword> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlQuery.toString())
+                    .bindMap(bindMap)
+                    .mapToBean(Headword.class)
+                    .findFirst());
+    return result.orElse(null);
   }
 
   @Override
