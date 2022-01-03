@@ -36,6 +36,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordRepositoryImpl.class);
 
+  public static final String MAPPING_PREFIX = "hw";
   public static final String SQL_INSERT_FIELDS = " uuid, created, label, locale, last_modified";
   public static final String SQL_INSERT_VALUES = " :uuid, :created, :label, :locale, :lastModified";
   public static final String SQL_REDUCED_FIELDS_HW =
@@ -46,7 +47,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Autowired
   public HeadwordRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, null);
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
