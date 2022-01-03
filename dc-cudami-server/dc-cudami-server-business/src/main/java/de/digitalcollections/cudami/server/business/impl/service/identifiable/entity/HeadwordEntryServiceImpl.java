@@ -34,6 +34,11 @@ public class HeadwordEntryServiceImpl extends EntityServiceImpl<HeadwordEntry>
   }
 
   @Override
+  public List<HeadwordEntry> findByHeadword(UUID headwordUuid) {
+    return ((HeadwordEntryRepository) repository).findByHeadword(headwordUuid);
+  }
+
+  @Override
   public HeadwordEntry get(UUID uuid, Locale locale) throws IdentifiableServiceException {
     HeadwordEntry headwordEntry = super.get(uuid, locale);
     if (headwordEntry == null) {
