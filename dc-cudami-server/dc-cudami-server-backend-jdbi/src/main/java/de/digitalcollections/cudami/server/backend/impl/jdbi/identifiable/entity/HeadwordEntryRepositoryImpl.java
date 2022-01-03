@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -11,12 +12,15 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.semantic.Headword;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +35,37 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntryRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "he";
+  private static final String SQL_SELECT_ALL_FIELDS_JOINS =
+      " LEFT JOIN "
+          + HeadwordRepositoryImpl.TABLE_NAME
+          + " AS "
+          + HeadwordRepositoryImpl.TABLE_ALIAS
+          + " ON "
+          + HeadwordRepositoryImpl.TABLE_ALIAS
+          + ".uuid = he.headword";
   public static final String TABLE_ALIAS = "he";
   public static final String TABLE_NAME = "headwordentries";
+
+  private static BiFunction<Map<UUID, HeadwordEntry>, RowView, Map<UUID, HeadwordEntry>>
+      createAdditionalReduceRowsBiFunction() {
+    return (map, rowView) -> {
+      // entity should be already in map, as we here just add additional data
+      HeadwordEntry headwordEntry =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+
+      if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        UUID headwordUuid =
+            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+        String label =
+            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
+        final Headword headword = new Headword();
+        headword.setUuid(headwordUuid);
+        headword.setLabel(label);
+        headwordEntry.setHeadword(headword);
+      }
+      return map;
+    };
+  }
 
   public static String getSqlInsertFields() {
     return ArticleRepositoryImpl.getSqlInsertFields() + ", headword";
@@ -49,16 +82,21 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         + tableAlias
         + ".text "
         + mappingPrefix
-        + "_text";
+        + "_text"
+        + ", "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".uuid "
+        + HeadwordRepositoryImpl.MAPPING_PREFIX
+        + "_uuid"
+        + ", "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".label "
+        + HeadwordRepositoryImpl.MAPPING_PREFIX
+        + "_label";
   }
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return ArticleRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".headword "
-        + mappingPrefix
-        + "_headword";
+    return ArticleRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -81,7 +119,9 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        SQL_SELECT_ALL_FIELDS_JOINS,
+        createAdditionalReduceRowsBiFunction());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
@@ -178,7 +218,13 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
   @Override
   public HeadwordEntry save(HeadwordEntry headwordEntry) {
-    super.save(headwordEntry);
+    Map<String, Object> bindings = new HashMap<>();
+    UUID headwordUuid = null;
+    if (headwordEntry.getHeadword() != null) {
+      headwordUuid = headwordEntry.getHeadword().getUuid();
+    }
+    bindings.put("headword", headwordUuid);
+    super.save(headwordEntry, bindings);
 
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
@@ -219,7 +265,13 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
   @Override
   public HeadwordEntry update(HeadwordEntry headwordEntry) {
-    super.update(headwordEntry);
+    Map<String, Object> bindings = new HashMap<>();
+    UUID headwordUuid = null;
+    if (headwordEntry.getHeadword() != null) {
+      headwordUuid = headwordEntry.getHeadword().getUuid();
+    }
+    bindings.put("headword", headwordUuid);
+    super.update(headwordEntry, bindings);
 
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
