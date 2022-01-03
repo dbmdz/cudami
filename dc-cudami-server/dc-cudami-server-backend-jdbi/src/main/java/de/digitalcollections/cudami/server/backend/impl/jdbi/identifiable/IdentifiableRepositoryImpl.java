@@ -6,6 +6,7 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -303,6 +304,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         UUID websiteUuid =
             rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
         if (websiteUuid != null) {
+          // FIXME: remove Website from this repository. Identifiable should not depend on website
+          // stuff.
           Website website =
               new Website(
                   rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
@@ -715,16 +718,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlSelectAllFieldsJoins,
       Filtering filtering,
       Map<String, Object> argumentMappings) {
-    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
-    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     StringBuilder sql =
         new StringBuilder(
             "SELECT"
                 + fieldsSql
                 + ","
-                + SQL_FULL_FIELDS_ID
+                + IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID
                 + ","
-                + SQL_PREVIEW_IMAGE_FIELDS_PI
+                + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
                 + UrlAliasRepositoryImpl.getSelectFields(true)
                 + " FROM "
@@ -732,22 +733,31 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + " AS "
                 + tableAlias
                 + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
-                + " LEFT JOIN identifiers AS id ON "
+                + " LEFT JOIN "
+                + IdentifierRepositoryImpl.TABLE_NAME
+                + " AS "
+                + IdentifierRepositoryImpl.TABLE_ALIAS
+                + " ON "
                 + tableAlias
-                + ".uuid = id.identifiable"
-                + " LEFT JOIN fileresources_image AS file ON "
+                + ".uuid = "
+                + IdentifierRepositoryImpl.TABLE_ALIAS
+                + ".identifiable"
+                + " LEFT JOIN "
+                + ImageFileResourceRepositoryImpl.TABLE_NAME
+                + " AS file ON "
                 + tableAlias
                 + ".previewfileresource = file.uuid"
                 + " LEFT JOIN "
-                + urlAliasName
+                + UrlAliasRepositoryImpl.TABLE_NAME
                 + " AS "
-                + urlAliasAlias
+                + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + " ON "
-                + this.tableAlias
+                + tableAlias
                 + ".uuid = "
-                + urlAliasAlias
+                + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + ".target_uuid"
-                + UrlAliasRepositoryImpl.WEBSITESJOIN);
+                + UrlAliasRepositoryImpl
+                    .WEBSITESJOIN); // FIXME: that's what sqlSelectAllFieldsJoins is for...
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
     }
