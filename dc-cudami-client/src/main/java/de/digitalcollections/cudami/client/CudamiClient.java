@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesCli
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
@@ -47,6 +48,7 @@ public class CudamiClient {
   private final CudamiFileResourcesMetadataClient cudamiFileResourcesMetadataClient;
   private final CudamiGeoLocationsClient cudamiGeoLocationsClient;
   private final CudamiGivenNamesClient cudamiGivenNamesClient;
+  private final CudamiHeadwordEntriesClient cudamiHeadwordEntriesClient;
   private final CudamiHeadwordsClient cudamiHeadwordsClient;
   private final CudamiHumanSettlementsClient cudamiHumanSettlementsClient;
   private final CudamiIdentifiablesClient cudamiIdentifiablesClient;
@@ -95,6 +97,8 @@ public class CudamiClient {
     this.cudamiGeoLocationsClient = new CudamiGeoLocationsClient(http, cudamiServerUrl, mapper);
     this.cudamiGivenNamesClient = new CudamiGivenNamesClient(http, cudamiServerUrl, mapper);
     this.cudamiHeadwordsClient = new CudamiHeadwordsClient(http, cudamiServerUrl, mapper);
+    this.cudamiHeadwordEntriesClient =
+        new CudamiHeadwordEntriesClient(http, cudamiServerUrl, mapper);
     this.cudamiHumanSettlementsClient =
         new CudamiHumanSettlementsClient(http, cudamiServerUrl, mapper);
     this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(http, cudamiServerUrl, mapper);
@@ -157,6 +161,10 @@ public class CudamiClient {
 
   public CudamiGivenNamesClient forGivenNames() {
     return cudamiGivenNamesClient;
+  }
+
+  public CudamiHeadwordEntriesClient forHeadwordEntries() {
+    return cudamiHeadwordEntriesClient;
   }
 
   public CudamiHeadwordsClient forHeadwords() {
