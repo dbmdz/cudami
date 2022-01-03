@@ -43,8 +43,8 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       // handle optional filtering params
       String filterClauses = getFilterClauses(filtering, argumentMappings);
       if (!filterClauses.isEmpty()) {
-        String innerQueryStr = sqlQuery.toString();
-        if (innerQueryStr.toUpperCase().contains(" WHERE ")) {
+        String sqlQueryStr = sqlQuery.toString();
+        if (sqlQueryStr.toUpperCase().contains(" WHERE ")) {
           sqlQuery.append(" AND ");
         } else {
           sqlQuery.append(" WHERE ");
