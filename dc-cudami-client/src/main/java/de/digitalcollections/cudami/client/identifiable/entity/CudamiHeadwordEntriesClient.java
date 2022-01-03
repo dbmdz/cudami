@@ -9,6 +9,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
+import java.util.List;
 import java.util.UUID;
 
 public class CudamiHeadwordEntriesClient extends CudamiBaseClient<HeadwordEntry> {
@@ -32,6 +33,11 @@ public class CudamiHeadwordEntriesClient extends CudamiBaseClient<HeadwordEntry>
   public SearchPageResponse<HeadwordEntry> find(SearchPageRequest pageRequest)
       throws HttpException {
     return this.doGetSearchRequestForPagedObjectList("/v5/headwordentries", pageRequest);
+  }
+
+  public List findByHeadword(UUID headwordUuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/v5/headwordentries/headword/%s", headwordUuid), HeadwordEntry.class);
   }
 
   public HeadwordEntry findOne(UUID uuid) throws HttpException {

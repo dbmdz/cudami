@@ -62,11 +62,44 @@ public class HeadwordEntryController {
     return headwordEntryService.find(pageRequest);
   }
 
+  @Operation(summary = "Get all headwordentries by headword")
+  @GetMapping(
+      value = {
+        "/v5/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<HeadwordEntry> findByHeadword(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the headword, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws IdentifiableServiceException {
+    return headwordEntryService.findByHeadword(uuid);
+  }
+
+  @Operation(summary = "Get an headwordentry by namespace and id")
+  @GetMapping(
+      value = {"/v5/headwordentries/identifier/{namespace}:{id}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public HeadwordEntry findByIdentifier(
+      @Parameter(example = "", description = "Namespace of the identifier")
+          @PathVariable("namespace")
+          String namespace,
+      @Parameter(example = "", description = "value of the identifier") @PathVariable("id")
+          String id)
+      throws IdentifiableServiceException {
+    return headwordEntryService.getByIdentifier(namespace, id);
+  }
+
   @Operation(summary = "Get an headwordentry")
   @GetMapping(
-      value = {"/v5/headwordentries/{uuid}"},
+      value = {
+        "/v5/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<HeadwordEntry> getHeadwordEntry(
+  public ResponseEntity<HeadwordEntry> findByUuid(
       @Parameter(
               example = "",
               description =

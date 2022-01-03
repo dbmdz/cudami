@@ -7,5 +7,7 @@ import java.util.UUID;
 
 public interface HeadwordEntryService extends EntityService<HeadwordEntry> {
 
+  public List<HeadwordEntry> findByHeadword(UUID uuid);
+
   List<Agent> getCreators(UUID headwordEntryUuid);
 }

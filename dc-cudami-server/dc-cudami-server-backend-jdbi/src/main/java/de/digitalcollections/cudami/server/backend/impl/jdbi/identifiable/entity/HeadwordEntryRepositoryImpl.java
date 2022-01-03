@@ -126,6 +126,26 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
+  public List<HeadwordEntry> findByHeadword(UUID headwordUuid) {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " WHERE headword = :uuid"
+                + " ORDER BY date_published ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", headwordUuid);
+
+    List<HeadwordEntry> result =
+        retrieveList(
+            sqlSelectReducedFields,
+            innerQuery,
+            argumentMappings,
+            "ORDER BY " + tableAlias + ".date_published ASC");
+    return result;
+  }
+
+  @Override
   public HeadwordEntry findOne(UUID uuid, Filtering filtering) {
     HeadwordEntry headwordEntry = super.findOne(uuid, filtering);
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiBaseClient;
 import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.model.identifiable.entity.Article;
-import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -38,11 +37,6 @@ public class CudamiHeadwordsClient extends CudamiBaseClient<Headword> {
   public List getRelatedArticles(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("/v5/headwords/%s/related/articles", uuid), Article.class);
-  }
-
-  public List getRelatedHeadwordEntries(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/v5/headwords/%s/related/headwordentries", uuid), HeadwordEntry.class);
   }
 
   public Headword save(Headword headword) throws HttpException {
