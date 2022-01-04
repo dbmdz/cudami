@@ -138,7 +138,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
     List<HeadwordEntry> result =
         retrieveList(
-            sqlSelectReducedFields,
+            sqlSelectAllFields,
             innerQuery,
             argumentMappings,
             "ORDER BY " + tableAlias + ".date_published ASC");
