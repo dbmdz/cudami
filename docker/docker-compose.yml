@@ -13,8 +13,7 @@ services:
   iiif:
     build:
       args:
-        HYMIR_VERSION: "5.0.0"
-        OPENJPEG_VERSION: "2.3.1"
+        HYMIR_VERSION: "5.1.1"
       context: .
       dockerfile: Dockerfile-iiif
     ports:
@@ -26,7 +25,7 @@ services:
   media:
     build:
       args:
-        EUPHORIA_VERSION: "4.0.0"
+        EUPHORIA_VERSION: "4.0.3"
       context: .
       dockerfile: Dockerfile-media
     ports:
