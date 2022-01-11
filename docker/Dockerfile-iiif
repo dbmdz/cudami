@@ -1,15 +1,9 @@
-FROM maven:3.6.3-jdk-11-slim
+FROM openjdk:11-jre-slim
+
+RUN apt update && apt install -y libopenjp2-7 libturbojpeg0
 
 ARG HYMIR_VERSION
 
-ARG OPENJPEG_VERSION
-
-ADD https://github.com/dbmdz/iiif-server-hymir/releases/download/$HYMIR_VERSION/hymir-$HYMIR_VERSION-exec.jar hymir.jar
-
-ENV LD_LIBRARY_PATH $PWD/openjpeg-v$OPENJPEG_VERSION-linux-x86_64/lib
-
-ADD https://github.com/uclouvain/openjpeg/releases/download/v$OPENJPEG_VERSION/openjpeg-v$OPENJPEG_VERSION-linux-x86_64.tar.gz /tmp/openjpeg.tar.gz
-
-RUN tar -xvf /tmp/openjpeg.tar.gz
+ADD https://oss.sonatype.org/content/repositories/releases/de/digitalcollections/iiif-server-hymir/$HYMIR_VERSION/iiif-server-hymir-$HYMIR_VERSION-exec.jar hymir.jar
 
 ENTRYPOINT [ "sh", "-c", "java -jar /hymir.jar --management.server.port=9001 --server.port=9000 --spring.config.additional-location=file:/application-iiif.yml" ]
