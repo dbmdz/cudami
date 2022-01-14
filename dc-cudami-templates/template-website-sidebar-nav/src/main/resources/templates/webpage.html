@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html 
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{base}">
+  <head>
+  </head>
+
+  <body>
+    <th:block layout:fragment="content">
+      <th:block th:if="${webpage}" th:insert="cudami/fragments/webpage-to-html :: renderWebpage(${webpage}, ${locale})">
+      </th:block>  
+    </th:block>  
+  </body>
+</html>
