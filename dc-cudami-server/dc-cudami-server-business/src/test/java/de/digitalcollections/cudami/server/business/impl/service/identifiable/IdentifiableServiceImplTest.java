@@ -21,11 +21,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -105,143 +102,144 @@ class IdentifiableServiceImplTest {
         });
   }
 
-  @DisplayName("does not guarantee URLAliases for some entity types")
-  @Test
-  public void noUrlAliasesForSomeEntityTypes() throws IdentifiableServiceException {
-    DigitalObject identifiable = new DigitalObject();
-    identifiable.setLabel("label");
-    service.ensureDefaultAliasesExist(identifiable);
-    assertThat(identifiable.getLocalizedUrlAliases()).isNull();
-  }
+  //  @DisplayName("does not guarantee URLAliases for some entity types")
+  //  @Test
+  //  public void noUrlAliasesForSomeEntityTypes() throws IdentifiableServiceException {
+  //    DigitalObject identifiable = new DigitalObject();
+  //    identifiable.setLabel("label");
+  //    service.ensureDefaultAliasesExist(identifiable);
+  //    assertThat(identifiable.getLocalizedUrlAliases()).isNull();
+  //  }
+  //
+  //  @DisplayName("can create an LocalizedUrlAlias, when it's missing")
+  //  @Test
+  //  public void createLocalizedUrlAliasWhenMissing() throws IdentifiableServiceException {
+  //    Identifiable identifiable = new Identifiable();
+  //    identifiable.setLabel("label");
+  //    service.ensureDefaultAliasesExist(identifiable);
+  //    assertThat(identifiable.getLocalizedUrlAliases()).isNotNull();
+  //  }
+  //
+  //  @DisplayName("sets all required attribute of a created default UrlAlias")
+  //  @Test
+  //  public void fillsAttributeOnCreatedDefaultUrlAlias()
+  //      throws IdentifiableServiceException, CudamiServiceException {
+  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
+  //        .thenReturn("hallo-welt");
+  //
+  //    UUID expectedTargetUuid = UUID.randomUUID();
+  //
+  //    Entity entity = new Entity();
+  //    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
+  //    entity.setUuid(expectedTargetUuid);
+  //    service.ensureDefaultAliasesExist(entity);
+  //
+  //    UrlAlias actual = entity.getLocalizedUrlAliases().flatten().get(0);
+  //    assertThat(actual.getLastPublished()).isNull(); // is set by the repository
+  //    assertThat(actual.isPrimary()).isTrue();
+  //    assertThat(actual.getCreated()).isNull(); // is set by the repository
+  //    assertThat(actual.getTargetUuid()).isEqualTo(expectedTargetUuid);
+  //    assertThat(actual.getTargetIdentifiableType()).isEqualTo(entity.getType());
+  //    assertThat(actual.getTargetEntityType()).isEqualTo(entity.getEntityType());
+  //    assertThat(actual.getWebsite()).isNull(); // no default website given
+  //    assertThat(actual.getSlug()).isEqualTo("hallo-welt");
+  //    assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
+  //  }
+  //
+  //  @DisplayName("does not create a default UrlAliases for a webpage")
+  //  @Test
+  //  public void noDefaultUrlAliasCreationForWebpage()
+  //      throws CudamiServiceException, IdentifiableServiceException {
+  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
+  //        .thenReturn("hallo-welt");
+  //    UUID expectedTargetUuid = UUID.randomUUID();
+  //
+  //    Identifiable identifiable = new Webpage();
+  //    identifiable.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
+  //    identifiable.setUuid(expectedTargetUuid);
+  //
+  //    service.ensureDefaultAliasesExist(identifiable);
+  //
+  //    assertThat(identifiable.getLocalizedUrlAliases().isEmpty());
+  //  }
 
-  @DisplayName("can create an LocalizedUrlAlias, when it's missing")
-  @Test
-  public void createLocalizedUrlAliasWhenMissing() throws IdentifiableServiceException {
-    Identifiable identifiable = new Identifiable();
-    identifiable.setLabel("label");
-    service.ensureDefaultAliasesExist(identifiable);
-    assertThat(identifiable.getLocalizedUrlAliases()).isNotNull();
-  }
-
-  @DisplayName("sets all required attribute of a created default UrlAlias")
-  @Test
-  public void fillsAttributeOnCreatedDefaultUrlAlias()
-      throws IdentifiableServiceException, CudamiServiceException {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-        .thenReturn("hallo-welt");
-
-    UUID expectedTargetUuid = UUID.randomUUID();
-
-    Entity entity = new Entity();
-    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-    entity.setUuid(expectedTargetUuid);
-    service.ensureDefaultAliasesExist(entity);
-
-    UrlAlias actual = entity.getLocalizedUrlAliases().flatten().get(0);
-    assertThat(actual.getLastPublished()).isNull(); // is set by the repository
-    assertThat(actual.isPrimary()).isTrue();
-    assertThat(actual.getCreated()).isNull(); // is set by the repository
-    assertThat(actual.getTargetUuid()).isEqualTo(expectedTargetUuid);
-    assertThat(actual.getTargetIdentifiableType()).isEqualTo(entity.getType());
-    assertThat(actual.getTargetEntityType()).isEqualTo(entity.getEntityType());
-    assertThat(actual.getWebsite()).isNull(); // no default website given
-    assertThat(actual.getSlug()).isEqualTo("hallo-welt");
-    assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
-  }
-
-  @DisplayName("does not create a default UrlAliases for a webpage")
-  @Test
-  public void noDefaultUrlAliasCreationForWebpage()
-      throws CudamiServiceException, IdentifiableServiceException {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-        .thenReturn("hallo-welt");
-    UUID expectedTargetUuid = UUID.randomUUID();
-
-    Identifiable identifiable = new Webpage();
-    identifiable.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-    identifiable.setUuid(expectedTargetUuid);
-
-    service.ensureDefaultAliasesExist(identifiable);
-
-    assertThat(identifiable.getLocalizedUrlAliases().isEmpty());
-  }
-
-  @DisplayName("adds an url alias for a certain language, when it's missing")
-  @Test
-  public void addUrlAliasWhenMissingInLanguage()
-      throws CudamiServiceException, IdentifiableServiceException {
-    when(urlAliasService.generateSlug(eq(Locale.GERMAN), any(String.class), eq(null)))
-        .thenReturn("hallo-welt");
-    when(urlAliasService.generateSlug(eq(Locale.ENGLISH), any(String.class), eq(null)))
-        .thenReturn("hello-world");
-
-    UUID expectedTargetUuid = UUID.randomUUID();
-
-    Entity entity = new Entity();
-    final LocalizedText label = new LocalizedText(Locale.GERMAN, "Hallo Welt");
-    label.setText(Locale.ENGLISH, "hello world");
-    entity.setLabel(label);
-    entity.setUuid(expectedTargetUuid);
-
-    // Let's assume, we only have localized aliases for the german label yet
-    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
-    UrlAlias germanUrlAlias = new UrlAlias();
-    germanUrlAlias.setPrimary(true);
-    germanUrlAlias.setSlug("hallo-welt");
-    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-    germanUrlAlias.setTargetUuid(expectedTargetUuid);
-    localizedUrlALiases.add(germanUrlAlias);
-    entity.setLocalizedUrlAliases(localizedUrlALiases);
-
-    service.ensureDefaultAliasesExist(entity);
-
-    assertThat(localizedUrlALiases.flatten()).hasSize(2); // german and english
-    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.GERMAN)).isTrue();
-    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.ENGLISH)).isTrue();
-
-    assertThat(localizedUrlALiases.get(Locale.ENGLISH).get(0).getSlug()).isEqualTo("hello-world");
-  }
-
-  @DisplayName("throws an exception, when primary UrlAliases are missing")
-  @Test
-  public void missingPrimaryUrlAliases() {
-    UUID expectedTargetUuid = UUID.randomUUID();
-
-    Entity entity = new Entity();
-    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-    entity.setUuid(expectedTargetUuid);
-
-    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
-    UrlAlias germanUrlAlias = new UrlAlias();
-    germanUrlAlias.setPrimary(false);
-    germanUrlAlias.setSlug("hallo-welt");
-    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-    germanUrlAlias.setTargetUuid(expectedTargetUuid);
-    localizedUrlALiases.add(germanUrlAlias);
-    entity.setLocalizedUrlAliases(localizedUrlALiases);
-
-    assertThrows(
-        IdentifiableServiceException.class,
-        () -> {
-          service.ensureDefaultAliasesExist(entity);
-        });
-  }
-
-  @DisplayName("throws an Exception, when slug generation fails")
-  @Test
-  public void failingSlugGeneration() throws CudamiServiceException {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-        .thenThrow(new CudamiServiceException("boo"));
-
-    Identifiable identifiable = new Identifiable();
-    identifiable.setLabel("label");
-
-    assertThrows(
-        IdentifiableServiceException.class,
-        () -> {
-          service.ensureDefaultAliasesExist(identifiable);
-        });
-  }
+  //  @DisplayName("adds an url alias for a certain language, when it's missing")
+  //  @Test
+  //  public void addUrlAliasWhenMissingInLanguage()
+  //      throws CudamiServiceException, IdentifiableServiceException {
+  //    when(urlAliasService.generateSlug(eq(Locale.GERMAN), any(String.class), eq(null)))
+  //        .thenReturn("hallo-welt");
+  //    when(urlAliasService.generateSlug(eq(Locale.ENGLISH), any(String.class), eq(null)))
+  //        .thenReturn("hello-world");
+  //
+  //    UUID expectedTargetUuid = UUID.randomUUID();
+  //
+  //    Entity entity = new Entity();
+  //    final LocalizedText label = new LocalizedText(Locale.GERMAN, "Hallo Welt");
+  //    label.setText(Locale.ENGLISH, "hello world");
+  //    entity.setLabel(label);
+  //    entity.setUuid(expectedTargetUuid);
+  //
+  //    // Let's assume, we only have localized aliases for the german label yet
+  //    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
+  //    UrlAlias germanUrlAlias = new UrlAlias();
+  //    germanUrlAlias.setPrimary(true);
+  //    germanUrlAlias.setSlug("hallo-welt");
+  //    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
+  //    germanUrlAlias.setTargetUuid(expectedTargetUuid);
+  //    localizedUrlALiases.add(germanUrlAlias);
+  //    entity.setLocalizedUrlAliases(localizedUrlALiases);
+  //
+  //    service.ensureDefaultAliasesExist(entity);
+  //
+  //    assertThat(localizedUrlALiases.flatten()).hasSize(2); // german and english
+  //    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.GERMAN)).isTrue();
+  //    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.ENGLISH)).isTrue();
+  //
+  //
+  // assertThat(localizedUrlALiases.get(Locale.ENGLISH).get(0).getSlug()).isEqualTo("hello-world");
+  //  }
+  //
+  //  @DisplayName("throws an exception, when primary UrlAliases are missing")
+  //  @Test
+  //  public void missingPrimaryUrlAliases() {
+  //    UUID expectedTargetUuid = UUID.randomUUID();
+  //
+  //    Entity entity = new Entity();
+  //    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
+  //    entity.setUuid(expectedTargetUuid);
+  //
+  //    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
+  //    UrlAlias germanUrlAlias = new UrlAlias();
+  //    germanUrlAlias.setPrimary(false);
+  //    germanUrlAlias.setSlug("hallo-welt");
+  //    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
+  //    germanUrlAlias.setTargetUuid(expectedTargetUuid);
+  //    localizedUrlALiases.add(germanUrlAlias);
+  //    entity.setLocalizedUrlAliases(localizedUrlALiases);
+  //
+  //    assertThrows(
+  //        IdentifiableServiceException.class,
+  //        () -> {
+  //          service.ensureDefaultAliasesExist(entity);
+  //        });
+  //  }
+  //
+  //  @DisplayName("throws an Exception, when slug generation fails")
+  //  @Test
+  //  public void failingSlugGeneration() throws CudamiServiceException {
+  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
+  //        .thenThrow(new CudamiServiceException("boo"));
+  //
+  //    Identifiable identifiable = new Identifiable();
+  //    identifiable.setLabel("label");
+  //
+  //    assertThrows(
+  //        IdentifiableServiceException.class,
+  //        () -> {
+  //          service.ensureDefaultAliasesExist(identifiable);
+  //        });
+  //  }
 
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
