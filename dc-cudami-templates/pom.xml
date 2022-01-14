@@ -15,5 +15,6 @@
 
   <modules>
     <module>template-website-springboot</module>
+    <module>template-website-sidebar-nav</module>
   </modules>
 </project>
