@@ -43,21 +43,46 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       CudamiConfig cudamiConfig,
       SlugGeneratorService slugGeneratorService)
       throws CudamiServiceException {
+
+    if (actualIdentifiable == null
+        || identifiableInDatabase == null
+        || cudamiConfig == null
+        || slugGeneratorService == null) {
+      throw new CudamiServiceException(
+          "Missing argument. Every parameter must be passed (not null).");
+    }
+
     IdentifiableUrlAliasAlignHelper<I> inst =
         new IdentifiableUrlAliasAlignHelper<>(
             actualIdentifiable, identifiableInDatabase, cudamiConfig, slugGeneratorService);
-    inst.fixMissingLocalizedUrlAliases();
-    inst.alignLabelUpdate();
-    inst.ensureDefaultAliasesExist();
+    try {
+      inst.fixMissingLocalizedUrlAliases();
+      inst.alignLabelUpdate();
+      inst.ensureDefaultAliasesExist();
+    } catch (RuntimeException e) {
+      throw new CudamiServiceException(
+          "Uncaught error in IdentifiableUrlAliasAlignHelper::alignForUpdate.", e);
+    }
   }
 
   public static <I extends Identifiable> void checkDefaultAliases(
       I actualIdentifiable, CudamiConfig cudamiConfig, SlugGeneratorService slugGeneratorService)
       throws CudamiServiceException {
+
+    if (actualIdentifiable == null || cudamiConfig == null || slugGeneratorService == null) {
+      throw new CudamiServiceException(
+          "Missing argument. Every parameter must be passed (not null).");
+    }
+
     IdentifiableUrlAliasAlignHelper<I> inst =
         new IdentifiableUrlAliasAlignHelper<>(
             actualIdentifiable, null, cudamiConfig, slugGeneratorService);
-    inst.ensureDefaultAliasesExist();
+    try {
+      inst.ensureDefaultAliasesExist();
+    } catch (RuntimeException e) {
+      throw new CudamiServiceException(
+          "Uncaught error in IdentifiableUrlAliasAlignHelper::checkDefaultAliases.", e);
+    }
   }
 
   private void alignLabelUpdate() throws CudamiServiceException {
@@ -166,7 +191,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       }
 
       // check that a primary alias exists for this language, even for webpages
-      if (!urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
+      if (urlAliases.get(lang) == null
+          || !urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
         throw new CudamiServiceException(
             String.format(
                 "There is not any primary alias for language '%s' of identifiable '%s'.",
