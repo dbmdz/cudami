@@ -10,25 +10,14 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConstructorBinding
 public class CudamiConfig {
 
-  private final Map<String, UUID> collections;
   private final Server server;
   private final Map<String, UUID> webpages;
   private final UUID website;
 
-  public CudamiConfig(
-      Map<String, UUID> collections, Server server, Map<String, UUID> webpages, UUID website) {
-    this.collections = collections;
+  public CudamiConfig(Server server, Map<String, UUID> webpages, UUID website) {
     this.server = server;
     this.webpages = webpages;
     this.website = website;
-  }
-
-  public UUID getCollection(String name) {
-    return collections.get(name);
-  }
-
-  public Map<String, UUID> getCollections() {
-    return collections;
   }
 
   public Server getServer() {
@@ -36,6 +25,9 @@ public class CudamiConfig {
   }
 
   public UUID getWebpage(String name) {
+    if (webpages == null) {
+      return null;
+    }
     return webpages.get(name);
   }
 

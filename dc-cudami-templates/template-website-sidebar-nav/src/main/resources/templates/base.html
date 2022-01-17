@@ -22,66 +22,25 @@
             <span class="sr-only">Toggle Menu</span>
           </button>
         </div>
-        <div class="p-4 pt-5">
-          <h1><a th:href="@{/}" class="logo" th:text="${website.label.getText()}">Website label</a></h1>
+        <div class="p-4 pt-3">
+          <div class="text-center">
+            <div th:if="${website.previewImage}">
+              <a th:href="@{/}" class="logo"><img th:src="${website.previewImage.httpBaseUrl} + '/full/200,/0/default.jpg'" /></a>
+            </div>
 
-          <ul class="list-unstyled components mb-5" th:if="${not #lists.isEmpty(rootWebpages)}">
-            <li th:each="webpage : ${rootWebpages}">
-              <a th:utext="${webpage.label.getText(locale)}" th:href="@{/p/__${webpage.uuid}__}">webpage label</a>
-            </li>
-          </ul>
-          
-          <ul class="list-unstyled components mb-5">
-            <li class="active">
-              <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
-              <ul class="collapse list-unstyled" id="homeSubmenu">
-                <li>
-                  <a href="#">Home 1</a>
-                </li>
-                <li>
-                  <a href="#">Home 2</a>
-                </li>
-                <li>
-                  <a href="#">Home 3</a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#">About</a>
-            </li>
-            <li>
-              <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Pages</a>
-              <ul class="collapse list-unstyled" id="pageSubmenu">
-                <li>
-                  <a href="#">Page 1</a>
-                </li>
-                <li>
-                  <a href="#">Page 2</a>
-                </li>
-                <li>
-                  <a href="#">Page 3</a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#">Portfolio</a>
-            </li>
-            <li>
-              <a href="#">Contact</a>
-            </li>
-          </ul>
-          <div class="mb-5">
-            <h3 class="h6">Subscribe for newsletter</h3>
-            <form action="#" class="colorlib-subscribe-form">
-              <div class="form-group d-flex">
-                <div class="icon"><span class="icon-paper-plane"></span></div>
-                <input type="text" class="form-control" placeholder="Enter Email Address">
-              </div>
-            </form>
+            <a th:href="@{/}" class="text-white fs-4" th:text="${website.label.getText()}">Website label</a>
           </div>
+
+          <ul class="list-unstyled components mb-5" th:if="${not #lists.isEmpty(rootWebpages)}" th:with="currentLevel=0,maxLevel=${navMaxLevel}">
+            <li th:each="wp : ${rootWebpages}">
+            <th:block th:insert="fragments/navigation :: renderWebpageNavigationTree(${wp},${currentLevel},${maxLevel})"></th:block>
+            </li>
+          </ul>
+
           <div class="footer">
             <p>
-              Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib.com</a>
+              Design by<br/>
+              <a href="https://colorlib.com" target="_blank">Colorlib.com</a> - <a href="https://creativecommons.org/licenses/by/3.0" target="_blank">CC BY 3.0</a>
             </p>
           </div>
         </div>
@@ -90,6 +49,14 @@
       <div id="content" class="p-4 p-md-5 pt-5">
         <th:block layout:fragment="content">
           ...
+        </th:block>
+
+        <th:block th:if="${footerWebpages}">
+          <footer>
+            <span th:each="wp : ${footerWebpages}" class="m-1">
+              <a th:utext="${wp.label.getText(locale)}" th:href="@{/p/__${wp.uuid}__}">webpage label</a>
+            </span>
+          </footer>
         </th:block>
       </div>
     </div>

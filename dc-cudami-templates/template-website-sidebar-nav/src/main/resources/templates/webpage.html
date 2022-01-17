@@ -6,9 +6,22 @@
   </head>
 
   <body>
-    <th:block layout:fragment="content">
-      <th:block th:if="${webpage}" th:insert="cudami/fragments/webpage-to-html :: renderWebpage(${webpage}, ${locale})">
-      </th:block>  
-    </th:block>  
-  </body>
+  <th:block layout:fragment="content">
+    <div class="row">
+      <div class="col-md-9">
+        <th:block th:if="${webpage}" th:insert="cudami/fragments/webpage-to-html :: renderWebpage(${webpage}, ${locale})">
+        </th:block>
+      </div>
+      <th:block th:if="${not #lists.isEmpty(webpage.children)}">
+        <div class="aside-menu col-md-3 border border-secondary">
+          <ul class="list-unstyled">
+            <li th:each="subpage : ${webpage.children}" class="flex items-baseline">
+              &raquo; <a th:utext="${subpage.label.getText(locale)}" th:href="@{/p/__${subpage.uuid}__}">webpage label</a>
+            </li>
+          </ul>
+        </div>
+      </th:block>
+    </div>
+  </th:block>  
+</body>
 </html>

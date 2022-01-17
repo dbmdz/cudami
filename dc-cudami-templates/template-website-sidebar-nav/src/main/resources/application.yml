@@ -4,5 +4,6 @@ cudami:
 #  webpages:
 #    content: 'c4c4b166-06d4-406a-9e6b-b5b7ce0afc9d'
 #    footer: '254bc49e-3ce3-43f5-8af0-9bc396da107b'
-#    start: '66549eb5-21c4-45d8-8658-d25a6446aac6'
   website: '855ecb67-b2e8-459d-ace3-c48cf77b9bec'
+template:
+  nav-max-level: 3
