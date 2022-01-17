@@ -42,9 +42,10 @@ class IdentifiableServiceImplTest {
   private IdentifierRepository identifierRepository;
 
   @BeforeEach
-  public void beforeEach() {
+  public void beforeEach() throws CudamiServiceException {
     repo = mock(IdentifiableRepository.class);
     urlAliasService = mock(UrlAliasService.class);
+    when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
     identifierRepository = mock(IdentifierRepository.class);
     CudamiConfig cudamiConfig = new CudamiConfig();
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
@@ -101,145 +102,6 @@ class IdentifiableServiceImplTest {
           service.delete(List.of(UUID.randomUUID()));
         });
   }
-
-  //  @DisplayName("does not guarantee URLAliases for some entity types")
-  //  @Test
-  //  public void noUrlAliasesForSomeEntityTypes() throws IdentifiableServiceException {
-  //    DigitalObject identifiable = new DigitalObject();
-  //    identifiable.setLabel("label");
-  //    service.ensureDefaultAliasesExist(identifiable);
-  //    assertThat(identifiable.getLocalizedUrlAliases()).isNull();
-  //  }
-  //
-  //  @DisplayName("can create an LocalizedUrlAlias, when it's missing")
-  //  @Test
-  //  public void createLocalizedUrlAliasWhenMissing() throws IdentifiableServiceException {
-  //    Identifiable identifiable = new Identifiable();
-  //    identifiable.setLabel("label");
-  //    service.ensureDefaultAliasesExist(identifiable);
-  //    assertThat(identifiable.getLocalizedUrlAliases()).isNotNull();
-  //  }
-  //
-  //  @DisplayName("sets all required attribute of a created default UrlAlias")
-  //  @Test
-  //  public void fillsAttributeOnCreatedDefaultUrlAlias()
-  //      throws IdentifiableServiceException, CudamiServiceException {
-  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-  //        .thenReturn("hallo-welt");
-  //
-  //    UUID expectedTargetUuid = UUID.randomUUID();
-  //
-  //    Entity entity = new Entity();
-  //    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-  //    entity.setUuid(expectedTargetUuid);
-  //    service.ensureDefaultAliasesExist(entity);
-  //
-  //    UrlAlias actual = entity.getLocalizedUrlAliases().flatten().get(0);
-  //    assertThat(actual.getLastPublished()).isNull(); // is set by the repository
-  //    assertThat(actual.isPrimary()).isTrue();
-  //    assertThat(actual.getCreated()).isNull(); // is set by the repository
-  //    assertThat(actual.getTargetUuid()).isEqualTo(expectedTargetUuid);
-  //    assertThat(actual.getTargetIdentifiableType()).isEqualTo(entity.getType());
-  //    assertThat(actual.getTargetEntityType()).isEqualTo(entity.getEntityType());
-  //    assertThat(actual.getWebsite()).isNull(); // no default website given
-  //    assertThat(actual.getSlug()).isEqualTo("hallo-welt");
-  //    assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
-  //  }
-  //
-  //  @DisplayName("does not create a default UrlAliases for a webpage")
-  //  @Test
-  //  public void noDefaultUrlAliasCreationForWebpage()
-  //      throws CudamiServiceException, IdentifiableServiceException {
-  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-  //        .thenReturn("hallo-welt");
-  //    UUID expectedTargetUuid = UUID.randomUUID();
-  //
-  //    Identifiable identifiable = new Webpage();
-  //    identifiable.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-  //    identifiable.setUuid(expectedTargetUuid);
-  //
-  //    service.ensureDefaultAliasesExist(identifiable);
-  //
-  //    assertThat(identifiable.getLocalizedUrlAliases().isEmpty());
-  //  }
-
-  //  @DisplayName("adds an url alias for a certain language, when it's missing")
-  //  @Test
-  //  public void addUrlAliasWhenMissingInLanguage()
-  //      throws CudamiServiceException, IdentifiableServiceException {
-  //    when(urlAliasService.generateSlug(eq(Locale.GERMAN), any(String.class), eq(null)))
-  //        .thenReturn("hallo-welt");
-  //    when(urlAliasService.generateSlug(eq(Locale.ENGLISH), any(String.class), eq(null)))
-  //        .thenReturn("hello-world");
-  //
-  //    UUID expectedTargetUuid = UUID.randomUUID();
-  //
-  //    Entity entity = new Entity();
-  //    final LocalizedText label = new LocalizedText(Locale.GERMAN, "Hallo Welt");
-  //    label.setText(Locale.ENGLISH, "hello world");
-  //    entity.setLabel(label);
-  //    entity.setUuid(expectedTargetUuid);
-  //
-  //    // Let's assume, we only have localized aliases for the german label yet
-  //    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
-  //    UrlAlias germanUrlAlias = new UrlAlias();
-  //    germanUrlAlias.setPrimary(true);
-  //    germanUrlAlias.setSlug("hallo-welt");
-  //    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-  //    germanUrlAlias.setTargetUuid(expectedTargetUuid);
-  //    localizedUrlALiases.add(germanUrlAlias);
-  //    entity.setLocalizedUrlAliases(localizedUrlALiases);
-  //
-  //    service.ensureDefaultAliasesExist(entity);
-  //
-  //    assertThat(localizedUrlALiases.flatten()).hasSize(2); // german and english
-  //    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.GERMAN)).isTrue();
-  //    assertThat(localizedUrlALiases.hasTargetLanguage(Locale.ENGLISH)).isTrue();
-  //
-  //
-  // assertThat(localizedUrlALiases.get(Locale.ENGLISH).get(0).getSlug()).isEqualTo("hello-world");
-  //  }
-  //
-  //  @DisplayName("throws an exception, when primary UrlAliases are missing")
-  //  @Test
-  //  public void missingPrimaryUrlAliases() {
-  //    UUID expectedTargetUuid = UUID.randomUUID();
-  //
-  //    Entity entity = new Entity();
-  //    entity.setLabel(new LocalizedText(Locale.GERMAN, "Hallo Welt"));
-  //    entity.setUuid(expectedTargetUuid);
-  //
-  //    LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases();
-  //    UrlAlias germanUrlAlias = new UrlAlias();
-  //    germanUrlAlias.setPrimary(false);
-  //    germanUrlAlias.setSlug("hallo-welt");
-  //    germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-  //    germanUrlAlias.setTargetUuid(expectedTargetUuid);
-  //    localizedUrlALiases.add(germanUrlAlias);
-  //    entity.setLocalizedUrlAliases(localizedUrlALiases);
-  //
-  //    assertThrows(
-  //        IdentifiableServiceException.class,
-  //        () -> {
-  //          service.ensureDefaultAliasesExist(entity);
-  //        });
-  //  }
-  //
-  //  @DisplayName("throws an Exception, when slug generation fails")
-  //  @Test
-  //  public void failingSlugGeneration() throws CudamiServiceException {
-  //    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
-  //        .thenThrow(new CudamiServiceException("boo"));
-  //
-  //    Identifiable identifiable = new Identifiable();
-  //    identifiable.setLabel("label");
-  //
-  //    assertThrows(
-  //        IdentifiableServiceException.class,
-  //        () -> {
-  //          service.ensureDefaultAliasesExist(identifiable);
-  //        });
-  //  }
 
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
@@ -317,7 +179,9 @@ class IdentifiableServiceImplTest {
     identifiable.setUuid(targetUuid);
     identifiable.setLabel(new LocalizedText(Locale.GERMAN, "label"));
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "label"));
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
     UrlAlias urlAlias = new UrlAlias();
@@ -327,7 +191,8 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
+    when(repo.update(eq(identifiable))).thenReturn(identifiable);
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
     verify(urlAliasService, times(1)).deleteAllForTarget(eq(targetUuid));
@@ -353,7 +218,7 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
-    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid))).thenReturn(List.of(urlAlias));
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiable);
 
     service.update(identifiable);
 
@@ -369,6 +234,11 @@ class IdentifiableServiceImplTest {
     identifiable.setUuid(targetUuid);
     identifiable.setLabel(new LocalizedText(Locale.GERMAN, "label"));
 
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "oldlabel"));
+
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
 
     service.update(identifiable);
@@ -382,8 +252,6 @@ class IdentifiableServiceImplTest {
   public void exceptionOnMultiplePrimaryEntries()
       throws CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
-
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
 
     Website website = new Website();
     website.setUuid(UUID.randomUUID());
@@ -411,6 +279,13 @@ class IdentifiableServiceImplTest {
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     identifiable.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
+
+    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.update(identifiable)).thenReturn(identifiable);
+
     when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
@@ -429,9 +304,6 @@ class IdentifiableServiceImplTest {
   public void exceptionOnMultiplePrimaryEntriesBasedOnSlug()
       throws CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
-
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
-    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
 
@@ -456,6 +328,13 @@ class IdentifiableServiceImplTest {
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     identifiable.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
+
+    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.update(identifiable)).thenReturn(identifiable);
+
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
         .validate(eq(localizedUrlAliases));
@@ -472,9 +351,6 @@ class IdentifiableServiceImplTest {
   public void allowMultiplePrimariesForDifferentTuples()
       throws CudamiServiceException, IdentifiableServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
-
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(null);
-    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
 
     Website website = new Website();
     website.setUuid(UUID.randomUUID());
@@ -506,6 +382,12 @@ class IdentifiableServiceImplTest {
     identifiable.setLabel(label);
 
     when(repo.update(identifiable)).thenReturn(identifiable);
+
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "label"));
+
+    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
   }
@@ -539,6 +421,15 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(localizedUrlAliases);
+
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    LocalizedText labelDb = new LocalizedText(Locale.GERMAN, "label");
+    labelDb.setText(Locale.ENGLISH, "label");
+    identifiableInDb.setLabel(labelDb);
+    identifiableInDb.setLocalizedUrlAliases(localizedUrlAliases);
+
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -588,8 +479,15 @@ class IdentifiableServiceImplTest {
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
-    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
-        .thenReturn(List.of(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias));
+
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
+    identifiableInDb.setLabel(label);
+    identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
+
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // new ones
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -610,8 +508,6 @@ class IdentifiableServiceImplTest {
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
-    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
-    label.setText(Locale.ENGLISH, "label");
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
@@ -659,8 +555,15 @@ class IdentifiableServiceImplTest {
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
-    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
-        .thenReturn(List.of(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias));
+
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
+    label.setText(Locale.ENGLISH, "label");
+    identifiableInDb.setLabel(label);
+    identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
+
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // new one
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -675,8 +578,6 @@ class IdentifiableServiceImplTest {
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
-    LocalizedText label = new LocalizedText(Locale.GERMAN, "label");
-    label.setText(Locale.ENGLISH, "label");
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
@@ -712,8 +613,14 @@ class IdentifiableServiceImplTest {
     LocalizedUrlAliases storedUrlAliases = new LocalizedUrlAliases(firstStoredPrimaryUrlAlias);
 
     when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
-    when(urlAliasService.findPrimaryLinksForTarget(eq(targetUuid)))
-        .thenReturn(List.of(firstStoredPrimaryUrlAlias));
+
+    Identifiable identifiableInDb = new Identifiable();
+    identifiableInDb.setUuid(targetUuid);
+    LocalizedText labelDb = new LocalizedText(Locale.GERMAN, "label");
+    identifiableInDb.setLabel(labelDb);
+    identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
+
+    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // aliases in object to update
     UrlAlias firstPrimaryUrlAlias = new UrlAlias(); // equals to DB
