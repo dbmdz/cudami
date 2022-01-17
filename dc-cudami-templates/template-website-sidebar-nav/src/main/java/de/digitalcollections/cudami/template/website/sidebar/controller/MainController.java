@@ -31,6 +31,10 @@ public class MainController {
   @GetMapping(value = {"", "/"})
   public String home(Model model) {
     log.info("Homepage requested");
+
+    Webpage startPage = contentService.getStartPage();
+    model.addAttribute("startPage", startPage);
+
     return "index";
   }
 

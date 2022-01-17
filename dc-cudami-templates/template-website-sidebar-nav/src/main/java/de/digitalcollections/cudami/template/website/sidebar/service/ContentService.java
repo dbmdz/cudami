@@ -36,33 +36,30 @@ public class ContentService {
     this.cudamiWebsitesClient = cudamiClient.forWebsites();
   }
 
-  private Locale getLocale(Webpage webpage) {
-    if (webpage == null) {
-      return null;
-    }
-    return webpage.getLabel().getLocales().iterator().next();
-  }
-
-  public List<Webpage> getSitemap() {
+  public List<Webpage> getContentPages() {
     try {
       // get website
       Website website = getWebsite();
 
-      // get root webpages
-      PageRequest pageRequest = PageRequest.defaultBuilder().pageSize(100).build();
-      PageResponse<Webpage> rootPagesResponse =
-          cudamiWebsitesClient.getRootPages(website.getUuid(), pageRequest);
-      List<Webpage> allRootWebpages = rootPagesResponse.getContent();
+      List<Webpage> allRootWebpages;
+
+      if (cudamiConfig.getWebpage("content") == null) {
+        // get root webpages
+        PageRequest pageRequest = PageRequest.defaultBuilder().pageSize(100).build();
+        PageResponse<Webpage> rootPagesResponse =
+            cudamiWebsitesClient.getRootPages(website.getUuid(), pageRequest);
+        allRootWebpages = rootPagesResponse.getContent();
+      } else {
+        Pair<Webpage, Locale> webpagePair = getWebpage(cudamiConfig.getWebpage("content"));
+        Webpage webpage = webpagePair.getLeft();
+        allRootWebpages = webpage.getChildren();
+      }
 
       List<Webpage> activeRootWebpages =
           allRootWebpages.stream()
               .filter(
                   f -> {
-                    LocalDate now = LocalDate.now();
-                    return (f.getPublicationStart() != null
-                            && f.getPublicationStart().compareTo(now) <= 0)
-                        && (f.getPublicationEnd() == null
-                            || f.getPublicationEnd().compareTo(now) > 0);
+                    return isActive(f);
                   })
               .collect(Collectors.toList());
 
@@ -77,6 +74,33 @@ public class ContentService {
       log.warn("Could not fetch root webpages due to exc={}", ex);
       return null;
     }
+  }
+
+  public List<Webpage> getFooterPages() {
+    if (cudamiConfig.getWebpage("footer") != null) {
+      Pair<Webpage, Locale> webpagePair = getWebpage(cudamiConfig.getWebpage("footer"));
+      if (webpagePair != null) {
+        Webpage webpage = webpagePair.getLeft();
+        return webpage.getChildren();
+      }
+    }
+    return null;
+  }
+
+  private Locale getLocale(Webpage webpage) {
+    if (webpage == null) {
+      return null;
+    }
+    return webpage.getLabel().getLocales().iterator().next();
+  }
+
+  public Webpage getStartPage() {
+    if (cudamiConfig.getWebpage("content") != null) {
+      Pair<Webpage, Locale> webpagePair = getWebpage(cudamiConfig.getWebpage("content"));
+      Webpage webpage = webpagePair.getLeft();
+      return webpage;
+    }
+    return null;
   }
 
   public Pair<Webpage, Locale> getWebpage(UUID uuid) {
@@ -98,8 +122,14 @@ public class ContentService {
     try {
       return cudamiWebsitesClient.findOne(websiteUuid);
     } catch (HttpException ex) {
-      log.error("Website with UUID {} can not be loaded.", websiteUuid);
+      log.error("Website with UUID {} can not be loaded due to exc={}", websiteUuid, ex);
       return null;
     }
+  }
+
+  public boolean isActive(Webpage f) {
+    LocalDate now = LocalDate.now();
+    return (f.getPublicationStart() != null && f.getPublicationStart().compareTo(now) <= 0)
+        && (f.getPublicationEnd() == null || f.getPublicationEnd().compareTo(now) > 0);
   }
 }

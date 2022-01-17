@@ -6,10 +6,16 @@
   </head>
 
   <body>
-    <th:block layout:fragment="content">
+  <th:block layout:fragment="content">
+    <th:block th:if="${startPage} AND ${startPage.text}">
+      <th:block th:insert="cudami/fragments/webpage-to-html :: renderWebpage(${startPage}, ${locale})">
+      </th:block>
+    </th:block>
+    <th:block th:unless="${startPage} AND ${startPage.text}">
       <th:block th:if="${website} AND ${website.description}">
         <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${website.description}, ${locale})"></th:block>
       </th:block>
-    </th:block>  
-  </body>
+    </th:block>
+  </th:block>  
+</body>
 </html>
