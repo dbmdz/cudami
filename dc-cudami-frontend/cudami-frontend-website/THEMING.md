@@ -63,11 +63,7 @@ These model-objects are available for usage in your templates:
 | Model object | Data type | Description | Scope |
 | --- | --- | --- | --- |
 | ${website} | [de.digitalcollections.model.identifiable.entity.Website](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/entity/Website.java) | The given website to be shown | global |
-| ${contentWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; |
-
-* the top level webpages of the given website (if no content root page has been given by using `-Dcudami.webpages.content=...`)
-* the children webpages of the configured "content"-webpage (if content root page has been given)
- | global |
+| ${contentWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; | <ul><li>the top level webpages of the given website (if no content root page has been given by using `-Dcudami.webpages.content=...`)</li><li>the children webpages of the configured "content"-webpage (if content root page has been given)</li></ul> | global |
 | ${footerWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; | the children webpages of the configured "footer"-webpage of the given website (if footer root page has been given by using `-Dcudami.webpages.footer=...`) | global |
 | ${navMaxLevel} | int | the maximum hierarchy level of content pages to be rendered e.g. in a navigation tree (defaults to "3" if not configured by using `-Dtemplate.navMaxLevel=...`) | global |
 | ${webpage} | [de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java) | the webpage to be shown | webpage.html |
