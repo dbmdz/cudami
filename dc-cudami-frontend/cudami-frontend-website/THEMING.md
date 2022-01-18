@@ -48,7 +48,7 @@ my-theme/templates/my-theme/webpage.html
 
 Have a look at the default templates in this project under `src/main/resources/templates/colorlib-sidebar-v2`.
 
-As you will notice these templates use a common `base.html` template for the pages basic design, just filling the content part (`fragment`) into the `base` template using the Thymeleaf Layout Dialect-Library.  For documentation on this visit the homepage of the Thymeleaf extension `[Thymeleaf Layout Dialect}(https://ultraq.github.io/thymeleaf-layout-dialect/)`. The extension is included and ready to use for your themes. Using a `base.html` is strongly encouraged.
+As you will notice these templates use a common `base.html` template for the pages basic design, just filling the content part (`fragment`) into the `base` template using the Thymeleaf Layout Dialect-Library.  For documentation on this visit the homepage of the Thymeleaf extension `[Thymeleaf Layout Dialect](https://ultraq.github.io/thymeleaf-layout-dialect/)`. The extension is included and ready to use for your themes. Using a `base.html` is strongly encouraged.
 
 In this case at least these threee templates have to be implemented:
 
@@ -63,8 +63,11 @@ These model-objects are available for usage in your templates:
 | Model object | Data type | Description | Scope |
 | --- | --- | --- | --- |
 | ${website} | [de.digitalcollections.model.identifiable.entity.Website](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/entity/Website.java) | The given website to be shown | global |
-| ${contentWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; | * the top level webpages of the given website (if no content root page has been given by using `-Dcudami.webpages.content=...`)
-* the children webpages of the configured "content"-webpage (if content root page has been given) | global |
+| ${contentWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; |
+
+* the top level webpages of the given website (if no content root page has been given by using `-Dcudami.webpages.content=...`)
+* the children webpages of the configured "content"-webpage (if content root page has been given)
+ | global |
 | ${footerWebpages} | List&lt;[de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java)&gt; | the children webpages of the configured "footer"-webpage of the given website (if footer root page has been given by using `-Dcudami.webpages.footer=...`) | global |
 | ${navMaxLevel} | int | the maximum hierarchy level of content pages to be rendered e.g. in a navigation tree (defaults to "3" if not configured by using `-Dtemplate.navMaxLevel=...`) | global |
 | ${webpage} | [de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java) | the webpage to be shown | webpage.html |
@@ -90,8 +93,8 @@ $ jar -tvf my-theme.jar
 
 5. Use theme package
 
-1. Create a `themes` directory in the directory containing the executable JAR-file of the webapp, e.g. `template-website-sidebar-nav-0.0.1-SNAPSHOT.jar`.
-2. Copy your theme's JAR-file (e.g. `my-theme.jar`) into the `themes` directory.
+* Create a `themes` directory in the directory containing the executable JAR-file of the webapp, e.g. `template-website-sidebar-nav-0.0.1-SNAPSHOT.jar`.
+* Copy your theme's JAR-file (e.g. `my-theme.jar`) into the `themes` directory.
 
 In order to use external JAR-files in the cudami frontend webapp, the webapp has to be started differently using the features of the spring boot [`PropertiesLauncher`](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.property-launcher)
 
