@@ -89,7 +89,7 @@ $ jar -tvf my-theme.jar
 
 5. Use theme package
 
-* Create a `themes` directory in the directory containing the executable JAR-file of the webapp, e.g. `template-website-sidebar-nav-0.0.1-SNAPSHOT.jar`.
+* Create a `themes` directory in the directory containing the executable JAR-file of the webapp, e.g. `cudami-frontend-website-1.0.0-SNAPSHOT.jar`.
 * Copy your theme's JAR-file (e.g. `my-theme.jar`) into the `themes` directory.
 
 In order to use external JAR-files in the cudami frontend webapp, the webapp has to be started differently using the features of the spring boot [`PropertiesLauncher`](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.property-launcher)
