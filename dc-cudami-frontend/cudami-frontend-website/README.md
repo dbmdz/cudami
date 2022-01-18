@@ -78,4 +78,4 @@ The cudami frontend webapp comes packaged with one theme, called `colorlib-sideb
 
 ### Create a custom theme
 
-Read our <THEMING.md> documentation.
+Read our [Theming documentation](THEMING.md).
