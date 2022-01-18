@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.template.website.sidebar.controller;
 
+import de.digitalcollections.cudami.template.website.sidebar.config.TemplateConfig;
 import de.digitalcollections.cudami.template.website.sidebar.service.ContentService;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.lang.invoke.MethodHandles;
@@ -23,8 +24,10 @@ public class MainController {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final ContentService contentService;
+  private final TemplateConfig templateConfig;
 
-  public MainController(ContentService contentService) {
+  public MainController(TemplateConfig templateConfig, ContentService contentService) {
+    this.templateConfig = templateConfig;
     this.contentService = contentService;
   }
 
@@ -35,7 +38,7 @@ public class MainController {
     Webpage startPage = contentService.getStartPage();
     model.addAttribute("startPage", startPage);
 
-    return "index";
+    return templateConfig.getName() + "/index";
   }
 
   /**
@@ -55,6 +58,6 @@ public class MainController {
     final Locale locale = tuple.getRight();
     model.addAttribute("locale", locale);
     model.addAttribute("webpage", webpage);
-    return "webpage";
+    return templateConfig.getName() + "/webpage";
   }
 }
