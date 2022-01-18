@@ -33,7 +33,7 @@
     "i18next": "^21.6.6",
     "lodash": "^4.17.21",
     "object.fromentries": "^2.0.5",
-    "prosemirror-commands": "^1.1.12",
+    "prosemirror-commands": "^1.2.0",
     "prosemirror-dropcursor": "^1.4.0",
     "prosemirror-gapcursor": "^1.2.1",
     "prosemirror-history": "^1.2.0",
