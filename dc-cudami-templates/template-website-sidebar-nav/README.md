@@ -72,7 +72,7 @@ The cudami frontend webapp comes packaged with one theme, called `colorlib-sideb
 
 ### Theme "colorlib-sidebar-v2"
 
-<a href="./screenshots/colorlib-sidebar-v2.png" target="_blank"><img src="./screenshots/colorlib-sidebar-v2.png" width="100"/></a>
+<a href="./screenshots/colorlib-sidebar-v2.png" target="_blank"><img src="./screenshots/colorlib-sidebar-v2.png" width="250"/></a>
 
 ### Create a custom theme
 
