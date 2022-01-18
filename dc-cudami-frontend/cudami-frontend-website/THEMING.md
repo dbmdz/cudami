@@ -68,7 +68,7 @@ These model-objects are available for usage in your templates:
 | ${navMaxLevel} | int | the maximum hierarchy level of content pages to be rendered e.g. in a navigation tree (defaults to "3" if not configured by using `-Dtemplate.navMaxLevel=...`) | global |
 | ${webpage} | [de.digitalcollections.model.identifiable.web.Webpage](https://github.com/dbmdz/digitalcollections-model/blob/main/dc-model/src/main/java/de/digitalcollections/model/identifiable/web/Webpage.java) | the webpage to be shown | webpage.html |
 
-These objects are added through the controller advice class `src/main/java/de/digitalcollections/cudami/frontend/website/controller/advice/GlobalControllerAdvice.java` or template specific in `src/main/java/de/digitalcollections/cudami/frontend/website/controller/MainController.java`.
+These objects are added through the controller advice class [GlobalControllerAdvice.java](src/main/java/de/digitalcollections/cudami/frontend/website/controller/advice/GlobalControllerAdvice.java) or template specific in [MainController.java](src/main/java/de/digitalcollections/cudami/frontend/website/controller/MainController.java).
 
 4. Create theme package
 
