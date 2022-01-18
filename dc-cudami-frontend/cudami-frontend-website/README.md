@@ -68,7 +68,7 @@ $ java \
 
 ## Themes
 
-cudami frontend webapp themes are based on the template engine `[Thymeleaf](https://www.thymeleaf.org/)`. Please make sure to read the Thymeleaf documentation when you try to understand how themes work.
+cudami frontend webapp themes are based on the template engine [Thymeleaf](https://www.thymeleaf.org/). Please make sure to read the Thymeleaf documentation when you try to understand how themes work.
 
 The cudami frontend webapp comes packaged with one theme, called `colorlib-sidebar-v2`, which is used by default.
 
