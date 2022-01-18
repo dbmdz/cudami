@@ -65,3 +65,18 @@ $ java \
   -Dtemplate.navMaxLevel=2 \
   -jar target/template-website-sidebar-nav-0.0.1-SNAPSHOT.jar
 ```
+
+## Themes
+
+The cudami frontend webapp comes packaged with one theme, called `colorlib-sidebar-v2`.
+
+### Theme "colorlib-sidebar-v2"
+
+<a href="./screenshots/colorlib-sidebar-v2.png" target="_blank"><img src="./screenshots/colorlib-sidebar-v2.png" width="100"/></a>
+
+### Create a custom theme
+
+-Dtemplate.name=...
+
+
+TODO
