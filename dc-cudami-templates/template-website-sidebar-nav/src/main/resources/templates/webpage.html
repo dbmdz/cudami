@@ -13,7 +13,7 @@
         </th:block>
       </div>
       <th:block th:if="${not #lists.isEmpty(webpage.children)}">
-        <div class="aside-menu col-md-3 border border-secondary">
+        <div class="aside-menu col-md-3">
           <ul class="list-unstyled">
             <li th:each="subpage : ${webpage.children}" class="flex items-baseline">
               &raquo; <a th:utext="${subpage.label.getText(locale)}" th:href="@{/p/__${subpage.uuid}__}">webpage label</a>

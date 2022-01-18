@@ -2,6 +2,12 @@ div.aside-menu {
   max-width: fit-content;
 }
 
+div.aside-menu ul {
+  margin-left: 0;
+  border-left: dotted 1px #c8cbcf;
+  padding-left: 10px;
+}
+
 div.aside-menu li {
   padding-top: 5px;
 }
@@ -40,6 +46,15 @@ footer {
 
 .fs-6 {
   font-size: 1rem !important;
+}
+
+#sidebar ul li a {
+  padding: 5px 0;
+}
+
+.webpage-description {
+  font-size: 0.9em;
+  font-style: italic;
 }
 
 .webpage-label {
