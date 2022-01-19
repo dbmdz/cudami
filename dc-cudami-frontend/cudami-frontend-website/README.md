@@ -43,7 +43,7 @@ If you want to cluster your website's webpages into pages that are
 
 you can specify the parent webpage UUID for
 
--  content pages using `-Dcudami.webpages.content` and
+- content pages using `-Dcudami.webpages.content` and
 - footer pages using `-Dcudami.webpages.footer`
 
 #### Navigation levels
