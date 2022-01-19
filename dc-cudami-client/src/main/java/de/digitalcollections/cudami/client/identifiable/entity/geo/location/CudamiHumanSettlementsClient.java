@@ -14,14 +14,6 @@ public class CudamiHumanSettlementsClient extends CudamiIdentifiablesClient<Huma
     super(http, serverUrl, HumanSettlement.class, mapper, "/v5/humansettlements");
   }
 
-  public HumanSettlement create() {
-    return new HumanSettlement();
-  }
-
-  public PageResponse<HumanSettlement> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
-  }
-
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
     return findByLanguageAndInitial(baseEndpoint, pageRequest, language, initial);
