@@ -29,21 +29,6 @@ public class CudamiDigitalObjectsClient extends CudamiIdentifiablesClient<Digita
         doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid)));
   }
 
-  public PageResponse<DigitalObject> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
-  }
-
-  public SearchPageResponse<DigitalObject> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search", searchPageRequest);
-  }
-
-  public List<DigitalObject> find(String searchTerm, int maxResults) throws HttpException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<DigitalObject> response = find(searchPageRequest);
-    return response.getContent();
-  }
-
   public List<DigitalObject> findAllReduced() throws HttpException {
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
   }
