@@ -50,7 +50,7 @@ Have a look at the default templates in this project under `src/main/resources/t
 
 As you will notice these templates use a common `base.html` template for the pages basic design, just filling the content part (`fragment`) into the `base` template using the Thymeleaf Layout Dialect-Library.  For documentation on this visit the homepage of the Thymeleaf extension `[Thymeleaf Layout Dialect](https://ultraq.github.io/thymeleaf-layout-dialect/)`. The extension is included and ready to use for your themes. Using a `base.html` is strongly encouraged.
 
-In this case at least these threee templates have to be implemented:
+In this case at least these three templates have to be implemented:
 
 ```
 my-theme/templates/my-theme/base.html
