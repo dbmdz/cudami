@@ -9,11 +9,18 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.NullHandling;
+import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -177,6 +184,53 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   }
 
   @Test
+  @DisplayName("can find by language and initial with plain attributes")
+  public void findByLanguageAndInitial() throws Exception {
+    client.findByLanguageAndInitial(
+        SERVER_URL + baseEndpoint, 1, 2, "label", "ASC", "NATIVE", "de", "a");
+
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=label.asc");
+  }
+
+  @Test
+  @DisplayName("can find by language, initial and full featured PageRequest")
+  public void findByLanguageInitialPageRequest() throws Exception {
+    PageRequest pageRequest = buildExamplePageRequest();
+    client.findByLanguageAndInitial(SERVER_URL + baseEndpoint, pageRequest, "de", "a");
+
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get",
+        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+  }
+
+  /**
+   * Creates an example PageRequest, which fills all possible fields
+   *
+   * @return
+   */
+  protected PageRequest buildExamplePageRequest() {
+    Direction direction = Direction.DESC;
+    Order order = new Order(direction, true, NullHandling.NULLS_FIRST, "sortable");
+    Sorting sorting = new Sorting(order);
+    FilterCriterion filterCriterion1 = new FilterCriterion("foo", FilterOperation.EQUALS, "bar");
+    FilterCriterion filterCriterion2 =
+        new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
+    Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
+    PageRequest pageRequest = new PageRequest(1, 2, sorting, filtering);
+    return pageRequest;
+  }
+
+  protected void verifyHttpRequestByMethodAndRelativeURL(String method, String url)
+      throws IOException, InterruptedException {
+    verify(httpClient, times(1))
+        .send(httpRequestCaptor.capture(), any(HttpResponse.BodyHandler.class));
+    HttpRequest actualRequest = httpRequestCaptor.getValue();
+    assertThat(actualRequest.method()).isEqualToIgnoringCase(method);
+    assertThat(actualRequest.uri()).isEqualTo(URI.create(SERVER_URL + baseEndpoint + url));
+  }
+
+  @Test
   @DisplayName("can save an identifiable")
   public void save() throws Exception {
     I toSave = client.create();
@@ -196,15 +250,6 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     client.update(uuid, toUpdate);
 
     verifyHttpRequestByMethodRelativeUrlAndRequestBody("put", "/" + uuid, toUpdate);
-  }
-
-  protected void verifyHttpRequestByMethodAndRelativeURL(String method, String url)
-      throws IOException, InterruptedException {
-    verify(httpClient, times(1))
-        .send(httpRequestCaptor.capture(), any(HttpResponse.BodyHandler.class));
-    HttpRequest actualRequest = httpRequestCaptor.getValue();
-    assertThat(actualRequest.method()).isEqualToIgnoringCase(method);
-    assertThat(actualRequest.uri()).isEqualTo(URI.create(SERVER_URL + baseEndpoint + url));
   }
 
   protected void verifyHttpRequestByMethodRelativeUrlAndRequestBody(
