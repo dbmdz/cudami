@@ -21,17 +21,17 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<GeoLocation> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/v5/geolocations", pageRequest);
+    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
   public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
       throws HttpException {
-    return doGetSearchRequestForPagedObjectList("/v5/geolocations", searchPageRequest);
+    return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws HttpException {
-    return findByLanguageAndInitial("/v5/geolocations", pageRequest, language, initial);
+    return findByLanguageAndInitial(baseEndpoint, pageRequest, language, initial);
   }
 
   public PageResponse<GeoLocation> findByLanguageAndInitial(
@@ -44,7 +44,7 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
       String initial)
       throws HttpException {
     return findByLanguageAndInitial(
-        "/v5/geolocations",
+        baseEndpoint,
         pageNumber,
         pageSize,
         sortField,
@@ -56,10 +56,10 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
 
   public GeoLocation findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("/v5/geolocations/identifier?namespace=%s&id=%s", namespace, id));
+        String.format("%s/identifier?namespace=%s&id=%s", baseEndpoint, namespace, id));
   }
 
   public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList("/v5/geolocations/languages", Locale.class);
+    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

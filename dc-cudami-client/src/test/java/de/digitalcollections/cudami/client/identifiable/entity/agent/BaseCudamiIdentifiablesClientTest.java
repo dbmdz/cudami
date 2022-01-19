@@ -205,9 +205,17 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   }
 
   /**
-   * Creates an example PageRequest, which fills all possible fields
+   * Creates an example PageRequest, which fills all possible fields:
    *
-   * @return
+   * <ul>
+   *   <li>first filter: Expression "foo" must be equal to "bar"
+   *   <li>second filter: Expression "gnarf" must be equal to "krchch"
+   *   <li>order: Descending for property "sortable" and nulls first
+   *   <li>pageNumber: 1
+   *   <li>pageSize: 2
+   * </ul>
+   *
+   * @return example PageRequest with defined pageSize, pageNumber, sorting and two filters
    */
   protected PageRequest buildExamplePageRequest() {
     Direction direction = Direction.DESC;
@@ -217,8 +225,26 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     FilterCriterion filterCriterion2 =
         new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
     Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
-    PageRequest pageRequest = new PageRequest(1, 2, sorting, filtering);
-    return pageRequest;
+    return new PageRequest(1, 2, sorting, filtering);
+  }
+
+  /**
+   * Creates an example SearchPageRequest, which fills all possible fields:
+   *
+   * <ul>
+   *   <li>order: Descending for property "sortable" and nulls first
+   *   <li>pageNumber: 1
+   *   <li>pageSize: 2
+   *   <li>searchTerm: "foo"
+   * </ul>
+   *
+   * @return example SearchPageRequest with defined pageSize, pageNumber, sorting and searchTerm
+   */
+  protected SearchPageRequest buildExampleSearchPageRequest() {
+    Direction direction = Direction.DESC;
+    Order order = new Order(direction, true, NullHandling.NULLS_FIRST, "sortable");
+    Sorting sorting = new Sorting(order);
+    return new SearchPageRequest("foo", 1, 2, sorting);
   }
 
   protected void verifyHttpRequestByMethodAndRelativeURL(String method, String url)
@@ -253,7 +279,8 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   }
 
   protected void verifyHttpRequestByMethodRelativeUrlAndRequestBody(
-      String method, String url, I requestBodyObject) throws IOException, InterruptedException {
+      String method, String url, Object requestBodyObject)
+      throws IOException, InterruptedException {
     verify(httpClient, times(1))
         .send(httpRequestCaptor.capture(), any(HttpResponse.BodyHandler.class));
     HttpRequest actualRequest = httpRequestCaptor.getValue();
