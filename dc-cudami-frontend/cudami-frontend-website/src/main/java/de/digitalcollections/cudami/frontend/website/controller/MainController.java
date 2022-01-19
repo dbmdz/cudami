@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.frontend.website.controller;
 import de.digitalcollections.cudami.frontend.website.config.TemplateConfig;
 import de.digitalcollections.cudami.frontend.website.service.ContentService;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 /** see GlobalControllerAdvice for global model objects */
 public class MainController {
 
-  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class);
 
   private final ContentService contentService;
   private final TemplateConfig templateConfig;
@@ -33,7 +32,7 @@ public class MainController {
 
   @GetMapping(value = {"", "/"})
   public String home(Model model) {
-    log.info("Homepage requested");
+    LOGGER.debug("Homepage requested");
 
     Webpage startPage = contentService.getStartPage();
     model.addAttribute("startPage", startPage);
@@ -50,6 +49,7 @@ public class MainController {
    */
   @GetMapping(value = {"/p/{uuid}"})
   public String viewWebpage(@PathVariable UUID uuid, Model model, HttpServletResponse resp) {
+    LOGGER.debug("Webpage {} requested", uuid);
     Pair<Webpage, Locale> tuple = contentService.getWebpage(uuid);
     Webpage webpage = tuple.getLeft();
     if (webpage == null) {
