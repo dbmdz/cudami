@@ -20,13 +20,12 @@ Copy the UUID of the created website and start this webapp
 as params like this, e.g.:
 
 ```
-java \
-  -Dcudami.server.url=http://localhost:9000 \
-  -Dcudami.website=ea9ddc66-e822-4867-9585-a43c6ed8bd98 \
-  -jar cudami-frontend-website-1.0.0-SNAPSHOT.jar
+java -jar cudami-frontend-website-1.0.0-SNAPSHOT.jar \
+  --cudami.server.url=http://localhost:9000 \
+  --cudami.website=ea9ddc66-e822-4867-9585-a43c6ed8bd98
 ```
 
-(Note: pass `-D`-arguments before `-jar`-argument)
+(Note: pass arguments with double dash `--` AFTER `-jar`-argument)
 
 Open your browser and request `http://localhost:8080`.
 
@@ -43,27 +42,34 @@ If you want to cluster your website's webpages into pages that are
 
 you can specify the parent webpage UUID for
 
-- content pages using `-Dcudami.webpages.content` and
-- footer pages using `-Dcudami.webpages.footer`
+- content pages using `--cudami.webpages.content` and
+- footer pages using `--cudami.webpages.footer`
 
 #### Navigation levels
 
 To specify how many hierarchical webpage levels should be shown in sidebar navigation,
-the config property `template.navMaxLevel` has to be provided (by specifiying e.g. `-Dtemplate.navMaxLevel=2`)
+the config property `template.navMaxLevel` has to be provided (by specifying e.g. `--template.navMaxLevel=2`)
 If you do not specify the property, the default is `3`.
+
+#### Logging level
+
+By default the logging level is set to `INFO`.
+If you want to change the logging level exclusively (not globally) for the webapp classes e.g. to `DEBUG`
+set the config property `logging.level.de.digitalcollections.cudami.frontend` to `DEBUG`
+(by specifying `--logging.level.de.digitalcollections.cudami.frontend=DEBUG`)
 
 #### Complete example
 
-An example using all possible configuration properties:
+An example using all possible configuration properties (debug logging level included):
 
 ```
-$ java \
-  -Dcudami.server.url=http://localhost:9000 \
-  -Dcudami.website=ea9ddc66-e822-4867-9585-a43c6ed8bd98 \
-  -Dcudami.webpages.content=ead664b6-5fcc-414e-b3bb-133f0af1acb8 \
-  -Dcudami.webpages.footer=6bcce154-e216-4223-a4f7-d9aa99d42695 \
-  -Dtemplate.navMaxLevel=2 \
-  -jar target/cudami-frontend-website-1.0.0-SNAPSHOT.jar
+$ java -jar cudami-frontend-website-1.0.0-SNAPSHOT.jar \
+  --cudami.server.url=http://localhost:9000 \
+  --cudami.website=ea9ddc66-e822-4867-9585-a43c6ed8bd98 \
+  --cudami.webpages.content=ead664b6-5fcc-414e-b3bb-133f0af1acb8 \
+  --cudami.webpages.footer=6bcce154-e216-4223-a4f7-d9aa99d42695 \
+  --template.navMaxLevel=2 \
+  --logging.level.de.digitalcollections.cudami.frontend=DEBUG
 ```
 
 ## Themes
