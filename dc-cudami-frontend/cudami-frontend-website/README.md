@@ -48,7 +48,7 @@ you can specify the parent webpage UUID for
 
 #### Navigation levels
 
-To specifiy how many hierarchical webpage levels should be shown in sidebar navigation
+To specify how many hierarchical webpage levels should be shown in sidebar navigation,
 the config property `template.navMaxLevel` has to be provided (by specifiying e.g. `-Dtemplate.navMaxLevel=2`)
 If you do not specify the property, the default is `3`.
 
