@@ -55,12 +55,7 @@ public class ContentService {
       }
 
       List<Webpage> activeContentWebpages =
-          allContentWebpages.stream()
-              .filter(
-                  f -> {
-                    return isActive(f);
-                  })
-              .collect(Collectors.toList());
+          allContentWebpages.stream().filter(this::isActive).collect(Collectors.toList());
 
       // fill active children tree of each active root webpage
       for (Webpage activeContentWebpage : activeContentWebpages) {
