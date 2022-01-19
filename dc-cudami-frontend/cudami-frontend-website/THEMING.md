@@ -96,6 +96,7 @@ In order to use external JAR-files in the cudami frontend webapp, the webapp has
 
 We have to
 
+* give all config properties prefixed with `-D` instead of `--` (IMPORTANT: directly after `java` command)
 * configure `loader.path` pointing to `themes` directory and
 * specify the theme name by passing `template.name` and
 * put the executable jar into classpath using `-cp` option.
