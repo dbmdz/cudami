@@ -22,7 +22,7 @@ public class CudamiPersonsClient extends CudamiIdentifiablesClient<Person> {
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<Person> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
+    return super.find(pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(

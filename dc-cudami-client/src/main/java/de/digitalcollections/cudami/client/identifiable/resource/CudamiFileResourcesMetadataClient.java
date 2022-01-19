@@ -24,18 +24,12 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
+    return super.find(pageRequest);
   }
 
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
-  }
-
-  public List<FileResource> find(String searchTerm, int maxResults) throws HttpException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<FileResource> response = find(searchPageRequest);
-    return response.getContent();
   }
 
   public SearchPageResponse<FileResource> findFileResourcesByType(

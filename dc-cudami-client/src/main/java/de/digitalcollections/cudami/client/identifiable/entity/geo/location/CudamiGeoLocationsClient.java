@@ -21,11 +21,12 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
   public PageResponse<GeoLocation> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
+    return super.find(pageRequest);
   }
 
   public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
       throws HttpException {
+    // Interestingly without "/search" in the path
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
