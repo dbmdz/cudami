@@ -15,7 +15,7 @@
 
   <properties>
     <version.dc-commons-jdbi>4.2.2-SNAPSHOT</version.dc-commons-jdbi>
-    <version.jdbi>3.20.1</version.jdbi>
+    <version.jdbi>3.27.0</version.jdbi>
     <version.testcontainers>1.16.3</version.testcontainers>
     <version.dc-commons-web>0.1.0-SNAPSHOT</version.dc-commons-web>
   </properties>
