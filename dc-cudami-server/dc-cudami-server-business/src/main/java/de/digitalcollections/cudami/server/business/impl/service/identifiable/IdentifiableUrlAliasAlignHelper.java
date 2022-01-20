@@ -37,6 +37,16 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     this.slugGeneratorService = slugGeneratorService;
   }
 
+  /**
+   * Align all UrlAliases to fit in with the updating/updated identifiable. It is also ensured that
+   * default aliases exist and missing ones are created.
+   *
+   * @param actualIdentifiable the object that is/was updated
+   * @param identifiableInDatabase the existing object saved in storage prior to any update
+   * @param cudamiConfig
+   * @param slugGeneratorService slug generator method
+   * @throws CudamiServiceException
+   */
   public static <I extends Identifiable> void alignForUpdate(
       I actualIdentifiable,
       I identifiableInDatabase,
@@ -65,6 +75,16 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     }
   }
 
+  /**
+   * Ensure that default aliases exist (new ones can be created). For an update of an existing
+   * identifiable {@link #alignForUpdate(Identifiable, Identifiable, CudamiConfig,
+   * SlugGeneratorService)} should be used instead.
+   *
+   * @param actualIdentifiable the (new) identifiable
+   * @param cudamiConfig
+   * @param slugGeneratorService slug generator method
+   * @throws CudamiServiceException
+   */
   public static <I extends Identifiable> void checkDefaultAliases(
       I actualIdentifiable, CudamiConfig cudamiConfig, SlugGeneratorService slugGeneratorService)
       throws CudamiServiceException {
@@ -232,6 +252,9 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
 
   private void unsetConflictingPrimaries(
       List<UrlAlias> primariesFromDb, List<UrlAlias> newPrimaryAliases) {
+    if (primariesFromDb == null || newPrimaryAliases == null) {
+      return;
+    }
     for (UrlAlias primaryFromDb : primariesFromDb) {
       if (newPrimaryAliases.stream()
           .filter(ua -> !ua.equals(primaryFromDb)) // if new one is equal to alias from DB -> ignore
@@ -266,6 +289,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     }
   }
 
+  // We do not want to have any services in this class but we need the slug generator.
+  // It can easyly be passed into a parameter of this functional interface type.
   public interface SlugGeneratorService {
     String apply(Locale locale, String label, UUID website) throws CudamiServiceException;
   }
