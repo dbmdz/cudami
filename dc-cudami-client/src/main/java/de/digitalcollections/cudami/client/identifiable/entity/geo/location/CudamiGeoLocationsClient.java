@@ -57,7 +57,7 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
 
   public GeoLocation findOneByIdentifier(String namespace, String id) throws HttpException {
     return doGetRequestForObject(
-        String.format("%s/identifier?namespace=%s&id=%s", baseEndpoint, namespace, id));
+        String.format("%s/?namespace=%s&id=%s", baseEndpoint, namespace, id));
   }
 
   public List<Locale> getLanguages() throws HttpException {

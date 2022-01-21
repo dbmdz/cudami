@@ -33,11 +33,6 @@ public class CudamiDigitalObjectsClient extends CudamiIdentifiablesClient<Digita
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
   }
 
-  public DigitalObject findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("%s/identifier/%s:%s.json", baseEndpoint, namespace, id));
-  }
-
   public DigitalObject findOneByRefId(long refId) throws HttpException {
     return doGetRequestForObject(String.format("%s/%s", baseEndpoint, refId));
   }

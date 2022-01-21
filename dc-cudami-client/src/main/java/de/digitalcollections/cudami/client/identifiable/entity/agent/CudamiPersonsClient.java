@@ -75,4 +75,10 @@ public class CudamiPersonsClient extends CudamiIdentifiablesClient<Person> {
     return doGetRequestForObjectList(
         String.format(baseEndpoint + "/%s/works", uuidPerson), Work.class);
   }
+
+  @Override
+  public Person findOneByIdentifier(String namespace, String id) throws HttpException {
+    return doGetRequestForObject(
+        String.format(baseEndpoint + "/identifier?namespace=%s&id=%s", namespace, id));
+  }
 }

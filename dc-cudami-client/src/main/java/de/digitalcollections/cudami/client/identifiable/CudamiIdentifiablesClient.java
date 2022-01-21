@@ -77,7 +77,8 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiBas
   }
 
   public I findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(String.format(baseEndpoint + "/%s:%s.json", namespace, id));
+    return doGetRequestForObject(
+        String.format(baseEndpoint + "/identifier/%s:%s.json", namespace, id));
   }
 
   public I save(I identifiable) throws HttpException {

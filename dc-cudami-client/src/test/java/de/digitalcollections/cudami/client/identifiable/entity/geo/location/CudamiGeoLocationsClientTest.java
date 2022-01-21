@@ -25,7 +25,7 @@ class CudamiGeoLocationsClientTest
     client.findOneByIdentifier(identifierNamespace, identifierValue);
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier?namespace=" + identifierNamespace + "&id=" + identifierValue);
+        "get", "/?namespace=" + identifierNamespace + "&id=" + identifierValue);
   }
 
   @Test
