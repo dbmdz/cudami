@@ -221,17 +221,17 @@ class WebpageServiceImplTest {
   @DisplayName("does not allow empty UrlAliases at update")
   public void updateWithEmptyUrlAliases()
       throws ValidationException, IdentifiableServiceException, CudamiServiceException {
-    UUID webpage_uuid = UUID.randomUUID();
+    UUID webpageUuid = UUID.randomUUID();
 
     // in DB
     Webpage dbWebpage = new Webpage();
-    dbWebpage.setUuid(webpage_uuid);
+    dbWebpage.setUuid(webpageUuid);
     dbWebpage.setLabel("test");
-    when(repo.findOne(eq(webpage_uuid))).thenReturn(dbWebpage);
+    when(repo.findOne(eq(webpageUuid))).thenReturn(dbWebpage);
 
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
-    webpage.setUuid(webpage_uuid);
+    webpage.setUuid(webpageUuid);
     when(repo.update(eq(webpage))).thenReturn(webpage);
     UrlAlias dummyAlias = new UrlAlias();
     Website dummyWebsite = new Website();

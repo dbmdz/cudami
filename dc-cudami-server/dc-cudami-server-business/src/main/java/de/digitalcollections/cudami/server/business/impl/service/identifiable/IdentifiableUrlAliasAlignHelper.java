@@ -276,7 +276,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // `ensureDefaultAliasesExist`
       // either set primary of the alias in the identifiable or add the primary from database to
       // complete
-      // tha aliases of the identifiable
+      // the aliases of the identifiable
       Optional<UrlAlias> oldPrimary =
           actualIdentifiable.getLocalizedUrlAliases().flatten().stream()
               .filter(ua -> Objects.equals(ua.getUuid(), primaryFromDb.getUuid()))
