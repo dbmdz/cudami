@@ -302,7 +302,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     try {
       // UrlAliases
       IdentifiableUrlAliasAlignHelper.alignForUpdate(
-          updatedIdentifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);
+          identifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);
       urlAliasService.deleteAllForTarget(identifiable.getUuid());
 
       // Validate again, because the default aliases insurance above can alter
