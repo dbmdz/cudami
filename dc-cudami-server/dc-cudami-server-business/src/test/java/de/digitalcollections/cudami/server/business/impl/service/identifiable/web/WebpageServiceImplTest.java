@@ -203,35 +203,46 @@ class WebpageServiceImplTest {
   }
 
   @Test
-  @DisplayName("allows empty UrlAliases at save and automatically creates an UrlAlias")
+  @DisplayName("does not allow empty UrlAliases at save")
   public void saveWithEmptyUrlAliases()
       throws ValidationException, IdentifiableServiceException, CudamiServiceException {
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
     when(repo.save(eq(webpage))).thenReturn(webpage);
-    UrlAlias dummyAlias = new UrlAlias();
-    Website dummyWebsite = new Website();
-    dummyWebsite.setUuid(UUID.randomUUID());
-    dummyAlias.setWebsite(dummyWebsite);
-    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(dummyAlias);
-    service.save(webpage);
+    assertThrows(
+        IdentifiableServiceException.class,
+        () -> {
+          service.save(webpage);
+        });
     verify(repo, times(1)).save(any(Webpage.class));
   }
 
   @Test
-  @DisplayName("allows empty UrlAliases at update and automatically creates an UrlAlias")
+  @DisplayName("does not allow empty UrlAliases at update")
   public void updateWithEmptyUrlAliases()
       throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+    UUID webpageUuid = UUID.randomUUID();
+
+    // in DB
+    Webpage dbWebpage = new Webpage();
+    dbWebpage.setUuid(webpageUuid);
+    dbWebpage.setLabel("test");
+    when(repo.findOne(eq(webpageUuid))).thenReturn(dbWebpage);
+
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
-    webpage.setUuid(UUID.randomUUID());
+    webpage.setUuid(webpageUuid);
     when(repo.update(eq(webpage))).thenReturn(webpage);
     UrlAlias dummyAlias = new UrlAlias();
     Website dummyWebsite = new Website();
     dummyWebsite.setUuid(UUID.randomUUID());
     dummyAlias.setWebsite(dummyWebsite);
     when(urlAliasService.create(any(UrlAlias.class))).thenReturn(dummyAlias);
-    service.update(webpage);
+    assertThrows(
+        IdentifiableServiceException.class,
+        () -> {
+          service.update(webpage);
+        });
     verify(repo, times(1)).update(any(Webpage.class));
   }
 

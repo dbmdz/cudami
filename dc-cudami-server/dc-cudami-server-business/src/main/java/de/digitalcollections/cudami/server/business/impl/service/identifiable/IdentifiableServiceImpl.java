@@ -15,7 +15,6 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
@@ -26,7 +25,6 @@ import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -104,53 +102,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
             .collect(Collectors.toList()));
 
     return true;
-  }
-
-  protected void ensureDefaultAliasesExist(I identifiable) throws IdentifiableServiceException {
-    if ((identifiable instanceof Entity)
-        && cudamiConfig
-            .getUrlAlias()
-            .getGenerationExcludes()
-            .contains(((Entity) identifiable).getEntityType())) {
-      return;
-    }
-    LocalizedUrlAliases urlAliases = identifiable.getLocalizedUrlAliases();
-    if (urlAliases == null) {
-      urlAliases = new LocalizedUrlAliases();
-      identifiable.setLocalizedUrlAliases(urlAliases);
-    }
-    for (Locale lang : identifiable.getLabel().getLocales()) {
-      if (!urlAliases.containsKey(lang)
-          || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
-        // there is not any default alias (w/o website); create one. But not for a webpage!
-        if (identifiable instanceof Webpage) {
-          continue;
-        }
-        UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTargetIdentifiableType(identifiable.getType());
-        defaultAlias.setTargetLanguage(lang);
-        defaultAlias.setTargetUuid(identifiable.getUuid());
-        if (identifiable instanceof Entity) {
-          defaultAlias.setTargetEntityType(((Entity) identifiable).getEntityType());
-        }
-        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
-        try {
-          defaultAlias.setSlug(
-              this.urlAliasService.generateSlug(lang, identifiable.getLabel().getText(lang), null));
-        } catch (CudamiServiceException e) {
-          throw new IdentifiableServiceException("An error occured during slug generation.", e);
-        }
-        urlAliases.add(defaultAlias);
-      }
-
-      // check that a primary alias exists for this language
-      if (!urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
-        throw new IdentifiableServiceException(
-            String.format(
-                "There is not any primary alias for language '%s' of identifiable '%s'.",
-                lang, identifiable.getUuid()));
-      }
-    }
   }
 
   @Override
@@ -264,7 +215,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       I savedIdentifiable = this.repository.save(identifiable);
       saveIdentifiers(identifiable.getIdentifiers(), savedIdentifiable);
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
-      this.ensureDefaultAliasesExist(savedIdentifiable);
+      IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
+          savedIdentifiable, cudamiConfig, urlAliasService::generateSlug);
 
       try {
         urlAliasService.validate(identifiable.getLocalizedUrlAliases());
@@ -333,8 +285,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
-    I updatedIdentifiable;
+    I updatedIdentifiable, identifiableInDb;
     try {
+      identifiableInDb = repository.findOne(identifiable.getUuid());
       updatedIdentifiable = repository.update(identifiable);
       // save identifiers
       // as we store the whole list new: delete old entries
@@ -348,46 +301,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
     try {
       // UrlAliases
-      if (identifiable.getLocalizedUrlAliases() == null
-          || identifiable.getLocalizedUrlAliases().isEmpty()) {
-        // if this field is unset then we check the DB
-        LocalizedUrlAliases aliasesFromDb =
-            urlAliasService.findLocalizedUrlAliases(identifiable.getUuid());
-        identifiable.setLocalizedUrlAliases(aliasesFromDb);
-      } else if (identifiable.getLocalizedUrlAliases().flatten().stream()
-          .allMatch(ua -> ua.isPrimary())) {
-        // there are only primary aliases: conflicting ones in DB must be unset
-        // conflicting aliases: equal websiteUuid & targetLanguage
-        LocalizedUrlAliases urlAliasesToUpdate = identifiable.getLocalizedUrlAliases();
-        // only primary aliases (as the var name suggests)
-        List<UrlAlias> allPrimariesFromDb =
-            urlAliasService.findPrimaryLinksForTarget(identifiable.getUuid());
-        // now we check whether any primary from the DB conflict with the new ones
-        for (UrlAlias primaryFromDb : allPrimariesFromDb) {
-          if (urlAliasesToUpdate.flatten().stream()
-              .filter(
-                  ua -> !ua.equals(primaryFromDb)) // if new one is equal to alias from DB -> ignore
-              .anyMatch(
-                  ua ->
-                      (ua.getWebsite() != null
-                                  && primaryFromDb.getWebsite() != null
-                                  && ua.getWebsite()
-                                      .getUuid()
-                                      .equals(primaryFromDb.getWebsite().getUuid())
-                              || ua.getWebsite() == primaryFromDb.getWebsite())
-                          && Objects.equals(
-                              ua.getTargetLanguage(), primaryFromDb.getTargetLanguage()))) {
-            primaryFromDb.setPrimary(false);
-          }
-          // must be outside preceding `if` to avoid creation of new aliases in
-          // `ensureDefaultAliasesExist`
-          if (!urlAliasesToUpdate.containsUrlAlias(primaryFromDb)) {
-            urlAliasesToUpdate.add(primaryFromDb);
-          }
-        }
-      }
+      IdentifiableUrlAliasAlignHelper.alignForUpdate(
+          updatedIdentifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);
       urlAliasService.deleteAllForTarget(identifiable.getUuid());
-      ensureDefaultAliasesExist(identifiable);
 
       // Validate again, because the default aliases insurance above can alter
       // the data
@@ -413,7 +329,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       //////
       return updatedIdentifiable;
 
-    } catch (CudamiServiceException | IdentifiableServiceException e) {
+    } catch (CudamiServiceException e) {
       LOGGER.error("Error while updating URL aliases for " + identifiable, e);
       throw new IdentifiableServiceException(e.getMessage(), e);
     }
