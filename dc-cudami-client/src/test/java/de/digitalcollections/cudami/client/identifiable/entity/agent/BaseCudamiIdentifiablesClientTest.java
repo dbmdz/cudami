@@ -180,7 +180,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     client.findOneByIdentifier(identifierNamespace, identifierValue);
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/" + identifierNamespace + ":" + identifierValue + ".json");
+        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
   }
 
   @Test

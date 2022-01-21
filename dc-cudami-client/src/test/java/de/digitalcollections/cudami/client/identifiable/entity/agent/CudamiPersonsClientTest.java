@@ -83,4 +83,17 @@ class CudamiPersonsClientTest
     assertThat(works.get(0)).isExactlyInstanceOf(Work.class);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + personUuid + "/works");
   }
+
+  @Test
+  @DisplayName("can find by identifier")
+  @Override
+  public void findByIdentifier() throws Exception {
+    String identifierNamespace = "mdz-obj";
+    String identifierValue = "bsb12345678";
+
+    client.findOneByIdentifier(identifierNamespace, identifierValue);
+
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get", "/identifier?namespace=" + identifierNamespace + "&id=" + identifierValue);
+  }
 }
