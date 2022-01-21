@@ -5,14 +5,14 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.CollectionBuilder;
-import de.digitalcollections.cudami.server.model.EntityRelationBuilder;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
-import de.digitalcollections.cudami.server.model.ProjectBuilder;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
+import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelationBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.PageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

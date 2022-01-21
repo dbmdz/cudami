@@ -5,12 +5,12 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
-import de.digitalcollections.cudami.server.model.WebpageBuilder;
-import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
+import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -40,7 +40,7 @@ class V2WebsiteControllerTest extends BaseControllerTest {
             .lastModifiedAt("2018-05-04T09:05:47.493")
             .withLabel(Locale.GERMAN, "Altsinica")
             .withDescription(Locale.GERMAN, "")
-            .withUuidFromPath(path)
+            .withUuid(extractFirstUuidFromPath(path))
             .withRefId(84)
             .withUrl("https://ostasien.digitale-sammlungen.de/")
             .withRootPages(

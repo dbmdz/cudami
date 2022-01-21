@@ -5,11 +5,11 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
-import de.digitalcollections.cudami.server.model.RenderingTemplateBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.view.RenderingTemplate;
+import de.digitalcollections.model.view.RenderingTemplateBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

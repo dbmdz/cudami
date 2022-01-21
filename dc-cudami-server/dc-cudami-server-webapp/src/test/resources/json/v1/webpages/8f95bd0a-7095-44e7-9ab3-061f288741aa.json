@@ -1,1 +1,223 @@
-{"identifiers":[],"label":{"translations":[{"locale":"de_DE","text":"Impressum (DEV)"}]},"type":"RESOURCE","uuid":"8f95bd0a-7095-44e7-9ab3-061f288741aa","entityPartType":"WEBPAGE","text":{"documents":{"de_DE":{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Bayerische Staatsbibliothek","marks":[{"type":"strong"}]},{"type":"text","text":"                                                                                              "},{"type":"text","text":"                                                                           ","marks":[{"type":"strong"}]},{"type":"text","text":"                                                                                                                       Ludwigstraße 16"},{"type":"hard_break"},{"type":"text","text":"80539 München"}]},{"type":"paragraph","content":[{"type":"text","text":"Gesetzlicher Vertreter:","marks":[{"type":"strong"}]}]},{"type":"paragraph","content":[{"type":"text","text":"Generaldirektor Dr. Klaus Ceynowa"}]},{"type":"paragraph","content":[{"type":"text","text":"Telefon: ","marks":[{"type":"strong"}]},{"type":"text","text":"+49 89 28638-0"},{"type":"hard_break"},{"type":"text","text":"Fax: ","marks":[{"type":"strong"}]},{"type":"text","text":"+49 89 28638-2200"}]},{"type":"paragraph","content":[{"type":"text","text":"E-Mail: ","marks":[{"type":"strong"}]},{"type":"text","text":"direktion[at]bsb-muenchen.de"},{"type":"hard_break"},{"type":"text","text":"                                                                                                                                                                                                                                                              "},{"type":"text","text":"                       Internet:                                                   ","marks":[{"type":"strong"}]},{"type":"text","text":"                                                                                                                                                                                                                                                       "},{"type":"text","text":"                                             www.bsb-muenchen.de","marks":[{"type":"link","attrs":{"href":"https://www.bsb-muenchen.de/"}}]},{"type":"text","text":"                                                                                        "},{"type":"hard_break"},{"type":"text","text":"                                                                                                                                                                                                                                                              "},{"type":"text","text":"                       Umsatzsteueridentifikationsnummer: ","marks":[{"type":"strong"}]},{"type":"text","text":"DE-811259539                              "}]},{"type":"paragraph","content":[{"type":"text","text":"Die Bayerische Staatsbibliothek ist eine dem "},{"type":"text","text":"Bayerischen Staatsministerium für Wissenschaft und Kunst","marks":[{"type":"link","attrs":{"href":"https://www.stmwk.bayern.de/","title":""}}]},{"type":"text","text":"  nachgeordnete Behörde der Mittelstufe mit dem Sitz in München.                               "}]}]}}},"publicationStart":"2019-01-18","children":[]}
+{
+  "identifiers": [],
+  "label": {
+    "translations": [
+      {
+        "locale": "de_DE",
+        "text": "Impressum"
+      }
+    ]
+  },
+  "type": "RESOURCE",
+  "uuid": "8f95bd0a-7095-44e7-9ab3-061f288741aa",
+  "publicationStart": "2019-01-18",
+  "text": {
+    "documents": {
+      "de_DE": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Acme",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "                                                                                              "
+              },
+              {
+                "type": "text",
+                "text": "                                                                           ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "                                                                                                                       Ludwigstraße 16"
+              },
+              {
+                "type": "hard_break"
+              },
+              {
+                "type": "text",
+                "text": "12345 Ort"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Gesetzlicher Vertreter:",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "xxx"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Telefon: ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "12345"
+              },
+              {
+                "type": "hard_break"
+              },
+              {
+                "type": "text",
+                "text": "Fax: ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "67890"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "E-Mail: ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "xxx@xxx.xxx"
+              },
+              {
+                "type": "hard_break"
+              },
+              {
+                "type": "text",
+                "text": "                                                                                                                                                                                                                                                              "
+              },
+              {
+                "type": "text",
+                "text": "                       Internet:                                                   ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "                                                                                                                                                                                                                                                       "
+              },
+              {
+                "type": "text",
+                "text": "                                             www.xxx.xxx",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://www.xxx.xxx/"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "                                                                                        "
+              },
+              {
+                "type": "hard_break"
+              },
+              {
+                "type": "text",
+                "text": "                                                                                                                                                                                                                                                              "
+              },
+              {
+                "type": "text",
+                "text": "                       Umsatzsteueridentifikationsnummer: ",
+                "marks": [
+                  {
+                    "type": "strong"
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "DE-1234567                              "
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "Acme ist eine "
+              },
+              {
+                "type": "text",
+                "text": "Testinstitution",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://localhost/",
+                      "title": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "  mit Sitz irgendwo.                               "
+              }
+            ]
+          }
+        ]
+      },
+      "en": {
+        "type": "doc"
+      }
+    }
+  },
+  "children": [],
+  "entityPartType": "WEBPAGE"
+}

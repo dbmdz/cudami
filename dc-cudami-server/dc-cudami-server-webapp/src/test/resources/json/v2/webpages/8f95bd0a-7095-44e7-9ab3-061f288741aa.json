@@ -4,13 +4,13 @@
     "translations": [
       {
         "locale": "de",
-        "text": "Impressum (DEV)"
+        "text": "Impressum"
       }
     ]
   },
   "type": "RESOURCE",
   "uuid": "8f95bd0a-7095-44e7-9ab3-061f288741aa",
-  "entityPartType": "WEBPAGE",
+  "publicationStart": "2019-01-18",
   "text": {
     "localizedStructuredContent": {
       "de": {
@@ -21,7 +21,7 @@
             "content": [
               {
                 "type": "text",
-                "text": "Bayerische Staatsbibliothek",
+                "text": "Acme",
                 "marks": [
                   {
                     "type": "strong"
@@ -50,7 +50,7 @@
               },
               {
                 "type": "text",
-                "text": "80539 München"
+                "text": "12345 Ort"
               }
             ]
           },
@@ -73,7 +73,7 @@
             "content": [
               {
                 "type": "text",
-                "text": "Generaldirektor Dr. Klaus Ceynowa"
+                "text": "xxx"
               }
             ]
           },
@@ -91,7 +91,7 @@
               },
               {
                 "type": "text",
-                "text": "+49 89 28638-0"
+                "text": "12345"
               },
               {
                 "type": "hard_break"
@@ -107,7 +107,7 @@
               },
               {
                 "type": "text",
-                "text": "+49 89 28638-2200"
+                "text": "67890"
               }
             ]
           },
@@ -125,7 +125,7 @@
               },
               {
                 "type": "text",
-                "text": "direktion[at]bsb-muenchen.de"
+                "text": "xxx@xxx.xxx"
               },
               {
                 "type": "hard_break"
@@ -149,12 +149,12 @@
               },
               {
                 "type": "text",
-                "text": "                                             www.bsb-muenchen.de",
+                "text": "                                             www.xxx.xxx",
                 "marks": [
                   {
                     "type": "link",
                     "attrs": {
-                      "href": "https://www.bsb-muenchen.de/"
+                      "href": "https://www.xxx.xxx/"
                     }
                   }
                 ]
@@ -181,7 +181,7 @@
               },
               {
                 "type": "text",
-                "text": "DE-811259539                              "
+                "text": "DE-1234567                              "
               }
             ]
           },
@@ -190,16 +190,16 @@
             "content": [
               {
                 "type": "text",
-                "text": "Die Bayerische Staatsbibliothek ist eine dem "
+                "text": "Acme ist eine "
               },
               {
                 "type": "text",
-                "text": "Bayerischen Staatsministerium für Wissenschaft und Kunst",
+                "text": "Testinstitution",
                 "marks": [
                   {
                     "type": "link",
                     "attrs": {
-                      "href": "https://www.stmwk.bayern.de/",
+                      "href": "https://localhost/",
                       "title": ""
                     }
                   }
@@ -207,14 +207,17 @@
               },
               {
                 "type": "text",
-                "text": "  nachgeordnete Behörde der Mittelstufe mit dem Sitz in München.                               "
+                "text": "  mit Sitz irgendwo.                               "
               }
             ]
           }
         ]
+      },
+      "en": {
+        "type": "doc"
       }
     }
   },
-  "publicationStart": "2019-01-18",
-  "children": []
+  "children": [],
+  "entityPartType": "WEBPAGE"
 }

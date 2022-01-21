@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.ProjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,7 +30,7 @@ class ProjectControllerTest extends BaseControllerTest {
             .withIdentifier("mdz-proj", "1467037957", "c938279a-dedb-4531-9e94-55091b8e6f72")
             .withLabel(Locale.GERMAN, "100(0) Dokumente")
             .lastModifiedAt("2021-04-01T04:15:01.406352")
-            .withUuidFromPath(path)
+            .withUuid(extractFirstUuidFromPath(path))
             .withRefId(1300623)
             .build();
 
