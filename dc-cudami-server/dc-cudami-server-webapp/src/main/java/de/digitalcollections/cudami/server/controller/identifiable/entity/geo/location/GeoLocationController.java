@@ -102,9 +102,9 @@ public class GeoLocationController {
   @Operation(summary = "Get a geolocation by namespace and id")
   @GetMapping(
       value = {
-        "/v5/geolocations/{uuid}",
+        "/v5/geolocations/identifier",
         "/v2/geolocations/identifier",
-        "/latest/geolocations/{uuid}"
+        "/latest/geolocations/identifier"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByIdentifier(
