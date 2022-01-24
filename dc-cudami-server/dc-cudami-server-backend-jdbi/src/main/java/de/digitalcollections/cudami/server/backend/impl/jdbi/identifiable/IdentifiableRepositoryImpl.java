@@ -304,8 +304,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         UUID websiteUuid =
             rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
         if (websiteUuid != null) {
-          // FIXME: remove Website from this repository. Identifiable should not depend on website
-          // stuff.
           Website website =
               new Website(
                   rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
@@ -756,8 +754,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ".uuid = "
                 + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + ".target_uuid"
-                + UrlAliasRepositoryImpl
-                    .WEBSITESJOIN); // FIXME: that's what sqlSelectAllFieldsJoins is for...
+                + UrlAliasRepositoryImpl.WEBSITESJOIN);
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
     }
