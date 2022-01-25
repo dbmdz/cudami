@@ -38,10 +38,4 @@ public class CudamiHumanSettlementsClient extends CudamiIdentifiablesClient<Huma
         language,
         initial);
   }
-
-  @Override
-  public HumanSettlement findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("%s/identifier?namespace=%s&id=%s", baseEndpoint, namespace, id));
-  }
 }
