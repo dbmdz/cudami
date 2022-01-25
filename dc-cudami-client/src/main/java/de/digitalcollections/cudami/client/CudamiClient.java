@@ -25,10 +25,12 @@ import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksC
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
+import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
+import de.digitalcollections.model.identifiable.Identifiable;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
@@ -51,9 +53,10 @@ public class CudamiClient {
   private final CudamiHeadwordEntriesClient cudamiHeadwordEntriesClient;
   private final CudamiHeadwordsClient cudamiHeadwordsClient;
   private final CudamiHumanSettlementsClient cudamiHumanSettlementsClient;
-  private final CudamiIdentifiablesClient cudamiIdentifiablesClient;
+  private final CudamiIdentifiablesClient<Identifiable> cudamiIdentifiablesClient;
   private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
   private final CudamiItemsClient cudamiItemsClient;
+  private final CudamiLicensesClient cudamiLicensesClient;
   private final CudamiLocalesClient cudamiLocalesClient;
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
@@ -101,10 +104,11 @@ public class CudamiClient {
         new CudamiHeadwordEntriesClient(http, cudamiServerUrl, mapper);
     this.cudamiHumanSettlementsClient =
         new CudamiHumanSettlementsClient(http, cudamiServerUrl, mapper);
-    this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient(http, cudamiServerUrl, mapper);
+    this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient<>(http, cudamiServerUrl, mapper);
     this.cudamiIdentifierTypesClient =
         new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
     this.cudamiItemsClient = new CudamiItemsClient(http, cudamiServerUrl, mapper);
+    this.cudamiLicensesClient = new CudamiLicensesClient(http, cudamiServerUrl, mapper);
     this.cudamiLocalesClient = new CudamiLocalesClient(http, cudamiServerUrl, mapper);
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
@@ -189,6 +193,10 @@ public class CudamiClient {
 
   public CudamiItemsClient forItems() {
     return cudamiItemsClient;
+  }
+
+  public CudamiLicensesClient forLicenses() {
+    return cudamiLicensesClient;
   }
 
   public CudamiLocalesClient forLocales() {
