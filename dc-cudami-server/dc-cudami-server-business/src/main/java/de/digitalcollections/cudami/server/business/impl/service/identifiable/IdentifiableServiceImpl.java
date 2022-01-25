@@ -294,7 +294,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       identifierRepository.deleteByIdentifiable(identifiable);
       Set<Identifier> identifiers = identifiable.getIdentifiers();
       saveIdentifiers(identifiers, identifiable);
-
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -326,7 +325,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       LocalizedUrlAliases savedLocalizedUrlAliases =
           urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
       updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
-      //////
       return updatedIdentifiable;
 
     } catch (CudamiServiceException e) {
