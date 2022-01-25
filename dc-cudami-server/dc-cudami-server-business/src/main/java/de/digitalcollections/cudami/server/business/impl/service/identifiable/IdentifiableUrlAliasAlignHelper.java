@@ -118,7 +118,6 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     if (identifiableInDatabase == null) {
       return;
     }
-    List<UrlAlias> newAliases = new ArrayList<>();
     for (Locale langFromDb : identifiableInDatabase.getLabel().getLocales()) {
       // check all in db EXISTING label languages; we are into label changes ONLY
       String labelSavedInDb = identifiableInDatabase.getLabel().get(langFromDb);
@@ -165,13 +164,13 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         newAlias.setPrimary(true);
 
         actualIdentifiable.getLocalizedUrlAliases().add(newAlias);
-        newAliases.add(newAlias);
       }
     }
 
     // finally we set primary flag of current primary aliases to false
     unsetConflictingPrimaries(
-        getPrimaryUrlAliases(identifiableInDatabase.getLocalizedUrlAliases(), null), newAliases);
+        getPrimaryUrlAliases(identifiableInDatabase.getLocalizedUrlAliases(), null),
+        getPrimaryUrlAliases(actualIdentifiable.getLocalizedUrlAliases(), null));
   }
 
   private void ensureDefaultAliasesExist() throws CudamiServiceException {
