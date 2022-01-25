@@ -1,5 +1,6 @@
 import '../../polyfills'
 
+import groupBy from 'lodash/groupBy'
 import kebabCase from 'lodash/kebabCase'
 import mergeWith from 'lodash/mergeWith'
 import omit from 'lodash/omit'
@@ -114,6 +115,7 @@ class IdentifiableForm extends Component {
       defaultLanguage,
       identifiable: initialIdentifiable,
       initialFileResource,
+      initialLabel: initialIdentifiable.label,
     })
   }
 
@@ -214,41 +216,82 @@ class IdentifiableForm extends Component {
     )
   }
 
+  getGeneratedUrlAliasForLanguageAndWebsite = async (language, website) => {
+    const {apiContextPath, uuid} = this.props
+    const {entityType, label, type} = this.state.identifiable
+    const slug = await generateSlug(
+      apiContextPath,
+      language,
+      label[language],
+      website?.uuid,
+    )
+    return {
+      primary: true,
+      slug,
+      targetEntityType: entityType,
+      targetIdentifiableType: type,
+      targetLanguage: language,
+      targetUuid: uuid,
+      website: website && pick(website, ['entityType', 'type', 'url', 'uuid']),
+    }
+  }
+
   getGeneratedUrlAliases = async () => {
-    const {apiContextPath, parentWebsite, uuid} = this.props
-    const {existingLanguages, identifiable} = this.state
+    const {existingLanguages, identifiable, initialLabel} = this.state
     const languagesWithoutGeneratedUrlAliases = existingLanguages.filter(
       (language) => {
         const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
-        return (
-          !listOfAliases.length ||
-          listOfAliases.every(
-            ({website}) => website?.uuid !== parentWebsite?.uuid,
-          )
+        /* filter the aliases that are connected with the parent website */
+        const existingDefaultUrlAlias = listOfAliases.filter(
+          ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
         )
+        const labelChanged =
+          initialLabel?.[language] &&
+          initialLabel?.[language] !== identifiable.label[language]
+        return !existingDefaultUrlAlias.length || labelChanged
       },
     )
-    const generatedUrlAliases = {}
+    const generatedUrlAliases = languagesWithoutGeneratedUrlAliases.reduce(
+      (aliases, language) => ({
+        ...aliases,
+        [language]: [],
+      }),
+      {},
+    )
     for (let language of languagesWithoutGeneratedUrlAliases) {
-      const slug = await generateSlug(
-        apiContextPath,
-        language,
-        identifiable.label[language],
-        parentWebsite?.uuid,
+      const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
+      /* filter the aliases that are connected with the parent website */
+      const existingDefaultUrlAlias = listOfAliases.filter(
+        ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
       )
-      generatedUrlAliases[language] = [
-        {
-          primary: true,
-          slug,
-          targetEntityType: identifiable.entityType,
-          targetIdentifiableType: identifiable.type,
-          targetLanguage: language,
-          targetUuid: uuid,
-          website:
-            parentWebsite &&
-            pick(parentWebsite, ['entityType', 'type', 'url', 'uuid']),
-        },
-      ]
+      /* add an alias with the parent website if there are no existing aliases for the language */
+      if (!existingDefaultUrlAlias.length) {
+        const newAlias = await this.getGeneratedUrlAliasForLanguageAndWebsite(
+          language,
+          this.props.parentWebsite,
+        )
+        generatedUrlAliases[language].push(newAlias)
+        continue
+      }
+      /* extract the websites with connected aliases */
+      const existingWebsites = Object.values(
+        groupBy(listOfAliases, 'website.uuid'),
+      ).map((aliases) => aliases[0].website)
+      for (let website of existingWebsites) {
+        const newAlias = await this.getGeneratedUrlAliasForLanguageAndWebsite(
+          language,
+          website,
+        )
+        /* find possibly manually added duplicates that are not yet persisted */
+        const duplicate = listOfAliases.find(
+          (alias) =>
+            alias.slug === newAlias.slug &&
+            alias.website?.uuid === website?.uuid,
+        )
+        if (!duplicate) {
+          generatedUrlAliases[language].push(newAlias)
+        }
+      }
     }
     return generatedUrlAliases
   }
@@ -316,14 +359,19 @@ class IdentifiableForm extends Component {
     const identifiable = {
       ...this.state.identifiable,
       description: this.cleanUpJson(this.state.identifiable.description),
-      localizedUrlAliases: mergeWith(
-        this.state.identifiable.localizedUrlAliases,
-        this.state.generatedUrlAliases ?? {},
-        (objValue, srcValue) => (objValue ?? []).concat(srcValue),
-      ),
+    }
+    if (this.state.generatedUrlAliases) {
+      // TODO: make only one alias primary
+      identifiable.localizedUrlAliases = mergeWith(
+        identifiable.localizedUrlAliases,
+        this.state.generatedUrlAliases,
+        (objValue, srcValue) => {
+          return (objValue ?? []).concat(srcValue)
+        },
+      )
     }
     if (identifiable.text) {
-      identifiable.text = this.cleanUpJson(this.state.identifiable.text)
+      identifiable.text = this.cleanUpJson(identifiable.text)
     }
     const {error = false, uuid} = await (identifiable.uuid
       ? updateIdentifiable(apiContextPath, identifiable, type)
