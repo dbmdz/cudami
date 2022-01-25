@@ -40,11 +40,6 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
         String.format("%s/type/%s", baseEndpoint, type), searchPageRequest);
   }
 
-  public FileResource findOneByIdentifier(String namespace, String id) throws HttpException {
-    return doGetRequestForObject(
-        String.format("%s/identifier/%s:%s.json", baseEndpoint, namespace, id));
-  }
-
   public List<Locale> getLanguages() throws HttpException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
