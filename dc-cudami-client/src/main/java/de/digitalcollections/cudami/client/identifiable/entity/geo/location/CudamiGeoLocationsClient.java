@@ -20,10 +20,12 @@ public class CudamiGeoLocationsClient extends CudamiIdentifiablesClient<GeoLocat
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  @Override
   public PageResponse<GeoLocation> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
   }
 
+  @Override
   public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     // Interestingly without "/search" in the path

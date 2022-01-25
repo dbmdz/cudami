@@ -21,6 +21,7 @@ public class CudamiPersonsClient extends CudamiIdentifiablesClient<Person> {
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  @Override
   public PageResponse<Person> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
   }

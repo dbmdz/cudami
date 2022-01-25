@@ -22,6 +22,7 @@ public class CudamiCorporateBodiesClient extends CudamiIdentifiablesClient<Corpo
   // TODO: Implement with test
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  @Override
   public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
   }

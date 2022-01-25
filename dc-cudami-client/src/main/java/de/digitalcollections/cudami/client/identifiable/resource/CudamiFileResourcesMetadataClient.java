@@ -23,10 +23,12 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
+  @Override
   public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
   }
 
+  @Override
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
       throws HttpException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
