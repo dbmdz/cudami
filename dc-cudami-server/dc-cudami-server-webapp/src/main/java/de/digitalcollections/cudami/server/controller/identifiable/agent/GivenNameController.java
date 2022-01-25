@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,16 @@ public class GivenNameController {
     return givenNameService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
+  @Operation(summary = "Get a givenname by namespace and id")
+  @GetMapping(
+      value = {"/v5/givennames/identifier/{namespace}:{id}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<GivenName> findByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    GivenName result = givenNameService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
   @Operation(summary = "Get a givenname by uuid")
   @GetMapping(
       value = {"/v5/givennames/{uuid}"},
@@ -90,12 +102,15 @@ public class GivenNameController {
   @GetMapping(
       value = {"/v5/givennames/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GivenName> getByIdentifier(
+  public void getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id)
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws IdentifiableServiceException {
-    GivenName result = givenNameService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
+    response.setHeader(
+        "Location", request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
   }
 
   @Operation(summary = "save a newly created givenname")

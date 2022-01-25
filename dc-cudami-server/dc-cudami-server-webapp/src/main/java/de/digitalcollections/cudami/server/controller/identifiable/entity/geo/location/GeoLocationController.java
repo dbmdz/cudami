@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -71,6 +73,20 @@ public class GeoLocationController {
     return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
+  @Operation(summary = "Get a geolocation by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/geolocations/identifier/{namespace}:{id}",
+        "/v2/geolocations/identifier/{namespace}:{id}",
+        "/latest/geolocations/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<GeoLocation> findByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
   @Operation(summary = "Get a geolocation by uuid")
   @GetMapping(
       value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
@@ -107,12 +123,15 @@ public class GeoLocationController {
         "/latest/geolocations/identifier"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GeoLocation> getByIdentifier(
+  public void getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id)
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws IdentifiableServiceException {
-    GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
+    response.setHeader(
+        "Location", request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
   }
 
   @Operation(summary = "Get languages of all geolocations")

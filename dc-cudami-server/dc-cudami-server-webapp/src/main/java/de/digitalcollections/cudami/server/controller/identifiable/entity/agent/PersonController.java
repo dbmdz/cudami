@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -82,6 +84,20 @@ public class PersonController {
       return personService.find(searchPageRequest);
     }
     return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
+  }
+
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/persons/identifier/{namespace}:{id}",
+        "/v2/persons/identifier/{namespace}:{id}",
+        "/latest/persons/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Person> findByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    Person result = personService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -172,12 +188,15 @@ public class PersonController {
   @GetMapping(
       value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> getByIdentifier(
+  public void getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id)
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws IdentifiableServiceException {
-    Person result = personService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
+    response.setHeader(
+        "Location", request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
   }
 
   @Operation(summary = "Get a person's digital objects")

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -72,6 +74,20 @@ public class ItemController {
     return itemService.findByLanguageAndInitial(pageRequest, language, initial);
   }
 
+  @Operation(summary = "Get an item by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/items/identifier/{namespace}:{id}",
+        "/v2/items/identifier/{namespace}:{id}",
+        "/latest/items/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Item> findByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    Item result = itemService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
   @Operation(summary = "Get an item by uuid")
   @GetMapping(
       value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
@@ -103,12 +119,15 @@ public class ItemController {
   @GetMapping(
       value = {"/v5/items/identifier", "/v2/items/identifier", "/latest/items/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Item> getByIdentifier(
+  public void getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id)
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request,
+      HttpServletResponse response)
       throws IdentifiableServiceException {
-    Item result = itemService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
+    response.setHeader(
+        "Location", request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
   }
 
   @Operation(summary = "save a newly created item")
