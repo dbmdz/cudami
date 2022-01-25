@@ -329,9 +329,10 @@ public class UrlAliasServiceImpl implements UrlAliasService {
               primaries.put(key, primariesPerTuple);
             });
 
-    // Validation is failed, if we have not only single primaries per tuple, or it we have no single
-    // primary per tuple at all
-    if ((Set.of(primaries.values()).size() != 1) || (!(primaries.values().contains(1)))) {
+    // Validation is failed, if we do not have only single primaries per tuple, or if we have no
+    // single primary per tuple at all
+    if (primaries.values().stream().collect(Collectors.toSet()).size() != 1
+        || !primaries.values().contains(1)) {
       throw new ValidationException("violated single primaries: " + primaries);
     }
 

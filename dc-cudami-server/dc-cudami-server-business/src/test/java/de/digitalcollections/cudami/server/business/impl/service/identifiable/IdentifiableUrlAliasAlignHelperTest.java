@@ -615,6 +615,80 @@ public class IdentifiableUrlAliasAlignHelperTest {
     verify(slugGeneratorService, times(1)).apply(any(), any(), any());
   }
 
+  @DisplayName(
+      "3 existing aliases, 1 label changed + new alias already passed but invalid primary states")
+  @Test
+  public void labelChangedWithNewAliasInvalidPrimaries() throws CudamiServiceException {
+    UUID targetUuid = UUID.randomUUID();
+
+    // DB
+    Identifiable dbIdent = new Identifiable();
+    LocalizedText dbLabels = new LocalizedText(Locale.GERMAN, "hallo welt");
+    dbLabels.setText(Locale.ENGLISH, "hello world");
+    dbIdent.setLabel(dbLabels);
+    LocalizedUrlAliases dbAliases =
+        createAliases(
+            targetUuid,
+            new SlugPrimaryTuple(Locale.GERMAN, "hallo-welt", true, UUID.randomUUID()),
+            new SlugPrimaryTuple(Locale.ENGLISH, "hello-world", true, UUID.randomUUID()),
+            new SlugPrimaryTuple(Locale.ENGLISH, "helloworld", false, UUID.randomUUID()));
+    dbIdent.setLocalizedUrlAliases(dbAliases);
+
+    // Update
+    Identifiable identifiable = new Identifiable();
+    LocalizedText labels = new LocalizedText(Locale.GERMAN, "hallo welt");
+    labels.setText(Locale.ENGLISH, "hello new world"); // different label
+    identifiable.setLabel(labels);
+    LocalizedUrlAliases aliases =
+        createAliases(
+            targetUuid,
+            new SlugPrimaryTuple(
+                Locale.GERMAN, "hallo-welt", true, dbAliases.get(Locale.GERMAN).get(0).getUuid()),
+            new SlugPrimaryTuple(
+                Locale.ENGLISH,
+                "hello-world",
+                true,
+                dbAliases.get(Locale.ENGLISH).get(0).getUuid()),
+            new SlugPrimaryTuple(
+                Locale.ENGLISH,
+                "helloworld",
+                false,
+                dbAliases.get(Locale.ENGLISH).get(1).getUuid()),
+            new SlugPrimaryTuple(Locale.ENGLISH, "hello-new-world", true));
+    identifiable.setLocalizedUrlAliases(aliases);
+
+    when(slugGeneratorService.apply(eq(Locale.ENGLISH), eq("hello new world"), eq(null)))
+        .thenReturn("hello-new-world");
+
+    IdentifiableUrlAliasAlignHelper.alignForUpdate(
+        identifiable, dbIdent, cudamiConfig, slugGeneratorService);
+
+    assertThat(identifiable).isNotEqualTo(dbIdent);
+
+    LocalizedUrlAliases locUrlAliases = identifiable.getLocalizedUrlAliases();
+    assertThat(locUrlAliases.size()).isEqualTo(2);
+    assertThat(locUrlAliases.flatten().size()).isEqualTo(4);
+    assertThat(locUrlAliases.flatten())
+        .satisfiesExactlyInAnyOrder(
+            ua -> {
+              assertThat(ua.getSlug()).isEqualTo("hallo-welt");
+              assertThat(ua.isPrimary()).isTrue();
+            },
+            ua -> {
+              assertThat(ua.getSlug()).isEqualTo("hello-world");
+              assertThat(ua.isPrimary()).isFalse();
+            },
+            ua -> {
+              assertThat(ua.getSlug()).isEqualTo("helloworld");
+              assertThat(ua.isPrimary()).isFalse();
+            },
+            ua -> {
+              assertThat(ua.getSlug()).isEqualTo("hello-new-world");
+              assertThat(ua.isPrimary()).isTrue();
+            });
+    verify(slugGeneratorService, times(1)).apply(any(), any(), any());
+  }
+
   @DisplayName("1 existing alias, 1 new label -> automatically create new alias")
   @Test
   public void addLabel() throws CudamiServiceException {
