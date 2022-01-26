@@ -266,9 +266,15 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   protected void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
     if (urlAlias.getLastPublished() != null) {
       if (urlAlias.getUuid() != null) {
-        // Only the primary flag can change
-        UrlAlias publishedAlias = this.findOne(urlAlias.getUuid());
+        UrlAlias publishedAlias = findOne(urlAlias.getUuid());
+        if (!publishedAlias.isPrimary() && urlAlias.isPrimary()) {
+          // set lastPublished to current date
+          urlAlias.setLastPublished(LocalDateTime.now());
+        }
+        // Only the primary flag and lastPublished are permitted to be changed
+        // so we sync these two objects and compare them
         publishedAlias.setPrimary(urlAlias.isPrimary());
+        publishedAlias.setLastPublished(urlAlias.getLastPublished());
         if (!urlAlias.equals(publishedAlias)) {
           // there are more changes than permitted
           throw new CudamiServiceException(
