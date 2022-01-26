@@ -1,6 +1,7 @@
 import './UrlAliases.css'
 
 import classNames from 'classnames'
+import groupBy from 'lodash/groupBy'
 import sortBy from 'lodash/sortBy'
 import {publish} from 'pubsub-js'
 import {useTranslation} from 'react-i18next'
@@ -93,7 +94,7 @@ const UrlAlias = ({
 
 const UrlAliases = ({
   aliases = [],
-  aliasesToRender = {},
+  aliasesToRender = groupBy(aliases, 'website.uuid'),
   onUpdate,
   readOnly = false,
   showAll = getShowAllUrlAliases(),
