@@ -256,7 +256,9 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     }
     for (UrlAlias primaryFromDb : primariesFromDb) {
       if (newPrimaryAliases.stream()
-          .filter(ua -> !ua.equals(primaryFromDb)) // if new one is equal to alias from DB -> ignore
+          // if new one is equal to alias from DB -> ignore
+          // we must filter by primaries again since l. 285 can change it
+          .filter(ua -> !ua.equals(primaryFromDb) && ua.isPrimary())
           .anyMatch(
               ua ->
                   (ua.getWebsite() != null
@@ -274,8 +276,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // must be outside preceding `if` to avoid creation of new aliases in
       // `ensureDefaultAliasesExist`
       // either set primary of the alias in the identifiable or add the primary from database to
-      // complete
-      // the aliases of the identifiable
+      // complete the aliases of the identifiable
       Optional<UrlAlias> oldPrimary =
           actualIdentifiable.getLocalizedUrlAliases().flatten().stream()
               .filter(ua -> Objects.equals(ua.getUuid(), primaryFromDb.getUuid()))
