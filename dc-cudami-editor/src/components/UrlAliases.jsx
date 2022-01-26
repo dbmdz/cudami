@@ -98,41 +98,39 @@ const UrlAliases = ({
   onUpdate,
   readOnly = false,
   showAll = getShowAllUrlAliases(),
-}) => {
-  return (
-    <>
-      {Object.entries(aliasesToRender)
-        .sort(sortByWebsite)
-        .map(([, listOfAliases]) => {
-          const website = listOfAliases[0].website
-          return (
-            <ListGroup className="my-2" key={website?.uuid ?? 'default'}>
-              {sortBy(listOfAliases, ['slug'])
-                .filter(({primary}) => showAll || primary)
-                .map(({lastPublished, primary, slug}) => (
-                  <UrlAlias
-                    key={slug}
-                    lastPublished={lastPublished}
-                    primary={primary}
-                    slug={slug}
-                    url={website?.url}
-                    {...(!readOnly && {
-                      onChangePrimary: () =>
-                        onUpdate(setNewPrimary(aliases, slug, website)),
-                      onRemove: () =>
-                        publish('editor.show-remove-urlalias-dialog', {
-                          slug,
-                          website,
-                        }),
-                    })}
-                  />
-                ))}
-            </ListGroup>
-          )
-        })}
-    </>
-  )
-}
+}) => (
+  <>
+    {Object.entries(aliasesToRender)
+      .sort(sortByWebsite)
+      .map(([, listOfAliases]) => {
+        const website = listOfAliases[0].website
+        return (
+          <ListGroup className="my-2" key={website?.uuid ?? 'default'}>
+            {sortBy(listOfAliases, ['slug'])
+              .filter(({primary}) => showAll || primary)
+              .map(({lastPublished, primary, slug}) => (
+                <UrlAlias
+                  key={slug}
+                  lastPublished={lastPublished}
+                  primary={primary}
+                  slug={slug}
+                  url={website?.url}
+                  {...(!readOnly && {
+                    onChangePrimary: () =>
+                      onUpdate(setNewPrimary(aliases, slug, website)),
+                    onRemove: () =>
+                      publish('editor.show-remove-urlalias-dialog', {
+                        slug,
+                        website,
+                      }),
+                  })}
+                />
+              ))}
+          </ListGroup>
+        )
+      })}
+  </>
+)
 
 export {EditableUrlAlias, UrlAlias}
 export default UrlAliases
