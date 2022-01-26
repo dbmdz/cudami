@@ -86,7 +86,7 @@
     <version.mockito-core>4.3.1</version.mockito-core>
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.1</version.passay>
-    <version.postgresql>42.2.24</version.postgresql>
+    <version.postgresql>42.3.1</version.postgresql>
     <version.slf4j>1.7.35</version.slf4j>
     <version.spotbugs>4.2.3</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
