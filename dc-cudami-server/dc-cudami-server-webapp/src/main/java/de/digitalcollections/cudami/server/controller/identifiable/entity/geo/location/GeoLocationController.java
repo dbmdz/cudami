@@ -11,12 +11,12 @@ import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -123,15 +123,14 @@ public class GeoLocationController {
         "/latest/geolocations/identifier"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public void getByIdentifier(
+  public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request,
-      HttpServletResponse response)
+      HttpServletRequest request)
       throws IdentifiableServiceException {
-    response.setStatus(HttpStatus.MOVED_PERMANENTLY.value());
-    response.setHeader(
-        "Location", request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "Get languages of all geolocations")
