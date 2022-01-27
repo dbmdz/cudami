@@ -1,3 +1,4 @@
+import groupBy from 'lodash/groupBy'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -5,7 +6,6 @@ import {
   ButtonGroup,
   FormGroup,
   Label,
-  ListGroup,
   Modal,
   ModalBody,
   ModalFooter,
@@ -16,18 +16,25 @@ import {useContext} from 'use-context-selector'
 import {generateSlug} from '../../api'
 import {Context} from '../../state/Store'
 import FeedbackMessage from '../FeedbackMessage'
-import {EditableUrlAlias, UrlAlias} from '../UrlAliases'
+import UrlAliases, {EditableUrlAliases} from '../UrlAliases'
 
 const validateAliases = async (aliases, apiContextPath) => {
   const validatedAliases = await Promise.all(
-    Object.entries(aliases).map(async ([language, [alias]]) => {
-      const slug = await generateSlug(
-        apiContextPath,
-        language,
-        alias.slug,
-        alias.website?.uuid,
-      )
-      return [language, [{...alias, slug}]]
+    Object.entries(aliases).map(async ([language, aliases]) => {
+      const validated = []
+      for (let alias of aliases) {
+        const slug = await generateSlug(
+          apiContextPath,
+          language,
+          alias.slug,
+          alias.website?.uuid,
+        )
+        validated.push({
+          ...alias,
+          slug,
+        })
+      }
+      return [language, validated]
     }),
   )
   return Object.fromEntries(validatedAliases)
@@ -95,30 +102,33 @@ const ConfirmGeneratatedUrlAliasesDialog = ({
         {feedbackMessage && (
           <FeedbackMessage className="mb-2" message={feedbackMessage} />
         )}
-        {Object.entries(generatedUrlAliases).map(([language, [alias]]) => (
+        {Object.entries(generatedUrlAliases).map(([language, aliases]) => (
           <FormGroup key={language}>
             <Label className="align-middle mb-0">
               {t(`languageNames:${language}`)}
             </Label>
             {editable ? (
-              <EditableUrlAlias
-                onChange={(slug) =>
+              <EditableUrlAliases
+                aliasesToRender={groupBy(aliases, 'website.uuid')}
+                onChange={(newSlug, oldSlug, websiteUuid) => {
+                  const idx = aliases.findIndex(
+                    ({slug, website}) =>
+                      slug === oldSlug &&
+                      websiteUuid === (website?.uuid ?? 'undefined'),
+                  )
                   onChange({
                     ...generatedUrlAliases,
-                    [language]: [{...alias, slug}],
+                    [language]: aliases.map((alias, currentIdx) => {
+                      if (currentIdx === idx) {
+                        return {...alias, slug: newSlug}
+                      }
+                      return alias
+                    }),
                   })
-                }
-                slug={alias.slug}
-                url={alias.website?.url}
+                }}
               />
             ) : (
-              <ListGroup>
-                <UrlAlias
-                  primary={alias.primary}
-                  slug={alias.slug}
-                  url={alias.website?.url}
-                />
-              </ListGroup>
+              <UrlAliases aliases={aliases} readOnly={true} showAll={true} />
             )}
           </FormGroup>
         ))}

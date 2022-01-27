@@ -43,14 +43,34 @@ const sortByWebsite = (
   return website1.url > website2.url ? 1 : -1
 }
 
-const EditableUrlAlias = ({onChange, slug, url = ''}) => (
-  <InputGroup>
-    <InputGroupAddon addonType="prepend">
-      {/* Ensure that the url ends with a slash */}
-      <InputGroupText>{`${url.replace(/\/*$/, '/')}`}</InputGroupText>
-    </InputGroupAddon>
-    <Input onChange={(evt) => onChange(evt.target.value)} value={slug} />
-  </InputGroup>
+const EditableUrlAliases = ({aliasesToRender, onChange}) => (
+  <>
+    {Object.entries(aliasesToRender)
+      .sort(sortByWebsite)
+      .map(([websiteUuid, listOfAliases]) => (
+        <ListGroup className="my-2" key={websiteUuid}>
+          {sortBy(listOfAliases, ['slug']).map(
+            ({slug, website: {url = ''} = {}}) => (
+              <InputGroup key={`${websiteUuid}-${slug}`}>
+                <InputGroupAddon addonType="prepend">
+                  {/* Ensure that the url ends with a slash */}
+                  <InputGroupText>{`${url.replace(
+                    /\/*$/,
+                    '/',
+                  )}`}</InputGroupText>
+                </InputGroupAddon>
+                <Input
+                  onChange={(evt) =>
+                    onChange(evt.target.value, slug, websiteUuid ?? undefined)
+                  }
+                  value={slug}
+                />
+              </InputGroup>
+            ),
+          )}
+        </ListGroup>
+      ))}
+  </>
 )
 
 const UrlAlias = ({
@@ -132,5 +152,5 @@ const UrlAliases = ({
   </>
 )
 
-export {EditableUrlAlias, UrlAlias}
+export {EditableUrlAliases, UrlAlias}
 export default UrlAliases
