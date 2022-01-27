@@ -510,7 +510,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type", "uuid"));
   }
 
   @Override
