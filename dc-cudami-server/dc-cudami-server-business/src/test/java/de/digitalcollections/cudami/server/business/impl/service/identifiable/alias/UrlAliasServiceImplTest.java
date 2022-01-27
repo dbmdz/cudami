@@ -590,7 +590,7 @@ class UrlAliasServiceImplTest {
     UrlAlias urlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(false);
-    LocalDateTime publicationDate = LocalDateTime.now();
+    LocalDateTime publicationDate = LocalDateTime.now().minusDays(1);
     urlAlias.setLastPublished(publicationDate);
     when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 

@@ -283,11 +283,9 @@ public class UrlAliasServiceImpl implements UrlAliasService {
                   urlAlias.getUuid()));
         }
       }
-    } else {
+    } else if (urlAlias.isPrimary()) {
       // no publishing date yet
-      if (urlAlias.isPrimary()) {
-        urlAlias.setLastPublished(LocalDateTime.now());
-      }
+      urlAlias.setLastPublished(LocalDateTime.now());
     }
   }
 
