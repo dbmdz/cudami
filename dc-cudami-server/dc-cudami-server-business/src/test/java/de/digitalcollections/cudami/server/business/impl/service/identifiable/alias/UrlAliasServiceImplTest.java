@@ -583,6 +583,50 @@ class UrlAliasServiceImplTest {
         });
   }
 
+  @DisplayName("checkPublication sets lastPublished to now when an alias becomes primary again")
+  @Test
+  public void checkPublicationSetLastPublishedAgain()
+      throws UrlAliasRepositoryException, CudamiServiceException {
+    UrlAlias urlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
+    urlAlias.setPrimary(false);
+    LocalDateTime publicationDate = LocalDateTime.now().minusDays(1);
+    urlAlias.setLastPublished(publicationDate);
+    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+
+    UrlAlias changedUrlAlias = deepCopy(urlAlias);
+    changedUrlAlias.setPrimary(true);
+
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
+    service.checkPublication(changedUrlAlias);
+    assertThat(changedUrlAlias.getLastPublished()).isNotEqualTo(publicationDate);
+    assertThat(changedUrlAlias.getLastPublished().compareTo(publicationDate))
+        .isEqualTo(1); // =later than publicationDate
+    assertThat(changedUrlAlias.isPrimary()).isTrue();
+  }
+
+  @DisplayName("checkPublication does not set lastPublished primary is set to false")
+  @Test
+  public void checkPublicationLastPublishedNotSet()
+      throws UrlAliasRepositoryException, CudamiServiceException {
+    UrlAlias urlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
+    urlAlias.setPrimary(true);
+    LocalDateTime publicationDate = LocalDateTime.now();
+    urlAlias.setLastPublished(publicationDate);
+    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+
+    UrlAlias changedUrlAlias = deepCopy(urlAlias);
+    changedUrlAlias.setPrimary(false);
+
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
+    service.checkPublication(changedUrlAlias);
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
+    assertThat(changedUrlAlias.getLastPublished().compareTo(publicationDate))
+        .isEqualTo(0); // =equal
+    assertThat(changedUrlAlias.isPrimary()).isFalse();
+  }
+
   @DisplayName("can successfully validate an empty LocalizedUrlAlias")
   @Test
   public void allowEmptyLocalizedUrlAlias() throws ValidationException {
@@ -798,6 +842,7 @@ class UrlAliasServiceImplTest {
     copy.setSlug(urlAlias.getSlug());
     copy.setTargetIdentifiableType(urlAlias.getTargetIdentifiableType());
     copy.setTargetEntityType(urlAlias.getTargetEntityType());
+    copy.setTargetUuid(urlAlias.getTargetUuid());
     return copy;
   }
 }
