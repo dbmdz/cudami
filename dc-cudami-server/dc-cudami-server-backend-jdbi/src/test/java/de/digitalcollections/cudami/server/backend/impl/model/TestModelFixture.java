@@ -3,10 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.model;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -16,10 +19,7 @@ public class TestModelFixture {
   public static DigitalObject createDigitalObject(
       Map<Locale, String> labelMap, Map<Locale, String> descriptionMap) {
     DigitalObject digitalObject = new DigitalObject();
-    LocalizedText labelText = new LocalizedText();
-    for (Map.Entry<Locale, String> entry : labelMap.entrySet()) {
-      labelText.setText(entry.getKey(), entry.getValue());
-    }
+    LocalizedText labelText = createLocalizedText(labelMap);
     digitalObject.setLabel(labelText);
 
     LocalizedStructuredContent descriptionContent = new LocalizedStructuredContent();
@@ -42,4 +42,25 @@ public class TestModelFixture {
     object.setUuid(UUID.randomUUID());
     return new EntityRelation(subject, predicate, object);
   }
+
+  public static License createLicense(
+      String acronym, Map<Locale, String> objectLabels, String url) {
+    try {
+      License license =
+          new License(acronym, createLocalizedText(objectLabels), URI.create(url).toURL());
+      return license;
+    } catch (MalformedURLException ex) {
+      return null;
+    }
+  }
+
+  private static LocalizedText createLocalizedText(Map<Locale, String> localizedTextMap) {
+    LocalizedText localizedText = new LocalizedText();
+    for (Map.Entry<Locale, String> entry : localizedTextMap.entrySet()) {
+      localizedText.setText(entry.getKey(), entry.getValue());
+    }
+    return localizedText;
+  }
+
+  private TestModelFixture() {}
 }
