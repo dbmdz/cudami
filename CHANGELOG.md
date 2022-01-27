@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added transactions to all SQL statements by annotation on class level in business service layer
 - Added config endpoint, mainly for admin GUI
 - Added HeadwordEntry and Headword endpoints for management of dictionaries / encyclopedias
+- Added `uuid` to allowed sorting fields
 
 ### Changed
 
