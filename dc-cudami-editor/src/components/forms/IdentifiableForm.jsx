@@ -361,7 +361,6 @@ class IdentifiableForm extends Component {
       description: this.cleanUpJson(this.state.identifiable.description),
     }
     if (this.state.generatedUrlAliases) {
-      // TODO: make only one alias primary
       identifiable.localizedUrlAliases = mergeWith(
         identifiable.localizedUrlAliases,
         this.state.generatedUrlAliases,
