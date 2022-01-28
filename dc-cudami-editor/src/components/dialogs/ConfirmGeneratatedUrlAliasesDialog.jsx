@@ -18,9 +18,9 @@ import {Context} from '../../state/Store'
 import FeedbackMessage from '../FeedbackMessage'
 import UrlAliases, {EditableUrlAliases} from '../UrlAliases'
 
-const validateAliases = async (aliases, apiContextPath) => {
+const validateAliases = async (localizedAliases, apiContextPath) => {
   const validatedAliases = await Promise.all(
-    Object.entries(aliases).map(async ([language, aliases]) => {
+    Object.entries(localizedAliases).map(async ([language, aliases]) => {
       const validated = []
       for (let alias of aliases) {
         const slug = await generateSlug(
