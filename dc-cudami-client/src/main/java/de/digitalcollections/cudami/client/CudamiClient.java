@@ -127,6 +127,10 @@ public class CudamiClient {
     return cudamiCollectionsClient;
   }
 
+  public CudamiConfigClient forConfig() {
+    return cudamiConfigClient;
+  }
+
   public CudamiCorporateBodiesClient forCorporateBodies() {
     return cudamiCorporateBodiesClient;
   }
