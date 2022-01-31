@@ -22,21 +22,21 @@ public interface LicenseRepository {
    *
    * @param url unique url of license
    */
-  void delete(String url);
+  void deleteByUrl(String url);
 
   /**
    * Delete a license by UUID
    *
    * @param uuid unique uuid of license
    */
-  void delete(UUID uuid);
+  void deleteByUuid(UUID uuid);
 
   /**
    * Delete licenses by their UUIDs
    *
    * @param uuids list of uuids of licenses
    */
-  void delete(List<UUID> uuids);
+  void deleteByUuids(List<UUID> uuids);
 
   /**
    * Return all licenses paged.
@@ -54,20 +54,20 @@ public interface LicenseRepository {
   List<License> findAll();
 
   /**
-   * Return license with uuid
-   *
-   * @param uuid the uuid of the license
-   * @return The found license
-   */
-  License findOne(UUID uuid);
-
-  /**
    * Return license with url
    *
    * @param url the url of the license
    * @return The found license
    */
-  License findOneByUrl(URL url);
+  License getByUrl(URL url);
+
+  /**
+   * Return license with uuid
+   *
+   * @param uuid the uuid of the license
+   * @return The found license
+   */
+  License getByUuid(UUID uuid);
 
   /**
    * Save a license.
