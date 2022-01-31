@@ -44,7 +44,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public void delete(String url) {
+  public void deleteByUrl(String url) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE url = :url")
@@ -53,7 +53,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public void delete(UUID uuid) {
+  public void deleteByUuid(UUID uuid) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid = :uuid")
@@ -62,7 +62,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public void delete(List<UUID> uuids) {
+  public void deleteByUuids(List<UUID> uuids) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
@@ -105,7 +105,19 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public License findOne(UUID uuid) {
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("acronym", "created", "label", "lastModified", "url"));
+  }
+
+  @Override
+  public License getByUrl(URL url) {
+    String query = "SELECT * FROM " + tableName + " WHERE url=:url";
+    return dbi.withHandle(
+        h -> h.createQuery(query).bind("url", url).mapToBean(License.class).findOne().orElse(null));
+  }
+
+  @Override
+  public License getByUuid(UUID uuid) {
     String query = "SELECT * FROM " + tableName + " WHERE uuid=:uuid";
     return dbi.withHandle(
         h ->
@@ -114,18 +126,6 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
                 .mapToBean(License.class)
                 .findOne()
                 .orElse(null));
-  }
-
-  @Override
-  public License findOneByUrl(URL url) {
-    String query = "SELECT * FROM " + tableName + " WHERE url=:url";
-    return dbi.withHandle(
-        h -> h.createQuery(query).bind("url", url).mapToBean(License.class).findOne().orElse(null));
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("acronym", "created", "label", "lastModified", "url"));
   }
 
   @Override
