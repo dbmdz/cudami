@@ -165,8 +165,7 @@ public abstract class BaseControllerTest {
     mockMvc
         .perform(get(path))
         .andExpect(status().isOk())
-        .andExpect(
-            content().contentType(ContentType.APPLICATION_JSON.getMimeType() + ";charset=UTF-8"))
+        .andExpect(content().contentType(ContentType.APPLICATION_JSON.getMimeType()))
         .andExpect(content().string(expected));
   }
 
