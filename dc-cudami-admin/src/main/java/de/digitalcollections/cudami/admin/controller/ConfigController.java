@@ -16,7 +16,7 @@ public class ConfigController {
   }
 
   @GetMapping("/api/config")
-  public CudamiConfig getLanguages() throws HttpException {
+  public CudamiConfig getConfig() throws HttpException {
     return service.getConfig();
   }
 }
