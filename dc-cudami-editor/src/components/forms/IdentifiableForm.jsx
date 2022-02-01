@@ -105,15 +105,11 @@ class IdentifiableForm extends Component {
     )
     this.setState({
       availableLanguages: availableLanguages
-        .reduce((languages, language) => {
-          if (!(language in initialIdentifiable.label)) {
-            languages.push({
-              displayName: t(`languageNames:${language}`),
-              name: language,
-            })
-          }
-          return languages
-        }, [])
+        .filter((language) => !(language in initialIdentifiable.label))
+        .map((language) => ({
+          displayName: t(`languageNames:${language}`),
+          name: language,
+        }))
         .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
       defaultLanguage,
       generationExcludes,
@@ -167,22 +163,14 @@ class IdentifiableForm extends Component {
   /*
    * Removes languages with empty content from the json
    */
-  cleanUpJson = (editorJson) => {
-    const cleanedJson = Object.entries(editorJson).reduce(
-      (json, [language, doc]) => {
-        if (this.isEmptyContent(doc.content)) {
-          return json
-        }
-        return {
-          ...json,
-          [language]: doc,
-        }
-      },
-      {},
+  cleanContent = (localizedContent) => {
+    const cleanedContent = Object.entries(localizedContent).filter(
+      ([, doc]) => !this.isEmptyContent(doc.content),
     )
-    if (Object.keys(cleanedJson).length > 0) {
-      return cleanedJson
+    if (!cleanedContent.length) {
+      return
     }
+    return Object.fromEntries(cleanedContent)
   }
 
   /*
@@ -383,7 +371,7 @@ class IdentifiableForm extends Component {
     const {apiContextPath, parentType, parentUuid, type} = this.props
     const identifiable = {
       ...this.state.identifiable,
-      description: this.cleanUpJson(this.state.identifiable.description),
+      description: this.cleanContent(this.state.identifiable.description),
       localizedUrlAliases: this.cleanUrlAliases(
         this.state.identifiable.localizedUrlAliases,
       ),
@@ -398,7 +386,7 @@ class IdentifiableForm extends Component {
       )
     }
     if (identifiable.text) {
-      identifiable.text = this.cleanUpJson(identifiable.text)
+      identifiable.text = this.cleanContent(identifiable.text)
     }
     const {error = false, uuid} = await (identifiable.uuid
       ? updateIdentifiable(apiContextPath, identifiable, type)
