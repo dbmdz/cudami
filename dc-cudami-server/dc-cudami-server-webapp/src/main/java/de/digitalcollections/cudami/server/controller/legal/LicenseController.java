@@ -126,6 +126,14 @@ public class LicenseController {
     return service.find(pageRequest);
   }
 
+  @Operation(summary = "Get all licenses in reduced form")
+  @GetMapping(
+      value = {"/v5/licenses/all"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<License> findAll() {
+    return service.findAll();
+  }
+
   @Operation(summary = "Get a license by url")
   @GetMapping(
       value = {"/v5/licenses"},
