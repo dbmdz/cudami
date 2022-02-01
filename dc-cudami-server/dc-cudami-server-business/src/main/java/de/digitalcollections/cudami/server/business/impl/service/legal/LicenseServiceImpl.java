@@ -29,7 +29,7 @@ public class LicenseServiceImpl implements LicenseService {
   }
 
   @Override
-  public void deleteByUrl(String url) {
+  public void deleteByUrl(URL url) {
     repository.deleteByUrl(url);
   }
 
