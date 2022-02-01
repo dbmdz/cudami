@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.legal;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
+import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.legal.License;
@@ -13,6 +14,7 @@ import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -22,8 +24,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,12 +58,12 @@ public class LicenseController {
       value = {"/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) String url) {
+  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url) {
     // WARNING: a DELETE request with param seems not to be spec allowed?
     // an url as path variable is technically not possible (unescaping leads to not allowed
     // characters in url)
     service.deleteByUrl(url);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Operation(summary = "Delete a license by uuid")
@@ -72,7 +76,7 @@ public class LicenseController {
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid")
           UUID uuid) {
     service.deleteByUuid(uuid);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Operation(summary = "Delete licenses by given uuid list")
@@ -84,7 +88,7 @@ public class LicenseController {
     // FIXME: How to implement deleteByUrl (also with body? how to distinguish these both methods?
     // give param?)
     service.deleteByUuids(uuids);
-    return new ResponseEntity<>(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Operation(summary = "Get all licenses as (filtered, sorted, paged) list")
@@ -127,7 +131,8 @@ public class LicenseController {
       value = {"/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License getByUrl(@RequestParam(name = "url", required = true) URL url) {
+  public License getByUrl(@RequestParam(name = "url", required = true) URL url)
+      throws MalformedURLException {
     return service.getByUrl(url);
   }
 
@@ -139,6 +144,11 @@ public class LicenseController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License getByUuid(@PathVariable UUID uuid) {
     return service.getByUuid(uuid);
+  }
+
+  @InitBinder
+  public void initBinder(WebDataBinder binder) {
+    binder.registerCustomEditor(URL.class, new UrlEditor());
   }
 
   @Operation(summary = "Save a newly created license")

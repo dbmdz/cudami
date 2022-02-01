@@ -219,7 +219,7 @@ public class UrlAliasController {
         "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/slug/{pLocale}/{label}"
       },
-      produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+      produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> generateSlug(
       @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
           @PathVariable(name = "pLocale")

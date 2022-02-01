@@ -87,7 +87,7 @@ public class LicenseRepositoryImplTest {
     License actual = repo.save(license);
     UUID uuid = actual.getUuid();
 
-    repo.deleteByUrl(actual.getUrl().toString());
+    repo.deleteByUrl(actual.getUrl());
 
     License result = repo.getByUuid(uuid);
 
