@@ -153,7 +153,7 @@ class IdentifiableForm extends Component {
       localizedUrlAliases: {
         ...identifiable.localizedUrlAliases,
         [activeLanguage]: [
-          ...identifiable.localizedUrlAliases[activeLanguage],
+          ...(identifiable.localizedUrlAliases[activeLanguage] ?? []),
           newUrlAlias,
         ],
       },
