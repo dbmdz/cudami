@@ -75,9 +75,7 @@
           "direction": "DESC",
           "ignoreCase": false,
           "nullHandling": "NATIVE",
-          "property": "publicationStart",
-          "ascending": false,
-          "descending": true
+          "property": "publicationStart"
         }
       ]
     }

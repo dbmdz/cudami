@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -93,6 +94,12 @@ public abstract class BaseControllerTest {
     String fullPath = "xml" + path + suffix;
     Path pathToResource = getPath(fullPath);
     return Files.readString(pathToResource);
+  }
+
+  protected void testDeleteJsonSuccessful(String path, String jsonBody) throws Exception {
+    mockMvc
+        .perform(delete(path).contentType(MediaType.APPLICATION_JSON).content(jsonBody))
+        .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
   }
 
   protected void testJson(String path) throws Exception {
@@ -182,6 +189,6 @@ public abstract class BaseControllerTest {
   }
 
   protected void testDeleteSuccessful(String path) throws Exception {
-    mockMvc.perform(delete(path)).andExpect(status().is(204));
+    mockMvc.perform(delete(path)).andExpect(status().is(HttpStatus.NO_CONTENT.value())); // 204
   }
 }

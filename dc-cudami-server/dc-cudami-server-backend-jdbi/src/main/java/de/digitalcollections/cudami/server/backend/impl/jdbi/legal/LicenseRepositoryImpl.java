@@ -44,7 +44,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public void deleteByUrl(String url) {
+  public void deleteByUrl(URL url) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE url = :url")

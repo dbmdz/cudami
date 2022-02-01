@@ -17,9 +17,7 @@
           "direction": "ASC",
           "ignoreCase": false,
           "nullHandling": "NATIVE",
-          "property": "namespace",
-          "descending": false,
-          "ascending": true
+          "property": "namespace"
         }
       ]
     }

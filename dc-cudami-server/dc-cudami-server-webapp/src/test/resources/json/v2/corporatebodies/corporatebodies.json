@@ -46,18 +46,14 @@
           "ignoreCase": false,
           "nullHandling": "NATIVE",
           "property": "label",
-          "subProperty": "de",
-          "descending": false,
-          "ascending": true
+          "subProperty": "de"
         },
         {
           "direction": "ASC",
           "ignoreCase": false,
           "nullHandling": "NATIVE",
           "property": "label",
-          "subProperty": "",
-          "descending": false,
-          "ascending": true
+          "subProperty": ""
         }
       ]
     }

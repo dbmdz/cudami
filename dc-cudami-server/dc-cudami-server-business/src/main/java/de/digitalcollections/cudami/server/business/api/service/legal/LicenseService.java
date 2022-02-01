@@ -22,7 +22,7 @@ public interface LicenseService {
    *
    * @param url unique url of license
    */
-  void deleteByUrl(String url);
+  void deleteByUrl(URL url);
 
   /**
    * Delete a license by UUID
