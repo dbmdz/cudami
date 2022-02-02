@@ -84,7 +84,7 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
         "/v5/urlaliases/search", searchPageRequest, LocalizedUrlAliases.class);
   }
 
-  public boolean isMainLink(UUID websiteUuid, String slug) throws HttpException {
+  public boolean isPrimary(UUID websiteUuid, String slug) throws HttpException {
     LocalizedUrlAliases localizedUrlAliases = findPrimaryLinks(websiteUuid, slug);
     if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
       return false;
