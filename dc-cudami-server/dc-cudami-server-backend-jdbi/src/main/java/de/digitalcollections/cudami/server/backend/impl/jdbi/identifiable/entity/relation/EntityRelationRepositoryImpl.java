@@ -132,7 +132,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("subject", "predicate", "object");
+    return new ArrayList<>(Arrays.asList("subject", "predicate", "object"));
   }
 
   @Override
@@ -150,6 +150,11 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return null;
   }
 
   @Override

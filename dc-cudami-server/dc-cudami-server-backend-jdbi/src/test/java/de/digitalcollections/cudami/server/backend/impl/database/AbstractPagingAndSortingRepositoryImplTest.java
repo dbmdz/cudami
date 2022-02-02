@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.database;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
@@ -100,6 +100,11 @@ public class AbstractPagingAndSortingRepositoryImplTest {
 
     protected void setColumnName(String name) {
       columnName = name;
+    }
+
+    @Override
+    protected String getUniqueField() {
+      return null;
     }
   }
 }

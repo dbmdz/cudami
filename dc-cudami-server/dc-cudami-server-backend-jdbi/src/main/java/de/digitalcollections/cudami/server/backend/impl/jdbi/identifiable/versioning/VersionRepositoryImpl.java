@@ -68,6 +68,11 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
+  protected String getUniqueField() {
+    return "uuid";
+  }
+
+  @Override
   public Version save(Version version) {
     version.setUuid(UUID.randomUUID());
     version.setCreated(new Date());

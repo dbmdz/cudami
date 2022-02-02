@@ -6,6 +6,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -88,7 +89,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("email", "firstname", "lastname");
+    return new ArrayList<>(Arrays.asList("email", "firstname", "lastname"));
   }
 
   @Override
@@ -103,9 +104,16 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
         return "lastname";
       case "firstname":
         return "firstname";
+      case "uuid":
+        return "uuid";
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
   }
 
   @Override

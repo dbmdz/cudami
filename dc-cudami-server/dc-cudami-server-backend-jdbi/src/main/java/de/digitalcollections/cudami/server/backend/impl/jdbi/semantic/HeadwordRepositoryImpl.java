@@ -367,6 +367,11 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
+  }
+
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
         dbi.withHandle(

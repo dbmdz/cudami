@@ -7,6 +7,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +163,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("id", "identifiable", "namespace");
+    return new ArrayList<>(Arrays.asList("id", "identifiable", "namespace"));
   }
 
   @Override
@@ -177,9 +178,16 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
         return "identifiable";
       case "namespace":
         return "namespace";
+      case "uuid":
+        return "uuid";
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
   }
 
   @Override

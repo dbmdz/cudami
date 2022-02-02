@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.relation.Predi
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.relation.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("created", "label", "lastModified", "value");
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "value"));
   }
 
   @Override
@@ -94,6 +95,11 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "value";
   }
 
   @Override
