@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.business.api.service.semantic.Headwor
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -145,8 +144,7 @@ public class HeadwordServiceImpl implements HeadwordService {
 
   protected void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      final Order labelOrder1 = new Order(Direction.ASC, "label");
-      Sorting sorting = Sorting.defaultBuilder().order(labelOrder1).build();
+      Sorting sorting = new Sorting(Direction.ASC, "label", "uuid");
       pageRequest.setSorting(sorting);
     }
   }

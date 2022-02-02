@@ -278,7 +278,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       labelOrder1.setSubProperty(defaultLanguage);
       final Order labelOrder2 = new Order(Direction.ASC, "label");
       labelOrder2.setSubProperty("");
-      Sorting sorting = Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).build();
+      Order uuidOrder = new Order(Direction.ASC, "uuid");
+      Sorting sorting =
+          Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).order(uuidOrder).build();
       pageRequest.setSorting(sorting);
     }
   }
