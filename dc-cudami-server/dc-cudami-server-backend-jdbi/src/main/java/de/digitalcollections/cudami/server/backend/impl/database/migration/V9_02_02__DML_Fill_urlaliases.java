@@ -108,7 +108,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     // the websites, they are bound, too
     migrateWebpages(jdbcTemplate);
 
-    removeIdentifiablesNotToMigrate(context);
+    removeIdentifiablesNotToMigrate();
 
     // All other entities have only generic URLAliases
     ENTITY_MIGRATION_TABLES.forEach(
@@ -123,7 +123,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         });
   }
 
-  private void removeIdentifiablesNotToMigrate(Context context) {
+  private void removeIdentifiablesNotToMigrate() {
     if (cudamiConfig.getUrlAlias() != null
         && cudamiConfig.getUrlAlias().getGenerationExcludes() != null) {
       List<EntityType> excludedIdentifiables = cudamiConfig.getUrlAlias().getGenerationExcludes();
