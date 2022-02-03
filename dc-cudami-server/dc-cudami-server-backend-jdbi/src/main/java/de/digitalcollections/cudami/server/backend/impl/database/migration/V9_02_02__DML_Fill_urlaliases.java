@@ -168,6 +168,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             + parentWebpageUuid
             + "'";
     List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+
     if (webpages.isEmpty()) {
       return;
     }
@@ -201,19 +202,14 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             } catch (SQLException e) {
               throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
             }
-            try {
-              migrateSubpages(jdbcTemplate, websiteUuid, uuid);
-            } catch (SQLException e) {
-              throw new RuntimeException(
-                  "Cannot migrate subpages for websiteUuid="
-                      + websiteUuid
-                      + ", uuid="
-                      + uuid
-                      + ": "
-                      + e,
-                  e);
-            }
           });
+      try {
+        migrateSubpages(jdbcTemplate, websiteUuid, uuid);
+      } catch (SQLException e) {
+        throw new RuntimeException(
+            "Cannot migrate subpages for websiteUuid=" + websiteUuid + ", uuid=" + uuid + ": " + e,
+            e);
+      }
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Cannot parse " + jsonObject + ": " + e, e);
     }
