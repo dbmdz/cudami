@@ -37,6 +37,7 @@ import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -60,7 +61,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 @SuppressWarnings("checkstyle:typename")
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   // Cannot be more elegant, since we want to allow null values
-  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new HashMap<>();
+  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new LinkedHashMap<>();
 
   static {
     ENTITY_MIGRATION_TABLES.put(AGENT, null);
