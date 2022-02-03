@@ -143,6 +143,14 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     String selectQuery =
         "SELECT w.uuid AS w_uuid, w.label AS label, ww.website_uuid AS ws_uuid FROM webpages w, website_webpages ww WHERE ww.webpage_uuid=w.uuid ORDER BY ws_uuid,w_uuid";
     List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+
+    if (webpages.isEmpty()) {
+      LOGGER.info("No UrlAliases to add for webpages");
+      return;
+    }
+
+    LOGGER.info("Migrating webpages");
+
     webpages.forEach(
         w -> {
           JSONObject jsonObject = new JSONObject(w.toString());
