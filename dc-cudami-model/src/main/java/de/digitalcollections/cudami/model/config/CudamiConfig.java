@@ -46,6 +46,7 @@ public class CudamiConfig {
   }
 
   public static class UrlAlias {
+    private static final int DB_MAX_LENGTH = 256;
 
     private List<EntityType> generationExcludes;
     private int maxLength = -1;
@@ -63,6 +64,12 @@ public class CudamiConfig {
     }
 
     public void setMaxLength(int maxLength) {
+      if (maxLength > DB_MAX_LENGTH) {
+        throw new RuntimeException(
+            "The maxLength you configured is invalid, because it is greater than "
+                + DB_MAX_LENGTH
+                + " (this is the greatest possible length in the database)!");
+      }
       this.maxLength = maxLength;
     }
   }
