@@ -5,9 +5,16 @@ import java.util.List;
 import java.util.Locale;
 
 public class CudamiConfig {
-
-  UrlAlias urlAlias;
   Defaults defaults;
+  UrlAlias urlAlias;
+
+  public Defaults getDefaults() {
+    return defaults;
+  }
+
+  public void setDefaults(Defaults defaults) {
+    this.defaults = defaults;
+  }
 
   public UrlAlias getUrlAlias() {
     return urlAlias;
@@ -17,12 +24,25 @@ public class CudamiConfig {
     this.urlAlias = urlAlias;
   }
 
-  public Defaults getDefaults() {
-    return defaults;
-  }
+  public static class Defaults {
+    String language;
+    Locale locale;
 
-  public void setDefaults(Defaults defaults) {
-    this.defaults = defaults;
+    public String getLanguage() {
+      return language;
+    }
+
+    public void setLanguage(String language) {
+      this.language = language;
+    }
+
+    public Locale getLocale() {
+      return locale;
+    }
+
+    public void setLocale(Locale locale) {
+      this.locale = locale;
+    }
   }
 
   public static class UrlAlias {
@@ -44,28 +64,6 @@ public class CudamiConfig {
 
     public void setMaxLength(int maxLength) {
       this.maxLength = maxLength;
-    }
-  }
-
-  public static class Defaults {
-
-    String language;
-    Locale locale;
-
-    public String getLanguage() {
-      return language;
-    }
-
-    public void setLanguage(String language) {
-      this.language = language;
-    }
-
-    public Locale getLocale() {
-      return locale;
-    }
-
-    public void setLocale(Locale locale) {
-      this.locale = locale;
     }
   }
 }
