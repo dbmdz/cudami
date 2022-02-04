@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.CudamiRestClient;
+import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -10,7 +10,7 @@ import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
 
-public class CudamiIdentifierTypesClient extends CudamiRestClient<IdentifierType> {
+public class CudamiIdentifierTypesClient extends BaseRestClient<IdentifierType> {
 
   public CudamiIdentifierTypesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, IdentifierType.class, mapper, "/v5/identifiertypes");
