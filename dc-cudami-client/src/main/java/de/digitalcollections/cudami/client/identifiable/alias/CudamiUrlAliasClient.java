@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.alias;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.CudamiRestClient;
+import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class CudamiUrlAliasClient extends CudamiRestClient<UrlAlias> {
+public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
 
   public CudamiUrlAliasClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, UrlAlias.class, mapper, "/v5/urlaliases");

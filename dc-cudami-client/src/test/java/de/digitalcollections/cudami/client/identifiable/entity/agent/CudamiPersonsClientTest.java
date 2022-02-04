@@ -16,25 +16,8 @@ import org.junit.jupiter.api.Test;
 class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, CudamiPersonsClient> {
 
   @Test
-  @DisplayName("can find by language, initial string and dedicated paging attributes")
-  public void findByLanguageInitialAndPagingAttributes() throws Exception {
-    client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
-  }
-
-  @Test
-  @DisplayName("can find by pageRequest, language and initial string")
-  public void findByPageRequestLanguageInitial() throws Exception {
-    client.findByLanguageAndInitial(buildExamplePageRequest(), "de", "a");
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get",
-        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
-  }
-
-  @Test
   @DisplayName("can find by the place of birth")
-  public void findByPlaceOfBirth() throws Exception {
+  public void testFindByPlaceOfBirth() throws Exception {
     UUID placeUuid = UUID.randomUUID();
     client.findByPlaceOfBirth(buildExamplePageRequest(), placeUuid);
     verifyHttpRequestByMethodAndRelativeURL(
@@ -46,7 +29,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
 
   @Test
   @DisplayName("can find by the place of death")
-  public void findByPlaceOfDeath() throws Exception {
+  public void testFindByPlaceOfDeath() throws Exception {
     UUID placeUuid = UUID.randomUUID();
     client.findByPlaceOfDeath(buildExamplePageRequest(), placeUuid);
     verifyHttpRequestByMethodAndRelativeURL(
@@ -58,34 +41,22 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
 
   @Test
   @DisplayName("can find DigitalObjects for a person")
-  public void findDigitalObjectsForPersons() throws Exception {
+  public void testGetDigitalObjects() throws Exception {
     UUID personUuid = UUID.randomUUID();
     client.getDigitalObjects(personUuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + personUuid + "/digitalobjects");
   }
 
   @Test
-  @DisplayName("can get by identifier")
-  public void getByIdentifier() throws Exception {
-    String identifierNamespace = "mdz-obj";
-    String identifierValue = "bsb12345678";
-
-    client.getByIdentifier(identifierNamespace, identifierValue);
-
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
-  }
-
-  @Test
   @DisplayName("can return the languages for all persons")
-  public void getLanguages() throws Exception {
+  public void testGetLanguages() throws Exception {
     client.getLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 
   @Test
   @DisplayName("can return all works of a person")
-  public void getWorks() throws Exception {
+  public void testGetWorks() throws Exception {
     String bodyJson = "[{\"entityType\":\"WORK\",\"identifiableType\":\"ENTITY\"}]";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 

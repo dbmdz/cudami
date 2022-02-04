@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.NullHandling;
 import de.digitalcollections.model.paging.Order;
@@ -115,5 +116,10 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
 
   public I getByUuidAndLocale(UUID uuid, String locale) throws HttpException {
     return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+  }
+
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws HttpException {
+    return doGetRequestForObjectList(
+        String.format("/v5/identifiables/%s/related/fileresources", uuid), FileResource.class);
   }
 }

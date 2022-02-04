@@ -17,7 +17,7 @@ class CudamiFileResourcesMetadataClientTest
 
   @Test
   @DisplayName("can find FileResources by their type")
-  public void findByType() throws Exception {
+  public void testFindFileResourcesByType() throws Exception {
     client.findFileResourcesByType(new SearchPageRequest(), "jpg");
     verifyHttpRequestByMethodAndRelativeURL("get", "/type/jpg?pageNumber=0&pageSize=0");
   }
@@ -25,7 +25,7 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can execute the find method with a SearchPageRequest")
   @Override
-  public void findWithSearchPageRequest() throws Exception {
+  public void testFindWithSearchPageRequest() throws Exception {
     String bodyJson =
         "{\"content\":[{\"objectType\":\"FILE_RESOURCE\", \"fileResource\":{\"entityType\":\"FILE_RESOURCE\",\"identifiableType\":\"ENTITY\"}}]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
@@ -41,7 +41,7 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can execute the find method with a search term and max results")
   @Override
-  public void findWithSearchTermAndMaxResults() throws Exception {
+  public void testFindWithSearchTermAndMaxResults() throws Exception {
     String bodyJson = "{\"content\":[]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
@@ -51,21 +51,8 @@ class CudamiFileResourcesMetadataClientTest
   }
 
   @Test
-  @DisplayName("can get by identifier")
-  @Override
-  public void getByIdentifier() throws Exception {
-    String identifierNamespace = "gnd";
-    String identifierValue = "1234567-8";
-
-    client.getByIdentifier(identifierNamespace, identifierValue);
-
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
-  }
-
-  @Test
   @DisplayName("can return the languages for all FileResources")
-  public void getLanguages() throws Exception {
+  public void testGetLanguages() throws Exception {
     client.getLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }

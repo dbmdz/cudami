@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
+import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.http.HttpException;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.lang.reflect.InvocationTargetException;
@@ -13,7 +13,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CudamiRestClient<T extends Object> extends BaseRestClient<T> {
+public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiRestClient.class);
 
@@ -80,11 +80,6 @@ public class CudamiRestClient<T extends Object> extends BaseRestClient<T> {
 
   public T getByUuid(UUID uuid) throws HttpException {
     return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
-  }
-
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws HttpException {
-    return doGetRequestForObjectList(
-        String.format("/v5/identifiables/%s/related/fileresources", uuid), FileResource.class);
   }
 
   public T save(T object) throws HttpException {
