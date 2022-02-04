@@ -1,10 +1,10 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import de.digitalcollections.cudami.client.exceptions.CudamiRestErrorDecoder;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.model.exception.http.HttpErrorDecoder;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.paging.Direction;
@@ -28,18 +28,24 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CudamiBaseClient<T extends Object> {
+public abstract class BaseRestClient<T extends Object> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CudamiBaseClient.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(BaseRestClient.class);
 
+  protected final String baseEndpoint;
   protected final HttpClient http;
   protected final ObjectMapper mapper;
   protected final ObjectReader reader;
   protected final URI serverUri;
   protected final Class<T> targetType;
 
-  public CudamiBaseClient(
-      HttpClient http, String serverUrl, Class<T> targetType, ObjectMapper mapper) {
+  public BaseRestClient(
+      HttpClient http,
+      String serverUrl,
+      Class<T> targetType,
+      ObjectMapper mapper,
+      String baseEndpoint) {
+    this.baseEndpoint = baseEndpoint;
     this.http = http;
     this.mapper = mapper;
     this.reader = mapper.reader().forType(targetType);
@@ -61,7 +67,7 @@ public class CudamiBaseClient<T extends Object> {
     return req;
   }
 
-  protected URI createFullUri(String requestUrl) {
+  public URI createFullUri(String requestUrl) {
     return serverUri.resolve(serverUri.getPath() + requestUrl);
   }
 
@@ -163,7 +169,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("DELETE " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("DELETE " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -183,7 +189,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -220,7 +226,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -254,7 +260,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -279,7 +285,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -313,7 +319,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("GET " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -340,7 +346,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PATCH " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -355,7 +361,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PATCH " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PATCH " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -370,7 +376,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -391,7 +397,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -411,7 +417,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       final byte[] body = response.body();
       if (body == null || body.length == 0) {
@@ -431,7 +437,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -457,7 +463,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -477,7 +483,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -492,7 +498,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("POST " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
@@ -507,7 +513,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PUT " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -528,7 +534,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PUT " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -549,7 +555,7 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PUT " + requestUrl, statusCode, response);
       }
       // This is the most performant approach for Jackson
       final byte[] body = response.body();
@@ -569,50 +575,13 @@ public class CudamiBaseClient<T extends Object> {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
       Integer statusCode = response.statusCode();
       if (statusCode >= 400) {
-        throw CudamiRestErrorDecoder.decode("PUT " + requestUrl, statusCode);
+        throw HttpErrorDecoder.decode("PUT " + requestUrl, statusCode, response);
       }
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
       throw new HttpException("Failed to retrieve response due to connection error", e);
     }
-  }
-
-  public PageResponse<T> findByLanguageAndInitial(
-      String baseUrl, PageRequest pageRequest, String language, String initial)
-      throws HttpException {
-    return doGetRequestForPagedObjectList(
-        String.format(baseUrl + "?language=%s&initial=%s", language, initial), pageRequest);
-  }
-
-  public PageResponse<T> findByLanguageAndInitial(
-      String baseUrl,
-      int pageNumber,
-      int pageSize,
-      String sortField,
-      String sortDirection,
-      String nullHandling,
-      String language,
-      String initial)
-      throws HttpException {
-    Order order =
-        new Order(
-            Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
-    Sorting sorting = new Sorting(order);
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sorting);
-    return findByLanguageAndInitial(baseUrl, pageRequest, language, initial);
-  }
-
-  /**
-   * Converts the given list of filter criterias to a request string
-   *
-   * @param filterCriterias a list of filter criterias
-   * @return the filter criterias as request string
-   */
-  private String getFilterParamsAsString(List<FilterCriterion> filterCriterias) {
-    return filterCriterias.stream()
-        .map(this::filterCriterionToUrlParam)
-        .collect(Collectors.joining("&"));
   }
 
   private String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
@@ -642,6 +611,27 @@ public class CudamiBaseClient<T extends Object> {
         break;
     }
     return criterion;
+  }
+
+  /**
+   * Get the base endpoint path for testing purposes
+   *
+   * @return the relative base endpoint of the client
+   */
+  public String getBaseEndpoint() {
+    return baseEndpoint;
+  }
+
+  /**
+   * Converts the given list of filter criterias to a request string
+   *
+   * @param filterCriterias a list of filter criterias
+   * @return the filter criterias as request string
+   */
+  private String getFilterParamsAsString(List<FilterCriterion> filterCriterias) {
+    return filterCriterias.stream()
+        .map(this::filterCriterionToUrlParam)
+        .collect(Collectors.joining("&"));
   }
 
   /**

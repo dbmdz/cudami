@@ -1,11 +1,9 @@
 package de.digitalcollections.cudami.client.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
@@ -19,13 +17,6 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
 
   public CudamiFileResourcesMetadataClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, FileResource.class, mapper, "/v5/fileresources");
-  }
-
-  @Deprecated(since = "5.0", forRemoval = true)
-  /** @deprecated Please use {@link #find(SearchPageRequest)} instead */
-  @Override
-  public PageResponse<FileResource> find(PageRequest pageRequest) throws HttpException {
-    return super.find(pageRequest);
   }
 
   @Override

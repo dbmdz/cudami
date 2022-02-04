@@ -1,8 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -18,23 +17,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class CudamiDigitalObjectsClient extends CudamiIdentifiablesClient<DigitalObject> {
+public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObject> {
 
   public CudamiDigitalObjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, DigitalObject.class, mapper, "/v5/digitalobjects");
   }
 
-  public boolean delete(UUID uuid) throws HttpException {
-    return Boolean.parseBoolean(
-        doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid)));
-  }
-
   public List<DigitalObject> findAllReduced() throws HttpException {
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
-  }
-
-  public DigitalObject findOneByRefId(long refId) throws HttpException {
-    return doGetRequestForObject(String.format("%s/%s", baseEndpoint, refId));
   }
 
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws HttpException {
@@ -73,6 +63,10 @@ public class CudamiDigitalObjectsClient extends CudamiIdentifiablesClient<Digita
         doGetRequestForObject(String.format("%s/%s/item", baseEndpoint, uuid), Item.class);
   }
 
+  public List<Locale> getLanguages() throws HttpException {
+    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
+  }
+
   public List<Locale> getLanguagesOfCollections(UUID uuid) throws HttpException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
@@ -94,9 +88,5 @@ public class CudamiDigitalObjectsClient extends CudamiIdentifiablesClient<Digita
         String.format("%s/%s/fileresources", baseEndpoint, uuid),
         fileResources,
         FileResource.class);
-  }
-
-  public List<Locale> getLanguages() throws HttpException {
-    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

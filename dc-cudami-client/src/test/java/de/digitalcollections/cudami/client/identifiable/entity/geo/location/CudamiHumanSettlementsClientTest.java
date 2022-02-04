@@ -1,25 +1,20 @@
 package de.digitalcollections.cudami.client.identifiable.entity.geo.location;
 
-import de.digitalcollections.cudami.client.identifiable.entity.agent.BaseCudamiIdentifiablesClientTest;
+import de.digitalcollections.cudami.client.identifiable.entity.BaseCudamiEntitiesClientTest;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The client for HumanSettlements")
 class CudamiHumanSettlementsClientTest
-    extends BaseCudamiIdentifiablesClientTest<HumanSettlement, CudamiHumanSettlementsClient> {
+    extends BaseCudamiEntitiesClientTest<HumanSettlement, CudamiHumanSettlementsClient> {
 
   @Test
-  @DisplayName("can find by identifier")
-  @Override
-  public void findByIdentifier() throws Exception {
-    String identifierNamespace = "gnd";
-    String identifierValue = "1234567-8";
-
-    client.findOneByIdentifier(identifierNamespace, identifierValue);
-
+  @DisplayName("can find by language, initial string and dedicated paging attributes")
+  public void findByLanguageInitialAndPagingAttributes() throws Exception {
+    client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
   }
 
   @Test
@@ -41,10 +36,15 @@ class CudamiHumanSettlementsClientTest
   }
 
   @Test
-  @DisplayName("can find by language, initial string and dedicated paging attributes")
-  public void findByLanguageInitialAndPagingAttributes() throws Exception {
-    client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
+  @DisplayName("can get by identifier")
+  @Override
+  public void getByIdentifier() throws Exception {
+    String identifierNamespace = "gnd";
+    String identifierValue = "1234567-8";
+
+    client.getByIdentifier(identifierNamespace, identifierValue);
+
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
+        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
   }
 }
