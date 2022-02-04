@@ -2,13 +2,12 @@ package de.digitalcollections.cudami.client.identifiable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClientTest.CudamiIdentifiablesClientForIdentifiables;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.BaseCudamiIdentifiablesClientTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import java.net.http.HttpClient;
 import org.junit.jupiter.api.DisplayName;
 
 @DisplayName("The Identifiables Client for Identifiables")
-class CudamiIdentifiablesClientTest
+public class CudamiIdentifiablesClientTest
     extends BaseCudamiIdentifiablesClientTest<
         Identifiable, CudamiIdentifiablesClientForIdentifiables> {
 

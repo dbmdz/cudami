@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.client.identifiable.alias;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.CudamiBaseClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
+import de.digitalcollections.cudami.client.CudamiRestClient;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -16,22 +16,40 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
+public class CudamiUrlAliasClient extends CudamiRestClient<UrlAlias> {
 
   public CudamiUrlAliasClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, UrlAlias.class, mapper);
+    super(http, serverUrl, UrlAlias.class, mapper, "/v5/urlaliases");
+  }
+
+  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(
+        baseEndpoint + "/search", searchPageRequest, LocalizedUrlAliases.class);
+  }
+
+  public LocalizedUrlAliases findAllLinks(UUID websiteUuid, String slug) throws HttpException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format(baseEndpoint + "/%s", slug), LocalizedUrlAliases.class);
+    }
+
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format(baseEndpoint + "/%s/%s", slug, websiteUuid), LocalizedUrlAliases.class);
   }
 
   public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug) throws HttpException {
     if (websiteUuid == null) {
       return (LocalizedUrlAliases)
           doGetRequestForObject(
-              String.format("/v5/urlaliases/primary/%s", slug), LocalizedUrlAliases.class);
+              String.format(baseEndpoint + "/primary/%s", slug), LocalizedUrlAliases.class);
     }
 
     return (LocalizedUrlAliases)
         doGetRequestForObject(
-            String.format("/v5/urlaliases/primary/%s/%s", slug, websiteUuid),
+            String.format(baseEndpoint + "/primary/%s/%s", slug, websiteUuid),
             LocalizedUrlAliases.class);
   }
 
@@ -40,48 +58,30 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
     if (websiteUuid == null) {
       return (LocalizedUrlAliases)
           doGetRequestForObject(
-              String.format("/v5/urlaliases/primary/%s?pLocale=%s", slug, pLocale),
+              String.format(baseEndpoint + "/primary/%s?pLocale=%s", slug, pLocale),
               LocalizedUrlAliases.class);
     }
 
     return (LocalizedUrlAliases)
         doGetRequestForObject(
-            String.format("/v5/urlaliases/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
+            String.format(baseEndpoint + "/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
             LocalizedUrlAliases.class);
   }
 
-  public LocalizedUrlAliases findAllLinks(UUID websiteUuid, String slug) throws HttpException {
-    if (websiteUuid == null) {
-      return (LocalizedUrlAliases)
-          doGetRequestForObject(
-              String.format("/v5/urlaliases/%s", slug), LocalizedUrlAliases.class);
+  public String generateSlug(Locale locale, String label, UUID websiteUuid) throws HttpException {
+    String encodedLabel;
+    try {
+      encodedLabel = URLEncoder.encode(label, StandardCharsets.UTF_8.toString());
+    } catch (UnsupportedEncodingException e) {
+      throw new HttpException("generateSlug", e);
     }
 
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format("/v5/urlaliases/%s/%s", slug, websiteUuid), LocalizedUrlAliases.class);
-  }
-
-  public UrlAlias save(UrlAlias urlAlias) throws HttpException {
-    return doPostRequestForObject("/v5/urlaliases", urlAlias);
-  }
-
-  public UrlAlias update(UUID uuid, UrlAlias urlAlias) throws HttpException {
-    return doPutRequestForObject(String.format("/v5/urlaliases/%s", uuid), urlAlias);
-  }
-
-  public UrlAlias findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/v5/urlaliases/%s", uuid));
-  }
-
-  public boolean delete(UUID uuid) throws HttpException {
-    return Boolean.parseBoolean(doDeleteRequestForString(String.format("/v5/urlaliases/%s", uuid)));
-  }
-
-  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
-    return doGetSearchRequestForPagedObjectList(
-        "/v5/urlaliases/search", searchPageRequest, LocalizedUrlAliases.class);
+    if (websiteUuid == null) {
+      return doGetRequestForString(
+          String.format(baseEndpoint + "/slug/%s/%s", locale, encodedLabel));
+    }
+    return doGetRequestForString(
+        String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 
   public boolean isMainLink(UUID websiteUuid, String slug) throws HttpException {
@@ -98,21 +98,5 @@ public class CudamiUrlAliasClient extends CudamiBaseClient<UrlAlias> {
     }
 
     return false;
-  }
-
-  public String generateSlug(Locale locale, String label, UUID websiteUuid) throws HttpException {
-    String encodedLabel;
-    try {
-      encodedLabel = URLEncoder.encode(label, StandardCharsets.UTF_8.toString());
-    } catch (UnsupportedEncodingException e) {
-      throw new HttpException("generateSlug", e);
-    }
-
-    if (websiteUuid == null) {
-      return doGetRequestForString(
-          String.format("/v5/urlaliases/slug/%s/%s", locale, encodedLabel));
-    }
-    return doGetRequestForString(
-        String.format("/v5/urlaliases/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 }

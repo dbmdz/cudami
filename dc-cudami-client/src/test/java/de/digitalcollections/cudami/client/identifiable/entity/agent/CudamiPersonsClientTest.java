@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.client.identifiable.entity.BaseCudamiEntitiesClientTest;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.nio.charset.StandardCharsets;
@@ -12,8 +13,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The client for persons")
-class CudamiPersonsClientTest
-    extends BaseCudamiIdentifiablesClientTest<Person, CudamiPersonsClient> {
+class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, CudamiPersonsClient> {
+
+  @Test
+  @DisplayName("can find by language, initial string and dedicated paging attributes")
+  public void findByLanguageInitialAndPagingAttributes() throws Exception {
+    client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
+  }
 
   @Test
   @DisplayName("can find by pageRequest, language and initial string")
@@ -22,14 +30,6 @@ class CudamiPersonsClientTest
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
-  }
-
-  @Test
-  @DisplayName("can find by language, initial string and dedicated paging attributes")
-  public void findByLanguageInitialAndPagingAttributes() throws Exception {
-    client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
   }
 
   @Test
@@ -65,6 +65,18 @@ class CudamiPersonsClientTest
   }
 
   @Test
+  @DisplayName("can get by identifier")
+  public void getByIdentifier() throws Exception {
+    String identifierNamespace = "mdz-obj";
+    String identifierValue = "bsb12345678";
+
+    client.getByIdentifier(identifierNamespace, identifierValue);
+
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
+  }
+
+  @Test
   @DisplayName("can return the languages for all persons")
   public void getLanguages() throws Exception {
     client.getLanguages();
@@ -82,18 +94,5 @@ class CudamiPersonsClientTest
     assertThat(works).isNotNull();
     assertThat(works.get(0)).isExactlyInstanceOf(Work.class);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + personUuid + "/works");
-  }
-
-  @Test
-  @DisplayName("can find by identifier")
-  @Override
-  public void findByIdentifier() throws Exception {
-    String identifierNamespace = "mdz-obj";
-    String identifierValue = "bsb12345678";
-
-    client.findOneByIdentifier(identifierNamespace, identifierValue);
-
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
   }
 }

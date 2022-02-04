@@ -1,50 +1,39 @@
 package de.digitalcollections.cudami.client.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.client.CudamiBaseClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.cudami.client.CudamiRestClient;
+import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.security.User;
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.UUID;
 
-public class CudamiUsersClient extends CudamiBaseClient<User> {
+public class CudamiUsersClient extends CudamiRestClient<User> {
 
   public CudamiUsersClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, User.class, mapper);
-  }
-
-  public User create() {
-    return new User();
-  }
-
-  public PageResponse<User> find(PageRequest pageRequest) throws HttpException {
-    return doGetRequestForPagedObjectList("/v5/users", pageRequest);
+    super(http, serverUrl, User.class, mapper, "/v5/users");
   }
 
   public List<User> findActiveAdminUsers() throws HttpException {
-    return doGetRequestForObjectList("/v5/users?role=ADMIN&enabled=true");
+    return doGetRequestForObjectList(String.format("%s?role=ADMIN&enabled=true", baseEndpoint));
   }
 
+  @Override
   public List<User> findAll() throws HttpException {
     return doGetRequestForObjectList("/v5/users");
   }
 
-  public User findOne(UUID uuid) throws HttpException {
-    return doGetRequestForObject(String.format("/v5/users/%s", uuid));
-  }
-
+  /**
+   * @deprecated This method is subject to be removed.
+   *     <p>Use {@link #getByEmail(java.lang.String)} instead.
+   * @param email email of user
+   * @return user with given email
+   */
+  @Deprecated(forRemoval = true)
   public User findOneByEmail(String email) throws HttpException {
-    return doGetRequestForObject(String.format("/v5/users?email=%s", email));
+    return getByEmail(email);
   }
 
-  public User save(User user) throws HttpException {
-    return doPostRequestForObject("/v5/users", user);
-  }
-
-  public User update(UUID uuid, User user) throws HttpException {
-    return doPutRequestForObject(String.format("/v5/users/%s", uuid), user);
+  public User getByEmail(String email) throws HttpException {
+    return doGetRequestForObject(String.format("%s?email=%s", baseEndpoint, email));
   }
 }
