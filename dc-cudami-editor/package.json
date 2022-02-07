@@ -62,7 +62,7 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.16.10",
     "@fisker/prettier-config": "^5.0.4",
-    "@types/node": "^17.0.14",
+    "@types/node": "^17.0.15",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.10",
     "eslint-plugin-react": "^7.28.0",
