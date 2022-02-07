@@ -5,7 +5,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>5.2.0-RC2</version>
+    <version>5.2.0-RC3</version>
   </parent>
   
   <name>DigitalCollections: cudami lobid.org Client</name>
