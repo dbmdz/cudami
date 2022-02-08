@@ -6,6 +6,8 @@ import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClien
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +27,12 @@ public class CudamiCorporateBodiesClient extends CudamiIdentifiablesClient<Corpo
   @Override
   public PageResponse<CorporateBody> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)
+      throws HttpException {
+    return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
   public List<Locale> getLanguages() throws HttpException {

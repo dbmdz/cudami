@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
@@ -95,5 +97,31 @@ class CudamiPersonsClientTest
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
+  }
+
+  @Test
+  @DisplayName("can execute the find method with a SearchPageRequest")
+  @Override
+  public void findWithSearchPageRequest() throws Exception {
+    String bodyJson = "{}";
+    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
+
+    SearchPageRequest searchPageRequest = new SearchPageRequest();
+    SearchPageResponse<Person> response = client.find(searchPageRequest);
+    assertThat(response).isNotNull();
+
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");
+  }
+
+  @Test
+  @DisplayName("can execute the find method with a search term and max results")
+  @Override
+  public void findWithSearchTermAndMaxResults() throws Exception {
+    String bodyJson = "{\"content\":[]}";
+    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
+
+    assertThat(client.find("foo", 100)).isNotNull();
+
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=100&searchTerm=foo");
   }
 }
