@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [5.2.1](https://github.com/dbmdz/cudami/releases/tag/5.2.1) - 2022-02-08
+
+### Added
+
+- Added indexes on big tables to improve performance of joins and sorting
+
+### Changed
+
+- Fixed search for a website's rootpages
+- Fixed two wrong endpoints endpoints called in the client
+- Improved paging: added unique field to sorting
+
 ## [5.2.0](https://github.com/dbmdz/cudami/releases/tag/5.2.0) - 2022-02-07
 
 ### Added
