@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.lobid.client.model.LobidCorporateBody;
 import de.digitalcollections.cudami.lobid.client.model.LobidDepiction;
 import de.digitalcollections.cudami.lobid.client.model.LobidHomepage;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -26,7 +26,7 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     super(http, serverUrl, LobidCorporateBody.class, mapper);
   }
 
-  public CorporateBody getByGndId(String gndId) throws HttpException {
+  public CorporateBody getByGndId(String gndId) throws TechnicalException {
     LobidCorporateBody lobidCorporateBody =
         doGetRequestForObject(String.format("/gnd/%s.json", gndId));
     CorporateBody corporateBody = mapLobidToModel(lobidCorporateBody);

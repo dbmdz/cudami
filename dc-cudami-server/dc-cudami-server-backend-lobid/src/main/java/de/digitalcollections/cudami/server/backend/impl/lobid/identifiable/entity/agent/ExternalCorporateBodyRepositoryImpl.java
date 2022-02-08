@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.enti
 import de.digitalcollections.cudami.lobid.client.LobidClient;
 import de.digitalcollections.cudami.lobid.client.LobidCorporateBodiesClient;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class ExternalCorporateBodyRepositoryImpl implements ExternalCorporateBod
     try {
       CorporateBody corporateBody = client.getByGndId(gndId);
       return corporateBody;
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       LOGGER.warn("Could not get corporate body by GND-ID: " + gndId, ex);
     }
     return null;

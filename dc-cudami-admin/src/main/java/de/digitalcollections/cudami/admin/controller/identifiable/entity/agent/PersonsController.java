@@ -4,8 +4,8 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -47,7 +47,7 @@ public class PersonsController extends AbstractController {
   }
 
   @GetMapping("/persons/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "persons/create";
   }
@@ -63,9 +63,9 @@ public class PersonsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Person person = service.findOne(uuid);
+    Person person = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
 
@@ -86,19 +86,19 @@ public class PersonsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/persons/{uuid}")
   @ResponseBody
-  public Person get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Person get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/persons")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -116,7 +116,7 @@ public class PersonsController extends AbstractController {
     try {
       Person personDb = service.save(person);
       return ResponseEntity.status(HttpStatus.CREATED).body(personDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save person: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -127,16 +127,16 @@ public class PersonsController extends AbstractController {
     try {
       Person personDb = service.update(uuid, person);
       return ResponseEntity.ok(personDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save person with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
   @GetMapping("/persons/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws HttpException {
+  public String view(@PathVariable UUID uuid, Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Person person = service.findOne(uuid);
+    Person person = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
 

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.geo.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -18,12 +18,12 @@ public class CudamiGeoLocationsClient extends CudamiEntitiesClient<GeoLocation> 
 
   @Override
   public SearchPageResponse<GeoLocation> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     // Interestingly without "/search" in the path
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 }

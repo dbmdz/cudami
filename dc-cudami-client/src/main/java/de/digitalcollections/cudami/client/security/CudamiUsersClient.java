@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.security.User;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -13,12 +13,12 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
     super(http, serverUrl, User.class, mapper, "/v5/users");
   }
 
-  public List<User> findActiveAdminUsers() throws HttpException {
+  public List<User> findActiveAdminUsers() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s?role=ADMIN&enabled=true", baseEndpoint));
   }
 
   @Override
-  public List<User> findAll() throws HttpException {
+  public List<User> findAll() throws TechnicalException {
     return doGetRequestForObjectList("/v5/users");
   }
 
@@ -29,11 +29,11 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
    * @return user with given email
    */
   @Deprecated(forRemoval = true)
-  public User findOneByEmail(String email) throws HttpException {
+  public User findOneByEmail(String email) throws TechnicalException {
     return getByEmail(email);
   }
 
-  public User getByEmail(String email) throws HttpException {
+  public User getByEmail(String email) throws TechnicalException {
     return doGetRequestForObject(String.format("%s?email=%s", baseEndpoint, email));
   }
 }

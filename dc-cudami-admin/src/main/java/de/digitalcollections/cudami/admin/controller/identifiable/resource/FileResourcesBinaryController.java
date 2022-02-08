@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ public class FileResourcesBinaryController extends AbstractController {
   @PostMapping("/api/files")
   @ResponseBody
   public FileResource upload(HttpServletRequest request, RedirectAttributes redirectAttributes)
-      throws HttpException {
+      throws TechnicalException {
     boolean isMultipart = ServletFileUpload.isMultipartContent(request);
     if (!isMultipart) {
       // Inform user about invalid request
@@ -70,7 +70,7 @@ public class FileResourcesBinaryController extends AbstractController {
         try {
           stream.close();
         } catch (IOException ex) {
-          throw new HttpException("Error closing stream", ex);
+          throw new TechnicalException("Error closing stream", ex);
         }
       }
     }

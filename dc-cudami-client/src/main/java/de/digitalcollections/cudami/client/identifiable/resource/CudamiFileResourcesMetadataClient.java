@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -21,17 +21,17 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
 
   @Override
   public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
   public SearchPageResponse<FileResource> findFileResourcesByType(
-      SearchPageRequest searchPageRequest, String type) throws HttpException {
+      SearchPageRequest searchPageRequest, String type) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/type/%s", baseEndpoint, type), searchPageRequest);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

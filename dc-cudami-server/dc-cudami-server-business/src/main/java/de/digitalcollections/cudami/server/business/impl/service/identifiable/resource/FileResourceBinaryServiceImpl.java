@@ -5,8 +5,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
-import de.digitalcollections.model.exception.ResourceIOException;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.InputStream;
@@ -38,7 +38,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public void assertReadability(FileResource resource) throws IdentifiableServiceException {
     try {
       binaryRepository.assertReadability(resource);
-    } catch (ResourceIOException | ResourceNotFoundException ex) {
+    } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new IdentifiableServiceException(
           "File resource " + resource.getUri() + " not readable.", ex);
     }
@@ -48,7 +48,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public FileResource find(String uuid, MimeType mimeType) throws IdentifiableServiceException {
     try {
       return binaryRepository.find(uuid, mimeType);
-    } catch (ResourceIOException | ResourceNotFoundException ex) {
+    } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new IdentifiableServiceException("File resource " + uuid + " not found.", ex);
     }
   }
@@ -57,7 +57,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public byte[] getAsBytes(FileResource resource) throws IdentifiableServiceException {
     try {
       return binaryRepository.getAsBytes(resource);
-    } catch (ResourceIOException | ResourceNotFoundException ex) {
+    } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new IdentifiableServiceException(
           "Can not return file resource " + resource.getUri() + " as bytes.", ex);
     }
@@ -67,7 +67,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public Document getAsDocument(FileResource resource) throws IdentifiableServiceException {
     try {
       return binaryRepository.getAsDocument(resource);
-    } catch (ResourceIOException | ResourceNotFoundException ex) {
+    } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new IdentifiableServiceException(
           "Can not return file resource " + resource.getUri() + " as document.", ex);
     }
@@ -77,7 +77,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public InputStream getInputStream(FileResource resource) throws IdentifiableServiceException {
     try {
       return binaryRepository.getInputStream(resource);
-    } catch (ResourceIOException | ResourceNotFoundException ex) {
+    } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new IdentifiableServiceException(
           "Can not return file resource " + resource.getUri() + " as inputstream.", ex);
     }
@@ -90,7 +90,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
       fileResource = binaryRepository.save(fileResource, binaryData);
       fileResource = metadataService.save(fileResource);
       return fileResource;
-    } catch (ResourceIOException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }

@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.admin.controller.view;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -60,8 +60,8 @@ public class RenderingTemplatesController extends AbstractController {
   }
 
   @GetMapping("/renderingtemplates/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
-    RenderingTemplate template = service.findOne(uuid);
+  public String edit(@PathVariable UUID uuid, Model model) throws TechnicalException {
+    RenderingTemplate template = service.getByUuid(uuid);
     model.addAttribute("name", template.getName());
     model.addAttribute("uuid", template.getUuid());
     return "renderingtemplates/edit";
@@ -72,7 +72,7 @@ public class RenderingTemplatesController extends AbstractController {
   public PageResponse<RenderingTemplate> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
+      throws TechnicalException {
     List<Order> orders = new ArrayList<>();
     Order labelOrder = new Order("label");
     labelOrder.setSubProperty(localeService.getDefaultLanguage().getLanguage());
@@ -84,8 +84,8 @@ public class RenderingTemplatesController extends AbstractController {
 
   @GetMapping("/api/renderingtemplates/{uuid}")
   @ResponseBody
-  public RenderingTemplate get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public RenderingTemplate get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/renderingtemplates")
@@ -98,7 +98,7 @@ public class RenderingTemplatesController extends AbstractController {
     try {
       RenderingTemplate templateDb = service.save(template);
       return ResponseEntity.status(HttpStatus.CREATED).body(templateDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save rendering template: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -109,7 +109,7 @@ public class RenderingTemplatesController extends AbstractController {
     try {
       RenderingTemplate templateDb = service.update(uuid, template);
       return ResponseEntity.ok(templateDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot update rendering template with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }

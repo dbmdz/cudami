@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
@@ -21,28 +21,28 @@ public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
 
   @Override
   public SearchPageResponse<Website> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
   public PageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/rootpages", baseEndpoint, uuid), searchPageRequest, Webpage.class);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
   public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/rootpages", baseEndpoint, uuid), pageRequest, Webpage.class);
   }
 
   public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootpages)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPutRequestForString(
             String.format("%s/%s/rootpages", baseEndpoint, websiteUuid), rootpages));

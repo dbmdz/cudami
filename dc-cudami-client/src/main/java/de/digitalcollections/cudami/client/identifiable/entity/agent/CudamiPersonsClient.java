@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -20,27 +20,27 @@ public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
   }
 
   public PageResponse<Person> findByPlaceOfBirth(PageRequest pageRequest, UUID uuidGeoLocation)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/placeofbirth/%s", baseEndpoint, uuidGeoLocation.toString()), pageRequest);
   }
 
   public PageResponse<Person> findByPlaceOfDeath(PageRequest pageRequest, UUID uuidGeoLocation)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/placeofdeath/%s", baseEndpoint, uuidGeoLocation.toString()), pageRequest);
   }
 
-  public List<DigitalObject> getDigitalObjects(UUID uuidPerson) throws HttpException {
+  public List<DigitalObject> getDigitalObjects(UUID uuidPerson) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, uuidPerson), DigitalObject.class);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
-  public List getWorks(UUID uuidPerson) throws HttpException {
+  public List getWorks(UUID uuidPerson) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/works", baseEndpoint, uuidPerson), Work.class);
   }

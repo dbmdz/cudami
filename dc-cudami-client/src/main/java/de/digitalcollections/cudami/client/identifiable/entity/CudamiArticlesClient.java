@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -16,11 +16,11 @@ public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
   }
 
   @Override
-  public SearchPageResponse<Article> find(SearchPageRequest pageRequest) throws HttpException {
+  public SearchPageResponse<Article> find(SearchPageRequest pageRequest) throws TechnicalException {
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }
