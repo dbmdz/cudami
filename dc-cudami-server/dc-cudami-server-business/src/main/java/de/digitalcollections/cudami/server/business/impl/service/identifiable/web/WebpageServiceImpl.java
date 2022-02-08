@@ -62,6 +62,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
     return ((NodeRepository<Webpage>) repository).findChildren(uuid, searchPageRequest);
   }
 
+  @Override
+  public SearchPageResponse<Webpage> findRootPagesForWebsite(
+      UUID websiteUuid, SearchPageRequest pageRequest) {
+    return ((WebpageRepository) repository).findRootPagesForWebsite(websiteUuid, pageRequest);
+  }
+
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
   //  @Override
   //  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {

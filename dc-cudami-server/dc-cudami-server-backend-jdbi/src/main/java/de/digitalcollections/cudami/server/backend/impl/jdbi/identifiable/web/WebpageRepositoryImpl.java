@@ -379,6 +379,47 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
+  public SearchPageResponse<Webpage> findRootPagesForWebsite(
+      UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " LEFT JOIN website_webpages ww ON "
+            + tableAlias
+            + ".uuid = ww.webpage_uuid"
+            + " WHERE ww.website_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(" ").append(orderBy);
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Webpage> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
+  }
+
+  @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
         "SELECT DISTINCT languages"
