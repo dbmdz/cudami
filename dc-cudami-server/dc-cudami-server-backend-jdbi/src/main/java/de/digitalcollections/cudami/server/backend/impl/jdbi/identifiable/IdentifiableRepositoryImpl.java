@@ -510,7 +510,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type", "uuid"));
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
   }
 
   @Override
@@ -631,6 +631,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   public String getSqlSelectReducedFields() {
     return sqlSelectReducedFields;
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {

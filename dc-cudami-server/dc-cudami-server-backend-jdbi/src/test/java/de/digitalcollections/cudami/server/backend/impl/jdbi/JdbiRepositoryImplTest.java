@@ -277,5 +277,10 @@ public class JdbiRepositoryImplTest {
     protected String getColumnName(String modelProperty) {
       return modelProperty;
     }
+
+    @Override
+    protected String getUniqueField() {
+      return "uuid";
+    }
   }
 }

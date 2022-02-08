@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +107,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("label", "namespace", "pattern");
+    return new ArrayList<>(Arrays.asList("label", "namespace", "pattern"));
   }
 
   @Override
@@ -121,9 +122,16 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
         return "namespace";
       case "pattern":
         return "pattern";
+      case "uuid":
+        return "uuid";
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
   }
 
   @Override

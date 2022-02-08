@@ -61,7 +61,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new Sorting(Direction.ASC, "namespace");
+      Sorting sorting = new Sorting(Direction.ASC, "namespace", "uuid");
       pageRequest.setSorting(sorting);
     }
   }
