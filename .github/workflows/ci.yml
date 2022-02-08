@@ -1,8 +1,9 @@
+# FIXME: remove branch metadata-service after it is merged
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, metadata-service ]
   push:
-    branches: [ main ]
+    branches: [ main, metadata-service ]
   release:
     types: [ published ]
   workflow_dispatch:
