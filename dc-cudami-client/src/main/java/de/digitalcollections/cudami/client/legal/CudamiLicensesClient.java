@@ -34,7 +34,8 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
    */
   public void deleteByUrl(URL url) throws TechnicalException {
     doDeleteRequestForString(
-        baseEndpoint + "?url=" + URLEncoder.encode(url.toString(), StandardCharsets.UTF_8));
+        String.format(
+            "%s?url=%s", baseEndpoint, URLEncoder.encode(url.toString(), StandardCharsets.UTF_8)));
   }
 
   @Deprecated
@@ -45,7 +46,7 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
 
   public License getByUrl(String url) throws TechnicalException {
     return doGetRequestForObject(
-        String.format(baseEndpoint + "?url=" + URLEncoder.encode(url, StandardCharsets.UTF_8)));
+        String.format("%s?url=%s", baseEndpoint, URLEncoder.encode(url, StandardCharsets.UTF_8)));
   }
 
   public License getByUrl(URL url) throws TechnicalException {
