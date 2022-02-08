@@ -3,10 +3,9 @@ package de.digitalcollections.cudami.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.UniqueObject;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import java.lang.reflect.InvocationTargetException;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -26,21 +25,9 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
     super(http, serverUrl, targetType, mapper, baseEndpoint);
   }
 
-  public long count() throws HttpException {
+  public long count() throws TechnicalException {
     String result = doGetRequestForString(baseEndpoint + "/count");
     return Long.parseLong(result);
-  }
-
-  public T create() {
-    try {
-      return targetType.getDeclaredConstructor().newInstance();
-    } catch (InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException
-        | NoSuchMethodException e) {
-      throw new RuntimeException(
-          "Cannot create new instance of " + targetType.getName() + ": " + e, e);
-    }
   }
 
   /**
@@ -49,21 +36,21 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
    * @param uuid UUID of Object
    */
   @Deprecated(forRemoval = true)
-  public void delete(UUID uuid) throws HttpException {
+  public void delete(UUID uuid) throws TechnicalException {
     deleteByUuid(uuid);
   }
 
-  public void deleteByUuid(UUID uuid) throws HttpException {
+  public void deleteByUuid(UUID uuid) throws TechnicalException {
     doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid));
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #find(SearchPageRequest)} instead FIXME: Really?! */
-  public PageResponse<T> find(PageRequest pageRequest) throws HttpException {
+  public PageResponse<T> find(PageRequest pageRequest) throws TechnicalException {
     return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List<T> findAll() throws HttpException {
+  public List<T> findAll() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/all");
   }
 
@@ -74,19 +61,19 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
    * @return object with given UUID
    */
   @Deprecated(forRemoval = true)
-  public T findOne(UUID uuid) throws HttpException {
+  public T findOne(UUID uuid) throws TechnicalException {
     return getByUuid(uuid);
   }
 
-  public T getByUuid(UUID uuid) throws HttpException {
+  public T getByUuid(UUID uuid) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
   }
 
-  public T save(T object) throws HttpException {
+  public T save(T object) throws TechnicalException {
     return doPostRequestForObject(baseEndpoint, object);
   }
 
-  public T update(UUID uuid, T object) throws HttpException {
+  public T update(UUID uuid, T object) throws TechnicalException {
     return doPutRequestForObject(String.format("%s/%s", baseEndpoint, uuid), object);
   }
 }

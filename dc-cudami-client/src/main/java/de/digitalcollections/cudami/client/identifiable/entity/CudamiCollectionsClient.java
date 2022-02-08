@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -23,7 +23,7 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPostRequestForString(
             String.format(
@@ -31,14 +31,14 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPostRequestForString(
             String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid), digitalObjects));
   }
 
   public boolean addSubcollection(UUID collectionUuid, UUID subcollectionUuid)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPostRequestForString(
             String.format(
@@ -46,59 +46,60 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public boolean addSubcollections(UUID collectionUuid, List<Collection> subcollections)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPostRequestForString(
             String.format(baseEndpoint + "/%s/subcollections", collectionUuid), subcollections));
   }
 
-  public PageResponse<Collection> findActive(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Collection> findActive(PageRequest pageRequest) throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "?active=true"), pageRequest);
   }
 
   public SearchPageResponse<Collection> findActive(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search?active", searchPageRequest);
   }
 
-  public Collection findActiveOne(UUID uuid, Locale locale) throws HttpException {
+  public Collection findActiveOne(UUID uuid, Locale locale) throws TechnicalException {
     return doGetRequestForObject(
         String.format(baseEndpoint + "/%s?active=true&pLocale=%s", uuid, locale));
   }
 
   public PageResponse<Collection> findActiveSubcollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws HttpException {
+      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/subcollections?active=true", uuid), searchPageRequest);
   }
 
   public PageResponse<Collection> findSubcollections(UUID uuid, SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/subcollections", uuid), searchPageRequest);
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #findTopCollections(SearchPageRequest)} instead */
-  public PageResponse<Collection> findTopCollections(PageRequest pageRequest) throws HttpException {
+  public PageResponse<Collection> findTopCollections(PageRequest pageRequest)
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(baseEndpoint + "/top", pageRequest);
   }
 
   public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint + "/top", searchPageRequest);
   }
 
   public PageResponse<Collection> getActiveSubcollections(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/subcollections?active=true", uuid),
         pageRequest,
         Collection.class);
   }
 
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
             String.format(baseEndpoint + "/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
@@ -107,7 +108,7 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   @Deprecated(since = "5.0", forRemoval = true)
   /** @deprecated Please use {@link #getDigitalObjects(UUID, SearchPageRequest)} instead */
   public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
         pageRequest,
@@ -115,24 +116,24 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public SearchPageResponse<DigitalObject> getDigitalObjects(
-      UUID collectionUuid, SearchPageRequest searchPageRequest) throws HttpException {
+      UUID collectionUuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
         searchPageRequest,
         DigitalObject.class);
   }
 
-  public Collection getParent(UUID uuid) throws HttpException {
+  public Collection getParent(UUID uuid) throws TechnicalException {
     return (Collection)
         doGetRequestForObject(String.format(baseEndpoint + "/%s/parent", uuid), Collection.class);
   }
 
-  public List<Collection> getParents(UUID uuid) throws HttpException {
+  public List<Collection> getParents(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format(baseEndpoint + "/%s/parents", uuid));
   }
 
   public List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering)
-      throws HttpException {
+      throws TechnicalException {
     if (filtering.getFilterCriterionFor("predicate") == null) {
       throw new IllegalArgumentException("Filter criterion 'predicate' is required");
     }
@@ -143,17 +144,17 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public PageResponse<Collection> getSubcollections(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/subcollections", uuid), pageRequest, Collection.class);
   }
 
-  public List<Locale> getTopCollectionsLanguages() throws HttpException {
+  public List<Locale> getTopCollectionsLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/top/languages", Locale.class);
   }
 
   public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doDeleteRequestForString(
             String.format(
@@ -161,7 +162,7 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public boolean removeSubcollection(UUID collectionUuid, UUID subcollectionUuid)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doDeleteRequestForString(
             String.format(
@@ -169,7 +170,7 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         (String)
             doPutRequestForObject(
@@ -179,7 +180,7 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
-      throws HttpException {
+      throws TechnicalException {
     return doPostRequestForObject(
         String.format(baseEndpoint + "/%s/collection", parentCollectionUuid), collection);
   }

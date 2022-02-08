@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
@@ -20,13 +20,13 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     super(http, serverUrl, Webpage.class, mapper, "/v5/webpages");
   }
 
-  public Webpage findActiveOne(UUID uuid, Locale locale) throws HttpException {
+  public Webpage findActiveOne(UUID uuid, Locale locale) throws TechnicalException {
     return doGetRequestForObject(
         String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
   }
 
   public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/children?active=true", baseEndpoint, uuid), searchPageRequest);
   }
@@ -39,73 +39,73 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
    */
   @Override
   @Deprecated(forRemoval = true)
-  public Webpage findOne(UUID uuid, String locale) throws HttpException {
+  public Webpage findOne(UUID uuid, String locale) throws TechnicalException {
     return doGetRequestForObject(String.format("/v5/webpages/%s?pLocale=%s", uuid, locale));
   }
 
   public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/children", baseEndpoint, uuid), searchPageRequest);
   }
 
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/children?active=true", baseEndpoint, uuid),
         pageRequest,
         Webpage.class);
   }
 
-  public List<Webpage> getActiveChildrenTree(UUID uuid) throws HttpException {
+  public List<Webpage> getActiveChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
   }
 
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws HttpException {
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
     return (BreadcrumbNavigation)
         doGetRequestForObject(
             String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
   }
 
-  public List<Webpage> getChildren(UUID uuid) throws HttpException {
+  public List<Webpage> getChildren(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
   }
 
   public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
   }
 
-  public List<Webpage> getChildrenTree(UUID uuid) throws HttpException {
+  public List<Webpage> getChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/childrentree", baseEndpoint, uuid));
   }
 
-  public Webpage getParent(UUID uuid) throws HttpException {
+  public Webpage getParent(UUID uuid) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
-  public Website getWebsite(UUID rootWebpageUuid) throws HttpException {
+  public Website getWebsite(UUID rootWebpageUuid) throws TechnicalException {
     return (Website)
         doGetRequestForObject(
             String.format("%s/%s/website", baseEndpoint, rootWebpageUuid), Website.class);
   }
 
   public Webpage saveWithParentWebpage(Webpage webpage, UUID parentWebpageUuid)
-      throws HttpException {
+      throws TechnicalException {
     return doPostRequestForObject(
         String.format("%s/%s/webpage", baseEndpoint, parentWebpageUuid), webpage);
   }
 
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
-      throws HttpException {
+      throws TechnicalException {
     return doPostRequestForObject(
         String.format("/v5/websites/%s/webpage", parentWebsiteUuid), webpage);
   }
 
   public boolean updateChildrenOrder(UUID webpageUuid, List<Webpage> children)
-      throws HttpException {
+      throws TechnicalException {
     return Boolean.parseBoolean(
         doPutRequestForString(
             String.format("%s/%s/children", baseEndpoint, webpageUuid), children));

@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.paging.PageResponse;
@@ -57,7 +57,7 @@ public class ProjectsController extends AbstractController {
   @PostMapping("/api/projects/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.addDigitalObjects(uuid, digitalObjects);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -66,7 +66,7 @@ public class ProjectsController extends AbstractController {
   }
 
   @GetMapping("/projects/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "projects/create";
   }
@@ -82,9 +82,9 @@ public class ProjectsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Project project = service.findOne(uuid);
+    Project project = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
 
@@ -105,15 +105,15 @@ public class ProjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/projects/{uuid}")
   @ResponseBody
-  public Project get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Project get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/api/projects/{uuid}/digitalobjects")
@@ -123,13 +123,13 @@ public class ProjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.getDigitalObjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/projects")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -141,7 +141,8 @@ public class ProjectsController extends AbstractController {
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(
-      @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid) throws HttpException {
+      @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid)
+      throws TechnicalException {
     boolean successful = service.removeDigitalObject(projectUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -154,7 +155,7 @@ public class ProjectsController extends AbstractController {
     try {
       Project projectDb = service.save(project);
       return ResponseEntity.status(HttpStatus.CREATED).body(projectDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save project: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -165,7 +166,7 @@ public class ProjectsController extends AbstractController {
     try {
       Project projectDb = service.update(uuid, project);
       return ResponseEntity.ok(projectDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save project with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -174,9 +175,9 @@ public class ProjectsController extends AbstractController {
   @GetMapping("/projects/{uuid}")
   public String view(
       @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Project project = service.findOne(uuid);
+    Project project = service.getByUuid(uuid);
     if (project == null) {
       throw new ResourceNotFoundException();
     }

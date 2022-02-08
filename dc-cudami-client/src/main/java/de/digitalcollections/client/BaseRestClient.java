@@ -3,8 +3,8 @@ package de.digitalcollections.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
-import de.digitalcollections.model.exception.http.HttpException;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.paging.Direction;
@@ -16,6 +16,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -51,6 +52,18 @@ public abstract class BaseRestClient<T extends Object> {
     this.reader = mapper.reader().forType(targetType);
     this.serverUri = URI.create(serverUrl);
     this.targetType = targetType;
+  }
+
+  public T create() {
+    try {
+      return targetType.getDeclaredConstructor().newInstance();
+    } catch (InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException e) {
+      throw new RuntimeException(
+          "Cannot create new instance of " + targetType.getName() + ": " + e, e);
+    }
   }
 
   private HttpRequest createDeleteRequest(String requestUrl) {
@@ -163,7 +176,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected String doDeleteRequestForString(String requestUrl) throws HttpException {
+  protected String doDeleteRequestForString(String requestUrl) throws TechnicalException {
     HttpRequest req = createDeleteRequest(requestUrl);
     try {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -174,16 +187,16 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (InterruptedException | IOException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected T doGetRequestForObject(String requestUrl) throws HttpException {
+  protected T doGetRequestForObject(String requestUrl) throws TechnicalException {
     return (T) doGetRequestForObject(requestUrl, targetType);
   }
 
   protected Object doGetRequestForObject(String requestUrl, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -199,21 +212,21 @@ public abstract class BaseRestClient<T extends Object> {
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected List<T> doGetRequestForObjectList(String requestUrl) throws HttpException {
+  protected List<T> doGetRequestForObjectList(String requestUrl) throws TechnicalException {
     return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
   }
 
   protected List doGetRequestForObjectList(String requestUrl, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
   }
 
   protected List doGetRequestForObjectList(
-      String requestUrl, Class<?> targetType, Filtering filtering) throws HttpException {
+      String requestUrl, Class<?> targetType, Filtering filtering) throws TechnicalException {
     if (filtering != null) {
       requestUrl +=
           (requestUrl.contains("?") ? "&" : "?")
@@ -236,12 +249,12 @@ public abstract class BaseRestClient<T extends Object> {
       List result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected PageResponse<T> doGetRequestForPagedObjectList(
-      String requestUrl, PageRequest pageRequest) throws HttpException {
+      String requestUrl, PageRequest pageRequest) throws TechnicalException {
     if (!requestUrl.contains("?")) {
       requestUrl = requestUrl + "?";
     } else {
@@ -270,16 +283,16 @@ public abstract class BaseRestClient<T extends Object> {
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected PageResponse doGetRequestForPagedObjectList(
-      String requestUrl, PageRequest pageRequest, Class<?> targetType) throws HttpException {
+      String requestUrl, PageRequest pageRequest, Class<?> targetType) throws TechnicalException {
     return doGetRequestForPagedObjectList(requestUrl, pageRequest);
   }
 
-  protected String doGetRequestForString(String requestUrl) throws HttpException {
+  protected String doGetRequestForString(String requestUrl) throws TechnicalException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -290,12 +303,13 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected <X extends Object> SearchPageResponse<X> doGetSearchRequestForPagedObjectList(
-      String requestUrl, SearchPageRequest searchPageRequest, Class<X> type) throws HttpException {
+      String requestUrl, SearchPageRequest searchPageRequest, Class<X> type)
+      throws TechnicalException {
     if (!requestUrl.contains("?")) {
       requestUrl = requestUrl + "?";
     } else {
@@ -330,17 +344,17 @@ public abstract class BaseRestClient<T extends Object> {
       result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
-      String requestUrl, SearchPageRequest searchPageRequest) throws HttpException {
+      String requestUrl, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         requestUrl, searchPageRequest, (Class<T>) getClass());
   }
 
-  protected String doPatchRequestForString(String requestUrl) throws HttpException {
+  protected String doPatchRequestForString(String requestUrl) throws TechnicalException {
     HttpRequest req = createPatchRequest(requestUrl);
     try {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -351,11 +365,12 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (InterruptedException | IOException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected String doPatchRequestForString(String requestUrl, Object object) throws HttpException {
+  protected String doPatchRequestForString(String requestUrl, Object object)
+      throws TechnicalException {
     try {
       HttpRequest req = createPatchRequest(requestUrl, object);
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -366,11 +381,11 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected T doPostRequestForObject(String requestUrl, T object) throws HttpException {
+  protected T doPostRequestForObject(String requestUrl, T object) throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl, object);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -386,12 +401,12 @@ public abstract class BaseRestClient<T extends Object> {
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
   protected Object doPostRequestForObject(String requestUrl, Object bodyObject, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl, bodyObject);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -407,11 +422,11 @@ public abstract class BaseRestClient<T extends Object> {
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
-  protected T doPostRequestForObject(String requestUrl) throws HttpException {
+  protected T doPostRequestForObject(String requestUrl) throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -426,12 +441,12 @@ public abstract class BaseRestClient<T extends Object> {
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (InterruptedException | IOException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected Object doPostRequestForObject(String requestUrl, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -447,17 +462,17 @@ public abstract class BaseRestClient<T extends Object> {
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
   protected List<T> doPostRequestForObjectList(String requestUrl, List<T> list)
-      throws HttpException {
+      throws TechnicalException {
     return (List<T>) doPostRequestForObjectList(requestUrl, (List<Class<?>>) list, targetType);
   }
 
   protected List<Class<?>> doPostRequestForObjectList(
-      String requestUrl, List<Class<?>> list, Class<?> targetType) throws HttpException {
+      String requestUrl, List<Class<?>> list, Class<?> targetType) throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl, list);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -473,11 +488,11 @@ public abstract class BaseRestClient<T extends Object> {
       List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
-  protected String doPostRequestForString(String requestUrl) throws HttpException {
+  protected String doPostRequestForString(String requestUrl) throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl);
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -488,11 +503,12 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (InterruptedException | IOException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected String doPostRequestForString(String requestUrl, Object object) throws HttpException {
+  protected String doPostRequestForString(String requestUrl, Object object)
+      throws TechnicalException {
     try {
       HttpRequest req = createPostRequest(requestUrl, object);
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -503,11 +519,11 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
-  protected T doPutRequestForObject(String requestUrl, T object) throws HttpException {
+  protected T doPutRequestForObject(String requestUrl, T object) throws TechnicalException {
     try {
       HttpRequest req = createPutRequest(requestUrl, object);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -523,12 +539,12 @@ public abstract class BaseRestClient<T extends Object> {
       T result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 
   protected Object doPutRequestForObject(String requestUrl, Object bodyObject, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     try {
       HttpRequest req = createPutRequest(requestUrl, bodyObject);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -544,12 +560,12 @@ public abstract class BaseRestClient<T extends Object> {
       Object result = mapper.readerFor(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
   protected List<Class<?>> doPutRequestForObjectList(
-      String requestUrl, List<Class<?>> list, Class<?> targetType) throws HttpException {
+      String requestUrl, List<Class<?>> list, Class<?> targetType) throws TechnicalException {
     try {
       HttpRequest req = createPutRequest(requestUrl, list);
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -565,11 +581,12 @@ public abstract class BaseRestClient<T extends Object> {
       List<Class<?>> result = mapper.readerForListOf(targetType).readValue(body);
       return result;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to error", e);
+      throw new TechnicalException("Failed to retrieve response due to error", e);
     }
   }
 
-  protected String doPutRequestForString(String requestUrl, Object object) throws HttpException {
+  protected String doPutRequestForString(String requestUrl, Object object)
+      throws TechnicalException {
     try {
       HttpRequest req = createPutRequest(requestUrl, object);
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());
@@ -580,7 +597,7 @@ public abstract class BaseRestClient<T extends Object> {
       final String body = response.body();
       return body;
     } catch (IOException | InterruptedException e) {
-      throw new HttpException("Failed to retrieve response due to connection error", e);
+      throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
   }
 

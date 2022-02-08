@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.relation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.relation.Predicate;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -15,11 +15,11 @@ public class CudamiPredicatesClient extends BaseRestClient<Predicate> {
     super(http, serverUrl, Predicate.class, mapper, "/v5/predicates");
   }
 
-  public List<Predicate> findAllPredicates() throws HttpException {
+  public List<Predicate> findAllPredicates() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint, Predicate.class);
   }
 
-  public Predicate save(Predicate predicate) throws HttpException {
+  public Predicate save(Predicate predicate) throws TechnicalException {
     return doPutRequestForObject(
         String.format(
             "%s/%s", baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),

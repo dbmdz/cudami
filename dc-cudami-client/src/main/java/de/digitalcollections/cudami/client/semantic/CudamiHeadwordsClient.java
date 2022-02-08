@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.semantic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -17,11 +17,12 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
     super(http, serverUrl, Headword.class, mapper, "/v5/headwords");
   }
 
-  public SearchPageResponse<Headword> find(SearchPageRequest pageRequest) throws HttpException {
+  public SearchPageResponse<Headword> find(SearchPageRequest pageRequest)
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List getRelatedArticles(UUID uuid) throws HttpException {
+  public List getRelatedArticles(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/related/articles", baseEndpoint, uuid), Article.class);
   }

@@ -4,10 +4,10 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -63,7 +63,7 @@ public class WebpagesController extends AbstractController {
       Model model,
       @RequestParam("parentType") String parentType,
       @RequestParam("parentUuid") UUID parentUuid)
-      throws HttpException {
+      throws TechnicalException {
     model
         .addAttribute("activeLanguage", localeService.getDefaultLanguage())
         .addAttribute("parentType", parentType)
@@ -88,9 +88,9 @@ public class WebpagesController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = service.findOne(uuid);
+    Webpage webpage = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
@@ -118,22 +118,22 @@ public class WebpagesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.findSubpages(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/webpages/{uuid}")
   @ResponseBody
-  public Webpage get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Webpage get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
-  private Website getWebsite(UUID uuid, String parentType) throws HttpException {
+  private Website getWebsite(UUID uuid, String parentType) throws TechnicalException {
     if (parentType == null || "webpage".equals(parentType.toLowerCase())) {
       return service.getWebsite(uuid);
     } else if ("website".equals(parentType.toLowerCase())) {
-      return websiteService.findOne(uuid);
+      return websiteService.getByUuid(uuid);
     }
     return null;
   }
@@ -151,7 +151,7 @@ public class WebpagesController extends AbstractController {
         webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(webpageDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       if (parentType.equals("website")) {
         LOGGER.error("Cannot save top-level webpage: ", e);
       } else if (parentType.equals("webpage")) {
@@ -166,7 +166,7 @@ public class WebpagesController extends AbstractController {
     try {
       Webpage webpageDb = service.update(uuid, webpage);
       return ResponseEntity.ok(webpageDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save webpage with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -174,7 +174,7 @@ public class WebpagesController extends AbstractController {
 
   @PutMapping("/api/webpages/{uuid}/webpages")
   public ResponseEntity updateSubpagesOrder(
-      @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws HttpException {
+      @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws TechnicalException {
     boolean successful = service.updateChildrenOrder(uuid, subpages);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -184,9 +184,9 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/webpages/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Webpage webpage = service.findOne(uuid);
+    Webpage webpage = service.getByUuid(uuid);
     if (webpage == null) {
       throw new ResourceNotFoundException();
     }

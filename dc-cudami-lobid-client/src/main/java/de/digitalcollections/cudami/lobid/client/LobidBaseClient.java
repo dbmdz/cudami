@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.lobid.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
-import de.digitalcollections.model.exception.http.HttpException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -50,12 +50,12 @@ public class LobidBaseClient<T extends Object> {
     return req;
   }
 
-  protected T doGetRequestForObject(String requestUrl) throws HttpException {
+  protected T doGetRequestForObject(String requestUrl) throws TechnicalException {
     return (T) doGetRequestForObject(requestUrl, targetType);
   }
 
   protected Object doGetRequestForObject(String requestUrl, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -77,7 +77,7 @@ public class LobidBaseClient<T extends Object> {
   }
 
   protected List doGetRequestForObjectList(String requestUrl, Class<?> targetType)
-      throws HttpException {
+      throws TechnicalException {
     HttpRequest req = createGetRequest(requestUrl);
     // TODO add creation of a request id if needed
     //            .header("X-Request-Id", request.getRequestId())
@@ -100,7 +100,7 @@ public class LobidBaseClient<T extends Object> {
     }
   }
 
-  protected String doGetRequestForString(String requestUrl) throws HttpException {
+  protected String doGetRequestForString(String requestUrl) throws TechnicalException {
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<String> response = http.send(req, HttpResponse.BodyHandlers.ofString());

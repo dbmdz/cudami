@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
@@ -33,18 +33,18 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
     super(http, serverUrl, (Class<I>) Identifiable.class, mapper, "/v5/identifiables");
   }
 
-  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) throws HttpException {
+  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search", searchPageRequest);
   }
 
-  public List<I> find(String searchTerm, int maxResults) throws HttpException {
+  public List<I> find(String searchTerm, int maxResults) throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
     SearchPageResponse<I> response = find(searchPageRequest);
     return response.getContent();
   }
 
   public PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) throws HttpException {
+      PageRequest pageRequest, String language, String initial) throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "?language=%s&initial=%s", language, initial), pageRequest);
   }
@@ -57,7 +57,7 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
       String nullHandling,
       String language,
       String initial)
-      throws HttpException {
+      throws TechnicalException {
     Order order =
         new Order(
             Direction.fromString(sortDirection), sortField, NullHandling.valueOf(nullHandling));
@@ -75,7 +75,7 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
    * @return object with given uuid and locale
    */
   @Deprecated(forRemoval = true)
-  public I findOne(UUID uuid, Locale locale) throws HttpException {
+  public I findOne(UUID uuid, Locale locale) throws TechnicalException {
     return getByUuidAndLocale(uuid, locale);
   }
 
@@ -88,7 +88,7 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
    * @return object with given uuid and locale
    */
   @Deprecated(forRemoval = true)
-  public I findOne(UUID uuid, String locale) throws HttpException {
+  public I findOne(UUID uuid, String locale) throws TechnicalException {
     return getByUuidAndLocale(uuid, locale);
   }
 
@@ -101,24 +101,24 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
    * @return object with given identifier
    */
   @Deprecated(forRemoval = true)
-  public I findOneByIdentifier(String namespace, String id) throws HttpException {
+  public I findOneByIdentifier(String namespace, String id) throws TechnicalException {
     return getByIdentifier(namespace, id);
   }
 
-  public I getByIdentifier(String namespace, String id) throws HttpException {
+  public I getByIdentifier(String namespace, String id) throws TechnicalException {
     return doGetRequestForObject(
         String.format(baseEndpoint + "/identifier/%s:%s.json", namespace, id));
   }
 
-  public I getByUuidAndLocale(UUID uuid, Locale locale) throws HttpException {
+  public I getByUuidAndLocale(UUID uuid, Locale locale) throws TechnicalException {
     return getByUuidAndLocale(uuid, locale.toString());
   }
 
-  public I getByUuidAndLocale(UUID uuid, String locale) throws HttpException {
+  public I getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
     return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
   }
 
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws HttpException {
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/identifiables/%s/related/fileresources", uuid), FileResource.class);
   }

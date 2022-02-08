@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageResponse;
@@ -53,7 +53,7 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "websites/create";
   }
@@ -69,9 +69,9 @@ public class WebsitesController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Website website = service.findOne(uuid);
+    Website website = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
 
@@ -93,7 +93,7 @@ public class WebsitesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
@@ -105,19 +105,19 @@ public class WebsitesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.findRootPages(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/websites/{uuid}")
   @ResponseBody
-  public Website get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Website get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/websites")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -130,7 +130,7 @@ public class WebsitesController extends AbstractController {
     try {
       Website websiteDb = service.save(website);
       return ResponseEntity.status(HttpStatus.CREATED).body(websiteDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save website: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -141,7 +141,7 @@ public class WebsitesController extends AbstractController {
     try {
       Website websiteDb = service.update(uuid, website);
       return ResponseEntity.ok(websiteDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save website with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -149,7 +149,7 @@ public class WebsitesController extends AbstractController {
 
   @PutMapping("/api/websites/{uuid}/webpages")
   public ResponseEntity updateRootPagesOrder(
-      @PathVariable UUID uuid, @RequestBody List<Webpage> rootPages) throws HttpException {
+      @PathVariable UUID uuid, @RequestBody List<Webpage> rootPages) throws TechnicalException {
     boolean successful = service.updateRootPagesOrder(uuid, rootPages);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -159,9 +159,9 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/websites/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Website website = service.findOne(uuid);
+    Website website = service.getByUuid(uuid);
     if (website == null) {
       throw new ResourceNotFoundException();
     }

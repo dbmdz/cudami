@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -23,17 +23,17 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     super(http, serverUrl, DigitalObject.class, mapper, "/v5/digitalobjects");
   }
 
-  public List<DigitalObject> findAllReduced() throws HttpException {
+  public List<DigitalObject> findAllReduced() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
   }
 
-  public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws HttpException {
+  public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws TechnicalException {
     PageRequest pageRequest = new PageRequest(0, count, null);
     return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
   }
 
   public SearchPageResponse<Collection> getActiveCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws HttpException {
+      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
         searchPageRequest,
@@ -41,49 +41,50 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
   }
 
   public SearchPageResponse<Collection> getCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws HttpException {
+      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/collections", baseEndpoint, uuid),
         searchPageRequest,
         Collection.class);
   }
 
-  public List<FileResource> getFileResources(UUID uuid) throws HttpException {
+  public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);
   }
 
-  public List<ImageFileResource> getImageFileResources(UUID uuid) throws HttpException {
+  public List<ImageFileResource> getImageFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources/images", baseEndpoint, uuid), ImageFileResource.class);
   }
 
-  public Item getItem(UUID uuid) throws HttpException {
+  public Item getItem(UUID uuid) throws TechnicalException {
     return (Item)
         doGetRequestForObject(String.format("%s/%s/item", baseEndpoint, uuid), Item.class);
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
-  public List<Locale> getLanguagesOfCollections(UUID uuid) throws HttpException {
+  public List<Locale> getLanguagesOfCollections(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public List<Locale> getLanguagesOfProjects(UUID uuid) throws HttpException {
+  public List<Locale> getLanguagesOfProjects(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/projects/languages", baseEndpoint, uuid), Locale.class);
   }
 
   public SearchPageResponse<Project> getProjects(UUID uuid, SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources) throws HttpException {
+  public List<FileResource> saveFileResources(UUID uuid, List fileResources)
+      throws TechnicalException {
     return doPostRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid),
         fileResources,

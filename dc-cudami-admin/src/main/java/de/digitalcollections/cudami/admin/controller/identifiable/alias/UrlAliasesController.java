@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.admin.controller.identifiable.alias;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.alias.CudamiUrlAliasClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.http.MediaType;
@@ -33,7 +33,7 @@ public class UrlAliasesController extends AbstractController {
       @PathVariable Locale pLocale,
       @PathVariable String label,
       @PathVariable(required = false) UUID websiteUuid)
-      throws HttpException {
+      throws TechnicalException {
     return service.generateSlug(pLocale, label, websiteUuid);
   }
 }

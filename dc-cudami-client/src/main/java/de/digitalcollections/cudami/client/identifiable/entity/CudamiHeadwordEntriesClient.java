@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -17,11 +17,11 @@ public class CudamiHeadwordEntriesClient extends CudamiEntitiesClient<HeadwordEn
 
   @Override
   public SearchPageResponse<HeadwordEntry> find(SearchPageRequest pageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List findByHeadword(UUID headwordUuid) throws HttpException {
+  public List findByHeadword(UUID headwordUuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/headword/%s", baseEndpoint, headwordUuid), HeadwordEntry.class);
   }

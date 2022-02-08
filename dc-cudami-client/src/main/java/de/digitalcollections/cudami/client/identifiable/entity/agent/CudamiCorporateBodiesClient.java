@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.agent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -14,11 +14,11 @@ public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateB
     super(http, serverUrl, CorporateBody.class, mapper, "/v5/corporatebodies");
   }
 
-  public CorporateBody fetchAndSaveByGndId(String gndId) throws HttpException {
+  public CorporateBody fetchAndSaveByGndId(String gndId) throws TechnicalException {
     return doPostRequestForObject(String.format("%s/gnd/%s", baseEndpoint, gndId));
   }
 
-  public List<Locale> getLanguages() throws HttpException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 }

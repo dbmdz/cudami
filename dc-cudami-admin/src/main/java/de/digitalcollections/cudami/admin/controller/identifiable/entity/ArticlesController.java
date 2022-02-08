@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.PageResponse;
@@ -52,7 +52,7 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "articles/create";
   }
@@ -68,9 +68,9 @@ public class ArticlesController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = service.findOne(uuid);
+    Article article = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
 
@@ -91,19 +91,19 @@ public class ArticlesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     final SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.find(pageRequest);
   }
 
   @GetMapping("/api/articles/{uuid}")
   @ResponseBody
-  public Article get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Article get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/articles")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale locale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -116,7 +116,7 @@ public class ArticlesController extends AbstractController {
     try {
       Article articleDb = service.save(article);
       return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save article: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -127,7 +127,7 @@ public class ArticlesController extends AbstractController {
     try {
       Article articleDb = service.update(uuid, article);
       return ResponseEntity.ok(articleDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save article with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -135,9 +135,9 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/articles/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Article article = service.findOne(uuid);
+    Article article = service.getByUuid(uuid);
     if (article == null) {
       throw new ResourceNotFoundException();
     }

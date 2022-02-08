@@ -1,8 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.exception.ResourceIOException;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +27,7 @@ public class CudamiFileResourcesBinaryClient {
     this.serverUri = URI.create(serverUrl);
   }
 
-  private FileResource doPost(HttpEntity entity) throws HttpException {
+  private FileResource doPost(HttpEntity entity) throws TechnicalException {
     try {
       HttpPost post = new HttpPost(serverUri + "/v5/files");
       post.setEntity(entity);
@@ -40,14 +39,14 @@ public class CudamiFileResourcesBinaryClient {
             mapper.readValue(response.getEntity().getContent(), FileResource.class);
         return fileResource;
       }
-      throw new ResourceIOException("Error saving uploaded file data");
+      throw new TechnicalException("Error saving uploaded file data");
     } catch (IOException ex) {
-      throw new HttpException("Error posting data to server", ex);
+      throw new TechnicalException("Error posting data to server", ex);
     }
   }
 
   public FileResource upload(InputStream inputStream, String filename, String contentType)
-      throws HttpException {
+      throws TechnicalException {
     try {
       filename =
           URLEncoder.encode(
@@ -59,12 +58,12 @@ public class CudamiFileResourcesBinaryClient {
               .build();
       return doPost(entity);
     } catch (Exception ex) {
-      throw new HttpException("Error saving uploaded file data", ex);
+      throw new TechnicalException("Error saving uploaded file data", ex);
     }
   }
 
   public FileResource upload(byte[] bytes, String filename, String contentType)
-      throws HttpException {
+      throws TechnicalException {
     try {
       filename =
           URLEncoder.encode(
@@ -76,7 +75,7 @@ public class CudamiFileResourcesBinaryClient {
               .build();
       return doPost(entity);
     } catch (Exception ex) {
-      throw new HttpException("Error saving uploaded file data", ex);
+      throw new TechnicalException("Error saving uploaded file data", ex);
     }
   }
 }

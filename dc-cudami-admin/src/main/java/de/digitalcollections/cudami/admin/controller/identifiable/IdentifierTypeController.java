@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -52,8 +52,8 @@ public class IdentifierTypeController extends AbstractController {
   }
 
   @GetMapping("/identifiertypes/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws HttpException {
-    IdentifierType identifierType = service.findOne(uuid);
+  public String edit(@PathVariable UUID uuid, Model model) throws TechnicalException {
+    IdentifierType identifierType = service.getByUuid(uuid);
     model.addAttribute("label", identifierType.getLabel());
     model.addAttribute("uuid", identifierType.getUuid());
     return "identifiertypes/edit";
@@ -64,14 +64,14 @@ public class IdentifierTypeController extends AbstractController {
   public PageResponse<IdentifierType> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
+      throws TechnicalException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return service.find(pageRequest);
   }
 
   @GetMapping("/api/identifiertypes/{uuid}")
   @ResponseBody
-  public IdentifierType get(@PathVariable UUID uuid) throws HttpException {
+  public IdentifierType get(@PathVariable UUID uuid) throws TechnicalException {
     return service.findOne(uuid);
   }
 
@@ -85,7 +85,7 @@ public class IdentifierTypeController extends AbstractController {
     try {
       IdentifierType identifierTypeDb = service.save(identifierType);
       return ResponseEntity.status(HttpStatus.CREATED).body(identifierTypeDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save identifier type: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -97,7 +97,7 @@ public class IdentifierTypeController extends AbstractController {
     try {
       IdentifierType identifierTypeDb = service.update(uuid, identifierType);
       return ResponseEntity.ok(identifierTypeDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot update identifier type with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }

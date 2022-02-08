@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.work;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
@@ -18,13 +18,13 @@ public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
     super(http, serverUrl, Work.class, mapper, "/v5/works");
   }
 
-  public Set<Agent> getCreators(UUID uuid) throws HttpException {
+  public Set<Agent> getCreators(UUID uuid) throws TechnicalException {
     return (Set<Agent>)
         doGetRequestForObjectList(
             String.format("%s/%s/creators", baseEndpoint, uuid), DigitalObject.class);
   }
 
-  public List getItems(UUID uuid) throws HttpException {
+  public List getItems(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/items", baseEndpoint, uuid), Item.class);
   }
 }

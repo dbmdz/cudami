@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
-import de.digitalcollections.model.exception.http.HttpException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -25,14 +25,14 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
     this(http, serverUrl, (Class<E>) Entity.class, mapper, "/v5/entities");
   }
 
-  public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws HttpException {
+  public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws TechnicalException {
     doPostRequestForObject(
         String.format("/v5/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
         (E) null);
   }
 
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
-      throws HttpException {
+      throws TechnicalException {
     doPostRequestForObject(
         String.format(
             "/v5/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
@@ -46,39 +46,39 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
    * @return object with given refId
    */
   @Deprecated(forRemoval = true)
-  public E findOneByRefId(long refId) throws HttpException {
+  public E findOneByRefId(long refId) throws TechnicalException {
     return getByRefId(refId);
   }
 
-  public List findRandomEntities(int count) throws HttpException {
+  public List findRandomEntities(int count) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/random?count=%d", count), Entity.class);
   }
 
-  public E getByRefId(long refId) throws HttpException {
+  public E getByRefId(long refId) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
   }
 
   @Override
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws HttpException {
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
-  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws HttpException {
+  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/relations/%s", subjectEntityUuid), EntityRelation.class);
   }
 
   public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
-      throws HttpException {
+      throws TechnicalException {
     return doPostRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid),
         fileResources,
         FileResource.class);
   }
 
-  public List<EntityRelation> saveRelationsForSubject(List relations) throws HttpException {
+  public List<EntityRelation> saveRelationsForSubject(List relations) throws TechnicalException {
     return doPutRequestForObjectList(
         String.format(
             "/v5/entities/%s/relations",

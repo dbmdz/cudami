@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -52,7 +52,7 @@ public class CorporateBodiesController extends AbstractController {
   }
 
   @GetMapping("/corporatebodies/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "corporatebodies/create";
   }
@@ -68,9 +68,9 @@ public class CorporateBodiesController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    CorporateBody corporateBody = service.findOne(uuid);
+    CorporateBody corporateBody = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 
@@ -91,19 +91,19 @@ public class CorporateBodiesController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/corporatebodies/{uuid}")
   @ResponseBody
-  public CorporateBody get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public CorporateBody get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/corporatebodies")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -116,7 +116,7 @@ public class CorporateBodiesController extends AbstractController {
     try {
       CorporateBody corporateBodyDb = service.save(corporateBody);
       return ResponseEntity.status(HttpStatus.CREATED).body(corporateBodyDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save corporate body: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -127,7 +127,7 @@ public class CorporateBodiesController extends AbstractController {
     try {
       CorporateBody corporateBodyDb = service.update(uuid, corporateBody);
       return ResponseEntity.ok(corporateBodyDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save corporate body with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -135,9 +135,9 @@ public class CorporateBodiesController extends AbstractController {
 
   @GetMapping("/corporatebodies/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    CorporateBody corporateBody = service.findOne(uuid);
+    CorporateBody corporateBody = service.getByUuid(uuid);
     if (corporateBody == null) {
       throw new ResourceNotFoundException();
     }

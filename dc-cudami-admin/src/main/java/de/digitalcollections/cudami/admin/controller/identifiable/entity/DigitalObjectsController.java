@@ -3,9 +3,9 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -52,7 +52,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
@@ -60,21 +60,21 @@ public class DigitalObjectsController extends AbstractController {
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
   @ResponseBody
   public DigitalObject findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws HttpException {
-    return service.findOneByIdentifier(namespace, id);
+      throws TechnicalException {
+    return service.getByIdentifier(namespace, id);
   }
 
   @GetMapping(
       "/api/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
   @ResponseBody
-  public DigitalObject get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public DigitalObject get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/api/digitalobjects/{refId:[0-9]+}")
   @ResponseBody
-  public DigitalObject getByRefId(@PathVariable long refId) throws HttpException {
-    return service.findOneByRefId(refId);
+  public DigitalObject getByRefId(@PathVariable long refId) throws TechnicalException {
+    return service.getByRefId(refId);
   }
 
   @GetMapping(
@@ -86,7 +86,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.getCollections(uuid, searchPageRequest);
   }
@@ -100,13 +100,13 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.getProjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/digitalobjects")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -122,7 +122,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "sortField", required = false) String sortField,
       @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
       Order order = new Order(sortDirection, sortField);
@@ -135,8 +135,8 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/digitalobjects/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
-    DigitalObject digitalObject = service.findOne(uuid);
+      throws TechnicalException, ResourceNotFoundException {
+    DigitalObject digitalObject = service.getByUuid(uuid);
     if (digitalObject == null) {
       throw new ResourceNotFoundException();
     }

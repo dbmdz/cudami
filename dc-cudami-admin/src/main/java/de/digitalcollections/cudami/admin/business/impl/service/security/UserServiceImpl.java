@@ -5,8 +5,8 @@ import de.digitalcollections.cudami.admin.business.api.service.security.UserServ
 import de.digitalcollections.cudami.admin.business.impl.validator.PasswordsValidatorParams;
 import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsernameValidator;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
         return true;
       }
       return false;
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public PageResponse<User> find(PageRequest pageRequest) throws ServiceException {
     try {
       return client.find(pageRequest);
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public List<User> findAll() throws ServiceException {
     try {
       return client.findAll();
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public User findByEmail(String email) throws ServiceException {
     try {
       return client.findOneByEmail(email);
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public User findOne(UUID uuid) throws ServiceException {
     try {
       return client.findOne(uuid);
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     User user;
     try {
       user = client.findOneByEmail(username);
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       throw new UsernameNotFoundException(
           String.format("User \"%s\" was not found.", username), ex);
     }
@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
         } else {
           user = client.save(user);
         }
-      } catch (HttpException ex) {
+      } catch (TechnicalException ex) {
         throw new ServiceException(ex.getMessage(), ex);
       }
     }
@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
       user.setEnabled(enabled);
       client.update(user.getUuid(), user);
       return true;
-    } catch (HttpException ex) {
+    } catch (TechnicalException ex) {
       return false;
     }
   }

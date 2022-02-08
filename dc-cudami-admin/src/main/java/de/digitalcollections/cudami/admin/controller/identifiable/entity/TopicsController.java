@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -79,9 +79,9 @@ public class TopicsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = service.findOne(uuid);
+    Topic topic = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
@@ -102,7 +102,7 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return this.service.findTopCollections(pageRequest);
   }
@@ -114,15 +114,15 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.findSubtopics(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}")
   @ResponseBody
-  public Topic get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Topic get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/api/topics/{uuid}/entities")
@@ -131,7 +131,7 @@ public class TopicsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
+      throws TechnicalException {
     return this.service.getEntities(uuid, new PageRequest(pageNumber, pageSize));
   }
 
@@ -141,12 +141,12 @@ public class TopicsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws HttpException {
+      throws TechnicalException {
     return this.service.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/topics")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -166,7 +166,7 @@ public class TopicsController extends AbstractController {
         topicDb = service.saveWithParentTopic(topic, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save topic: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -177,7 +177,7 @@ public class TopicsController extends AbstractController {
     try {
       Topic topicDb = service.update(uuid, topic);
       return ResponseEntity.ok(topicDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save topic with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -185,8 +185,8 @@ public class TopicsController extends AbstractController {
 
   @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
   public String viewByRefId(@PathVariable long refId, Model model)
-      throws HttpException, ResourceNotFoundException {
-    Topic topic = service.findOneByRefId(refId);
+      throws TechnicalException, ResourceNotFoundException {
+    Topic topic = service.getByRefId(refId);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }
@@ -198,9 +198,9 @@ public class TopicsController extends AbstractController {
     "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Topic topic = service.findOne(uuid);
+    Topic topic = service.getByUuid(uuid);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }

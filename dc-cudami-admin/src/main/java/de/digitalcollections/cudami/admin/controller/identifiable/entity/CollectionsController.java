@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.paging.Direction;
@@ -62,7 +62,7 @@ public class CollectionsController extends AbstractController {
   @PostMapping("/api/collections/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.addDigitalObjects(uuid, digitalObjects);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -73,7 +73,7 @@ public class CollectionsController extends AbstractController {
   @PostMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.addSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -84,7 +84,7 @@ public class CollectionsController extends AbstractController {
   @PostMapping("/api/collections/{collectionUuid}/subcollections")
   public ResponseEntity addSubcollections(
       @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.addSubcollections(collectionUuid, subcollections);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -97,7 +97,7 @@ public class CollectionsController extends AbstractController {
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
-      throws HttpException {
+      throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
@@ -115,9 +115,9 @@ public class CollectionsController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = service.findOne(uuid);
+    Collection collection = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
@@ -138,7 +138,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
 
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.findTopCollections(searchPageRequest);
@@ -151,7 +151,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.getDigitalObjects(uuid, searchPageRequest);
   }
@@ -162,8 +162,8 @@ public class CollectionsController extends AbstractController {
   })
   @ResponseBody
   public Collection findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws HttpException {
-    return service.findOneByIdentifier(namespace, id);
+      throws TechnicalException {
+    return service.getByIdentifier(namespace, id);
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -173,7 +173,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.findSubcollections(uuid, searchPageRequest);
   }
@@ -183,18 +183,18 @@ public class CollectionsController extends AbstractController {
     "/api/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public Collection get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping({"/api/collections/{refId:[0-9]+}", "/api/subcollections/{refId:[0-9]+}"})
   @ResponseBody
-  public Collection getByRefId(@PathVariable long refId) throws HttpException {
-    return service.findOneByRefId(refId);
+  public Collection getByRefId(@PathVariable long refId) throws TechnicalException {
+    return service.getByRefId(refId);
   }
 
   @GetMapping("/collections")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -206,7 +206,7 @@ public class CollectionsController extends AbstractController {
   @ResponseBody
   public ResponseEntity removeDigitalObject(
       @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.removeDigitalObject(collectionUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -217,7 +217,7 @@ public class CollectionsController extends AbstractController {
   @DeleteMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
-      throws HttpException {
+      throws TechnicalException {
     boolean successful = service.removeSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
@@ -238,7 +238,7 @@ public class CollectionsController extends AbstractController {
         collectionDb = service.save(collection);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(collectionDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save collection: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -252,7 +252,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "sortField", required = false) String sortField,
       @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
       Order order = new Order(sortDirection, sortField);
@@ -268,7 +268,7 @@ public class CollectionsController extends AbstractController {
     try {
       Collection collectionDb = service.update(uuid, collection);
       return ResponseEntity.ok(collectionDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save collection with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -279,9 +279,9 @@ public class CollectionsController extends AbstractController {
     "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
   })
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Collection collection = service.findOne(uuid);
+    Collection collection = service.getByUuid(uuid);
     if (collection == null) {
       throw new ResourceNotFoundException();
     }
@@ -310,8 +310,8 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
   public String viewByRefId(@PathVariable long refId, Model model)
-      throws HttpException, ResourceNotFoundException {
-    Collection collection = service.findOneByRefId(refId);
+      throws TechnicalException, ResourceNotFoundException {
+    Collection collection = service.getByRefId(refId);
     if (collection == null) {
       throw new ResourceNotFoundException();
     }

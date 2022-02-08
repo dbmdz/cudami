@@ -4,9 +4,9 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.exceptions.HttpException;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
@@ -57,7 +57,7 @@ public class FileResourcesMetadataController extends AbstractController {
   }
 
   @GetMapping(value = "/fileresources/new")
-  public String create(Model model) throws HttpException {
+  public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "fileresources/create";
   }
@@ -73,9 +73,9 @@ public class FileResourcesMetadataController extends AbstractController {
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
-      throws HttpException {
+      throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    FileResource fileResource = service.findOne(uuid);
+    FileResource fileResource = service.getByUuid(uuid);
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
 
@@ -97,19 +97,19 @@ public class FileResourcesMetadataController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
   }
 
   @GetMapping("/api/fileresources/{uuid}")
   @ResponseBody
-  public FileResource get(@PathVariable UUID uuid) throws HttpException {
-    return service.findOne(uuid);
+  public FileResource get(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/fileresources")
-  public String list(Model model) throws HttpException {
+  public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
@@ -122,7 +122,7 @@ public class FileResourcesMetadataController extends AbstractController {
     try {
       FileResource fileResourceDb = service.save(fileResource);
       return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save fileresource: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -137,7 +137,7 @@ public class FileResourcesMetadataController extends AbstractController {
       @RequestParam(name = "sortField", required = false) String sortField,
       @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws HttpException {
+      throws TechnicalException {
     Sorting sorting = null;
     if (sortField != null && sortDirection != null) {
       Order order = new Order(sortDirection, sortField);
@@ -153,7 +153,7 @@ public class FileResourcesMetadataController extends AbstractController {
     try {
       FileResource fileResourceDb = service.update(uuid, fileResource);
       return ResponseEntity.ok(fileResourceDb);
-    } catch (HttpException e) {
+    } catch (TechnicalException e) {
       LOGGER.error("Cannot save fileresource with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
@@ -161,9 +161,9 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping(value = "/fileresources/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
-      throws HttpException, ResourceNotFoundException {
+      throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    FileResource resource = service.findOne(uuid);
+    FileResource resource = service.getByUuid(uuid);
     if (resource == null) {
       throw new ResourceNotFoundException();
     }
