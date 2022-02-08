@@ -75,7 +75,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "value"));
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified"));
   }
 
   @Override

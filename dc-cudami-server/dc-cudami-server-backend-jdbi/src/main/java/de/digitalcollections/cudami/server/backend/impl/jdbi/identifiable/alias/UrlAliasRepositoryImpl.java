@@ -13,6 +13,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -313,7 +314,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(
-        List.of("created", "lastPublished", "\"primary\"", "slug", "targetLanguage"));
+        Arrays.asList("created", "lastPublished", "\"primary\"", "slug", "targetLanguage"));
   }
 
   private String getAssignmentsForUpdate() {
