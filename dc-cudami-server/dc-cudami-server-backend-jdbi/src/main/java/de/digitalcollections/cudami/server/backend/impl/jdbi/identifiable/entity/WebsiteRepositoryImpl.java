@@ -7,8 +7,6 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
@@ -99,53 +96,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
       website.setRootPages(getRootPages(website));
     }
     return website;
-  }
-
-  @Override
-  public SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest) {
-    final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
-    final String wpTableName = webpageRepositoryImpl.getTableName();
-
-    String commonSql =
-        " FROM "
-            + wpTableName
-            + " AS "
-            + wpTableAlias
-            + " LEFT JOIN website_webpages ww ON "
-            + wpTableAlias
-            + ".uuid = ww.webpage_uuid"
-            + " WHERE ww.website_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuid);
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (StringUtils.hasText(searchTerm)) {
-      commonSql += " AND " + getCommonSearchSql(wpTableAlias);
-      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-
-    String orderBy = null;
-    if (searchPageRequest.getSorting() == null) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
-    }
-    addPageRequestParams(searchPageRequest, innerQuery);
-
-    List<Webpage> result =
-        webpageRepositoryImpl.retrieveList(
-            webpageRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
