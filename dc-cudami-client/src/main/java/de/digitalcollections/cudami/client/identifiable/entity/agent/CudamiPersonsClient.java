@@ -8,6 +8,8 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -24,6 +26,11 @@ public class CudamiPersonsClient extends CudamiIdentifiablesClient<Person> {
   @Override
   public PageResponse<Person> find(PageRequest pageRequest) throws HttpException {
     return super.find(pageRequest);
+  }
+
+  @Override
+  public SearchPageResponse<Person> find(SearchPageRequest pageRequest) throws HttpException {
+    return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
   public PageResponse findByLanguageAndInitial(
