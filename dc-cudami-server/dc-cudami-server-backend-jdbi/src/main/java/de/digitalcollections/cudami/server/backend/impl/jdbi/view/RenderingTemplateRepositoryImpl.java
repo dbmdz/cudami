@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingA
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return Arrays.asList("label", "name", "uuid");
+    return new ArrayList<>(Arrays.asList("label", "name"));
   }
 
   @Override
@@ -75,6 +76,11 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
       default:
         return null;
     }
+  }
+
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
   }
 
   @Override

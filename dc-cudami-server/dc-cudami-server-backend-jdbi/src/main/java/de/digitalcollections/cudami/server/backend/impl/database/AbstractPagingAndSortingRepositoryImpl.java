@@ -78,6 +78,9 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       return null;
     }
     List<String> allowedOrderByFields = getAllowedOrderByFields();
+    if (getUniqueField() != null && !allowedOrderByFields.contains(getUniqueField())) {
+      allowedOrderByFields.add(getUniqueField());
+    }
     String orderBy =
         Optional.ofNullable(sorting.getOrders()).orElse(Collections.emptyList()).stream()
             .filter(
@@ -113,4 +116,10 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
             .collect(Collectors.joining(","));
     return orderBy;
   }
+
+  /**
+   * @return name of model property that guarantees an unique sorting, e.g. a db primary key or
+   *     another unique column/field
+   */
+  protected abstract String getUniqueField();
 }

@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami-server</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.2-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Repository Server (Business)</name>
@@ -14,8 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.dc-commons-web>0.1.0-SNAPSHOT</version.dc-commons-web>
-    <version.icu4j>63.1</version.icu4j>
+    <version.dc-commons-web>1.0.0</version.dc-commons-web>
     <version.jscience>4.3.1</version.jscience>
   </properties>
 

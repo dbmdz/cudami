@@ -86,7 +86,7 @@ public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
         String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 
-  public boolean isMainLink(UUID websiteUuid, String slug) throws TechnicalException {
+  public boolean isPrimary(UUID websiteUuid, String slug) throws HttpException {
     LocalizedUrlAliases localizedUrlAliases = findPrimaryLinks(websiteUuid, slug);
     if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
       return false;

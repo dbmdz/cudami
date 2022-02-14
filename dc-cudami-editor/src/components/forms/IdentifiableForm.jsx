@@ -11,8 +11,8 @@ import {withTranslation} from 'react-i18next'
 
 import {
   generateSlug,
+  getConfig,
   loadAvailableLanguages,
-  loadDefaultLanguage,
   loadIdentifiable,
   saveIdentifiable,
   typeToEndpointMapping,
@@ -78,7 +78,10 @@ class IdentifiableForm extends Component {
   async componentDidMount() {
     const {apiContextPath, t, type, uuid} = this.props
     const availableLanguages = await loadAvailableLanguages(apiContextPath)
-    const defaultLanguage = await loadDefaultLanguage(apiContextPath)
+    const {
+      defaults: {language: defaultLanguage},
+      urlAlias: {generationExcludes},
+    } = await getConfig(apiContextPath)
     const identifiable = await loadIdentifiable(apiContextPath, type, uuid)
     const initialIdentifiable = {
       description: {},
@@ -102,17 +105,14 @@ class IdentifiableForm extends Component {
     )
     this.setState({
       availableLanguages: availableLanguages
-        .reduce((languages, language) => {
-          if (!(language in initialIdentifiable.label)) {
-            languages.push({
-              displayName: t(`languageNames:${language}`),
-              name: language,
-            })
-          }
-          return languages
-        }, [])
+        .filter((language) => !(language in initialIdentifiable.label))
+        .map((language) => ({
+          displayName: t(`languageNames:${language}`),
+          name: language,
+        }))
         .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
       defaultLanguage,
+      generationExcludes,
       identifiable: initialIdentifiable,
       initialFileResource,
       initialLabel: initialIdentifiable.label,
@@ -153,7 +153,7 @@ class IdentifiableForm extends Component {
       localizedUrlAliases: {
         ...identifiable.localizedUrlAliases,
         [activeLanguage]: [
-          ...identifiable.localizedUrlAliases[activeLanguage],
+          ...(identifiable.localizedUrlAliases[activeLanguage] ?? []),
           newUrlAlias,
         ],
       },
@@ -163,22 +163,27 @@ class IdentifiableForm extends Component {
   /*
    * Removes languages with empty content from the json
    */
-  cleanUpJson = (editorJson) => {
-    const cleanedJson = Object.entries(editorJson).reduce(
-      (json, [language, doc]) => {
-        if (this.isEmptyContent(doc.content)) {
-          return json
-        }
-        return {
-          ...json,
-          [language]: doc,
-        }
-      },
-      {},
+  cleanContent = (localizedContent) => {
+    const cleanedContent = Object.entries(localizedContent).filter(
+      ([, doc]) => !this.isEmptyContent(doc.content),
     )
-    if (Object.keys(cleanedJson).length > 0) {
-      return cleanedJson
+    if (!cleanedContent.length) {
+      return
     }
+    return Object.fromEntries(cleanedContent)
+  }
+
+  /*
+   * Removes languages with empty list of aliases from the json
+   */
+  cleanUrlAliases = (localizedAliases) => {
+    const cleanedAliases = Object.entries(localizedAliases).filter(
+      ([, aliases]) => aliases.length,
+    )
+    if (!cleanedAliases.length) {
+      return
+    }
+    return Object.fromEntries(cleanedAliases)
   }
 
   getFormComponent = () => {
@@ -237,17 +242,25 @@ class IdentifiableForm extends Component {
   }
 
   getGeneratedUrlAliases = async () => {
-    const {existingLanguages, identifiable, initialLabel} = this.state
+    const {
+      existingLanguages,
+      generationExcludes,
+      identifiable: {entityType, label, localizedUrlAliases},
+      initialLabel,
+    } = this.state
+    if (entityType && generationExcludes.includes(entityType)) {
+      return {}
+    }
     const languagesWithoutGeneratedUrlAliases = existingLanguages.filter(
       (language) => {
-        const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
+        const listOfAliases = localizedUrlAliases[language]
         /* filter the aliases that are connected with the parent website */
         const existingDefaultUrlAlias = listOfAliases.filter(
           ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
         )
         const labelChanged =
           initialLabel?.[language] &&
-          initialLabel?.[language] !== identifiable.label[language]
+          initialLabel?.[language] !== label[language]
         return !existingDefaultUrlAlias.length || labelChanged
       },
     )
@@ -259,7 +272,7 @@ class IdentifiableForm extends Component {
       {},
     )
     for (let language of languagesWithoutGeneratedUrlAliases) {
-      const listOfAliases = identifiable.localizedUrlAliases?.[language] ?? []
+      const listOfAliases = localizedUrlAliases[language]
       /* filter the aliases that are connected with the parent website */
       const existingDefaultUrlAlias = listOfAliases.filter(
         ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
@@ -358,7 +371,10 @@ class IdentifiableForm extends Component {
     const {apiContextPath, parentType, parentUuid, type} = this.props
     const identifiable = {
       ...this.state.identifiable,
-      description: this.cleanUpJson(this.state.identifiable.description),
+      description: this.cleanContent(this.state.identifiable.description),
+      localizedUrlAliases: this.cleanUrlAliases(
+        this.state.identifiable.localizedUrlAliases,
+      ),
     }
     if (this.state.generatedUrlAliases) {
       identifiable.localizedUrlAliases = mergeWith(
@@ -370,7 +386,7 @@ class IdentifiableForm extends Component {
       )
     }
     if (identifiable.text) {
-      identifiable.text = this.cleanUpJson(identifiable.text)
+      identifiable.text = this.cleanContent(identifiable.text)
     }
     const {error = false, uuid} = await (identifiable.uuid
       ? updateIdentifiable(apiContextPath, identifiable, type)

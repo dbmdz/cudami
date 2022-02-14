@@ -1,6 +1,7 @@
 export const typeToEndpointMapping = {
   article: 'articles',
   collection: 'collections',
+  config: 'config',
   corporateBody: 'corporatebodies',
   digitalObject: 'digitalobjects',
   entity: 'entities',
@@ -102,6 +103,17 @@ export async function generateSlug(contextPath, language, slug, websiteUuid) {
     return await response.json()
   } catch (err) {
     return slug
+  }
+}
+
+export async function getConfig(contextPath) {
+  const url = `${contextPath}api/${typeToEndpointMapping.config}`
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    return json
+  } catch (err) {
+    return {}
   }
 }
 

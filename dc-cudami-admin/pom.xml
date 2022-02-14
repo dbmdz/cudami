@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.2-SNAPSHOT</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
@@ -61,6 +61,10 @@
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-model</artifactId>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.model</groupId>

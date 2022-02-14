@@ -36,7 +36,7 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
 
   private void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
-      Sorting sorting = new Sorting(Direction.ASC, "name");
+      Sorting sorting = new Sorting(Direction.ASC, "name", "uuid");
       pageRequest.setSorting(sorting);
     }
   }

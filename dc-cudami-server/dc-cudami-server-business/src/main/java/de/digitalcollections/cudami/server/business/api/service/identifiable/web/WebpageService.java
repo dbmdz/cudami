@@ -32,6 +32,9 @@ public interface WebpageService extends NodeService<Webpage> {
 
   SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
 
+  SearchPageResponse<Webpage> findRootPagesForWebsite(
+      UUID websiteUuid, SearchPageRequest searchPageRequest);
+
   Webpage getActive(UUID uuid);
 
   Webpage getActive(UUID uuid, Locale pLocale);

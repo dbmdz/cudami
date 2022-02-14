@@ -37,6 +37,7 @@ import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -60,7 +61,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 @SuppressWarnings("checkstyle:typename")
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   // Cannot be more elegant, since we want to allow null values
-  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new HashMap<>();
+  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new LinkedHashMap<>();
 
   static {
     ENTITY_MIGRATION_TABLES.put(AGENT, null);
@@ -107,7 +108,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     // the websites, they are bound, too
     migrateWebpages(jdbcTemplate);
 
-    removeIdentifiablesNotToMigrate(context);
+    removeIdentifiablesNotToMigrate();
 
     // All other entities have only generic URLAliases
     ENTITY_MIGRATION_TABLES.forEach(
@@ -122,7 +123,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
         });
   }
 
-  private void removeIdentifiablesNotToMigrate(Context context) {
+  private void removeIdentifiablesNotToMigrate() {
     if (cudamiConfig.getUrlAlias() != null
         && cudamiConfig.getUrlAlias().getGenerationExcludes() != null) {
       List<EntityType> excludedIdentifiables = cudamiConfig.getUrlAlias().getGenerationExcludes();
@@ -142,6 +143,14 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     String selectQuery =
         "SELECT w.uuid AS w_uuid, w.label AS label, ww.website_uuid AS ws_uuid FROM webpages w, website_webpages ww WHERE ww.webpage_uuid=w.uuid ORDER BY ws_uuid,w_uuid";
     List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+
+    if (webpages.isEmpty()) {
+      LOGGER.info("No UrlAliases to add for webpages");
+      return;
+    }
+
+    LOGGER.info("Migrating webpages");
+
     webpages.forEach(
         w -> {
           JSONObject jsonObject = new JSONObject(w.toString());
@@ -159,6 +168,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             + parentWebpageUuid
             + "'";
     List<Map<String, String>> webpages = jdbcTemplate.queryForList(selectQuery);
+
     if (webpages.isEmpty()) {
       return;
     }
@@ -192,19 +202,14 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             } catch (SQLException e) {
               throw new RuntimeException("Cannot save urlAlias " + urlAlias + ": " + e, e);
             }
-            try {
-              migrateSubpages(jdbcTemplate, websiteUuid, uuid);
-            } catch (SQLException e) {
-              throw new RuntimeException(
-                  "Cannot migrate subpages for websiteUuid="
-                      + websiteUuid
-                      + ", uuid="
-                      + uuid
-                      + ": "
-                      + e,
-                  e);
-            }
           });
+      try {
+        migrateSubpages(jdbcTemplate, websiteUuid, uuid);
+      } catch (SQLException e) {
+        throw new RuntimeException(
+            "Cannot migrate subpages for websiteUuid=" + websiteUuid + ", uuid=" + uuid + ": " + e,
+            e);
+      }
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Cannot parse " + jsonObject + ": " + e, e);
     }
