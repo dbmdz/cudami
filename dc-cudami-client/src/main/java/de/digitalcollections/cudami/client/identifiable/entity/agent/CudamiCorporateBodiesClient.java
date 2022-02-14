@@ -22,7 +22,7 @@ public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateB
 
   @Override
   public SearchPageResponse<CorporateBody> find(SearchPageRequest searchPageRequest)
-      throws HttpException {
+      throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 

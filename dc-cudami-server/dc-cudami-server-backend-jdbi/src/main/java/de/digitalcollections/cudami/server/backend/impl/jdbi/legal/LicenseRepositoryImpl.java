@@ -151,6 +151,11 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
     }
   }
 
+  @Override
+  protected String getUniqueField() {
+    return "uuid";
+  }
+
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
         dbi.withHandle(

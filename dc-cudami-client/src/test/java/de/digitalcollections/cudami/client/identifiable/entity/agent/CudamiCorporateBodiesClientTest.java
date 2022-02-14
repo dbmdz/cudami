@@ -36,7 +36,7 @@ class CudamiCorporateBodiesClientTest
   @Test
   @DisplayName("can execute the find method with a SearchPageRequest")
   @Override
-  public void findWithSearchPageRequest() throws Exception {
+  public void testFindWithSearchPageRequest() throws Exception {
     String bodyJson = "{}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
@@ -50,7 +50,7 @@ class CudamiCorporateBodiesClientTest
   @Test
   @DisplayName("can execute the find method with a search term and max results")
   @Override
-  public void findWithSearchTermAndMaxResults() throws Exception {
+  public void testFindWithSearchTermAndMaxResults() throws Exception {
     String bodyJson = "{\"content\":[]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 

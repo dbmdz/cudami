@@ -22,7 +22,7 @@ public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
   }
 
   @Override
-  public SearchPageResponse<Person> find(SearchPageRequest pageRequest) throws HttpException {
+  public SearchPageResponse<Person> find(SearchPageRequest pageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
