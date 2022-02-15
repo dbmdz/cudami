@@ -1,12 +1,15 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierTypeRepositoryImpl.SQL_INSERT_FIELDS;
+import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierTypeRepositoryImpl.SQL_INSERT_VALUES;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +22,13 @@ import org.springframework.stereotype.Repository;
 public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserRepository {
 
   public static final String MAPPING_PREFIX = "u";
+  public static final String SQL_INSERT_FIELDS =
+      " uuid, acronym, created, label, last_modified, url";
+  public static final String SQL_INSERT_VALUES =
+      " :uuid, :acronym, :created, :label::JSONB, :lastModified, :url";
+  public static final String SQL_REDUCED_FIELDS_US =
+      " u.uuid, u.created, u.email, u.enabled, u.firstname, u.lastname, u.last_modified, u.passwordhash, u.roles";
+  public static final String SQL_FULL_FIELDS_US = SQL_REDUCED_FIELDS_US;
   public static final String TABLE_ALIAS = "u";
   public static final String TABLE_NAME = "users";
 
@@ -35,7 +45,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public PageResponse<User> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT * FROM users");
+    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + " FROM users");
 
     addPageRequestParams(pageRequest, query);
     List<User> result =
@@ -51,7 +61,12 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   public List<User> findActiveAdminUsers() {
     return dbi.withHandle(
         h ->
-            h.createQuery("SELECT * FROM users WHERE '" + Role.ADMIN.name() + "' = any(roles)")
+            h.createQuery(
+                    "SELECT "
+                        + SQL_REDUCED_FIELDS_US
+                        + " FROM users WHERE '"
+                        + Role.ADMIN.name()
+                        + "' = any(roles)")
                 .mapToBean(User.class)
                 .map(User.class::cast)
                 .list());
@@ -62,7 +77,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     List<User> users =
         dbi.withHandle(
             h ->
-                h.createQuery("SELECT * FROM users WHERE email = :email")
+                h.createQuery("SELECT " + SQL_FULL_FIELDS_US + " FROM users WHERE email = :email")
                     .bind("email", email)
                     .mapToBean(User.class)
                     .map(User.class::cast)
@@ -78,7 +93,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     List<User> users =
         dbi.withHandle(
             h ->
-                h.createQuery("SELECT * FROM users WHERE uuid = :uuid")
+                h.createQuery("SELECT " + SQL_FULL_FIELDS_US + " FROM users WHERE uuid = :uuid")
                     .bind("uuid", uuid)
                     .mapToBean(User.class)
                     .map(User.class::cast)
@@ -100,14 +115,18 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
       return null;
     }
     switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
       case "email":
-        return "email";
+        return tableAlias + ".email";
       case "lastname":
-        return "lastname";
+        return tableAlias + ".lastname";
       case "firstname":
-        return "firstname";
+        return tableAlias + ".firstname";
+      case "lastModified":
+        return tableAlias + ".last_modified";
       case "uuid":
-        return "uuid";
+        return tableAlias + ".uuid";
       default:
         return null;
     }
@@ -121,21 +140,25 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   @Override
   public User save(User user) {
     user.setUuid(UUID.randomUUID());
-    //    User result = dbi.withHandle(h -> h.createQuery(
-    //            "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles)
-    // VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles) RETURNING *")
-    //            .bindBean(user)
-    //            .bind("roles", user.getRoles().stream().map(Role::name).toArray(String[]::new))
-    //            .mapToBean(User.class)
-    //            .findOne().orElse(null));
-    //    return (S) result;
+    user.setCreated(LocalDateTime.now());
+    user.setLastModified(LocalDateTime.now());
+
+    final String sql =
+        "INSERT INTO "
+            + tableName
+            + "("
+            + SQL_INSERT_FIELDS
+            + ")"
+            + " VALUES ("
+            + SQL_INSERT_VALUES
+            + ")"
+            + " RETURNING *";
 
     User result =
         dbi.withHandle(
             h ->
                 h.registerArrayType(Role.class, "varchar")
-                    .createQuery(
-                        "INSERT INTO users(email, enabled, firstname, lastname, passwordHash, roles, uuid) VALUES (:email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid) RETURNING *")
+                    .createQuery(sql)
                     .bindBean(user)
                     .mapToBean(User.class)
                     .findOne()

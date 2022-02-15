@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +26,13 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "idt";
+  public static final String SQL_INSERT_FIELDS =
+      " uuid, created, identifiable, namespace, identifier, last_modified";
+  public static final String SQL_INSERT_VALUES =
+      " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
+  public static final String SQL_REDUCED_FIELDS_IDT =
+      " id.uuid, id.created, id.identifiable, id.namespace, id.identifier, id.last_modified";
+  public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
   public static final String TABLE_ALIAS = "idt";
   public static final String TABLE_NAME = "identifiertypes";
 
@@ -46,7 +54,9 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
     Map<String, Object> argumentMappings = new HashMap<>();
-    StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName);
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
@@ -77,7 +87,14 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public IdentifierType findOne(UUID uuid) {
-    final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_IDT
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE uuid = :uuid";
 
     IdentifierType identifierType =
         dbi.withHandle(
@@ -118,14 +135,18 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
       return null;
     }
     switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
       case "label":
-        return "label";
+        return tableAlias + ".label";
+      case "lastModified":
+        return tableAlias + ".last_modified";
       case "namespace":
-        return "namespace";
+        return tableAlias + ".namespace";
       case "pattern":
-        return "pattern";
+        return tableAlias + ".pattern";
       case "uuid":
-        return "uuid";
+        return tableAlias + ".uuid";
       default:
         return null;
     }
@@ -139,12 +160,18 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public IdentifierType save(IdentifierType identifierType) {
     identifierType.setUuid(UUID.randomUUID());
+    identifierType.setCreated(LocalDateTime.now());
+    identifierType.setLastModified(LocalDateTime.now());
 
     final String sql =
         "INSERT INTO "
             + tableName
-            + "(uuid, label, namespace, pattern)"
-            + " VALUES (:uuid, :label, :namespace, :pattern)"
+            + "("
+            + SQL_INSERT_FIELDS
+            + ")"
+            + " VALUES ("
+            + SQL_INSERT_VALUES
+            + ")"
             + " RETURNING *";
 
     IdentifierType result =
