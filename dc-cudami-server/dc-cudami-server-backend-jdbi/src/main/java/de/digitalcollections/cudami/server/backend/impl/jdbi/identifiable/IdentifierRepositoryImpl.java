@@ -8,6 +8,7 @@ import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,8 +29,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "id";
-  public static final String SQL_FULL_FIELDS_ID =
-      " id.uuid id_uuid, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id";
+  public static final String SQL_INSERT_FIELDS =
+      "uuid, created, identifiable, namespace, identifier, last_modified";
+  public static final String SQL_INSERT_VALUES =
+      ":uuid, :created, :identifiable, :namespace, :id, :lastModified";
+  public static final String SQL_REDUCED_FIELDS_ID =
+      " id.uuid id_uuid, id.created id_created, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id, id.last_modified id_last_modified";
+  public static final String SQL_FULL_FIELDS_ID = SQL_REDUCED_FIELDS_ID;
   public static final String TABLE_ALIAS = "id";
   public static final String TABLE_NAME = "identifiers";
 
@@ -67,7 +73,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Override
   public PageResponse<Identifier> find(PageRequest pageRequest) {
     Map<String, Object> argumentMappings = new HashMap<>();
-    StringBuilder innerQuery = new StringBuilder("SELECT * FROM " + tableName);
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT " + SQL_REDUCED_FIELDS_ID + " FROM " + tableName + " AS " + tableAlias);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
@@ -96,7 +104,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     Map<String, Object> argumentMappings = new HashMap<>();
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT * FROM " + tableName + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
+            "SELECT "
+                + SQL_REDUCED_FIELDS_ID
+                + " FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
     addFiltering(searchPageRequest, innerQuery, argumentMappings);
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -116,6 +130,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
         new StringBuilder(
             "SELECT count(*) FROM "
                 + tableName
+                + " AS "
+                + tableAlias
                 + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
     addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total =
@@ -133,7 +149,14 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) {
-    final String sql = "SELECT * FROM " + tableName + " WHERE identifiable = :uuid";
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE identifiable = :uuid";
 
     List<Identifier> result =
         dbi.withHandle(
@@ -149,7 +172,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Override
   public Identifier findOne(String namespace, String id) {
     final String sql =
-        "SELECT * FROM " + tableName + " WHERE namespace = :namespace, identifier = :identifier";
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE namespace = :namespace, identifier = :identifier";
 
     Identifier identifier =
         dbi.withHandle(
@@ -174,14 +203,18 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
       return null;
     }
     switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
       case "id":
-        return "id";
+        return tableAlias + ".id";
       case "identifiable":
-        return "identifiable";
+        return tableAlias + ".identifiable";
+      case "lastModified":
+        return tableAlias + ".last_modified";
       case "namespace":
-        return "namespace";
+        return tableAlias + ".namespace";
       case "uuid":
-        return "uuid";
+        return tableAlias + ".uuid";
       default:
         return null;
     }
@@ -195,12 +228,18 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Override
   public Identifier save(Identifier identifier) {
     identifier.setUuid(UUID.randomUUID());
+    identifier.setCreated(LocalDateTime.now());
+    identifier.setLastModified(LocalDateTime.now());
 
     final String sql =
         "INSERT INTO "
             + tableName
-            + "(uuid, identifiable, namespace, identifier)"
-            + " VALUES (:uuid, :identifiable, :namespace, :id)"
+            + "( "
+            + SQL_INSERT_FIELDS
+            + " )"
+            + " VALUES ( "
+            + SQL_INSERT_VALUES
+            + " )"
             + " RETURNING *";
 
     Identifier result =
