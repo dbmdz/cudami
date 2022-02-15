@@ -14,8 +14,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; -- needed for generation of random U
 ALTER TABLE predicates
 ADD COLUMN IF NOT EXISTS uuid UUID NOT NULL UNIQUE DEFAULT uuid_generate_v4();
 
--- renderingtemplates
-ALTER TABLE renderingtemplates
+-- rendering_templates
+ALTER TABLE rendering_templates
 ADD COLUMN IF NOT EXISTS created TIMESTAMP NOT NULL DEFAULT '2016-12-22 00:00:00.000Z',
 ADD COLUMN IF NOT EXISTS last_modified TIMESTAMP NOT NULL DEFAULT '2016-12-22 00:00:00.000Z';
 
