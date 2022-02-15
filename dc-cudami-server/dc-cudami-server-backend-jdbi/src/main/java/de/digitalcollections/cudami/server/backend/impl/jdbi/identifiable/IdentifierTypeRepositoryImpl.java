@@ -187,11 +187,12 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public IdentifierType update(IdentifierType identifierType) {
+    identifierType.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid
     final String sql =
         "UPDATE "
             + tableName
-            + " SET label=:label, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
+            + " SET label=:label, last_modified=:lastModified, namespace=:namespace, pattern=:pattern WHERE uuid=:uuid RETURNING *";
 
     IdentifierType result =
         dbi.withHandle(

@@ -115,10 +115,11 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public RenderingTemplate update(RenderingTemplate template) {
+    template.setLastModified(LocalDateTime.now());
     String query =
         "UPDATE "
             + tableName
-            + " SET description=:description::JSONB, label=:label::JSONB, name=:name"
+            + " SET description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, name=:name"
             + " WHERE uuid=:uuid RETURNING *";
     return dbi.withHandle(
         h ->
