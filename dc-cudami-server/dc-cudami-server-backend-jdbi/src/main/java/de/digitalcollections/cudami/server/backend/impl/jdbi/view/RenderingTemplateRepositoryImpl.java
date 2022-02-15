@@ -1,10 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,29 +14,28 @@ import org.jdbi.v3.core.Jdbi;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl
+public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
     implements RenderingTemplateRepository {
 
   public static final String MAPPING_PREFIX = "r";
+  public static final String SQL_INSERT_FIELDS =
+      " uuid, created, label, description, name, last_modified";
+  public static final String SQL_INSERT_VALUES =
+      " :uuid, :created, :label::JSONB, :description::JSONB, :name, :lastModified";
+  public static final String SQL_REDUCED_FIELDS_RT =
+      " rt.uuid, rt.created, rt.label, rt.name, rt.last_modified";
+  public static final String SQL_FULL_FIELDS_RT = SQL_REDUCED_FIELDS_RT + ", rt.description";
   public static final String TABLE_ALIAS = "rt";
   public static final String TABLE_NAME = "rendering_templates";
 
-  private final Jdbi dbi;
-
   public RenderingTemplateRepositoryImpl(Jdbi dbi) {
-    this.dbi = dbi;
-  }
-
-  @Override
-  public long count() {
-    String sql = "SELECT count(*) FROM rendering_templates";
-    long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
-    return count;
+    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
   public PageResponse<RenderingTemplate> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT * FROM rendering_templates");
+    StringBuilder query =
+        new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_RT + " FROM rendering_templates");
     addPageRequestParams(pageRequest, query);
     List<RenderingTemplate> result =
         dbi.withHandle(
@@ -46,7 +46,7 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
 
   @Override
   public RenderingTemplate findOne(UUID uuid) {
-    String query = "SELECT * FROM rendering_templates WHERE uuid=:uuid";
+    String query = "SELECT " + SQL_FULL_FIELDS_RT + " FROM rendering_templates WHERE uuid=:uuid";
     return dbi.withHandle(
         h ->
             h.createQuery(query)
@@ -67,12 +67,16 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
       return null;
     }
     switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
       case "label":
-        return "label";
+        return tableAlias + ".label";
+      case "lastModified":
+        return tableAlias + ".last_modified";
       case "name":
-        return "name";
+        return tableAlias + ".name";
       case "uuid":
-        return "uuid";
+        return tableAlias + ".uuid";
       default:
         return null;
     }
@@ -86,10 +90,20 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
   @Override
   public RenderingTemplate save(RenderingTemplate template) {
     template.setUuid(UUID.randomUUID());
-    String query =
-        "INSERT INTO rendering_templates(description, label, name, uuid)"
-            + " VALUES (:description::JSONB, :label::JSONB, :name, :uuid)"
+    template.setCreated(LocalDateTime.now());
+    template.setLastModified(LocalDateTime.now());
+
+    final String query =
+        "INSERT INTO "
+            + tableName
+            + "("
+            + SQL_INSERT_FIELDS
+            + ")"
+            + " VALUES ("
+            + SQL_INSERT_VALUES
+            + ")"
             + " RETURNING *";
+
     return dbi.withHandle(
         h ->
             h.createQuery(query)
@@ -102,7 +116,8 @@ public class RenderingTemplateRepositoryImpl extends AbstractPagingAndSortingRep
   @Override
   public RenderingTemplate update(RenderingTemplate template) {
     String query =
-        "UPDATE rendering_templates"
+        "UPDATE "
+            + tableName
             + " SET description=:description::JSONB, label=:label::JSONB, name=:name"
             + " WHERE uuid=:uuid RETURNING *";
     return dbi.withHandle(

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -22,12 +23,17 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicateRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "pred";
 
+  public static final String SQL_INSERT_FIELDS =
+      " value, label, description, created, last_modified, uuid";
+  public static final String SQL_INSERT_VALUES =
+      " :value, :label::JSONB, :description::JSONB, :created, :lastModified, :uuid";
+
   public static final String SQL_REDUCED_FIELDS_PRED =
-      " p.value pred_value, p.label pred_label,"
+      " p.uuid pred_uuid, p.value pred_value, p.label pred_label,"
           + " p.created pred_created, p.last_modified pred_lastModified";
 
   public static final String SQL_FULL_FIELDS_PRED =
-      SQL_REDUCED_FIELDS_PRED + " , p.description pred_description";
+      SQL_REDUCED_FIELDS_PRED + ", p.description pred_description";
 
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "predicates";
@@ -49,7 +55,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public List<Predicate> findAll() {
-    final String sql = "SELECT * FROM " + tableName + " AS " + tableAlias;
+    final String sql =
+        "SELECT " + SQL_REDUCED_FIELDS_PRED + " FROM " + tableName + " AS " + tableAlias;
 
     List<Predicate> result =
         dbi.withHandle(
@@ -63,7 +70,14 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public Predicate findOneByValue(String value) {
-    String query = "SELECT * FROM " + tableName + " WHERE value = :value";
+    String query =
+        "SELECT "
+            + SQL_FULL_FIELDS_PRED
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE value = :value";
     Optional<Predicate> result =
         dbi.withHandle(
             h ->
@@ -92,6 +106,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
         return tableAlias + ".label";
       case "lastModified":
         return tableAlias + ".last_modified";
+      case "uuid":
+        return tableAlias + ".uuid";
       case "value":
         return tableAlias + ".value";
       default:
@@ -126,17 +142,16 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
       dbi.withHandle(h -> h.createUpdate(updateQuery).bindBean(predicate).execute());
     } else {
       // Creation
+      predicate.setUuid(UUID.randomUUID());
       predicate.setCreated(predicate.getLastModified());
 
       String createQuery =
           "INSERT INTO "
               + tableName
               + "("
-              + "value, label, description,"
-              + " created, last_modified"
+              + SQL_INSERT_FIELDS
               + ") VALUES ("
-              + ":value, :label::JSONB, :description::JSONB,"
-              + " :created, :lastModified"
+              + SQL_INSERT_VALUES
               + ")";
 
       dbi.withHandle(h -> h.createUpdate(createQuery).bindBean(predicate).execute());
