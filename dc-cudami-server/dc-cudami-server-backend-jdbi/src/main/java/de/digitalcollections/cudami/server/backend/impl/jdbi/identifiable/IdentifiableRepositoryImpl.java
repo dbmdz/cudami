@@ -662,8 +662,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       StringBuilder innerQuery,
       final Map<String, Object> argumentMappings,
       String orderBy) {
-    final String urlAliasName = UrlAliasRepositoryImpl.TABLE_NAME;
-    final String urlAliasAlias = UrlAliasRepositoryImpl.TABLE_ALIAS;
     final String sql =
         "SELECT "
             + fieldsSql
@@ -678,20 +676,28 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + " AS "
             + tableAlias
             + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
-            + " LEFT JOIN identifiers AS id ON "
+            + " LEFT JOIN "
+            + IdentifierRepositoryImpl.TABLE_NAME
+            + " AS "
+            + IdentifierRepositoryImpl.TABLE_ALIAS
+            + " ON "
             + tableAlias
-            + ".uuid = id.identifiable"
-            + " LEFT JOIN fileresources_image AS file ON "
+            + ".uuid = "
+            + IdentifierRepositoryImpl.TABLE_ALIAS
+            + ".identifiable"
+            + " LEFT JOIN "
+            + ImageFileResourceRepositoryImpl.TABLE_NAME
+            + " AS file ON "
             + tableAlias
             + ".previewfileresource = file.uuid"
             + " LEFT JOIN "
-            + urlAliasName
+            + UrlAliasRepositoryImpl.TABLE_NAME
             + " AS "
-            + urlAliasAlias
+            + UrlAliasRepositoryImpl.TABLE_ALIAS
             + " ON "
-            + this.tableAlias
+            + tableAlias
             + ".uuid = "
-            + urlAliasAlias
+            + UrlAliasRepositoryImpl.TABLE_ALIAS
             + ".target_uuid"
             + UrlAliasRepositoryImpl.WEBSITESJOIN
             + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
