@@ -1,8 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierTypeRepositoryImpl.SQL_INSERT_FIELDS;
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierTypeRepositoryImpl.SQL_INSERT_VALUES;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.paging.PageRequest;
