@@ -166,12 +166,13 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public User update(User user) {
+    user.setLastModified(LocalDateTime.now());
     User result =
         dbi.withHandle(
             h ->
                 h.registerArrayType(Role.class, "varchar")
                     .createQuery(
-                        "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
+                        "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(User.class)
                     .map(User.class::cast)
