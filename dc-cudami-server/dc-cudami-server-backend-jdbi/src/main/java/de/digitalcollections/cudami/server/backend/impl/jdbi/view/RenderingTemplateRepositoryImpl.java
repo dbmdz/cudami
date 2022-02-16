@@ -38,7 +38,8 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public PageResponse<RenderingTemplate> find(PageRequest pageRequest) {
     StringBuilder query =
-        new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_RT + " FROM rendering_templates");
+        new StringBuilder(
+            "SELECT " + SQL_REDUCED_FIELDS_RT + " FROM " + tableName + " AS " + tableAlias);
     addPageRequestParams(pageRequest, query);
     List<RenderingTemplate> result =
         dbi.withHandle(
@@ -49,7 +50,14 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public RenderingTemplate findOne(UUID uuid) {
-    String query = "SELECT " + SQL_FULL_FIELDS_RT + " FROM rendering_templates WHERE uuid=:uuid";
+    String query =
+        "SELECT "
+            + SQL_FULL_FIELDS_RT
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE uuid=:uuid";
     return dbi.withHandle(
         h ->
             h.createQuery(query)
