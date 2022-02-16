@@ -29,15 +29,18 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "id";
-  public static final String SQL_INSERT_FIELDS =
-      "uuid, created, identifiable, namespace, identifier, last_modified";
-  public static final String SQL_INSERT_VALUES =
-      ":uuid, :created, :identifiable, :namespace, :id, :lastModified";
-  public static final String SQL_REDUCED_FIELDS_ID =
-      " id.uuid id_uuid, id.created id_created, id.identifiable id_identifiable, id.namespace id_namespace, id.identifier id_id, id.last_modified id_last_modified";
-  public static final String SQL_FULL_FIELDS_ID = SQL_REDUCED_FIELDS_ID;
   public static final String TABLE_ALIAS = "id";
   public static final String TABLE_NAME = "identifiers";
+
+  public static final String SQL_INSERT_FIELDS =
+      " uuid, created, identifiable, namespace, identifier, last_modified";
+  public static final String SQL_INSERT_VALUES =
+      " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
+  public static final String SQL_REDUCED_FIELDS_ID =
+      String.format(
+          " %1$s.uuid %2$s_uuid, %1$s.created %2$s_created, %1$s.identifiable %2$s_identifiable, %1$s.namespace %2$s_namespace, %1$s.identifier %2$s_id, %1$s.last_modified %2$s_lastModified",
+          TABLE_ALIAS, MAPPING_PREFIX);
+  public static final String SQL_FULL_FIELDS_ID = SQL_REDUCED_FIELDS_ID;
 
   @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
