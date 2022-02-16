@@ -26,15 +26,18 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "idt";
+  public static final String TABLE_ALIAS = "idt";
+  public static final String TABLE_NAME = "identifiertypes";
+
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, identifiable, namespace, identifier, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
   public static final String SQL_REDUCED_FIELDS_IDT =
-      " id.uuid, id.created, id.identifiable, id.namespace, id.identifier, id.last_modified";
+      String.format(
+          " %1$s.uuid, %1$s.created, %1$s.identifiable, %1$s.namespace, %1$s.identifier, %1$s.last_modified",
+          TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
-  public static final String TABLE_ALIAS = "idt";
-  public static final String TABLE_NAME = "identifiertypes";
 
   @Autowired
   public IdentifierTypeRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {

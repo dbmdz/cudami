@@ -23,21 +23,18 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicateRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "pred";
+  public static final String TABLE_ALIAS = "pred";
+  public static final String TABLE_NAME = "predicates";
 
   public static final String SQL_INSERT_FIELDS =
       " value, label, description, created, last_modified, uuid";
   public static final String SQL_INSERT_VALUES =
       " :value, :label::JSONB, :description::JSONB, :created, :lastModified, :uuid";
-
   public static final String SQL_REDUCED_FIELDS_PRED =
-      " p.uuid pred_uuid, p.value pred_value, p.label pred_label,"
-          + " p.created pred_created, p.last_modified pred_lastModified";
-
+      String.format(
+          " %1$s.uuid, %1$s.value, %1$s.label, %1$s.created, %1$s.last_modified", TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_PRED =
-      SQL_REDUCED_FIELDS_PRED + ", p.description pred_description";
-
-  public static final String TABLE_ALIAS = "p";
-  public static final String TABLE_NAME = "predicates";
+      SQL_REDUCED_FIELDS_PRED + String.format(", %s.description", TABLE_ALIAS);
 
   @Autowired
   public PredicateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
