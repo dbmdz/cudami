@@ -17,16 +17,19 @@ import org.springframework.stereotype.Repository;
 public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
     implements RenderingTemplateRepository {
 
-  public static final String MAPPING_PREFIX = "r";
+  public static final String MAPPING_PREFIX = "rt";
+  public static final String TABLE_ALIAS = "rt";
+  public static final String TABLE_NAME = "rendering_templates";
+
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, label, description, name, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :label::JSONB, :description::JSONB, :name, :lastModified";
   public static final String SQL_REDUCED_FIELDS_RT =
-      " rt.uuid, rt.created, rt.label, rt.name, rt.last_modified";
-  public static final String SQL_FULL_FIELDS_RT = SQL_REDUCED_FIELDS_RT + ", rt.description";
-  public static final String TABLE_ALIAS = "rt";
-  public static final String TABLE_NAME = "rendering_templates";
+      String.format(
+          " %1$s.uuid, %1$s.created, %1$s.label, %1$s.name, %1$s.last_modified", TABLE_ALIAS);
+  public static final String SQL_FULL_FIELDS_RT =
+      SQL_REDUCED_FIELDS_RT + String.format(", %s.description", TABLE_ALIAS);
 
   public RenderingTemplateRepositoryImpl(Jdbi dbi) {
     super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);

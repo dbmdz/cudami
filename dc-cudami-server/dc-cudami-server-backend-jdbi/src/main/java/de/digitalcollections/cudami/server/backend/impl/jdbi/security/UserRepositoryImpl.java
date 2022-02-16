@@ -20,15 +20,18 @@ import org.springframework.stereotype.Repository;
 public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserRepository {
 
   public static final String MAPPING_PREFIX = "u";
+  public static final String TABLE_ALIAS = "u";
+  public static final String TABLE_NAME = "users";
+
   public static final String SQL_INSERT_FIELDS =
       " uuid, acronym, created, label, last_modified, url";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :acronym, :created, :label::JSONB, :lastModified, :url";
   public static final String SQL_REDUCED_FIELDS_US =
-      " u.uuid, u.created, u.email, u.enabled, u.firstname, u.lastname, u.last_modified, u.passwordhash, u.roles";
+      String.format(
+          " %1$s.uuid, %1$s.created, %1$s.email, %1$s.enabled, %1$s.firstname, %1$s.lastname, %1$s.last_modified, %1$s.passwordhash, %1$s.roles",
+          TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_US = SQL_REDUCED_FIELDS_US;
-  public static final String TABLE_ALIAS = "u";
-  public static final String TABLE_NAME = "users";
 
   @Autowired
   public UserRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
