@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   public PredicateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+    dbi.registerRowMapper(BeanMapper.factory(Predicate.class, mappingPrefix));
   }
 
   @Override
