@@ -74,12 +74,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
             + " WHERE value = :value";
     Optional<Predicate> result =
         dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("value", value)
-                    .mapToBean(Predicate.class)
-                    .map(Predicate.class::cast)
-                    .findFirst());
+            h -> h.createQuery(query).bind("value", value).mapToBean(Predicate.class).findFirst());
     return result.orElse(null);
   }
 
