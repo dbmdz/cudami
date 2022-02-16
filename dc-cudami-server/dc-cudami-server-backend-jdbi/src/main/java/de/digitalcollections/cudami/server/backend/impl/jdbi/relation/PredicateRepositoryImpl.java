@@ -13,15 +13,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements PredicateRepository {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PredicateRepositoryImpl.class);
   public static final String MAPPING_PREFIX = "pred";
   public static final String TABLE_ALIAS = "pred";
   public static final String TABLE_NAME = "predicates";
