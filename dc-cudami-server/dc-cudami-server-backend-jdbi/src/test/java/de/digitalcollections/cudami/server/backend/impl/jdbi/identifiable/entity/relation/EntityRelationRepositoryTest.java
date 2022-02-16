@@ -33,7 +33,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
     classes = EntityRelationRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
-@DisplayName("The Identifiable Repository")
+@DisplayName("The EntityRelationRepository")
 public class EntityRelationRepositoryTest {
   EntityRelationRepositoryImpl repository;
 
