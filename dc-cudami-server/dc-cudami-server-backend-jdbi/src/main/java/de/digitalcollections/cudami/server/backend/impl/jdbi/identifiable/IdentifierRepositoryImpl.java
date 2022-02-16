@@ -18,15 +18,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements IdentifierRepository {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "id";
   public static final String TABLE_ALIAS = "id";

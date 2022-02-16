@@ -14,16 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     implements IdentifierTypeRepository {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "idt";
   public static final String TABLE_ALIAS = "idt";
