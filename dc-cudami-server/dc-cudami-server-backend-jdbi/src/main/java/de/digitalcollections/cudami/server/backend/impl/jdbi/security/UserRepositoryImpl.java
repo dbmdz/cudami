@@ -46,7 +46,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public PageResponse<User> find(PageRequest pageRequest) {
-    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + " FROM users");
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT " + SQL_REDUCED_FIELDS_US + " FROM " + tableName + " AS " + tableAlias);
 
     addPageRequestParams(pageRequest, query);
     List<User> result =
@@ -65,7 +67,11 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h.createQuery(
                     "SELECT "
                         + SQL_REDUCED_FIELDS_US
-                        + " FROM users WHERE '"
+                        + " FROM "
+                        + tableName
+                        + " AS "
+                        + tableAlias
+                        + " WHERE '"
                         + Role.ADMIN.name()
                         + "' = any(roles)")
                 .mapToBean(User.class)
@@ -78,7 +84,14 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     List<User> users =
         dbi.withHandle(
             h ->
-                h.createQuery("SELECT " + SQL_FULL_FIELDS_US + " FROM users WHERE email = :email")
+                h.createQuery(
+                        "SELECT "
+                            + SQL_FULL_FIELDS_US
+                            + " FROM "
+                            + tableName
+                            + " AS "
+                            + tableAlias
+                            + " WHERE email = :email")
                     .bind("email", email)
                     .mapToBean(User.class)
                     .map(User.class::cast)
@@ -94,7 +107,14 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     List<User> users =
         dbi.withHandle(
             h ->
-                h.createQuery("SELECT " + SQL_FULL_FIELDS_US + " FROM users WHERE uuid = :uuid")
+                h.createQuery(
+                        "SELECT "
+                            + SQL_FULL_FIELDS_US
+                            + " FROM "
+                            + tableName
+                            + " AS "
+                            + tableAlias
+                            + " WHERE uuid = :uuid")
                     .bind("uuid", uuid)
                     .mapToBean(User.class)
                     .map(User.class::cast)
@@ -175,7 +195,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
             h ->
                 h.registerArrayType(Role.class, "varchar")
                     .createQuery(
-                        "UPDATE users SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
+                        "UPDATE "
+                            + tableName
+                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(User.class)
                     .map(User.class::cast)
