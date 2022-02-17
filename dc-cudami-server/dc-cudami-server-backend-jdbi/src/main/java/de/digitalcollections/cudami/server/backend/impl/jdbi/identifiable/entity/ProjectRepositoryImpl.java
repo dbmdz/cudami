@@ -123,7 +123,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             + doTableName
             + " AS "
             + doTableAlias
-            + " LEFT JOIN project_digitalobjects AS pd ON "
+            + " INNER JOIN project_digitalobjects AS pd ON "
             + doTableAlias
             + ".uuid = pd.digitalobject_uuid"
             + " WHERE pd.project_uuid = :uuid";
@@ -142,7 +142,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY pd.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 

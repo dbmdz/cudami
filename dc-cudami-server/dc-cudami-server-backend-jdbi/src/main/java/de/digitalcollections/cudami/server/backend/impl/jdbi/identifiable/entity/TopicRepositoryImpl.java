@@ -141,7 +141,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -288,7 +289,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder innerQuery = new StringBuilder("SELECT tt.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+    innerQuery.append(
+        " ORDER BY tt.sortindex"); // must be the column itself to use window functions
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Topic> result =
@@ -319,7 +321,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder innerQuery = new StringBuilder("SELECT te.sortindex AS idx, *" + commonSql);
     entityRepositoryImpl.addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+    innerQuery.append(
+        " ORDER BY te.sortindex"); // must be the column itself to use window functions
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Entity> result =
@@ -370,7 +373,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder innerQuery = new StringBuilder("SELECT tf.sortindex AS idx, * ");
     innerQuery.append(commonSql);
     fileResourceMetadataRepositoryImpl.addFiltering(pageRequest, innerQuery, argumentMappings);
-    innerQuery.append(" ORDER BY idx ASC");
+    innerQuery.append(
+        " ORDER BY tf.sortindex"); // must be the column itself to use window functions
     pageRequest.setSorting(null);
     this.addPageRequestParams(pageRequest, innerQuery);
 
