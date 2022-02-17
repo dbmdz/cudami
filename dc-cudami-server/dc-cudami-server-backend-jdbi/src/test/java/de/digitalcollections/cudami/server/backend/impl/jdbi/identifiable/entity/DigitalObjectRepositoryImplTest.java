@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
@@ -73,10 +74,11 @@ class DigitalObjectRepositoryImplTest {
               Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
           .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
+  @Autowired CudamiConfig cudamiConfig;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new DigitalObjectRepositoryImpl(jdbi);
+    repo = new DigitalObjectRepositoryImpl(jdbi, cudamiConfig);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setFileResourceMetadataRepository(fileResourceMetadataRepositoryImpl);
   }
@@ -91,7 +93,7 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("can save a DigitalObject with all of its embedded resources")
   void saveDigitalObject() {
     // Insert a license with uuid
-    LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi);
+    LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     licenseRepository.save(EXISTING_LICENSE);
 
     // Insert a corporate body with UUID
@@ -101,7 +103,7 @@ class DigitalObjectRepositoryImplTest {
             .withLabel(Locale.GERMAN, "Körperschaft")
             .withLabel(Locale.ENGLISH, "Corporate Body")
             .build();
-    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi);
+    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
@@ -110,7 +112,7 @@ class DigitalObjectRepositoryImplTest {
             .withUuid(UUID.randomUUID())
             .withLabel(Locale.GERMAN, "Ort")
             .build();
-    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi);
+    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     CreationInfo creationInfo =

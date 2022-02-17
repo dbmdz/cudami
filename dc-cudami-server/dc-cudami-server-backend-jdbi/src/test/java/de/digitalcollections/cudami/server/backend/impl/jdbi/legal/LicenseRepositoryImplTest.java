@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.legal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.legal.License;
@@ -33,11 +34,12 @@ public class LicenseRepositoryImplTest {
 
   @Autowired Jdbi jdbi;
   @Autowired PostgreSQLContainer postgreSQLContainer;
+  @Autowired CudamiConfig cudamiConfig;
   LicenseRepositoryImpl repo;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new LicenseRepositoryImpl(jdbi);
+    repo = new LicenseRepositoryImpl(jdbi, cudamiConfig);
   }
 
   @Test
