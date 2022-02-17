@@ -8,6 +8,7 @@ cudami:
   urlalias:
     generationExcludes: []
     maxlength: 64
+  offsetForAlternativePaging: 5000
 
 iiif:
   image:
