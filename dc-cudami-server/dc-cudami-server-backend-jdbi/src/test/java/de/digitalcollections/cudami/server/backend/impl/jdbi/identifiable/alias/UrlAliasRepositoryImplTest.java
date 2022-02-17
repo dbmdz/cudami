@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -49,6 +50,7 @@ public class UrlAliasRepositoryImplTest {
   UrlAliasRepositoryImpl repo;
   @Autowired Jdbi jdbi;
   @Autowired WebsiteRepository websiteRepository;
+  @Autowired CudamiConfig cudamiConfig;
 
   Website website;
   UrlAlias urlAliasWithoutWebsite;
@@ -56,7 +58,7 @@ public class UrlAliasRepositoryImplTest {
 
   @BeforeAll
   public void setupTest() throws MalformedURLException {
-    this.repo = new UrlAliasRepositoryImpl(this.jdbi);
+    this.repo = new UrlAliasRepositoryImpl(this.jdbi, cudamiConfig);
     this.prepareWebsite();
     this.urlAliasWithoutWebsite = this.getNewUrlAliasObject();
     this.urlAliasWithWebsite = this.getNewUrlAliasObject();
