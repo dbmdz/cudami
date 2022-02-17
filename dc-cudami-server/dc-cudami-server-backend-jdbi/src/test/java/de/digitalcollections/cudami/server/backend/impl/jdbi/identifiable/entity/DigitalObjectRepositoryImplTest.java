@@ -74,6 +74,7 @@ class DigitalObjectRepositoryImplTest {
               Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
           .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
+
   @Autowired CudamiConfig cudamiConfig;
 
   @BeforeEach
