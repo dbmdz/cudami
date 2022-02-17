@@ -75,6 +75,7 @@ class DigitalObjectRepositoryImplTest {
               Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
           .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
+  @Autowired CudamiConfig cudamiConfig;
 
   @BeforeEach
   public void beforeEach() {
@@ -103,7 +104,7 @@ class DigitalObjectRepositoryImplTest {
             .withLabel(Locale.GERMAN, "Körperschaft")
             .withLabel(Locale.ENGLISH, "Corporate Body")
             .build();
-    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi);
+    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
@@ -112,7 +113,7 @@ class DigitalObjectRepositoryImplTest {
             .withUuid(UUID.randomUUID())
             .withLabel(Locale.GERMAN, "Ort")
             .build();
-    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi);
+    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     CreationInfo creationInfo =
