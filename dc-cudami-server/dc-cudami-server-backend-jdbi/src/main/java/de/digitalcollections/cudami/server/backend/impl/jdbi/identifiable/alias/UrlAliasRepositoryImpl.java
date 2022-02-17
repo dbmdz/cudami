@@ -10,6 +10,7 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -120,7 +121,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
     Filtering filtering = searchPageRequest.getFiltering();
     Filtering slug =
-        Filtering.defaultBuilder().filter("slug").contains(searchPageRequest.getQuery()).build();
+        StringUtils.hasText(searchPageRequest.getQuery())
+            ? Filtering.defaultBuilder()
+                .filter("slug")
+                .contains(searchPageRequest.getQuery())
+                .build()
+            : null;
     if (filtering == null) {
       filtering = slug;
     } else {
@@ -147,16 +153,17 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       throw new UrlAliasRepositoryException(e);
     }
 
-    if (searchPageRequest.getSorting() == null) {
-      commonSql.append(" ORDER BY slug ");
+    if (!searchPageRequest.hasSorting()) {
+      searchPageRequest.setSorting(new Sorting("slug"));
     }
+    commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
     addPageRequestParams(searchPageRequest, commonSql);
 
     try {
       UrlAlias[] resultset =
           dbi.withHandle(
               h ->
-                  h.createQuery("SELECT " + getSelectFields(true) + commonSql.toString())
+                  h.createQuery(commonSql.toString())
                       .bindMap(bindings)
                       .reduceRows(this::mapRowToUrlAlias)
                       .toArray(UrlAlias[]::new));

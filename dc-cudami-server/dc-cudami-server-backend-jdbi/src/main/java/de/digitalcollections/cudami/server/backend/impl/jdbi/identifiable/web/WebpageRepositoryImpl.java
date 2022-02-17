@@ -150,7 +150,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -281,7 +282,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     String orderBy = null;
     if (pageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY ww.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(pageRequest, innerQuery);
 
@@ -407,7 +409,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY ww.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 

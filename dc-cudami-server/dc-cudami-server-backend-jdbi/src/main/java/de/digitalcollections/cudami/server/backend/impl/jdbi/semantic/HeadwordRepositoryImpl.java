@@ -156,12 +156,12 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
-    String orderBy = getOrderBy(pageRequest.getSorting());
-    if (StringUtils.hasText(orderBy)) {
-      orderBy = " ORDER BY " + orderBy;
-    }
     List<Headword> result =
-        retrieveList(SQL_REDUCED_FIELDS_HW, innerQuery, argumentMappings, orderBy);
+        retrieveList(
+            SQL_REDUCED_FIELDS_HW,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount, argumentMappings);
@@ -187,12 +187,12 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(searchPageRequest, innerQuery, argumentMappings);
     addPageRequestParams(searchPageRequest, innerQuery);
-    String orderBy = getOrderBy(searchPageRequest.getSorting());
-    if (StringUtils.hasText(orderBy)) {
-      orderBy = " ORDER BY " + orderBy;
-    }
     List<Headword> result =
-        retrieveList(SQL_REDUCED_FIELDS_HW, innerQuery, argumentMappings, orderBy);
+        retrieveList(
+            SQL_REDUCED_FIELDS_HW,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(searchPageRequest.getSorting()));
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
