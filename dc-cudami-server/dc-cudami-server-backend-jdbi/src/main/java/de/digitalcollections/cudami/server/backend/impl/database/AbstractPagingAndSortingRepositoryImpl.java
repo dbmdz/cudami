@@ -23,7 +23,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(AbstractPagingAndSortingRepositoryImpl.class);
 
-  public void addLimit(PageRequest pageRequest, StringBuilder sqlQuery) {
+  private void addLimit(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       int pageSize = pageRequest.getPageSize();
       if (pageSize > 0) {
@@ -32,7 +32,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  public void addOffset(PageRequest pageRequest, StringBuilder sqlQuery) {
+  private void addOffset(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       int offset = pageRequest.getOffset();
       if (offset >= 0) {
@@ -41,7 +41,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  public void addOrderBy(PageRequest pageRequest, StringBuilder sqlQuery) {
+  protected void addOrderBy(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       // Sorting
       Sorting sorting = pageRequest.getSorting();
