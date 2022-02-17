@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
@@ -174,7 +175,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       FamilyNameRepositoryImpl familyNameRepositoryImpl,
       GivenNameRepositoryImpl givenNameRepositoryImpl,
-      WorkRepositoryImpl workRepositoryImpl) {
+      WorkRepositoryImpl workRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -187,7 +189,8 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         getSqlInsertValues(),
         getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction());
+        createAdditionalReduceRowsBiFunction(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
     this.givenNameRepositoryImpl = givenNameRepositoryImpl;

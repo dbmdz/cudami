@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
@@ -71,7 +72,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Autowired
-  public FileResourceMetadataRepositoryImpl(Jdbi dbi) {
+  public FileResourceMetadataRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     this(
         dbi,
         TABLE_NAME,
@@ -82,7 +83,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   protected FileResourceMetadataRepositoryImpl(
@@ -95,7 +97,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String sqlSelectReducedFields,
       String sqlInsertFields,
       String sqlInsertValues,
-      String sqlUpdateFieldValues) {
+      String sqlUpdateFieldValues,
+      int offsetForAlternativePaging) {
     super(
         dbi,
         tableName,
@@ -106,7 +109,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         sqlSelectReducedFields,
         sqlInsertFields,
         sqlInsertValues,
-        sqlUpdateFieldValues);
+        sqlUpdateFieldValues,
+        offsetForAlternativePaging);
   }
 
   @Override

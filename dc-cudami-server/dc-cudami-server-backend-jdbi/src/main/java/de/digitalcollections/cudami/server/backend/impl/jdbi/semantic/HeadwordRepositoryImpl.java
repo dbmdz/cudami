@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -47,8 +48,9 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   public static final String TABLE_NAME = "headwords";
 
   @Autowired
-  public HeadwordRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public HeadwordRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

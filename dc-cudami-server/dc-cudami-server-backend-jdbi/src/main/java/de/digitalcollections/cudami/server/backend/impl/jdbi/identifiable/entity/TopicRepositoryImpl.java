@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -68,7 +69,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public TopicRepositoryImpl(
       Jdbi dbi,
       EntityRepositoryImpl entityRepositoryImpl,
-      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
+      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -79,7 +81,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }

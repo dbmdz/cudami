@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -80,7 +81,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Autowired
-  public WebpageRepositoryImpl(Jdbi dbi) {
+  public WebpageRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -91,7 +92,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -81,7 +82,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public ItemRepositoryImpl(
       Jdbi dbi,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
-      @Lazy WorkRepositoryImpl workRepositoryImpl) {
+      @Lazy WorkRepositoryImpl workRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -92,7 +94,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
   }

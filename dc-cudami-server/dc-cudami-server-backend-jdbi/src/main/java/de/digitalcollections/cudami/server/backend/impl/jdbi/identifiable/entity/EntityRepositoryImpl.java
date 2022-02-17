@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
@@ -84,7 +85,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Autowired
   private EntityRepositoryImpl(
-      Jdbi dbi, FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl) {
+      Jdbi dbi,
+      FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     this(
         dbi,
         TABLE_NAME,
@@ -95,7 +98,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
 
@@ -109,33 +113,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String sqlSelectReducedFields,
       String sqlInsertFields,
       String sqlInsertValues,
-      String sqlUpdateFieldValues) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
-        null);
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class entityImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
       String sqlUpdateFieldValues,
-      String sqlSelectAllFieldsJoins) {
+      int offsetForAlternativePaging) {
     this(
         dbi,
         tableName,
@@ -147,8 +126,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         sqlInsertFields,
         sqlInsertValues,
         sqlUpdateFieldValues,
-        sqlSelectAllFieldsJoins,
-        null);
+        null,
+        offsetForAlternativePaging);
   }
 
   protected EntityRepositoryImpl(
@@ -163,7 +142,37 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String sqlInsertValues,
       String sqlUpdateFieldValues,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction) {
+      int offsetForAlternativePaging) {
+    this(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        entityImplClass,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
+        null,
+        offsetForAlternativePaging);
+  }
+
+  protected EntityRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class entityImplClass,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins,
+      BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction,
+      int offsetForAlternativePaging) {
     super(
         dbi,
         tableName,
@@ -176,7 +185,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         sqlInsertValues,
         sqlUpdateFieldValues,
         sqlSelectAllFieldsJoins,
-        additionalReduceRowsBiFunction);
+        additionalReduceRowsBiFunction,
+        offsetForAlternativePaging);
   }
 
   @Override

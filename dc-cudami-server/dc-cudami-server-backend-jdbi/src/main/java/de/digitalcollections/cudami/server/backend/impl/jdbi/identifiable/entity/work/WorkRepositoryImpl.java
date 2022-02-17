@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
@@ -65,7 +66,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
   @Autowired
   public WorkRepositoryImpl(
-      Jdbi dbi, AgentRepositoryImpl agentRepositoryImpl, ItemRepositoryImpl itemRepositoryImpl) {
+      Jdbi dbi,
+      AgentRepositoryImpl agentRepositoryImpl,
+      ItemRepositoryImpl itemRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -76,7 +80,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.agentRepositoryImpl = agentRepositoryImpl;
     this.itemRepositoryImpl = itemRepositoryImpl;
   }

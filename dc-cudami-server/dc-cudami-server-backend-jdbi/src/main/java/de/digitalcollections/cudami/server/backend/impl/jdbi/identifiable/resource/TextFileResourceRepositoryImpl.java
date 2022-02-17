@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.TextFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import org.jdbi.v3.core.Jdbi;
@@ -42,7 +43,7 @@ public class TextFileResourceRepositoryImpl
   }
 
   @Autowired
-  public TextFileResourceRepositoryImpl(Jdbi dbi) {
+  public TextFileResourceRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -53,6 +54,7 @@ public class TextFileResourceRepositoryImpl
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 }
