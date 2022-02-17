@@ -181,7 +181,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -312,7 +313,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+    innerQuery.append(
+        " ORDER BY cc.sortindex"); // must be the column itself to use window functions
     addPageRequestParams(pageRequest, innerQuery);
 
     List<Collection> result =
@@ -373,7 +375,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY cd.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -412,7 +415,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     pageRequest.setSorting(null);
-    innerQuery.append(" ORDER BY idx ASC");
+    innerQuery.append(
+        " ORDER BY cd.sortindex"); // must be the column itself to use window functions
     addPageRequestParams(pageRequest, innerQuery);
 
     List<DigitalObject> result =

@@ -221,7 +221,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY cd.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
@@ -362,7 +363,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + prTableName
             + " AS "
             + prTableAlias
-            + " LEFT JOIN project_digitalobjects AS pd ON "
+            + " INNER JOIN project_digitalobjects AS pd ON "
             + prTableAlias
             + ".uuid = pd.project_uuid"
             + " WHERE pd.digitalobject_uuid = :uuid";
@@ -381,7 +382,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     String orderBy = null;
     if (searchPageRequest.getSorting() == null) {
       orderBy = "ORDER BY idx ASC";
-      innerQuery.append(" ").append(orderBy);
+      innerQuery.append(
+          " ORDER BY pd.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 

@@ -694,7 +694,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + urlAliasAlias
             + ".target_uuid"
             + UrlAliasRepositoryImpl.WEBSITESJOIN
-            + (orderBy != null ? " " + orderBy : "");
+            + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
+                ? " " + orderBy
+                : (StringUtils.hasText(orderBy) ? " ORDER BY " + orderBy : ""));
 
     List<I> result =
         dbi.withHandle(
