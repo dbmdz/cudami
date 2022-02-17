@@ -264,7 +264,7 @@ public class JdbiRepositoryImplTest {
   private class MyImpl extends JdbiRepositoryImpl {
 
     public MyImpl() {
-      super(null, null, null, null);
+      super(null, null, null, null, 5000);
     }
 
     @Override

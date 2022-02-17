@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.relation.PredicateRepositoryImpl;
@@ -37,8 +38,8 @@ public class EntityRelationRepositoryTest {
   EntityRelationRepositoryImpl repository;
 
   @Autowired PostgreSQLContainer postgreSQLContainer;
-
   @Autowired Jdbi jdbi;
+  @Autowired CudamiConfig cudamiConfig;
 
   @Autowired
   @Qualifier("entityRepositoryImpl")
@@ -48,7 +49,7 @@ public class EntityRelationRepositoryTest {
 
   @BeforeEach
   public void beforeEach() {
-    repository = new EntityRelationRepositoryImpl(jdbi, entityRepository);
+    repository = new EntityRelationRepositoryImpl(jdbi, entityRepository, cudamiConfig);
   }
 
   @Test

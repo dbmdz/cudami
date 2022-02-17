@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.database.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.Map;
@@ -79,5 +80,12 @@ public class SpringConfigBackendDatabase {
     }
 
     return jdbi;
+  }
+
+  @Bean
+  CudamiConfig cudamiConfig() {
+    var cudamiConfig = new CudamiConfig();
+    cudamiConfig.setOffsetForAlternativePaging(5000);
+    return cudamiConfig;
   }
 }
