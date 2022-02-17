@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.GivenNameRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.GivenName;
@@ -46,7 +47,7 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   }
 
   @Autowired
-  public GivenNameRepositoryImpl(Jdbi dbi) {
+  public GivenNameRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -57,7 +58,8 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

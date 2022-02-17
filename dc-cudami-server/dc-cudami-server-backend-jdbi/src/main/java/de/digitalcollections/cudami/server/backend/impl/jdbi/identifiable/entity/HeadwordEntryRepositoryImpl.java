@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
 import de.digitalcollections.model.filter.Filtering;
@@ -108,7 +109,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   @Autowired
   public HeadwordEntryRepositoryImpl(
       Jdbi dbi,
-      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl) {
+      @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
+      CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -121,7 +123,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         getSqlInsertValues(),
         getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction());
+        createAdditionalReduceRowsBiFunction(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
 

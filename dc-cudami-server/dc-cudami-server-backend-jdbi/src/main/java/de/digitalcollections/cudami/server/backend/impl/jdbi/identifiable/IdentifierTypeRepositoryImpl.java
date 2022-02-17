@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
@@ -28,8 +29,9 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_NAME = "identifiertypes";
 
   @Autowired
-  public IdentifierTypeRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public IdentifierTypeRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

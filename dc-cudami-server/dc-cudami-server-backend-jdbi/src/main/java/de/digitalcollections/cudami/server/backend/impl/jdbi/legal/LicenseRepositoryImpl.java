@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.legal;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.legal.LicenseRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.legal.License;
@@ -39,8 +40,9 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   public static final String TABLE_NAME = "licenses";
 
   @Autowired
-  public LicenseRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public LicenseRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

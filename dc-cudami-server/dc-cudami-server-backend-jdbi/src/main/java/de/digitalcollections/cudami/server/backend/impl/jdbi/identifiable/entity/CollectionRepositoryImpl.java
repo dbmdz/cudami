@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
@@ -82,7 +83,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
   @Autowired
-  public CollectionRepositoryImpl(Jdbi dbi) {
+  public CollectionRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -93,7 +94,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

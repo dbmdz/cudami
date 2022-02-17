@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
@@ -80,8 +81,9 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
           " LEFT JOIN websites %1$s ON %1$s.uuid = %2$s.website_uuid ", WEBSITESALIAS, TABLE_ALIAS);
 
   @Autowired
-  public UrlAliasRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public UrlAliasRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerRowMapper(BeanMapper.factory(UrlAlias.class, MAPPING_PREFIX));
   }
 
