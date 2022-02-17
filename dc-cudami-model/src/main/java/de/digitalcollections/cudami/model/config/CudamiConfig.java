@@ -7,6 +7,7 @@ import java.util.Locale;
 public class CudamiConfig {
   Defaults defaults;
   UrlAlias urlAlias;
+  int offsetForAlternativePaging = 0;
 
   public Defaults getDefaults() {
     return defaults;
@@ -43,6 +44,14 @@ public class CudamiConfig {
     public void setLocale(Locale locale) {
       this.locale = locale;
     }
+  }
+
+  public int getOffsetForAlternativePaging() {
+    return offsetForAlternativePaging;
+  }
+
+  public void setOffsetForAlternativePaging(int offsetForAlternativePaging) {
+    this.offsetForAlternativePaging = offsetForAlternativePaging;
   }
 
   public static class UrlAlias {
