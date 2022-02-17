@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -33,8 +34,9 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   public static final String TABLE_NAME = "identifiers";
 
   @Autowired
-  public IdentifierRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
 
     // Hint: as repo is no extension of IdentifiableRepositoryImpl (registering mapper for
     // Identifiable in constructor), we have to register row mapper on ourselves

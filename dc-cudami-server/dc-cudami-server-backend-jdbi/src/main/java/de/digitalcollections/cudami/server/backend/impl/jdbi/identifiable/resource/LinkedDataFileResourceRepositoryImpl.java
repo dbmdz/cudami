@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public class LinkedDataFileResourceRepositoryImpl
   }
 
   @Autowired
-  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi) {
+  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -65,7 +66,8 @@ public class LinkedDataFileResourceRepositoryImpl
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override

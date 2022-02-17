@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
@@ -63,7 +64,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   @Autowired
-  public WebsiteRepositoryImpl(Jdbi dbi, WebpageRepositoryImpl webpageRepositoryImpl) {
+  public WebsiteRepositoryImpl(
+      Jdbi dbi, WebpageRepositoryImpl webpageRepositoryImpl, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -74,7 +76,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
     this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
 

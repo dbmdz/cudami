@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
@@ -126,7 +127,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   private final String sqlUpdateFieldValues;
 
   @Autowired
-  protected IdentifiableRepositoryImpl(Jdbi dbi) {
+  protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     this(
         dbi,
         TABLE_NAME,
@@ -137,32 +138,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
-  }
-
-  protected IdentifiableRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class identifiableImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        identifiableImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
-        null);
+        getSqlUpdateFieldValues(),
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   protected IdentifiableRepositoryImpl(
@@ -176,7 +153,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlInsertFields,
       String sqlInsertValues,
       String sqlUpdateFieldValues,
-      String sqlSelectAllFieldsJoins) {
+      int offsetForAlternativePaging) {
     this(
         dbi,
         tableName,
@@ -188,8 +165,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         sqlInsertFields,
         sqlInsertValues,
         sqlUpdateFieldValues,
-        sqlSelectAllFieldsJoins,
-        null);
+        null,
+        offsetForAlternativePaging);
   }
 
   protected IdentifiableRepositoryImpl(
@@ -204,8 +181,38 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlInsertValues,
       String sqlUpdateFieldValues,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction) {
-    super(dbi, tableName, tableAlias, mappingPrefix);
+      int offsetForAlternativePaging) {
+    this(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        identifiableImplClass,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
+        null,
+        offsetForAlternativePaging);
+  }
+
+  protected IdentifiableRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class identifiableImplClass,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins,
+      BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction,
+      int offsetForAlternativePaging) {
+    super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
     // register row mapper for given class and mapping prefix
     // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
