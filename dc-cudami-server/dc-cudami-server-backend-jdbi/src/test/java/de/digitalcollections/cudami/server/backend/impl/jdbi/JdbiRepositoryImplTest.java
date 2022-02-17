@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.Sorting;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -261,6 +266,172 @@ public class JdbiRepositoryImplTest {
     assertEquals(argumentMappings.get("filtervalue_1"), "Donau");
   }
 
+  @Test
+  public void testDefaultPaging() {
+    StringBuilder innerSql = new StringBuilder("SELECT d.* FROM digitalobjects AS d");
+    PageRequest pageRequest =
+        new PageRequest(
+            0,
+            1000,
+            new Sorting(
+                new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT d.* FROM digitalobjects AS d ORDER BY last_modified DESC,uuid ASC LIMIT 1000 OFFSET 0",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testDefaultPaging2() {
+    StringBuilder innerSql = new StringBuilder("SELECT * FROM digitalobjects AS d");
+    PageRequest pageRequest =
+        new PageRequest(
+            1,
+            1000,
+            new Sorting(
+                new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM digitalobjects AS d ORDER BY last_modified DESC,uuid ASC LIMIT 1000 OFFSET 1000",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePaging() {
+    StringBuilder innerSql = new StringBuilder("SELECT * FROM digitalobjects AS d");
+    PageRequest pageRequest =
+        new PageRequest(
+            5,
+            1000,
+            new Sorting(
+                new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC,uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(5000,6000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithAliasInSelect() {
+    StringBuilder innerSql = new StringBuilder("SELECT d.* FROM digitalobjects AS d");
+    PageRequest pageRequest =
+        new PageRequest(
+            5,
+            1000,
+            new Sorting(
+                new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC,uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(5000,6000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithFieldsInSelect() {
+    StringBuilder innerSql =
+        new StringBuilder(
+            "SELECT d.sortindex AS idx, d.* FROM digitalobjects AS d "
+                + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid");
+    PageRequest pageRequest =
+        new PageRequest(7, 1000, new Sorting(new Order(Direction.DESC, "last_modified")));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM ("
+            + "SELECT row_number() OVER (ORDER BY last_modified DESC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
+            + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid"
+            + ") innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(7000,8000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithFieldsInSelectAndOrderBy() {
+    StringBuilder innerSql =
+        new StringBuilder(
+            "SELECT d.sortindex AS idx, d.* FROM digitalobjects AS d "
+                + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid "
+                + "WHERE cd.collection_uuid = :uuid "
+                + "ORDER BY d.sortindex ASC");
+    PageRequest pageRequest = new PageRequest(7, 1000);
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM ("
+            + "SELECT row_number() OVER (ORDER BY d.sortindex ASC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
+            + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid"
+            + ") innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(7000,8000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithFieldsInSelectAndOrderByAndSorting() {
+    StringBuilder innerSql =
+        new StringBuilder(
+            "SELECT d.sortindex AS idx, * FROM digitalobjects AS d "
+                + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid "
+                + "WHERE cd.collection_uuid = :uuid "
+                + "ORDER BY d.sortindex ASC");
+    PageRequest pageRequest =
+        new PageRequest(7, 1000, new Sorting(Direction.DESC, "last_modified"));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM ("
+            + "SELECT row_number() OVER (ORDER BY d.sortindex ASC, last_modified DESC) rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
+            + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid "
+            + "WHERE cd.collection_uuid = :uuid"
+            + ") innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(7000,8000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithoutSorting() {
+    StringBuilder innerSql =
+        new StringBuilder(
+            "SELECT d.sortindex AS idx, * FROM digitalobjects AS d "
+                + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid");
+    PageRequest pageRequest = new PageRequest(7, 1000);
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM ("
+            + "SELECT row_number() OVER () rn, d.sortindex AS idx, d.uuid rnsetid FROM digitalobjects AS d "
+            + "LEFT JOIN collection_digitalobjects AS cd ON d.uuid = cd.digitalobject_uuid WHERE cd.collection_uuid = :uuid"
+            + ") innerselect_rownumber "
+            + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
+            + "WHERE '(7000,8000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
+  @Test
+  public void testAlternativePagingWithFullFields() {
+    StringBuilder innerSql =
+        new StringBuilder(
+            "SELECT ua.created ua_created, ua.last_published ua_lastPublished, ua.primary ua_primary, ua.slug ua_slug, ua.target_identifiable_type "
+                + "ua_targetIdentifiableType, ua.target_entity_type ua_targetEntityType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
+                + "ua.uuid ua_uuid, ua.website_uuid ua_websiteUuid, webs.uuid webs_uuid, webs.label webs_label, webs.url webs_url "
+                + "FROM url_aliases AS ua LEFT JOIN websites webs ON webs.uuid = ua.website_uuid "
+                + "WHERE (ua.slug ILIKE '%' || :filtervalue_1 || '%')");
+    PageRequest pageRequest = new PageRequest(7, 1000, new Sorting(Direction.ASC, "slug"));
+    instance.addPageRequestParams(pageRequest, innerSql);
+    assertEquals(
+        "SELECT * FROM ("
+            + "SELECT row_number() OVER (ORDER BY slug ASC) rn, ua.created ua_created, ua.last_published ua_lastPublished, ua.primary ua_primary, ua.slug ua_slug, ua.target_identifiable_type "
+            + "ua_targetIdentifiableType, ua.target_entity_type ua_targetEntityType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
+            + "ua.uuid ua_uuid, ua.website_uuid ua_websiteUuid, webs.uuid webs_uuid, webs.label webs_label, webs.url webs_url "
+            + "FROM url_aliases AS ua LEFT JOIN websites webs ON webs.uuid = ua.website_uuid "
+            + "WHERE (ua.slug ILIKE '%' || :filtervalue_1 || '%')"
+            + ") innerselect_rownumber "
+            + "WHERE '(7000,8000]'::int8range @> innerselect_rownumber.rn",
+        innerSql.toString());
+  }
+
   private class MyImpl extends JdbiRepositoryImpl {
 
     public MyImpl() {
@@ -269,8 +440,7 @@ public class JdbiRepositoryImplTest {
 
     @Override
     protected List<String> getAllowedOrderByFields() {
-      throw new UnsupportedOperationException(
-          "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+      return new ArrayList<>(List.of("last_modified", "slug"));
     }
 
     @Override
