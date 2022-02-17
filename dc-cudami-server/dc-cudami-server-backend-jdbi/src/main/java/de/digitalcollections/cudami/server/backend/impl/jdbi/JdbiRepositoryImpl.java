@@ -5,29 +5,42 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.paging.PageRequest;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.springframework.util.StringUtils;
 
 public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
 
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
 
+  private static Pattern selectStmtSplitter;
+
   protected final Jdbi dbi;
   protected final String mappingPrefix;
   protected final String tableAlias;
   protected final String tableName;
+  protected int offsetForAlternativePaging;
 
-  public JdbiRepositoryImpl(Jdbi dbi, String tableName, String tableAlias, String mappingPrefix) {
+  public JdbiRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      int offsetForAlternativePaging) {
     this.dbi = dbi;
     this.mappingPrefix = mappingPrefix;
     this.tableName = tableName;
     this.tableAlias = tableAlias;
+    this.offsetForAlternativePaging = offsetForAlternativePaging;
   }
 
   public void addFiltering(
@@ -52,6 +65,91 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
         sqlQuery.append(filterClauses);
       }
     }
+  }
+
+  @Override
+  protected void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
+    if (pageRequest.getOffset() < offsetForAlternativePaging) {
+      super.addPageRequestParams(pageRequest, sqlQuery);
+    } else {
+      buildPageRequestSql(pageRequest, sqlQuery);
+    }
+  }
+
+  /**
+   * For examples showing what should happen here see {@link
+   * de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImplTest#testAlternativePaging}
+   * and following ones.
+   */
+  @SuppressFBWarnings("LI_LAZY_INIT_STATIC")
+  protected void buildPageRequestSql(PageRequest pageRequest, StringBuilder innerSql) {
+    if (pageRequest == null || innerSql == null) {
+      return;
+    }
+    if (JdbiRepositoryImpl.selectStmtSplitter == null) {
+      // init this field here where we use it to keep it in sight
+      JdbiRepositoryImpl.selectStmtSplitter =
+          Pattern.compile(
+              "(?iu)^\\s*(SELECT\\s+(?<fields>.+)\\s+)?FROM\\s+(?<fromwhere>(?<table>\\w+\\b)(\\s+AS\\s+(?<tablealias>\\w+))?.*?(\\sWHERE.+?)?)(\\sORDER BY\\s+(?<orderings>.+))?\\s*$");
+    }
+    Matcher selectStmtMatcher = selectStmtSplitter.matcher(innerSql.toString());
+    if (!selectStmtMatcher.find()) {
+      // FIXME: We should log it somehow
+      super.addPageRequestParams(pageRequest, innerSql);
+    }
+    String fields = selectStmtMatcher.group("fields");
+    String fromWherePart = selectStmtMatcher.group("fromwhere");
+    String table = selectStmtMatcher.group("table").strip();
+    String tableAlias = selectStmtMatcher.group("tablealias");
+    String orderings = selectStmtMatcher.group("orderings");
+    String pageRequestOrderings = getOrderBy(pageRequest.getSorting());
+    if (!StringUtils.hasText(orderings) && StringUtils.hasText(pageRequestOrderings)) {
+      orderings = pageRequestOrderings.strip();
+    } else if (StringUtils.hasText(orderings) && StringUtils.hasText(pageRequestOrderings)) {
+      orderings = String.format("%s, %s", orderings.strip(), pageRequestOrderings.strip());
+    }
+    int offset = pageRequest.getOffset();
+    int pageSize = pageRequest.getPageSize();
+    // clear passed StringBuilder and rebuild the select statement
+    innerSql.delete(0, innerSql.length());
+    // outer SELECT part
+    innerSql.append("SELECT * FROM (");
+    // inner SELECT part
+    if (fields != null && fields.contains("*")) {
+      fields =
+          fields.replaceFirst(
+              "(\\w+[.])?[*]",
+              String.format(
+                  "%s.%s rnsetid", tableAlias != null ? tableAlias : table, getUniqueField()));
+    } else if (fields == null) {
+      fields =
+          String.format("%s.%s rnsetid", tableAlias != null ? tableAlias : table, getUniqueField());
+    }
+    innerSql
+        .append("SELECT row_number() OVER (")
+        .append(StringUtils.hasText(orderings) ? String.format("ORDER BY %s", orderings) : "")
+        .append(") rn, ")
+        .append(fields);
+    // inner FROM and WHERE parts
+    innerSql.append(String.format(" FROM %s", fromWherePart));
+    // outer SELECT statement goes on: FROM part
+    innerSql.append(") innerselect_rownumber ");
+    if (fields.contains("rnsetid")) {
+      // add a join
+      innerSql
+          .append("INNER JOIN ")
+          .append(table)
+          .append(
+              String.format(" ON %s.%s = innerselect_rownumber.rnsetid ", table, getUniqueField()));
+    }
+    // last but not least: outer WHERE part
+    // we are using a range here since its costs are lower than of a BETWEEN or two comparisons
+    // see also https://www.postgresql.org/docs/12/rangetypes.html,
+    // https://www.postgresql.org/docs/12/functions-range.html
+    // it is simply written as a mathematics intervall
+    innerSql.append(
+        String.format(
+            "WHERE '(%d,%d]'::int8range @> innerselect_rownumber.rn", offset, offset + pageSize));
   }
 
   public long count() {
