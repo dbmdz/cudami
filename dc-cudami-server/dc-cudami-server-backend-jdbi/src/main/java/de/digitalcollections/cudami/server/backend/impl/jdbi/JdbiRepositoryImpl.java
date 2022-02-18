@@ -77,8 +77,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   /**
-   * For examples showing what should happen here see {@link
-   * de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImplTest#testAlternativePaging}
+   * For examples showing what should happen here see JdbiRepositoryImplTest#testAlternativePaging
    * and following ones.
    */
   @SuppressFBWarnings("LI_LAZY_INIT_STATIC")
