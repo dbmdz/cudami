@@ -16,10 +16,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
 
   private static Pattern selectStmtSplitter;
@@ -93,8 +96,10 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
     Matcher selectStmtMatcher = selectStmtSplitter.matcher(innerSql.toString());
     if (!selectStmtMatcher.find()) {
-      // FIXME: We should log it somehow
+      JdbiRepositoryImpl.LOGGER.warn(
+          "Regex 'selectStmtSplitter' did not match on <<{}>>", innerSql.toString());
       super.addPageRequestParams(pageRequest, innerSql);
+      return;
     }
     String fields = selectStmtMatcher.group("fields");
     String fromWherePart = selectStmtMatcher.group("fromwhere");
