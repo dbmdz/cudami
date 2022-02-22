@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.ParagraphBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.ParagraphBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

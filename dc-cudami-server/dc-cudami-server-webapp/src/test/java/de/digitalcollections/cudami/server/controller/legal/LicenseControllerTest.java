@@ -5,10 +5,10 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.text.LocalizedText;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
