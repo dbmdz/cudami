@@ -6,16 +6,16 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.CollectionBuilder;
-import de.digitalcollections.cudami.server.model.DigitalObjectBuilder;
-import de.digitalcollections.cudami.server.model.ProjectBuilder;
-import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,7 +47,8 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .forEndDate("c.publication_end", "2021-03-31")
                 .build();
 
-    DigitalObject digitalObject = new DigitalObjectBuilder().atPath(path).build();
+    DigitalObject digitalObject =
+        new DigitalObjectBuilder().withUuid(extractFirstUuidFromPath(path)).build();
     when(digitalObjectService.getActiveCollections(eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
 

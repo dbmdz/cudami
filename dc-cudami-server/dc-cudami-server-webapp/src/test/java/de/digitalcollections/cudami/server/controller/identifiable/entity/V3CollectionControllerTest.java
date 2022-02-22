@@ -7,17 +7,17 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.CollectionBuilder;
-import de.digitalcollections.cudami.server.model.DigitalObjectBuilder;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
-import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -64,7 +64,8 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    Collection collection = new CollectionBuilder().atPath(path).build();
+    Collection collection =
+        new CollectionBuilder().withUuid(extractFirstUuidFromPath(path)).build();
 
     when(collectionService.getDigitalObjects(eq(collection), any(SearchPageRequest.class)))
         .thenReturn(expected);

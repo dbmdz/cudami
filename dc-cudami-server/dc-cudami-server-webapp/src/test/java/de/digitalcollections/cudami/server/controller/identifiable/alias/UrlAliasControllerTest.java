@@ -7,16 +7,15 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.LocalizedUrlAliasBuilder;
-import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
-import de.digitalcollections.cudami.server.model.UrlAliasBuilder;
-import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.alias.UrlAliasBuilder;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -222,23 +221,21 @@ class UrlAliasControllerTest extends BaseControllerTest {
                 .withTotalElements(319)
                 .withContent(
                     List.of(
-                        new LocalizedUrlAliasBuilder()
-                            .addUrlAlias(
-                                new UrlAliasBuilder()
-                                    .createdAt("2021-08-17T15:18:01.000001")
-                                    .lastPublishedAt("2021-08-17T15:18:01.000001")
-                                    .isPrimary()
-                                    .withSlug("hurz")
-                                    .withTargetLanguage("de")
-                                    .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-                                    .withTargetUuid("23456789-2345-2345-2345-234567890123")
-                                    .withUuid("12345678-1234-1234-1234-123456789012")
-                                    .withWebsite(
-                                        new WebsiteBuilder()
-                                            .withUuid("87654321-4321-4321-4321-876543210987")
-                                            .build())
-                                    .build())
-                            .build()))
+                        new LocalizedUrlAliases(
+                            new UrlAliasBuilder()
+                                .createdAt("2021-08-17T15:18:01.000001")
+                                .lastPublishedAt("2021-08-17T15:18:01.000001")
+                                .isPrimary()
+                                .withSlug("hurz")
+                                .withTargetLanguage("de")
+                                .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+                                .withTargetUuid("23456789-2345-2345-2345-234567890123")
+                                .withUuid("12345678-1234-1234-1234-123456789012")
+                                .withWebsite(
+                                    new WebsiteBuilder()
+                                        .withUuid("87654321-4321-4321-4321-876543210987")
+                                        .build())
+                                .build())))
                 .build();
 
     when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
