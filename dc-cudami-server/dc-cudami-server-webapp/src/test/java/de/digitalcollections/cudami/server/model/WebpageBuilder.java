@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.model;
 
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -18,8 +17,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.LocaleUtils;
 import org.flywaydb.core.internal.util.StringUtils;
 
@@ -142,92 +139,5 @@ public class WebpageBuilder {
   public WebpageBuilder withChildren(List<Webpage> children) {
     webpage.setChildren(children);
     return this;
-  }
-
-  public static Webpage createPrefilledWebpage(String path) {
-    LocalizedStructuredContent content = new LocalizedStructuredContent();
-    StructuredContent structuredContentDe = new StructuredContent();
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
-            .addText("Bayerische Staatsbibliothek", "strong")
-            .addText(
-                "                                                                                              ")
-            .addText(
-                "                                                                           ",
-                "strong")
-            .addText(
-                "                                                                                                                       Ludwigstraße 16")
-            .addHardBreak()
-            .addText("80539 München")
-            .build());
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder().addText("Gesetzlicher Vertreter:", "strong").build());
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder().addText("Generaldirektor Dr. Klaus Ceynowa").build());
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
-            .addText("Telefon: ", "strong")
-            .addText("+49 89 28638-0")
-            .addHardBreak()
-            .addText("Fax: ", "strong")
-            .addText("+49 89 28638-2200")
-            .build());
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
-            .addText("E-Mail: ", "strong")
-            .addText("direktion[at]bsb-muenchen.de")
-            .addHardBreak()
-            .addText(
-                "                                                                                                                                                                                                                                                              ")
-            .addText(
-                "                       Internet:                                                   ",
-                "strong")
-            .addText(
-                "                                                                                                                                                                                                                                                       ")
-            .addLink(
-                "                                             www.bsb-muenchen.de",
-                "https://www.bsb-muenchen.de/")
-            .addText(
-                "                                                                                        ")
-            .addHardBreak()
-            .addText(
-                "                                                                                                                                                                                                                                                              ")
-            .addText("                       Umsatzsteueridentifikationsnummer: ", "strong")
-            .addText("DE-811259539                              ")
-            .build());
-    structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
-            .addText("Die Bayerische Staatsbibliothek ist eine dem ")
-            .addLinkWithTitle(
-                "Bayerischen Staatsministerium für Wissenschaft und Kunst",
-                "https://www.stmwk.bayern.de/",
-                "")
-            .addText(
-                "  nachgeordnete Behörde der Mittelstufe mit dem Sitz in München.                               ")
-            .build());
-    content.put(Locale.GERMAN, structuredContentDe);
-    content.put(Locale.ENGLISH, new StructuredContent());
-
-    Webpage webpage = new Webpage();
-    webpage.setText(content);
-    webpage.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "Impressum (DEV)"));
-    webpage.setUuid(extractFirstUuidFromPath(path));
-    webpage.setPublicationStart(LocalDate.parse("2019-01-18"));
-    webpage.setType(IdentifiableType.ENTITY);
-    webpage.setChildren(List.of());
-    webpage.setCreated(LocalDateTime.parse("2019-01-16T10:06:31.747"));
-    webpage.setLastModified(LocalDateTime.parse("2019-01-18T10:26:17.527"));
-
-    return webpage;
-  }
-
-  private static UUID extractFirstUuidFromPath(String path) {
-    Pattern uuidPattern =
-        Pattern.compile("(\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12})");
-    Matcher matcher = uuidPattern.matcher(path);
-    if (matcher.find()) {
-      return UUID.fromString(matcher.group(0));
-    }
-    return null;
   }
 }

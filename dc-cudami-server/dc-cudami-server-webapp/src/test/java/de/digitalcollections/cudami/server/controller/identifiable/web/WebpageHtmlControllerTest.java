@@ -4,8 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.Locale;
 import java.util.UUID;
@@ -16,7 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(WebpageHtmlController.class)
-public class WebpageHtmlControllerTest extends BaseControllerTest {
+public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
 
   @MockBean protected WebpageService webpageService;
 
@@ -28,7 +26,7 @@ public class WebpageHtmlControllerTest extends BaseControllerTest {
         "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.html?pLocale=de_DE"
       })
   public void returnWebpageV1Html(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
 
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
@@ -44,7 +42,7 @@ public class WebpageHtmlControllerTest extends BaseControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.html?pLocale=de_DE"
       })
   public void returnWebpageV3Html(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
 
