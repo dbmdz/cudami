@@ -6,13 +6,12 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.PageResponseBuilder;
-import de.digitalcollections.cudami.server.model.WebpageBuilder;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.PageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -25,7 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V3WebpageController.class)
 @DisplayName("The V3WebpageController")
-class V3WebpageControllerTest extends BaseControllerTest {
+class V3WebpageControllerTest extends BaseWebpageControllerTest {
 
   @MockBean private LocaleService localeService;
   @MockBean private WebpageService webpageService;
@@ -41,7 +40,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?pLocale=de_DE"
       })
   public void returnWebpageV3JsonUrl(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
@@ -55,7 +54,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
       })
   public void returnWebpageV3JsonAcceptHeader(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
@@ -69,7 +68,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
       })
   public void returnWebpageV3JsonDefault(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
@@ -96,7 +95,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true&pLocale=de_DE"
       })
   public void returnActive(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.getActive(any(UUID.class))).thenReturn(expected);
     when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
@@ -111,7 +110,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
       })
   @Disabled("does not support XML results any more since they were never used")
   public void returnWebpageV3XmlUrl(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testXml(path);
@@ -126,7 +125,7 @@ class V3WebpageControllerTest extends BaseControllerTest {
       })
   @Disabled("does not support XML results any more since they were never used")
   public void returnWebpageV3XmlAcceptHeader(String path) throws Exception {
-    Webpage expected = WebpageBuilder.createPrefilledWebpage(path);
+    Webpage expected = createPrefilledWebpage(path);
     when(webpageService.get(any(UUID.class))).thenReturn(expected);
     when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testXml(path);

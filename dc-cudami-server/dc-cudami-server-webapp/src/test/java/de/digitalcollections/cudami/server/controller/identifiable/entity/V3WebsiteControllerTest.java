@@ -5,13 +5,13 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.cudami.server.model.SearchPageResponseBuilder;
-import de.digitalcollections.cudami.server.model.WebpageBuilder;
-import de.digitalcollections.cudami.server.model.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -91,7 +91,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
   public void websiteByUuid(String path) throws Exception {
     Website expected =
         new WebsiteBuilder()
-            .atPath(path)
+            .withUuid(extractFirstUuidFromPath(path))
             .createdAt("2019-08-12T16:28:52.171814")
             .withLabel(Locale.GERMAN, "MDZ Homepage")
             .lastModifiedAt("2019-12-02T12:46:46.6262")
