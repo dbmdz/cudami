@@ -40,12 +40,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String TABLE_NAME = "digitalobjects";
 
   public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields();
+    return EntityRepositoryImpl.getSqlInsertFields()
+        + ", creation_geolocation_uuid, creation_date, creation_creator_uuid, item_uuid, license_uuid, number_binaryresources, parent_uuid";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues();
+    return EntityRepositoryImpl.getSqlInsertValues()
+        + ", :creationInfo_geoLocation, :creationInfo_date, :creationInfo_creator, :item, :license, :numberOfBinaryResources, :parent"; // oder doch so: bindBean(), bindFields(), and bindMethods() may be used to bind nested properties, e.g. :user.address.street. : :creationInfo.date
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -325,7 +327,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject save(DigitalObject digitalObject) {
-    super.save(digitalObject);
+    // oder doch so: bindBean(), bindFields(), and bindMethods() may be used to bind nested
+    // properties, e.g. :user.address.street.
+    // dann braucht es das vielleicht hier nicht
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("locationOfBirth", null);
+    bindings.put("locationOfDeath", null);
+    super.save(digitalObject, bindings);
 
     // for now we implement first interesting use case: new digital object with new fileresources...
     final List<FileResource> fileResources = digitalObject.getFileResources();

@@ -31,11 +31,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", custom_attrs, entity_type";
+    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", custom_attrs, entity_type, navdate";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
+    // FIXME add navdate!
     // refid is generated as serial, DO NOT SET!
     return IdentifiableRepositoryImpl.getSqlInsertValues()
         + ", :customAttributes::JSONB, :entityType";
@@ -52,6 +53,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + ".custom_attrs "
         + mappingPrefix
         + "_customAttributes, "
+        + tableAlias
+        + ".navdate "
+        + mappingPrefix
+        + "_navDate"
         + tableAlias
         + ".entity_type "
         + mappingPrefix
