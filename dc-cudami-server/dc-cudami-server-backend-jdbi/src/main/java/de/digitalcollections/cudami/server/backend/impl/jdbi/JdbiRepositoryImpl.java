@@ -92,6 +92,9 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
     if (JdbiRepositoryImpl.selectStmtSplitter == null) {
       // init this field here where we use it to keep it in sight
+      // the flags at the start stand for:
+      // - i: case insensitive
+      // - u: unicode aware case folding
       JdbiRepositoryImpl.selectStmtSplitter =
           Pattern.compile(
               "(?iu)^\\s*(SELECT\\s+(?<fields>.+)\\s+)?FROM\\s+(?<fromwhere>(?<table>\\w+\\b)(\\s+AS\\s+(?<tablealias>\\w+))?.*?(\\sWHERE.+?)?)(\\sORDER BY\\s+(?<orderings>.+))?\\s*$");
