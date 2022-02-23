@@ -1,5 +1,5 @@
 ALTER TABLE fileresources_linkeddata ADD PRIMARY KEY(uuid);
-CREATE TABLE IF NOT EXISTS digitalobject_downloadresources (
+CREATE TABLE IF NOT EXISTS digitalobject_linkeddataresources (
   digitalobject_uuid UUID NOT NULL,
   linkeddata_fileresource_uuid UUID NOT NULL UNIQUE,
   sortIndex SMALLINT,
