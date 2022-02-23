@@ -83,6 +83,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
    * For examples showing what should happen here see JdbiRepositoryImplTest#testAlternativePaging
    * and following ones.
    */
+  // Spotbugs complains about l. 94 - ignore it
   @SuppressFBWarnings("LI_LAZY_INIT_STATIC")
   protected void buildPageRequestSql(PageRequest pageRequest, StringBuilder innerSql) {
     if (pageRequest == null || innerSql == null) {
@@ -97,7 +98,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     Matcher selectStmtMatcher = selectStmtSplitter.matcher(innerSql.toString());
     if (!selectStmtMatcher.find()) {
       JdbiRepositoryImpl.LOGGER.warn(
-          "Regex 'selectStmtSplitter' did not match on <<{}>>", innerSql.toString());
+          "Regex 'selectStmtSplitter' did not match on << {} >>", innerSql.toString());
       super.addPageRequestParams(pageRequest, innerSql);
       return;
     }
@@ -131,7 +132,8 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
     innerSql
         .append("SELECT row_number() OVER (")
-        .append(StringUtils.hasText(orderings) ? String.format("ORDER BY %s", orderings) : "")
+        .append(
+            StringUtils.hasText(orderings) ? String.format("ORDER BY %s", orderings.strip()) : "")
         .append(") rn, ")
         .append(fields);
     // inner FROM and WHERE parts

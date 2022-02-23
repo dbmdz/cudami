@@ -356,7 +356,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + doTableName
             + " AS "
             + doTableAlias
-            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + " INNER JOIN collection_digitalobjects AS cd ON "
             + doTableAlias
             + ".uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
@@ -405,7 +405,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + doTableName
             + " AS "
             + doTableAlias
-            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + " INNER JOIN collection_digitalobjects AS cd ON "
             + doTableAlias
             + ".uuid = cd.digitalobject_uuid"
             + " WHERE cd.collection_uuid = :uuid";
