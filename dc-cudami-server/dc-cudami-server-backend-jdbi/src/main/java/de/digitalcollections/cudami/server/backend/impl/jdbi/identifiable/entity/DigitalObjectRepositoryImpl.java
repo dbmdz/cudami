@@ -186,7 +186,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + tableNameCollection
             + " AS "
             + tableAliasCollection
-            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + " INNER JOIN collection_digitalobjects AS cd ON "
             + tableAliasCollection
             + ".uuid = cd.collection_uuid"
             + " WHERE cd.digitalobject_uuid = :uuid";
@@ -251,7 +251,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableName
                 + " AS "
                 + frTableAlias
-                + " LEFT JOIN digitalobject_fileresources AS df ON "
+                + " INNER JOIN digitalobject_fileresources AS df ON "
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
@@ -277,7 +277,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
                 + frTableName
                 + " AS "
                 + frTableAlias
-                + " LEFT JOIN digitalobject_fileresources AS df ON "
+                + " INNER JOIN digitalobject_fileresources AS df ON "
                 + frTableAlias
                 + ".uuid = df.fileresource_uuid"
                 + " WHERE df.digitalobject_uuid = :uuid"
@@ -323,7 +323,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + collectionTable
             + " AS "
             + collectionAlias
-            + " LEFT JOIN collection_digitalobjects AS cd ON "
+            + " INNER JOIN collection_digitalobjects AS cd ON "
             + collectionAlias
             + ".uuid = cd.collection_uuid"
             + " WHERE cd.digitalobject_uuid = :uuid";
@@ -344,7 +344,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             + projectTable
             + " AS "
             + projectAlias
-            + " LEFT JOIN project_digitalobjects AS pd ON "
+            + " INNER JOIN project_digitalobjects AS pd ON "
             + projectAlias
             + ".uuid = pd.project_uuid"
             + " WHERE pd.digitalobject_uuid = :uuid";
