@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS digitalobject_renderingresources (
   digitalobject_uuid UUID NOT NULL,
-  linkeddata_fileresource_uuid UUID NOT NULL UNIQUE,
+  fileresource_uuid UUID NOT NULL UNIQUE,
   sortIndex SMALLINT,
 
-  PRIMARY KEY (digitalobject_uuid, linkeddata_fileresource_uuid),
+  PRIMARY KEY (digitalobject_uuid, fileresource_uuid),
   FOREIGN KEY (digitalobject_uuid) REFERENCES digitalobjects(uuid),
-  FOREIGN KEY (linkeddata_fileresource_uuid) REFERENCES fileresources_linkeddata(uuid)
+  FOREIGN KEY (fileresource_uuid) REFERENCES fileresources(uuid)
 );
