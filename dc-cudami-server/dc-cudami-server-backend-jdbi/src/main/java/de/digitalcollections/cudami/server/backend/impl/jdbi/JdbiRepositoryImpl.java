@@ -83,8 +83,9 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
    * For examples showing what should happen here see JdbiRepositoryImplTest#testAlternativePaging
    * and following ones.
    */
-  // Spotbugs complains about l. 94 - ignore it
-  @SuppressFBWarnings("LI_LAZY_INIT_STATIC")
+  @SuppressFBWarnings(
+      value = "LI_LAZY_INIT_STATIC",
+      justification = "Spotbugs complains about l. 95 - ignore it")
   protected void buildPageRequestSql(PageRequest pageRequest, StringBuilder innerSql) {
     if (pageRequest == null || innerSql == null) {
       return;
