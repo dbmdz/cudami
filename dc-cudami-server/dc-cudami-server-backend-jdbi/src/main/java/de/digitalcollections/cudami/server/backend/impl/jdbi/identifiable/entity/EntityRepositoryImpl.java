@@ -57,7 +57,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + tableAlias
         + ".navdate "
         + mappingPrefix
-        + "_navDate"
+        + "_navDate, "
         + tableAlias
         + ".entity_type "
         + mappingPrefix
