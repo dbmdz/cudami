@@ -5,11 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.OrderBuilder;
@@ -56,6 +58,16 @@ class DigitalObjectRepositoryImplTest {
 
   @Autowired CudamiConfig cudamiConfig;
 
+  private static final License EXISTING_LICENSE =
+      new LicenseBuilder()
+          .withUuid(UUID.randomUUID())
+          .withAcronym("CC0 1.0")
+          .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
+          .withLabel(
+              Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
+          .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
+          .build();
+
   @BeforeEach
   public void beforeEach() {
     repo = new DigitalObjectRepositoryImpl(jdbi, cudamiConfig);
@@ -72,22 +84,17 @@ class DigitalObjectRepositoryImplTest {
   @Test
   @DisplayName("should save a DigitalObject")
   void saveDigitalObject() {
+    // Insert a license with uuid
+    LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
+    licenseRepository.save(EXISTING_LICENSE);
+
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
             .withDescription(Locale.ENGLISH, "description")
-            .withLicense(
-                new LicenseBuilder()
-                    .withUuid(UUID.randomUUID())
-                    .withAcronym("CC0 1.0")
-                    .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
-                    .withLabel(
-                        Locale.GERMAN,
-                        "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
-                    .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
-                    .build())
+            .withLicense(EXISTING_LICENSE)
             .build();
 
     DigitalObject actual = repo.save(digitalObject);
