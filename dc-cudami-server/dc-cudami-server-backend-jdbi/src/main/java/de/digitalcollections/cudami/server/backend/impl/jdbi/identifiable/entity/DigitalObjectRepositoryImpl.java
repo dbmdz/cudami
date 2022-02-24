@@ -47,7 +47,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :creationInfo_geoLocation, :creationInfo_date, :creationInfo_creator, :item, :license, :numberOfBinaryResources, :parent"; // oder doch so: bindBean(), bindFields(), and bindMethods() may be used to bind nested properties, e.g. :user.address.street. : :creationInfo.date
+        + ", :creationInfo.geoLocation.uuid, :creationInfo.date, :creationInfo.creator.uuid, :item.uuid, :license.uuid, :numberOfBinaryResources, :parent.uuid";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -58,11 +58,27 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".license_uuid "
+        + mappingPrefix
+        + "_license.uuid";
+    //            + ", " + tableAlias + ".license_label " + LicenseRepositoryImpl.MAPPING_PREFIX +
+    // "_label"
+    //            + ", " + tableAlias + ".license_url " + LicenseRepositoryImpl.MAPPING_PREFIX +
+    // "_url";
   }
 
   public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues();
+    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+        + ", creation_geolocation_uuid=:creationInfo.geoLocation.uuid"
+        + ", creation_date=:creationInfo.date"
+        + ", creation_creator_uuid=:creationInfo.creator.uuid"
+        + ", item_uuid=:item.uuid"
+        + ", license_uuid=:license.uuid"
+        + ", number_binaryresources=:numberOfBinaryResources"
+        + ", parent_uuid=:parent.uuid";
   }
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
@@ -327,13 +343,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public DigitalObject save(DigitalObject digitalObject) {
-    // oder doch so: bindBean(), bindFields(), and bindMethods() may be used to bind nested
-    // properties, e.g. :user.address.street.
-    // dann braucht es das vielleicht hier nicht
-    Map<String, Object> bindings = new HashMap<>();
-    bindings.put("locationOfBirth", null);
-    bindings.put("locationOfDeath", null);
-    super.save(digitalObject, bindings);
+    super.save(digitalObject);
 
     // for now we implement first interesting use case: new digital object with new fileresources...
     final List<FileResource> fileResources = digitalObject.getFileResources();
