@@ -122,10 +122,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableName
             + " AS "
             + tableAlias
-            + " INNER JOIN topic_topics cc ON "
+            + " INNER JOIN topic_topics tt ON "
             + tableAlias
-            + ".uuid = cc.child_topic_uuid"
-            + " WHERE cc.parent_topic_uuid = :uuid";
+            + ".uuid = tt.child_topic_uuid"
+            + " WHERE tt.parent_topic_uuid = :uuid";
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
 
@@ -135,14 +135,14 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
       argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     }
 
-    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT tt.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
       innerQuery.append(
-          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
+          " ORDER BY tt.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
