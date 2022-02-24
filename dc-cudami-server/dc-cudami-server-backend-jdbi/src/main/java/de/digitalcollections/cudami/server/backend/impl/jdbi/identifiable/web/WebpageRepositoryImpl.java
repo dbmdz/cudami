@@ -131,10 +131,10 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
             + tableName
             + " AS "
             + tableAlias
-            + " INNER JOIN webpage_webpages cc ON "
+            + " INNER JOIN webpage_webpages ww ON "
             + tableAlias
-            + ".uuid = cc.child_webpage_uuid"
-            + " WHERE cc.parent_webpage_uuid = :uuid";
+            + ".uuid = ww.child_webpage_uuid"
+            + " WHERE ww.parent_webpage_uuid = :uuid";
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
 
@@ -144,14 +144,14 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
       argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
     }
 
-    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
     addFiltering(searchPageRequest, innerQuery, argumentMappings);
 
     String orderBy = getOrderBy(searchPageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
       innerQuery.append(
-          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
+          " ORDER BY ww.sortindex"); // must be the column itself to use window functions
     }
     addPageRequestParams(searchPageRequest, innerQuery);
 
