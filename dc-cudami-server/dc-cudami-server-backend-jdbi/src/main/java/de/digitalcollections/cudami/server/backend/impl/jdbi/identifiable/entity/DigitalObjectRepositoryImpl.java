@@ -41,13 +41,25 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
-        + ", creation_geolocation_uuid, creation_date, creation_creator_uuid, item_uuid, license_uuid, number_binaryresources, parent_uuid";
+        + ", creation_geolocation_uuid"
+        + ", creation_date"
+        + ", creation_creator_uuid"
+        + ", item_uuid"
+        + ", license_uuid"
+        + ", number_binaryresources"
+        + ", parent_uuid";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :creationInfo.geoLocation.uuid, :creationInfo.date, :creationInfo.creator.uuid, :item.uuid, :license.uuid, :numberOfBinaryResources, :parent.uuid";
+        + ", :creationInfo?.geoLocation?.uuid"
+        + ", :creationInfo.date"
+        + ", :creationInfo.creator.uuid"
+        + ", :item?.uuid"
+        + ", :license?.uuid"
+        + ", :numberOfBinaryResources"
+        + ", :parent?.uuid";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -63,7 +75,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".license_uuid "
         + mappingPrefix
-        + "_license.uuid";
+        + "_license_uuid";
     //            + ", " + tableAlias + ".license_label " + LicenseRepositoryImpl.MAPPING_PREFIX +
     // "_label"
     //            + ", " + tableAlias + ".license_url " + LicenseRepositoryImpl.MAPPING_PREFIX +

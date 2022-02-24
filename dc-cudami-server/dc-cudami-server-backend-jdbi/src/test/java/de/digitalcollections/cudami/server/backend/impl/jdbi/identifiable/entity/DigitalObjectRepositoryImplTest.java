@@ -7,7 +7,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.OrderBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -18,6 +20,7 @@ import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,9 +70,22 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("should save a DigitalObject")
   void saveDigitalObject() {
     DigitalObject digitalObject =
-        TestModelFixture.createDigitalObject(
-            Map.of(Locale.GERMAN, "deutschsprachiges Label", Locale.ENGLISH, "english label"),
-            Map.of(Locale.GERMAN, "Beschreibung", Locale.ENGLISH, "description"));
+        new DigitalObjectBuilder()
+            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+            .withLabel(Locale.ENGLISH, "english label")
+            .withDescription(Locale.GERMAN, "Beschreibung")
+            .withDescription(Locale.ENGLISH, "description")
+            .withLicense(
+                new LicenseBuilder()
+                    .withUuid(UUID.randomUUID())
+                    .withAcronym("CC0 1.0")
+                    .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
+                    .withLabel(
+                        Locale.GERMAN,
+                        "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
+                    .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
+                    .build())
+            .build();
 
     DigitalObject actual = repo.save(digitalObject);
 
@@ -78,6 +94,8 @@ class DigitalObjectRepositoryImplTest {
     Paragraph paragraphDe =
         (Paragraph) actual.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
     assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
+
+    assertThat(actual.getLicense().getUuid()).isEqualTo(digitalObject.getLicense().getUuid());
   }
 
   @Test
