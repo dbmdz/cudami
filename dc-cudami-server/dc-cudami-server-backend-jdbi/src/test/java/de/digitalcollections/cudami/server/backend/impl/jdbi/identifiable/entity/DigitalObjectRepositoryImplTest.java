@@ -124,6 +124,7 @@ class DigitalObjectRepositoryImplTest {
             .withGeoLocation(creationPlace)
             .build();
 
+
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
