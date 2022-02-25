@@ -123,8 +123,7 @@ class DigitalObjectRepositoryImplTest {
             .withDate("2022-02-25")
             .withGeoLocation(creationPlace)
             .build();
-
-
+    
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
