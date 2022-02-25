@@ -95,7 +95,7 @@ class DigitalObjectRepositoryImplTest {
     // Insert a license with uuid
     LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     licenseRepository.save(EXISTING_LICENSE);
-    
+
     // Insert a corporate body with UUID
     CorporateBody creator =
         new CorporateBodyBuilder()
