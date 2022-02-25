@@ -162,7 +162,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction(),
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging()
+        );
   }
 
   @Override
@@ -500,7 +501,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         }
         digitalObject.setCreationInfo(creationInfo);
       }
-
+      
       return map;
     };
   }
