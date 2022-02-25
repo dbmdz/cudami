@@ -4,12 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.legal.LicenseBuilder;
@@ -18,8 +24,11 @@ import de.digitalcollections.model.paging.OrderBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.production.CreationInfo;
+import de.digitalcollections.model.production.CreationInfoBuilder;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -81,11 +90,37 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("should save a DigitalObject")
+  @DisplayName("can save a DigitalObject with all of its embedded resources")
   void saveDigitalObject() {
     // Insert a license with uuid
     LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     licenseRepository.save(EXISTING_LICENSE);
+
+    // Insert a corporate body with UUID
+    CorporateBody creator =
+        new CorporateBodyBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Körperschaft")
+            .withLabel(Locale.ENGLISH, "Corporate Body")
+            .build();
+    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi);
+    corporateBodyRepository.save(creator);
+
+    // Insert a geolocation with UUID
+    GeoLocation creationPlace =
+        new GeoLocationBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Ort")
+            .build();
+    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi);
+    geoLocationRepository.save(creationPlace);
+
+    CreationInfo creationInfo =
+        new CreationInfoBuilder()
+            .withCreator(creator)
+            .withDate("2022-02-25")
+            .withGeoLocation(creationPlace)
+            .build();
 
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
@@ -94,6 +129,7 @@ class DigitalObjectRepositoryImplTest {
             .withDescription(Locale.GERMAN, "Beschreibung")
             .withDescription(Locale.ENGLISH, "description")
             .withLicense(EXISTING_LICENSE)
+            .withCreationInfo(creationInfo)
             .build();
 
     DigitalObject actual = repo.save(digitalObject);
@@ -105,6 +141,11 @@ class DigitalObjectRepositoryImplTest {
     assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
 
     assertThat(actual.getLicense().getUuid()).isEqualTo(digitalObject.getLicense().getUuid());
+    assertThat(actual.getCreationInfo().getCreator().getUuid()).isEqualTo(creator.getUuid());
+    assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
+        .isEqualTo("2022-02-25");
+    assertThat(actual.getCreationInfo().getGeoLocation().getUuid())
+        .isEqualTo(creationPlace.getUuid());
   }
 
   @Test
