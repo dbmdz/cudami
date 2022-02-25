@@ -75,8 +75,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
         + ", :creationInfo?.geoLocation?.uuid"
-        + ", :creationInfo.date"
-        + ", :creationInfo.creator.uuid"
+        + ", :creationInfo?.date"
+        + ", :creationInfo?.creator?.uuid"
         + ", :item?.uuid"
         + ", :license?.uuid"
         + ", :numberOfBinaryResources"
@@ -126,13 +126,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   public static String getSqlUpdateFieldValues() {
     return EntityRepositoryImpl.getSqlUpdateFieldValues()
-        + ", creation_geolocation_uuid=:creationInfo.geoLocation.uuid"
-        + ", creation_date=:creationInfo.date"
-        + ", creation_creator_uuid=:creationInfo.creator.uuid"
-        + ", item_uuid=:item.uuid"
-        + ", license_uuid=:license.uuid"
+        + ", creation_geolocation_uuid=:creationInfo?.geoLocation?.uuid"
+        + ", creation_date=:creationInfo?.date"
+        + ", creation_creator_uuid=:creationInfo?.creator?.uuid"
+        + ", item_uuid=:item?.uuid"
+        + ", license_uuid=:license?.uuid"
         + ", number_binaryresources=:numberOfBinaryResources"
-        + ", parent_uuid=:parent.uuid";
+        + ", parent_uuid=:parent?.uuid";
   }
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
