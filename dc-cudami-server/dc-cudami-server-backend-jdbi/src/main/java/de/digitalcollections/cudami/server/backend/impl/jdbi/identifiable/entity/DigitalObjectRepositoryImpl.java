@@ -10,6 +10,8 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.agent.AgentBuilder;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -17,7 +19,9 @@ import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -102,7 +106,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + LicenseRepositoryImpl.TABLE_ALIAS
         + ".url "
         + LicenseRepositoryImpl.MAPPING_PREFIX
-        + "_url";
+        + "_url"
+        + ", "
+        + tableAlias
+        + ".creation_creator_uuid "
+        + mappingPrefix
+        + "_creation_creator_uuid"
+        + ", "
+        + tableAlias
+        + ".creation_date "
+        + mappingPrefix
+        + "_creation_date"
+        + ", "
+        + tableAlias
+        + ".creation_geolocation_uuid "
+        + mappingPrefix
+        + "_creation_geolocation_uuid";
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -439,17 +458,43 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   private static BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
       createAdditionalReduceRowsBiFunction() {
     return (map, rowView) -> {
+      DigitalObject digitalObject =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+
+      // Try to fill license subresource with uuid, url and label
       UUID licenseUuid = rowView.getColumn(MAPPING_PREFIX + "_license_uuid", UUID.class);
       String url = rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_url", String.class);
       LocalizedText label =
           rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
       final License license =
           new LicenseBuilder().withUuid(licenseUuid).withLabel(label).withUrl(url).build();
-
-      DigitalObject digitalObject =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
       if (licenseUuid != null) {
         digitalObject.setLicense(license);
+      }
+
+      // Try to fill UUID of geolocation of creator
+      UUID creationCreatorUuid =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
+      LocalDate creationDate =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
+      UUID creationGeolocationUuid =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
+
+      // If and oy creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
+      // We must build the CreationInfo object
+      if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
+        CreationInfo creationInfo = new CreationInfo();
+        if (creationCreatorUuid != null) {
+          creationInfo.setCreator(new AgentBuilder().withUuid(creationCreatorUuid).build());
+        }
+        if (creationDate != null) {
+          creationInfo.setDate(creationDate);
+        }
+        if (creationGeolocationUuid != null) {
+          creationInfo.setGeoLocation(
+              new GeoLocationBuilder().withUuid(creationGeolocationUuid).build());
+        }
+        digitalObject.setCreationInfo(creationInfo);
       }
 
       return map;
