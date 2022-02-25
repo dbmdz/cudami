@@ -501,7 +501,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         }
         digitalObject.setCreationInfo(creationInfo);
       }
-      
       return map;
     };
   }
