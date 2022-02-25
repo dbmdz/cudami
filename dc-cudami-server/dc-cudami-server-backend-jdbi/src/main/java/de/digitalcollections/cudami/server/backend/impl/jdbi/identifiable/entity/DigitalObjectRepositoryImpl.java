@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -12,15 +13,20 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.legal.License;
+import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +44,17 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String MAPPING_PREFIX = "do";
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
+
+  private static final String SQL_SELECT_ALL_FIELDS_JOINS =
+      " LEFT JOIN "
+          + LicenseRepositoryImpl.TABLE_NAME
+          + " AS "
+          + LicenseRepositoryImpl.TABLE_ALIAS
+          + " ON "
+          + LicenseRepositoryImpl.TABLE_ALIAS
+          + ".uuid = "
+          + TABLE_ALIAS
+          + ".license_uuid";
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
@@ -75,11 +92,17 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".license_uuid "
         + mappingPrefix
-        + "_license_uuid";
-    //            + ", " + tableAlias + ".license_label " + LicenseRepositoryImpl.MAPPING_PREFIX +
-    // "_label"
-    //            + ", " + tableAlias + ".license_url " + LicenseRepositoryImpl.MAPPING_PREFIX +
-    // "_url";
+        + "_license_uuid"
+        + ", "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".label "
+        + LicenseRepositoryImpl.MAPPING_PREFIX
+        + "_label"
+        + ", "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".url "
+        + LicenseRepositoryImpl.MAPPING_PREFIX
+        + "_url";
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -116,7 +139,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
         getSqlInsertFields(),
         getSqlInsertValues(),
-        getSqlUpdateFieldValues());
+        getSqlUpdateFieldValues(),
+        SQL_SELECT_ALL_FIELDS_JOINS,
+        createAdditionalReduceRowsBiFunction());
   }
 
   @Override
@@ -409,6 +434,26 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     super.update(digitalObject);
     DigitalObject result = findOne(digitalObject.getUuid());
     return result;
+  }
+
+  private static BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
+      createAdditionalReduceRowsBiFunction() {
+    return (map, rowView) -> {
+      UUID licenseUuid = rowView.getColumn(MAPPING_PREFIX + "_license_uuid", UUID.class);
+      String url = rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_url", String.class);
+      LocalizedText label =
+          rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
+      final License license =
+          new LicenseBuilder().withUuid(licenseUuid).withLabel(label).withUrl(url).build();
+
+      DigitalObject digitalObject =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+      if (licenseUuid != null) {
+        digitalObject.setLicense(license);
+      }
+
+      return map;
+    };
   }
 
   public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
