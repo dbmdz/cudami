@@ -56,11 +56,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
     List<Predicate> result =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .mapToBean(Predicate.class)
-                    .map(Predicate.class::cast)
-                    .collect(Collectors.toList()));
+            h -> h.createQuery(sql).mapToBean(Predicate.class).collect(Collectors.toList()));
     return result;
   }
 

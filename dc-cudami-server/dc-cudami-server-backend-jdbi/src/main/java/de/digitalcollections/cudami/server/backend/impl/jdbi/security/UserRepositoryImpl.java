@@ -52,9 +52,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
     addPageRequestParams(pageRequest, query);
     List<User> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query.toString()).mapToBean(User.class).map(User.class::cast).list());
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(User.class).list());
     long total = count();
     PageResponse<User> pageResponse = new PageResponse<>(result, pageRequest, total);
     return pageResponse;
@@ -75,7 +73,6 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                         + Role.ADMIN.name()
                         + "' = any(roles)")
                 .mapToBean(User.class)
-                .map(User.class::cast)
                 .list());
   }
 
@@ -94,7 +91,6 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                             + " WHERE email = :email")
                     .bind("email", email)
                     .mapToBean(User.class)
-                    .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
       return null;
@@ -117,7 +113,6 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                             + " WHERE uuid = :uuid")
                     .bind("uuid", uuid)
                     .mapToBean(User.class)
-                    .map(User.class::cast)
                     .list());
     if (users.isEmpty()) {
       return null;
@@ -200,7 +195,6 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                             + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(User.class)
-                    .map(User.class::cast)
                     .findOne()
                     .orElse(null));
     return result;

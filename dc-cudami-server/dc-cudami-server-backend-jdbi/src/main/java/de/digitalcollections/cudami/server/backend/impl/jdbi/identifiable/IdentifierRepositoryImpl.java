@@ -122,7 +122,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .bindMap(argumentMappings)
                     .mapToBean(Identifier.class)
-                    .map(Identifier.class::cast)
                     .list());
 
     StringBuilder countQuery =
@@ -163,7 +162,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                 h.createQuery(sql)
                     .bind("uuid", uuidIdentifiable)
                     .mapToBean(Identifier.class)
-                    .map(Identifier.class::cast)
                     .collect(Collectors.toList()));
     return result;
   }
