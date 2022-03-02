@@ -192,7 +192,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                     .createQuery(
                         "UPDATE "
                             + tableName
-                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles, uuid=:uuid WHERE uuid=:uuid RETURNING *")
+                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(User.class)
                     .findOne()
