@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.paging.PageRequest;
@@ -31,8 +32,9 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   public static final String SQL_FULL_FIELDS_RT =
       SQL_REDUCED_FIELDS_RT + String.format(", %s.description", TABLE_ALIAS);
 
-  public RenderingTemplateRepositoryImpl(Jdbi dbi) {
-    super(dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX);
+  public RenderingTemplateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override
