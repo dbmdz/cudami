@@ -128,8 +128,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
         new StringBuilder(
             "SELECT count(*) FROM "
                 + tableName
-                + " AS "
-                + tableAlias
                 + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
     addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total =
