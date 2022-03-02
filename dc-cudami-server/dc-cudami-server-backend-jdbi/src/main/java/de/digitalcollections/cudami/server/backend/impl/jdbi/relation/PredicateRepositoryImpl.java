@@ -26,6 +26,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
       " value, label, description, created, last_modified, uuid";
   public static final String SQL_INSERT_VALUES =
       " :value, :label::JSONB, :description::JSONB, :created, :lastModified, :uuid";
+  // FIXME: using the mapping prefix leads to mapping issues (the corresponding test in
+  // EntityRelationRepositoryTest#L71 fails)
   public static final String SQL_REDUCED_FIELDS_PRED =
       String.format(
           " %1$s.uuid, %1$s.value, %1$s.label, %1$s.created, %1$s.last_modified", TABLE_ALIAS);
