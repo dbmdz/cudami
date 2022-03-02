@@ -601,7 +601,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 h.createQuery(query)
                     .bind("identifiableUuid", identifiableUuid)
                     .mapToBean(Entity.class)
-                    .map(Entity.class::cast)
                     .list());
     return list;
   }
@@ -620,7 +619,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 h.createQuery(query)
                     .bind("identifiableUuid", identifiableUuid)
                     .mapToBean(FileResource.class)
-                    .map(FileResource.class::cast)
                     .list());
     return result;
   }

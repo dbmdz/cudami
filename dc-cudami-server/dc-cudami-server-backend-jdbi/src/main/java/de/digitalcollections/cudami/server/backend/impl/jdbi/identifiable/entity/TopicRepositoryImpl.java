@@ -204,7 +204,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 argumentMappings,
                 "ORDER BY idx ASC")
             .stream()
-            .map(Entity.class::cast)
             .collect(Collectors.toList());
 
     return result;

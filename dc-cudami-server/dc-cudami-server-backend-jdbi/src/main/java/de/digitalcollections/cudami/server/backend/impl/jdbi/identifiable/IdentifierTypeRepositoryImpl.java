@@ -67,7 +67,6 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
                 h.createQuery(sql)
                     .bindMap(argumentMappings)
                     .mapToBean(IdentifierType.class)
-                    .map(IdentifierType.class::cast)
                     .list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
