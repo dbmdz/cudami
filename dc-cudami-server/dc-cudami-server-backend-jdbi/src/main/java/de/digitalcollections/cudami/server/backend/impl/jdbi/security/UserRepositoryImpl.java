@@ -46,6 +46,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public PageResponse<User> find(PageRequest pageRequest) {
+    // Actually "*" should be used in select, but here we don't need it as there is no outer select
     StringBuilder query =
         new StringBuilder(
             "SELECT " + SQL_REDUCED_FIELDS_US + " FROM " + tableName + " AS " + tableAlias);

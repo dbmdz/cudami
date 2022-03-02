@@ -53,6 +53,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
     Map<String, Object> argumentMappings = new HashMap<>();
+    // Actually "*" should be used in select, but here we don't need it as there is no outer select
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias);
