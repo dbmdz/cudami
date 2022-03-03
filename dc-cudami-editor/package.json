@@ -64,7 +64,7 @@
     "@fisker/prettier-config": "^5.0.5",
     "@types/node": "^17.0.21",
     "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.10",
+    "@types/react-dom": "^17.0.13",
     "eslint-plugin-react": "^7.28.0",
     "import-sort-style-module": "^6.0.0",
     "prettier": "^2.5.1",
