@@ -8,8 +8,11 @@ import de.digitalcollections.cudami.server.backend.impl.database.config.SpringCo
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.paging.Direction;
+import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
@@ -116,6 +119,37 @@ class IdentifiableRepositoryImplTest {
     String expected =
         "(jsonb_path_exists(test.label, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath) OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     assertThat(actual).isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("test overridden getOrderBy")
+  void testGetOrderBy() {
+    Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
+    assertThat(repo.getOrderBy(sorting)).isEqualTo("i.last_modified DESC,i.uuid ASC");
+
+    sorting = new Sorting(Order.defaultBuilder().property("label").subProperty("de").build());
+    assertThat(repo.getOrderBy(sorting))
+        .isEqualTo("COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC");
+
+    sorting.getOrders().add(new Order(Direction.DESC, "lastModified"));
+    assertThat(repo.getOrderBy(sorting))
+        .isEqualTo(
+            "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC,i.last_modified DESC");
+
+    sorting =
+        new Sorting(
+            new Order(Direction.DESC, "created"),
+            Order.defaultBuilder().property("label").subProperty("de").build(),
+            Order.defaultBuilder()
+                .property("label")
+                .subProperty("en")
+                .direction(Direction.DESC)
+                .build());
+    assertThat(repo.getOrderBy(sorting))
+        .isEqualTo(
+            "i.created DESC,"
+                + "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC,"
+                + "COALESCE(i.label->>'en', i.label->>'') COLLATE \"ucs_basic\" DESC");
   }
 
   private DigitalObject createDigitalObjectWithLabels(String label) {
