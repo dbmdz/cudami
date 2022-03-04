@@ -594,11 +594,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     if (sorting == null || sorting.getOrders() == null) {
       return null;
     }
-    String orderby = super.getOrderBy(sorting);
+    String orderBy = super.getOrderBy(sorting);
     // Does it work in general or do we have to restrict it to labels?
     // The COALESCE function returns the first of its arguments that is not null. Null is returned
     // only if all arguments are null. (from Postgres doc)
-    return orderby.replaceAll(
+    return orderBy.replaceAll(
         "(?i)(([\\w._]+)->>'.+?') +(asc|desc)", "COALESCE($1, $2->>'') COLLATE \"ucs_basic\" $3");
   }
 

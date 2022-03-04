@@ -49,6 +49,8 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       if (StringUtils.hasText(orderBy)) {
         if (!sqlQuery.toString().matches("(?i).* order by .*")) {
           sqlQuery.append(" ORDER BY ");
+        } else {
+          sqlQuery.append(",");
         }
         sqlQuery.append(orderBy);
       }
