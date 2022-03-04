@@ -381,11 +381,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
-    String orderBy = getOrderBy(pageRequest.getSorting());
-    if (StringUtils.hasText(orderBy)) {
-      orderBy = " ORDER BY " + orderBy;
-    }
-    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+    List<I> result =
+        retrieveList(
+            sqlSelectReducedFields,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
     addFiltering(pageRequest, sqlCount, argumentMappings);
@@ -414,11 +415,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(searchPageRequest, innerQuery, argumentMappings);
     addPageRequestParams(searchPageRequest, innerQuery);
-    String orderBy = getOrderBy(searchPageRequest.getSorting());
-    if (StringUtils.hasText(orderBy)) {
-      orderBy = " ORDER BY " + orderBy;
-    }
-    List<I> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+    List<I> result =
+        retrieveList(
+            sqlSelectReducedFields,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(searchPageRequest.getSorting()));
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
