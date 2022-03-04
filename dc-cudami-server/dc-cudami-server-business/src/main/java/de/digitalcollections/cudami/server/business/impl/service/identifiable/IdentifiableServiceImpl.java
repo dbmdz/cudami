@@ -269,18 +269,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {
-    // business logic: default sorting if no other sorting given: german label ascending
-    // TODO or make dependend from language the user has chosen...?
+    // business logic: default sorting if no other sorting given: lastModified descending, uuid
+    // ascending
     if (!pageRequest.hasSorting()) {
-      // TODO: discuss default sorting (what if only english label exists? or german and english?)
-      String defaultLanguage = localeService.getDefaultLanguage();
-      final Order labelOrder1 = new Order(Direction.ASC, "label");
-      labelOrder1.setSubProperty(defaultLanguage);
-      final Order labelOrder2 = new Order(Direction.ASC, "label");
-      labelOrder2.setSubProperty("");
-      Order uuidOrder = new Order(Direction.ASC, "uuid");
-      Sorting sorting =
-          Sorting.defaultBuilder().order(labelOrder1).order(labelOrder2).order(uuidOrder).build();
+      Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
       pageRequest.setSorting(sorting);
     }
   }
