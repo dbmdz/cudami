@@ -104,7 +104,8 @@ class DigitalObjectRepositoryImplTest {
             .withLabel(Locale.GERMAN, "Körperschaft")
             .withLabel(Locale.ENGLISH, "Corporate Body")
             .build();
-    CorporateBodyRepositoryImpl corporateBodyRepository = new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+    CorporateBodyRepositoryImpl corporateBodyRepository =
+        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
@@ -113,7 +114,8 @@ class DigitalObjectRepositoryImplTest {
             .withUuid(UUID.randomUUID())
             .withLabel(Locale.GERMAN, "Ort")
             .build();
-    GeoLocationRepositoryImpl geoLocationRepository = new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+    GeoLocationRepositoryImpl geoLocationRepository =
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     CreationInfo creationInfo =

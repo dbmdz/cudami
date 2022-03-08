@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -28,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -35,6 +35,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = IdentifiableRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @DisplayName("The Identifiable Repository")
+@Sql(scripts = "classpath:cleanup_database.sql")
 class IdentifiableRepositoryImplTest {
 
   IdentifiableRepositoryImpl repo;
