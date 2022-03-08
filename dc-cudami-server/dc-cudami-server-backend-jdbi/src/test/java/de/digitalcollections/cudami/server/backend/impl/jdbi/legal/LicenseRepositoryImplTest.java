@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -30,6 +31,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     classes = {LicenseRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @DisplayName("Test for License Repository")
+@Sql(scripts = "classpath:cleanup_database.sql")
 public class LicenseRepositoryImplTest {
 
   @Autowired Jdbi jdbi;
