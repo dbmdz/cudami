@@ -50,7 +50,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String TABLE_ALIAS = "d";
   public static final String TABLE_NAME = "digitalobjects";
 
-  // FIXME Hier geht's dann wohl weiter mit den FileResources...
   private static final String SQL_SELECT_ALL_FIELDS_JOINS =
       " LEFT JOIN "
           + LicenseRepositoryImpl.TABLE_NAME
