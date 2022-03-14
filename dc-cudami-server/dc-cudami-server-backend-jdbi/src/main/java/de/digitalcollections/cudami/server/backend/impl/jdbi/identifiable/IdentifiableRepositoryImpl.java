@@ -599,7 +599,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // The COALESCE function returns the first of its arguments that is not null. Null is returned
     // only if all arguments are null. (from Postgres doc)
     return orderBy.replaceAll(
-        "(?i)(([\\w._]+)->>'.+?') +(asc|desc)", "COALESCE($1, $2->>'') COLLATE \"ucs_basic\" $3");
+        "(?i)(?<jsonfield>(?<col>[\\w._]+)->>'.+?') +(?<sorting>asc|desc)",
+        "COALESCE(${jsonfield}, ${col}->>'') COLLATE \"ucs_basic\" ${sorting}");
   }
 
   @Override

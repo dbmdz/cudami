@@ -50,7 +50,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
         if (!sqlQuery.toString().matches("(?i).* order by .*")) {
           sqlQuery.append(" ORDER BY ");
         } else {
-          sqlQuery.append(",");
+          sqlQuery.append(", ");
         }
         sqlQuery.append(orderBy);
       }
@@ -118,7 +118,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
                   return String.format(
                       "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
                 })
-            .collect(Collectors.joining(","));
+            .collect(Collectors.joining(", "));
     return orderBy;
   }
 
