@@ -76,7 +76,7 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
-    assertEquals("ORDER BY foo->>'bar' DESC,foo ASC", query.toString().trim());
+    assertEquals("ORDER BY foo->>'bar' DESC, foo ASC", query.toString().trim());
   }
 
   private class PagingAndSortingRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {

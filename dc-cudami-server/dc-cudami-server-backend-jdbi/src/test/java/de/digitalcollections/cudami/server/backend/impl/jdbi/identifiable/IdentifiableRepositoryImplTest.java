@@ -125,7 +125,7 @@ class IdentifiableRepositoryImplTest {
   @DisplayName("test overridden getOrderBy")
   void testGetOrderBy() {
     Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
-    assertThat(repo.getOrderBy(sorting)).isEqualTo("i.last_modified DESC,i.uuid ASC");
+    assertThat(repo.getOrderBy(sorting)).isEqualTo("i.last_modified DESC, i.uuid ASC");
 
     sorting = new Sorting(Order.defaultBuilder().property("label").subProperty("de").build());
     assertThat(repo.getOrderBy(sorting))
@@ -134,7 +134,7 @@ class IdentifiableRepositoryImplTest {
     sorting.getOrders().add(new Order(Direction.DESC, "lastModified"));
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo(
-            "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC,i.last_modified DESC");
+            "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC, i.last_modified DESC");
 
     sorting =
         new Sorting(
@@ -147,8 +147,8 @@ class IdentifiableRepositoryImplTest {
                 .build());
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo(
-            "i.created DESC,"
-                + "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC,"
+            "i.created DESC, "
+                + "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC, "
                 + "COALESCE(i.label->>'en', i.label->>'') COLLATE \"ucs_basic\" DESC");
   }
 

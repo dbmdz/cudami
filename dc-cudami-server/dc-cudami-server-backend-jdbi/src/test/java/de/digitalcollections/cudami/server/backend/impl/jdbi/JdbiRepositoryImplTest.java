@@ -277,7 +277,7 @@ public class JdbiRepositoryImplTest {
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
     instance.addPageRequestParams(pageRequest, innerSql);
     assertEquals(
-        "SELECT d.* FROM digitalobjects AS d ORDER BY last_modified DESC,uuid ASC LIMIT 1000 OFFSET 0",
+        "SELECT d.* FROM digitalobjects AS d ORDER BY last_modified DESC, uuid ASC LIMIT 1000 OFFSET 0",
         innerSql.toString());
   }
 
@@ -292,7 +292,7 @@ public class JdbiRepositoryImplTest {
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
     instance.addPageRequestParams(pageRequest, innerSql);
     assertEquals(
-        "SELECT * FROM digitalobjects AS d ORDER BY last_modified DESC,uuid ASC LIMIT 1000 OFFSET 1000",
+        "SELECT * FROM digitalobjects AS d ORDER BY last_modified DESC, uuid ASC LIMIT 1000 OFFSET 1000",
         innerSql.toString());
   }
 
@@ -307,7 +307,7 @@ public class JdbiRepositoryImplTest {
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
     instance.addPageRequestParams(pageRequest, innerSql);
     assertEquals(
-        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC,uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
+        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC, uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
             + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
             + "WHERE '(5000,6000]'::int8range @> innerselect_rownumber.rn",
         innerSql.toString());
@@ -324,7 +324,7 @@ public class JdbiRepositoryImplTest {
                 new Order(Direction.DESC, "last_modified"), new Order(Direction.ASC, "uuid")));
     instance.addPageRequestParams(pageRequest, innerSql);
     assertEquals(
-        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC,uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
+        "SELECT * FROM (SELECT row_number() OVER (ORDER BY last_modified DESC, uuid ASC) rn, d.uuid rnsetid FROM digitalobjects AS d) innerselect_rownumber "
             + "INNER JOIN digitalobjects ON digitalobjects.uuid = innerselect_rownumber.rnsetid "
             + "WHERE '(5000,6000]'::int8range @> innerselect_rownumber.rn",
         innerSql.toString());
