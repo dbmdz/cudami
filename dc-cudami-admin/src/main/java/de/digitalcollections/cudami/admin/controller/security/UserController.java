@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Controller for all "Users" pages. */
 @Controller
+@SessionAttributes(value = {"user"})
 public class UserController extends AbstractController {
 
   private final MessageSource messageSource;

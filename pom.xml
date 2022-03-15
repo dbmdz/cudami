@@ -11,7 +11,7 @@
 
   <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami</artifactId>
-  <version>5.2.2-SNAPSHOT</version>
+  <version>5.2.2</version>
   <packaging>pom</packaging>
 
   <name>DigitalCollections: cudami</name>
@@ -83,7 +83,7 @@
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.8.2</version.junit>
     <version.logstash-logback-encoder>6.6</version.logstash-logback-encoder>
-    <version.mockito-core>4.3.1</version.mockito-core>
+    <version.mockito-core>4.4.0</version.mockito-core>
     <version.openjson>1.0.12</version.openjson>
     <version.passay>1.6.1</version.passay>
     <version.postgresql>42.2.24</version.postgresql>
@@ -98,7 +98,7 @@
     <version.maven-fmt-plugin>2.13</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M5</version.maven-surefire-plugin>
-    <version.nexus-staging-maven-plugin>1.6.8</version.nexus-staging-maven-plugin>
+    <version.nexus-staging-maven-plugin>1.6.12</version.nexus-staging-maven-plugin>
     <version.spotbugs-maven-plugin>4.5.0.0</version.spotbugs-maven-plugin>
   </properties>
 

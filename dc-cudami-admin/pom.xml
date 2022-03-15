@@ -6,7 +6,7 @@
   <parent>
     <groupId>de.digitalcollections.cudami</groupId>
     <artifactId>dc-cudami</artifactId>
-    <version>5.2.2-SNAPSHOT</version>
+    <version>5.2.2</version>
   </parent>
 
   <name>DigitalCollections: cudami Management Webapp</name>
@@ -26,7 +26,7 @@
     <version.webjar-admin-lte>3.1.0</version.webjar-admin-lte>
     <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
     <version.webjar-url-search-params-polyfill>8.1.1</version.webjar-url-search-params-polyfill>
-    <version.webjar-webjars-locator>0.42</version.webjar-webjars-locator>
+    <version.webjar-webjars-locator>0.45</version.webjar-webjars-locator>
 
     <!-- plugins -->
     <version.frontend-maven-plugin>1.12.1</version.frontend-maven-plugin>
