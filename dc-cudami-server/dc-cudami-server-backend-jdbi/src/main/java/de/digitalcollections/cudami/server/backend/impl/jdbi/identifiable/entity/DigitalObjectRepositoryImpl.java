@@ -2,20 +2,27 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.AgentBuilder;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -23,6 +30,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -86,14 +94,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    // TODO: add license, version
-    //    return getSqlSelectReducedFields(tableAlias, mappingPrefix) + ", "
-    //            + tableAlias + ".version " + mappingPrefix + "_version";
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".license_uuid "
@@ -110,6 +111,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + LicenseRepositoryImpl.MAPPING_PREFIX
         + "_url"
         + ", "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".acronym "
+        + LicenseRepositoryImpl.MAPPING_PREFIX
+        + "_acronym"
+        + ", "
         + tableAlias
         + ".creation_creator_uuid "
         + mappingPrefix
@@ -123,7 +129,17 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".creation_geolocation_uuid "
         + mappingPrefix
-        + "_creation_geolocation_uuid";
+        + "_creation_geolocation_uuid"
+        + ", "
+        + tableAlias
+        + ".number_binaryresources "
+        + mappingPrefix
+        + "_number_binaryresources";
+  }
+
+  // TODO: Return any license info here?
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -139,12 +155,25 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
+  @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
+
+  @Lazy @Autowired private EntityRepositoryImpl<Agent> agentEntityRepositoryImpl;
+
   @Lazy @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
+  @Lazy @Autowired private EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl;
+
+  @Lazy @Autowired private GeoLocationRepositoryImpl geoLocationRepositoryImpl;
+
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
+  @Lazy @Autowired
+  private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
+
   @Lazy @Autowired private ItemRepositoryImpl itemRepositoryImpl;
+
+  @Lazy @Autowired private PersonRepositoryImpl personRepositoryImpl;
 
   @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
 
@@ -294,6 +323,58 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
+    final String ldfrTableAlias = linkedDataFileResourceRepositoryImpl.getTableAlias();
+    final String ldfrTableName = linkedDataFileResourceRepositoryImpl.getTableName();
+    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT dl.sortindex as idx, * FROM "
+                + ldfrTableName
+                + " AS "
+                + ldfrTableAlias
+                + " INNER JOIN digitalobject_linkeddataresources AS dl ON "
+                + ldfrTableAlias
+                + ".uuid = dl.linkeddata_fileresource_uuid"
+                + " WHERE dl.digitalobject_uuid = :uuid"
+                + " ORDER by idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<LinkedDataFileResource> linkedDataFileResources =
+        linkedDataFileResourceRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return linkedDataFileResources;
+  }
+
+  @Override
+  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
+    final String rfrTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
+    final String rfrTableName = fileResourceMetadataRepositoryImpl.getTableName();
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT dr.sortindex as idx, * FROM "
+                + rfrTableName
+                + " AS "
+                + rfrTableAlias
+                + " INNER JOIN digitalobject_renderingresources AS dr ON "
+                + rfrTableAlias
+                + ".uuid = dr.fileresource_uuid"
+                + " WHERE dr.digitalobject_uuid = :uuid"
+                + " ORDER by idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<FileResource> fileResources =
+        fileResourceMetadataRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return fileResources;
+  }
+
+  @Override
   public Item getItem(UUID digitalObjectUuid) {
     final String itTableAlias = itemRepositoryImpl.getTableAlias();
     String sqlAdditionalJoins =
@@ -403,12 +484,86 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  /**
+   * Returns the fully filled DigitalObject including all of its direct attributes.
+   *
+   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
+   * UUID set, and the client is responsible for retrieving the whole item object!
+   */
+  public DigitalObject getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    DigitalObject digitalObject = super.getByUuidAndFiltering(uuid, filtering);
+
+    // Look for linked data file resources. If they exist, fill the DigitalObject
+    List<LinkedDataFileResource> linkedDataFileResources = getLinkedDataFileResources(uuid);
+    if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
+      digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
+    }
+
+    // Look for rendering resources. If they exist, fill the object
+    List<FileResource> renderingResources = getRenderingFileResources(uuid);
+    if (renderingResources != null && !renderingResources.isEmpty()) {
+      digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
+    }
+
+    // Fill the previewImage
+    UUID previewImageUuid =
+        digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;
+    if (previewImageUuid != null) {
+      digitalObject.setPreviewImage(imageFileResourceRepositoryImpl.getByUuid(previewImageUuid));
+    }
+
+    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their objects
+    CreationInfo creationInfo = digitalObject.getCreationInfo();
+    if (creationInfo != null) {
+      UUID creatorUuid =
+          creationInfo.getCreator() != null ? creationInfo.getCreator().getUuid() : null;
+      if (creatorUuid != null) {
+        // Can be either a CorporateBody or a Person
+        Agent creatorEntity = agentEntityRepositoryImpl.getByUuid(creatorUuid);
+        if (creatorEntity != null) {
+          switch (creatorEntity.getEntityType()) {
+            case CORPORATE_BODY:
+              creationInfo.setCreator(corporateBodyRepositoryImpl.getByUuid(creatorUuid));
+              break;
+            case PERSON:
+              creationInfo.setCreator(personRepositoryImpl.getByUuid(creatorUuid));
+              break;
+            default:
+              creationInfo.setCreator(creatorEntity);
+          }
+        }
+      }
+
+      UUID geolocationUuid =
+          creationInfo.getGeoLocation() != null ? creationInfo.getGeoLocation().getUuid() : null;
+      if (geolocationUuid != null) {
+        // Can be a GeoLocation or a HumanSettlement at the moment
+        GeoLocation geolocationEntity = geolocationEntityRepositoryImpl.getByUuid(geolocationUuid);
+        if (geolocationEntity != null) {
+          switch (geolocationEntity.getEntityType()) {
+              // FIXME: Why no HUMAN_SETTLEMENT here?
+            default:
+              creationInfo.setGeoLocation(geoLocationRepositoryImpl.getByUuid(geolocationUuid));
+          }
+        }
+      }
+    }
+
+    return digitalObject;
+  }
+
+  @Override
   public DigitalObject save(DigitalObject digitalObject) {
     super.save(digitalObject);
 
-    // for now we implement first interesting use case: new digital object with new fileresources...
-    final List<FileResource> fileResources = digitalObject.getFileResources();
-    saveFileResources(digitalObject, fileResources);
+    // save the rendering resources, which are also FileResources
+    final ArrayList<FileResource> renderingResources = digitalObject.getRenderingResources();
+    saveRenderingResources(digitalObject, renderingResources);
+
+    // save the linked data resources
+    final ArrayList<LinkedDataFileResource> linkedDataResources =
+        digitalObject.getLinkedDataResources();
+    saveLinkedDataFileResources(digitalObject, linkedDataResources);
 
     DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;
@@ -454,9 +609,95 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public List<FileResource> saveRenderingResources(
+      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM digitalobject_renderingresources WHERE digitalobject_uuid = :uuid")
+                .bind("uuid", digitalObjectUuid)
+                .execute());
+
+    if (renderingResources != null) {
+      // first save rendering resources
+      for (FileResource renderingResource : renderingResources) {
+        if (renderingResource.getUuid() == null) {
+          fileResourceMetadataRepositoryImpl.save(renderingResource);
+        }
+      }
+
+      // second: save relations to digital object
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO digitalobject_renderingresources(digitalobject_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
+            for (FileResource renderingResource : renderingResources) {
+              preparedBatch
+                  .bind("uuid", digitalObjectUuid)
+                  .bind("fileResourceUuid", renderingResource.getUuid())
+                  .bind("sortIndex", getIndex(renderingResources, renderingResource))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+    }
+    return getRenderingFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM digitalobject_linkeddataresources WHERE digitalobject_uuid = :uuid")
+                .bind("uuid", digitalObjectUuid)
+                .execute());
+
+    if (linkedDataFileResources != null) {
+      // first save linked data resources
+      for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
+        if (linkedDataFileResource.getUuid() == null) {
+          linkedDataFileResourceRepositoryImpl.save(linkedDataFileResource);
+        }
+      }
+
+      // second: save relations to digital object
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO digitalobject_linkeddataresources(digitalobject_uuid, linkeddata_fileresource_uuid, sortIndex) VALUES(:uuid, :linkedDataFileResourceUuid, :sortIndex)");
+            for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
+              preparedBatch
+                  .bind("uuid", digitalObjectUuid)
+                  .bind("linkedDataFileResourceUuid", linkedDataFileResource.getUuid())
+                  .bind("sortIndex", getIndex(linkedDataFileResources, linkedDataFileResource))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+    }
+    return getLinkedDataFileResources(digitalObjectUuid);
+  }
+
+  @Override
   public DigitalObject update(DigitalObject digitalObject) {
     super.update(digitalObject);
+
     DigitalObject result = getByUuid(digitalObject.getUuid());
+
+    // save the rendering resources, which are also FileResources
+    final ArrayList<FileResource> renderingResources = digitalObject.getRenderingResources();
+    saveRenderingResources(digitalObject, renderingResources);
+
+    // save the linked data resources
+    final ArrayList<LinkedDataFileResource> linkedDataResources =
+        digitalObject.getLinkedDataResources();
+    saveLinkedDataFileResources(digitalObject, linkedDataResources);
     return result;
   }
 
@@ -471,8 +712,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       String url = rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_url", String.class);
       LocalizedText label =
           rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
+      String acronym =
+          rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_acronym", String.class);
       final License license =
-          new LicenseBuilder().withUuid(licenseUuid).withLabel(label).withUrl(url).build();
+          new LicenseBuilder()
+              .withUuid(licenseUuid)
+              .withLabel(label)
+              .withUrl(url)
+              .withAcronym(acronym)
+              .build();
       if (licenseUuid != null) {
         digitalObject.setLicense(license);
       }
@@ -485,7 +733,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       UUID creationGeolocationUuid =
           rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
 
-      // If and oy creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
+      // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
       // We must build the CreationInfo object
       if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
         CreationInfo creationInfo = new CreationInfo();
@@ -501,16 +749,48 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         }
         digitalObject.setCreationInfo(creationInfo);
       }
+
+      // Fill further attributes
+      digitalObject.setNumberOfBinaryResources(
+          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class));
+
       return map;
     };
+  }
+
+  // --------- repository setters for testing purposes only ----------------------
+  public void setAgentEntityRepository(EntityRepositoryImpl<Agent> agentEntityRepositoryImpl) {
+    this.agentEntityRepositoryImpl = agentEntityRepositoryImpl;
   }
 
   public void setCollectionRepository(CollectionRepositoryImpl collectionRepositoryImpl) {
     this.collectionRepositoryImpl = collectionRepositoryImpl;
   }
 
+  public void setCorporateBodyRepository(CorporateBodyRepositoryImpl corporateBodyRepositoryImpl) {
+    this.corporateBodyRepositoryImpl = corporateBodyRepositoryImpl;
+  }
+
   public void setFileResourceMetadataRepository(
       FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl) {
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
+  }
+
+  public void setGeolocationEntityRepositoryImpl(
+      EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl) {
+    this.geolocationEntityRepositoryImpl = geolocationEntityRepositoryImpl;
+  }
+
+  public void setGeoLocationRepositoryImpl(GeoLocationRepositoryImpl geoLocationRepositoryImpl) {
+    this.geoLocationRepositoryImpl = geoLocationRepositoryImpl;
+  }
+
+  public void setLinkedDataFileResourceRepository(
+      LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl) {
+    this.linkedDataFileResourceRepositoryImpl = linkedDataFileResourceRepositoryImpl;
+  }
+
+  public void setPersonRepository(PersonRepositoryImpl personRepositoryImpl) {
+    this.personRepositoryImpl = personRepositoryImpl;
   }
 }
