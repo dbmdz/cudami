@@ -214,8 +214,8 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
         expression = getColumnName(givenExpression);
         if (expression == null) {
           throw new IllegalArgumentException(
-              String.format("Given expression '%s' is invalid / can not be mapped.")
-                  + givenExpression);
+              String.format(
+                  "Given expression '%s' is invalid / can not be mapped.", givenExpression));
         }
       }
 
@@ -300,7 +300,15 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
               .append(":")
               .append(criterionKey)
               .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
+          try {
+            argumentMappings.put(criterionKey, fc.getValue());
+          } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ArgumentMappings=" + argumentMappings);
+            System.err.println("criterionKey=" + criterionKey);
+            System.err.println("fc=" + fc);
+            System.err.println("fc.getValue()=" + fc.getValue());
+          }
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html

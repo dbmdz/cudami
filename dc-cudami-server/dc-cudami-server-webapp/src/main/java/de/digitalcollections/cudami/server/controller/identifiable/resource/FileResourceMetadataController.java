@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.paging.Order;
@@ -13,6 +14,8 @@ import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -55,12 +58,25 @@ public class FileResourceMetadataController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "uri", required = false)
+          FilterCriterion<String> encodedUriFilterCriterion) {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
+    if (encodedUriFilterCriterion != null) {
+      FilterCriterion<String> uri =
+          new FilterCriterion<>(
+              "uri",
+              encodedUriFilterCriterion.getOperation(),
+              URLDecoder.decode(
+                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
+      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      searchPageRequest.setFiltering(filtering);
+    }
+
     return metadataService.find(searchPageRequest);
   }
 

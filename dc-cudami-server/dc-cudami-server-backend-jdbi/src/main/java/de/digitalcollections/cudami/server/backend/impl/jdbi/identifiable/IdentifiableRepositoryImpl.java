@@ -31,7 +31,6 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -400,7 +399,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     String commonSql = " FROM " + tableName + " AS " + tableAlias;
     String searchTerm = searchPageRequest.getQuery();
     if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
+      return find(searchPageRequest, commonSql, new HashMap<>());
     }
 
     commonSql += " WHERE " + getCommonSearchSql(tableAlias);

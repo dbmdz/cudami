@@ -1,0 +1,43 @@
+{
+  "content": [
+    {
+      "objectType": "FILE_RESOURCE",
+      "uuid": "12345678-abcd-1234-abcd-123456789012",
+      "identifiers": [],
+      "label": {
+        "de": "Test-Label"
+      },
+      "type": "RESOURCE",
+      "fileResourceType": "UNDEFINED",
+      "filename": "bla.xml",
+      "mimeType": "application/xml",
+      "readonly": false,
+      "sizeInBytes": 0,
+      "uri": "http://foo.bar/bla.xml",
+      "filenameExtension": "xml"
+    }
+  ],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": "de"
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": ""
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 1
+}
