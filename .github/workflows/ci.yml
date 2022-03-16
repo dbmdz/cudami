@@ -1,9 +1,8 @@
-# FIXME: remove branch metadata-service after it is merged
 on:
   pull_request:
-    branches: [ main, metadata-service ]
+    branches: [ main ]
   push:
-    branches: [ main, metadata-service ]
+    branches: [ main ]
   release:
     types: [ published ]
   workflow_dispatch:
@@ -80,7 +79,7 @@ jobs:
             ~/.m2/repository
             **/target
       - name: Install XML utils
-        run: sudo apt install libxml2-utils
+        run: sudo apt update && sudo apt install libxml2-utils
       - name: Extract project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       - name: Set project version as output variable
