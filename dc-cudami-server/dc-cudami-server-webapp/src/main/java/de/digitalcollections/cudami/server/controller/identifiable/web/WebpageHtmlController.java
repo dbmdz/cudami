@@ -57,9 +57,9 @@ public class WebpageHtmlController {
       throws IdentifiableServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = webpageService.get(uuid);
+      webpage = webpageService.getByUuid(uuid);
     } else {
-      webpage = webpageService.get(uuid, pLocale);
+      webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
       Locale returnedLocale = getLocale(webpage);
       model.addAttribute("locale", returnedLocale);
     }

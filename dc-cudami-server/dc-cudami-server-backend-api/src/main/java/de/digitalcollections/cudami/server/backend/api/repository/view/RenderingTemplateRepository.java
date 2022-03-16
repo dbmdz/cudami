@@ -29,7 +29,7 @@ public interface RenderingTemplateRepository {
    * @param uuid the uuid of the rendering template
    * @return The found rendering template
    */
-  RenderingTemplate findOne(UUID uuid);
+  RenderingTemplate getByUuid(UUID uuid);
 
   /**
    * Save a template.

@@ -93,7 +93,7 @@ public class PersonsController extends AbstractController {
 
   @GetMapping("/api/persons/{uuid}")
   @ResponseBody
-  public Person get(@PathVariable UUID uuid) throws TechnicalException {
+  public Person getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 

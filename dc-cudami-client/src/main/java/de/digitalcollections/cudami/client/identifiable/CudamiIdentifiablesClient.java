@@ -66,45 +66,6 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
     return findByLanguageAndInitial(pageRequest, language, initial);
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiIdentifiablesClient#getByUuidAndLocale(java.util.UUID,
-   *     java.util.Locale)} instead.
-   * @param uuid unique uuid of object
-   * @param locale locale of localized texts of object
-   * @return object with given uuid and locale
-   */
-  @Deprecated(forRemoval = true)
-  public I findOne(UUID uuid, Locale locale) throws TechnicalException {
-    return getByUuidAndLocale(uuid, locale);
-  }
-
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiIdentifiablesClient#getByUuidAndLocale(java.util.UUID,
-   *     java.lang.String)} instead.
-   * @param uuid unique uuid of object
-   * @param locale locale of localized texts of object
-   * @return object with given uuid and locale
-   */
-  @Deprecated(forRemoval = true)
-  public I findOne(UUID uuid, String locale) throws TechnicalException {
-    return getByUuidAndLocale(uuid, locale);
-  }
-
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiIdentifiablesClient#getByIdentifier(java.lang.String,
-   *     java.lang.String)} instead.
-   * @param namespace namespace part of identifier
-   * @param id id part of identifier
-   * @return object with given identifier
-   */
-  @Deprecated(forRemoval = true)
-  public I findOneByIdentifier(String namespace, String id) throws TechnicalException {
-    return getByIdentifier(namespace, id);
-  }
-
   public I getByIdentifier(String namespace, String id) throws TechnicalException {
     return doGetRequestForObject(
         String.format(baseEndpoint + "/identifier/%s:%s.json", namespace, id));

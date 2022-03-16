@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public interface VersionRepository {
 
-  Version findOne(UUID uuid);
+  Version getByUuid(UUID uuid);
 
-  Version findOneByInstanceversionKey(String externalKey);
+  Version getByInstanceversionKey(String externalKey);
 
   Version save(Version version);
 

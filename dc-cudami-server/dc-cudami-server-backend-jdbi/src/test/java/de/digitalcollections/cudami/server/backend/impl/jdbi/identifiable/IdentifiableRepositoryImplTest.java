@@ -39,12 +39,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @DisplayName("The Identifiable Repository")
 class IdentifiableRepositoryImplTest {
-
-  IdentifiableRepositoryImpl repo;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-  @Autowired Jdbi jdbi;
   @Autowired CudamiConfig cudamiConfig;
+
+  @Autowired Jdbi jdbi;
+  @Autowired PostgreSQLContainer postgreSQLContainer;
+  IdentifiableRepositoryImpl repo;
 
   @BeforeEach
   public void beforeEach() {
@@ -57,9 +56,25 @@ class IdentifiableRepositoryImplTest {
     assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
+  private DigitalObject createDigitalObjectWithLabels(String label) {
+    DigitalObject digitalObject = new DigitalObject();
+    LocalizedText labelText = new LocalizedText();
+    labelText.setText(Locale.GERMAN, label);
+    labelText.setText(Locale.ENGLISH, label);
+    digitalObject.setLabel(labelText);
+    LocalizedStructuredContent description = new LocalizedStructuredContent();
+    StructuredContent structuredContent = new StructuredContent();
+    Paragraph paragraph = new Paragraph(label);
+    structuredContent.addContentBlock(paragraph);
+    description.put(Locale.GERMAN, structuredContent);
+    description.put(Locale.ENGLISH, structuredContent);
+    digitalObject.setDescription(description);
+    return digitalObject;
+  }
+
   @Test
   @DisplayName("retrieve one digital object")
-  void testFindOne() {
+  void testGetByUuid() {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
@@ -69,47 +84,8 @@ class IdentifiableRepositoryImplTest {
 
     identifiable = this.repo.save(identifiable);
 
-    Identifiable actual = this.repo.findOne(identifiable.getUuid());
+    Identifiable actual = this.repo.getByUuid(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
-  }
-
-  @Test
-  @DisplayName("saves a DigitalObject and fills uuid and timestamps")
-  void testSave() {
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setLabel("Test");
-    assertThat(digitalObject.getCreated()).isNull();
-    assertThat(digitalObject.getLastModified()).isNull();
-    assertThat(digitalObject.getUuid()).isNull();
-
-    DigitalObject actual = (DigitalObject) repo.save(digitalObject);
-
-    assertThat(actual).isEqualTo(digitalObject);
-    assertThat(actual.getCreated()).isNotNull();
-    assertThat(actual.getLastModified()).isNotNull();
-    assertThat(actual.getUuid()).isNotNull();
-  }
-
-  @Test
-  @DisplayName("returns properly sized pages on search")
-  void testSearchPageSize() {
-    // Insert a bunch of DigitalObjects with labels
-    IntStream.range(0, 20)
-        .forEach(
-            i -> {
-              repo.save(createDigitalObjectWithLabels("test" + i));
-            });
-
-    String query = "test";
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    searchPageRequest.setPageSize(10);
-    searchPageRequest.setPageNumber(0);
-    searchPageRequest.setQuery(query);
-
-    SearchPageResponse response = repo.find(searchPageRequest);
-
-    List<Identifiable> content = response.getContent();
-    assertThat(content).hasSize(10);
   }
 
   @Test
@@ -152,19 +128,42 @@ class IdentifiableRepositoryImplTest {
                 + "COALESCE(i.label->>'en', i.label->>'') COLLATE \"ucs_basic\" DESC");
   }
 
-  private DigitalObject createDigitalObjectWithLabels(String label) {
+  @Test
+  @DisplayName("saves a DigitalObject and fills uuid and timestamps")
+  void testSave() {
     DigitalObject digitalObject = new DigitalObject();
-    LocalizedText labelText = new LocalizedText();
-    labelText.setText(Locale.GERMAN, label);
-    labelText.setText(Locale.ENGLISH, label);
-    digitalObject.setLabel(labelText);
-    LocalizedStructuredContent description = new LocalizedStructuredContent();
-    StructuredContent structuredContent = new StructuredContent();
-    Paragraph paragraph = new Paragraph(label);
-    structuredContent.addContentBlock(paragraph);
-    description.put(Locale.GERMAN, structuredContent);
-    description.put(Locale.ENGLISH, structuredContent);
-    digitalObject.setDescription(description);
-    return digitalObject;
+    digitalObject.setLabel("Test");
+    assertThat(digitalObject.getCreated()).isNull();
+    assertThat(digitalObject.getLastModified()).isNull();
+    assertThat(digitalObject.getUuid()).isNull();
+
+    DigitalObject actual = (DigitalObject) repo.save(digitalObject);
+
+    assertThat(actual).isEqualTo(digitalObject);
+    assertThat(actual.getCreated()).isNotNull();
+    assertThat(actual.getLastModified()).isNotNull();
+    assertThat(actual.getUuid()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("returns properly sized pages on search")
+  void testSearchPageSize() {
+    // Insert a bunch of DigitalObjects with labels
+    IntStream.range(0, 20)
+        .forEach(
+            i -> {
+              repo.save(createDigitalObjectWithLabels("test" + i));
+            });
+
+    String query = "test";
+    SearchPageRequest searchPageRequest = new SearchPageRequest();
+    searchPageRequest.setPageSize(10);
+    searchPageRequest.setPageNumber(0);
+    searchPageRequest.setQuery(query);
+
+    SearchPageResponse response = repo.find(searchPageRequest);
+
+    List<Identifiable> content = response.getContent();
+    assertThat(content).hasSize(10);
   }
 }

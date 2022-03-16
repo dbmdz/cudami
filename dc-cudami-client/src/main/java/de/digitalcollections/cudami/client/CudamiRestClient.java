@@ -54,17 +54,6 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
     return doGetRequestForObjectList(baseEndpoint + "/all");
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiRestClient#getByUuid(java.util.UUID)} instead.
-   * @param uuid UUID of Object
-   * @return object with given UUID
-   */
-  @Deprecated(forRemoval = true)
-  public T findOne(UUID uuid) throws TechnicalException {
-    return getByUuid(uuid);
-  }
-
   public T getByUuid(UUID uuid) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
   }

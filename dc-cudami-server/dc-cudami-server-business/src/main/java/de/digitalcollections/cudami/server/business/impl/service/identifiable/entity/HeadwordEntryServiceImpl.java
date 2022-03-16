@@ -39,8 +39,9 @@ public class HeadwordEntryServiceImpl extends EntityServiceImpl<HeadwordEntry>
   }
 
   @Override
-  public HeadwordEntry get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    HeadwordEntry headwordEntry = super.get(uuid, locale);
+  public HeadwordEntry getByUuidAndLocale(UUID uuid, Locale locale)
+      throws IdentifiableServiceException {
+    HeadwordEntry headwordEntry = super.getByUuidAndLocale(uuid, locale);
     if (headwordEntry == null) {
       return null;
     }

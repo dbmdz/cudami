@@ -192,7 +192,7 @@ class IdentifiableServiceImplTest {
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
     verify(urlAliasService, times(1)).deleteAllForTarget(eq(targetUuid));
@@ -218,7 +218,7 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiable);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiable);
 
     service.update(identifiable);
 
@@ -238,7 +238,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "oldlabel"));
 
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
 
     service.update(identifiable);
@@ -283,7 +283,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
-    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
     when(repo.update(identifiable)).thenReturn(identifiable);
 
     when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
@@ -332,7 +332,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
-    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
     when(repo.update(identifiable)).thenReturn(identifiable);
 
     doThrow(new ValidationException("no way!"))
@@ -387,7 +387,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "label"));
 
-    when(repo.findOne(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
   }
@@ -429,7 +429,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(labelDb);
     identifiableInDb.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -487,7 +487,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(label);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // new ones
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -563,7 +563,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(label);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // new one
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -620,7 +620,7 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(labelDb);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.findOne(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     // aliases in object to update
     UrlAlias firstPrimaryUrlAlias = new UrlAlias(); // equals to DB

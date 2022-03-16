@@ -7,7 +7,7 @@ import java.util.List;
 /** @param <E> entity instance */
 public interface EntityRepository<E extends Entity> extends IdentifiableRepository<E> {
 
-  E findOneByRefId(long refId);
+  E getByRefId(long refId);
 
   List<E> findRandom(int count);
 }

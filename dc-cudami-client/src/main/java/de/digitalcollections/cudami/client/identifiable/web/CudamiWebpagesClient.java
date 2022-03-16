@@ -31,18 +31,6 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         String.format("%s/%s/children?active=true", baseEndpoint, uuid), searchPageRequest);
   }
 
-  /**
-   * Only reason for overwriting is name of param "pLocale" instead "locale": FIXME?
-   *
-   * @deprecated This method is subject to be removed. Use {@link
-   *     CudamiIdentifiablesClient#getByUuidAndLocale(java.util.UUID, java.lang.String)} instead.
-   */
-  @Override
-  @Deprecated(forRemoval = true)
-  public Webpage findOne(UUID uuid, String locale) throws TechnicalException {
-    return doGetRequestForObject(String.format("/v5/webpages/%s?pLocale=%s", uuid, locale));
-  }
-
   public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
       throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(

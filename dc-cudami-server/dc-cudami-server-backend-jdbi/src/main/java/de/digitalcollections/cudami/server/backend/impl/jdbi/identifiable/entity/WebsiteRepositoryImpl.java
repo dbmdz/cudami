@@ -82,18 +82,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website findOne(UUID uuid, Filtering filtering) {
-    Website website = super.findOne(uuid, filtering);
-
-    if (website != null) {
-      website.setRootPages(getRootPages(website));
-    }
-    return website;
-  }
-
-  @Override
-  public Website findOne(Identifier identifier) {
-    Website website = super.findOne(identifier);
+  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Website website = super.getByUuidAndFiltering(uuid, filtering);
 
     if (website != null) {
       website.setRootPages(getRootPages(website));
@@ -106,6 +96,16 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
     allowedOrderByFields.addAll(Arrays.asList("url"));
     return allowedOrderByFields;
+  }
+
+  @Override
+  public Website getByIdentifier(Identifier identifier) {
+    Website website = super.getByIdentifier(identifier);
+
+    if (website != null) {
+      website.setRootPages(getRootPages(website));
+    }
+    return website;
   }
 
   @Override
@@ -158,14 +158,14 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   @Override
   public Website save(Website website) {
     super.save(website);
-    Website result = findOne(website.getUuid());
+    Website result = getByUuid(website.getUuid());
     return result;
   }
 
   @Override
   public Website update(Website website) {
     super.update(website);
-    Website result = findOne(website.getUuid());
+    Website result = getByUuid(website.getUuid());
     return result;
   }
 

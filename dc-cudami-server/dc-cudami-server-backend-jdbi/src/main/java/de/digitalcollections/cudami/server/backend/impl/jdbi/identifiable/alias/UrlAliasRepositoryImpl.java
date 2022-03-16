@@ -288,7 +288,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException {
+  public UrlAlias getByUuid(UUID uuid) throws UrlAliasRepositoryException {
     if (uuid == null) {
       return null;
     }
@@ -432,7 +432,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
-      return findOne(newUuid);
+      return getByUuid(newUuid);
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new UrlAliasRepositoryException(
@@ -462,7 +462,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             String.format(
                 "Update of '%s' went wrong. Affected rows: %d", urlAlias.getUuid(), affected));
       }
-      return findOne(urlAlias.getUuid());
+      return getByUuid(urlAlias.getUuid());
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new UrlAliasRepositoryException(

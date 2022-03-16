@@ -94,10 +94,24 @@ public class PersonController {
         "/latest/persons/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> findByIdentifier(
+  public ResponseEntity<Person> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     Person result = personService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Void> getByIdentifier(
+      @RequestParam(name = "namespace", required = true) String namespace,
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request)
+      throws IdentifiableServiceException {
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -160,7 +174,7 @@ public class PersonController {
         "/latest/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> get(
+  public ResponseEntity<Person> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -177,25 +191,11 @@ public class PersonController {
 
     Person result;
     if (pLocale == null) {
-      result = personService.get(uuid);
+      result = personService.getByUuid(uuid);
     } else {
-      result = personService.get(uuid, pLocale);
+      result = personService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a person by namespace and id")
-  @GetMapping(
-      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
-      throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "Get a person's digital objects")

@@ -235,14 +235,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   @Override
   public Item save(Item item) {
     super.save(item);
-    Item result = findOne(item.getUuid());
+    Item result = getByUuid(item.getUuid());
     return result;
   }
 
   @Override
   public Item update(Item item) {
     super.update(item);
-    Item result = findOne(item.getUuid());
+    Item result = getByUuid(item.getUuid());
     return result;
   }
 }

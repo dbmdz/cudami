@@ -51,7 +51,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public boolean delete(UUID uuid) {
     // Check for existance. If not given, return false.
-    DigitalObject existingDigitalObject = get(uuid);
+    DigitalObject existingDigitalObject = getByUuid(uuid);
     if (existingDigitalObject == null) {
       return false;
     }

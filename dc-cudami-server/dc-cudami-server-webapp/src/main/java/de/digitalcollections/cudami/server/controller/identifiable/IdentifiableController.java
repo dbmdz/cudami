@@ -73,16 +73,31 @@ public class IdentifiableController {
     return identifiables;
   }
 
-  @Operation(summary = "Get identifiable by uuid")
+  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
   @GetMapping(
-      value = {
-        "/v5/identifiables/{uuid}",
-        "/v2/identifiables/{uuid}",
-        "/latest/identifiables/{uuid}"
-      },
+      value = {"/v5/identifiables/{uuid}/localizedUrlAliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Identifiable findById(@PathVariable UUID uuid) {
-    return identifiableService.get(uuid);
+  public ResponseEntity<LocalizedUrlAliases> findLocalizedUrlAliases(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws CudamiControllerException {
+
+    try {
+      if (getByUuid(uuid) == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      throw new CudamiControllerException(e);
+    }
+
+    try {
+      return new ResponseEntity<>(urlAliasService.findLocalizedUrlAliases(uuid), HttpStatus.OK);
+    } catch (CudamiServiceException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get an identifiable by namespace and id")
@@ -103,30 +118,15 @@ public class IdentifiableController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
+  @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
-      value = {"/v5/identifiables/{uuid}/localizedUrlAliases"},
+      value = {
+        "/v5/identifiables/{uuid}",
+        "/v2/identifiables/{uuid}",
+        "/latest/identifiables/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LocalizedUrlAliases> findLocalizedUrlAliases(
-      @Parameter(
-              description =
-                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid)
-      throws CudamiControllerException {
-
-    try {
-      if (findById(uuid) == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-    } catch (Exception e) {
-      throw new CudamiControllerException(e);
-    }
-
-    try {
-      return new ResponseEntity<>(urlAliasService.findLocalizedUrlAliases(uuid), HttpStatus.OK);
-    } catch (CudamiServiceException e) {
-      throw new CudamiControllerException(e);
-    }
+  public Identifiable getByUuid(@PathVariable UUID uuid) {
+    return identifiableService.getByUuid(uuid);
   }
 }

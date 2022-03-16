@@ -87,14 +87,14 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
   @Override
   public CorporateBody save(CorporateBody corporateBody) {
     super.save(corporateBody);
-    CorporateBody result = findOne(corporateBody.getUuid());
+    CorporateBody result = getByUuid(corporateBody.getUuid());
     return result;
   }
 
   @Override
   public CorporateBody update(CorporateBody corporateBody) {
     super.update(corporateBody);
-    CorporateBody result = findOne(corporateBody.getUuid());
+    CorporateBody result = getByUuid(corporateBody.getUuid());
     return result;
   }
 }

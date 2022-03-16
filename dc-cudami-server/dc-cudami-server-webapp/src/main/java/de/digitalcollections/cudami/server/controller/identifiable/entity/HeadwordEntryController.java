@@ -83,7 +83,7 @@ public class HeadwordEntryController {
   @GetMapping(
       value = {"/v5/headwordentries/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public HeadwordEntry findByIdentifier(
+  public HeadwordEntry getByIdentifier(
       @Parameter(example = "", description = "Namespace of the identifier")
           @PathVariable("namespace")
           String namespace,
@@ -99,7 +99,7 @@ public class HeadwordEntryController {
         "/v5/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<HeadwordEntry> findByUuid(
+  public ResponseEntity<HeadwordEntry> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -116,9 +116,9 @@ public class HeadwordEntryController {
 
     HeadwordEntry headwordEntry;
     if (pLocale == null) {
-      headwordEntry = headwordEntryService.get(uuid);
+      headwordEntry = headwordEntryService.getByUuid(uuid);
     } else {
-      headwordEntry = headwordEntryService.get(uuid, pLocale);
+      headwordEntry = headwordEntryService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(headwordEntry, HttpStatus.OK);
   }

@@ -36,7 +36,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void nonexistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.findOne(any(UUID.class))).thenReturn(null);
+    when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(null);
 
     testNotFound(path);
   }
@@ -58,7 +58,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withWebsite(
                 new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.findOne(any(UUID.class))).thenReturn(expectedUrlAlias);
+    when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(expectedUrlAlias);
 
     testJson(path);
   }

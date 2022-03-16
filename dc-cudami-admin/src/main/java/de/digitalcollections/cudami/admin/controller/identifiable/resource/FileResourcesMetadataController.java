@@ -51,11 +51,6 @@ public class FileResourcesMetadataController extends AbstractController {
     this.service = client.forFileResourcesMetadata();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "fileresources";
-  }
-
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
@@ -104,7 +99,7 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/{uuid}")
   @ResponseBody
-  public FileResource get(@PathVariable UUID uuid) throws TechnicalException {
+  public FileResource getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -115,6 +110,11 @@ public class FileResourcesMetadataController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "fileresources/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "fileresources";
   }
 
   @PostMapping("/api/fileresources")

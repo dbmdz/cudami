@@ -64,17 +64,31 @@ public class FamilyNameController {
   @GetMapping(
       value = {"/v5/familynames/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FamilyName> findByIdentifier(
+  public ResponseEntity<FamilyName> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     FamilyName result = familyNameService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a familyname by namespace and id")
+  @GetMapping(
+      value = {"/v5/familynames/identifier"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Void> getByIdentifier(
+      @RequestParam(name = "namespace", required = true) String namespace,
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request)
+      throws IdentifiableServiceException {
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
       value = {"/v5/familynames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FamilyName> get(
+  public ResponseEntity<FamilyName> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -91,25 +105,11 @@ public class FamilyNameController {
       throws IdentifiableServiceException {
     FamilyName result;
     if (pLocale == null) {
-      result = familyNameService.get(uuid);
+      result = familyNameService.getByUuid(uuid);
     } else {
-      result = familyNameService.get(uuid, pLocale);
+      result = familyNameService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a familyname by namespace and id")
-  @GetMapping(
-      value = {"/v5/familynames/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
-      throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "save a newly created family")

@@ -43,11 +43,6 @@ public class RenderingTemplatesController extends AbstractController {
     this.service = client.forRenderingTemplates();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "renderingtemplates";
-  }
-
   @GetMapping("/renderingtemplates/new")
   public String create() {
     return "renderingtemplates/create";
@@ -84,13 +79,18 @@ public class RenderingTemplatesController extends AbstractController {
 
   @GetMapping("/api/renderingtemplates/{uuid}")
   @ResponseBody
-  public RenderingTemplate get(@PathVariable UUID uuid) throws TechnicalException {
+  public RenderingTemplate getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
   @GetMapping("/renderingtemplates")
   public String list() {
     return "renderingtemplates/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "renderingtemplates";
   }
 
   @PostMapping("/api/renderingtemplates")

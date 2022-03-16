@@ -73,12 +73,7 @@ public interface HeadwordRepository {
   PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  default Headword findOne(UUID uuid) {
-    return findOne(uuid, null);
-  }
-
-  Headword findOne(UUID uuid, Filtering filtering);
-
+  List<Headword> findRandom(int count);
   /**
    * Returns a headword, if available
    *
@@ -86,9 +81,13 @@ public interface HeadwordRepository {
    * @param locale locale of label, e.g. "de"
    * @return Headword or null
    */
-  Headword findOneByLabelAndLocale(String label, Locale locale);
+  Headword getByLabelAndLocale(String label, Locale locale);
 
-  List<Headword> findRandom(int count);
+  default Headword getByUuid(UUID uuid) {
+    return getByUuidAndFiltering(uuid, null);
+  }
+
+  Headword getByUuidAndFiltering(UUID uuid, Filtering filtering);
 
   List<Locale> getLanguages();
 

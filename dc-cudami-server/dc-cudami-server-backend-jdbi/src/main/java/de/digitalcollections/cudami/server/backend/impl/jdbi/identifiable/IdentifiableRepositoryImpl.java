@@ -486,7 +486,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I findOne(UUID uuid, Filtering filtering) {
+  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) {
     if (filtering == null) {
       filtering = Filtering.defaultBuilder().build();
     }
@@ -497,9 +497,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I findOne(Identifier identifier) {
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
+  }
+
+  @Override
+  public I getByIdentifier(Identifier identifier) {
     if (identifier.getIdentifiable() != null) {
-      return findOne(identifier.getIdentifiable());
+      return getByUuid(identifier.getIdentifiable());
     }
 
     String namespace = identifier.getNamespace();
@@ -515,11 +520,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
     return result;
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
   }
 
   @Override

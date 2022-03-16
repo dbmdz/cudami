@@ -45,6 +45,31 @@ public class ItemController {
     this.itemService = itemService;
   }
 
+  @Operation(summary = "Add digital object to an item")
+  @PostMapping(
+      value = {
+        "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public boolean addDigitalObject(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
+      @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
+          @PathVariable
+          UUID digitalObjectUuid) {
+    return itemService.addDigitalObject(uuid, digitalObjectUuid);
+  }
+
+  @Operation(summary = "Add work to an item")
+  @PostMapping(
+      value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public boolean addWork(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
+      @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {
+    return itemService.addWork(uuid, workUuid);
+  }
+
   @Operation(summary = "count all items")
   @GetMapping(
       value = {"/v5/items/count", "/v2/items/count", "/latest/items/count"},
@@ -82,36 +107,9 @@ public class ItemController {
         "/latest/items/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Item> findByIdentifier(
+  public ResponseEntity<Item> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     Item result = itemService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get an item by uuid")
-  @GetMapping(
-      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Item> get(
-      @Parameter(
-              name = "uuid",
-              description = "UUID of the item, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-
-    Item result;
-    if (pLocale == null) {
-      result = itemService.get(uuid);
-    } else {
-      result = itemService.get(uuid, pLocale);
-    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -127,6 +125,51 @@ public class ItemController {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+  }
+
+  @Operation(summary = "Get an item by uuid")
+  @GetMapping(
+      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Item> getByUuid(
+      @Parameter(
+              name = "uuid",
+              description = "UUID of the item, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+
+    Item result;
+    if (pLocale == null) {
+      result = itemService.getByUuid(uuid);
+    } else {
+      result = itemService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get digital objects of this item")
+  @GetMapping(
+      value = {"/latest/items/{uuid}/digitalobjects", "/v2/items/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Set<DigitalObject> getDigitalObjects(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
+    return itemService.getDigitalObjects(uuid);
+  }
+
+  @Operation(summary = "Get works embodied in an item")
+  @GetMapping(
+      value = {"/latest/items/{uuid}/works", "/v2/items/{uuid}/works"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Set<Work> getWorks(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
+    return itemService.getWorks(uuid);
   }
 
   @Operation(summary = "save a newly created item")
@@ -149,48 +192,5 @@ public class ItemController {
     }
 
     return itemService.update(item);
-  }
-
-  @Operation(summary = "Get digital objects of this item")
-  @GetMapping(
-      value = {"/latest/items/{uuid}/digitalobjects", "/v2/items/{uuid}/digitalobjects"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Set<DigitalObject> getDigitalObjects(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return itemService.getDigitalObjects(uuid);
-  }
-
-  @Operation(summary = "Get works embodied in an item")
-  @GetMapping(
-      value = {"/latest/items/{uuid}/works", "/v2/items/{uuid}/works"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Set<Work> getWorks(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return itemService.getWorks(uuid);
-  }
-
-  @Operation(summary = "Add work to an item")
-  @PostMapping(
-      value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public boolean addWork(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
-      @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {
-    return itemService.addWork(uuid, workUuid);
-  }
-
-  @Operation(summary = "Add digital object to an item")
-  @PostMapping(
-      value = {
-        "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public boolean addDigitalObject(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
-      @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
-          @PathVariable
-          UUID digitalObjectUuid) {
-    return itemService.addDigitalObject(uuid, digitalObjectUuid);
   }
 }

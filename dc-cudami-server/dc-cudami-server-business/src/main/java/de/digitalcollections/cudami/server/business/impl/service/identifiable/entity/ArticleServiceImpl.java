@@ -34,8 +34,8 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public Article get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    Article article = super.get(uuid, locale);
+  public Article getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+    Article article = super.getByUuidAndLocale(uuid, locale);
     if (article == null) {
       return null;
     }

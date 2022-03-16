@@ -69,16 +69,16 @@ public interface IdentifiableRepository<I extends Identifiable> {
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  I findOne(Identifier identifier);
+  I getByIdentifier(Identifier identifier);
 
-  default I findOne(UUID uuid) {
-    return findOne(uuid, null);
+  default I getByUuid(UUID uuid) {
+    return getByUuidAndFiltering(uuid, null);
   }
 
-  I findOne(UUID uuid, Filtering filtering);
+  I getByUuidAndFiltering(UUID uuid, Filtering filtering);
 
-  default I findOneByIdentifier(String namespace, String id) {
-    return findOne(new Identifier(null, namespace, id));
+  default I getByIdentifier(String namespace, String id) {
+    return getByIdentifier(new Identifier(null, namespace, id));
   }
 
   List<Locale> getLanguages();

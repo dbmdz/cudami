@@ -10,9 +10,9 @@ public interface VersionService {
 
   String extractInstanceVersionkey(Identifiable identifiable);
 
-  Version get(UUID uuid);
-
   Version getByInstanceversionKey(String instanceVersionkey);
+
+  Version getByUuid(UUID uuid);
 
   Version save(Version version) throws Exception;
 

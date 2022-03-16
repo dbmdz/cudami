@@ -25,6 +25,35 @@ class V2WebsiteControllerTest extends BaseControllerTest {
 
   @MockBean private WebsiteService websiteService;
 
+  @DisplayName("returns a paged list of websites")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v2/websites?pageNumber=0&pageSize=1"})
+  public void pagedWebsites(String path) throws Exception {
+    SearchPageResponse<Website> expected =
+        (SearchPageResponse)
+            new SearchPageResponseBuilder<>()
+                .forPageSize(1)
+                .forRequestPage(0)
+                .forAscendingOrderedField("label", "de")
+                .forAscendingOrderedField("label")
+                .withTotalElements(82)
+                .withContent(
+                    new WebsiteBuilder()
+                        .createdAt("2018-05-02T13:32:52.582")
+                        .withDescription(Locale.GERMAN, "")
+                        .withLabel(Locale.GERMAN, "Testseite")
+                        .lastModifiedAt("2018-09-11T09:47:40.311")
+                        .withUuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
+                        .withRefId(71)
+                        .withUrl("https://www.digitale-sammlungen.de/")
+                        .build())
+                .build();
+
+    when(websiteService.find(any(SearchPageRequest.class))).thenReturn(expected);
+
+    testJson(path);
+  }
+
   @DisplayName(
       "returns a website in v2 json format for UUID, with or without json suffix in the url")
   @ParameterizedTest
@@ -68,36 +97,7 @@ class V2WebsiteControllerTest extends BaseControllerTest {
                         .build()))
             .build();
 
-    when(websiteService.get(any(UUID.class))).thenReturn(expected);
-
-    testJson(path);
-  }
-
-  @DisplayName("returns a paged list of websites")
-  @ParameterizedTest
-  @ValueSource(strings = {"/v2/websites?pageNumber=0&pageSize=1"})
-  public void pagedWebsites(String path) throws Exception {
-    SearchPageResponse<Website> expected =
-        (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
-                .forPageSize(1)
-                .forRequestPage(0)
-                .forAscendingOrderedField("label", "de")
-                .forAscendingOrderedField("label")
-                .withTotalElements(82)
-                .withContent(
-                    new WebsiteBuilder()
-                        .createdAt("2018-05-02T13:32:52.582")
-                        .withDescription(Locale.GERMAN, "")
-                        .withLabel(Locale.GERMAN, "Testseite")
-                        .lastModifiedAt("2018-09-11T09:47:40.311")
-                        .withUuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-                        .withRefId(71)
-                        .withUrl("https://www.digitale-sammlungen.de/")
-                        .build())
-                .build();
-
-    when(websiteService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(websiteService.getByUuid(any(UUID.class))).thenReturn(expected);
 
     testJson(path);
   }

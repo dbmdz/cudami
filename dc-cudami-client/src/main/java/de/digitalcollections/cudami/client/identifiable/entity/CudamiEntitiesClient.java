@@ -39,17 +39,6 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         (E) null);
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiEntitiesClient#getByRefId(long)} instead.
-   * @param refId unique reference id of object
-   * @return object with given refId
-   */
-  @Deprecated(forRemoval = true)
-  public E findOneByRefId(long refId) throws TechnicalException {
-    return getByRefId(refId);
-  }
-
   public List findRandomEntities(int count) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/random?count=%d", count), Entity.class);

@@ -149,8 +149,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry findOne(UUID uuid, Filtering filtering) {
-    HeadwordEntry headwordEntry = super.findOne(uuid, filtering);
+  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
 
     if (headwordEntry != null) {
       List<Agent> creators = getCreators(uuid);
@@ -160,8 +160,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry findOne(Identifier identifier) {
-    HeadwordEntry headwordEntry = super.findOne(identifier);
+  public HeadwordEntry getByRefId(long refId) {
+    HeadwordEntry headwordEntry = super.getByRefId(refId);
 
     if (headwordEntry != null) {
       headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
@@ -170,8 +170,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry findOneByRefId(long refId) {
-    HeadwordEntry headwordEntry = super.findOneByRefId(refId);
+  public HeadwordEntry getByIdentifier(Identifier identifier) {
+    HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
 
     if (headwordEntry != null) {
       headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
@@ -253,7 +253,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     List<Agent> creators = headwordEntry.getCreators();
     saveCreatorsList(headwordEntry, creators);
 
-    HeadwordEntry result = findOne(headwordEntry.getUuid());
+    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
     return result;
   }
 
@@ -300,7 +300,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     List<Agent> creators = headwordEntry.getCreators();
     saveCreatorsList(headwordEntry, creators);
 
-    HeadwordEntry result = findOne(headwordEntry.getUuid());
+    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
     return result;
   }
 }

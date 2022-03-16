@@ -32,7 +32,7 @@ public class PredicateServiceImpl implements PredicateService {
 
   @Override
   public Predicate getByValue(String value) {
-    return repository.findOneByValue(value);
+    return repository.getByValue(value);
   }
 
   @Override

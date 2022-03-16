@@ -59,28 +59,28 @@ class UrlAliasServiceImplTest {
   @DisplayName("returns null, when an nonexisting UrlAlias should be retrieved")
   @Test
   public void readNonexisting() throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.findOne(any(UUID.class))).thenReturn(null);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
-    assertThat(service.findOne(UUID.randomUUID())).isNull();
+    assertThat(service.getByUuid(UUID.randomUUID())).isNull();
   }
 
   @DisplayName("returns null, an UrlAlias with uuid=null should be retrieved")
   @Test
   public void readNull() throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.findOne(eq(null))).thenReturn(null);
+    when(repo.getByUuid(eq(null))).thenReturn(null);
 
-    assertThat(service.findOne(null)).isNull();
+    assertThat(service.getByUuid(null)).isNull();
   }
 
   @DisplayName("raises a ServiceException when the repository throws an exception")
   @Test
   public void raiseException() throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.findOne(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+    when(repo.getByUuid(any(UUID.class))).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findOne(UUID.randomUUID());
+          service.getByUuid(UUID.randomUUID());
         });
   }
 
@@ -90,9 +90,9 @@ class UrlAliasServiceImplTest {
     UrlAlias expected =
         createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
-    when(repo.findOne(any(UUID.class))).thenReturn(expected);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
 
-    assertThat(service.findOne(UUID.randomUUID())).isEqualTo(expected);
+    assertThat(service.getByUuid(UUID.randomUUID())).isEqualTo(expected);
   }
 
   @DisplayName("raises a ServiceException when trying to create an empty UrlAlias")
@@ -108,7 +108,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("raises a ServiceException when trying to create an UrlAlias with existing UUID")
   @Test
   public void raiseExceptionWhenSaveWithUuid() throws UrlAliasRepositoryException {
-    when(repo.findOne(any(UUID.class))).thenReturn(null);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
     assertThrows(
         CudamiServiceException.class,
         () -> {
@@ -172,7 +172,7 @@ class UrlAliasServiceImplTest {
   @Test
   public void raiseExceptionWhenUpdateLeadsToAnException()
       throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.findOne(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+    when(repo.getByUuid(any(UUID.class))).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
@@ -192,7 +192,7 @@ class UrlAliasServiceImplTest {
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     expected.setLastPublished(null);
 
-    when(repo.findOne(any(UUID.class))).thenReturn(expected);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
     when(repo.update(any())).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
@@ -208,7 +208,7 @@ class UrlAliasServiceImplTest {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
-    when(repo.findOne(any(UUID.class))).thenReturn(expected);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
     when(repo.update(eq(expected))).thenReturn(expected);
 
     assertThat(service.update(expected)).isEqualTo(expected);
@@ -231,7 +231,7 @@ class UrlAliasServiceImplTest {
   @Test
   public void deleteNonexistantSingleUrlAlias()
       throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.findOne(any(UUID.class))).thenReturn(null);
+    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
     assertThat(service.delete(UUID.randomUUID())).isFalse();
   }
@@ -557,7 +557,7 @@ class UrlAliasServiceImplTest {
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
 
-    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
     service.checkPublication(urlAlias);
     assertThat(urlAlias.getLastPublished()).isEqualTo(publicationDate);
   }
@@ -571,7 +571,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = deepCopy(urlAlias);
     changedUrlAlias.setSlug("foo");
@@ -592,7 +592,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setPrimary(false);
     LocalDateTime publicationDate = LocalDateTime.now().minusDays(1);
     urlAlias.setLastPublished(publicationDate);
-    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = deepCopy(urlAlias);
     changedUrlAlias.setPrimary(true);
@@ -614,7 +614,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.findOne(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = deepCopy(urlAlias);
     changedUrlAlias.setPrimary(false);

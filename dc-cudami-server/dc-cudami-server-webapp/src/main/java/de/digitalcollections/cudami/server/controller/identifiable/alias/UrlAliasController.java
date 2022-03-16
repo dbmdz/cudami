@@ -39,29 +39,22 @@ public class UrlAliasController {
     this.urlAliasService = urlAliasService;
   }
 
-  @Operation(summary = "Get an UrlAlias by uuid")
-  @GetMapping(
-      value = {
-        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
+  @Operation(summary = "Create and persist an UrlAlias")
+  @PostMapping(
+      value = {"/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UrlAlias> get(
-      @Parameter(
-              description =
-                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid)
+  public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
       throws CudamiControllerException {
+
+    if (urlAlias == null || urlAlias.getUuid() != null) {
+      return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 
     UrlAlias result;
     try {
-      result = urlAliasService.findOne(uuid);
+      result = urlAliasService.create(urlAlias);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
-    }
-
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -93,58 +86,6 @@ public class UrlAliasController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @Operation(summary = "Create and persist an UrlAlias")
-  @PostMapping(
-      value = {"/v5/urlaliases"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
-      throws CudamiControllerException {
-
-    if (urlAlias == null || urlAlias.getUuid() != null) {
-      return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    UrlAlias result;
-    try {
-      result = urlAliasService.create(urlAlias);
-    } catch (CudamiServiceException e) {
-      throw new CudamiControllerException(e);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "update an UrlAlias")
-  @PutMapping(
-      value = {
-        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UrlAlias> update(
-      @Parameter(
-              description =
-                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @RequestBody UrlAlias urlAlias)
-      throws CudamiControllerException {
-
-    if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
-      return new ResponseEntity(
-          "UUID=" + uuid + " not set or does not match UUID of provided resource",
-          HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    UrlAlias result;
-    try {
-      result = urlAliasService.update(urlAlias);
-    } catch (CudamiServiceException e) {
-      throw new CudamiControllerException(e);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
   @Operation(
       summary =
           "Find limited amounts of LocalizedUrlAliases. If the searchTerm is used, the slugs to be returned have to match the searchTerm")
@@ -168,6 +109,73 @@ public class UrlAliasController {
       result = urlAliasService.find(pageRequest);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
+    }
+
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
+  @GetMapping(
+      value = {
+        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/urlaliases/slug/{pLocale}/{label}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> generateSlug(
+      @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
+          @PathVariable(name = "pLocale")
+          Locale pLocale,
+      @Parameter(
+              name = "label",
+              description =
+                  "The label, from which the slug shall be constructed, e.g. <tt>Impressum</tt>")
+          @PathVariable("label")
+          String label,
+      @Parameter(
+              description =
+                  "UUID of the website (or not provided, if the default website shall be used), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>",
+              required = false)
+          @PathVariable(value = "website_uuid", required = false)
+          UUID websiteUuid)
+      throws CudamiControllerException {
+
+    String result;
+    try {
+      result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
+    } catch (CudamiServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+
+    if (result == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(JSONObject.quote(result), HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get an UrlAlias by uuid")
+  @GetMapping(
+      value = {
+        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UrlAlias> getByUuid(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws CudamiControllerException {
+
+    UrlAlias result;
+    try {
+      result = urlAliasService.getByUuid(uuid);
+    } catch (CudamiServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+
+    if (result == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     return new ResponseEntity<>(result, HttpStatus.OK);
@@ -213,42 +221,34 @@ public class UrlAliasController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
-  @GetMapping(
+  @Operation(summary = "update an UrlAlias")
+  @PutMapping(
       value = {
-        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/urlaliases/slug/{pLocale}/{label}"
+        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> generateSlug(
-      @Parameter(name = "pLocale", description = "Desired locale, e.g. <tt>de_DE</tt>.")
-          @PathVariable(name = "pLocale")
-          Locale pLocale,
-      @Parameter(
-              name = "label",
-              description =
-                  "The label, from which the slug shall be constructed, e.g. <tt>Impressum</tt>")
-          @PathVariable("label")
-          String label,
+  public ResponseEntity<UrlAlias> update(
       @Parameter(
               description =
-                  "UUID of the website (or not provided, if the default website shall be used), e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>",
-              required = false)
-          @PathVariable(value = "website_uuid", required = false)
-          UUID websiteUuid)
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestBody UrlAlias urlAlias)
       throws CudamiControllerException {
 
-    String result;
+    if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
+      return new ResponseEntity(
+          "UUID=" + uuid + " not set or does not match UUID of provided resource",
+          HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    UrlAlias result;
     try {
-      result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
+      result = urlAliasService.update(urlAlias);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(JSONObject.quote(result), HttpStatus.OK);
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

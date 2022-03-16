@@ -53,12 +53,12 @@ public interface HeadwordService {
    */
   List<Headword> findAll();
 
+  List<Headword> findByLabelAndLocale(String label, Locale locale);
+
   PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  Headword get(UUID uuid);
-
-  List<Headword> get(String label, Locale locale);
+  Headword getByUuid(UUID uuid);
 
   List<Locale> getLanguages();
 

@@ -32,16 +32,6 @@ public class UserController {
     this.userService = userService;
   }
 
-  @Operation(summary = "Get all users with given role and enabled status")
-  @GetMapping(
-      value = {"/v5/users", "/v2/users", "/latest/users"},
-      params = {"role", "enabled"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<User> getByRoleAndStatus(
-      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
-    return userService.findActiveAdminUsers();
-  }
-
   @Operation(summary = "Get all users")
   @GetMapping(
       value = {"/v5/users", "/v2/users", "/latest/users"},
@@ -58,12 +48,14 @@ public class UserController {
     return userService.find(pageRequest);
   }
 
-  @Operation(summary = "Get user by uuid")
+  @Operation(summary = "Get all users with given role and enabled status")
   @GetMapping(
-      value = {"/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {"/v5/users", "/v2/users", "/latest/users"},
+      params = {"role", "enabled"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User findById(@PathVariable UUID uuid) {
-    return userService.get(uuid);
+  public List<User> getByRoleAndStatus(
+      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
+    return userService.findActiveAdminUsers();
   }
 
   @Operation(summary = "Get user by email address")
@@ -71,8 +63,16 @@ public class UserController {
       value = {"/v5/users", "/v2/users", "/latest/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User findByName(@RequestParam(name = "email") String email) {
+  public User getByUsername(@RequestParam(name = "email") String email) {
     return userService.loadUserByUsername(email);
+  }
+
+  @Operation(summary = "Get user by uuid")
+  @GetMapping(
+      value = {"/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public User getByUuid(@PathVariable UUID uuid) {
+    return userService.getByUuid(uuid);
   }
 
   @Operation(summary = "Save a newly created user")

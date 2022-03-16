@@ -79,9 +79,16 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
+    setDefaultSorting(searchPageRequest);
+    return ((NodeRepository<Collection>) repository).findRootNodes(searchPageRequest);
+  }
+
+  @Override
   public Collection getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
-    Collection collection = ((CollectionRepository) repository).findOne(uuid, filtering);
+    Collection collection =
+        ((CollectionRepository) repository).getByUuidAndFiltering(uuid, filtering);
     if (collection != null) {
       collection.setChildren(getActiveChildren(uuid));
     }
@@ -149,12 +156,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
     return ((NodeRepository<Collection>) repository).getRootNodes(pageRequest);
-  }
-
-  @Override
-  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
-    setDefaultSorting(searchPageRequest);
-    return ((NodeRepository<Collection>) repository).findRootNodes(searchPageRequest);
   }
 
   @Override

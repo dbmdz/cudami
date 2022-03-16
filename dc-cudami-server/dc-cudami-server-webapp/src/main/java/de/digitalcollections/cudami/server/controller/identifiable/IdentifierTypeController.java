@@ -55,8 +55,8 @@ public class IdentifierTypeController {
         "/latest/identifiertypes/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public IdentifierType findById(@PathVariable UUID uuid) {
-    return identifierTypeService.get(uuid);
+  public IdentifierType getByUuid(@PathVariable UUID uuid) {
+    return identifierTypeService.getByUuid(uuid);
   }
 
   @Operation(summary = "save a newly created identifier type")

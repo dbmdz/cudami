@@ -198,8 +198,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection findOne(UUID uuid, Filtering filtering) {
-    Collection collection = super.findOne(uuid, filtering);
+  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Collection collection = super.getByUuidAndFiltering(uuid, filtering);
 
     if (collection != null) {
       collection.setChildren(getChildren(collection));
@@ -208,8 +208,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection findOne(Identifier identifier) {
-    Collection collection = super.findOne(identifier);
+  public Collection getByRefId(long refId) {
+    Collection collection = super.getByRefId(refId);
 
     if (collection != null) {
       collection.setChildren(getChildren(collection));
@@ -218,13 +218,27 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection findOneByRefId(long refId) {
-    Collection collection = super.findOneByRefId(refId);
+  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE ("
+            + " NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
+            + tableAlias
+            + ".uuid))";
 
-    if (collection != null) {
-      collection.setChildren(getChildren(collection));
+    String searchTerm = searchPageRequest.getQuery();
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-    return collection;
+
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override
@@ -272,6 +286,16 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     }
 
     return new BreadcrumbNavigation(result);
+  }
+
+  @Override
+  public Collection getByIdentifier(Identifier identifier) {
+    Collection collection = super.getByIdentifier(identifier);
+
+    if (collection != null) {
+      collection.setChildren(getChildren(collection));
+    }
+    return collection;
   }
 
   @Override
@@ -522,30 +546,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE ("
-            + " NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
-            + tableAlias
-            + ".uuid))";
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-
-    commonSql += " AND " + getCommonSearchSql(tableAlias);
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
-    return find(searchPageRequest, commonSql, argumentMappings);
-  }
-
-  @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
         "SELECT DISTINCT languages"
@@ -616,7 +616,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public Collection save(Collection collection) {
     super.save(collection);
-    Collection result = findOne(collection.getUuid());
+    Collection result = getByUuid(collection.getUuid());
     return result;
   }
 
@@ -666,13 +666,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                 .bind("sortindex", nextSortIndex)
                 .execute());
 
-    return findOne(childUuid);
+    return getByUuid(childUuid);
   }
 
   @Override
   public Collection update(Collection collection) {
     super.update(collection);
-    Collection result = findOne(collection.getUuid());
+    Collection result = getByUuid(collection.getUuid());
     return result;
   }
 

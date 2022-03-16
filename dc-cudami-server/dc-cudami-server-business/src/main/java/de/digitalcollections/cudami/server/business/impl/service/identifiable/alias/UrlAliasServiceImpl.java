@@ -34,8 +34,8 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasServiceImpl.class);
   private final LocaleService localeService;
-  private final SlugGenerator slugGenerator;
   private final UrlAliasRepository repository;
+  private final SlugGenerator slugGenerator;
 
   @Autowired
   public UrlAliasServiceImpl(
@@ -43,6 +43,32 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     this.repository = repository;
     this.slugGenerator = slugGenerator;
     this.localeService = localeService;
+  }
+
+  protected void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
+    if (urlAlias.getLastPublished() != null) {
+      if (urlAlias.getUuid() != null) {
+        UrlAlias publishedAlias = getByUuid(urlAlias.getUuid());
+        if (!publishedAlias.isPrimary() && urlAlias.isPrimary()) {
+          // set lastPublished to current date
+          urlAlias.setLastPublished(LocalDateTime.now());
+        }
+        // Only the primary flag and lastPublished are permitted to be changed
+        // so we sync these two objects and compare them
+        publishedAlias.setPrimary(urlAlias.isPrimary());
+        publishedAlias.setLastPublished(urlAlias.getLastPublished());
+        if (!urlAlias.equals(publishedAlias)) {
+          // there are more changes than permitted
+          throw new CudamiServiceException(
+              String.format(
+                  "Error: Attempt to change an already published Alias. UUID: %s",
+                  urlAlias.getUuid()));
+        }
+      }
+    } else if (urlAlias.isPrimary()) {
+      // no publishing date yet
+      urlAlias.setLastPublished(LocalDateTime.now());
+    }
   }
 
   @Override
@@ -85,6 +111,36 @@ public class UrlAliasServiceImpl implements UrlAliasService {
             .collect(Collectors.toList()));
   }
 
+  protected LocalizedUrlAliases filterForLocale(
+      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
+    final List<UrlAlias> filteredUrlAliases =
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> pLocale.equals(u.getTargetLanguage()))
+            .collect(Collectors.toList());
+    return new LocalizedUrlAliases(filteredUrlAliases);
+  }
+
+  protected LocalizedUrlAliases filterForLocaleWithFallback(
+      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
+    if (pLocale == null) {
+      return localizedUrlAliases;
+    }
+
+    if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
+      return localizedUrlAliases;
+    }
+
+    if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
+      // Remove all languages, which do not match the desired pLocale
+      localizedUrlAliases = filterForLocale(pLocale, localizedUrlAliases);
+    } else {
+      // Remove all languages, which are not the default language
+      localizedUrlAliases = filterForLocale(localeService.getDefaultLocale(), localizedUrlAliases);
+    }
+
+    return localizedUrlAliases;
+  }
+
   @Override
   public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
       throws CudamiServiceException {
@@ -104,19 +160,6 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     } catch (Exception e) {
       throw new CudamiServiceException(
           "Cannot find LocalizedUrlAliases for identifiable with uuid=" + uuid + ": " + e, e);
-    }
-  }
-
-  @Override
-  public UrlAlias findOne(UUID uuid) throws CudamiServiceException {
-    if (uuid == null) {
-      return null;
-    }
-
-    try {
-      return repository.findOne(uuid);
-    } catch (Exception e) {
-      throw new CudamiServiceException("Cannot findOne with uuid=" + uuid + ": " + e, e);
     }
   }
 
@@ -175,49 +218,6 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
   }
 
-  protected LocalizedUrlAliases removeNonmatchingLanguagesForSlug(
-      LocalizedUrlAliases localizedUrlAliases, String slug) {
-    List<Locale> matchingLocales =
-        localizedUrlAliases.flatten().stream()
-            .filter(u -> slug.equalsIgnoreCase(u.getSlug()))
-            .map(u -> u.getTargetLanguage())
-            .collect(Collectors.toList());
-    return new LocalizedUrlAliases(
-        localizedUrlAliases.flatten().stream()
-            .filter(u -> matchingLocales.contains(u.getTargetLanguage()))
-            .collect(Collectors.toList()));
-  }
-
-  protected LocalizedUrlAliases filterForLocaleWithFallback(
-      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
-    if (pLocale == null) {
-      return localizedUrlAliases;
-    }
-
-    if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
-      return localizedUrlAliases;
-    }
-
-    if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
-      // Remove all languages, which do not match the desired pLocale
-      localizedUrlAliases = filterForLocale(pLocale, localizedUrlAliases);
-    } else {
-      // Remove all languages, which are not the default language
-      localizedUrlAliases = filterForLocale(localeService.getDefaultLocale(), localizedUrlAliases);
-    }
-
-    return localizedUrlAliases;
-  }
-
-  protected LocalizedUrlAliases filterForLocale(
-      Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
-    final List<UrlAlias> filteredUrlAliases =
-        localizedUrlAliases.flatten().stream()
-            .filter(u -> pLocale.equals(u.getTargetLanguage()))
-            .collect(Collectors.toList());
-    return new LocalizedUrlAliases(filteredUrlAliases);
-  }
-
   @Override
   public String generateSlug(Locale pLocale, String label, UUID websiteUuid)
       throws CudamiServiceException {
@@ -263,30 +263,30 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     }
   }
 
-  protected void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
-    if (urlAlias.getLastPublished() != null) {
-      if (urlAlias.getUuid() != null) {
-        UrlAlias publishedAlias = findOne(urlAlias.getUuid());
-        if (!publishedAlias.isPrimary() && urlAlias.isPrimary()) {
-          // set lastPublished to current date
-          urlAlias.setLastPublished(LocalDateTime.now());
-        }
-        // Only the primary flag and lastPublished are permitted to be changed
-        // so we sync these two objects and compare them
-        publishedAlias.setPrimary(urlAlias.isPrimary());
-        publishedAlias.setLastPublished(urlAlias.getLastPublished());
-        if (!urlAlias.equals(publishedAlias)) {
-          // there are more changes than permitted
-          throw new CudamiServiceException(
-              String.format(
-                  "Error: Attempt to change an already published Alias. UUID: %s",
-                  urlAlias.getUuid()));
-        }
-      }
-    } else if (urlAlias.isPrimary()) {
-      // no publishing date yet
-      urlAlias.setLastPublished(LocalDateTime.now());
+  @Override
+  public UrlAlias getByUuid(UUID uuid) throws CudamiServiceException {
+    if (uuid == null) {
+      return null;
     }
+
+    try {
+      return repository.getByUuid(uuid);
+    } catch (Exception e) {
+      throw new CudamiServiceException("Cannot find an UrlAlias with uuid=" + uuid + ": " + e, e);
+    }
+  }
+
+  protected LocalizedUrlAliases removeNonmatchingLanguagesForSlug(
+      LocalizedUrlAliases localizedUrlAliases, String slug) {
+    List<Locale> matchingLocales =
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> slug.equalsIgnoreCase(u.getSlug()))
+            .map(u -> u.getTargetLanguage())
+            .collect(Collectors.toList());
+    return new LocalizedUrlAliases(
+        localizedUrlAliases.flatten().stream()
+            .filter(u -> matchingLocales.contains(u.getTargetLanguage()))
+            .collect(Collectors.toList()));
   }
 
   @Override

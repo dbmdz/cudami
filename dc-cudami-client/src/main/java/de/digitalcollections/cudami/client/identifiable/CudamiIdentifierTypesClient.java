@@ -27,12 +27,12 @@ public class CudamiIdentifierTypesClient extends CudamiRestClient<IdentifierType
     return response.getContent();
   }
 
-  public IdentifierType findOne(UUID uuid, String locale) throws TechnicalException {
-    return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
-  }
-
-  public IdentifierType findOneByIdentifier(String namespace, String id) throws TechnicalException {
+  public IdentifierType getByIdentifier(String namespace, String id) throws TechnicalException {
     return doGetRequestForObject(
         String.format(baseEndpoint + "/identifier/%s:%s.json", namespace, id));
+  }
+
+  public IdentifierType getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
+    return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
   }
 }

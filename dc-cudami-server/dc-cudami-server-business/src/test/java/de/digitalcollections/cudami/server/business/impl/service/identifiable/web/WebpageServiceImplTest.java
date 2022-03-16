@@ -227,7 +227,7 @@ class WebpageServiceImplTest {
     Webpage dbWebpage = new Webpage();
     dbWebpage.setUuid(webpageUuid);
     dbWebpage.setLabel("test");
-    when(repo.findOne(eq(webpageUuid))).thenReturn(dbWebpage);
+    when(repo.getByUuid(eq(webpageUuid))).thenReturn(dbWebpage);
 
     Webpage webpage = new Webpage();
     webpage.setLabel("test");

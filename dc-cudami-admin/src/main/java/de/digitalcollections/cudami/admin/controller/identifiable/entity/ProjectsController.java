@@ -49,11 +49,6 @@ public class ProjectsController extends AbstractController {
     this.service = client.forProjects();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "projects";
-  }
-
   @PostMapping("/api/projects/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
@@ -112,7 +107,7 @@ public class ProjectsController extends AbstractController {
 
   @GetMapping("/api/projects/{uuid}")
   @ResponseBody
-  public Project get(@PathVariable UUID uuid) throws TechnicalException {
+  public Project getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -136,6 +131,11 @@ public class ProjectsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
 
     return "projects/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "projects";
   }
 
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")

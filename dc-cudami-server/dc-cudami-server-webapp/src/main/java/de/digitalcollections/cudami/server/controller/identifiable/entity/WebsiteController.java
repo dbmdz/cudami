@@ -132,7 +132,7 @@ public class WebsiteController {
   @GetMapping(
       value = {"/v5/websites/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Website> findById(
+  public ResponseEntity<Website> getByUuid(
       @Parameter(
               name = "uuid",
               description = "the UUID of the website",
@@ -141,7 +141,7 @@ public class WebsiteController {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException {
-    Website website = websiteService.get(uuid);
+    Website website = websiteService.getByUuid(uuid);
 
     if (website == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);

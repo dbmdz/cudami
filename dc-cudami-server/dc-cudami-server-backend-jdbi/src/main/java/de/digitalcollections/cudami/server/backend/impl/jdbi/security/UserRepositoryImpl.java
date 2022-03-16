@@ -78,7 +78,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  public User findByEmail(String email) {
+  public User getByEmail(String email) {
     List<User> users =
         dbi.withHandle(
             h ->
@@ -100,7 +100,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  public User findOne(UUID uuid) {
+  public User getByUuid(UUID uuid) {
     List<User> users =
         dbi.withHandle(
             h ->

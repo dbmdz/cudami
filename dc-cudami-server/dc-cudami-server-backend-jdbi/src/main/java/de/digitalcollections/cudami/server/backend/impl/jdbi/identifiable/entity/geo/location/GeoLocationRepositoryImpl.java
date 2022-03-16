@@ -72,14 +72,14 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
   @Override
   public GeoLocation save(GeoLocation geoLocation) {
     super.save(geoLocation);
-    GeoLocation result = findOne(geoLocation.getUuid());
+    GeoLocation result = getByUuid(geoLocation.getUuid());
     return result;
   }
 
   @Override
   public GeoLocation update(GeoLocation geoLocation) {
     super.update(geoLocation);
-    GeoLocation result = findOne(geoLocation.getUuid());
+    GeoLocation result = getByUuid(geoLocation.getUuid());
     return result;
   }
 }

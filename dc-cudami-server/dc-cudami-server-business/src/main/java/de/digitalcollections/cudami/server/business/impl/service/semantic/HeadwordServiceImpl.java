@@ -73,6 +73,11 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
+  public List<Headword> findByLabelAndLocale(String label, Locale locale) {
+    return repository.find(label, locale);
+  }
+
+  @Override
   public PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) {
     PageResponse<Headword> result =
@@ -81,13 +86,8 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public Headword get(UUID uuid) {
-    return repository.findOne(uuid);
-  }
-
-  @Override
-  public List<Headword> get(String label, Locale locale) {
-    return repository.find(label, locale);
+  public Headword getByUuid(UUID uuid) {
+    return repository.getByUuid(uuid);
   }
 
   @Override

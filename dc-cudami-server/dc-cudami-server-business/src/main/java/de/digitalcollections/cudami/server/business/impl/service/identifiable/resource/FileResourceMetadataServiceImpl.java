@@ -80,14 +80,14 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource get(UUID uuid) {
-    FileResource fileResource = repository.findOne(uuid);
+  public FileResource getByIdentifier(String namespace, String id) {
+    FileResource fileResource = repository.getByIdentifier(namespace, id);
     return getTypeSpecific(fileResource);
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id) {
-    FileResource fileResource = repository.findOneByIdentifier(namespace, id);
+  public FileResource getByUuid(UUID uuid) {
+    FileResource fileResource = repository.getByUuid(uuid);
     return getTypeSpecific(fileResource);
   }
 
@@ -97,17 +97,17 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
     }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
     if (specificFileResource instanceof ApplicationFileResource) {
-      return applicationFileResourceService.get(fileResource.getUuid());
+      return applicationFileResourceService.getByUuid(fileResource.getUuid());
     } else if (specificFileResource instanceof AudioFileResource) {
-      return audioFileResourceService.get(fileResource.getUuid());
+      return audioFileResourceService.getByUuid(fileResource.getUuid());
     } else if (specificFileResource instanceof ImageFileResource) {
-      return imageFileResourceService.get(fileResource.getUuid());
+      return imageFileResourceService.getByUuid(fileResource.getUuid());
     } else if (specificFileResource instanceof LinkedDataFileResource) {
-      return linkedDataFileResourceService.get(fileResource.getUuid());
+      return linkedDataFileResourceService.getByUuid(fileResource.getUuid());
     } else if (specificFileResource instanceof TextFileResource) {
-      return textFileResourceService.get(fileResource.getUuid());
+      return textFileResourceService.getByUuid(fileResource.getUuid());
     } else if (specificFileResource instanceof VideoFileResource) {
-      return videoFileResourceService.get(fileResource.getUuid());
+      return videoFileResourceService.getByUuid(fileResource.getUuid());
     }
     return fileResource;
   }

@@ -80,8 +80,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                           String objectUuid = rs.getString("rel_object");
 
                           Entity subject =
-                              entityRepositoryImpl.findOne(UUID.fromString(subjectUuid));
-                          Entity object = entityRepositoryImpl.findOne(UUID.fromString(objectUuid));
+                              entityRepositoryImpl.getByUuid(UUID.fromString(subjectUuid));
+                          Entity object =
+                              entityRepositoryImpl.getByUuid(UUID.fromString(objectUuid));
 
                           acc.add(new EntityRelation(subject, predicate, object));
 
@@ -104,7 +105,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
-    Entity subjectEntity = entityRepositoryImpl.findOne(subjectEntityUuid);
+    Entity subjectEntity = entityRepositoryImpl.getByUuid(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
     }

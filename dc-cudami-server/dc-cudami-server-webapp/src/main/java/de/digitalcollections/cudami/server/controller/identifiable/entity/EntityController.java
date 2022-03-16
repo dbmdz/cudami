@@ -47,29 +47,6 @@ public class EntityController<E extends Entity> {
     return entityService.count();
   }
 
-  @Operation(summary = "Get all entities")
-  @GetMapping(
-      value = {"/v5/entities", "/v3/entities", "/latest/entities"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Entity> findAll(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "entityType", required = false)
-          FilterCriterion<String> entityTypeCriterion) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (entityTypeCriterion != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
-      pageRequest.setFiltering(filtering);
-    }
-    return entityService.find(pageRequest);
-  }
-
   @Operation(
       summary = "Find limited amount of entities containing searchTerm in label or description")
   @GetMapping(
@@ -95,48 +72,27 @@ public class EntityController<E extends Entity> {
     return entityService.find(pageRequest);
   }
 
-  @Operation(summary = "Get entity by uuid")
+  @Operation(summary = "Get all entities")
   @GetMapping(
-      value = {
-        "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
+      value = {"/v5/entities", "/v3/entities", "/latest/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity findById(@PathVariable UUID uuid) {
-    return entityService.get(uuid);
-  }
-
-  @Operation(summary = "Get entity by namespace and id")
-  @GetMapping(
-      value = {
-        "/v5/entities/identifier/{namespace}:{id}",
-        "/latest/entities/identifier/{namespace}:{id}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity findByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws IdentifiableServiceException {
-    Entity entity = entityService.getByIdentifier(namespace, id);
-    return entity;
-  }
-
-  @Operation(summary = "Get entity by reference id")
-  @GetMapping(
-      value = {"/v5/entities/{refId:[0-9]+}", "/latest/entities/{refId:[0-9]+}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity findByRefId(@PathVariable long refId) {
-    Entity entity = entityService.getByRefId(refId);
-    if (entity == null) {
-      return null;
+  public PageResponse<Entity> findAll(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "entityType", required = false)
+          FilterCriterion<String> entityTypeCriterion) {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
     }
-    // routing should be done in frontend webapp (second call will be sent on entity type)
-    //    EntityType entityType = entity.getEntityType();
-    //    UUID uuid = entity.getUuid();
-    //    switch (entityType) {
-    //      case PERSON:
-    //        return personService.get(uuid);
-    //    }
-    return entity;
+    if (entityTypeCriterion != null) {
+      Filtering filtering =
+          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
+      pageRequest.setFiltering(filtering);
+    }
+    return entityService.find(pageRequest);
   }
 
   @Operation(summary = "Find limited amount of random entites")
@@ -146,6 +102,50 @@ public class EntityController<E extends Entity> {
   public List<Entity> findRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return entityService.getRandom(count);
+  }
+
+  @Operation(summary = "Get entity by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/entities/identifier/{namespace}:{id}",
+        "/latest/entities/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Entity getByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws IdentifiableServiceException {
+    Entity entity = entityService.getByIdentifier(namespace, id);
+    return entity;
+  }
+
+  @Operation(summary = "Get entity by reference id")
+  @GetMapping(
+      value = {"/v5/entities/{refId:[0-9]+}", "/latest/entities/{refId:[0-9]+}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Entity getByRefId(@PathVariable long refId) {
+    Entity entity = entityService.getByRefId(refId);
+    if (entity == null) {
+      return null;
+    }
+    // routing should be done in frontend webapp (second call will be sent on entity type)
+    //    EntityType entityType = entity.getEntityType();
+    //    UUID uuid = entity.getUuid();
+    //    switch (entityType) {
+    //      case PERSON:
+    //        return personService.getByIdentifier(uuid);
+    //    }
+    return entity;
+  }
+
+  @Operation(summary = "Get entity by uuid")
+  @GetMapping(
+      value = {
+        "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Entity getByUuid(@PathVariable UUID uuid) {
+    return entityService.getByUuid(uuid);
   }
 
   @Operation(summary = "Get related file resources of entity")

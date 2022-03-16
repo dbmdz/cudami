@@ -35,7 +35,7 @@ public class MainController {
     if (principal instanceof UserDetails) {
       try {
         String username = ((UserDetails) principal).getUsername();
-        User user = userService.findByEmail(username);
+        User user = userService.getByEmail(username);
         model.addAttribute("loggedInUser", user);
       } catch (ServiceException ex) {
       }

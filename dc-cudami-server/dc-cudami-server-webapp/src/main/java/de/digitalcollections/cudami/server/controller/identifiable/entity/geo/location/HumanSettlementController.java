@@ -72,41 +72,9 @@ public class HumanSettlementController {
         "/latest/humansettlements/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<HumanSettlement> findByIdentifier(
+  public ResponseEntity<HumanSettlement> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     HumanSettlement result = humanSettlementService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a human settlement by uuid")
-  @GetMapping(
-      value = {
-        "/v5/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<HumanSettlement> get(
-      @Parameter(
-              example = "",
-              description =
-                  "UUID of the human settlement, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-
-    HumanSettlement result;
-    if (pLocale == null) {
-      result = humanSettlementService.get(uuid);
-    } else {
-      result = humanSettlementService.get(uuid, pLocale);
-    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -126,6 +94,38 @@ public class HumanSettlementController {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+  }
+
+  @Operation(summary = "Get a human settlement by uuid")
+  @GetMapping(
+      value = {
+        "/v5/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<HumanSettlement> getByUuid(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the human settlement, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+
+    HumanSettlement result;
+    if (pLocale == null) {
+      result = humanSettlementService.getByUuid(uuid);
+    } else {
+      result = humanSettlementService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @Operation(summary = "save a newly created human settlement")

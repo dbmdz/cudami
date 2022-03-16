@@ -29,7 +29,7 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  public Version findOne(UUID uuid) {
+  public Version getByUuid(UUID uuid) {
     final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
 
     Version version =
@@ -44,7 +44,7 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  public Version findOneByInstanceversionKey(String instVersionKey) {
+  public Version getByInstanceversionKey(String instVersionKey) {
     final String sql =
         "SELECT * FROM " + tableName + " WHERE instance_version_key = :instance_version_key";
 

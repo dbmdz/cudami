@@ -46,11 +46,6 @@ public class CorporateBodiesController extends AbstractController {
     this.service = client.forCorporateBodies();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "corporatebodies";
-  }
-
   @GetMapping("/corporatebodies/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
@@ -98,7 +93,7 @@ public class CorporateBodiesController extends AbstractController {
 
   @GetMapping("/api/corporatebodies/{uuid}")
   @ResponseBody
-  public CorporateBody get(@PathVariable UUID uuid) throws TechnicalException {
+  public CorporateBody getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -109,6 +104,11 @@ public class CorporateBodiesController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "corporatebodies/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "corporatebodies";
   }
 
   @PostMapping("/api/corporatebodies")

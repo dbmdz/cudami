@@ -22,17 +22,6 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
     return doGetRequestForObjectList("/v5/users");
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link #getByEmail(java.lang.String)} instead.
-   * @param email email of user
-   * @return user with given email
-   */
-  @Deprecated(forRemoval = true)
-  public User findOneByEmail(String email) throws TechnicalException {
-    return getByEmail(email);
-  }
-
   public User getByEmail(String email) throws TechnicalException {
     return doGetRequestForObject(String.format("%s?email=%s", baseEndpoint, email));
   }

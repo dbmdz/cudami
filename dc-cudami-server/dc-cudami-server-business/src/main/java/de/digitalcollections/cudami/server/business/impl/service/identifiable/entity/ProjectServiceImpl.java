@@ -44,7 +44,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     // Step 1: Retrieve all identifiers for the project
     Set<Identifier> identifiers;
 
-    Project existingProject = get(uuid);
+    Project existingProject = getByUuid(uuid);
     if (existingProject != null) {
       identifiers = existingProject.getIdentifiers();
     } else {

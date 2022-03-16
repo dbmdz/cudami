@@ -63,6 +63,11 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
+  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
+    return ((NodeRepository<Webpage>) repository).findRootNodes(searchPageRequest);
+  }
+
+  @Override
   public SearchPageResponse<Webpage> findRootPagesForWebsite(
       UUID websiteUuid, SearchPageRequest pageRequest) {
     return ((WebpageRepository) repository).findRootPagesForWebsite(websiteUuid, pageRequest);
@@ -70,13 +75,13 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
   //  @Override
-  //  public Webpage get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-  //    Webpage webpage = super.get(uuid, locale);
+  //  public Webpage getByIdentifier(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  //    Webpage webpage = super.getByIdentifier(uuid, locale);
   //    if (webpage == null) {
   //      return null;
   //    }
   //
-  //    // get the already filtered language to compare with
+  //    // getByIdentifier the already filtered language to compare with
   //    Locale fLocale = webpage.getLabel().entrySet().iterator().next().getKey();
   //    // filter out not requested translations of fields not already filtered
   //    if (webpage.getText() != null) {
@@ -88,7 +93,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public Webpage getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
-    Webpage webpage = ((WebpageRepository) repository).findOne(uuid, filtering);
+    Webpage webpage = ((WebpageRepository) repository).getByUuidAndFiltering(uuid, filtering);
     if (webpage != null) {
       webpage.setChildren(getActiveChildren(uuid));
     }
@@ -110,14 +115,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public List<Webpage> getActiveChildrenTree(UUID uuid) {
-    List<Webpage> webpages = getActiveChildren(uuid);
-    return webpages.stream()
-        .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
-        .collect(Collectors.toList());
-  }
-
-  @Override
   public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
@@ -125,10 +122,10 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public List<Webpage> getChildrenTree(UUID uuid) {
-    List<Webpage> webpages = getChildren(uuid);
+  public List<Webpage> getActiveChildrenTree(UUID uuid) {
+    List<Webpage> webpages = getActiveChildren(uuid);
     return webpages.stream()
-        .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
+        .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
         .collect(Collectors.toList());
   }
 
@@ -150,6 +147,14 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
     return ((NodeRepository<Webpage>) repository).getChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public List<Webpage> getChildrenTree(UUID uuid) {
+    List<Webpage> webpages = getChildren(uuid);
+    return webpages.stream()
+        .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -190,6 +195,16 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
+  public Webpage save(Webpage identifiable)
+      throws IdentifiableServiceException, ValidationException {
+    if (identifiable.getLocalizedUrlAliases() != null
+        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
+      validate(identifiable.getLocalizedUrlAliases());
+    }
+    return super.save(identifiable);
+  }
+
+  @Override
   public Webpage saveWithParent(UUID childUuid, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
@@ -216,26 +231,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
-    return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parentUuid, children);
-  }
-
-  @Override
-  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Webpage>) repository).findRootNodes(searchPageRequest);
-  }
-
-  @Override
-  public Webpage save(Webpage identifiable)
-      throws IdentifiableServiceException, ValidationException {
-    if (identifiable.getLocalizedUrlAliases() != null
-        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
-      validate(identifiable.getLocalizedUrlAliases());
-    }
-    return super.save(identifiable);
-  }
-
-  @Override
   public Webpage update(Webpage identifiable)
       throws IdentifiableServiceException, ValidationException {
     if (identifiable.getLocalizedUrlAliases() != null
@@ -243,6 +238,11 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       validate(identifiable.getLocalizedUrlAliases());
     }
     return super.update(identifiable);
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Webpage> children) {
+    return ((NodeRepository<Webpage>) repository).updateChildrenOrder(parentUuid, children);
   }
 
   private void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException {

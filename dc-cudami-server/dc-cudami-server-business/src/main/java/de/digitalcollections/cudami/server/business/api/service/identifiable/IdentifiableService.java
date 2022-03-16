@@ -102,13 +102,13 @@ public interface IdentifiableService<I extends Identifiable> {
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  I get(Identifier identifier);
-
-  I get(UUID uuid);
-
-  I get(UUID uuid, Locale locale) throws IdentifiableServiceException;
+  I getByIdentifier(Identifier identifier);
 
   I getByIdentifier(String namespace, String id);
+
+  I getByUuid(UUID uuid);
+
+  I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException;
 
   List<Locale> getLanguages();
 

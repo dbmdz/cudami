@@ -25,8 +25,8 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
   }
 
   @Override
-  public RenderingTemplate findOne(UUID uuid) {
-    return repository.findOne(uuid);
+  public RenderingTemplate getByUuid(UUID uuid) {
+    return repository.getByUuid(uuid);
   }
 
   @Override

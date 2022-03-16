@@ -25,18 +25,18 @@ import org.springframework.stereotype.Repository;
 public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements IdentifierRepository {
 
   public static final String MAPPING_PREFIX = "id";
-  public static final String TABLE_ALIAS = "id";
-  public static final String TABLE_NAME = "identifiers";
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, identifiable, namespace, identifier, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
+  public static final String TABLE_ALIAS = "id";
   public static final String SQL_REDUCED_FIELDS_ID =
       String.format(
           " %1$s.uuid %2$s_uuid, %1$s.created %2$s_created, %1$s.identifiable %2$s_identifiable, %1$s.namespace %2$s_namespace, %1$s.identifier %2$s_id, %1$s.last_modified %2$s_lastModified",
           TABLE_ALIAS, MAPPING_PREFIX);
   public static final String SQL_FULL_FIELDS_ID = SQL_REDUCED_FIELDS_ID;
+  public static final String TABLE_NAME = "identifiers";
 
   @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -165,7 +165,12 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public Identifier findOne(String namespace, String id) {
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("id", "identifiable", "namespace"));
+  }
+
+  @Override
+  public Identifier getByNamespaceAndId(String namespace, String id) {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_ID
@@ -185,11 +190,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                     .findOne()
                     .orElse(null));
     return identifier;
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("id", "identifiable", "namespace"));
   }
 
   @Override

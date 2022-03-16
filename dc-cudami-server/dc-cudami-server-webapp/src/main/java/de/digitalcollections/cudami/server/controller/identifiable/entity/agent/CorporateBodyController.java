@@ -74,38 +74,6 @@ public class CorporateBodyController {
     return corporateBodyService.find(searchPageRequest);
   }
 
-  @Operation(summary = "Get a corporate body by uuid")
-  @GetMapping(
-      value = {
-        "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<CorporateBody> get(
-      @Parameter(
-              example = "",
-              description =
-                  "UUID of the corporate body, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-
-    CorporateBody corporateBody;
-    if (pLocale == null) {
-      corporateBody = corporateBodyService.get(uuid);
-    } else {
-      corporateBody = corporateBodyService.get(uuid, pLocale);
-    }
-    return new ResponseEntity<>(corporateBody, HttpStatus.OK);
-  }
-
   @Operation(summary = "Get corporate body by namespace and id")
   @GetMapping(
       value = {
@@ -134,6 +102,38 @@ public class CorporateBodyController {
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
       throws IdentifiableServiceException {
     return corporateBodyService.getByRefId(refId);
+  }
+
+  @Operation(summary = "Get a corporate body by uuid")
+  @GetMapping(
+      value = {
+        "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<CorporateBody> getByUuid(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the corporate body, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+
+    CorporateBody corporateBody;
+    if (pLocale == null) {
+      corporateBody = corporateBodyService.getByUuid(uuid);
+    } else {
+      corporateBody = corporateBodyService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(corporateBody, HttpStatus.OK);
   }
 
   @Operation(summary = "Get languages of all corporatebodies")

@@ -27,8 +27,8 @@ public class VersionController {
   @GetMapping(
       value = {"/v5/versions/{uuid}", "/v2/versions/{uuid}", "/latest/versions/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Version findById(@PathVariable UUID uuid) {
-    return versionService.get(uuid);
+  public Version getByUuid(@PathVariable UUID uuid) {
+    return versionService.getByUuid(uuid);
   }
 
   @Operation(summary = "Update the version status")

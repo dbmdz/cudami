@@ -81,40 +81,9 @@ public class WorkController {
         "/latest/works/identifier/{namespace}:{id}",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Work> findByIdentifier(
+  public ResponseEntity<Work> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     Work result = workService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a work by uuid")
-  @GetMapping(
-      value = {
-        "/v5/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Work> get(
-      @Parameter(
-              example = "",
-              description = "UUID of the work, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-
-    Work result;
-    if (pLocale == null) {
-      result = workService.get(uuid);
-    } else {
-      result = workService.get(uuid, pLocale);
-    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -134,6 +103,57 @@ public class WorkController {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+  }
+
+  @Operation(summary = "Get a work by uuid")
+  @GetMapping(
+      value = {
+        "/v5/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Work> getByUuid(
+      @Parameter(
+              example = "",
+              description = "UUID of the work, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+
+    Work result;
+    if (pLocale == null) {
+      result = workService.getByUuid(uuid);
+    } else {
+      result = workService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get creators of a work")
+  @GetMapping(
+      value = {
+        "/v5/works/{uuid}/creators",
+        "/v2/works/{uuid}/creators",
+        "/latest/works/{uuid}/creators"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Agent> getCreators(@PathVariable UUID uuid) {
+    return workService.getCreators(uuid);
+  }
+
+  @Operation(summary = "Get items of a work")
+  @GetMapping(
+      value = {"/v5/works/{uuid}/items", "/v2/works/{uuid}/items", "/latest/works/{uuid}/items"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Item> getItems(@PathVariable UUID uuid) {
+    return workService.getItems(uuid);
   }
 
   @Operation(summary = "save a newly created work")
@@ -156,25 +176,5 @@ public class WorkController {
     }
 
     return workService.update(work);
-  }
-
-  @Operation(summary = "Get creators of a work")
-  @GetMapping(
-      value = {
-        "/v5/works/{uuid}/creators",
-        "/v2/works/{uuid}/creators",
-        "/latest/works/{uuid}/creators"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Agent> getCreators(@PathVariable UUID uuid) {
-    return workService.getCreators(uuid);
-  }
-
-  @Operation(summary = "Get items of a work")
-  @GetMapping(
-      value = {"/v5/works/{uuid}/items", "/v2/works/{uuid}/items", "/latest/works/{uuid}/items"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Item> getItems(@PathVariable UUID uuid) {
-    return workService.getItems(uuid);
   }
 }

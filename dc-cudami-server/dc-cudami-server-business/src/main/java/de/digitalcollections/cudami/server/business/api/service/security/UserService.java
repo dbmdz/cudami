@@ -23,11 +23,11 @@ public interface UserService<T extends User> {
 
   boolean doesActiveAdminUserExist();
 
+  PageResponse<T> find(PageRequest pageRequest);
+
   List<T> findActiveAdminUsers();
 
-  T get(UUID uuid);
-
-  PageResponse<T> find(PageRequest pageRequest);
+  T getByUuid(UUID uuid);
 
   T loadUserByUsername(String string) throws UsernameNotFoundException;
 

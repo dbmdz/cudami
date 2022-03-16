@@ -41,11 +41,6 @@ public class DigitalObjectsController extends AbstractController {
     this.service = client.forDigitalObjects();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "digitalobjects";
-  }
-
   @GetMapping("/api/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> findAll(
@@ -55,26 +50,6 @@ public class DigitalObjectsController extends AbstractController {
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     return service.find(searchPageRequest);
-  }
-
-  @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
-  @ResponseBody
-  public DigitalObject findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws TechnicalException {
-    return service.getByIdentifier(namespace, id);
-  }
-
-  @GetMapping(
-      "/api/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
-  @ResponseBody
-  public DigitalObject get(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
-  @GetMapping("/api/digitalobjects/{refId:[0-9]+}")
-  @ResponseBody
-  public DigitalObject getByRefId(@PathVariable long refId) throws TechnicalException {
-    return service.getByRefId(refId);
   }
 
   @GetMapping(
@@ -105,6 +80,26 @@ public class DigitalObjectsController extends AbstractController {
     return this.service.getProjects(uuid, searchPageRequest);
   }
 
+  @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
+  @ResponseBody
+  public DigitalObject getByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws TechnicalException {
+    return service.getByIdentifier(namespace, id);
+  }
+
+  @GetMapping("/api/digitalobjects/{refId:[0-9]+}")
+  @ResponseBody
+  public DigitalObject getByRefId(@PathVariable long refId) throws TechnicalException {
+    return service.getByRefId(refId);
+  }
+
+  @GetMapping(
+      "/api/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @ResponseBody
+  public DigitalObject getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
+  }
+
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -112,6 +107,11 @@ public class DigitalObjectsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "digitalobjects/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "digitalobjects";
   }
 
   @GetMapping("/api/digitalobjects/search")

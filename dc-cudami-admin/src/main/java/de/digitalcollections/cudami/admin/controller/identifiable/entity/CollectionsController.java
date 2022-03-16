@@ -54,11 +54,6 @@ public class CollectionsController extends AbstractController {
     this.service = client.forCollections();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "collections";
-  }
-
   @PostMapping("/api/collections/{uuid}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
@@ -156,16 +151,6 @@ public class CollectionsController extends AbstractController {
     return service.getDigitalObjects(uuid, searchPageRequest);
   }
 
-  @GetMapping({
-    "/api/collections/identifier/{namespace}:{id}",
-    "/api/subcollections/identifier/{namespace}:{id}"
-  })
-  @ResponseBody
-  public Collection findOneByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws TechnicalException {
-    return service.getByIdentifier(namespace, id);
-  }
-
   @GetMapping("/api/collections/{uuid}/subcollections")
   @ResponseBody
   public PageResponse<Collection> findSubcollections(
@@ -179,18 +164,28 @@ public class CollectionsController extends AbstractController {
   }
 
   @GetMapping({
-    "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-    "/api/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+    "/api/collections/identifier/{namespace}:{id}",
+    "/api/subcollections/identifier/{namespace}:{id}"
   })
   @ResponseBody
-  public Collection get(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
+  public Collection getByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws TechnicalException {
+    return service.getByIdentifier(namespace, id);
   }
 
   @GetMapping({"/api/collections/{refId:[0-9]+}", "/api/subcollections/{refId:[0-9]+}"})
   @ResponseBody
   public Collection getByRefId(@PathVariable long refId) throws TechnicalException {
     return service.getByRefId(refId);
+  }
+
+  @GetMapping({
+    "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+    "/api/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+  })
+  @ResponseBody
+  public Collection getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/collections")
@@ -200,6 +195,11 @@ public class CollectionsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
     return "collections/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "collections";
   }
 
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")

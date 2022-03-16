@@ -81,37 +81,9 @@ public class GeoLocationController {
         "/latest/geolocations/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GeoLocation> findByIdentifier(
+  public ResponseEntity<GeoLocation> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a geolocation by uuid")
-  @GetMapping(
-      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GeoLocation> get(
-      @Parameter(
-              example = "",
-              description =
-                  "UUID of the geolocation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-
-    GeoLocation result;
-    if (pLocale == null) {
-      result = geoLocationService.get(uuid);
-    } else {
-      result = geoLocationService.get(uuid, pLocale);
-    }
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
@@ -131,6 +103,34 @@ public class GeoLocationController {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+  }
+
+  @Operation(summary = "Get a geolocation by uuid")
+  @GetMapping(
+      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<GeoLocation> getByUuid(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the geolocation, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+
+    GeoLocation result;
+    if (pLocale == null) {
+      result = geoLocationService.getByUuid(uuid);
+    } else {
+      result = geoLocationService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @Operation(summary = "Get languages of all geolocations")

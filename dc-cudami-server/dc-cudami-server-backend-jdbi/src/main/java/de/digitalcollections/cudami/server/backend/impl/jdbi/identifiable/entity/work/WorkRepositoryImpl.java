@@ -87,8 +87,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work findOne(UUID uuid, Filtering filtering) {
-    Work work = super.findOne(uuid, filtering);
+  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Work work = super.getByUuidAndFiltering(uuid, filtering);
 
     if (work != null) {
       List<Agent> creators = getCreators(uuid);
@@ -98,8 +98,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work findOne(Identifier identifier) {
-    Work work = super.findOne(identifier);
+  public Work getByIdentifier(Identifier identifier) {
+    Work work = super.getByIdentifier(identifier);
 
     if (work != null) {
       List<Agent> creators = getCreators(work.getUuid());
@@ -171,7 +171,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     List<Agent> creators = work.getCreators();
     saveCreatorsList(work, creators);
 
-    Work result = findOne(work.getUuid());
+    Work result = getByUuid(work.getUuid());
     return result;
   }
 
@@ -212,7 +212,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     List<Agent> creators = work.getCreators();
     saveCreatorsList(work, creators);
 
-    Work result = findOne(work.getUuid());
+    Work result = getByUuid(work.getUuid());
     return result;
   }
 }
