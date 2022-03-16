@@ -24,6 +24,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsC
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
+import de.digitalcollections.cudami.client.identifiable.resource.CudamiLinkedDataFileResourcesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
@@ -57,6 +58,7 @@ public class CudamiClient {
   private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
   private final CudamiItemsClient cudamiItemsClient;
   private final CudamiLicensesClient cudamiLicensesClient;
+  private final CudamiLinkedDataFileResourcesClient cudamiLinkedDataFileResourcesClient;
   private final CudamiLocalesClient cudamiLocalesClient;
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
@@ -109,6 +111,8 @@ public class CudamiClient {
         new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
     this.cudamiItemsClient = new CudamiItemsClient(http, cudamiServerUrl, mapper);
     this.cudamiLicensesClient = new CudamiLicensesClient(http, cudamiServerUrl, mapper);
+    this.cudamiLinkedDataFileResourcesClient =
+        new CudamiLinkedDataFileResourcesClient(http, cudamiServerUrl, mapper);
     this.cudamiLocalesClient = new CudamiLocalesClient(http, cudamiServerUrl, mapper);
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
@@ -197,6 +201,10 @@ public class CudamiClient {
 
   public CudamiLicensesClient forLicenses() {
     return cudamiLicensesClient;
+  }
+
+  public CudamiLinkedDataFileResourcesClient forLinkedDataFileResources() {
+    return cudamiLinkedDataFileResourcesClient;
   }
 
   public CudamiLocalesClient forLocales() {

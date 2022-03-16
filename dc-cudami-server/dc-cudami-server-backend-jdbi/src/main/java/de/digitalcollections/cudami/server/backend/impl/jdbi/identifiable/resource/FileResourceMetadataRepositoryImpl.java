@@ -135,6 +135,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         return tableAlias + ".mimetype";
       case "sizeInBytes":
         return tableAlias + ".size_in_bytes";
+      case "uri":
+        return tableAlias + ".uri";
       default:
         return null;
     }

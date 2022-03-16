@@ -14,6 +14,7 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
@@ -105,6 +106,16 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
+    return ((DigitalObjectRepository) repository).getLinkedDataFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
+    return ((DigitalObjectRepository) repository).getRenderingFileResources(digitalObjectUuid);
+  }
+
+  @Override
   public Item getItem(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getItem(digitalObjectUuid);
   }
@@ -130,5 +141,19 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
         .saveFileResources(digitalObjectUuid, fileResources);
+  }
+
+  @Override
+  public List<FileResource> saveRenderingResources(
+      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+    return ((DigitalObjectRepository) repository)
+        .saveRenderingResources(digitalObjectUuid, renderingResources);
+  }
+
+  @Override
+  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
+    return ((DigitalObjectRepository) repository)
+        .saveLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
   }
 }
