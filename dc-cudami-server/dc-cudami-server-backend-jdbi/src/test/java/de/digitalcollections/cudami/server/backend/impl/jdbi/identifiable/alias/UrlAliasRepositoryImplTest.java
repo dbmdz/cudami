@@ -109,8 +109,8 @@ public class UrlAliasRepositoryImplTest {
   @DisplayName("Retrieve object by UUID")
   @Order(2)
   @Test
-  public void findOne() throws UrlAliasRepositoryException {
-    UrlAlias found = this.repo.findOne(this.urlAliasWithWebsite.getUuid());
+  public void getByUuid() throws UrlAliasRepositoryException {
+    UrlAlias found = this.repo.getByUuid(this.urlAliasWithWebsite.getUuid());
     assertEquals(found, this.urlAliasWithWebsite);
   }
 

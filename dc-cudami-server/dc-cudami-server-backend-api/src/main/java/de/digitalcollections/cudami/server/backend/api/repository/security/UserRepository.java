@@ -17,9 +17,9 @@ public interface UserRepository {
 
   List<User> findActiveAdminUsers();
 
-  User findByEmail(String email);
+  User getByEmail(String email);
 
-  User findOne(UUID uuid);
+  User getByUuid(UUID uuid);
 
   User save(User user);
 

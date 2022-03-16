@@ -29,64 +29,6 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   @MockBean private LocaleService localeService;
   @MockBean private WebpageService webpageService;
 
-  // TODO: test /latest/webpages/<uuid>/children
-  // TODO: test webpages and webpages/childen with active flag
-  // TODO: test latest/webpages/<uuid>/childrentree with and withput active flag
-  @DisplayName("returns a webpage in explicit (url) v3 json format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?pLocale=de_DE"
-      })
-  public void returnWebpageV3JsonUrl(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-    testJson(path);
-  }
-
-  @DisplayName("returns a webpage in explicit (accept header) v3 json format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
-      })
-  public void returnWebpageV3JsonAcceptHeader(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-    testJson(path);
-  }
-
-  @DisplayName("returns a webpage in default v3 json format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
-      })
-  public void returnWebpageV3JsonDefault(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-    testJson(path);
-  }
-
-  @DisplayName("does not return a non active webpage")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true&pLocale=de_DE"
-      })
-  public void returnNoNonActive(String path) throws Exception {
-    when(webpageService.getActive(any(UUID.class))).thenReturn(null);
-    when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(null);
-    testNotFound(path);
-  }
-
   @DisplayName("returns active webpage")
   @ParameterizedTest
   @ValueSource(
@@ -99,36 +41,6 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
     when(webpageService.getActive(any(UUID.class))).thenReturn(expected);
     when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(expected);
     testJson(path);
-  }
-
-  @DisplayName("returns a webpage in explicit (url) v3 xml format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.xml",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.xml?pLocale=de_DE"
-      })
-  @Disabled("does not support XML results any more since they were never used")
-  public void returnWebpageV3XmlUrl(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-    testXml(path);
-  }
-
-  @DisplayName("returns a webpage in explicit (accept header) v3 xml format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
-        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
-      })
-  @Disabled("does not support XML results any more since they were never used")
-  public void returnWebpageV3XmlAcceptHeader(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
-    testXml(path);
   }
 
   @DisplayName("returns the (active) children of a webpage")
@@ -191,6 +103,19 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
     testJson(path.replaceAll("latest", "v3")); // v3 equals latest
   }
 
+  @DisplayName("does not return a non active webpage")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true&pLocale=de_DE"
+      })
+  public void returnNoNonActive(String path) throws Exception {
+    when(webpageService.getActive(any(UUID.class))).thenReturn(null);
+    when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(null);
+    testNotFound(path);
+  }
+
   @DisplayName("keeps the sorting order of the children of a webpage")
   @ParameterizedTest
   @ValueSource(
@@ -249,6 +174,85 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
     when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
     testJson(path, "/v3/webpages/news.json");
+  }
+
+  @DisplayName("returns a webpage in explicit (accept header) v3 json format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
+      })
+  public void returnWebpageV3JsonAcceptHeader(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testJson(path);
+  }
+
+  @DisplayName("returns a webpage in default v3 json format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
+      })
+  public void returnWebpageV3JsonDefault(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testJson(path);
+  }
+  // TODO: test /latest/webpages/<uuid>/children
+  // TODO: test webpages and webpages/childen with active flag
+  // TODO: test latest/webpages/<uuid>/childrentree with and withput active flag
+  @DisplayName("returns a webpage in explicit (url) v3 json format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json?pLocale=de_DE"
+      })
+  public void returnWebpageV3JsonUrl(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testJson(path);
+  }
+
+  @DisplayName("returns a webpage in explicit (accept header) v3 xml format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?pLocale=de_DE"
+      })
+  @Disabled("does not support XML results any more since they were never used")
+  public void returnWebpageV3XmlAcceptHeader(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testXml(path);
+  }
+
+  @DisplayName("returns a webpage in explicit (url) v3 xml format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.xml",
+        "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.xml?pLocale=de_DE"
+      })
+  @Disabled("does not support XML results any more since they were never used")
+  public void returnWebpageV3XmlUrl(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testXml(path);
   }
 
   @DisplayName("returns a webpage with a tree of its children")

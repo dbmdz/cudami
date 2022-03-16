@@ -19,13 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserServiceTest {
 
-  private User user;
-
   CudamiClient cudamiClient = Mockito.mock(CudamiClient.class);
-  CudamiUsersClient userRepository = Mockito.mock(CudamiUsersClient.class);
   MessageSource messageSource = Mockito.mock(MessageSource.class);
 
   UserService service;
+  private User user;
+  CudamiUsersClient userRepository = Mockito.mock(CudamiUsersClient.class);
 
   @BeforeEach
   public void setup() throws Exception {
@@ -35,7 +34,7 @@ public class UserServiceTest {
     Mockito.when(cudamiClient.forUsers()).thenReturn(userRepository);
     Mockito.when(messageSource.getMessage(Mockito.any(), Mockito.any(), Mockito.any()))
         .thenReturn("foobar");
-    Mockito.when(userRepository.findOneByEmail("foo@spar.org")).thenReturn(user);
+    Mockito.when(userRepository.getByEmail("foo@spar.org")).thenReturn(user);
     service = new UserServiceImpl(null, cudamiClient, messageSource);
   }
 
@@ -45,15 +44,15 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testLoadUserByUsername() throws Exception {
-    UserDetails retrieved = service.loadUserByUsername("foo@spar.org");
-    assertThat(retrieved.getUsername()).isEqualTo(user.getEmail());
-    Mockito.verify(userRepository, VerificationModeFactory.times(1)).findOneByEmail("foo@spar.org");
-  }
-
-  @Test
   public void testGetPasswordHash() throws Exception {
     PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
     assertThat(pwEncoder.matches("foobar", user.getPasswordHash())).isTrue();
+  }
+
+  @Test
+  public void testLoadUserByUsername() throws Exception {
+    UserDetails retrieved = service.loadUserByUsername("foo@spar.org");
+    assertThat(retrieved.getUsername()).isEqualTo(user.getEmail());
+    Mockito.verify(userRepository, VerificationModeFactory.times(1)).getByEmail("foo@spar.org");
   }
 }

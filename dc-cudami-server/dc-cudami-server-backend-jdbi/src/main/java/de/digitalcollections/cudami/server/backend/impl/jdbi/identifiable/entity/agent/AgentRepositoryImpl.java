@@ -74,14 +74,14 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   @Override
   public Agent save(Agent agent) {
     super.save(agent);
-    Agent result = findOne(agent.getUuid());
+    Agent result = getByUuid(agent.getUuid());
     return result;
   }
 
   @Override
   public Agent update(Agent agent) {
     super.update(agent);
-    Agent result = findOne(agent.getUuid());
+    Agent result = getByUuid(agent.getUuid());
     return result;
   }
 }

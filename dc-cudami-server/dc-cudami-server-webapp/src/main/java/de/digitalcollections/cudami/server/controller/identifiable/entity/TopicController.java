@@ -112,74 +112,6 @@ public class TopicController {
     return topicService.findRootNodes(searchPageRequest);
   }
 
-  @Operation(summary = "Get topic by uuid (and optional locale)")
-  @GetMapping(
-      value = {
-        "/v5/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Topic> findById(
-      @Parameter(
-              example = "",
-              description = "UUID of the topic, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale)
-      throws IdentifiableServiceException {
-    Topic topic;
-    if (pLocale == null) {
-      topic = topicService.get(uuid);
-    } else {
-      topic = topicService.get(uuid, pLocale);
-    }
-    return new ResponseEntity<>(topic, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get topic by refId")
-  @GetMapping(
-      value = {
-        "/v5/topics/{refId:[0-9]+}",
-        "/v3/topics/{refId:[0-9]+}",
-        "/latest/topics/{refId:[0-9]+}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Topic> findByRefId(
-      @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
-          @PathVariable
-          long refId)
-      throws IdentifiableServiceException {
-    Topic topic = topicService.getByRefId(refId);
-    return findById(topic.getUuid(), null);
-  }
-
-  @Operation(summary = "Get paged subtopics of a topic")
-  @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/subtopics",
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Topic> getSubtopics(
-      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
-          UUID topicUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return topicService.findChildren(topicUuid, searchPageRequest);
-  }
-
   @Operation(summary = "Get the breadcrumb for a topic")
   @GetMapping(
       value = {
@@ -215,6 +147,53 @@ public class TopicController {
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get topic by refId")
+  @GetMapping(
+      value = {
+        "/v5/topics/{refId:[0-9]+}",
+        "/v3/topics/{refId:[0-9]+}",
+        "/latest/topics/{refId:[0-9]+}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Topic> getByRefId(
+      @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
+          @PathVariable
+          long refId)
+      throws IdentifiableServiceException {
+    Topic topic = topicService.getByRefId(refId);
+    return getByUuid(topic.getUuid(), null);
+  }
+
+  @Operation(summary = "Get topic by uuid (and optional locale)")
+  @GetMapping(
+      value = {
+        "/v5/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Topic> getByUuid(
+      @Parameter(
+              example = "",
+              description = "UUID of the topic, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale)
+      throws IdentifiableServiceException {
+    Topic topic;
+    if (pLocale == null) {
+      topic = topicService.getByUuid(uuid);
+    } else {
+      topic = topicService.getByUuidAndLocale(uuid, pLocale);
+    }
+    return new ResponseEntity<>(topic, HttpStatus.OK);
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -307,6 +286,27 @@ public class TopicController {
     return topicService.getParent(uuid);
   }
 
+  @Operation(summary = "Get paged subtopics of a topic")
+  @GetMapping(
+      value = {
+        "/v5/topics/{uuid}/subtopics",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Topic> getSubtopics(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    return topicService.findChildren(topicUuid, searchPageRequest);
+  }
+
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
       value = {"/v2/topics/{uuid}/subtopics"},
@@ -315,6 +315,18 @@ public class TopicController {
     return new ResponseEntity<>(
         "no longer supported. use '/v3/topics/{uuid}/children' endpoint, returning list of child-topics",
         HttpStatus.GONE);
+  }
+
+  @Operation(summary = "Get languages of all top topics")
+  @GetMapping(
+      value = {
+        "/v5/topics/top/languages",
+        "/v3/topics/top/languages",
+        "/latest/topics/top/languages"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getTopTopicsLanguages() {
+    return topicService.getRootNodesLanguages();
   }
 
   @Operation(summary = "Get topics an entity is linked to")
@@ -339,18 +351,6 @@ public class TopicController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
     return topicService.getTopicsOfFileResource(uuid);
-  }
-
-  @Operation(summary = "Get languages of all top topics")
-  @GetMapping(
-      value = {
-        "/v5/topics/top/languages",
-        "/v3/topics/top/languages",
-        "/latest/topics/top/languages"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getTopTopicsLanguages() {
-    return topicService.getRootNodesLanguages();
   }
 
   @Operation(summary = "Remove child-relation of the given subtopic to the given parent topic")

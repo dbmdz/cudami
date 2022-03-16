@@ -18,19 +18,6 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
 
   @MockBean private WebpageService webpageService;
 
-  @DisplayName("returns a webpage in v1 json format for UUID")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
-        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
-      })
-  public void returnWebpageV1Json(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    testJson(path);
-  }
-
   @DisplayName("returns a localized webpage in v1 json format for UUID")
   @ParameterizedTest
   @ValueSource(
@@ -40,7 +27,21 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnLocalizedWebpageV1Json(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testJson(path);
+  }
+
+  @DisplayName("returns a webpage in v1 json format for UUID")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
+        "/v1/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
+      })
+  public void returnWebpageV1Json(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }
 
@@ -54,7 +55,7 @@ class V1WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWrongLocalizedWebpageV1Json(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }
 }

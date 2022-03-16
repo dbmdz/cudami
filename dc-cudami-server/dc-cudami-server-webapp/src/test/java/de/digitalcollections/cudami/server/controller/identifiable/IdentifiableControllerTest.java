@@ -30,23 +30,13 @@ public class IdentifiableControllerTest extends BaseControllerTest {
 
   @MockBean private UrlAliasService urlAliasService;
 
-  @DisplayName("returns a 404, when an identifiable could not be found")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
-  public void nonexistingUrlAlias(String path) throws Exception {
-    when(identifiableService.get(any(UUID.class))).thenReturn(null);
-
-    testNotFound(path);
-  }
-
   @DisplayName("can return an empty LocalizedUrlAlias")
   @ParameterizedTest
   @ValueSource(
       strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
   public void emptyLocalizedUrlAlias(String path) throws Exception {
     Identifiable dummyIdentifiable = mock(Identifiable.class);
-    when(identifiableService.get(any(UUID.class))).thenReturn(dummyIdentifiable);
+    when(identifiableService.getByUuid(any(UUID.class))).thenReturn(dummyIdentifiable);
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
 
@@ -59,7 +49,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
       strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
   public void localizedUrlAlias(String path) throws Exception {
     Identifiable dummyIdentifiable = mock(Identifiable.class);
-    when(identifiableService.get(any(UUID.class))).thenReturn(dummyIdentifiable);
+    when(identifiableService.getByUuid(any(UUID.class))).thenReturn(dummyIdentifiable);
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     UrlAlias urlAlias1 =
         new UrlAliasBuilder()
@@ -91,5 +81,15 @@ public class IdentifiableControllerTest extends BaseControllerTest {
     when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
 
     testJson(path, "/v5/identifiables/localizedUrlAliases.json");
+  }
+
+  @DisplayName("returns a 404, when an identifiable could not be found")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {"/v5/identifiables/12345678-1234-1234-1234-123456789012/localizedUrlAliases"})
+  public void nonexistingUrlAlias(String path) throws Exception {
+    when(identifiableService.getByUuid(any(UUID.class))).thenReturn(null);
+
+    testNotFound(path);
   }
 }

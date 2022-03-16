@@ -144,7 +144,7 @@ public class ProjectController {
         "/latest/projects/identifier/{namespace}:{id}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Project findByIdentifier(@PathVariable String namespace, @PathVariable String id)
+  public Project getByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws IdentifiableServiceException {
     return projectService.getByIdentifier(namespace, id);
   }
@@ -153,7 +153,7 @@ public class ProjectController {
   @GetMapping(
       value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Project> findByUuid(
+  public ResponseEntity<Project> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -170,9 +170,9 @@ public class ProjectController {
 
     Project project;
     if (pLocale == null) {
-      project = projectService.get(uuid);
+      project = projectService.getByUuid(uuid);
     } else {
-      project = projectService.get(uuid, pLocale);
+      project = projectService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(project, HttpStatus.OK);
   }
@@ -192,6 +192,14 @@ public class ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
     return projectService.getDigitalObjects(project, searchPageRequest);
+  }
+
+  @Operation(summary = "Get languages of all projects")
+  @GetMapping(
+      value = {"/v5/projects/languages", "/v3/projects/languages", "/latest/projects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return projectService.getLanguages();
   }
 
   @Operation(summary = "Remove an existing digital object from an existing project")
@@ -263,13 +271,5 @@ public class ProjectController {
       throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, project.getUuid());
     return projectService.update(project);
-  }
-
-  @Operation(summary = "Get languages of all projects")
-  @GetMapping(
-      value = {"/v5/projects/languages", "/v3/projects/languages", "/latest/projects/languages"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return projectService.getLanguages();
   }
 }

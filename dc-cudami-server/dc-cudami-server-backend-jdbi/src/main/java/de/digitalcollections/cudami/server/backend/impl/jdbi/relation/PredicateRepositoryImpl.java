@@ -61,7 +61,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
-  public Predicate findOneByValue(String value) {
+  public Predicate getByValue(String value) {
     String query =
         "SELECT "
             + SQL_FULL_FIELDS_PRED
@@ -109,7 +109,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public Predicate save(Predicate predicate) {
-    Predicate existingPredicate = findOneByValue(predicate.getValue());
+    Predicate existingPredicate = getByValue(predicate.getValue());
     if (existingPredicate != null) {
       predicate.setCreated(existingPredicate.getCreated());
     }
@@ -144,6 +144,6 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
       dbi.withHandle(h -> h.createUpdate(createQuery).bindBean(predicate).execute());
     }
 
-    return findOneByValue(predicate.getValue());
+    return getByValue(predicate.getValue());
   }
 }

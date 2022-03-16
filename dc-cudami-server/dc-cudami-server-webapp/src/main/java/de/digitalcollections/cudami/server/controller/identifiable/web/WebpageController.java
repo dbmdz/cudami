@@ -166,9 +166,9 @@ public class WebpageController {
       }
     } else {
       if (pLocale == null) {
-        webpage = webpageService.get(uuid);
+        webpage = webpageService.getByUuid(uuid);
       } else {
-        webpage = webpageService.get(uuid, pLocale);
+        webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
       }
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);

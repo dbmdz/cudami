@@ -40,13 +40,13 @@ public class VersionServiceImpl implements VersionService {
   }
 
   @Override
-  public Version get(UUID uuid) {
-    return repository.findOne(uuid);
+  public Version getByInstanceversionKey(String instanceVersionkey) {
+    return repository.getByInstanceversionKey(instanceVersionkey);
   }
 
   @Override
-  public Version getByInstanceversionKey(String instanceVersionkey) {
-    return repository.findOneByInstanceversionKey(instanceVersionkey);
+  public Version getByUuid(UUID uuid) {
+    return repository.getByUuid(uuid);
   }
 
   @Override

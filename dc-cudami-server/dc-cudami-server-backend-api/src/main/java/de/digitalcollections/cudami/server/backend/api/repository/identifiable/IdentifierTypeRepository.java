@@ -18,9 +18,9 @@ public interface IdentifierTypeRepository {
 
   PageResponse<IdentifierType> find(PageRequest pageRequest);
 
-  IdentifierType findOne(UUID uuid);
+  IdentifierType getByUuid(UUID uuid);
 
-  IdentifierType findOneByNamespace(String namespace);
+  IdentifierType getByNamespace(String namespace);
 
   IdentifierType save(IdentifierType identifier);
 

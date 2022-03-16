@@ -134,7 +134,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                         .build()))
             .build();
 
-    when(websiteService.get(any(UUID.class))).thenReturn(expected);
+    when(websiteService.getByUuid(any(UUID.class))).thenReturn(expected);
 
     testJson(path);
   }

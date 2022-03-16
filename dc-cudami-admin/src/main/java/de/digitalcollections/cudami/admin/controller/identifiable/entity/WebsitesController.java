@@ -47,11 +47,6 @@ public class WebsitesController extends AbstractController {
     this.service = client.forWebsites();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "websites";
-  }
-
   @GetMapping("/websites/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
@@ -112,7 +107,7 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/api/websites/{uuid}")
   @ResponseBody
-  public Website get(@PathVariable UUID uuid) throws TechnicalException {
+  public Website getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -123,6 +118,11 @@ public class WebsitesController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "websites/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "websites";
   }
 
   @PostMapping("/api/websites")

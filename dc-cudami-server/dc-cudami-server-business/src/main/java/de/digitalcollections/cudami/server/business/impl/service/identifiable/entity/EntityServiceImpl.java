@@ -90,7 +90,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   @Override
   public E getByRefId(long refId) {
-    return ((EntityRepository<E>) repository).findOneByRefId(refId);
+    return ((EntityRepository<E>) repository).getByRefId(refId);
   }
 
   @Override

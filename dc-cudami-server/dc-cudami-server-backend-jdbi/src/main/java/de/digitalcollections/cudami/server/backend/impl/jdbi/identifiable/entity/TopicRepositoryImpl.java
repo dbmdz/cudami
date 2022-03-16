@@ -158,8 +158,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic findOne(UUID uuid, Filtering filtering) {
-    Topic topic = super.findOne(uuid, filtering);
+  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Topic topic = super.getByUuidAndFiltering(uuid, filtering);
 
     if (topic != null) {
       topic.setChildren(getChildren(topic));
@@ -168,13 +168,26 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic findOne(Identifier identifier) {
-    Topic topic = super.findOne(identifier);
+  public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE ("
+            + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
+            + tableAlias
+            + ".uuid))";
 
-    if (topic != null) {
-      topic.setChildren(getChildren(topic));
+    String searchTerm = searchPageRequest.getQuery();
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-    return topic;
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
+    return find(searchPageRequest, commonSql, argumentMappings);
   }
 
   @Override
@@ -247,6 +260,16 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     }
 
     return new BreadcrumbNavigation(result);
+  }
+
+  @Override
+  public Topic getByIdentifier(Identifier identifier) {
+    Topic topic = super.getByIdentifier(identifier);
+
+    if (topic != null) {
+      topic.setChildren(getChildren(topic));
+    }
+    return topic;
   }
 
   @Override
@@ -476,29 +499,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE ("
-            + " NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
-            + tableAlias
-            + ".uuid))";
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(searchPageRequest, commonSql, argumentMappings);
-  }
-
-  @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
         "SELECT DISTINCT languages"
@@ -573,7 +573,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   @Override
   public Topic save(Topic topic) {
     super.save(topic);
-    Topic result = findOne(topic.getUuid());
+    Topic result = getByUuid(topic.getUuid());
     return result;
   }
 
@@ -651,13 +651,13 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 .bind("sortIndex", nextSortIndex)
                 .execute());
 
-    return findOne(childUuid);
+    return getByUuid(childUuid);
   }
 
   @Override
   public Topic update(Topic topic) {
     super.update(topic);
-    Topic result = findOne(topic.getUuid());
+    Topic result = getByUuid(topic.getUuid());
     return result;
   }
 

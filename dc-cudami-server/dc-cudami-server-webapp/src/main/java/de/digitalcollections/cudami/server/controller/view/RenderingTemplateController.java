@@ -55,8 +55,8 @@ public class RenderingTemplateController {
         "/latest/renderingtemplates/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public RenderingTemplate findOne(@PathVariable UUID uuid) {
-    return renderingTemplateService.findOne(uuid);
+  public RenderingTemplate getByUuid(@PathVariable UUID uuid) {
+    return renderingTemplateService.getByUuid(uuid);
   }
 
   @Operation(summary = "Save a newly created rendering template")

@@ -28,8 +28,9 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
   public void returnWebpageV1Html(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
 
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
 
     testHtml(path);
   }
@@ -43,8 +44,9 @@ public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV3Html(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
 
     testHtml(path);
   }

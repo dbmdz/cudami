@@ -40,14 +40,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
+  private CudamiConfig cudamiConfig;
+  protected IdentifierRepository identifierRepository;
 
   @Autowired private LocaleService localeService;
 
   protected IdentifiableRepository<I> repository;
-  protected IdentifierRepository identifierRepository;
 
   private UrlAliasService urlAliasService;
-  private CudamiConfig cudamiConfig;
 
   @Autowired
   public IdentifiableServiceImpl(
@@ -91,7 +91,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public boolean deleteIdentifiers(UUID identifiableUuid) {
-    I identifiable = repository.findOne(identifiableUuid);
+    I identifiable = repository.getByUuid(identifiableUuid);
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
@@ -139,25 +139,25 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I get(Identifier identifier) {
-    return repository.findOne(identifier);
-  }
-
-  @Override
-  public I get(UUID uuid) {
-    return repository.findOne(uuid);
-  }
-
-  @Override
-  public I get(UUID uuid, Locale locale) throws IdentifiableServiceException {
-    // get identifiable with all translations:
-    I identifiable = get(uuid);
-    return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
+  public I getByIdentifier(Identifier identifier) {
+    return repository.getByIdentifier(identifier);
   }
 
   @Override
   public I getByIdentifier(String namespace, String id) {
-    return repository.findOneByIdentifier(namespace, id);
+    return repository.getByIdentifier(namespace, id);
+  }
+
+  @Override
+  public I getByUuid(UUID uuid) {
+    return repository.getByUuid(uuid);
+  }
+
+  @Override
+  public I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+    // getByIdentifier identifiable with all translations:
+    I identifiable = getByUuid(uuid);
+    return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
   }
 
   @Override
@@ -196,7 +196,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     final Locale fLocale = locale; // needed final for following lambda expressions
 
     // filter out all translations not in requested locale
-    // TODO maybe a better solution to just get locale specific fields directly from
+    // TODO maybe a better solution to just getByIdentifier locale specific fields directly from
     // database/repository instead of removing it here?
     // filter label
     label.entrySet().removeIf(entry -> !entry.getKey().equals(fLocale));
@@ -281,7 +281,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
     I updatedIdentifiable, identifiableInDb;
     try {
-      identifiableInDb = repository.findOne(identifiable.getUuid());
+      identifiableInDb = repository.getByUuid(identifiable.getUuid());
       updatedIdentifiable = repository.update(identifiable);
       // save identifiers
       // as we store the whole list new: delete old entries

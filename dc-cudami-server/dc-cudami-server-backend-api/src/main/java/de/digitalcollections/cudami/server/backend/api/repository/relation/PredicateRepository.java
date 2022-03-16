@@ -23,7 +23,7 @@ public interface PredicateRepository {
    * @param value unique value of predicate, e.g. "is_part_of"
    * @return Predicate or null
    */
-  Predicate findOneByValue(String value);
+  Predicate getByValue(String value);
 
   /**
    * Save a predicate. Since its field <code>value</code> is its primary key, there's no difference,

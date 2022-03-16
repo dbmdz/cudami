@@ -249,7 +249,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public Headword findOne(UUID uuid, Filtering filtering) {
+  public Headword getByUuidAndFiltering(UUID uuid, Filtering filtering) {
     // basic query
     StringBuilder sqlQuery =
         new StringBuilder(
@@ -276,7 +276,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public Headword findOneByLabelAndLocale(String label, Locale locale) {
+  public Headword getByLabelAndLocale(String label, Locale locale) {
     // basic query
     StringBuilder sqlQuery =
         new StringBuilder(

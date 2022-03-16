@@ -46,16 +46,6 @@ public class UserController extends AbstractController {
     this.service = service;
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "users";
-  }
-
-  @ModelAttribute("allRoles")
-  protected List<Role> populateAllRoles() {
-    return Arrays.asList(Role.values());
-  }
-
   @GetMapping("/users/new")
   public String create() {
     return "users/create";
@@ -73,7 +63,7 @@ public class UserController extends AbstractController {
 
   @GetMapping("/users/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
-    model.addAttribute("user", service.findOne(uuid));
+    model.addAttribute("user", service.getByUuid(uuid));
     return "users/edit";
   }
 
@@ -89,13 +79,23 @@ public class UserController extends AbstractController {
 
   @GetMapping("/api/users/{uuid}")
   @ResponseBody
-  public User get(@PathVariable UUID uuid) throws ServiceException {
-    return this.service.findOne(uuid);
+  public User getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.getByUuid(uuid);
   }
 
   @GetMapping("/users")
   public String list() {
     return "users/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "users";
+  }
+
+  @ModelAttribute("allRoles")
+  protected List<Role> populateAllRoles() {
+    return Arrays.asList(Role.values());
   }
 
   @PostMapping("/api/users")
@@ -147,7 +147,7 @@ public class UserController extends AbstractController {
   @GetMapping("/users/updatePassword")
   public String updatePassword(Model model) throws ServiceException {
     User currentUser =
-        service.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        service.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
     model.addAttribute("user", currentUser);
     return "users/edit-password";
   }
@@ -187,7 +187,7 @@ public class UserController extends AbstractController {
   @GetMapping("/users/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
       throws ResourceNotFoundException, ServiceException {
-    User user = service.findOne(uuid);
+    User user = service.getByUuid(uuid);
     if (user == null) {
       throw new ResourceNotFoundException();
     }

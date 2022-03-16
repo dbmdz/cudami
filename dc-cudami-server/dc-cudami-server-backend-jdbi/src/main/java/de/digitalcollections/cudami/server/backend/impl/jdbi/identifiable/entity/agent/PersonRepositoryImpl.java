@@ -328,7 +328,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     // save family names
     List<FamilyName> familyNames = person.getFamilyNames();
     saveRelatedFamilyNames(familyNames, person);
-    Person result = findOne(person.getUuid());
+    Person result = getByUuid(person.getUuid());
     return result;
   }
 
@@ -405,7 +405,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
                 .bind("uuid", person.getUuid())
                 .execute());
     saveRelatedFamilyNames(familyNames, person);
-    Person result = findOne(person.getUuid());
+    Person result = getByUuid(person.getUuid());
     return result;
   }
 }

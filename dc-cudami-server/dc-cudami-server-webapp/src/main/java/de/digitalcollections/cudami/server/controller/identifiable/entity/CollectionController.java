@@ -201,74 +201,6 @@ public class CollectionController {
     return collectionService.findRootNodes(searchPageRequest);
   }
 
-  @Operation(summary = "Get a collection by namespace and id")
-  @GetMapping(
-      value = {
-        "/v5/collections/identifier/{namespace}:{id}",
-        "/v2/collections/identifier/{namespace}:{id}",
-        "/latest/collections/identifier/{namespace}:{id}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Collection findByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws IdentifiableServiceException {
-    return collectionService.getByIdentifier(namespace, id);
-  }
-
-  @Operation(summary = "Get a collection by refId")
-  @GetMapping(
-      value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Collection> findByRefId(
-      @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
-          @PathVariable
-          long refId)
-      throws IdentifiableServiceException {
-    Collection collection = collectionService.getByRefId(refId);
-    return findByUuid(collection.getUuid(), null, null);
-  }
-
-  @Operation(summary = "Get a collection by uuid")
-  @GetMapping(
-      value = {
-        "/v5/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Collection> findByUuid(
-      @Parameter(
-              example = "",
-              description =
-                  "UUID of the collection, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pLocale",
-              description =
-                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
-          @RequestParam(name = "pLocale", required = false)
-          Locale pLocale,
-      @Parameter(name = "active", description = "If set, object will only be returned if active")
-          @RequestParam(name = "active", required = false)
-          String active)
-      throws IdentifiableServiceException {
-    Collection collection;
-    if (active != null) {
-      if (pLocale == null) {
-        collection = collectionService.getActive(uuid);
-      } else {
-        collection = collectionService.getActive(uuid, pLocale);
-      }
-    } else {
-      if (pLocale == null) {
-        collection = collectionService.get(uuid);
-      } else {
-        collection = collectionService.get(uuid, pLocale);
-      }
-    }
-    return new ResponseEntity<>(collection, HttpStatus.OK);
-  }
-
   @Operation(
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
@@ -329,6 +261,74 @@ public class CollectionController {
     }
 
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a collection by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/collections/identifier/{namespace}:{id}",
+        "/v2/collections/identifier/{namespace}:{id}",
+        "/latest/collections/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Collection getByIdentifier(@PathVariable String namespace, @PathVariable String id)
+      throws IdentifiableServiceException {
+    return collectionService.getByIdentifier(namespace, id);
+  }
+
+  @Operation(summary = "Get a collection by refId")
+  @GetMapping(
+      value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Collection> getByRefId(
+      @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
+          @PathVariable
+          long refId)
+      throws IdentifiableServiceException {
+    Collection collection = collectionService.getByRefId(refId);
+    return getByUuid(collection.getUuid(), null, null);
+  }
+
+  @Operation(summary = "Get a collection by uuid")
+  @GetMapping(
+      value = {
+        "/v5/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Collection> getByUuid(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the collection, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pLocale",
+              description =
+                  "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
+          @RequestParam(name = "pLocale", required = false)
+          Locale pLocale,
+      @Parameter(name = "active", description = "If set, object will only be returned if active")
+          @RequestParam(name = "active", required = false)
+          String active)
+      throws IdentifiableServiceException {
+    Collection collection;
+    if (active != null) {
+      if (pLocale == null) {
+        collection = collectionService.getActive(uuid);
+      } else {
+        collection = collectionService.getActive(uuid, pLocale);
+      }
+    } else {
+      if (pLocale == null) {
+        collection = collectionService.getByUuid(uuid);
+      } else {
+        collection = collectionService.getByUuidAndLocale(uuid, pLocale);
+      }
+    }
+    return new ResponseEntity<>(collection, HttpStatus.OK);
   }
 
   @Operation(summary = "Get paged digital objects of a collection")

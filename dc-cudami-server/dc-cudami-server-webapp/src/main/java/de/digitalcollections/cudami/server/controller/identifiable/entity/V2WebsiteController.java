@@ -147,7 +147,7 @@ public class V2WebsiteController {
   @GetMapping(
       value = {"/v2/websites/{uuid}", "/v2/websites/{uuid}.json"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public String findById(
+  public String getByUuid(
       @Parameter(
               name = "uuid",
               description = "the UUID of the website",
@@ -156,7 +156,7 @@ public class V2WebsiteController {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException {
-    Website website = websiteService.get(uuid);
+    Website website = websiteService.getByUuid(uuid);
     if (website == null) {
       return null;
     }

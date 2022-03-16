@@ -71,8 +71,8 @@ public class IdentifierTypeController extends AbstractController {
 
   @GetMapping("/api/identifiertypes/{uuid}")
   @ResponseBody
-  public IdentifierType get(@PathVariable UUID uuid) throws TechnicalException {
-    return service.findOne(uuid);
+  public IdentifierType getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/identifiertypes")

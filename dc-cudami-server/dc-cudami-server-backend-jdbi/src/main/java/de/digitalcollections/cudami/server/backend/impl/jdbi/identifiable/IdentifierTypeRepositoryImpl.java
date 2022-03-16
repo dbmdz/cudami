@@ -85,7 +85,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType findOne(UUID uuid) {
+  public IdentifierType getByUuid(UUID uuid) {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_IDT
@@ -108,7 +108,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType findOneByNamespace(String namespace) {
+  public IdentifierType getByNamespace(String namespace) {
     final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
 
     IdentifierType identifierType =

@@ -34,7 +34,7 @@ class WebsiteControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
   public void websiteByUuid(String path) throws Exception {
-    when(websiteService.get(any(UUID.class))).thenReturn(null);
+    when(websiteService.getByUuid(any(UUID.class))).thenReturn(null);
 
     testNotFound(path);
   }

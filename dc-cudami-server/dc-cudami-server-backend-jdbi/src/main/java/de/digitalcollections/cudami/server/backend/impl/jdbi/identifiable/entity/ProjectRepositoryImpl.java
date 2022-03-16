@@ -195,7 +195,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public Project save(Project project) {
     super.save(project);
-    Project result = findOne(project.getUuid());
+    Project result = getByUuid(project.getUuid());
     return result;
   }
 
@@ -232,7 +232,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   @Override
   public Project update(Project project) {
     super.update(project);
-    Project result = findOne(project.getUuid());
+    Project result = getByUuid(project.getUuid());
     return result;
   }
 }

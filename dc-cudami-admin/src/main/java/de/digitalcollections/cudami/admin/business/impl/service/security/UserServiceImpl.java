@@ -121,18 +121,18 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public User findByEmail(String email) throws ServiceException {
+  public User getByEmail(String email) throws ServiceException {
     try {
-      return client.findOneByEmail(email);
+      return client.getByEmail(email);
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public User findOne(UUID uuid) throws ServiceException {
+  public User getByUuid(UUID uuid) throws ServiceException {
     try {
-      return client.findOne(uuid);
+      return client.getByUuid(uuid);
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user;
     try {
-      user = client.findOneByEmail(username);
+      user = client.getByEmail(username);
     } catch (TechnicalException ex) {
       throw new UsernameNotFoundException(
           String.format("User \"%s\" was not found.", username), ex);
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   @Override
   public boolean setStatus(UUID uuid, boolean enabled) {
     try {
-      User user = client.findOne(uuid);
+      User user = client.getByUuid(uuid);
       user.setEnabled(enabled);
       client.update(user.getUuid(), user);
       return true;

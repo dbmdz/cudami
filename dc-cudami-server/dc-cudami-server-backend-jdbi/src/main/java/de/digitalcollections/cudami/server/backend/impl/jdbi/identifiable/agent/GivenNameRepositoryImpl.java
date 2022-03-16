@@ -65,14 +65,14 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   @Override
   public GivenName save(GivenName givenName) {
     super.save(givenName);
-    GivenName result = findOne(givenName.getUuid());
+    GivenName result = getByUuid(givenName.getUuid());
     return result;
   }
 
   @Override
   public GivenName update(GivenName givenName) {
     super.update(givenName);
-    GivenName result = findOne(givenName.getUuid());
+    GivenName result = getByUuid(givenName.getUuid());
     return result;
   }
 }

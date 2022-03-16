@@ -18,9 +18,9 @@ public interface IdentifierTypeService {
 
   PageResponse<IdentifierType> find(PageRequest pageRequest);
 
-  IdentifierType get(UUID uuid);
-
   IdentifierType getByNamespace(String namespace);
+
+  IdentifierType getByUuid(UUID uuid);
 
   IdentifierType save(IdentifierType identifierType);
 

@@ -52,7 +52,7 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public RenderingTemplate findOne(UUID uuid) {
+  public RenderingTemplate getByUuid(UUID uuid) {
     String query =
         "SELECT "
             + SQL_FULL_FIELDS_RT

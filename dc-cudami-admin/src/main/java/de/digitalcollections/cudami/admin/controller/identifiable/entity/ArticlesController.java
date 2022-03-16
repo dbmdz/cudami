@@ -46,11 +46,6 @@ public class ArticlesController extends AbstractController {
     this.service = client.forArticles();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "articles";
-  }
-
   @GetMapping("/articles/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
@@ -98,7 +93,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/api/articles/{uuid}")
   @ResponseBody
-  public Article get(@PathVariable UUID uuid) throws TechnicalException {
+  public Article getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -109,6 +104,11 @@ public class ArticlesController extends AbstractController {
         "existingLanguages",
         this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
     return "articles/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "articles";
   }
 
   @PostMapping("/api/articles")

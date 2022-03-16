@@ -53,11 +53,6 @@ public class WebpagesController extends AbstractController {
     this.websiteService = client.forWebsites();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "webpages";
-  }
-
   @GetMapping("/webpages/new")
   public String create(
       Model model,
@@ -125,7 +120,7 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/api/webpages/{uuid}")
   @ResponseBody
-  public Webpage get(@PathVariable UUID uuid) throws TechnicalException {
+  public Webpage getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
@@ -136,6 +131,11 @@ public class WebpagesController extends AbstractController {
       return websiteService.getByUuid(uuid);
     }
     return null;
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "webpages";
   }
 
   @PostMapping("/api/webpages")

@@ -60,14 +60,14 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
   @Override
   public FamilyName save(FamilyName familyName) {
     super.save(familyName);
-    FamilyName result = findOne(familyName.getUuid());
+    FamilyName result = getByUuid(familyName.getUuid());
     return result;
   }
 
   @Override
   public FamilyName update(FamilyName familyName) {
     super.update(familyName);
-    FamilyName result = findOne(familyName.getUuid());
+    FamilyName result = getByUuid(familyName.getUuid());
     return result;
   }
 }

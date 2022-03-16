@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User activate(UUID uuid) {
-    User user = userRepository.findOne(uuid);
+    User user = userRepository.getByUuid(uuid);
     user.setEnabled(true);
     user = userRepository.save(user);
     return user;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = false)
   public User deactivate(UUID uuid) {
-    User user = userRepository.findOne(uuid);
+    User user = userRepository.getByUuid(uuid);
     user.setEnabled(false);
     user = userRepository.save(user);
     return user;
@@ -75,8 +75,8 @@ public class UserServiceImpl implements UserService<User> {
   }
 
   @Override
-  public User get(UUID uuid) {
-    return userRepository.findOne(uuid);
+  public User getByUuid(UUID uuid) {
+    return userRepository.getByUuid(uuid);
   }
 
   /*
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService<User> {
   @Override
   //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
   public User loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByEmail(username);
+    User user = userRepository.getByEmail(username);
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
     }

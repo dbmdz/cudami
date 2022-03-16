@@ -37,7 +37,7 @@ public interface IdentifierRepository {
 
   List<Identifier> findByIdentifiable(UUID identifiableUuid);
 
-  Identifier findOne(String namespace, String id);
+  Identifier getByNamespaceAndId(String namespace, String id);
 
   Identifier save(Identifier identifier);
 

@@ -34,7 +34,7 @@ class ProjectControllerTest extends BaseControllerTest {
             .withRefId(1300623)
             .build();
 
-    when(projectService.get(eq(expected.getUuid()))).thenReturn(expected);
+    when(projectService.getByUuid(eq(expected.getUuid()))).thenReturn(expected);
 
     testJson(path);
   }

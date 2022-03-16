@@ -74,7 +74,7 @@ public interface UrlAliasRepository {
    * @return the found {@code UrlAlias} or {@code null}
    * @throws UrlAliasRepositoryException
    */
-  UrlAlias findOne(UUID uuid) throws UrlAliasRepositoryException;
+  UrlAlias getByUuid(UUID uuid) throws UrlAliasRepositoryException;
 
   /**
    * Check whether an entry exists for the passed website UUID, slug and language.

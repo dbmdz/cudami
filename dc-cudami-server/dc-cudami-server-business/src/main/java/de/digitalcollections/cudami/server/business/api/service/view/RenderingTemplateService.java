@@ -9,7 +9,7 @@ public interface RenderingTemplateService {
 
   PageResponse<RenderingTemplate> find(PageRequest pageRequest);
 
-  RenderingTemplate findOne(UUID uuid);
+  RenderingTemplate getByUuid(UUID uuid);
 
   RenderingTemplate save(RenderingTemplate template);
 

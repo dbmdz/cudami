@@ -96,8 +96,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article findOne(UUID uuid, Filtering filtering) {
-    Article article = super.findOne(uuid, filtering);
+  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Article article = super.getByUuidAndFiltering(uuid, filtering);
 
     if (article != null) {
       List<Agent> creators = getCreators(uuid);
@@ -107,8 +107,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article findOne(Identifier identifier) {
-    Article article = super.findOne(identifier);
+  public Article getByRefId(long refId) {
+    Article article = super.getByRefId(refId);
 
     if (article != null) {
       article.setCreators(getCreators(article.getUuid()));
@@ -117,8 +117,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article findOneByRefId(long refId) {
-    Article article = super.findOneByRefId(refId);
+  public Article getByIdentifier(Identifier identifier) {
+    Article article = super.getByIdentifier(identifier);
 
     if (article != null) {
       article.setCreators(getCreators(article.getUuid()));
@@ -194,7 +194,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     List<Agent> creators = article.getCreators();
     saveCreatorsList(article, creators);
 
-    Article result = findOne(article.getUuid());
+    Article result = getByUuid(article.getUuid());
     return result;
   }
 
@@ -235,7 +235,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     List<Agent> creators = article.getCreators();
     saveCreatorsList(article, creators);
 
-    Article result = findOne(article.getUuid());
+    Article result = getByUuid(article.getUuid());
     return result;
   }
 }

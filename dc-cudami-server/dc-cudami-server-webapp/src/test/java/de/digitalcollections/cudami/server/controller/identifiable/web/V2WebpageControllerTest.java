@@ -19,20 +19,6 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
   @MockBean protected WebpageService webpageService;
 
   @DisplayName(
-      "returns a webpage in v2 json format for UUID, with or without json suffix in the url")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
-        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
-      })
-  public void returnWebpageV2Json(String path) throws Exception {
-    Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class))).thenReturn(expected);
-    testJson(path);
-  }
-
-  @DisplayName(
       "returns a localized webpage in v2 json format for UUID, with or without json suffix in the url")
   @ParameterizedTest
   @ValueSource(
@@ -42,7 +28,22 @@ public class V2WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnLocalizedWebpageV2Json(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.get(any(UUID.class), any(Locale.class))).thenReturn(expected);
+    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
+    testJson(path);
+  }
+
+  @DisplayName(
+      "returns a webpage in v2 json format for UUID, with or without json suffix in the url")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa.json",
+        "/v2/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa"
+      })
+  public void returnWebpageV2Json(String path) throws Exception {
+    Webpage expected = createPrefilledWebpage(path);
+    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
     testJson(path);
   }
 }

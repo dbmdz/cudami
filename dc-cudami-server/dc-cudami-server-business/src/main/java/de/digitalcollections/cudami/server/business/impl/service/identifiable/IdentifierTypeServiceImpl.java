@@ -45,13 +45,13 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType get(UUID uuid) {
-    return repository.findOne(uuid);
+  public IdentifierType getByNamespace(String namespace) {
+    return repository.getByNamespace(namespace);
   }
 
   @Override
-  public IdentifierType getByNamespace(String namespace) {
-    return repository.findOneByNamespace(namespace);
+  public IdentifierType getByUuid(UUID uuid) {
+    return repository.getByUuid(uuid);
   }
 
   @Override

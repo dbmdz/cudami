@@ -46,6 +46,51 @@ public class V3WebsiteController {
   }
 
   @Operation(
+      deprecated = true,
+      summary = "Get a website by its uuid",
+      description = "Use /v5/websites/{uuid} instead",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Website or empty value (instead of a 404 error)",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = Website.class))),
+        @ApiResponse(responseCode = "404", description = "never returned!")
+      })
+  @GetMapping(
+      value = {"/latest/websites/{uuid}", "/v3/websites/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> getByUuid(
+      @Parameter(
+              name = "uuid",
+              description = "the UUID of the website",
+              example = "7a2f1935-c5b8-40fb-8622-c675de0a6242",
+              schema = @Schema(implementation = UUID.class))
+          @PathVariable
+          UUID uuid)
+      throws JsonProcessingException {
+    Website website = websiteService.getByUuid(uuid);
+
+    if (website == null) {
+      // For compatibility reasons, we must return 200 with empty body
+      return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    // Fix the attributes, which are missing or different in new model
+    JSONObject result = new JSONObject(objectMapper.writeValueAsString(website));
+    JSONArray rootPages = (JSONArray) result.get("rootPages");
+    for (Iterator it = rootPages.iterator(); it.hasNext(); ) {
+      JSONObject rootPage = (JSONObject) it.next();
+      rootPage.put("type", "ENTITY_PART");
+      rootPage.put("entityPartType", "WEBPAGE");
+    }
+
+    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+  }
+
+  @Operation(
       summary = "Get root pages of a website",
       description = "Get a paged and sorted list of root pages of a website",
       responses = {
@@ -116,51 +161,6 @@ public class V3WebsiteController {
       JSONObject rootPage = (JSONObject) it.next();
       rootPage.put(
           "className", "de.digitalcollections.model.impl.identifiable.entity.parts.WebpageImpl");
-      rootPage.put("type", "ENTITY_PART");
-      rootPage.put("entityPartType", "WEBPAGE");
-    }
-
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
-  }
-
-  @Operation(
-      deprecated = true,
-      summary = "Get a website by its uuid",
-      description = "Use /v5/websites/{uuid} instead",
-      responses = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Website or empty value (instead of a 404 error)",
-            content =
-                @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = Website.class))),
-        @ApiResponse(responseCode = "404", description = "never returned!")
-      })
-  @GetMapping(
-      value = {"/latest/websites/{uuid}", "/v3/websites/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findById(
-      @Parameter(
-              name = "uuid",
-              description = "the UUID of the website",
-              example = "7a2f1935-c5b8-40fb-8622-c675de0a6242",
-              schema = @Schema(implementation = UUID.class))
-          @PathVariable
-          UUID uuid)
-      throws JsonProcessingException {
-    Website website = websiteService.get(uuid);
-
-    if (website == null) {
-      // For compatibility reasons, we must return 200 with empty body
-      return new ResponseEntity<>("", HttpStatus.OK);
-    }
-
-    // Fix the attributes, which are missing or different in new model
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(website));
-    JSONArray rootPages = (JSONArray) result.get("rootPages");
-    for (Iterator it = rootPages.iterator(); it.hasNext(); ) {
-      JSONObject rootPage = (JSONObject) it.next();
       rootPage.put("type", "ENTITY_PART");
       rootPage.put("entityPartType", "WEBPAGE");
     }

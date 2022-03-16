@@ -31,9 +31,9 @@ public interface UserService<U extends User> extends UserDetailsService {
   //  List<U> findActiveAdminUsers();
   List<U> findAll() throws ServiceException;
 
-  U findByEmail(String email) throws ServiceException;
+  U getByEmail(String email) throws ServiceException;
 
-  U findOne(UUID uuid) throws ServiceException;
+  U getByUuid(UUID uuid) throws ServiceException;
 
   boolean setStatus(UUID uuid, boolean enabled);
 

@@ -110,50 +110,6 @@ public class DigitalObjectController {
     return digitalObjectService.findAllReduced();
   }
 
-  @Operation(summary = "Get a digital object by refId")
-  @GetMapping(
-      value = {"/v5/digitalobjects/{refId:[0-9]+}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject findByRefId(@PathVariable long refId) {
-    return digitalObjectService.getByRefId(refId);
-  }
-
-  @Operation(summary = "Get a digital object by uuid")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject findByUuid(@PathVariable UUID uuid) {
-    return digitalObjectService.get(uuid);
-  }
-
-  @Operation(summary = "Get digital object by namespace and id")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/identifier/{namespace}:{id}",
-        "/v2/digitalobjects/identifier/{namespace}:{id}",
-        "/latest/digitalobjects/identifier/{namespace}:{id}"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject findByIdentifier(
-      @Parameter(example = "", description = "Namespace of the identifier")
-          @PathVariable("namespace")
-          String namespace,
-      @Parameter(example = "", description = "value of the identifier") @PathVariable("id")
-          String id)
-      throws IdentifiableServiceException {
-    return digitalObjectService.getByIdentifier(namespace, id);
-    //    if (digitalObject == null) {
-    //      // FIXME throw resource not found http exception
-    //      throw new IdentifiableServiceException(
-    //          "DigitalObject " + namespace + ":" + id + " not found");
-    //    }
-    //    return digitalObject;
-  }
-
   @Operation(
       summary =
           "Find limited amount of digital objects containing searchTerm in label or description")
@@ -202,6 +158,50 @@ public class DigitalObjectController {
     return digitalObjectService.getRandom(count);
   }
 
+  @Operation(summary = "Get digital object by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/digitalobjects/identifier/{namespace}:{id}",
+        "/v2/digitalobjects/identifier/{namespace}:{id}",
+        "/latest/digitalobjects/identifier/{namespace}:{id}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public DigitalObject getByIdentifier(
+      @Parameter(example = "", description = "Namespace of the identifier")
+          @PathVariable("namespace")
+          String namespace,
+      @Parameter(example = "", description = "value of the identifier") @PathVariable("id")
+          String id)
+      throws IdentifiableServiceException {
+    return digitalObjectService.getByIdentifier(namespace, id);
+    //    if (digitalObject == null) {
+    //      // FIXME throw resource not found http exception
+    //      throw new IdentifiableServiceException(
+    //          "DigitalObject " + namespace + ":" + id + " not found");
+    //    }
+    //    return digitalObject;
+  }
+
+  @Operation(summary = "Get a digital object by refId")
+  @GetMapping(
+      value = {"/v5/digitalobjects/{refId:[0-9]+}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public DigitalObject getByRefId(@PathVariable long refId) {
+    return digitalObjectService.getByRefId(refId);
+  }
+
+  @Operation(summary = "Get a digital object by uuid")
+  @GetMapping(
+      value = {
+        "/v5/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v2/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public DigitalObject getByUuid(@PathVariable UUID uuid) {
+    return digitalObjectService.getByUuid(uuid);
+  }
+
   @Operation(summary = "Get (active or all) paged collections of a digital objects")
   @GetMapping(
       value = {"/v5/digitalobjects/{uuid}/collections"},
@@ -245,6 +245,18 @@ public class DigitalObjectController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
     return digitalObjectService.getImageFileResources(uuid);
+  }
+
+  @Operation(summary = "Get languages of all digital objects")
+  @GetMapping(
+      value = {
+        "/v5/digitalobjects/languages",
+        "/v3/digitalobjects/languages",
+        "/latest/digitalobjects/languages"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return digitalObjectService.getLanguages();
   }
 
   @Operation(summary = "Get all languages of a digital object's collections")
@@ -320,17 +332,5 @@ public class DigitalObjectController {
       throws IdentifiableServiceException, ValidationException {
     assert Objects.equals(uuid, digitalObject.getUuid());
     return digitalObjectService.update(digitalObject);
-  }
-
-  @Operation(summary = "Get languages of all digital objects")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/languages",
-        "/v3/digitalobjects/languages",
-        "/latest/digitalobjects/languages"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return digitalObjectService.getLanguages();
   }
 }

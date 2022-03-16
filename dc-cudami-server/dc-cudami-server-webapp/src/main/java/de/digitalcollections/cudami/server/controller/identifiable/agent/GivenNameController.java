@@ -64,17 +64,31 @@ public class GivenNameController {
   @GetMapping(
       value = {"/v5/givennames/identifier/{namespace}:{id}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GivenName> findByIdentifier(
+  public ResponseEntity<GivenName> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     GivenName result = givenNameService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a givenname by namespace and id")
+  @GetMapping(
+      value = {"/v5/givennames/identifier"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Void> getByIdentifier(
+      @RequestParam(name = "namespace", required = true) String namespace,
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request)
+      throws IdentifiableServiceException {
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "Get a givenname by uuid")
   @GetMapping(
       value = {"/v5/givennames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GivenName> get(
+  public ResponseEntity<GivenName> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -91,25 +105,11 @@ public class GivenNameController {
 
     GivenName result;
     if (pLocale == null) {
-      result = givenNameService.get(uuid);
+      result = givenNameService.getByUuid(uuid);
     } else {
-      result = givenNameService.get(uuid, pLocale);
+      result = givenNameService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a givenname by namespace and id")
-  @GetMapping(
-      value = {"/v5/givennames/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
-      throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "save a newly created givenname")

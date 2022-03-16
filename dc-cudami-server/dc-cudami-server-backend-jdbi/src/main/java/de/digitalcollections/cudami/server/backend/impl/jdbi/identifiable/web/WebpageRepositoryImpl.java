@@ -167,8 +167,8 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage findOne(UUID uuid, Filtering filtering) {
-    Webpage webpage = super.findOne(uuid, filtering);
+  public Webpage getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Webpage webpage = super.getByUuidAndFiltering(uuid, filtering);
 
     if (webpage != null) {
       webpage.setChildren(getChildren(webpage));
@@ -177,13 +177,67 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage findOne(Identifier identifier) {
-    Webpage webpage = super.findOne(identifier);
+  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE ("
+            + " NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
+            + tableAlias
+            + ".uuid))";
 
-    if (webpage != null) {
-      webpage.setChildren(getChildren(webpage));
+    String searchTerm = searchPageRequest.getQuery();
+    if (!StringUtils.hasText(searchTerm)) {
+      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
     }
-    return webpage;
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    commonSql += " AND " + getCommonSearchSql(tableAlias);
+    return find(searchPageRequest, commonSql, argumentMappings);
+  }
+
+  @Override
+  public SearchPageResponse<Webpage> findRootPagesForWebsite(
+      UUID uuid, SearchPageRequest searchPageRequest) {
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " LEFT JOIN website_webpages ww ON "
+            + tableAlias
+            + ".uuid = ww.webpage_uuid"
+            + " WHERE ww.website_uuid = :uuid";
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+
+    String searchTerm = searchPageRequest.getQuery();
+    if (StringUtils.hasText(searchTerm)) {
+      commonSql += " AND " + getCommonSearchSql(tableAlias);
+      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
+    }
+
+    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
+    addFiltering(searchPageRequest, innerQuery, argumentMappings);
+
+    String orderBy = null;
+    if (searchPageRequest.getSorting() == null) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(
+          " ORDER BY ww.sortindex"); // must be the column itself to use window functions
+    }
+    addPageRequestParams(searchPageRequest, innerQuery);
+
+    List<Webpage> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    addFiltering(searchPageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -239,6 +293,16 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     }
 
     return new BreadcrumbNavigation(result);
+  }
+
+  @Override
+  public Webpage getByIdentifier(Identifier identifier) {
+    Webpage webpage = super.getByIdentifier(identifier);
+
+    if (webpage != null) {
+      webpage.setChildren(getChildren(webpage));
+    }
+    return webpage;
   }
 
   @Override
@@ -361,70 +425,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE ("
-            + " NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
-            + tableAlias
-            + ".uuid))";
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    commonSql += " AND " + getCommonSearchSql(tableAlias);
-    return find(searchPageRequest, commonSql, argumentMappings);
-  }
-
-  @Override
-  public SearchPageResponse<Webpage> findRootPagesForWebsite(
-      UUID uuid, SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " LEFT JOIN website_webpages ww ON "
-            + tableAlias
-            + ".uuid = ww.webpage_uuid"
-            + " WHERE ww.website_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuid);
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (StringUtils.hasText(searchTerm)) {
-      commonSql += " AND " + getCommonSearchSql(tableAlias);
-      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT ww.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-
-    String orderBy = null;
-    if (searchPageRequest.getSorting() == null) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(
-          " ORDER BY ww.sortindex"); // must be the column itself to use window functions
-    }
-    addPageRequestParams(searchPageRequest, innerQuery);
-
-    List<Webpage> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new SearchPageResponse<>(result, searchPageRequest, total);
-  }
-
-  @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
         "SELECT DISTINCT languages"
@@ -476,7 +476,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public Webpage save(Webpage webpage) {
     super.save(webpage);
-    Webpage result = findOne(webpage.getUuid());
+    Webpage result = getByUuid(webpage.getUuid());
     return result;
   }
 
@@ -497,7 +497,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 .bind("sortIndex", nextSortIndex)
                 .execute());
 
-    return findOne(childWebpageUuid);
+    return getByUuid(childWebpageUuid);
   }
 
   @Override
@@ -517,13 +517,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 .bind("sortIndex", nextSortIndex)
                 .execute());
 
-    return findOne(webpageUuid);
+    return getByUuid(webpageUuid);
   }
 
   @Override
   public Webpage update(Webpage webpage) {
     super.update(webpage);
-    Webpage result = findOne(webpage.getUuid());
+    Webpage result = getByUuid(webpage.getUuid());
     return result;
   }
 

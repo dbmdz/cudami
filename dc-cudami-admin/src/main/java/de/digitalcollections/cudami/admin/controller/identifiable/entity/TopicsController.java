@@ -51,11 +51,6 @@ public class TopicsController extends AbstractController {
     this.service = client.forTopics();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "topics";
-  }
-
   @GetMapping({"/subtopics/new", "/topics/new"})
   public String create(
       Model model,
@@ -119,12 +114,6 @@ public class TopicsController extends AbstractController {
     return service.findSubtopics(uuid, searchPageRequest);
   }
 
-  @GetMapping("/api/topics/{uuid}")
-  @ResponseBody
-  public Topic get(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
   @GetMapping("/api/topics/{uuid}/entities")
   @ResponseBody
   public PageResponse<Entity> getAttachedEntites(
@@ -133,6 +122,12 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws TechnicalException {
     return this.service.getEntities(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
+  @GetMapping("/api/topics/{uuid}")
+  @ResponseBody
+  public Topic getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/api/topics/{uuid}/fileresources")
@@ -152,6 +147,11 @@ public class TopicsController extends AbstractController {
         "existingLanguages",
         languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
     return "topics/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "topics";
   }
 
   @PostMapping("/api/topics")
@@ -181,16 +181,6 @@ public class TopicsController extends AbstractController {
       LOGGER.error("Cannot save topic with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-  }
-
-  @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
-  public String viewByRefId(@PathVariable long refId, Model model)
-      throws TechnicalException, ResourceNotFoundException {
-    Topic topic = service.getByRefId(refId);
-    if (topic == null) {
-      throw new ResourceNotFoundException();
-    }
-    return view(topic.getUuid(), model);
   }
 
   @GetMapping({
@@ -231,5 +221,15 @@ public class TopicsController extends AbstractController {
     model.addAttribute("breadcrumbs", breadcrumbs);
 
     return "topics/view";
+  }
+
+  @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
+  public String viewByRefId(@PathVariable long refId, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    Topic topic = service.getByRefId(refId);
+    if (topic == null) {
+      throw new ResourceNotFoundException();
+    }
+    return view(topic.getUuid(), model);
   }
 }

@@ -150,14 +150,14 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   @Override
   public F save(F fileResource) {
     super.save(fileResource);
-    F result = findOne(fileResource.getUuid());
+    F result = getByUuid(fileResource.getUuid());
     return result;
   }
 
   @Override
   public F update(F fileResource) {
     super.update(fileResource);
-    F result = findOne(fileResource.getUuid());
+    F result = getByUuid(fileResource.getUuid());
     return result;
   }
 }

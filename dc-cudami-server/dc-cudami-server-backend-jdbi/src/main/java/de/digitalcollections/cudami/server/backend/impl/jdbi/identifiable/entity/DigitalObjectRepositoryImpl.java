@@ -335,7 +335,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final List<FileResource> fileResources = digitalObject.getFileResources();
     saveFileResources(digitalObject, fileResources);
 
-    DigitalObject result = findOne(digitalObject.getUuid());
+    DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;
   }
 
@@ -381,7 +381,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public DigitalObject update(DigitalObject digitalObject) {
     super.update(digitalObject);
-    DigitalObject result = findOne(digitalObject.getUuid());
+    DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;
   }
 

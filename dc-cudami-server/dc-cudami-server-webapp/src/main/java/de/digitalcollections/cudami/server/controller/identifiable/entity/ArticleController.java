@@ -83,9 +83,9 @@ public class ArticleController {
 
     Article article;
     if (pLocale == null) {
-      article = articleService.get(uuid);
+      article = articleService.getByUuid(uuid);
     } else {
-      article = articleService.get(uuid, pLocale);
+      article = articleService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(article, HttpStatus.OK);
   }

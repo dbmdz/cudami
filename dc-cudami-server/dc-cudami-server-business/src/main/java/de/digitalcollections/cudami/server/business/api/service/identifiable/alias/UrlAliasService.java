@@ -12,15 +12,25 @@ import java.util.UUID;
 
 /** Service for UrlAliasses */
 public interface UrlAliasService {
-
   /**
-   * Retrieve one UrlAlias by its UUID
+   * Create an UrlAlias in the database (with validation)
    *
-   * @param uuid the UUID
-   * @return the UrlAlias or null
-   * @throws CudamiServiceException in case of an error
+   * @param urlAlias the UrlAlias (with yet empty UUID)
+   * @return the persisted UrlAlias with its generated UUID
+   * @throws CudamiServiceException
    */
-  UrlAlias findOne(UUID uuid) throws CudamiServiceException;
+  default UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
+    return this.create(urlAlias, false);
+  }
+  /**
+   * Create an UrlAlias in the database
+   *
+   * @param urlAlias the UrlAlias (with yet empty UUID)
+   * @param force if true, do not validate
+   * @return the persisted UrlAlias with its generated UUID
+   * @throws CudamiServiceException
+   */
+  UrlAlias create(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
 
   /**
    * Delete a single UrlAlias by its UUID
@@ -66,36 +76,6 @@ public interface UrlAliasService {
    * @throws CudamiServiceException
    */
   boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException;
-
-  /**
-   * Create an UrlAlias in the database (with validation)
-   *
-   * @param urlAlias the UrlAlias (with yet empty UUID)
-   * @return the persisted UrlAlias with its generated UUID
-   * @throws CudamiServiceException
-   */
-  default UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
-    return this.create(urlAlias, false);
-  }
-
-  /**
-   * Create an UrlAlias in the database
-   *
-   * @param urlAlias the UrlAlias (with yet empty UUID)
-   * @param force if true, do not validate
-   * @return the persisted UrlAlias with its generated UUID
-   * @throws CudamiServiceException
-   */
-  UrlAlias create(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
-
-  /**
-   * Updates an UrlAlias in the database
-   *
-   * @param urlAlias the UrlAlias (with set UUID)
-   * @return the updated UrlAlias
-   * @throws CudamiServiceException
-   */
-  UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException;
 
   /**
    * Find UrlAliases
@@ -151,6 +131,22 @@ public interface UrlAliasService {
    * @throws CudamiServiceException
    */
   String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws CudamiServiceException;
+  /**
+   * Retrieve one UrlAlias by its UUID
+   *
+   * @param uuid the UUID
+   * @return the UrlAlias or null
+   * @throws CudamiServiceException in case of an error
+   */
+  UrlAlias getByUuid(UUID uuid) throws CudamiServiceException;
+  /**
+   * Updates an UrlAlias in the database
+   *
+   * @param urlAlias the UrlAlias (with set UUID)
+   * @return the updated UrlAlias
+   * @throws CudamiServiceException
+   */
+  UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException;
 
   /**
    * Validates the given localizedUrlAliases according to the following criteria:
