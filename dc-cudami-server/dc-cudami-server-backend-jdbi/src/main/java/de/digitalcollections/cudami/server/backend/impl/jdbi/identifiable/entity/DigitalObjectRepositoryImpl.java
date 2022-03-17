@@ -751,8 +751,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       }
 
       // Fill further attributes
+      Integer numberOfBinaryResources =
+          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
       digitalObject.setNumberOfBinaryResources(
-          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class));
+          numberOfBinaryResources != null ? numberOfBinaryResources : 0);
 
       return map;
     };
