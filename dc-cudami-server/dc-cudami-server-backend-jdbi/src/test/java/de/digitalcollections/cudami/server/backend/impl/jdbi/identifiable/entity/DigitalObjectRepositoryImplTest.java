@@ -187,6 +187,7 @@ class DigitalObjectRepositoryImplTest {
             .withCreationInfo(creationInfo)
             .withLinkedDataFileResource(linkedDataFileResource)
             .withRenderingResource(renderingResource)
+            .withParent(parent)
             .build();
 
     // The "save" method internally retrieves the object by findOne
@@ -210,6 +211,10 @@ class DigitalObjectRepositoryImplTest {
 
     assertThat(actual.getRenderingResources()).hasSize(1);
     assertThat(actual.getRenderingResources().get(0)).isEqualTo(renderingResource);
+
+    assertThat(actual.getParent()).isNotNull();
+    assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
+    assertThat(actual.getParent().getLabel()).isEqualTo(parent.getLabel());
   }
 
   @Test
@@ -270,6 +275,10 @@ class DigitalObjectRepositoryImplTest {
             .withDate("2022-02-25")
             .withGeoLocation(creationPlace)
             .build();
+
+    // Build a parent DigitalObject, save and retrieve it
+    DigitalObject parent =
+        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
