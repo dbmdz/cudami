@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Removed
+
+Methods returning one object renamed from `find...` to `getBy...`:
+
+- `findOne(UUID uuid)`-methods, use `getByUuid`-method instead
+- `findOne(UUID uuid, Locale locale)`-methods, use `getByUuidAndLocale`-method instead
+- `findOneByIdentifier(String namespace, String id)`-methods, use `getByIdentifier`-method instead
+- `findOneByRefId(long refId)`-methods, use `getByRefId`-method instead
+- `findOneByEmail(String email)`-methods, use `getByEmail`-method instead
+- `findOneByLabelAndLocale`-methods, use `getByLabelAndLocale`-method instead
+- `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
+- `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
+
 ## [5.2.2](https://github.com/dbmdz/cudami/releases/tag/5.2.2) - 2022-03-15
 
 ### Changed
