@@ -300,15 +300,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
               .append(":")
               .append(criterionKey)
               .append(")");
-          try {
-            argumentMappings.put(criterionKey, fc.getValue());
-          } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("ArgumentMappings=" + argumentMappings);
-            System.err.println("criterionKey=" + criterionKey);
-            System.err.println("fc=" + fc);
-            System.err.println("fc.getValue()=" + fc.getValue());
-          }
+          argumentMappings.put(criterionKey, fc.getValue());
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html

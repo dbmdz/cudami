@@ -14,6 +14,7 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.AgentBuilder;
@@ -134,10 +135,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".number_binaryresources "
         + mappingPrefix
-        + "_number_binaryresources";
+        + "_number_binaryresources"
+        + ", "
+        + tableAlias
+        + ".parent_uuid "
+        + mappingPrefix
+        + "_parent_uuid";
   }
 
-  // TODO: Return any license info here?
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
@@ -547,6 +552,15 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           }
         }
       }
+
+      UUID parentUuid =
+          digitalObject.getParent() != null ? digitalObject.getParent().getUuid() : null;
+      if (parentUuid != null) {
+        DigitalObject parent = findOne(parentUuid);
+        if (parent != null) {
+          digitalObject.setParent(parent);
+        }
+      }
     }
 
     return digitalObject;
@@ -748,6 +762,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
               new GeoLocationBuilder().withUuid(creationGeolocationUuid).build());
         }
         digitalObject.setCreationInfo(creationInfo);
+      }
+
+      // Fill the parent (empty, only with uuid), if present
+      UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
+      if (parentUuid != null) {
+        digitalObject.setParent(new DigitalObjectBuilder().withUuid(parentUuid).build());
       }
 
       // Fill further attributes
