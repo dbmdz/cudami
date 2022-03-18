@@ -88,7 +88,7 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
   @Autowired private PersonRepositoryImpl personRepositoryImpl;
-  
+
   private static final License EXISTING_LICENSE =
       new LicenseBuilder()
           .withUuid(UUID.randomUUID())
@@ -176,7 +176,10 @@ class DigitalObjectRepositoryImplTest {
             .withDate("2022-02-25")
             .withGeoLocation(creationPlace)
             .build();
-    
+
+    DigitalObject parent =
+        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
