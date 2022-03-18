@@ -556,7 +556,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       UUID parentUuid =
           digitalObject.getParent() != null ? digitalObject.getParent().getUuid() : null;
       if (parentUuid != null) {
-        DigitalObject parent = findOne(parentUuid);
+        DigitalObject parent = getByUuid(parentUuid);
         if (parent != null) {
           digitalObject.setParent(parent);
         }
