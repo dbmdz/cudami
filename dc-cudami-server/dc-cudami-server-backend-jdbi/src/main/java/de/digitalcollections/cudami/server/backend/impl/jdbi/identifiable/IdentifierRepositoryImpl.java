@@ -28,6 +28,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, identifiable, namespace, identifier, last_modified";
+  public static final String SQL_RETURN_FIELDS =
+      " uuid, created, identifiable, namespace, identifier as id, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
   public static final String TABLE_ALIAS = "id";
@@ -235,7 +237,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " VALUES ( "
             + SQL_INSERT_VALUES
             + " )"
-            + " RETURNING *";
+            + " RETURNING "
+            + SQL_RETURN_FIELDS;
 
     Identifier result =
         dbi.withHandle(
