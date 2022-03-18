@@ -702,8 +702,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObject update(DigitalObject digitalObject) {
     super.update(digitalObject);
 
-    DigitalObject result = getByUuid(digitalObject.getUuid());
-
     // save the rendering resources, which are also FileResources
     final ArrayList<FileResource> renderingResources = digitalObject.getRenderingResources();
     saveRenderingResources(digitalObject, renderingResources);
@@ -712,6 +710,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     final ArrayList<LinkedDataFileResource> linkedDataResources =
         digitalObject.getLinkedDataResources();
     saveLinkedDataFileResources(digitalObject, linkedDataResources);
+
+    DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;
   }
 
