@@ -86,11 +86,23 @@ public class LinkedDataFileResourceController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "uri", required = false)
+          FilterCriterion<String> encodedUriFilterCriterion) {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
+    }
+    if (encodedUriFilterCriterion != null) {
+      FilterCriterion<String> uri =
+          new FilterCriterion<>(
+              "uri",
+              encodedUriFilterCriterion.getOperation(),
+              URLDecoder.decode(
+                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
+      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      searchPageRequest.setFiltering(filtering);
     }
 
     return service.find(searchPageRequest);
@@ -116,9 +128,9 @@ public class LinkedDataFileResourceController {
       throws IdentifiableServiceException {
     LinkedDataFileResource linkedDataFileResource;
     if (pLocale == null) {
-      linkedDataFileResource = service.get(uuid);
+      linkedDataFileResource = service.getByUuid(uuid);
     } else {
-      linkedDataFileResource = service.get(uuid, pLocale);
+      linkedDataFileResource = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(linkedDataFileResource, HttpStatus.OK);
   }

@@ -51,7 +51,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .withUri("http://foo.bar/bla.xml")
             .build();
 
-    when(linkedDataFileResourceService.get(any(UUID.class))).thenReturn(expected);
+    when(linkedDataFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
 
     testJson(path);
   }
