@@ -76,8 +76,6 @@ class DigitalObjectRepositoryImplTest {
           .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
 
-  @Autowired CudamiConfig cudamiConfig;
-
   @BeforeEach
   public void beforeEach() {
     repo = new DigitalObjectRepositoryImpl(jdbi, cudamiConfig);
