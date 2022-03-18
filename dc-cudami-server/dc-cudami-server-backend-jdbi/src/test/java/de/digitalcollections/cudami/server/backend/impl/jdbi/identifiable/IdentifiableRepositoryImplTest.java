@@ -41,7 +41,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @DisplayName("The Identifiable Repository")
 @Sql(scripts = "classpath:cleanup_database.sql")
 class IdentifiableRepositoryImplTest {
-  
+
   IdentifiableRepositoryImpl repo;
 
   @Autowired PostgreSQLContainer postgreSQLContainer;
