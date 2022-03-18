@@ -252,7 +252,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     if (identifiers != null) {
       for (Identifier identifier : identifiers) {
         identifier.setIdentifiable(identifiable.getUuid());
-        identifierRepository.save(identifier);
+        Identifier savedIdentifier = identifierRepository.save(identifier);
+        identifiable.addIdentifier(savedIdentifier);
       }
     }
   }
