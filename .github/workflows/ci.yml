@@ -1,8 +1,8 @@
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ release/v5.3 ]
   push:
-    branches: [ main ]
+    branches: [ release/v5.3 ]
   release:
     types: [ published ]
   workflow_dispatch:
@@ -61,7 +61,7 @@ jobs:
       - name: Publish code coverage reports
         uses: codecov/codecov-action@v1
   publish:
-    if: (github.event_name == 'push' && contains(github.ref, 'main')) || github.event_name == 'release'
+    if: (github.event_name == 'push' && contains(github.ref, 'release/v5.3')) || github.event_name == 'release'
     needs: build
     outputs:
       PROJECT_VERSION: ${{ steps.projectversion.outputs.PROJECT_VERSION }}
@@ -79,7 +79,7 @@ jobs:
             ~/.m2/repository
             **/target
       - name: Install XML utils
-        run: sudo apt install libxml2-utils
+        run: sudo apt update && sudo apt install libxml2-utils
       - name: Extract project version
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       - name: Set project version as output variable
