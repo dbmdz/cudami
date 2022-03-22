@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+    <th:block th:fragment="renderLink(identifiable, locale, website)">
+      <a th:utext="${identifiable.label.getText(locale)}"
+         th:href="@{primaryUA ? '/' + ${primaryUA.slug} : '/p/' + ${identifiable.uuid}}"
+         th:with="primaryUA=${identifiable.getPrimaryUrlAlias(locale, website)}"
+      >label</a>
+    </th:block>
+
+  </body>
+</html>
