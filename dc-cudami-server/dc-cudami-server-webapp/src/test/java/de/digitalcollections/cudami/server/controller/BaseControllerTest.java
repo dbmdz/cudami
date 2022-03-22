@@ -102,6 +102,15 @@ public abstract class BaseControllerTest {
         .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
   }
 
+  /**
+   * Check, if the JSON result from a GET request to the given path matches the contents of a JSON
+   * file, which lies in src/test/resources under the identically constructed path ( and a .json
+   * suffix of the file name)
+   *
+   * @param path the path of the HTTP GET request and of the JSON file, against which the validation
+   *     is made (the file gets a .json suffix)
+   * @throws Exception in case of an error
+   */
   protected void testJson(String path) throws Exception {
     mockMvc
         .perform(get(path))
@@ -110,6 +119,14 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(path)));
   }
 
+  /**
+   * Check, if the JSON result for a GET request to the given path matches the contents of a JSON
+   * file, which resides in the provided expectedJsonPath.
+   *
+   * @param path the path of the HTTP GET request
+   * @param expectedJsonPath the location of the JSON file, against which the validation is made
+   * @throws Exception in case of an error
+   */
   protected void testJson(String path, String expectedJsonPath) throws Exception {
     mockMvc
         .perform(get(path))
@@ -118,6 +135,15 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
   }
 
+  /**
+   * Checks, if the JSON result of a POST request to the given path with the jsonBody as payload is
+   * equal to the contents of a JSON file, which resides in the expectedJsonPath
+   *
+   * @param path the path of the HTTP POST request
+   * @param jsonBody the JSON body of the HTTP POST request
+   * @param expectedJsonPath the location of the JSON file, against which the validation is made
+   * @throws Exception in case of an error
+   */
   protected void testPostJson(String path, String jsonBody, String expectedJsonPath)
       throws Exception {
     mockMvc
@@ -127,6 +153,15 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
   }
 
+  /**
+   * Checks, if a POST request with the provided jsonBody as payload to the provided path returns
+   * the expectedState as result
+   *
+   * @param path the path of the HTTP POST request
+   * @param jsonBody the JSON body of the HTTP POST request
+   * @param expectedState the expected HTTP state (result code)
+   * @throws Exception in case of an error
+   */
   protected void testPostJsonWithState(String path, String jsonBody, int expectedState)
       throws Exception {
     mockMvc
@@ -134,6 +169,15 @@ public abstract class BaseControllerTest {
         .andExpect(status().is(expectedState));
   }
 
+  /**
+   * Checks, if the JSON result of a PUT request to the given path with the jsonBody as payload is
+   * equal to the contents of a JSON file, which resides in the expectedJsonPath
+   *
+   * @param path the path of the HTTP PUT request
+   * @param jsonBody the JSON body of the HTTP PUT request
+   * @param expectedJsonPath the location of the JSON file, against which the validation is made
+   * @throws Exception in case of an error
+   */
   protected void testPutJson(String path, String jsonBody, String expectedJsonPath)
       throws Exception {
     mockMvc
@@ -143,6 +187,15 @@ public abstract class BaseControllerTest {
         .andExpect(content().json(getJsonFromFileResource(expectedJsonPath)));
   }
 
+  /**
+   * Checks, if a PUT request with the provided jsonBody as payload to the provided path returns the
+   * expectedState as result
+   *
+   * @param path the path of the HTTP PUT request
+   * @param jsonBody the JSON body of the HTTP PUT request
+   * @param expectedState the expected HTTP state (result code)
+   * @throws Exception in case of an error
+   */
   protected void testPutJsonWithState(String path, String jsonBody, int expectedState)
       throws Exception {
     mockMvc
@@ -150,6 +203,15 @@ public abstract class BaseControllerTest {
         .andExpect(status().is(expectedState));
   }
 
+  /**
+   * Check, if the HTML result from a GET request to the given path matches the contents of a HTML
+   * file, which lies in src/test/resources under the identically constructed path ( and a .html
+   * suffix of the file name)
+   *
+   * @param path the path of the HTTP GET request and of the HTML file, against which the validation
+   *     is made (the file gets a .html suffix)
+   * @throws Exception in case of an error
+   */
   protected void testHtml(String path) throws Exception {
     mockMvc
         .perform(get(path))
@@ -159,6 +221,15 @@ public abstract class BaseControllerTest {
         .andExpect(content().string(getHtmlFromFileResource(path)));
   }
 
+  /**
+   * Check, if the XML result from a GET request to the given path matches the contents of an XML
+   * file, which lies in src/test/resources under the identically constructed path ( and a .xml
+   * suffix of the file name)
+   *
+   * @param path the path of the HTTP GET request and of the XML file, against which the validation
+   *     is made (the file gets a .xml suffix)
+   * @throws Exception in case of an error
+   */
   protected void testXml(String path) throws Exception {
     mockMvc
         .perform(get(path))
@@ -168,6 +239,14 @@ public abstract class BaseControllerTest {
         .andExpect(content().xml(getXmlFromFileResource(path)));
   }
 
+  /**
+   * Check, if the JSON result from a GET request to the given path matches the contents of the
+   * expected JSON string
+   *
+   * @param path the path of the HTTP GET request
+   * @param expected the expected JSON string
+   * @throws Exception in case of an error
+   */
   protected void testGetJsonString(String path, String expected) throws Exception {
     mockMvc
         .perform(get(path))
@@ -176,18 +255,44 @@ public abstract class BaseControllerTest {
         .andExpect(content().string(expected));
   }
 
+  /**
+   * Verifies, that an HTTP GET request to the given path results in an HTTP not found state
+   *
+   * @param path the path of the HTTP GET request
+   * @throws Exception in case of an error
+   */
   protected void testNotFound(String path) throws Exception {
     mockMvc.perform(get(path)).andExpect(status().isNotFound());
   }
 
+  /**
+   * Verifies, that an HTTP GET request to the given path results in an internal server error
+   *
+   * @param path the path of the HTTP GET request
+   * @throws Exception in case of an error
+   */
   protected void testInternalError(String path) throws Exception {
     mockMvc.perform(get(path)).andExpect(status().is(500));
   }
 
+  /**
+   * Verifies, that an HTTP DELETE request results in a resource not found Exception (HTTP status
+   * 404)
+   *
+   * @param path the path of the HTTP DELETE request
+   * @throws Exception in case of an error
+   */
   protected void testDeleteNotFound(String path) throws Exception {
     mockMvc.perform(delete(path)).andExpect(status().isNotFound());
   }
 
+  /**
+   * Verifies, that an HTTP DELETE request was successful and returns the NO CONTENT state (code
+   * 204)
+   *
+   * @param path the path of the HTTP DELETE request
+   * @thries Exception in case of an error
+   */
   protected void testDeleteSuccessful(String path) throws Exception {
     mockMvc.perform(delete(path)).andExpect(status().is(HttpStatus.NO_CONTENT.value())); // 204
   }
