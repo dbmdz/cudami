@@ -97,7 +97,9 @@ public interface UrlAliasService {
 
   /**
    * Returns the primary Links (one per language) as LocalizedUrlAliases for a given slug for a
-   * given website (identified by its uuid). The given website can be null.
+   * given website (identified by its uuid). The given website can be null. Additionally you can
+   * provide a {@code Locale} language to retrieve primary links of this particular target language
+   * only.
    *
    * @param websiteUuid the UUID of the website, the slug belongs to, or null
    * @param slug the slug (=relative path)
