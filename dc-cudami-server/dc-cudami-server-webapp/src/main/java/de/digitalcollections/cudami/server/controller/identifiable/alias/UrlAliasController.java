@@ -190,7 +190,7 @@ public class UrlAliasController {
         "/v5/urlaliases/primary/{slug}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LocalizedUrlAliases> getMainUrlAlias(
+  public ResponseEntity<LocalizedUrlAliases> getPrimaryUrlAliases(
       @Parameter(description = "the slug of the URL, e.g. <tt>imprint</tt>") @PathVariable("slug")
           String slug,
       @Parameter(
@@ -201,8 +201,8 @@ public class UrlAliasController {
       @Parameter(
               name = "pLocale",
               description =
-                  "Desired locale in flattened form. If unset, contents in all languages will be returned",
-              example = "de_DE",
+                  "Desired language locale in flattened form. If unset, contents in all languages will be returned",
+              example = "de",
               schema = @Schema(implementation = Locale.class))
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
