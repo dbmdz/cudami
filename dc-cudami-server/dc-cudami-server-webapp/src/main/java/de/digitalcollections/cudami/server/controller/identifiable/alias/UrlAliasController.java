@@ -183,7 +183,7 @@ public class UrlAliasController {
 
   @Operation(
       summary =
-          "Get the primary LocalizedUrlAliases for a given website uuid and slug, and optionally filtered by a locale")
+          "Get the primary LocalizedUrlAliases for a given website uuid (null if empty) and slug, and optionally filtered by a locale")
   @GetMapping(
       value = {
         "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
