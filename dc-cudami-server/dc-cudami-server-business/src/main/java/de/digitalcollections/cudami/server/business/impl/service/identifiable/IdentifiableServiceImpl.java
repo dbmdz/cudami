@@ -23,8 +23,10 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -252,7 +254,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     if (identifiers != null) {
       for (Identifier identifier : identifiers) {
         identifier.setIdentifiable(identifiable.getUuid());
-        Identifier savedIdentifier = identifierRepository.save(identifier);
+        Identifier savedIdentifier;
+        if (identifier.getUuid() == null) {
+          savedIdentifier = identifierRepository.save(identifier);
+        } else {
+          savedIdentifier = identifierRepository.getByUuid(identifier.getUuid());
+        }
         identifiable.addIdentifier(savedIdentifier);
       }
     }
@@ -284,11 +291,46 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     try {
       identifiableInDb = repository.getByUuid(identifiable.getUuid());
       updatedIdentifiable = repository.update(identifiable);
+
+      // Retrieve all identifiers from the database and put them into a map
+      Map<String, Identifier> existingIdentifierMap =
+          identifierRepository.findByIdentifiable(identifiable.getUuid()).stream()
+              .collect(Collectors.toMap(i -> i.getNamespace() + ":" + i.getId(), i -> i));
+      Set<String> existingIdentifiersByNamespaceAndId = existingIdentifierMap.keySet();
+
+      // Build a map of all provided identifiers
+      Map<String, Identifier> providedIdentifierMap =
+          identifiable.getIdentifiers().stream()
+              .collect(
+                  Collectors.toMap(
+                      i -> i.getNamespace() + ":" + i.getId(),
+                      i -> {
+                        i.setIdentifiable(identifiable.getUuid());
+                        return i;
+                      }));
+      Set<String> providedIdentifiersByNamespaceAndId = providedIdentifierMap.keySet();
+
+      // Difference calculations
+      Set<String> obsoleteIdentifiers = new HashSet(existingIdentifiersByNamespaceAndId);
+      obsoleteIdentifiers.removeAll(providedIdentifiersByNamespaceAndId);
+
+      Set<String> missingIdentifiers = new HashSet(providedIdentifiersByNamespaceAndId);
+      missingIdentifiers.removeAll(existingIdentifiersByNamespaceAndId);
+
+      if (!missingIdentifiers.isEmpty()) {
+        missingIdentifiers.forEach(i -> identifierRepository.save(providedIdentifierMap.get(i)));
+      }
+
+      if (!obsoleteIdentifiers.isEmpty()) {
+        obsoleteIdentifiers.forEach(
+            i -> identifierRepository.delete(existingIdentifierMap.get(i).getUuid()));
+      }
+
       // save identifiers
       // as we store the whole list new: delete old entries
-      identifierRepository.deleteByIdentifiable(identifiable);
-      Set<Identifier> identifiers = identifiable.getIdentifiers();
-      saveIdentifiers(identifiers, identifiable);
+      // identifierRepository.deleteByIdentifiable(identifiable);
+      // Set<Identifier> identifiers = identifiable.getIdentifiers();
+      // saveIdentifiers(identifiers, identifiable);
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());

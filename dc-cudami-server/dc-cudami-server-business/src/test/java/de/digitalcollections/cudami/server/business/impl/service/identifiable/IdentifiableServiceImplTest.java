@@ -19,6 +19,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -655,5 +657,38 @@ class IdentifiableServiceImplTest {
     verify(urlAliasService, times(1)).create(eq(secondPrimaryUrlAlias), eq(true));
     verify(urlAliasService, times(1)).update(eq(firstPrimaryUrlAlias));
     assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isTrue();
+  }
+
+  @DisplayName("Filters out non-provided identifiers on update")
+  @Test
+  void updateRemovedNonProvidedIdentifiers()
+      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+    UUID uuid = UUID.randomUUID();
+
+    Identifiable identifiableToUpdate = new Identifiable();
+    identifiableToUpdate.setUuid(uuid);
+    identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    identifiableToUpdate.setIdentifiers(Set.of(new Identifier(null, "namespace", "value")));
+
+    Identifiable existingIdentifiable = new Identifiable();
+    existingIdentifiable.setUuid(uuid);
+    existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    existingIdentifiable.setIdentifiers(Set.of(new Identifier(uuid, "other", "foo")));
+
+    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
+    when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
+    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
+
+    Identifiable actual = service.update(identifiableToUpdate);
+
+    assertThat(actual.getIdentifiers()).hasSize(1);
+    Identifier actualIdentifier = actual.getIdentifiers().stream().findFirst().get();
+    assertThat(actualIdentifier.getIdentifiable()).isEqualTo(uuid);
+    assertThat(actualIdentifier.getNamespace()).isEqualTo("namespace");
+    assertThat(actualIdentifier.getId()).isEqualTo("value");
+
+    // verify(identifierRepository, times(1)).save(any(Identifier.class));
+    // verify(identifierRepository, times(1)).delete(any(UUID.class));
+
   }
 }
