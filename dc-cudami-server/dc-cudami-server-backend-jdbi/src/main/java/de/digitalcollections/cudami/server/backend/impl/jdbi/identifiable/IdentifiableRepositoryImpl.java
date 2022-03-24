@@ -509,15 +509,28 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
+    StringBuilder innerSelect =
+        new StringBuilder(
+            String.format(
+                "(SELECT %2$s.* "
+                    + "FROM %1$s %2$s INNER JOIN %3$s %4$s ON %4$s.identifiable = %2$s.uuid ",
+                tableName,
+                tableAlias,
+                IdentifierRepositoryImpl.TABLE_NAME,
+                IdentifierRepositoryImpl.TABLE_ALIAS));
     Filtering filtering =
         Filtering.defaultBuilder()
-            .filterNative("id.identifier")
+            .filterNative(IdentifierRepositoryImpl.TABLE_ALIAS + ".identifier")
             .isEquals(identifierId)
-            .filterNative("id.namespace")
+            .filterNative(IdentifierRepositoryImpl.TABLE_ALIAS + ".namespace")
             .isEquals(namespace)
             .build();
-
-    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
+    Map<String, Object> arguments = new HashMap<>();
+    addFiltering(filtering, innerSelect, arguments);
+    innerSelect.append(")");
+    I result =
+        retrieveOne(
+            sqlSelectAllFields, sqlSelectAllFieldsJoins, null, arguments, innerSelect.toString());
     return result;
   }
 
@@ -749,6 +762,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String sqlSelectAllFieldsJoins,
       Filtering filtering,
       Map<String, Object> argumentMappings) {
+    return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings, null);
+  }
+
+  public I retrieveOne(
+      String fieldsSql,
+      String sqlSelectAllFieldsJoins,
+      Filtering filtering,
+      Map<String, Object> argumentMappings,
+      String innerSelect) {
     StringBuilder sql =
         new StringBuilder(
             "SELECT"
@@ -760,7 +782,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ", "
                 + UrlAliasRepositoryImpl.getSelectFields(true)
                 + " FROM "
-                + tableName
+                + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
                 + tableAlias
                 + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
