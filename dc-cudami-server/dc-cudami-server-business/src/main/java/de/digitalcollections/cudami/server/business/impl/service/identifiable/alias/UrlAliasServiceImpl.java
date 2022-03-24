@@ -132,13 +132,11 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
     if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
       // Remove all languages, which do not match the desired pLocale
-      localizedUrlAliases = filterForLocale(pLocale, localizedUrlAliases);
-    } else {
-      // Remove all languages, which are not the default language
-      localizedUrlAliases = filterForLocale(localeService.getDefaultLocale(), localizedUrlAliases);
+      return filterForLocale(pLocale, localizedUrlAliases);
     }
-
-    return localizedUrlAliases;
+    // Remove all languages, which are not the default language
+    return filterForLocale(
+        Locale.forLanguageTag(localeService.getDefaultLanguage()), localizedUrlAliases);
   }
 
   @Override
@@ -177,8 +175,6 @@ public class UrlAliasServiceImpl implements UrlAliasService {
             repository.findPrimaryLinksForWebsite(null, slug);
         unspecificLocalizedUrlAliases =
             filterForLocaleWithFallback(pLocale, unspecificLocalizedUrlAliases);
-        // unspecificLocalizedUrlAliases =
-        // removeNonmatchingLanguagesForSlug(unspecificLocalizedUrlAliases, slug);
         return unspecificLocalizedUrlAliases;
       }
 
