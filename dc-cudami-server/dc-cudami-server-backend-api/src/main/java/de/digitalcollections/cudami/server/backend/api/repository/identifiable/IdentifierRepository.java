@@ -41,5 +41,7 @@ public interface IdentifierRepository {
 
   Identifier save(Identifier identifier);
 
+  Identifier getByUuid(UUID identifierUuid);
+
   Identifier update(Identifier identifier);
 }

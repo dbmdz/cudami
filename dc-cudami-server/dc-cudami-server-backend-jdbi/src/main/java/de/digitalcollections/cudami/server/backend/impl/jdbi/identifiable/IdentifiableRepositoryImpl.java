@@ -325,8 +325,21 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
           identifiable.getLocalizedUrlAliases().add(urlAlias);
         }
       }
+
+      extendReducedIdentifiable(identifiable, rowView);
+
       return map;
     };
+  }
+
+  /**
+   * Extend the reduced Identifiable by the contents of the provided RowView
+   *
+   * @param identifiable the reduced Identifiable
+   * @param rowView the rowView
+   */
+  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
+    // do nothing by default
   }
 
   @Override

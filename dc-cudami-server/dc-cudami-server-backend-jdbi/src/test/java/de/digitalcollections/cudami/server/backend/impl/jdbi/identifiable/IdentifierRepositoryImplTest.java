@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifier;
+import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,5 +56,40 @@ class IdentifierRepositoryImplTest {
     assertThat(persisted.getIdentifiable()).isEqualTo(identifiableUuid);
     assertThat(persisted.getNamespace()).isEqualTo("namespace");
     assertThat(persisted.getId()).isEqualTo("id");
+  }
+
+  @Test
+  @DisplayName("can return an empty list when no identifiers were found for an identifiable")
+  void retrieveNoIdentifiersForIdentifiable() {
+    assertThat(repo.findByIdentifiable(UUID.randomUUID())).isEmpty();
+  }
+
+  @Test
+  @DisplayName("can return a list of identifiers for an identifiable")
+  void identifiersForIdentifiable() {
+    UUID identifiableUuid = UUID.randomUUID();
+    Identifier identifier1 = repo.save(new Identifier(identifiableUuid, "namespace", "1"));
+    Identifier identifier2 = repo.save(new Identifier(identifiableUuid, "namespace", "2"));
+
+    List<Identifier> actual = repo.findByIdentifiable(identifiableUuid);
+    assertThat(actual).hasSize(2);
+    assertThat(actual).containsExactly(identifier1, identifier2);
+  }
+
+  @Test
+  @DisplayName("can return an identifier by its uuid")
+  void getByUuid() {
+    // Persist an identifier
+    UUID identifiableUuid = UUID.randomUUID();
+    Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
+
+    Identifier persisted = repo.save(identifier);
+
+    UUID identifierUuid = persisted.getUuid();
+    assertThat(identifierUuid).isNotNull();
+
+    // Retrieve it by its uuid - it must be the same as what was returned before at persisting
+    Identifier actual = repo.getByUuid(identifierUuid);
+    assertThat(actual).isEqualTo(persisted);
   }
 }

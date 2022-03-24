@@ -4,6 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
@@ -12,7 +13,11 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -84,6 +89,8 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private EntityRepositoryImpl<GeoLocation> geoLocationEntityRepositoryImpl;
 
   @Autowired private GeoLocationRepositoryImpl geoLocationRepositoryImpl;
+
+  @Autowired private IdentifierRepositoryImpl identifierRepositoryImpl;
 
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
@@ -338,6 +345,61 @@ class DigitalObjectRepositoryImplTest {
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);
+  }
+
+  @Test
+  @DisplayName("can filter by the parent uuid")
+  void filterByParentUuid() {
+    // Insert the parent DigitalObject
+    DigitalObject parent =
+        TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());
+    parent = repo.save(parent);
+
+    // Insert the ADO
+    DigitalObject ado =
+        TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "ADO"), Map.of());
+    ado.setParent(parent);
+    repo.save(ado);
+
+    // Retrieve the ADO by filtering the parent uuid
+    SearchPageRequest searchPageRequest = new SearchPageRequest();
+    searchPageRequest.setFiltering(
+        new Filtering(
+            List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
+    SearchPageResponse response = repo.find(searchPageRequest);
+
+    List<DigitalObject> actuals = response.getContent();
+    assertThat(actuals).hasSize(1);
+
+    DigitalObject actual = actuals.get(0);
+    assertThat(actual.getUuid()).isNotEqualTo(parent.getUuid()); // Because actual is the ADO
+    assertThat(actual.getParent().getUuid())
+        .isEqualTo(parent.getUuid()); // Only the UUID of the parent is filled in a search result
+  }
+
+  @Test
+  @DisplayName("returns all identifiers for a DigitalObject")
+  void returnIdentifiers() {
+    // Step1: Create the DigitalObject
+    DigitalObject digitalObject =
+        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Label").build();
+    DigitalObject persisted = repo.save(digitalObject);
+
+    // Step2: Create the identifiers and connect with with the DigitalObject
+    Identifier identifier1 =
+        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace1", "1"));
+    Identifier identifier2 =
+        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace2", "2"));
+
+    // Step3: Create and persist an identifier for another DigitalObject
+    identifierRepositoryImpl.save(new Identifier(UUID.randomUUID(), "namespace1", "other"));
+
+    // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
+    // other DigitalObject
+    Identifier demandedIdentifier = new Identifier(null, "namespace1", "1");
+    DigitalObject actual = repo.getByIdentifier(demandedIdentifier);
+
+    assertThat(actual.getIdentifiers()).containsExactly(identifier1, identifier2);
   }
 
   // -----------------------------------------------------------------

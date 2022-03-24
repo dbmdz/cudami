@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -124,12 +126,19 @@ public class DigitalObjectController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "parent.uuid", required = false)
+          FilterCriterion<UUID> parentUuidFilterCriterion) {
     SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
+    if (parentUuidFilterCriterion != null) {
+      parentUuidFilterCriterion.setExpression("parent.uuid");
+      pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
+    }
+
     return digitalObjectService.find(pageRequest);
   }
 

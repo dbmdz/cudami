@@ -12,6 +12,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
@@ -135,16 +136,16 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".number_binaryresources "
         + mappingPrefix
-        + "_number_binaryresources"
+        + "_number_binaryresources";
+  }
+
+  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".parent_uuid "
         + mappingPrefix
         + "_parent_uuid";
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -489,6 +490,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  protected String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
+    switch (modelProperty) {
+      case "parent.uuid":
+        return tableAlias + ".parent_uuid";
+      default:
+        return null;
+    }
+  }
+
+  @Override
   /**
    * Returns the fully filled DigitalObject including all of its direct attributes.
    *
@@ -764,12 +781,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         digitalObject.setCreationInfo(creationInfo);
       }
 
-      // Fill the parent (empty, only with uuid), if present
-      UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
-      if (parentUuid != null) {
-        digitalObject.setParent(new DigitalObjectBuilder().withUuid(parentUuid).build());
-      }
-
       // Fill further attributes
       Integer numberOfBinaryResources =
           rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
@@ -778,6 +789,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
       return map;
     };
+  }
+
+  @Override
+  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
+    super.extendReducedIdentifiable(identifiable, rowView);
+
+    if (!(identifiable instanceof DigitalObject)) {
+      return;
+    }
+
+    // Fill the parent (empty, only with uuid), if present.
+    UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      ((DigitalObject) identifiable)
+          .setParent(new DigitalObjectBuilder().withUuid(parentUuid).build());
+    }
   }
 
   // --------- repository setters for testing purposes only ----------------------
