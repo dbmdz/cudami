@@ -27,6 +27,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -692,5 +693,51 @@ class IdentifiableServiceImplTest {
 
     verify(identifierRepository, times(1)).save(any(Identifier.class));
     verify(identifierRepository, times(1)).delete(eq(identifierToDelete.getUuid()));
+  }
+
+  @DisplayName(
+      "fills the provided identifiers with the missing values, obtained from the existing identifiers, where present")
+  @Test
+  void fillProvidedIdentifiers()
+      throws CudamiServiceException, ValidationException, IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+
+    // The identifiable, which we want to update, carries one identifier, which is already
+    // present in the database (but when we provide it, we do not set the UUID of the identifiable)
+    // and another one, which is new
+    Identifiable identifiableToUpdate = new Identifiable();
+    identifiableToUpdate.setUuid(uuid);
+    identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    identifiableToUpdate.setIdentifiers(
+        Set.of(new Identifier(null, "namespace1", "1"), new Identifier(null, "namespace2", "1")));
+
+    // The existing identifiable carries one identifier
+    Identifiable existingIdentifiable = new Identifiable();
+    existingIdentifiable.setUuid(uuid);
+    existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    Identifier existingIdentifier = new Identifier(uuid, "namespace1", "1");
+    existingIdentifier.setUuid(UUID.randomUUID());
+    existingIdentifiable.setIdentifiers(Set.of(existingIdentifier));
+
+    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
+    when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
+        .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
+    when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
+    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
+
+    Identifiable actual = service.update(identifiableToUpdate);
+    List<Identifier> actualIdentifiers = new ArrayList<>(actual.getIdentifiers());
+    // We sort the identifiers, for easier validation
+    Collections.sort(
+        actualIdentifiers,
+        (i1, i2) -> {
+          String key1 = i1.getNamespace() + ":" + i1.getId();
+          String key2 = i2.getNamespace() + ":" + i2.getId();
+          return key1.compareTo(key2);
+        });
+    assertThat(actualIdentifiers.get(0)).isEqualTo(existingIdentifier);
+    assertThat(actualIdentifiers.get(1).getIdentifiable()).isEqualTo(uuid);
+    assertThat(actualIdentifiers.get(1).getNamespace()).isEqualTo("namespace2");
+    assertThat(actualIdentifiers.get(1).getId()).isEqualTo("1");
   }
 }
