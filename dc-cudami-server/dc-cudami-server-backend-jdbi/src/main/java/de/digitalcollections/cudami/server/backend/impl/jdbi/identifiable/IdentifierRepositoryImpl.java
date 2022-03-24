@@ -148,22 +148,14 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Override
   public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) {
     final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_ID
-            + " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE identifiable = :uuid";
+        "SELECT " + SQL_RETURN_FIELDS + " FROM " + tableName + " WHERE identifiable = :uuid";
 
-    List<Identifier> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", uuidIdentifiable)
-                    .mapToBean(Identifier.class)
-                    .collect(Collectors.toList()));
-    return result;
+    return dbi.withHandle(
+        h ->
+            h.createQuery(sql)
+                .bind("uuid", uuidIdentifiable)
+                .mapToBean(Identifier.class)
+                .collect(Collectors.toList()));
   }
 
   @Override
@@ -245,6 +237,20 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             h ->
                 h.createQuery(sql)
                     .bindBean(identifier)
+                    .mapToBean(Identifier.class)
+                    .findOne()
+                    .orElse(null));
+    return result;
+  }
+
+  public Identifier getByUuid(UUID identifierUuid) {
+    final String sql = "SELECT " + SQL_RETURN_FIELDS + " FROM " + tableName + " WHERE uuid = :uuid";
+
+    Identifier result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("uuid", identifierUuid)
                     .mapToBean(Identifier.class)
                     .findOne()
                     .orElse(null));

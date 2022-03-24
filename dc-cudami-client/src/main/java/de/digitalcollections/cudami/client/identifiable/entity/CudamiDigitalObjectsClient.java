@@ -2,6 +2,9 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -25,6 +28,19 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
 
   public List<DigitalObject> findAllReduced() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
+  }
+
+  public SearchPageResponse<DigitalObject> findAllForParent(DigitalObject parent)
+      throws TechnicalException {
+    if (parent == null) {
+      throw new TechnicalException("Empty parent");
+    }
+
+    SearchPageRequest searchPageRequest = new SearchPageRequest(null, 0, 10000);
+    searchPageRequest.setFiltering(
+        new Filtering(
+            List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
+    return find(searchPageRequest);
   }
 
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws TechnicalException {

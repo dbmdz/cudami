@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -131,5 +133,20 @@ class CudamiDigitalObjectsClientTest
 
     verifyHttpRequestByMethodRelativeUrlAndRequestBody(
         "post", "/" + uuid + "/fileresources", fileResources);
+  }
+
+  @Test
+  @DisplayName("can retrieve all ADOs for a parent DigitalObject")
+  public void retrieveAdosForParent() throws Exception {
+    DigitalObject parent =
+        new DigitalObjectBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Parent")
+            .build();
+
+    client.findAllForParent(parent);
+
+    verifyHttpRequestByMethodAndRelativeURL(
+        "get", "/search?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());
   }
 }
