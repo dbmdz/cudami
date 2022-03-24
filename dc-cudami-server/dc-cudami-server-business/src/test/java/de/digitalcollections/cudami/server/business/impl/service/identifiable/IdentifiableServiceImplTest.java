@@ -670,12 +670,15 @@ class IdentifiableServiceImplTest {
     identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
     identifiableToUpdate.setIdentifiers(Set.of(new Identifier(null, "namespace", "value")));
 
+    Identifier identifierToDelete = new Identifier(uuid, "other", "foo");
     Identifiable existingIdentifiable = new Identifiable();
     existingIdentifiable.setUuid(uuid);
     existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    existingIdentifiable.setIdentifiers(Set.of(new Identifier(uuid, "other", "foo")));
+    existingIdentifiable.setIdentifiers(Set.of(identifierToDelete));
 
     when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
+    when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
+        .thenReturn(List.of(identifierToDelete));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
     when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
@@ -687,8 +690,7 @@ class IdentifiableServiceImplTest {
     assertThat(actualIdentifier.getNamespace()).isEqualTo("namespace");
     assertThat(actualIdentifier.getId()).isEqualTo("value");
 
-    // verify(identifierRepository, times(1)).save(any(Identifier.class));
-    // verify(identifierRepository, times(1)).delete(any(UUID.class));
-
+    verify(identifierRepository, times(1)).save(any(Identifier.class));
+    verify(identifierRepository, times(1)).delete(eq(identifierToDelete.getUuid()));
   }
 }
