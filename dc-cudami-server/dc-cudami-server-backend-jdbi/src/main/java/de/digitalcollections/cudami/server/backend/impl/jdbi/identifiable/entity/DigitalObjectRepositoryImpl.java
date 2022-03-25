@@ -13,6 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseReposi
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
@@ -514,6 +515,29 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
    */
   public DigitalObject getByUuidAndFiltering(UUID uuid, Filtering filtering) {
     DigitalObject digitalObject = super.getByUuidAndFiltering(uuid, filtering);
+    fillAttributes(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  /**
+   * Returns the fully filled DigitalObject including all of its direct attributes.
+   *
+   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
+   * UUID set, and the client is responsible for retrieving the whole item object!
+   */
+  public DigitalObject getByIdentifier(Identifier identifier) {
+    DigitalObject digitalObject = super.getByIdentifier(identifier);
+    fillAttributes(digitalObject);
+    return digitalObject;
+  }
+
+  private void fillAttributes(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return;
+    }
+
+    UUID uuid = digitalObject.getUuid();
 
     // Look for linked data file resources. If they exist, fill the DigitalObject
     List<LinkedDataFileResource> linkedDataFileResources = getLinkedDataFileResources(uuid);
@@ -579,8 +603,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         }
       }
     }
-
-    return digitalObject;
   }
 
   @Override
