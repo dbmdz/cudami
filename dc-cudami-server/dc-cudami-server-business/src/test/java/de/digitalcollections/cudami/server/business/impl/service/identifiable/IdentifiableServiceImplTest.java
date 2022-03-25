@@ -677,7 +677,15 @@ class IdentifiableServiceImplTest {
     existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
     existingIdentifiable.setIdentifiers(Set.of(identifierToDelete));
 
-    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
+    Identifiable existingIdentifiableWithUpdatedIdentifiers = new Identifiable();
+    existingIdentifiableWithUpdatedIdentifiers.setUuid(uuid);
+    existingIdentifiableWithUpdatedIdentifiers.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    existingIdentifiableWithUpdatedIdentifiers.setIdentifiers(
+        Set.of(new Identifier(uuid, "namespace", "value")));
+
+    when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
+        .thenReturn(existingIdentifiable)
+        .thenReturn(existingIdentifiableWithUpdatedIdentifiers);
     when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(List.of(identifierToDelete));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
@@ -719,7 +727,15 @@ class IdentifiableServiceImplTest {
     existingIdentifier.setUuid(UUID.randomUUID());
     existingIdentifiable.setIdentifiers(Set.of(existingIdentifier));
 
-    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
+    Identifiable existingIdentifiableWithUpdateUuids = new Identifiable();
+    existingIdentifiableWithUpdateUuids.setUuid(uuid);
+    existingIdentifiableWithUpdateUuids.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    existingIdentifiableWithUpdateUuids.setIdentifiers(
+        Set.of(existingIdentifier, new Identifier(uuid, "namespace2", "1")));
+
+    when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
+        .thenReturn(existingIdentifiable)
+        .thenReturn(existingIdentifiableWithUpdateUuids);
     when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
@@ -739,5 +755,10 @@ class IdentifiableServiceImplTest {
     assertThat(actualIdentifiers.get(1).getIdentifiable()).isEqualTo(uuid);
     assertThat(actualIdentifiers.get(1).getNamespace()).isEqualTo("namespace2");
     assertThat(actualIdentifiers.get(1).getId()).isEqualTo("1");
+
+    // Only one identifier was saved - the identifier, was was provided, but did not already exist
+    verify(identifierRepository, times(1)).save(any(Identifier.class));
+    // No identifier was deleted at all
+    verify(identifierRepository, never()).delete(any(UUID.class));
   }
 }
