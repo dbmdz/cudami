@@ -1,4 +1,4 @@
-package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.relation;
+package de.digitalcollections.cudami.server.business.impl.service.relation;
 
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
