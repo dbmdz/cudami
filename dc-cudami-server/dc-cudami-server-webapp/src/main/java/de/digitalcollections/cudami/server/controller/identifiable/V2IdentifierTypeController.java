@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Identifier type controller")
 public class V2IdentifierTypeController {
 
-  private final DigitalCollectionsObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
+  private final ObjectMapper objectMapper;
   private final IdentifierTypeService identifierTypeService;
 
-  public V2IdentifierTypeController(IdentifierTypeService identifierTypeService) {
+  public V2IdentifierTypeController(
+      IdentifierTypeService identifierTypeService, ObjectMapper objectMapper) {
     this.identifierTypeService = identifierTypeService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(
