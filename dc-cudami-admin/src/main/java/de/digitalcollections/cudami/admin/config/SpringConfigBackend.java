@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,12 +15,12 @@ public class SpringConfigBackend {
   private String serverUrl;
 
   @Bean
-  public CudamiClient cudamiClient() {
+  public CudamiClient cudamiClient(ObjectMapper objectMapper) {
     final HttpClient http =
         HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    return new CudamiClient(http, serverUrl, new DigitalCollectionsObjectMapper());
+    return new CudamiClient(http, serverUrl, objectMapper);
   }
 }
