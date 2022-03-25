@@ -290,7 +290,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     I updatedIdentifiable, identifiableInDb;
     try {
       identifiableInDb = repository.getByUuid(identifiable.getUuid());
-      updatedIdentifiable = repository.update(identifiable);
+      repository.update(identifiable);
 
       // Retrieve all identifiers from the database and put them into a map
       Map<String, Identifier> existingIdentifierMap =
