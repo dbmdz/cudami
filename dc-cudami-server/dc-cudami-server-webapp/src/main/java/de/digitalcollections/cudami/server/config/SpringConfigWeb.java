@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.commons.springmvc.converter.StringToOrderConverter;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.server.interceptors.RequestIdLoggingInterceptor;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.format.datetime.standard.DateTimeFormatterRegistrar;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.format.support.FormattingConversionService;
@@ -77,6 +79,11 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public AbstractProcessorDialect whiteSpaceNormalizedDialect() {
     return new SpacesDialect();
+  }
+
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new StringToOrderConverter());
   }
 
   @Override
