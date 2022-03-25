@@ -5,6 +5,7 @@ import com.github.mxab.thymeleaf.extras.dataattribute.dialect.DataAttributeDiale
 import de.digitalcollections.commons.servlet.filter.LogSessionIdFilter;
 import de.digitalcollections.commons.springmvc.config.SpringConfigCommonsMvc;
 import de.digitalcollections.commons.springmvc.controller.ErrorController;
+import de.digitalcollections.commons.springmvc.converter.StringToOrderConverter;
 import de.digitalcollections.commons.springmvc.thymeleaf.SpacesDialect;
 import de.digitalcollections.cudami.admin.converter.GrantedAuthorityJsonFilter;
 import de.digitalcollections.cudami.admin.interceptors.CreateAdminUserInterceptor;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -122,5 +124,10 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   public LanguageSortingHelper languageSortingHelper(
       @Value("${cudami.prioritisedSortedLanguages}") List<Locale> prioritisedSortedLanguages) {
     return new LanguageSortingHelper(prioritisedSortedLanguages);
+  }
+
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(new StringToOrderConverter());
   }
 }
