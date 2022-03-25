@@ -183,12 +183,6 @@ public class DigitalObjectController {
           String id)
       throws IdentifiableServiceException {
     return digitalObjectService.getByIdentifier(namespace, id);
-    //    if (digitalObject == null) {
-    //      // FIXME throw resource not found http exception
-    //      throw new IdentifiableServiceException(
-    //          "DigitalObject " + namespace + ":" + id + " not found");
-    //    }
-    //    return digitalObject;
   }
 
   @Operation(summary = "Get a digital object by refId")

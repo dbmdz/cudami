@@ -311,10 +311,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       Set<String> providedIdentifiersByNamespaceAndId = providedIdentifierMap.keySet();
 
       // Difference calculations
-      Set<String> obsoleteIdentifiers = new HashSet(existingIdentifiersByNamespaceAndId);
+      Set<String> obsoleteIdentifiers = new HashSet<>(existingIdentifiersByNamespaceAndId);
       obsoleteIdentifiers.removeAll(providedIdentifiersByNamespaceAndId);
 
-      Set<String> missingIdentifiers = new HashSet(providedIdentifiersByNamespaceAndId);
+      Set<String> missingIdentifiers = new HashSet<>(providedIdentifiersByNamespaceAndId);
       missingIdentifiers.removeAll(existingIdentifiersByNamespaceAndId);
 
       if (!missingIdentifiers.isEmpty()) {
@@ -325,12 +325,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         obsoleteIdentifiers.forEach(
             i -> identifierRepository.delete(existingIdentifierMap.get(i).getUuid()));
       }
-
-      // save identifiers
-      // as we store the whole list new: delete old entries
-      // identifierRepository.deleteByIdentifiable(identifiable);
-      // Set<Identifier> identifiers = identifiable.getIdentifiers();
-      // saveIdentifiers(identifiers, identifiable);
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -359,14 +353,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
           }
         }
       }
-      LocalizedUrlAliases savedLocalizedUrlAliases =
-          urlAliasService.findLocalizedUrlAliases(updatedIdentifiable.getUuid());
-      updatedIdentifiable.setLocalizedUrlAliases(savedLocalizedUrlAliases);
-      return updatedIdentifiable;
-
     } catch (CudamiServiceException e) {
       LOGGER.error("Error while updating URL aliases for " + identifiable, e);
       throw new IdentifiableServiceException(e.getMessage(), e);
     }
+
+    return repository.getByUuid(identifiable.getUuid());
   }
 }

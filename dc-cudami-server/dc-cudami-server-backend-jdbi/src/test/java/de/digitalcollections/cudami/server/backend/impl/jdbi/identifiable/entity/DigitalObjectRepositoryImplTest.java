@@ -230,77 +230,7 @@ class DigitalObjectRepositoryImplTest {
   @Test
   @DisplayName("returns the reduced DigitalObject without any creation info and embedded resources")
   void returnReduced() {
-    // Insert a license with uuid
-    ensureLicense(EXISTING_LICENSE);
-
-    // Insert a corporate body with UUID
-    CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
-            .build();
-    CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
-    corporateBodyRepository.save(creator);
-
-    // Insert a geolocation with UUID
-    GeoLocation creationPlace =
-        new GeoLocationBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Ort")
-            .build();
-    GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
-    geoLocationRepository.save(creationPlace);
-
-    // Insert a LinkedDataFileResource
-    LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .build();
-
-    linkedDataFileResourceRepository.save(linkedDataFileResource);
-
-    // Insert a rendering FileResource
-    FileResource renderingResource = new FileResource();
-    renderingResource.setUri(URI.create("https://bla.bla/foo.jpg"));
-    renderingResource.setMimeType(MimeType.MIME_IMAGE);
-    renderingResource.setUuid(UUID.randomUUID());
-    renderingResource.setFilename("foo.jpg");
-    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
-    FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
-        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
-    fileResourceMetadataRepository.save(renderingResource);
-
-    // Build a CreationInfo object with the formerly persisted contents
-    CreationInfo creationInfo =
-        new CreationInfoBuilder()
-            .withCreator(creator)
-            .withDate("2022-02-25")
-            .withGeoLocation(creationPlace)
-            .build();
-
-    // Build a parent DigitalObject, save and retrieve it
-    DigitalObject parent =
-        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
-
-    DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLicense(EXISTING_LICENSE)
-            .withCreationInfo(creationInfo)
-            .withLinkedDataFileResource(linkedDataFileResource)
-            .withRenderingResource(renderingResource)
-            .build();
+    DigitalObject digitalObject = buildDigitalObject();
 
     // The "save" method internally retrieves the object by findOne
     repo.save(digitalObject);
@@ -402,11 +332,111 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actual.getIdentifiers()).containsExactly(identifier1, identifier2);
   }
 
+  @Test
+  @DisplayName("can return null, when getByIdentifier finds no DigitalObject")
+  void returnNullByGetByIdentifier() {
+    assertThat(repo.getByIdentifier(new Identifier(null, "namespace", "nonexisting"))).isNull();
+  }
+
+  @Test
+  @DisplayName("returns the fully filled DigitalObject by getByIdentifer")
+  void returnGetByIdentifier() {
+    DigitalObject digitalObject = buildDigitalObject();
+    digitalObject = repo.save(digitalObject);
+    identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));
+
+    DigitalObject actual = repo.getByIdentifier(new Identifier(null, "namespace", "key"));
+
+    CreationInfo actualCreationInfo = actual.getCreationInfo();
+    assertThat(actualCreationInfo).isNotNull();
+    assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
+        .isEqualTo("Körperschaft");
+    assertThat(actual.getLinkedDataResources()).isNotEmpty();
+    assertThat(actual.getRenderingResources()).isNotEmpty();
+    assertThat(actual.getParent()).isNotNull();
+  }
+
   // -----------------------------------------------------------------
   private void ensureLicense(License license) {
     LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }
+  }
+
+  private DigitalObject buildDigitalObject() {
+    // Insert a license with uuid
+    ensureLicense(EXISTING_LICENSE);
+
+    // Insert a corporate body with UUID
+    CorporateBody creator =
+        new CorporateBodyBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Körperschaft")
+            .withLabel(Locale.ENGLISH, "Corporate Body")
+            .build();
+    CorporateBodyRepositoryImpl corporateBodyRepository =
+        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+    corporateBodyRepository.save(creator);
+
+    // Insert a geolocation with UUID
+    GeoLocation creationPlace =
+        new GeoLocationBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Ort")
+            .build();
+    GeoLocationRepositoryImpl geoLocationRepository =
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+    geoLocationRepository.save(creationPlace);
+
+    // Insert a LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        new LinkedDataFileResourceBuilder()
+            .withUuid(UUID.randomUUID())
+            .withLabel(Locale.GERMAN, "Linked Data")
+            .withContext("https://foo.bar/blubb.xml")
+            .withObjectType("XML")
+            .withFilename("blubb.xml") // required!!
+            .withMimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+
+    linkedDataFileResourceRepository.save(linkedDataFileResource);
+
+    // Insert a rendering FileResource
+    FileResource renderingResource = new FileResource();
+    renderingResource.setUri(URI.create("https://bla.bla/foo.jpg"));
+    renderingResource.setMimeType(MimeType.MIME_IMAGE);
+    renderingResource.setUuid(UUID.randomUUID());
+    renderingResource.setFilename("foo.jpg");
+    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
+    FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
+        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
+    fileResourceMetadataRepository.save(renderingResource);
+
+    // Build a CreationInfo object with the formerly persisted contents
+    CreationInfo creationInfo =
+        new CreationInfoBuilder()
+            .withCreator(creator)
+            .withDate("2022-02-25")
+            .withGeoLocation(creationPlace)
+            .build();
+
+    // Build a parent DigitalObject, save and retrieve it
+    DigitalObject parent =
+        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+
+    DigitalObject digitalObject =
+        new DigitalObjectBuilder()
+            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+            .withLabel(Locale.ENGLISH, "english label")
+            .withDescription(Locale.GERMAN, "Beschreibung")
+            .withDescription(Locale.ENGLISH, "description")
+            .withLicense(EXISTING_LICENSE)
+            .withCreationInfo(creationInfo)
+            .withLinkedDataFileResource(linkedDataFileResource)
+            .withRenderingResource(renderingResource)
+            .withParent(parent)
+            .build();
+    return digitalObject;
   }
 }

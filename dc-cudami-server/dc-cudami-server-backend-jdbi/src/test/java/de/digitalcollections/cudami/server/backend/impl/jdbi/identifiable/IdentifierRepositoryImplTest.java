@@ -65,7 +65,7 @@ class IdentifierRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can return a list of identifiers for an identifiable")
+  @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
   void identifiersForIdentifiable() {
     UUID identifiableUuid = UUID.randomUUID();
     Identifier identifier1 = repo.save(new Identifier(identifiableUuid, "namespace", "1"));
