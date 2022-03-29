@@ -26,12 +26,12 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_NAME = "identifiertypes";
 
   public static final String SQL_INSERT_FIELDS =
-      " uuid, created, identifiable, namespace, identifier, last_modified";
+      " uuid, created, label, namespace, pattern, last_modified";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
+      " :uuid, :created, :label, :namespace, :pattern, :lastModified";
   public static final String SQL_REDUCED_FIELDS_IDT =
       String.format(
-          " %1$s.uuid, %1$s.created, %1$s.identifiable, %1$s.namespace, %1$s.identifier, %1$s.last_modified",
+          " %1$s.uuid, %1$s.created, %1$s.label, %1$s.namespace, %1$s.pattern, %1$s.last_modified",
           TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
 

@@ -44,7 +44,7 @@ class IdentifierTypeRepositoryImplTest {
   void saveNewIdentifierType() {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
-    expected.setNamespace("type-namespace");
+    expected.setNamespace("type-namespace-" + System.currentTimeMillis()); // Namespace is PK
     expected.setPattern("type-pattern");
 
     IdentifierType actual = repo.save(expected);
@@ -60,7 +60,7 @@ class IdentifierTypeRepositoryImplTest {
   void getByUuid() {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
-    expected.setNamespace("type-namespace");
+    expected.setNamespace("type-namespace-" + System.currentTimeMillis());
     expected.setPattern("type-pattern");
 
     IdentifierType persisted = repo.save(expected);
@@ -78,7 +78,7 @@ class IdentifierTypeRepositoryImplTest {
   void getByUuidNotFound() {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
-    expected.setNamespace("type-namespace");
+    expected.setNamespace("type-namespace-" + System.currentTimeMillis());
     expected.setPattern("type-pattern");
     repo.save(expected);
 
@@ -89,14 +89,16 @@ class IdentifierTypeRepositoryImplTest {
   @Test
   @DisplayName("can retrieve an identifier type by namespace")
   void getByNamespace() {
+    String namespace = "type-namespace-" + System.currentTimeMillis();
+
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
-    expected.setNamespace("type-namespace");
+    expected.setNamespace(namespace);
     expected.setPattern("type-pattern");
 
     IdentifierType persisted = repo.save(expected);
 
-    IdentifierType actual = repo.getByNamespace("type-namespace");
+    IdentifierType actual = repo.getByNamespace(namespace);
     assertThat(actual.getLabel()).isEqualTo(expected.getLabel());
     assertThat(actual.getNamespace()).isEqualTo(expected.getNamespace());
     assertThat(actual.getPattern()).isEqualTo(expected.getPattern());
@@ -108,7 +110,7 @@ class IdentifierTypeRepositoryImplTest {
   void getByNamespaceNotFound() {
     IdentifierType expected = new IdentifierType();
     expected.setLabel("type-label");
-    expected.setNamespace("type-namespace");
+    expected.setNamespace("type-namespace-" + System.currentTimeMillis());
     expected.setPattern("type-pattern");
     repo.save(expected);
 
@@ -121,17 +123,37 @@ class IdentifierTypeRepositoryImplTest {
   void update() {
     IdentifierType initial = new IdentifierType();
     initial.setLabel("type-label");
-    initial.setNamespace("type-namespace");
+    initial.setNamespace("type-namespace-" + System.currentTimeMillis());
     initial.setPattern("type-pattern");
 
     IdentifierType expected = repo.save(initial);
     expected.setLabel("otherlabel");
     expected.setPattern("otherpattern");
-    expected.setNamespace("othernamespace");
+    expected.setNamespace("othernamespace-" + System.currentTimeMillis());
 
     IdentifierType actual = repo.update(expected);
     assertThat(actual.getLabel()).isEqualTo(expected.getLabel());
     assertThat(actual.getNamespace()).isEqualTo(expected.getNamespace());
     assertThat(actual.getPattern()).isEqualTo(expected.getPattern());
+  }
+
+  @Test
+  @DisplayName("can delete an identifier type")
+  void delete() {
+    IdentifierType initial = new IdentifierType();
+    initial.setLabel("type-label");
+    initial.setNamespace("type-namespace-" + System.currentTimeMillis());
+    initial.setPattern("type-pattern");
+
+    IdentifierType expected = repo.save(initial);
+
+    repo.delete(expected.getUuid());
+
+    IdentifierType actual = repo.getByUuid(expected.getUuid());
+    assertThat(actual).isNull();
+
+    expected.setLabel("otherlabel");
+    expected.setPattern("otherpattern");
+    expected.setNamespace("othernamespace-" + System.currentTimeMillis());
   }
 }
