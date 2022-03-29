@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- Handling of `LinkedDataFileResources`
+
+### Changed
+
+- Using `digitalcollections-model` Version 10
+- Database update for the updated `DigitalObject`
+- Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
+- Improved `Identifier` handling by avoiding useless deletions and re-insertions
+- Test updates
+- Fixed handling of IdentifierTypes
+
 ### Removed
 
 Methods returning one object renamed from `find...` to `getBy...`:
