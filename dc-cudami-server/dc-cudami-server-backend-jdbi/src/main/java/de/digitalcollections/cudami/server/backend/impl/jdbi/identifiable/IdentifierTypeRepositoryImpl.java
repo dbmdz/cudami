@@ -70,7 +70,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
                     .mapToBean(IdentifierType.class)
                     .list());
 
-    StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
+    StringBuilder sqlCount =
+        new StringBuilder("SELECT count(*) FROM " + tableName + " " + tableAlias);
     addFiltering(pageRequest, sqlCount, argumentMappings);
     long total =
         dbi.withHandle(
