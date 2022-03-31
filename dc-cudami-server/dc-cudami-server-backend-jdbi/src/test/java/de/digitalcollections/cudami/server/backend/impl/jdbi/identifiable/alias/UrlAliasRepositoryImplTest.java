@@ -164,7 +164,7 @@ public class UrlAliasRepositoryImplTest {
     mainLinkInGerman.setTargetLanguage(Locale.GERMAN);
     mainLinkInGerman.setPrimary(true);
     mainLinkInGerman.setWebsite(website);
-    repo.save(mainLinkInGerman);
+    mainLinkInGerman = repo.save(mainLinkInGerman);
 
     LocalizedUrlAliases
         allLinks = this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
