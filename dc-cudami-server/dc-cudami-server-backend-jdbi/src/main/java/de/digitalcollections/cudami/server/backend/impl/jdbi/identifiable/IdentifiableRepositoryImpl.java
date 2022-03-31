@@ -848,8 +848,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       // to make saving on storage using uuid is possible
       identifiable.setUuid(UUID.randomUUID());
     }
-    identifiable.setCreated(LocalDateTime.now());
-    identifiable.setLastModified(LocalDateTime.now());
+    if (identifiable.getCreated() == null) {
+      identifiable.setCreated(LocalDateTime.now());
+    }
+    if (identifiable.getLastModified() == null) {
+      identifiable.setLastModified(LocalDateTime.now());
+    }
 
     final String sql =
         "INSERT INTO " + tableName + "(" + sqlInsertFields + ") VALUES (" + sqlInsertValues + ")";
