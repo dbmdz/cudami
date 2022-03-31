@@ -18,6 +18,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -77,10 +78,10 @@ class IdentifiableRepositoryImplTest {
   void testGetByUuid() {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
-    identifiable.setCreated(LocalDateTime.now());
+    identifiable.setCreated(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     identifiable.setType(IdentifiableType.RESOURCE);
     identifiable.setLabel("test");
-    identifiable.setLastModified(LocalDateTime.now());
+    identifiable.setLastModified(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
 
     identifiable = this.repo.save(identifiable);
 

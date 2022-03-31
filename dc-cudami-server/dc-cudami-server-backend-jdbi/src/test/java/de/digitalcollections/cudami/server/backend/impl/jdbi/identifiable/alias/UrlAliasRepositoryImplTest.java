@@ -20,6 +20,7 @@ import de.digitalcollections.model.paging.SearchPageRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -70,9 +71,9 @@ public class UrlAliasRepositoryImplTest {
     // to meet the foreign key constraints we must do some preparation
     this.website = new Website(new URL("https://my-first-website.com"));
     this.website.setUuid(UUID.randomUUID());
-    this.website.setCreated(LocalDateTime.now());
+    this.website.setCreated(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     this.website.setRefId(13);
-    this.website.setLastModified(LocalDateTime.now());
+    this.website.setLastModified(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     this.website.setLabel("Test website");
     this.websiteRepository.save(this.website);
   }
@@ -119,7 +120,8 @@ public class UrlAliasRepositoryImplTest {
   @Test
   public void update() throws UrlAliasRepositoryException {
     this.urlAliasWithoutWebsite = this.repo.save(this.urlAliasWithoutWebsite);
-    this.urlAliasWithoutWebsite.setLastPublished(LocalDateTime.now());
+    this.urlAliasWithoutWebsite.setLastPublished(
+        LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     this.urlAliasWithoutWebsite.setPrimary(true);
     this.urlAliasWithoutWebsite.setTargetIdentifiableType(IdentifiableType.ENTITY);
     this.urlAliasWithoutWebsite.setTargetEntityType(EntityType.COLLECTION);
