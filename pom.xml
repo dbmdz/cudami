@@ -95,7 +95,7 @@
     <version.githook-maven-plugin>1.0.5</version.githook-maven-plugin>
     <version.jacoco-maven-plugin>0.8.7</version.jacoco-maven-plugin>
     <version.maven-failsafe-plugin>3.0.0-M5</version.maven-failsafe-plugin>
-    <version.maven-fmt-plugin>2.13</version.maven-fmt-plugin>
+    <version.maven-fmt-plugin>2.18</version.maven-fmt-plugin>
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.12</version.nexus-staging-maven-plugin>
@@ -295,7 +295,7 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.coveo</groupId>
+        <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
         <version>${version.maven-fmt-plugin}</version>
         <executions>
