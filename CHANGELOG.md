@@ -32,6 +32,12 @@ Methods returning one object renamed from `find...` to `getBy...`:
 - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
 - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
 
+## [5.2.3](https://github.com/dbmdz/cudami/releases/tag/5.2.3) - 2022-04-01
+
+### Changed
+
+- Updated Spring Boot to fix CVE-2022-22965
+
 ## [5.2.2](https://github.com/dbmdz/cudami/releases/tag/5.2.2) - 2022-03-15
 
 ### Changed
