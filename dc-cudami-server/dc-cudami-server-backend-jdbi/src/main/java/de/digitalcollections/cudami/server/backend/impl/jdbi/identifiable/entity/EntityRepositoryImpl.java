@@ -41,7 +41,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
-    // FIXME add navdate!
     // refid is generated as serial, DO NOT SET!
     return IdentifiableRepositoryImpl.getSqlInsertValues()
         + ", :customAttributes::JSONB"
