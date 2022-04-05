@@ -2,7 +2,13 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+<<<<<<< HEAD
 import de.digitalcollections.model.filter.Filtering;
+=======
+import de.digitalcollections.model.filter.FilterCriterion;
+import de.digitalcollections.model.filter.FilterOperation;
+import de.digitalcollections.model.filter.FilteringBuilder;
+>>>>>>> Version dependency downgrade
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
