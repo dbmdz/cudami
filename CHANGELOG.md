@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- Using `digitalcollections-model` Version 10
+- Using `digitalcollections-model` Version 9.2.0
 - Database update for the updated `DigitalObject`
 - Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions

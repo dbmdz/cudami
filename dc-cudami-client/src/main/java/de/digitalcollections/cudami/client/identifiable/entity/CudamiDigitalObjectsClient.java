@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.filter.FilteringBuilder;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -38,8 +38,9 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
 
     SearchPageRequest searchPageRequest = new SearchPageRequest(null, 0, 10000);
     searchPageRequest.setFiltering(
-        new Filtering(
-            List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
+        new FilteringBuilder()
+            .add(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))
+            .build());
     return find(searchPageRequest);
   }
 
