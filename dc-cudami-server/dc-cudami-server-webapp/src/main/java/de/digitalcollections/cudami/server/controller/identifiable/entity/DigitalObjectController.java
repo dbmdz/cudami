@@ -89,11 +89,17 @@ public class DigitalObjectController {
   public PageResponse<DigitalObject> findAll(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "parent.uuid", required = false)
+          FilterCriterion<UUID> parentUuidFilterCriterion) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
+    }
+    if (parentUuidFilterCriterion != null) {
+      parentUuidFilterCriterion.setExpression("parent.uuid");
+      pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
     }
     return digitalObjectService.find(pageRequest);
   }

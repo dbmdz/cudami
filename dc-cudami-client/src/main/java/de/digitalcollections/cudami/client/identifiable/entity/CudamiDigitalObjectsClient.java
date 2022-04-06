@@ -2,9 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.FilteringBuilder;
+import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -12,6 +10,7 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageRequestBuilder;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -30,18 +29,20 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
   }
 
-  public SearchPageResponse<DigitalObject> findAllForParent(DigitalObject parent)
+  public PageResponse<DigitalObject> findAllForParent(DigitalObject parent)
       throws TechnicalException {
     if (parent == null) {
       throw new TechnicalException("Empty parent");
     }
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest(null, 0, 10000);
-    searchPageRequest.setFiltering(
-        new FilteringBuilder()
-            .add(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))
-            .build());
-    return find(searchPageRequest);
+    PageRequest pageRequest =
+        new PageRequestBuilder()
+            .pageNumber(0)
+            .pageSize(10000)
+            .filtering(
+                Filtering.defaultBuilder().filter("parent.uuid").isEquals(parent.getUuid()).build())
+            .build();
+    return find(pageRequest);
   }
 
   public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws TechnicalException {

@@ -32,7 +32,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   public static String getSqlInsertFields() {
-
     return IdentifiableRepositoryImpl.getSqlInsertFields()
         + ", custom_attrs"
         + ", entity_type"
