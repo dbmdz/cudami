@@ -147,6 +147,6 @@ class CudamiDigitalObjectsClientTest
     client.findAllForParent(parent);
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/search?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());
+        "get", "?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());
   }
 }

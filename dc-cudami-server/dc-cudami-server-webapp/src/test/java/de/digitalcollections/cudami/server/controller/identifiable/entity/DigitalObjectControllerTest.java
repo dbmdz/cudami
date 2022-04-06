@@ -13,8 +13,8 @@ import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -68,12 +68,12 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v5/digitalobjects/search?pageNumber=0&pageSize=10000&parent.uuid=eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
+        "/v5/digitalobjects?pageNumber=0&pageSize=10000&parent.uuid=eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
       })
   public void filterByParentUUID(String path) throws Exception {
     UUID parentUuid = UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d");
 
-    SearchPageResponse<DigitalObject> expected = new SearchPageResponse<>();
+    PageResponse<DigitalObject> expected = new PageResponse<>();
     expected.setContent(
         List.of(
             new DigitalObjectBuilder()
@@ -90,22 +90,22 @@ class DigitalObjectControllerTest extends BaseControllerTest {
                 .withParent(new DigitalObjectBuilder().withUuid(parentUuid).build())
                 .build()));
 
-    when(digitalObjectService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
 
-    ArgumentCaptor<SearchPageRequest> searchPageRequestArgumentCaptor =
-        ArgumentCaptor.forClass(SearchPageRequest.class);
+    ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
+        ArgumentCaptor.forClass(PageRequest.class);
 
-    SearchPageRequest expectedSearchPageRequest = new SearchPageRequest();
-    expectedSearchPageRequest.setPageSize(10000);
-    expectedSearchPageRequest.setPageNumber(0);
+    PageRequest expectedPageRequest = new PageRequest();
+    expectedPageRequest.setPageSize(10000);
+    expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
         new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid);
     Filtering filtering = new Filtering(List.of(filterCriterion));
-    expectedSearchPageRequest.setFiltering(filtering);
+    expectedPageRequest.setFiltering(filtering);
 
     testJson(path, "/v5/digitalobjects/filtered_by_parent.json");
 
-    verify(digitalObjectService, times(1)).find(searchPageRequestArgumentCaptor.capture());
-    assertThat(searchPageRequestArgumentCaptor.getValue()).isEqualTo(expectedSearchPageRequest);
+    verify(digitalObjectService, times(1)).find(pageRequestArgumentCaptor.capture());
+    assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);
   }
 }
