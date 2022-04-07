@@ -237,6 +237,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     switch (modelProperty) {
       case "entityType":
         return tableAlias + ".entity_type";
+      case "navdate":
+        return tableAlias + ".navdate";
       case "refId":
         return tableAlias + ".refid";
       default:
