@@ -126,7 +126,7 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can save and retrieve a DigitalObject with all of its embedded resources")
+  @DisplayName("can save and retrieve a DigitalObject with all of its directly embedded resources")
   void saveDigitalObject() {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
@@ -151,19 +151,6 @@ class DigitalObjectRepositoryImplTest {
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
-
-    // Insert a LinkedDataFileResource
-    LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .build();
-
-    linkedDataFileResourceRepository.save(linkedDataFileResource);
 
     // Insert a rendering FileResource
     FileResource renderingResource = new FileResource();
@@ -195,7 +182,6 @@ class DigitalObjectRepositoryImplTest {
             .withDescription(Locale.ENGLISH, "description")
             .withLicense(EXISTING_LICENSE)
             .withCreationInfo(creationInfo)
-            .withLinkedDataFileResource(linkedDataFileResource)
             .withRenderingResource(renderingResource)
             .withParent(parent)
             .build();
@@ -215,9 +201,6 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
         .isEqualTo("2022-02-25");
     assertThat(actual.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
-
-    assertThat(actual.getLinkedDataResources()).hasSize(1);
-    assertThat(actual.getLinkedDataResources().get(0)).isEqualTo(linkedDataFileResource);
 
     assertThat(actual.getRenderingResources()).hasSize(1);
     assertThat(actual.getRenderingResources().get(0)).isEqualTo(renderingResource);

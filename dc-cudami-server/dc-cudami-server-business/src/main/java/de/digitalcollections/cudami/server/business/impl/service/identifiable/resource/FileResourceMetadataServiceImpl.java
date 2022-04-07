@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +47,6 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   private final TextFileResourceService textFileResourceService;
   private final VideoFileResourceService videoFileResourceService;
 
-  @Autowired
   public FileResourceMetadataServiceImpl(
       @Qualifier("fileResourceMetadataRepositoryImpl")
           FileResourceMetadataRepository<FileResource> metadataRepository,
@@ -64,7 +62,7 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
       CudamiConfig cudamiConfig) {
-    super(metadataRepository, identifierRepository, urlAliasService, cudamiConfig);
+    super(metadataRepository, identifierRepository, urlAliasService, localeService, cudamiConfig);
     this.applicationFileResourceService = applicationFileResourceService;
     this.audioFileResourceService = audioFileResourceService;
     this.imageFileResourceService = imageFileResourceService;

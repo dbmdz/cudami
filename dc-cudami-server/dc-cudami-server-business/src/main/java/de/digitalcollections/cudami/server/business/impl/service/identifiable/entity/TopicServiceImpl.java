@@ -4,9 +4,11 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -20,7 +22,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Service for Topic handling. */
@@ -30,13 +31,20 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicServiceImpl.class);
 
-  @Autowired
   public TopicServiceImpl(
       TopicRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
   }
 
   @Override

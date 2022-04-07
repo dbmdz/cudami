@@ -4,9 +4,11 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -21,7 +23,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -31,13 +32,20 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionServiceImpl.class);
 
-  @Autowired
   public CollectionServiceImpl(
       CollectionRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
   }
 
   @Override

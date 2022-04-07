@@ -3,11 +3,17 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.filter.Filtering;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -17,12 +23,13 @@ import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Service for Digital Object handling. */
@@ -34,19 +41,29 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
   private final CollectionService collectionService;
+  private final LinkedDataFileResourceService linkedDataFileResourceService;
   private final ProjectService projectService;
 
-  @Autowired
   public DigitalObjectServiceImpl(
       DigitalObjectRepository repository,
       CollectionService collectionService,
       ProjectService projectService,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LinkedDataFileResourceService linkedDataFileResourceService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
     this.collectionService = collectionService;
     this.projectService = projectService;
+    this.linkedDataFileResourceService = linkedDataFileResourceService;
   }
 
   @Override
@@ -107,7 +124,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getLinkedDataFileResources(digitalObjectUuid);
+    return linkedDataFileResourceService.getLinkedDataFileResourcesForDigitalObjectUuid(
+        digitalObjectUuid);
   }
 
   @Override
@@ -153,7 +171,70 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<LinkedDataFileResource> saveLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
-    return ((DigitalObjectRepository) repository)
-        .saveLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
+    return linkedDataFileResourceService.saveLinkedDataFileResources(
+        digitalObjectUuid, linkedDataFileResources);
+  }
+
+  @Override
+  public DigitalObject getByIdentifier(Identifier identifier) {
+    return fillDigitalObject(super.getByIdentifier(identifier));
+  }
+
+  @Override
+  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale)
+      throws IdentifiableServiceException {
+    return fillDigitalObject(super.getByUuidAndLocale(uuid, locale));
+  }
+
+  @Override
+  public DigitalObject getByRefId(long refId) {
+    return fillDigitalObject(super.getByRefId(refId));
+  }
+
+  @Override
+  public List<DigitalObject> getRandom(int count) {
+    List<DigitalObject> digitalObjects = super.getRandom(count);
+    if (digitalObjects == null || digitalObjects.isEmpty()) {
+      return digitalObjects;
+    }
+    return digitalObjects.stream().map(this::fillDigitalObject).collect(Collectors.toList());
+  }
+
+  @Override
+  public DigitalObject save(DigitalObject entity)
+      throws IdentifiableServiceException, ValidationException {
+    DigitalObject digitalObject = super.save(entity);
+
+    // save the linked data resources
+    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
+    saveLinkedDataFileResources(digitalObject, linkedDataResources);
+
+    return fillDigitalObject(digitalObject);
+  }
+
+  @Override
+  public DigitalObject update(DigitalObject entity)
+      throws IdentifiableServiceException, ValidationException {
+    DigitalObject digitalObject = super.update(entity);
+
+    // save the linked data resources
+    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
+    saveLinkedDataFileResources(digitalObject, linkedDataResources);
+
+    return fillDigitalObject(digitalObject);
+  }
+
+  private DigitalObject fillDigitalObject(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return null;
+    }
+
+    // Look for linked data file resources. If they exist, fill the DigitalObject
+    List<LinkedDataFileResource> linkedDataFileResources =
+        getLinkedDataFileResources(digitalObject.getUuid());
+    if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
+      digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
+    }
+    return digitalObject;
   }
 }

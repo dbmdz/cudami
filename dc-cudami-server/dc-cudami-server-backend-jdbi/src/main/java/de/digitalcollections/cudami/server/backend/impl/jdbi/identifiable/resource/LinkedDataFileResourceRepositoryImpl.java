@@ -4,8 +4,12 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +97,68 @@ public class LinkedDataFileResourceRepositoryImpl
       default:
         return null;
     }
+  }
+
+  @Override
+  public List<LinkedDataFileResource> getLinkedDataFileResourcesForDigitalObjectUuid(
+      UUID digitalObjectUuid) {
+    final String ldfrTableAlias = getTableAlias();
+    final String ldfrTableName = getTableName();
+    final String fieldsSql = getSqlSelectAllFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT dl.sortindex as idx, * FROM "
+                + ldfrTableName
+                + " AS "
+                + ldfrTableAlias
+                + " INNER JOIN digitalobject_linkeddataresources AS dl ON "
+                + ldfrTableAlias
+                + ".uuid = dl.linkeddata_fileresource_uuid"
+                + " WHERE dl.digitalobject_uuid = :uuid"
+                + " ORDER by idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<LinkedDataFileResource> linkedDataFileResources =
+        retrieveList(fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return linkedDataFileResources;
+  }
+
+  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
+    // as we store the whole list new: delete old entries
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM digitalobject_linkeddataresources WHERE digitalobject_uuid = :uuid")
+                .bind("uuid", digitalObjectUuid)
+                .execute());
+
+    if (linkedDataFileResources != null) {
+      // first save linked data resources
+      for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
+        if (linkedDataFileResource.getUuid() == null) {
+          save(linkedDataFileResource);
+        }
+      }
+
+      // second: save relations to digital object
+      dbi.useHandle(
+          handle -> {
+            PreparedBatch preparedBatch =
+                handle.prepareBatch(
+                    "INSERT INTO digitalobject_linkeddataresources(digitalobject_uuid, linkeddata_fileresource_uuid, sortIndex) VALUES(:uuid, :linkedDataFileResourceUuid, :sortIndex)");
+            for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
+              preparedBatch
+                  .bind("uuid", digitalObjectUuid)
+                  .bind("linkedDataFileResourceUuid", linkedDataFileResource.getUuid())
+                  .bind("sortIndex", getIndex(linkedDataFileResources, linkedDataFileResource))
+                  .add();
+            }
+            preparedBatch.execute();
+          });
+    }
+    return getLinkedDataFileResourcesForDigitalObjectUuid(digitalObjectUuid);
   }
 }

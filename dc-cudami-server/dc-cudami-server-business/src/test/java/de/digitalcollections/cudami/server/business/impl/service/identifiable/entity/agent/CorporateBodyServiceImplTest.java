@@ -12,10 +12,12 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import java.net.MalformedURLException;
@@ -50,6 +52,10 @@ class CorporateBodyServiceImplTest {
 
     cudamiConfig = mock(CudamiConfig.class);
 
+    HookProperties hookProperties = mock(HookProperties.class);
+
+    LocaleService localeService = mock(LocaleService.class);
+
     corporateBodyService =
         new CorporateBodyServiceImpl(
             corporateBodyRepository,
@@ -57,6 +63,8 @@ class CorporateBodyServiceImplTest {
             imageFileResourceService,
             identifierRepository,
             urlAliasService,
+            hookProperties,
+            localeService,
             cudamiConfig);
   }
 
