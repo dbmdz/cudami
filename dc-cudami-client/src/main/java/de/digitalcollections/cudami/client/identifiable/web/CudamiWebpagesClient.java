@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -72,6 +73,11 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
 
   public Webpage getParent(UUID uuid) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
+  }
+
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/related/fileresources", baseEndpoint, uuid), FileResource.class);
   }
 
   public Website getWebsite(UUID rootWebpageUuid) throws TechnicalException {

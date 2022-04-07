@@ -48,7 +48,6 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
     return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
   }
 
-  @Override
   public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
