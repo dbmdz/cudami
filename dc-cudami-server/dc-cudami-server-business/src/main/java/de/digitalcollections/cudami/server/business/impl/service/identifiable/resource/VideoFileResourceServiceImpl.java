@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.VideoFileResourceRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
@@ -27,8 +28,14 @@ public class VideoFileResourceServiceImpl extends IdentifiableServiceImpl<VideoF
       VideoFileResourceRepository videoFileResourceRepository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(videoFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        videoFileResourceRepository,
+        identifierRepository,
+        urlAliasService,
+        localeService,
+        cudamiConfig);
   }
 
   @Override

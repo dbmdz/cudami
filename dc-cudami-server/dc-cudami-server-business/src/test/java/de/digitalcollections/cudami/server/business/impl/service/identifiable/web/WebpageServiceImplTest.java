@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -50,7 +51,12 @@ class WebpageServiceImplTest {
     identifierRepository = mock(IdentifierRepository.class);
     urlAliasService = mock(UrlAliasService.class);
     cudamiConfig = mock(CudamiConfig.class);
-    service = new WebpageServiceImpl(repo, identifierRepository, urlAliasService, cudamiConfig);
+
+    LocaleService localeService = mock(LocaleService.class);
+
+    service =
+        new WebpageServiceImpl(
+            repo, identifierRepository, urlAliasService, localeService, cudamiConfig);
   }
 
   @Test

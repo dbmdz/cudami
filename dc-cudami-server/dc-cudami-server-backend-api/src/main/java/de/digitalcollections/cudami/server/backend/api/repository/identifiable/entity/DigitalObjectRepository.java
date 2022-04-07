@@ -6,7 +6,6 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
@@ -37,12 +36,6 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
-
-  default List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject) {
-    return getLinkedDataFileResources(digitalObject.getUuid());
-  }
-
-  List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
 
   default List<FileResource> getRenderingFileResources(DigitalObject digitalObject) {
     return getRenderingFileResources(digitalObject.getUuid());
@@ -91,16 +84,4 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   List<FileResource> saveRenderingResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources);
-
-  default List<LinkedDataFileResource> saveLinkedDataFileResources(
-      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources) {
-    if (linkedDataFileResources == null) {
-      return null;
-    }
-
-    return saveLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
-  }
-
-  List<LinkedDataFileResource> saveLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
 }

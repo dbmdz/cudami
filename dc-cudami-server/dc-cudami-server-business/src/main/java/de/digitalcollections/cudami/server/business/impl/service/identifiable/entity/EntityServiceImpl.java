@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -38,17 +38,19 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EntityServiceImpl.class);
 
-  @Autowired protected HookProperties hookProperties;
+  protected HookProperties hookProperties;
 
   protected HttpClient httpClient = HttpClient.newHttpClient();
 
-  @Autowired
   public EntityServiceImpl(
       @Qualifier("entityRepositoryImpl") EntityRepository<E> repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(repository, identifierRepository, urlAliasService, localeService, cudamiConfig);
+    this.hookProperties = hookProperties;
   }
 
   @Override

@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.ImageFileResourceRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
@@ -12,7 +13,6 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -22,13 +22,18 @@ public class ImageFileResourceServiceImpl extends IdentifiableServiceImpl<ImageF
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ImageFileResourceServiceImpl.class);
 
-  @Autowired
   public ImageFileResourceServiceImpl(
       ImageFileResourceRepository imageFileResourceRepository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(imageFileResourceRepository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        imageFileResourceRepository,
+        identifierRepository,
+        urlAliasService,
+        localeService,
+        cudamiConfig);
   }
 
   @Override

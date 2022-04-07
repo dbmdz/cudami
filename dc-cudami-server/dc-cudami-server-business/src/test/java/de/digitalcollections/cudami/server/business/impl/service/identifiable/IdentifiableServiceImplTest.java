@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -54,8 +55,12 @@ class IdentifiableServiceImplTest {
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
     urlAliasConfig.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
     cudamiConfig.setUrlAlias(urlAliasConfig);
+
+    LocaleService localeService = mock(LocaleService.class);
+
     service =
-        new IdentifiableServiceImpl(repo, identifierRepository, urlAliasService, cudamiConfig);
+        new IdentifiableServiceImpl(
+            repo, identifierRepository, urlAliasService, localeService, cudamiConfig);
   }
 
   @DisplayName("can add related entities by delegating it to the repository")
