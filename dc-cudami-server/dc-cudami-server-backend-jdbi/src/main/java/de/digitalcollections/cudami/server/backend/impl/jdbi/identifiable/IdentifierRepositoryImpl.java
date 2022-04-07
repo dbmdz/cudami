@@ -28,8 +28,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, identifiable, namespace, identifier, last_modified";
-  public static final String SQL_RETURN_FIELDS =
-      " uuid, created, identifiable, namespace, identifier as id, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
   public static final String TABLE_ALIAS = "id";
@@ -84,7 +82,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
     List<Identifier> result =
         dbi.withHandle(
-            h -> h.createQuery(sql).bindMap(argumentMappings).mapToBean(Identifier.class).list());
+            h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Identifier.class).list());
 
     StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
     addFiltering(pageRequest, sqlCount, argumentMappings);
@@ -123,7 +121,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                 h.createQuery(sql)
                     .bind("searchTerm", searchPageRequest.getQuery())
                     .bindMap(argumentMappings)
-                    .mapToBean(Identifier.class)
+                    .mapTo(Identifier.class)
                     .list());
 
     StringBuilder countQuery =
@@ -148,13 +146,19 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   @Override
   public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) {
     final String sql =
-        "SELECT " + SQL_RETURN_FIELDS + " FROM " + tableName + " WHERE identifiable = :uuid";
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " "
+            + tableAlias
+            + " WHERE identifiable = :uuid";
 
     return dbi.withHandle(
         h ->
             h.createQuery(sql)
                 .bind("uuid", uuidIdentifiable)
-                .mapToBean(Identifier.class)
+                .mapTo(Identifier.class)
                 .collect(Collectors.toList()));
   }
 
@@ -180,7 +184,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                 h.createQuery(sql)
                     .bind("namespace", namespace)
                     .bind("identifier", id)
-                    .mapToBean(Identifier.class)
+                    .mapTo(Identifier.class)
                     .findOne()
                     .orElse(null));
     return identifier;
@@ -229,8 +233,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " VALUES ( "
             + SQL_INSERT_VALUES
             + " )"
-            + " RETURNING "
-            + SQL_RETURN_FIELDS;
+            + " RETURNING *, identifier id";
 
     Identifier result =
         dbi.withHandle(
@@ -243,15 +246,23 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     return result;
   }
 
+  @Override
   public Identifier getByUuid(UUID identifierUuid) {
-    final String sql = "SELECT " + SQL_RETURN_FIELDS + " FROM " + tableName + " WHERE uuid = :uuid";
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " "
+            + tableAlias
+            + " WHERE uuid = :uuid";
 
     Identifier result =
         dbi.withHandle(
             h ->
                 h.createQuery(sql)
                     .bind("uuid", identifierUuid)
-                    .mapToBean(Identifier.class)
+                    .mapTo(Identifier.class)
                     .findOne()
                     .orElse(null));
     return result;
