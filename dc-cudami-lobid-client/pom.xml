@@ -14,7 +14,7 @@
   
   <properties>
     <skipIntegrationTests>true</skipIntegrationTests>
-    <version.maven-failsafe-plugin>2.22.2</version.maven-failsafe-plugin>
+    <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
   </properties>
   
   <dependencies>
