@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS digitalobject_renderingresources (
   sortIndex SMALLINT,
 
   PRIMARY KEY (digitalobject_uuid, fileresource_uuid),
-  FOREIGN KEY (digitalobject_uuid) REFERENCES digitalobjects(uuid),
-  FOREIGN KEY (fileresource_uuid) REFERENCES fileresources(uuid)
+  FOREIGN KEY (digitalobject_uuid) REFERENCES digitalobjects(uuid)
 );
