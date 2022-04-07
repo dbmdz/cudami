@@ -639,7 +639,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     String query =
         "SELECT * FROM fileresources f"
             + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
-            + " WHERE ref.identifiableUuid = :identifiableUuid"
+            + " WHERE ref.identifiable_uuid = :identifiableUuid"
             + " ORDER BY ref.sortindex";
 
     List<FileResource> result =
