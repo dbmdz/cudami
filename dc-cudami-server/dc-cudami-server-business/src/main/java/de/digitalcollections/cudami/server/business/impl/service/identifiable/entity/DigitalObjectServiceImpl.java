@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.filter.Filtering;
@@ -41,6 +42,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
   private final CollectionService collectionService;
+  private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private final LinkedDataFileResourceService linkedDataFileResourceService;
   private final ProjectService projectService;
 
@@ -51,6 +53,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
       LinkedDataFileResourceService linkedDataFileResourceService,
+      DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
@@ -63,6 +66,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
         cudamiConfig);
     this.collectionService = collectionService;
     this.projectService = projectService;
+    this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.linkedDataFileResourceService = linkedDataFileResourceService;
   }
 
@@ -130,7 +134,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getRenderingFileResources(digitalObjectUuid);
+    return digitalObjectRenderingFileResourceService.getForDigitalObject(digitalObjectUuid);
   }
 
   @Override
@@ -164,8 +168,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<FileResource> saveRenderingResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources) {
-    return ((DigitalObjectRepository) repository)
-        .saveRenderingResources(digitalObjectUuid, renderingResources);
+    return digitalObjectRenderingFileResourceService.saveForDigitalObject(
+        digitalObjectUuid, renderingResources);
   }
 
   @Override
@@ -201,27 +205,53 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject save(DigitalObject entity)
+  public DigitalObject save(DigitalObject digitalObject)
       throws IdentifiableServiceException, ValidationException {
-    DigitalObject digitalObject = super.save(entity);
+    // Keep the resources for later saving, because the repository save
+    // method returns the DigitalObject with empty fields there!
+    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
+    final List<FileResource> renderingResources = digitalObject.getRenderingResources();
+
+    digitalObject = super.save(digitalObject);
 
     // save the linked data resources
-    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
     saveLinkedDataFileResources(digitalObject, linkedDataResources);
+
+    // save the rendering resources
+    saveRenderingResources(digitalObject, renderingResources);
 
     return fillDigitalObject(digitalObject);
   }
 
   @Override
-  public DigitalObject update(DigitalObject entity)
+  public DigitalObject update(DigitalObject digitalObject)
       throws IdentifiableServiceException, ValidationException {
-    DigitalObject digitalObject = super.update(entity);
+    // Keep the resources for later saving, because the repository save
+    // method returns the DigitalObject with empty fields there!
+    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
+    final List<FileResource> renderingResources = digitalObject.getRenderingResources();
+
+    digitalObject = super.update(digitalObject);
 
     // save the linked data resources
-    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
     saveLinkedDataFileResources(digitalObject, linkedDataResources);
 
+    // save the rendering resources
+    saveRenderingResources(digitalObject, renderingResources);
+
     return fillDigitalObject(digitalObject);
+  }
+
+  @Override
+  public List<FileResource> getRenderingResources(DigitalObject digitalObject) {
+    return digitalObjectRenderingFileResourceService.getForDigitalObject(digitalObject);
+  }
+
+  @Override
+  public List<FileResource> saveRenderingResources(
+      DigitalObject digitalObject, List<FileResource> renderingResources) {
+    return digitalObjectRenderingFileResourceService.saveForDigitalObject(
+        digitalObject, renderingResources);
   }
 
   private DigitalObject fillDigitalObject(DigitalObject digitalObject) {
@@ -235,6 +265,13 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
       digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
     }
+
+    // Look for rendering resources. If they exist, fill the object
+    List<FileResource> renderingResources = getRenderingResources(digitalObject.getUuid());
+    if (renderingResources != null && !renderingResources.isEmpty()) {
+      digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
+    }
+
     return digitalObject;
   }
 }

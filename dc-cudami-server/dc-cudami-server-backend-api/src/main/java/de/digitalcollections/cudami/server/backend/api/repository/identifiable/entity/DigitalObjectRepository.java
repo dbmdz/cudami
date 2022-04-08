@@ -37,12 +37,6 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
 
-  default List<FileResource> getRenderingFileResources(DigitalObject digitalObject) {
-    return getRenderingFileResources(digitalObject.getUuid());
-  }
-
-  List<FileResource> getRenderingFileResources(UUID digitalObjectUuid);
-
   default Item getItem(DigitalObject digitalObject) {
     if (digitalObject == null) {
       return null;
@@ -73,15 +67,4 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
-
-  default List<FileResource> saveRenderingResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources) {
-    if (renderingResources == null) {
-      return null;
-    }
-    return saveRenderingResources(digitalObject.getUuid(), renderingResources);
-  }
-
-  List<FileResource> saveRenderingResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources);
 }

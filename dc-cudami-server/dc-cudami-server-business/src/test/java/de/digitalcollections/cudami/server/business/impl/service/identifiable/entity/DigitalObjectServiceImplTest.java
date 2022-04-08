@@ -15,6 +15,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
@@ -22,8 +23,12 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
+import de.digitalcollections.model.identifiable.resource.TextFileResource;
+import de.digitalcollections.model.text.LocalizedText;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -37,6 +42,7 @@ class DigitalObjectServiceImplTest {
   private CollectionService collectionService;
   private CudamiConfig cudamiConfig;
   private DigitalObjectServiceImpl service;
+  private DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private DigitalObjectRepository repo;
   protected HookProperties hookProperties;
   private IdentifierRepository identifierRepository;
@@ -49,6 +55,8 @@ class DigitalObjectServiceImplTest {
   public void beforeEach() throws CudamiServiceException {
     repo = mock(DigitalObjectRepository.class);
     collectionService = mock(CollectionService.class);
+    digitalObjectRenderingFileResourceService =
+        mock(DigitalObjectRenderingFileResourceService.class);
     hookProperties = mock(HookProperties.class);
     identifierRepository = mock(IdentifierRepository.class);
     linkedDataFileResourceService = mock(LinkedDataFileResourceService.class);
@@ -71,6 +79,7 @@ class DigitalObjectServiceImplTest {
             identifierRepository,
             urlAliasService,
             linkedDataFileResourceService,
+            digitalObjectRenderingFileResourceService,
             hookProperties,
             localeService,
             cudamiConfig);
@@ -138,6 +147,69 @@ class DigitalObjectServiceImplTest {
 
     assertThat(actual).isNotNull();
     assertThat(actual.getLinkedDataResources()).containsExactly(persistedLinkedDataFileResource);
+  }
+
+  @Test
+  @DisplayName("can save RenderingResources for a DigitalObject")
+  void saveRenderingResources() throws ValidationException, IdentifiableServiceException {
+    FileResource renderingResource = new TextFileResource();
+    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    renderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    renderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    renderingResource.setUuid(UUID.randomUUID());
+    renderingResource.setFilename("foo.html");
+    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+
+    Identifier identifier = new Identifier(null, "foo", "bar");
+
+    DigitalObject digitalObject =
+        new DigitalObjectBuilder()
+            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+            .withLabel(Locale.ENGLISH, "english label")
+            .withDescription(Locale.GERMAN, "Beschreibung")
+            .withDescription(Locale.ENGLISH, "description")
+            .withRenderingResource(renderingResource)
+            .build();
+
+    DigitalObject savedDigitalObject = digitalObject;
+    savedDigitalObject.setUuid(UUID.randomUUID());
+    when(repo.save(eq(digitalObject))).thenReturn(savedDigitalObject);
+    when(identifierRepository.save(eq(identifier))).thenReturn(identifier);
+
+    DigitalObject persisted = service.save(digitalObject);
+
+    assertThat(persisted.getRenderingResources()).hasSize(1);
+    assertThat(persisted.getRenderingResources().get(0)).isEqualTo(renderingResource);
+  }
+
+  @Test
+  @DisplayName("fills RenderingResources for a retrieved DigitalObject by uuid")
+  void fillRenderingResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        new DigitalObjectBuilder()
+            .withUuid(uuid)
+            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+            .withLabel(Locale.ENGLISH, "english label")
+            .withDescription(Locale.GERMAN, "Beschreibung")
+            .withDescription(Locale.ENGLISH, "description")
+            .build();
+    when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getForDigitalObject(eq(uuid)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual = service.getByUuidAndLocale(uuid, Locale.ROOT);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
   }
 
   /*
