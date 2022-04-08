@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -33,7 +32,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.thymeleaf.dialect.AbstractProcessorDialect;
-import org.thymeleaf.dialect.springdata.SpringDataDialect;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 
 @Configuration
@@ -42,7 +40,6 @@ import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
     excludeFilters = {
       @ComponentScan.Filter(value = ErrorController.class, type = FilterType.ASSIGNABLE_TYPE)
     })
-@EnableSpringDataWebSupport // for getting support for sorting and paging params
 @Import(SpringConfigCommonsMvc.class)
 public class SpringConfigWeb implements WebMvcConfigurer {
 
@@ -73,11 +70,6 @@ public class SpringConfigWeb implements WebMvcConfigurer {
   @Bean
   public LayoutDialect layoutDialect() {
     return new LayoutDialect();
-  }
-
-  @Bean
-  public SpringDataDialect springDataDialect() {
-    return new SpringDataDialect();
   }
 
   @Bean
