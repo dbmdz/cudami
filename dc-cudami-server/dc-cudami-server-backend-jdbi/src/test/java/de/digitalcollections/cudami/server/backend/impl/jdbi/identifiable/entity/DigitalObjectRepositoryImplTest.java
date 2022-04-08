@@ -126,7 +126,7 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can save and retrieve a DigitalObject with all of its directly embedded resources")
+  @DisplayName("can save and retrieve a DigitalObject with its directly embedded resources")
   void saveDigitalObject() {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
@@ -152,17 +152,6 @@ class DigitalObjectRepositoryImplTest {
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
-    // Insert a rendering FileResource
-    FileResource renderingResource = new FileResource();
-    renderingResource.setUri(URI.create("https://bla.bla/foo.jpg"));
-    renderingResource.setMimeType(MimeType.MIME_IMAGE);
-    renderingResource.setUuid(UUID.randomUUID());
-    renderingResource.setFilename("foo.jpg");
-    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
-    FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
-        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
-    fileResourceMetadataRepository.save(renderingResource);
-
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
         new CreationInfoBuilder()
@@ -182,7 +171,6 @@ class DigitalObjectRepositoryImplTest {
             .withDescription(Locale.ENGLISH, "description")
             .withLicense(EXISTING_LICENSE)
             .withCreationInfo(creationInfo)
-            .withRenderingResource(renderingResource)
             .withParent(parent)
             .build();
 
@@ -201,9 +189,6 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
         .isEqualTo("2022-02-25");
     assertThat(actual.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
-
-    assertThat(actual.getRenderingResources()).hasSize(1);
-    assertThat(actual.getRenderingResources().get(0)).isEqualTo(renderingResource);
 
     assertThat(actual.getParent()).isNotNull();
     assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
@@ -322,7 +307,7 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("returns the fully filled DigitalObject by getByIdentifer")
+  @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() {
     DigitalObject digitalObject = buildDigitalObject();
     digitalObject = repo.save(digitalObject);
@@ -334,8 +319,6 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualCreationInfo).isNotNull();
     assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
         .isEqualTo("Körperschaft");
-    assertThat(actual.getLinkedDataResources()).isNotEmpty();
-    assertThat(actual.getRenderingResources()).isNotEmpty();
     assertThat(actual.getParent()).isNotNull();
   }
 
