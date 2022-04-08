@@ -17,8 +17,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -173,8 +171,7 @@ public class ProjectsController extends AbstractController {
   }
 
   @GetMapping("/projects/{uuid}")
-  public String view(
-      @PathVariable UUID uuid, @PageableDefault(size = 25) Pageable pageable, Model model)
+  public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.getByUuid(uuid);
