@@ -280,8 +280,8 @@
             <configuration>
               <hooks>
                 <pre-commit>
-                  if ! mvn com.coveo:fmt-maven-plugin:check ; then
-                  mvn com.coveo:fmt-maven-plugin:format
+                  if ! mvn com.spotify.fmt:fmt-maven-plugin:check ; then
+                  mvn com.spotify.fmt:fmt-maven-plugin:format
                   echo -e "\e[31mCode has been reformatted to match code style\e[0m"
                   echo -e "\e[31mPlease use git add … to add modified files\e[0m"
                   echo "Your commit message was:"
