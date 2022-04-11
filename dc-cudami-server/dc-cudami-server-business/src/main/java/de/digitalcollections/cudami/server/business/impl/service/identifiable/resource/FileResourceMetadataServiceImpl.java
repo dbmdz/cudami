@@ -39,13 +39,13 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataServiceImpl.class);
 
-  private final ApplicationFileResourceService applicationFileResourceService;
-  private final AudioFileResourceService audioFileResourceService;
-  private final ImageFileResourceService imageFileResourceService;
-  private final LinkedDataFileResourceService linkedDataFileResourceService;
+  protected final ApplicationFileResourceService applicationFileResourceService;
+  protected final AudioFileResourceService audioFileResourceService;
+  protected final ImageFileResourceService imageFileResourceService;
+  protected final LinkedDataFileResourceService linkedDataFileResourceService;
   private final LocaleService localeService;
-  private final TextFileResourceService textFileResourceService;
-  private final VideoFileResourceService videoFileResourceService;
+  protected final TextFileResourceService textFileResourceService;
+  protected final VideoFileResourceService videoFileResourceService;
 
   public FileResourceMetadataServiceImpl(
       @Qualifier("fileResourceMetadataRepositoryImpl")
