@@ -45,7 +45,9 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
-  /** @deprecated Please use {@link #find(SearchPageRequest)} instead FIXME: Really?! */
+  /**
+   * @deprecated Please use {@link #find(SearchPageRequest)} instead FIXME: Really?!
+   */
   public PageResponse<T> find(PageRequest pageRequest) throws TechnicalException {
     return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
   }

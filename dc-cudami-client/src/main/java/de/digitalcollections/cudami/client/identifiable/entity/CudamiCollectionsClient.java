@@ -80,7 +80,9 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
-  /** @deprecated Please use {@link #findTopCollections(SearchPageRequest)} instead */
+  /**
+   * @deprecated Please use {@link #findTopCollections(SearchPageRequest)} instead
+   */
   public PageResponse<Collection> findTopCollections(PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(baseEndpoint + "/top", pageRequest);
@@ -106,7 +108,9 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   @Deprecated(since = "5.0", forRemoval = true)
-  /** @deprecated Please use {@link #getDigitalObjects(UUID, SearchPageRequest)} instead */
+  /**
+   * @deprecated Please use {@link #getDigitalObjects(UUID, SearchPageRequest)} instead
+   */
   public PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(

@@ -57,7 +57,9 @@ public class EntityRelationController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Deprecated
-  /** @deprecated use {@link #saveEntityRelations(List)} instead} */
+  /**
+   * @deprecated use {@link #saveEntityRelations(List)} instead}
+   */
   List<EntityRelation> saveEntityRelationsForSubject(
       @PathVariable("subjectuuid") UUID subjectUuid,
       @RequestBody List<EntityRelation> entityRelations) {
