@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.security;
 
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
+import de.digitalcollections.cudami.server.business.impl.validator.UniqueUsernameValidator;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
@@ -10,23 +11,22 @@ import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 
 /** Service for User handling. */
 @Service
 // @Transactional(readOnly = true)
-public class UserServiceImpl implements UserService<User> {
+public class UserServiceImpl implements UserService<User>, InitializingBean {
 
-  @Autowired
-  @Qualifier("uniqueUsernameValidator")
-  private Validator uniqueUsernameValidator;
+  private UniqueUsernameValidator uniqueUsernameValidator;
+  private final UserRepository userRepository;
 
-  @Autowired private UserRepository userRepository;
+  public UserServiceImpl(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @Override
   //  @Transactional(readOnly = false)
@@ -35,6 +35,11 @@ public class UserServiceImpl implements UserService<User> {
     user.setEnabled(true);
     user = userRepository.save(user);
     return user;
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    this.uniqueUsernameValidator = new UniqueUsernameValidator(this);
   }
 
   @Override
