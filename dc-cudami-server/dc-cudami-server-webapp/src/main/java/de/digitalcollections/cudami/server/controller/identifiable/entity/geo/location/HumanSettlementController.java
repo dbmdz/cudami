@@ -68,11 +68,11 @@ public class HumanSettlementController {
   @GetMapping(
       value = {
         "/v5/humansettlements/identifier/{namespace}:{id}",
-            "/v5/humansettlements/identifier/{namespace}:{id}.json",
+        "/v5/humansettlements/identifier/{namespace}:{id}.json",
         "/v2/humansettlements/identifier/{namespace}:{id}",
-            "/v2/humansettlements/identifier/{namespace}:{id}.json",
+        "/v2/humansettlements/identifier/{namespace}:{id}.json",
         "/latest/humansettlements/identifier/{namespace}:{id}",
-            "/latest/humansettlements/identifier/{namespace}:{id}.json"
+        "/latest/humansettlements/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HumanSettlement> getByIdentifier(

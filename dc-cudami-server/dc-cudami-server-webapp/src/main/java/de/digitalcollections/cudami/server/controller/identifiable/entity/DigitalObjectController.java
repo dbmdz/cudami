@@ -162,11 +162,11 @@ public class DigitalObjectController {
   @GetMapping(
       value = {
         "/v5/digitalobjects/identifier/{namespace}:{id}",
-            "/v5/digitalobjects/identifier/{namespace}:{id}.json",
+        "/v5/digitalobjects/identifier/{namespace}:{id}.json",
         "/v2/digitalobjects/identifier/{namespace}:{id}",
-            "/v2/digitalobjects/identifier/{namespace}:{id}.json",
+        "/v2/digitalobjects/identifier/{namespace}:{id}.json",
         "/latest/digitalobjects/identifier/{namespace}:{id}",
-            "/latest/digitalobjects/identifier/{namespace}:{id}.json"
+        "/latest/digitalobjects/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject getByIdentifier(

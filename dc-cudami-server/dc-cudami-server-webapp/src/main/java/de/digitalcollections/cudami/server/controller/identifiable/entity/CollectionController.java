@@ -267,11 +267,11 @@ public class CollectionController {
   @GetMapping(
       value = {
         "/v5/collections/identifier/{namespace}:{id}",
-            "/v5/collections/identifier/{namespace}:{id}.json",
+        "/v5/collections/identifier/{namespace}:{id}.json",
         "/v2/collections/identifier/{namespace}:{id}",
-            "/v2/collections/identifier/{namespace}:{id}.json",
+        "/v2/collections/identifier/{namespace}:{id}.json",
         "/latest/collections/identifier/{namespace}:{id}",
-            "/latest/collections/identifier/{namespace}:{id}.json"
+        "/latest/collections/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection getByIdentifier(@PathVariable String namespace, @PathVariable String id)
