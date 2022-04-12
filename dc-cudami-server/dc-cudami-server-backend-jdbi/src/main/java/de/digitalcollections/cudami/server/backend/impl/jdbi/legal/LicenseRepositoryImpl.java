@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   public LicenseRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+    this.dbi.registerRowMapper(BeanMapper.factory(License.class, MAPPING_PREFIX));
   }
 
   @Override

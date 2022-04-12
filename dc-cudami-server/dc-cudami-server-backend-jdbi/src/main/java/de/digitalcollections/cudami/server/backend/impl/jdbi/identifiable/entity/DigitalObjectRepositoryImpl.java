@@ -27,11 +27,9 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.production.CreationInfo;
-import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,10 +96,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".license_uuid "
-        + mappingPrefix
-        + "_license_uuid"
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".uuid "
+        + LicenseRepositoryImpl.MAPPING_PREFIX
+        + "_uuid"
         + ", "
         + LicenseRepositoryImpl.TABLE_ALIAS
         + ".label "
@@ -758,20 +756,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
       // Try to fill license subresource with uuid, url and label
-      UUID licenseUuid = rowView.getColumn(MAPPING_PREFIX + "_license_uuid", UUID.class);
-      String url = rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_url", String.class);
-      LocalizedText label =
-          rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
-      String acronym =
-          rowView.getColumn(LicenseRepositoryImpl.MAPPING_PREFIX + "_acronym", String.class);
-      final License license =
-          new LicenseBuilder()
-              .withUuid(licenseUuid)
-              .withLabel(label)
-              .withUrl(url)
-              .withAcronym(acronym)
-              .build();
-      if (licenseUuid != null) {
+      License license = rowView.getRow(License.class);
+      if (license.getUuid() != null) {
         digitalObject.setLicense(license);
       }
 
