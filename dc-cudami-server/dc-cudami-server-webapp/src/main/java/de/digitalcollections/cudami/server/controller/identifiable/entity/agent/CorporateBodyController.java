@@ -78,8 +78,11 @@ public class CorporateBodyController {
   @GetMapping(
       value = {
         "/v5/corporatebodies/identifier/{namespace}:{id}",
+            "/v5/corporatebodies/identifier/{namespace}:{id}.json",
         "/v3/corporatebodies/identifier/{namespace}:{id}",
-        "/latest/corporatebodies/identifier/{namespace}:{id}"
+            "/v3/corporatebodies/identifier/{namespace}:{id}.json",
+        "/latest/corporatebodies/identifier/{namespace}:{id}",
+            "/latest/corporatebodies/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody getByIdentifier(

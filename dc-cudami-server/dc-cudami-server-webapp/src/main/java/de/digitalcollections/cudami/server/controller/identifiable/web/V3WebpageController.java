@@ -140,7 +140,7 @@ public class V3WebpageController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/webpages/{uuid}"},
+      value = {"/v3/webpages/{uuid}", "/v3/webpages/{uuid}.xml"},
       produces = MediaType.APPLICATION_XML_VALUE)
   public ResponseEntity<String> getWebpageXml(
       @Parameter(

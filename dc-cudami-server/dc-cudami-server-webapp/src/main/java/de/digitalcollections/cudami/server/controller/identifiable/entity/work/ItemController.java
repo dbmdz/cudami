@@ -102,9 +102,10 @@ public class ItemController {
   @Operation(summary = "Get an item by namespace and id")
   @GetMapping(
       value = {
-        "/v5/items/identifier/{namespace}:{id}",
-        "/v2/items/identifier/{namespace}:{id}",
-        "/latest/items/identifier/{namespace}:{id}"
+        "/v5/items/identifier/{namespace}:{id}", "/v5/items/identifier/{namespace}:{id}.json",
+        "/v2/items/identifier/{namespace}:{id}", "/v2/items/identifier/{namespace}:{id}.json",
+        "/latest/items/identifier/{namespace}:{id}",
+            "/latest/items/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(

@@ -81,7 +81,10 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get an headwordentry by namespace and id")
   @GetMapping(
-      value = {"/v5/headwordentries/identifier/{namespace}:{id}"},
+      value = {
+        "/v5/headwordentries/identifier/{namespace}:{id}",
+        "/v5/headwordentries/identifier/{namespace}:{id}.json"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry getByIdentifier(
       @Parameter(example = "", description = "Namespace of the identifier")
