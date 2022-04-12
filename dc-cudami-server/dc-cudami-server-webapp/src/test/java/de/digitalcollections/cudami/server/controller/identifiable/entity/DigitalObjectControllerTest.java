@@ -23,8 +23,12 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
+        "/latest/digitalobjects/identifier/mdz-obj:bsb10000001",
+        "/latest/digitalobjects/identifier/mdz-obj:bsb10000001.json",
         "/v2/digitalobjects/identifier/mdz-obj:bsb10000001",
-        "/v2/digitalobjects/identifier/mdz-obj:bsb10000001.json"
+        "/v2/digitalobjects/identifier/mdz-obj:bsb10000001.json",
+        "/v5/digitalobjects/identifier/mdz-obj:bsb10000001",
+        "/v5/digitalobjects/identifier/mdz-obj:bsb10000001.json"
       })
   public void getDigitalObjectByIdentifier(String path) throws Exception {
 
