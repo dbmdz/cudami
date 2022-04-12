@@ -124,11 +124,11 @@ public class FileResourceMetadataController {
   @GetMapping(
       value = {
         "/v5/fileresources/identifier/{namespace}:{id}",
-            "/v5/fileresources/identifier/{namespace}:{id}.json",
+        "/v5/fileresources/identifier/{namespace}:{id}.json",
         "/v2/fileresources/identifier/{namespace}:{id}",
-            "/v2/fileresources/identifier/{namespace}:{id}.json",
+        "/v2/fileresources/identifier/{namespace}:{id}.json",
         "/latest/fileresources/identifier/{namespace}:{id}",
-            "/latest/fileresources/identifier/{namespace}:{id}.json"
+        "/latest/fileresources/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FileResource> getByIdentifier(

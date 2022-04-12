@@ -107,9 +107,10 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get entity by namespace and id")
   @GetMapping(
       value = {
-        "/v5/entities/identifier/{namespace}:{id}", "/v5/entities/identifier/{namespace}:{id}.json",
+        "/v5/entities/identifier/{namespace}:{id}",
+        "/v5/entities/identifier/{namespace}:{id}.json",
         "/latest/entities/identifier/{namespace}:{id}",
-            "/latest/entities/identifier/{namespace}:{id}.json"
+        "/latest/entities/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity getByIdentifier(@PathVariable String namespace, @PathVariable String id)
