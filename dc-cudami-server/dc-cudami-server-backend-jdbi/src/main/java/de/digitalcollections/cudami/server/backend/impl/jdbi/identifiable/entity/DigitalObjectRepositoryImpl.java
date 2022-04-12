@@ -196,7 +196,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         SQL_SELECT_ALL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction(),
         cudamiConfig.getOffsetForAlternativePaging());
-    dbi.registerRowMapper(BeanMapper.factory(License.class, LicenseRepositoryImpl.MAPPING_PREFIX));
   }
 
   @Override
