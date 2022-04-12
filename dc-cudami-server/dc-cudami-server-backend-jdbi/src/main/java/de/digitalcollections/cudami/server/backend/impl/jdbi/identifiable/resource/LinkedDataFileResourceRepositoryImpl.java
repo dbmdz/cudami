@@ -115,7 +115,7 @@ public class LinkedDataFileResourceRepositoryImpl
                 + ldfrTableAlias
                 + ".uuid = dl.linkeddata_fileresource_uuid"
                 + " WHERE dl.digitalobject_uuid = :uuid"
-                + " ORDER by idx ASC");
+                + " ORDER by dl.sortindex ASC");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", digitalObjectUuid);
 
