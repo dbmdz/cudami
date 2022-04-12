@@ -38,7 +38,6 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;

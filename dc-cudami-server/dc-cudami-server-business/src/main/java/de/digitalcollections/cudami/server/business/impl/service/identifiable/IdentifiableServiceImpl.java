@@ -241,11 +241,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       return savedIdentifiable;
     } catch (CudamiServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
-      e.printStackTrace();
       throw new IdentifiableServiceException(e.getMessage());
     } catch (Exception e) {
       LOGGER.error("Cannot save identifiable " + identifiable + ": " + e, e);
-      e.printStackTrace();
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
