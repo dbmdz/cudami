@@ -139,9 +139,10 @@ public class ProjectController {
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
-        "/v5/projects/identifier/{namespace}:{id}",
-        "/v3/projects/identifier/{namespace}:{id}",
-        "/latest/projects/identifier/{namespace}:{id}"
+        "/v5/projects/identifier/{namespace}:{id}", "/v5/projects/identifier/{namespace}:{id}.json",
+        "/v3/projects/identifier/{namespace}:{id}", "/v3/projects/identifier/{namespace}:{id}.json",
+        "/latest/projects/identifier/{namespace}:{id}",
+            "/latest/projects/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project getByIdentifier(@PathVariable String namespace, @PathVariable String id)

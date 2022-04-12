@@ -62,7 +62,10 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
-      value = {"/v5/familynames/identifier/{namespace}:{id}"},
+      value = {
+        "/v5/familynames/identifier/{namespace}:{id}",
+        "/v5/familynames/identifier/{namespace}:{id}.json"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {

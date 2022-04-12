@@ -76,9 +76,10 @@ public class WorkController {
   @Operation(summary = "Get a work by namespace and id")
   @GetMapping(
       value = {
-        "/v5/works/identifier/{namespace}:{id}",
-        "/v2/works/identifier/{namespace}:{id}",
+        "/v5/works/identifier/{namespace}:{id}", "/v5/works/identifier/{namespace}:{id}.json",
+        "/v2/works/identifier/{namespace}:{id}", "/v2/works/identifier/{namespace}:{id}.json",
         "/latest/works/identifier/{namespace}:{id}",
+            "/latest/works/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Work> getByIdentifier(

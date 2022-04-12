@@ -62,7 +62,10 @@ public class GivenNameController {
 
   @Operation(summary = "Get a givenname by namespace and id")
   @GetMapping(
-      value = {"/v5/givennames/identifier/{namespace}:{id}"},
+      value = {
+        "/v5/givennames/identifier/{namespace}:{id}",
+        "/v5/givennames/identifier/{namespace}:{id}.json"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {

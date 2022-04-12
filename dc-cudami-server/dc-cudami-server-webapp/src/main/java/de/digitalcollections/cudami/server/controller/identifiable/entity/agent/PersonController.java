@@ -89,9 +89,10 @@ public class PersonController {
   @Operation(summary = "Get a person by namespace and id")
   @GetMapping(
       value = {
-        "/v5/persons/identifier/{namespace}:{id}",
-        "/v2/persons/identifier/{namespace}:{id}",
-        "/latest/persons/identifier/{namespace}:{id}"
+        "/v5/persons/identifier/{namespace}:{id}", "/v5/persons/identifier/{namespace}:{id}.json",
+        "/v2/persons/identifier/{namespace}:{id}", "/v2/persons/identifier/{namespace}:{id}.json",
+        "/latest/persons/identifier/{namespace}:{id}",
+            "/latest/persons/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Person> getByIdentifier(

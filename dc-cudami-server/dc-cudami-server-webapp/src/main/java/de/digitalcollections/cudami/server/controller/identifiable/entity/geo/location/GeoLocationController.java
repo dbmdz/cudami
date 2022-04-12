@@ -77,8 +77,11 @@ public class GeoLocationController {
   @GetMapping(
       value = {
         "/v5/geolocations/identifier/{namespace}:{id}",
+            "/v5/geolocations/identifier/{namespace}:{id}.json",
         "/v2/geolocations/identifier/{namespace}:{id}",
-        "/latest/geolocations/identifier/{namespace}:{id}"
+            "/v2/geolocations/identifier/{namespace}:{id}.json",
+        "/latest/geolocations/identifier/{namespace}:{id}",
+            "/latest/geolocations/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByIdentifier(

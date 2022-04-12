@@ -104,8 +104,11 @@ public class IdentifiableController {
   @GetMapping(
       value = {
         "/v5/identifiables/identifier/{namespace}:{id}",
+            "/v5/identifiables/identifier/{namespace}:{id}.json",
         "/v2/identifiables/identifier/{namespace}:{id}",
-        "/latest/identifiables/identifier/{namespace}:{id}"
+            "/v2/identifiables/identifier/{namespace}:{id}.json",
+        "/latest/identifiables/identifier/{namespace}:{id}",
+            "/latest/identifiables/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByIdentifier(
