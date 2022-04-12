@@ -68,7 +68,7 @@ public class V3WebpageController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/webpages/{uuid}"},
+      value = {"/v3/webpages/{uuid}.json", "/v3/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getWebpageJson(
       @Parameter(
