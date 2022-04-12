@@ -39,7 +39,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl
                 + rfrTableAlias
                 + ".uuid = dr.fileresource_uuid"
                 + " WHERE dr.digitalobject_uuid = :uuid"
-                + " ORDER by idx ASC");
+                + " ORDER by dr.sortindex ASC");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", digitalObjectUuid);
 
