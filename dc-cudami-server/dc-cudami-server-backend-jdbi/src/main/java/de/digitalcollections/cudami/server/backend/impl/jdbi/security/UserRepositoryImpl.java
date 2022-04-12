@@ -24,9 +24,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   public static final String TABLE_NAME = "users";
 
   public static final String SQL_INSERT_FIELDS =
-      " uuid, acronym, created, label, last_modified, url";
+      " email, enabled, firstname, lastname, passwordhash, roles, uuid";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :acronym, :created, :label::JSONB, :lastModified, :url";
+      " :email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid";
   public static final String SQL_REDUCED_FIELDS_US =
       String.format(
           " %1$s.uuid, %1$s.created, %1$s.email, %1$s.enabled, %1$s.firstname, %1$s.lastname, %1$s.last_modified, %1$s.passwordhash, %1$s.roles",
@@ -193,7 +193,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                     .createQuery(
                         "UPDATE "
                             + tableName
-                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordHash=:passwordHash, roles=:roles WHERE uuid=:uuid RETURNING *")
+                            + " SET email=:email, enabled=:enabled, firstname=:firstname, lastname=:lastname, last_modified=:lastModified, passwordhash=:passwordHash, roles=:roles WHERE uuid=:uuid RETURNING *")
                     .bindBean(user)
                     .mapToBean(User.class)
                     .findOne()
