@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Added
 
 - Handling of `LinkedDataFileResources`
+- Added missing columns for unique objects
 
 ### Changed
 
@@ -18,6 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions
 - Test updates
 - Fixed handling of IdentifierTypes
+- Fixed filtering of `LocalizedUrlAliases` by `Locale`
+- Added collation to `varchar` columns
 - Updated multiple dependencies
 
 ### Removed
