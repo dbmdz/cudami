@@ -109,13 +109,11 @@ const AddAttachedIdentifiablesDialog = ({
                   <Autocomplete
                     activeLanguage={activeLanguage}
                     onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                      searchIdentifiables(
-                        contextPath,
-                        searchTerm,
-                        type,
+                      searchIdentifiables(contextPath, type, {
                         pageNumber,
                         pageSize,
-                      )
+                        searchTerm,
+                      })
                     }
                     onSelect={(identifiable) =>
                       setIdentifiables([...identifiables, identifiable])

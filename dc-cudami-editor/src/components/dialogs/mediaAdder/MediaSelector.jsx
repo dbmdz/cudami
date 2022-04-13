@@ -230,13 +230,11 @@ const MediaSelector = ({
             <Autocomplete
               activeLanguage={activeLanguage}
               onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                searchMedia(
-                  contextPath,
-                  mediaType,
-                  searchTerm,
+                searchMedia(contextPath, mediaType, {
                   pageNumber,
                   pageSize,
-                )
+                  searchTerm,
+                })
               }
               onSelect={(suggestion) => {
                 onChange({

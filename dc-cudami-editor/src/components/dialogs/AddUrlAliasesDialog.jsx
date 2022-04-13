@@ -131,13 +131,11 @@ const AddUrlAliasesDialog = ({
               activeLanguage={activeLanguage}
               maxElements={5}
               onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                loadRootIdentifiables(
-                  contextPath,
-                  'website',
+                loadRootIdentifiables(contextPath, 'website', {
                   pageNumber,
                   pageSize,
                   searchTerm,
-                )
+                })
               }
               onSelect={(website) => {
                 setNewUrlAlias({
