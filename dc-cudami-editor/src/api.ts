@@ -1,4 +1,4 @@
-export const typeToEndpointMapping = {
+export const typeToEndpointMapping: Record<string, string> = {
   article: 'articles',
   collection: 'collections',
   config: 'config',
@@ -23,11 +23,11 @@ export const typeToEndpointMapping = {
 }
 
 export async function addAttachedIdentifiable(
-  contextPath,
-  parentType,
-  parentUuid,
-  type,
-  uuid,
+  contextPath: string,
+  parentType: string,
+  parentUuid: string,
+  type: string,
+  uuid: string,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
@@ -41,11 +41,11 @@ export async function addAttachedIdentifiable(
 }
 
 export async function addAttachedIdentifiables(
-  contextPath,
-  identifiables,
-  parentType,
-  parentUuid,
-  type,
+  contextPath: string,
+  identifiables: any[],
+  parentType: string,
+  parentUuid: string,
+  type: string,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
@@ -62,7 +62,11 @@ export async function addAttachedIdentifiables(
   }
 }
 
-export async function changeUserStatus(contextPath, uuid, enabled) {
+export async function changeUserStatus(
+  contextPath: string,
+  uuid: string,
+  enabled: boolean,
+) {
   const url = `${contextPath}api/${typeToEndpointMapping.user}/${uuid}`
   try {
     const response = await fetch(url, {
@@ -78,7 +82,12 @@ export async function changeUserStatus(contextPath, uuid, enabled) {
   }
 }
 
-export async function findByIdentifier(contextPath, id, namespace, type) {
+export async function findByIdentifier(
+  contextPath: string,
+  id: string,
+  namespace: string,
+  type: string,
+) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
   try {
     const response = await fetch(url)
@@ -91,7 +100,12 @@ export async function findByIdentifier(contextPath, id, namespace, type) {
   }
 }
 
-export async function generateSlug(contextPath, language, slug, websiteUuid) {
+export async function generateSlug(
+  contextPath: string,
+  language: string,
+  slug: string,
+  websiteUuid: string,
+) {
   let url = `${contextPath}api/${
     typeToEndpointMapping.urlAlias
   }/slug/${language}/${encodeURIComponent(slug)}`
@@ -106,7 +120,7 @@ export async function generateSlug(contextPath, language, slug, websiteUuid) {
   }
 }
 
-export async function getConfig(contextPath) {
+export async function getConfig(contextPath: string) {
   const url = `${contextPath}api/${typeToEndpointMapping.config}`
   try {
     const response = await fetch(url)
@@ -117,7 +131,7 @@ export async function getConfig(contextPath) {
   }
 }
 
-export async function getIdentifierTypes(contextPath) {
+export async function getIdentifierTypes(contextPath: string) {
   const url = `${contextPath}api/${typeToEndpointMapping.identifierType}`
   try {
     const response = await fetch(url)
@@ -129,13 +143,13 @@ export async function getIdentifierTypes(contextPath) {
 }
 
 export async function loadAttachedIdentifiables(
-  contextPath,
-  parentType,
-  parentUuid,
-  type,
-  pageNumber,
-  pageSize,
-  searchTerm,
+  contextPath: string,
+  parentType: string,
+  parentUuid: string,
+  type: string,
+  pageNumber: number,
+  pageSize: number,
+  searchTerm: string,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -159,7 +173,7 @@ export async function loadAttachedIdentifiables(
   }
 }
 
-export async function loadAvailableLanguages(contextPath) {
+export async function loadAvailableLanguages(contextPath: string) {
   const url = `${contextPath}api/${typeToEndpointMapping.language}`
   try {
     const response = await fetch(url)
@@ -169,7 +183,7 @@ export async function loadAvailableLanguages(contextPath) {
   }
 }
 
-export async function loadDefaultLanguage(contextPath) {
+export async function loadDefaultLanguage(contextPath: string) {
   const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
   try {
     const response = await fetch(url)
@@ -179,7 +193,11 @@ export async function loadDefaultLanguage(contextPath) {
   }
 }
 
-export async function loadIdentifiable(contextPath, type, uuid = 'new') {
+export async function loadIdentifiable(
+  contextPath: string,
+  type: string,
+  uuid = 'new',
+) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
   try {
     const response = await fetch(url)
@@ -193,11 +211,11 @@ export async function loadIdentifiable(contextPath, type, uuid = 'new') {
 }
 
 export async function loadRootIdentifiables(
-  contextPath,
-  type,
-  pageNumber,
-  pageSize,
-  searchTerm,
+  contextPath: string,
+  type: string,
+  pageNumber: number,
+  pageSize: number,
+  searchTerm: string,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -221,7 +239,10 @@ export async function loadRootIdentifiables(
   }
 }
 
-export async function loadUser(contextPath, {admin = false, uuid = 'new'}) {
+export async function loadUser(
+  contextPath: string,
+  {admin = false, uuid = 'new'},
+) {
   const url = `${contextPath}api/${typeToEndpointMapping.user}/${uuid}?admin=${admin}`
   try {
     const response = await fetch(url)
@@ -235,11 +256,11 @@ export async function loadUser(contextPath, {admin = false, uuid = 'new'}) {
 }
 
 export async function removeAttachedIdentifiable(
-  contextPath,
-  parentType,
-  parentUuid,
-  type,
-  uuid,
+  contextPath: string,
+  parentType: string,
+  parentUuid: string,
+  type: string,
+  uuid: string,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}/${uuid}`
   try {
@@ -252,15 +273,15 @@ export async function removeAttachedIdentifiable(
   }
 }
 
-export async function saveFileResource(contextPath, fileResource) {
+export async function saveFileResource(contextPath: string, fileResource: any) {
   return await saveIdentifiable(contextPath, fileResource, 'fileResource')
 }
 
 export async function saveIdentifiable(
-  contextPath,
-  identifiable,
-  type,
-  {parentType, parentUuid} = {},
+  contextPath: string,
+  identifiable: any,
+  type: string,
+  {parentType, parentUuid}: Record<string, string> = {},
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}`
   if (parentType && parentUuid) {
@@ -291,7 +312,11 @@ export async function saveIdentifiable(
  * @param passwords `{pwd1:..., pwd2:...}` that will be added as request params
  * @returns `{error: flag if there was an error, json: on error an error object, the new/updated user object otherwise}`
  */
-export async function saveOrUpdateUser(contextPath, user, passwords) {
+export async function saveOrUpdateUser(
+  contextPath: string,
+  user: any,
+  passwords: Record<string, string>,
+) {
   let url = `${contextPath}api/${typeToEndpointMapping.user}`
   if (user.uuid) {
     url += `/${user.uuid}`
@@ -324,9 +349,9 @@ export async function saveOrUpdateUser(contextPath, user, passwords) {
 }
 
 export async function searchIdentifiables(
-  contextPath,
-  searchTerm,
-  type,
+  contextPath: string,
+  searchTerm: string,
+  type: string,
   pageNumber = 0,
   pageSize = 10,
 ) {
@@ -348,9 +373,9 @@ export async function searchIdentifiables(
 }
 
 export async function searchMedia(
-  contextPath,
-  mediaType,
-  searchTerm,
+  contextPath: string,
+  mediaType: string,
+  searchTerm: string,
   pageNumber = 0,
   pageSize = 10,
 ) {
@@ -372,11 +397,11 @@ export async function searchMedia(
 }
 
 export async function updateAttachedIdentifiablesOrder(
-  contextPath,
-  identifiables,
-  parentType,
-  parentUuid,
-  type,
+  contextPath: string,
+  identifiables: any[],
+  parentType: string,
+  parentUuid: string,
+  type: string,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
@@ -393,11 +418,18 @@ export async function updateAttachedIdentifiablesOrder(
   }
 }
 
-export async function updateFileResource(contextPath, fileResource) {
+export async function updateFileResource(
+  contextPath: string,
+  fileResource: any,
+) {
   return await updateIdentifiable(contextPath, fileResource, 'fileResource')
 }
 
-export async function updateIdentifiable(contextPath, identifiable, type) {
+export async function updateIdentifiable(
+  contextPath: string,
+  identifiable: any,
+  type: string,
+) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/${identifiable.uuid}`
   try {
     const response = await fetch(url, {
@@ -416,7 +448,11 @@ export async function updateIdentifiable(contextPath, identifiable, type) {
   }
 }
 
-export async function uploadFile(contextPath, file, updateProgress) {
+export async function uploadFile(
+  contextPath: string,
+  file: any,
+  updateProgress: (progress: number) => void,
+) {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
     for (let eventType of ['abort', 'error', 'timeout']) {
