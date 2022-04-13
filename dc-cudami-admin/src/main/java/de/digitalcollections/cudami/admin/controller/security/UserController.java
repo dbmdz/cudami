@@ -4,8 +4,10 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.Arrays;
@@ -69,11 +71,16 @@ public class UserController extends AbstractController {
 
   @GetMapping("/api/users")
   @ResponseBody
-  public PageResponse<User> findAll(
+  public PageResponse<User> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
     return service.find(pageRequest);
   }
 
