@@ -10,9 +10,11 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -93,13 +95,18 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/api/topics")
   @ResponseBody
-  public PageResponse<Topic> findAllTop(
+  public PageResponse<Topic> findTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.findTopCollections(pageRequest);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    return this.service.findTopTopics(searchPageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}/subtopics")

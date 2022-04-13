@@ -9,7 +9,6 @@ import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -129,13 +128,17 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections")
   @ResponseBody
-  public SearchPageResponse<Collection> findAllTop(
+  public SearchPageResponse<Collection> findTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
     return service.findTopCollections(searchPageRequest);
   }
 
@@ -249,18 +252,15 @@ public class CollectionsController extends AbstractController {
   public SearchPageResponse<Collection> search(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      Order order = new Order(sortDirection, sortField);
-      sorting = new Sorting(order);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
     }
-    SearchPageRequest pageRequest =
-        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
-    return service.find(pageRequest);
+    return service.find(searchPageRequest);
   }
 
   @PutMapping("/api/collections/{uuid}")

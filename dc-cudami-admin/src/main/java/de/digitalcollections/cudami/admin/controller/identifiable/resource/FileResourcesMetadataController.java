@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResou
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.Order;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -88,12 +87,17 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources")
   @ResponseBody
-  public PageResponse<FileResource> findAll(
+  public PageResponse<FileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
     return service.find(searchPageRequest);
   }
 
@@ -134,18 +138,15 @@ public class FileResourcesMetadataController extends AbstractController {
       @PathVariable String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortField", required = false) String sortField,
-      @RequestParam(name = "sortDirection", required = false) Direction sortDirection,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    Sorting sorting = null;
-    if (sortField != null && sortDirection != null) {
-      Order order = new Order(sortDirection, sortField);
-      sorting = new Sorting(order);
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
     }
-    SearchPageRequest pageRequest =
-        new SearchPageRequest(searchTerm, pageNumber, pageSize, sorting);
-    return service.findFileResourcesByType(pageRequest, type);
+    return service.findFileResourcesByType(searchPageRequest, type);
   }
 
   @PutMapping("/api/fileresources/{uuid}")
