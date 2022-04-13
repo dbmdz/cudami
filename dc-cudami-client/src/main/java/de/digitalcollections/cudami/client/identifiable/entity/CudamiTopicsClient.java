@@ -33,15 +33,7 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
         String.format("%s/%s/subtopics", baseEndpoint, uuid), searchPageRequest);
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link
-   *     CudamiTopicsClient#findTopTopics(de.digitalcollections.model.paging.PageRequest)} instead.
-   * @param searchPageRequest search params
-   * @return object with given refId
-   */
-  @Deprecated(forRemoval = true)
-  public SearchPageResponse<Topic> findTopCollections(SearchPageRequest searchPageRequest)
+  public SearchPageResponse<Topic> findTopTopics(SearchPageRequest searchPageRequest)
       throws TechnicalException {
     // FIXME: findTopCollections? wrong method, we just have top topics!
     return doGetSearchRequestForPagedObjectList(
