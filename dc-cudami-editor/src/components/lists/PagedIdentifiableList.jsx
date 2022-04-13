@@ -8,7 +8,6 @@ import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 import {
   addAttachedIdentifiable,
   addAttachedIdentifiables,
-  getIdentifierTypes,
   loadAttachedIdentifiables,
   loadDefaultLanguage,
   loadRootIdentifiables,
@@ -63,7 +62,12 @@ class PagedIdentifiableList extends Component {
   }
 
   async componentDidMount() {
-    const identifierTypes = await getIdentifierTypes(this.props.apiContextPath)
+    const {content: identifierTypes} = await loadRootIdentifiables(
+      this.props.apiContextPath,
+      typeToEndpointMapping.identifierType,
+      0,
+      this.pageSize,
+    )
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
     this.setState({
