@@ -1,3 +1,25 @@
+interface Order {
+  property: string
+  subProperty?: string
+}
+
+interface Sorting {
+  orders: Order[]
+}
+
+interface ListRequest {
+  sorting?: Sorting
+}
+
+interface PageRequest extends ListRequest {
+  pageNumber: number
+  pageSize: number
+}
+
+interface SearchPageRequest extends PageRequest {
+  searchTerm?: string
+}
+
 export const typeToEndpointMapping: Record<string, string> = {
   article: 'articles',
   collection: 'collections',
@@ -136,9 +158,7 @@ export async function loadAttachedIdentifiables(
   parentType: string,
   parentUuid: string,
   type: string,
-  pageNumber: number,
-  pageSize: number,
-  searchTerm: string,
+  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -202,9 +222,7 @@ export async function loadIdentifiable(
 export async function loadRootIdentifiables(
   contextPath: string,
   type: string,
-  pageNumber: number,
-  pageSize: number,
-  searchTerm: string,
+  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -339,10 +357,8 @@ export async function saveOrUpdateUser(
 
 export async function searchIdentifiables(
   contextPath: string,
-  searchTerm: string,
   type: string,
-  pageNumber = 0,
-  pageSize = 10,
+  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {
@@ -364,9 +380,7 @@ export async function searchIdentifiables(
 export async function searchMedia(
   contextPath: string,
   mediaType: string,
-  searchTerm: string,
-  pageNumber = 0,
-  pageSize = 10,
+  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
 ) {
   const url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   try {

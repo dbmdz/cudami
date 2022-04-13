@@ -13,8 +13,7 @@ const usePagination = (apiContextPath, type) => {
     const {content, totalElements} = await loadRootIdentifiables(
       context,
       type,
-      pageNumber,
-      pageSize,
+      {pageNumber, pageSize},
     )
     return {
       numberOfPages: Math.ceil(totalElements / pageSize),
