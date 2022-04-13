@@ -234,6 +234,9 @@ const MediaSelector = ({
                   pageNumber,
                   pageSize,
                   searchTerm,
+                  sorting: {
+                    orders: [{property: 'label', subProperty: defaultLanguage}],
+                  },
                 })
               }
               onSelect={(suggestion) => {

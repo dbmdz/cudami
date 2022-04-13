@@ -27,7 +27,10 @@ const SelectRenderingTemplateDialog = ({isOpen, onSelect, toggle}) => {
     pageNumber,
     setPageNumber,
     totalElements,
-  } = usePagination(apiContextPath, type)
+  } = usePagination(apiContextPath, type, [
+    {property: 'name'},
+    {property: 'uuid'},
+  ])
   const {t} = useTranslation()
   if (isLoading) {
     return <Spinner color="secondary" />

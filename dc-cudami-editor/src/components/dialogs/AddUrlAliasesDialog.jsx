@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import omit from 'lodash/omit'
 import pick from 'lodash/pick'
 import {subscribe, unsubscribe} from 'pubsub-js'
-import {useEffect, useState} from 'react'
+import {useContext as useContextReact, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaCheck, FaGlobe, FaLink, FaTrashAlt} from 'react-icons/fa'
 import {
@@ -27,6 +27,7 @@ import {useContext} from 'use-context-selector'
 import {generateSlug, loadRootIdentifiables} from '../../api'
 import {toggleAllUrlAliases} from '../../state/actions'
 import {Context} from '../../state/Store'
+import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
 import CircleButton from '../CircleButton'
 import FeedbackMessage from '../FeedbackMessage'
@@ -52,6 +53,7 @@ const AddUrlAliasesDialog = ({
     ...target,
   }
   const {apiContextPath, dispatch} = useContext(Context)
+  const {defaultLanguage} = useContextReact(AppContext)
   const [activeStep, setActiveStep] = useState(0)
   const [newUrlAlias, setNewUrlAlias] = useState(initialUrlAlias)
   const {t} = useTranslation()
@@ -135,6 +137,9 @@ const AddUrlAliasesDialog = ({
                   pageNumber,
                   pageSize,
                   searchTerm,
+                  sorting: {
+                    orders: [{property: 'label', subProperty: defaultLanguage}],
+                  },
                 })
               }
               onSelect={(website) => {

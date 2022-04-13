@@ -18,7 +18,10 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
     pageSize,
     totalElements,
     setPageNumber,
-  } = usePagination(apiContextPath, type)
+  } = usePagination(apiContextPath, type, [
+    {property: 'name'},
+    {property: 'uuid'},
+  ])
   const [defaultLanguage, setDefaultLanguage] = useState('')
   useEffect(() => {
     loadDefaultLanguage(apiContextPath).then((defaultLanguage) =>

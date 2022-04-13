@@ -20,6 +20,13 @@ interface SearchPageRequest extends PageRequest {
   searchTerm?: string
 }
 
+const convertOrdersToString = (orders: Order[]): string =>
+  orders
+    .map(({property, subProperty}) =>
+      subProperty ? `${property}_${subProperty}` : property,
+    )
+    .join(',')
+
 export const typeToEndpointMapping: Record<string, string> = {
   article: 'articles',
   collection: 'collections',
@@ -222,11 +229,14 @@ export async function loadIdentifiable(
 export async function loadRootIdentifiables(
   contextPath: string,
   type: string,
-  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
     url = `${url}&searchTerm=${searchTerm}`
+  }
+  if (sorting?.orders) {
+    url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
   }
   try {
     const response = await fetch(url)
@@ -358,9 +368,12 @@ export async function saveOrUpdateUser(
 export async function searchIdentifiables(
   contextPath: string,
   type: string,
-  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
 ) {
-  const url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  if (sorting?.orders) {
+    url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
+  }
   try {
     const response = await fetch(url)
     const json = await response.json()
@@ -380,9 +393,12 @@ export async function searchIdentifiables(
 export async function searchMedia(
   contextPath: string,
   mediaType: string,
-  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
 ) {
-  const url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  if (sorting?.orders) {
+    url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
+  }
   try {
     const response = await fetch(url)
     const json = await response.json()

@@ -64,8 +64,14 @@ class PagedIdentifiableList extends Component {
   async componentDidMount() {
     const {content: identifierTypes} = await loadRootIdentifiables(
       this.props.apiContextPath,
-      typeToEndpointMapping.identifierType,
-      {pageNumber: 0, pageSize: this.pageSize},
+      'identifierType',
+      {
+        pageNumber: 0,
+        pageSize: this.pageSize,
+        sorting: {
+          orders: [{property: 'namespace'}, {property: 'uuid'}],
+        },
+      },
     )
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
@@ -278,7 +284,7 @@ class PagedIdentifiableList extends Component {
 
   loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
     const {apiContextPath, parentType, parentUuid, type} = this.props
-    const {searchTerm} = this.state
+    const {defaultLanguage, searchTerm} = this.state
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
         apiContextPath,
@@ -292,6 +298,9 @@ class PagedIdentifiableList extends Component {
       pageNumber,
       pageSize,
       searchTerm,
+      sorting: {
+        orders: [{property: 'label', subProperty: defaultLanguage}],
+      },
     })
   }
 

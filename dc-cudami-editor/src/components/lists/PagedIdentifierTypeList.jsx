@@ -16,7 +16,10 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
     pageSize,
     totalElements,
     setPageNumber,
-  } = usePagination(apiContextPath, type)
+  } = usePagination(apiContextPath, type, [
+    {property: 'namespace'},
+    {property: 'uuid'},
+  ])
   const {t} = useTranslation()
   return (
     <>
