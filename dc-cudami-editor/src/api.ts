@@ -131,17 +131,6 @@ export async function getConfig(contextPath: string) {
   }
 }
 
-export async function getIdentifierTypes(contextPath: string) {
-  const url = `${contextPath}api/${typeToEndpointMapping.identifierType}`
-  try {
-    const response = await fetch(url)
-    const json = await response.json()
-    return json.content
-  } catch (err) {
-    return []
-  }
-}
-
 export async function loadAttachedIdentifiables(
   contextPath: string,
   parentType: string,
