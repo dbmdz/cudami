@@ -16,7 +16,7 @@
   <properties>
     <version.dc-commons-jdbi>4.2.3</version.dc-commons-jdbi>
     <version.jdbi>3.28.0</version.jdbi>
-    <version.testcontainers>1.16.3</version.testcontainers>
+    <version.testcontainers>1.17.0</version.testcontainers>
     <version.dc-commons-web>1.0.0</version.dc-commons-web>
   </properties>
 
