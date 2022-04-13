@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <version.dc-commons-web>1.0.0</version.dc-commons-web>
+    <version.dc-commons-web>1.0.1</version.dc-commons-web>
     <version.jscience>4.3.1</version.jscience>
   </properties>
 
