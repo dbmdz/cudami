@@ -113,6 +113,11 @@ const AddAttachedIdentifiablesDialog = ({
                         pageNumber,
                         pageSize,
                         searchTerm,
+                        sorting: {
+                          orders: [
+                            {property: 'label', subProperty: defaultLanguage},
+                          ],
+                        },
                       })
                     }
                     onSelect={(identifiable) =>

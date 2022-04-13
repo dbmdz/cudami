@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react'
 
 import {loadRootIdentifiables} from '../api'
 
-const usePagination = (apiContextPath, type) => {
+const usePagination = (apiContextPath, type, orders = []) => {
   const [content, setContent] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfPages, setNumberOfPages] = useState(0)
@@ -13,7 +13,7 @@ const usePagination = (apiContextPath, type) => {
     const {content, totalElements} = await loadRootIdentifiables(
       context,
       type,
-      {pageNumber, pageSize},
+      {pageNumber, pageSize, sorting: {orders}},
     )
     return {
       numberOfPages: Math.ceil(totalElements / pageSize),

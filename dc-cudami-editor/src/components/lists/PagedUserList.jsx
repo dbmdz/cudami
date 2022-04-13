@@ -21,7 +21,7 @@ const PagedUserList = ({apiContextPath = '/'}) => {
     totalElements,
     setContent,
     setPageNumber,
-  } = usePagination(apiContextPath, type)
+  } = usePagination(apiContextPath, type, [{property: 'email'}])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState()
   const [userIndex, setUserIndex] = useState()
