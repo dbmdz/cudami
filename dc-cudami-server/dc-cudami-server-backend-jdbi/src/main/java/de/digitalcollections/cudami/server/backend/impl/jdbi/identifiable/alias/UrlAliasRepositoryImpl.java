@@ -429,6 +429,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createQuery(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
+                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
