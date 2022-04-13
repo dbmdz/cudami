@@ -12,10 +12,9 @@ public interface DigitalObjectRenderingFileResourceRepository {
    * @param digitalObjectUuid the UUID of the DigitalObject
    * @return list of rendering FileResources
    */
-  List<FileResource> getForDigitalObjectUuid(UUID digitalObjectUuid);
+  List<FileResource> findByDigitalObject(UUID digitalObjectUuid);
 
-  public void deleteRelatedRenderingResourcesForDigitalObjectUuid(UUID digitalObjectUuid);
+  public void removeByDigitalObject(UUID digitalObjectUuid);
 
-  public void saveRelatedRenderingResourcesForDigitalObjectUuid(
-      UUID digitalObjectUuid, List<FileResource> renderingResources);
+  public void saveForDigitalObject(UUID digitalObjectUuid, List<FileResource> renderingResources);
 }

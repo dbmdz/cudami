@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -47,11 +48,12 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
 
-  default List<FileResource> getRenderingResources(DigitalObject digitalObject) {
+  default List<FileResource> getRenderingResources(DigitalObject digitalObject)
+      throws CudamiServiceException {
     return getRenderingResources(digitalObject.getUuid());
   }
 
-  List<FileResource> getRenderingResources(UUID digitalObjectUuid);
+  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
 
   default Item getItem(DigitalObject digitalObject) {
     if (digitalObject == null) {
@@ -85,7 +87,8 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 
   default List<FileResource> saveRenderingResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources) {
+      DigitalObject digitalObject, List<FileResource> renderingResources)
+      throws CudamiServiceException {
     if (renderingResources == null) {
       return null;
     }
