@@ -480,8 +480,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       return;
     }
 
-    UUID uuid = digitalObject.getUuid();
-
     // Fill the previewImage
     UUID previewImageUuid =
         digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;

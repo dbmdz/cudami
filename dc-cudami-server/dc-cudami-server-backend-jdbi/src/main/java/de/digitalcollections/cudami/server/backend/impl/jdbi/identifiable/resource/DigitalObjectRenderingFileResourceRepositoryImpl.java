@@ -25,7 +25,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl
   }
 
   @Override
-  public List<FileResource> getForDigitalObjectUuid(UUID digitalObjectUuid) {
+  public List<FileResource> findByDigitalObject(UUID digitalObjectUuid) {
     final String rfrTableAlias = getTableAlias();
     final String rfrTableName = getTableName();
     final String fieldsSql = getSqlSelectAllFields();
@@ -52,7 +52,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl
   }
 
   @Override
-  public void deleteRelatedRenderingResourcesForDigitalObjectUuid(UUID digitalObjectUuid) {
+  public void removeByDigitalObject(UUID digitalObjectUuid) {
     dbi.withHandle(
         h ->
             h.createUpdate(
@@ -62,8 +62,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl
   }
 
   @Override
-  public void saveRelatedRenderingResourcesForDigitalObjectUuid(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+  public void saveForDigitalObject(UUID digitalObjectUuid, List<FileResource> renderingResources) {
     dbi.useHandle(
         handle -> {
           PreparedBatch preparedBatch =
@@ -96,6 +95,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl
         break;
       case "video":
         untypedFileResource.setFileResourceType(FileResourceType.VIDEO);
+        break;
       default:
         // nop
     }

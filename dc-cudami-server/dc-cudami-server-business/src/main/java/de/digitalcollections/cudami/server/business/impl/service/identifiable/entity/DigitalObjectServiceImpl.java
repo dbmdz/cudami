@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -218,7 +219,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     saveLinkedDataFileResources(digitalObject, linkedDataResources);
 
     // save the rendering resources
-    saveRenderingResources(digitalObject, renderingResources);
+    try {
+      saveRenderingResources(digitalObject, renderingResources);
+    } catch (CudamiServiceException e) {
+      throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
+    }
 
     return fillDigitalObject(digitalObject);
   }
@@ -237,19 +242,25 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     saveLinkedDataFileResources(digitalObject, linkedDataResources);
 
     // save the rendering resources
-    saveRenderingResources(digitalObject, renderingResources);
+    try {
+      saveRenderingResources(digitalObject, renderingResources);
+    } catch (CudamiServiceException e) {
+      throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
+    }
 
     return fillDigitalObject(digitalObject);
   }
 
   @Override
-  public List<FileResource> getRenderingResources(DigitalObject digitalObject) {
+  public List<FileResource> getRenderingResources(DigitalObject digitalObject)
+      throws CudamiServiceException {
     return digitalObjectRenderingFileResourceService.getForDigitalObject(digitalObject);
   }
 
   @Override
   public List<FileResource> saveRenderingResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources) {
+      DigitalObject digitalObject, List<FileResource> renderingResources)
+      throws CudamiServiceException {
     return digitalObjectRenderingFileResourceService.saveForDigitalObject(
         digitalObject, renderingResources);
   }

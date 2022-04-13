@@ -84,8 +84,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
         });
 
     // Remove the old relations
-    renderingFileResourceRepository.deleteRelatedRenderingResourcesForDigitalObjectUuid(
-        digitalObjectUuid);
+    renderingFileResourceRepository.removeByDigitalObject(digitalObjectUuid);
 
     // Persist the new rendering resources
     if (renderingResources != null) {
@@ -104,8 +103,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
               .collect(Collectors.toList());
 
       // Persist the new relations
-      renderingFileResourceRepository.saveRelatedRenderingResourcesForDigitalObjectUuid(
-          digitalObjectUuid, renderingResources);
+      renderingFileResourceRepository.saveForDigitalObject(digitalObjectUuid, renderingResources);
     }
 
     return renderingResources;
@@ -153,6 +151,6 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
 
   @Override
   public List<FileResource> getForDigitalObject(UUID digitalObjectUuid) {
-    return renderingFileResourceRepository.getForDigitalObjectUuid(digitalObjectUuid);
+    return renderingFileResourceRepository.findByDigitalObject(digitalObjectUuid);
   }
 }
