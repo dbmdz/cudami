@@ -10,10 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 - Handling of `LinkedDataFileResources`
 - Added missing columns for unique objects
+- Added sorting of resources in `dc-cudami-admin-webapp`
 
 ### Changed
 
-- Using `digitalcollections-model` Version 9.2.0
+- Using `digitalcollections-model` in version `9.2.0`
 - Database update for the updated `DigitalObject`
 - Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions
@@ -21,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Fixed handling of IdentifierTypes
 - Fixed filtering of `LocalizedUrlAliases` by `Locale`
 - Added collation to `varchar` columns
+- Changed default sorting of identifiables in `dc-cudami-server-webapp` from `label` in default language to `lastModified` and `uuid`
 - Updated multiple dependencies
 
 ### Removed
