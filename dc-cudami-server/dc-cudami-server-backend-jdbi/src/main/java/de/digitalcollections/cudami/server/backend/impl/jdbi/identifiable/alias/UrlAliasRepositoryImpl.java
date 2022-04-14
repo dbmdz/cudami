@@ -370,7 +370,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     Filtering filtering =
         Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build();
     filtering.add(
-        Filtering.defaultBuilder().filter("targetLanguage").isEquals(targetLanguage).build());
+        Filtering.defaultBuilder()
+            .filter("targetLanguage")
+            .isEquals(targetLanguage.getLanguage())
+            .build());
     filtering.add(Filtering.defaultBuilder().filter("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
     addFiltering(filtering, sql, bindings);
