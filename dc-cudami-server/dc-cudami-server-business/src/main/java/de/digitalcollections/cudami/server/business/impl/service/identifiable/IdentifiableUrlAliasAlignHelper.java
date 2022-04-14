@@ -106,13 +106,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   }
 
   private void alignLabelUpdate() throws CudamiServiceException {
-    if (actualIdentifiable == null
-        || (actualIdentifiable instanceof Entity)
-            && cudamiConfig
-                .getUrlAlias()
-                .getGenerationExcludes()
-                .contains(((Entity) actualIdentifiable).getEntityType())
-        || actualIdentifiable.getLabel() == null) {
+    if (checkIdentifiableExcluded()) {
       return;
     }
     if (identifiableInDatabase == null) {
@@ -173,12 +167,16 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         getPrimaryUrlAliases(actualIdentifiable.getLocalizedUrlAliases(), null));
   }
 
-  private void ensureDefaultAliasesExist() throws CudamiServiceException {
-    if ((actualIdentifiable instanceof Entity)
-        && cudamiConfig
+  private boolean checkIdentifiableExcluded() {
+    return cudamiConfig
             .getUrlAlias()
             .getGenerationExcludes()
-            .contains(((Entity) actualIdentifiable).getEntityType())) {
+            .contains(actualIdentifiable.getClass().getSimpleName())
+        || actualIdentifiable.getLabel() == null;
+  }
+
+  private void ensureDefaultAliasesExist() throws CudamiServiceException {
+    if (checkIdentifiableExcluded()) {
       return;
     }
     LocalizedUrlAliases urlAliases = actualIdentifiable.getLocalizedUrlAliases();

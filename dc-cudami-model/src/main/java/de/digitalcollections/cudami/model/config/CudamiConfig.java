@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.model.config;
 
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,14 +56,14 @@ public class CudamiConfig {
   public static class UrlAlias {
     private static final int DB_MAX_LENGTH = 256;
 
-    private List<EntityType> generationExcludes;
+    private List<String> generationExcludes;
     private int maxLength = -1;
 
-    public List<EntityType> getGenerationExcludes() {
+    public List<String> getGenerationExcludes() {
       return this.generationExcludes;
     }
 
-    public void setGenerationExcludes(List<EntityType> generationExcludes) {
+    public void setGenerationExcludes(List<String> generationExcludes) {
       this.generationExcludes = generationExcludes;
     }
 
