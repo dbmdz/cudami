@@ -22,7 +22,6 @@ import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
@@ -67,8 +66,7 @@ class DigitalObjectServiceImplTest {
 
     cudamiConfig = mock(CudamiConfig.class);
     CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
-    when(cudamiConfigUrlAlias.getGenerationExcludes())
-        .thenReturn(List.of(EntityType.DIGITAL_OBJECT));
+    when(cudamiConfigUrlAlias.getGenerationExcludes()).thenReturn(List.of("DigitalObject"));
     when(cudamiConfig.getUrlAlias()).thenReturn(cudamiConfigUrlAlias);
 
     service =
