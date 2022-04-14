@@ -110,11 +110,11 @@ public class ProjectController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @Operation(summary = "Get all projects in reduced form (no identifiers)")
+  @Operation(summary = "Get all projects as (sorted, paged) list")
   @GetMapping(
       value = {"/v5/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Project> findAll(
+  public PageResponse<Project> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -129,11 +129,10 @@ public class ProjectController {
 
   @Operation(summary = "Get all projects as list")
   @GetMapping(
-      value = {"/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
+      value = {"/v6/projects/all", "/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Project> findAllReducedAsList() {
-    // TODO test if reduced is sufficient for use cases...
-    return projectService.findAllReduced();
+  public List<Project> findAll() {
+    return projectService.findAllFull();
   }
 
   @Operation(summary = "Get project by namespace and id")

@@ -30,16 +30,6 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
     return Long.parseLong(result);
   }
 
-  /**
-   * @deprecated This method is subject to be removed.
-   *     <p>Use {@link CudamiRestClient#deleteByUuid(java.util.UUID)} instead.
-   * @param uuid UUID of Object
-   */
-  @Deprecated(forRemoval = true)
-  public void delete(UUID uuid) throws TechnicalException {
-    deleteByUuid(uuid);
-  }
-
   public void deleteByUuid(UUID uuid) throws TechnicalException {
     doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid));
   }

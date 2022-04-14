@@ -23,7 +23,7 @@ public class CudamiGeoLocationsClient extends CudamiEntitiesClient<GeoLocation> 
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
+  public List<Locale> findLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 }

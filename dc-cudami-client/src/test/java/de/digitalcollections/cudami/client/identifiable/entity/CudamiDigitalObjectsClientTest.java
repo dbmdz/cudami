@@ -41,7 +41,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve active collections of a DigitalObject by a SearchPageRequest")
   public void testGetActiveCollectionsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getActiveCollections(uuid, buildExampleSearchPageRequest());
+    client.findActiveCollections(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -53,7 +53,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve collections of a DigitalObject by a SearchPageRequest")
   public void testGetCollectionsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getCollections(uuid, buildExampleSearchPageRequest());
+    client.findCollections(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -65,7 +65,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve FileResources for a DigitalObject")
   public void testGetFileResources() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getFileResources(uuid);
+    client.findFileResources(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/fileresources");
   }
 
@@ -73,7 +73,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve ImageFileResources for a DigitalObject")
   public void testGetImageFileResources() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getImageFileResources(uuid);
+    client.findImageFileResources(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/fileresources/images");
   }
 
@@ -88,7 +88,7 @@ class CudamiDigitalObjectsClientTest
   @Test
   @DisplayName("can return the languages for all DigitalObjects")
   public void testGetLanguages() throws Exception {
-    client.getLanguages();
+    client.findLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 
@@ -97,7 +97,7 @@ class CudamiDigitalObjectsClientTest
       "can retrieve the languages of all collections, in which the DigitalObject is contained")
   public void testGetLanguagesForCollections() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getLanguagesOfCollections(uuid);
+    client.findLanguagesOfCollections(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/collections/languages");
   }
 
@@ -106,7 +106,7 @@ class CudamiDigitalObjectsClientTest
       "can retrieve the languages of all projects, in which the DigitalObject is contained")
   public void testGetLanguagesForProjects() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getLanguagesOfProjects(uuid);
+    client.findLanguagesOfProjects(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/projects/languages");
   }
 
@@ -114,7 +114,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve projects of a DigitalObject by a SearchPageRequest")
   public void testGetProjectsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getProjects(uuid, buildExampleSearchPageRequest());
+    client.findProjects(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -129,7 +129,7 @@ class CudamiDigitalObjectsClientTest
     FileResource fileResource = new FileResource();
     List<FileResource> fileResources = List.of(fileResource);
 
-    client.saveFileResources(uuid, fileResources);
+    client.setFileResources(uuid, fileResources);
 
     verifyHttpRequestByMethodRelativeUrlAndRequestBody(
         "post", "/" + uuid + "/fileresources", fileResources);

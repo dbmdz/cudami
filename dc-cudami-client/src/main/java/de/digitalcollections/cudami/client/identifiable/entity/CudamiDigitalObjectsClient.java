@@ -50,7 +50,7 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
   }
 
-  public SearchPageResponse<Collection> getActiveCollections(
+  public SearchPageResponse<Collection> findActiveCollections(
       UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
@@ -58,7 +58,7 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         Collection.class);
   }
 
-  public SearchPageResponse<Collection> getCollections(
+  public SearchPageResponse<Collection> findCollections(
       UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/collections", baseEndpoint, uuid),
@@ -66,12 +66,12 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         Collection.class);
   }
 
-  public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
+  public List<FileResource> findFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);
   }
 
-  public List<ImageFileResource> getImageFileResources(UUID uuid) throws TechnicalException {
+  public List<ImageFileResource> findImageFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources/images", baseEndpoint, uuid), ImageFileResource.class);
   }
@@ -81,27 +81,27 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         doGetRequestForObject(String.format("%s/%s/item", baseEndpoint, uuid), Item.class);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
+  public List<Locale> findLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
-  public List<Locale> getLanguagesOfCollections(UUID uuid) throws TechnicalException {
+  public List<Locale> findLanguagesOfCollections(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public List<Locale> getLanguagesOfProjects(UUID uuid) throws TechnicalException {
+  public List<Locale> findLanguagesOfProjects(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/projects/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public SearchPageResponse<Project> getProjects(UUID uuid, SearchPageRequest searchPageRequest)
+  public SearchPageResponse<Project> findProjects(UUID uuid, SearchPageRequest searchPageRequest)
       throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources)
+  public List<FileResource> setFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
     return doPostRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid),

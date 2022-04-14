@@ -31,11 +31,11 @@ public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
         String.format("%s/%s/rootpages", baseEndpoint, uuid), searchPageRequest, Webpage.class);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
+  public List<Locale> findLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
-  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Webpage> findRootPages(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/rootpages", baseEndpoint, uuid), pageRequest, Webpage.class);

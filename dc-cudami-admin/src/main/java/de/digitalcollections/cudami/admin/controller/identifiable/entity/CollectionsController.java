@@ -151,7 +151,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.getDigitalObjects(uuid, searchPageRequest);
+    return service.findDigitalObjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -196,7 +196,8 @@ public class CollectionsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
+        languageSortingHelper.sortLanguages(
+            displayLocale, service.findLanguagesOfTopCollections()));
     return "collections/list";
   }
 
@@ -298,7 +299,7 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
-    List<Collection> parents = service.getParents(uuid);
+    List<Collection> parents = service.findParents(uuid);
     model.addAttribute("parents", parents);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);

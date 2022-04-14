@@ -109,7 +109,7 @@ public class ArticlesController extends AbstractController {
     final Locale locale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
+        this.languageSortingHelper.sortLanguages(locale, this.service.findLanguages()));
     return "articles/list";
   }
 
@@ -150,7 +150,7 @@ public class ArticlesController extends AbstractController {
     }
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(article.getUuid());
+    List<FileResource> relatedFileResources = service.findRelatedFileResources(article.getUuid());
     model
         .addAttribute("article", article)
         .addAttribute("existingLanguages", existingLanguages)

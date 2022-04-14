@@ -38,12 +38,7 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public List<Project> getAll() throws TechnicalException {
-    // TODO: why not using findAll() method of CudamiRestClient? (endpoint must be renamed)
-    return doGetRequestForObjectList(String.format("/v5/projectlist", Project.class));
-  }
-
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID projectUuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid),
@@ -51,7 +46,7 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
         DigitalObject.class);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
+  public List<Locale> findLanguages() throws TechnicalException {
     return doGetRequestForObjectList("/v5/projects/languages", Locale.class);
   }
 
@@ -63,7 +58,7 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
                 "%s/%s/digitalobjects/%s", baseEndpoint, projectUuid, digitalObjectUuid)));
   }
 
-  public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
+  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
     return Boolean.parseBoolean(
         (String)

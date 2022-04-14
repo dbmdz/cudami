@@ -128,7 +128,7 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws TechnicalException {
-    return this.service.getEntities(uuid, new PageRequest(pageNumber, pageSize));
+    return this.service.findEntities(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/api/topics/{uuid}")
@@ -144,7 +144,7 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws TechnicalException {
-    return this.service.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
+    return this.service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/topics")
@@ -152,7 +152,7 @@ public class TopicsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.findTopTopicsLanguages()));
     return "topics/list";
   }
 
@@ -207,8 +207,8 @@ public class TopicsController extends AbstractController {
         topic.getChildren().stream()
             .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
-    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid);
-    List<Locale> existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
+    List<Locale> existingEntityLanguages = this.service.findLanguagesOfEntities(uuid);
+    List<Locale> existingFileResourceLanguages = this.service.findLanguagesOfFileResources(uuid);
 
     model
         .addAttribute("existingLanguages", existingLanguages)

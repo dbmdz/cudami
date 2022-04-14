@@ -45,14 +45,14 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @DisplayName("can find DigitalObjects for a person")
   public void testGetDigitalObjects() throws Exception {
     UUID personUuid = UUID.randomUUID();
-    client.getDigitalObjects(personUuid);
+    client.findDigitalObjects(personUuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + personUuid + "/digitalobjects");
   }
 
   @Test
   @DisplayName("can return the languages for all persons")
   public void testGetLanguages() throws Exception {
-    client.getLanguages();
+    client.findLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 
@@ -63,7 +63,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     UUID personUuid = UUID.randomUUID();
-    List<Work> works = client.getWorks(personUuid);
+    List<Work> works = client.findWorks(personUuid);
     assertThat(works).isNotNull();
     assertThat(works.get(0)).isExactlyInstanceOf(Work.class);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + personUuid + "/works");

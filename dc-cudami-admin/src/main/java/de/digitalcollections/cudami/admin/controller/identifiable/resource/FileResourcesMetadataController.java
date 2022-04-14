@@ -112,7 +112,7 @@ public class FileResourcesMetadataController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
     return "fileresources/list";
   }
 
@@ -146,7 +146,7 @@ public class FileResourcesMetadataController extends AbstractController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return service.findFileResourcesByType(searchPageRequest, type);
+    return service.findByType(searchPageRequest, type);
   }
 
   @PutMapping("/api/fileresources/{uuid}")

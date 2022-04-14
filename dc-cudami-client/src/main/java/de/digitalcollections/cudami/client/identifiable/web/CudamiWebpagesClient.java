@@ -38,7 +38,7 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         String.format("%s/%s/children", baseEndpoint, uuid), searchPageRequest);
   }
 
-  public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/children?active=true", baseEndpoint, uuid),
@@ -46,7 +46,7 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         Webpage.class);
   }
 
-  public List<Webpage> getActiveChildrenTree(UUID uuid) throws TechnicalException {
+  public List<Webpage> findActiveChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
   }
@@ -57,17 +57,17 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
             String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
   }
 
-  public List<Webpage> getChildren(UUID uuid) throws TechnicalException {
+  public List<Webpage> findChildren(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
   }
 
-  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
   }
 
-  public List<Webpage> getChildrenTree(UUID uuid) throws TechnicalException {
+  public List<Webpage> findChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/childrentree", baseEndpoint, uuid));
   }
 
@@ -75,7 +75,7 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
+  public List<FileResource> findRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/related/fileresources", baseEndpoint, uuid), FileResource.class);
   }

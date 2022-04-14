@@ -67,7 +67,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.getCollections(uuid, searchPageRequest);
+    return this.service.findCollections(uuid, searchPageRequest);
   }
 
   @GetMapping(
@@ -81,7 +81,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.getProjects(uuid, searchPageRequest);
+    return this.service.findProjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
@@ -109,7 +109,7 @@ public class DigitalObjectsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
     return "digitalobjects/list";
   }
 
@@ -141,8 +141,8 @@ public class DigitalObjectsController extends AbstractController {
     if (digitalObject == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingCollectionLanguages = this.service.getLanguagesOfCollections(uuid),
-        existingProjectLanguages = this.service.getLanguagesOfProjects(uuid);
+    List<Locale> existingCollectionLanguages = this.service.findLanguagesOfCollections(uuid),
+        existingProjectLanguages = this.service.findLanguagesOfProjects(uuid);
 
     model
         .addAttribute("digitalObject", digitalObject)

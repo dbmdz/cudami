@@ -18,7 +18,7 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can find FileResources by their type")
   public void testFindFileResourcesByType() throws Exception {
-    client.findFileResourcesByType(new SearchPageRequest(), "jpg");
+    client.findByType(new SearchPageRequest(), "jpg");
     verifyHttpRequestByMethodAndRelativeURL("get", "/type/jpg?pageNumber=0&pageSize=0");
   }
 
@@ -53,7 +53,7 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can return the languages for all FileResources")
   public void testGetLanguages() throws Exception {
-    client.getLanguages();
+    client.findLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 }

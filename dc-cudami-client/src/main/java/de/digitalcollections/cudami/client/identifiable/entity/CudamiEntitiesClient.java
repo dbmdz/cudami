@@ -48,17 +48,17 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
     return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
   }
 
-  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
+  public List<FileResource> findRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
-  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
+  public List<EntityRelation> findRelations(UUID subjectEntityUuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/relations/%s", subjectEntityUuid), EntityRelation.class);
   }
 
-  public List<FileResource> saveRelatedFileResources(UUID uuid, List fileResources)
+  public List<FileResource> setRelatedFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
     return doPostRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid),
@@ -66,7 +66,7 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         FileResource.class);
   }
 
-  public List<EntityRelation> saveRelationsForSubject(List relations) throws TechnicalException {
+  public List<EntityRelation> addRelationsForSubject(List relations) throws TechnicalException {
     return doPutRequestForObjectList(
         String.format(
             "/v5/entities/%s/relations",

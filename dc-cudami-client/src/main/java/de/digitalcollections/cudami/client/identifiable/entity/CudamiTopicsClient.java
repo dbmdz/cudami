@@ -35,16 +35,11 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
 
   public SearchPageResponse<Topic> findTopTopics(SearchPageRequest searchPageRequest)
       throws TechnicalException {
-    // FIXME: findTopCollections? wrong method, we just have top topics!
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/top", baseEndpoint), searchPageRequest);
   }
 
-  public PageResponse<Topic> findTopTopics(PageRequest pageRequest) throws TechnicalException {
-    return doGetRequestForPagedObjectList(String.format("%s/top", baseEndpoint), pageRequest);
-  }
-
-  public List<Entity> getAllEntities(UUID uuid) throws TechnicalException {
+  public List<Entity> findAllEntities(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/entities/all", baseEndpoint, uuid), Entity.class);
   }
@@ -55,34 +50,34 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
             String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
   }
 
-  public List<Topic> getChildren(UUID uuid) throws TechnicalException {
+  public List<Topic> findChildren(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
   }
 
-  public PageResponse<Topic> getChildren(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
   }
 
-  public PageResponse<Entity> getEntities(UUID uuid, PageRequest pageRequest)
+  public PageResponse<Entity> findEntities(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/entities", baseEndpoint, uuid), pageRequest, Entity.class);
   }
 
-  public PageResponse<FileResource> getFileResources(UUID uuid, PageRequest pageRequest)
+  public PageResponse<FileResource> findFileResources(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), pageRequest, FileResource.class);
   }
 
-  public List<Locale> getLanguagesOfEntities(UUID topicUuid) throws TechnicalException {
+  public List<Locale> findLanguagesOfEntities(UUID topicUuid) throws TechnicalException {
     return this.doGetRequestForObjectList(
         String.format("%s/%s/entities/languages", baseEndpoint, topicUuid), Locale.class);
   }
 
-  public List<Locale> getLanguagesOfFileResources(UUID topicUuid) throws TechnicalException {
+  public List<Locale> findLanguagesOfFileResources(UUID topicUuid) throws TechnicalException {
     return this.doGetRequestForObjectList(
         String.format("%s/%s/fileresources/languages", baseEndpoint, topicUuid), Locale.class);
   }
@@ -91,15 +86,15 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
-  public List<Locale> getTopTopicsLanguages() throws TechnicalException {
+  public List<Locale> findTopTopicsLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/top/languages", baseEndpoint), Locale.class);
   }
 
-  public List<Topic> getTopicsOfEntity(UUID uuid) throws TechnicalException {
+  public List<Topic> findTopicsOfEntity(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/entity/%s", baseEndpoint, uuid));
   }
 
-  public List<Topic> getTopicsOfFileResource(UUID uuid) throws TechnicalException {
+  public List<Topic> findTopicsOfFileResource(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/fileresource/%s", baseEndpoint, uuid));
   }
 
@@ -109,13 +104,15 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
             String.format("%s/%s/children/%s", baseEndpoint, parentUuid, childUuid)));
   }
 
-  public List<Entity> saveEntities(UUID uuid, List entities) throws TechnicalException {
+  public List<Entity> setEntities(UUID uuid, List entities) throws TechnicalException {
+    // FIXME: should be PUT
     return doPostRequestForObjectList(
         String.format("%s/%s/entities", baseEndpoint, uuid), entities, Entity.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources)
+  public List<FileResource> setFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
+    // FIXME: should be PUT
     return doPostRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid),
         fileResources,

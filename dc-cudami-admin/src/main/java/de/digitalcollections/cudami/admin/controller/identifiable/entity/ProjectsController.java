@@ -125,7 +125,7 @@ public class ProjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.getDigitalObjects(uuid, searchPageRequest);
+    return service.findDigitalObjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/projects")
@@ -133,7 +133,7 @@ public class ProjectsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
 
     return "projects/list";
   }

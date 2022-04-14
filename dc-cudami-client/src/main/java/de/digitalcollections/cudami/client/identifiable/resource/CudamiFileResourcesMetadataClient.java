@@ -25,13 +25,13 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public SearchPageResponse<FileResource> findFileResourcesByType(
+  public SearchPageResponse<FileResource> findByType(
       SearchPageRequest searchPageRequest, String type) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/type/%s", baseEndpoint, type), searchPageRequest);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
+  public List<Locale> findLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

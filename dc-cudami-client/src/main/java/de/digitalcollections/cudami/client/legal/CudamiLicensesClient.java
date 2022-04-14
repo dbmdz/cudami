@@ -10,8 +10,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
 
 public class CudamiLicensesClient extends CudamiRestClient<License> {
 
@@ -36,12 +34,6 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
     doDeleteRequestForString(
         String.format(
             "%s?url=%s", baseEndpoint, URLEncoder.encode(url.toString(), StandardCharsets.UTF_8)));
-  }
-
-  @Deprecated
-  public void deleteByUuids(List<UUID> uuids) {
-    throw new UnsupportedOperationException(
-        "Spec https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html not explicitely allows a body in DELETE methods. Java HTTP RequestBuilder does not allow.");
   }
 
   public License getByUrl(String url) throws TechnicalException {

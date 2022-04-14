@@ -63,7 +63,7 @@ public class GeoLocationsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
     return "geolocations/list";
   }
 
