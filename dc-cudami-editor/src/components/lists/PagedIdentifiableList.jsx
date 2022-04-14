@@ -73,8 +73,10 @@ class PagedIdentifiableList extends Component {
         },
       },
     )
-    const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(0, {
+      defaultLanguage,
+    })
     this.setState({
       defaultLanguage,
       identifiables: content,
@@ -86,10 +88,9 @@ class PagedIdentifiableList extends Component {
   }
 
   activateChangeOfOrder = async () => {
-    const {content, pageSize, totalElements} = await this.loadIdentifiables(
-      0,
-      this.state.totalElements,
-    )
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(0, {
+      pageSize: this.state.totalElements,
+    })
     this.setState({
       changeOfOrderActive: true,
       identifiables: content,
@@ -124,10 +125,7 @@ class PagedIdentifiableList extends Component {
   }
 
   executeSearch = async () => {
-    const {content, pageSize, totalElements} = await this.loadIdentifiables(
-      0,
-      this.pageSize,
-    )
+    const {content, pageSize, totalElements} = await this.loadIdentifiables(0)
     this.setState({
       identifiables: content,
       numberOfPages: Math.ceil(totalElements / pageSize),
@@ -282,9 +280,15 @@ class PagedIdentifiableList extends Component {
     this.updatePage({selected: pageNumber})
   }
 
-  loadIdentifiables = async (pageNumber, pageSize = this.pageSize) => {
+  loadIdentifiables = async (
+    pageNumber,
+    {
+      defaultLanguage = this.state.defaultLanguage,
+      pageSize = this.pageSize,
+    } = {},
+  ) => {
     const {apiContextPath, parentType, parentUuid, type} = this.props
-    const {defaultLanguage, searchTerm} = this.state
+    const {searchTerm} = this.state
     if (parentType && parentUuid) {
       return await loadAttachedIdentifiables(
         apiContextPath,
