@@ -79,7 +79,7 @@
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
     <version.commons-lang3>3.12.0</version.commons-lang3>
     <version.dc-model>9.2.0</version.dc-model>
-    <version.flyway>8.5.7</version.flyway>
+    <version.flyway>8.5.8</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.8.2</version.junit>
     <version.logstash-logback-encoder>7.1.1</version.logstash-logback-encoder>
