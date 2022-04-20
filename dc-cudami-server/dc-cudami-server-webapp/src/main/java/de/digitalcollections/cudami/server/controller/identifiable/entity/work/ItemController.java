@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -116,6 +118,26 @@ public class ItemController {
   public ResponseEntity<Item> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     Item result = itemService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get an item by namespace and id, where the id can contain slashes, too")
+  @GetMapping(
+      value = {
+        "/v5/items/identifier/**",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException {
+    String argumentsStr =
+        request.getRequestURI().replaceFirst("^/.*?identifier/", "").replaceFirst("\\.json$", "");
+    argumentsStr = URLDecoder.decode(argumentsStr, Charset.forName("LATIN1"));
+    String[] arguments = argumentsStr.split(":");
+    if (arguments.length != 2) {
+      throw new IllegalArgumentException("Invalid parameters '" + argumentsStr + "'");
+    }
+    Item result = itemService.getByIdentifier(arguments[0], arguments[1]);
+
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
