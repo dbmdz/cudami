@@ -23,6 +23,7 @@ import de.digitalcollections.model.identifiable.entity.agent.AgentBuilder;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.ItemBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.legal.License;
@@ -141,7 +142,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".parent_uuid "
         + mappingPrefix
-        + "_parent_uuid";
+        + "_parent_uuid"
+        + ", "
+        + tableAlias
+        + ".item_uuid "
+        + mappingPrefix
+        + "_item_uuid";
   }
 
   public static String getSqlUpdateFieldValues() {
@@ -599,6 +605,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       License license = rowView.getRow(License.class);
       if (license.getUuid() != null) {
         digitalObject.setLicense(license);
+      }
+
+      // Try to fill UUID for item
+      UUID itemUUID = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
+      if (itemUUID != null) {
+        digitalObject.setItem(new ItemBuilder().withUuid(itemUUID).build());
       }
 
       // Try to fill UUID of geolocation of creator

@@ -283,6 +283,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
     }
 
+    // If an item exists, insert a blank Item object with UUID only
+    // FIXME
+
     return digitalObject;
   }
 }
