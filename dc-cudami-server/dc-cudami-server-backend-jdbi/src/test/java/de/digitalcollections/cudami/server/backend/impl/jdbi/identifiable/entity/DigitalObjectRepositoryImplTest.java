@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -290,7 +291,10 @@ class DigitalObjectRepositoryImplTest {
         identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace2", "2"));
 
     // Step3: Create and persist an identifier for another DigitalObject
-    identifierRepositoryImpl.save(new Identifier(UUID.randomUUID(), "namespace1", "other"));
+    DigitalObject otherDigitalObject =
+        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Anderes Label").build();
+    DigitalObject otherPersisted = repo.save(otherDigitalObject);
+    identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject

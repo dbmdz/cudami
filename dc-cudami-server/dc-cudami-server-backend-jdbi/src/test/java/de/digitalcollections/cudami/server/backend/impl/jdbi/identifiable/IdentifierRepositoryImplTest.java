@@ -3,9 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +36,7 @@ class IdentifierRepositoryImplTest {
   @Autowired PostgreSQLContainer postgreSQLContainer;
   @Autowired Jdbi jdbi;
   @Autowired CudamiConfig cudamiConfig;
+  @Autowired WebpageRepository webpageRepository;
 
   @BeforeEach
   public void beforeEach() {
@@ -49,6 +54,7 @@ class IdentifierRepositoryImplTest {
   @DisplayName("can save and return the saved object")
   void checkSave() {
     UUID identifiableUuid = UUID.randomUUID();
+    saveIdentifiable(identifiableUuid);
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
 
     Identifier persisted = repo.save(identifier);
@@ -68,6 +74,7 @@ class IdentifierRepositoryImplTest {
   @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
   void identifiersForIdentifiable() {
     UUID identifiableUuid = UUID.randomUUID();
+    saveIdentifiable(identifiableUuid);
     Identifier identifier1 = repo.save(new Identifier(identifiableUuid, "namespace", "1"));
     Identifier identifier2 = repo.save(new Identifier(identifiableUuid, "namespace", "2"));
 
@@ -81,6 +88,7 @@ class IdentifierRepositoryImplTest {
   void getByUuid() {
     // Persist an identifier
     UUID identifiableUuid = UUID.randomUUID();
+    saveIdentifiable(identifiableUuid);
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
 
     Identifier persisted = repo.save(identifier);
@@ -91,5 +99,14 @@ class IdentifierRepositoryImplTest {
     // Retrieve it by its uuid - it must be the same as what was returned before at persisting
     Identifier actual = repo.getByUuid(identifierUuid);
     assertThat(actual).isEqualTo(persisted);
+  }
+
+  private void saveIdentifiable(UUID uuid) {
+    Webpage webpage =
+        new WebpageBuilder()
+            .withLabel(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
+            .withUuid(uuid.toString())
+            .build();
+    webpageRepository.save(webpage);
   }
 }
