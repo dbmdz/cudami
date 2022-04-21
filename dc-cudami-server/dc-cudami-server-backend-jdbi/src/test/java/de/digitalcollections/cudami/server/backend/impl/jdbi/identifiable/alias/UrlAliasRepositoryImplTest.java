@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.filter.FilteringBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -16,6 +17,8 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,6 +53,7 @@ public class UrlAliasRepositoryImplTest {
 
   UrlAliasRepositoryImpl repo;
   @Autowired Jdbi jdbi;
+  @Autowired WebpageRepository webpageRepository;
   @Autowired WebsiteRepository websiteRepository;
   @Autowired CudamiConfig cudamiConfig;
 
@@ -83,7 +87,9 @@ public class UrlAliasRepositoryImplTest {
     urlAlias.setSlug("impressum");
     urlAlias.setTargetLanguage(Locale.GERMAN);
     urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    urlAlias.setTargetUuid(UUID.randomUUID());
+    Webpage webpage = new WebpageBuilder().withLabel(Locale.GERMAN, "webpage").build();
+    webpage = webpageRepository.save(webpage);
+    urlAlias.setTargetUuid(webpage.getUuid());
     return urlAlias;
   }
 
