@@ -23,7 +23,6 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
@@ -53,7 +52,7 @@ class IdentifiableServiceImplTest {
     identifierRepository = mock(IdentifierRepository.class);
     CudamiConfig cudamiConfig = new CudamiConfig();
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
-    urlAliasConfig.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
+    urlAliasConfig.setGenerationExcludes(List.of("DigitalObject"));
     cudamiConfig.setUrlAlias(urlAliasConfig);
 
     LocaleService localeService = mock(LocaleService.class);

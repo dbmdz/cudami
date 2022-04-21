@@ -17,7 +17,6 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
@@ -38,7 +37,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
   public void setup() {
     cudamiConfig = new CudamiConfig();
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
-    urlAliasConfig.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
+    urlAliasConfig.setGenerationExcludes(List.of("DigitalObject"));
     cudamiConfig.setUrlAlias(urlAliasConfig);
 
     slugGeneratorService = mock(IdentifiableUrlAliasAlignHelper.SlugGeneratorService.class);

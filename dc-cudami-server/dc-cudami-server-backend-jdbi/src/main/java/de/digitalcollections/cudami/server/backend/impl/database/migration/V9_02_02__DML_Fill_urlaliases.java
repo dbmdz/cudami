@@ -1,27 +1,14 @@
 package de.digitalcollections.cudami.server.backend.impl.database.migration;
 
-import static de.digitalcollections.model.identifiable.entity.EntityType.AGENT;
 import static de.digitalcollections.model.identifiable.entity.EntityType.ARTICLE;
-import static de.digitalcollections.model.identifiable.entity.EntityType.AUDIO;
-import static de.digitalcollections.model.identifiable.entity.EntityType.BOOK;
 import static de.digitalcollections.model.identifiable.entity.EntityType.COLLECTION;
 import static de.digitalcollections.model.identifiable.entity.EntityType.CORPORATE_BODY;
 import static de.digitalcollections.model.identifiable.entity.EntityType.DIGITAL_OBJECT;
-import static de.digitalcollections.model.identifiable.entity.EntityType.ENTITY;
-import static de.digitalcollections.model.identifiable.entity.EntityType.EVENT;
-import static de.digitalcollections.model.identifiable.entity.EntityType.EXPRESSION;
-import static de.digitalcollections.model.identifiable.entity.EntityType.FAMILY;
 import static de.digitalcollections.model.identifiable.entity.EntityType.GEOLOCATION;
-import static de.digitalcollections.model.identifiable.entity.EntityType.HEADWORD_ENTRY;
-import static de.digitalcollections.model.identifiable.entity.EntityType.IMAGE;
 import static de.digitalcollections.model.identifiable.entity.EntityType.ITEM;
-import static de.digitalcollections.model.identifiable.entity.EntityType.MANIFESTATION;
-import static de.digitalcollections.model.identifiable.entity.EntityType.OBJECT_3D;
 import static de.digitalcollections.model.identifiable.entity.EntityType.PERSON;
-import static de.digitalcollections.model.identifiable.entity.EntityType.PLACE;
 import static de.digitalcollections.model.identifiable.entity.EntityType.PROJECT;
 import static de.digitalcollections.model.identifiable.entity.EntityType.TOPIC;
-import static de.digitalcollections.model.identifiable.entity.EntityType.VIDEO;
 import static de.digitalcollections.model.identifiable.entity.EntityType.WEBSITE;
 import static de.digitalcollections.model.identifiable.entity.EntityType.WORK;
 
@@ -33,8 +20,23 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.config.SpringUtility;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Family;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Manifestation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -43,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
@@ -61,33 +64,39 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 @SuppressWarnings("checkstyle:typename")
 public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
   // Cannot be more elegant, since we want to allow null values
-  private static final Map<EntityType, String> ENTITY_MIGRATION_TABLES = new LinkedHashMap<>();
+  private static final Map<String, Pair<String, EntityType>> ENTITY_MIGRATION_TABLES =
+      new LinkedHashMap<>();
 
+  // for all the commented lines there doesn't exist a corresponding model class
   static {
-    ENTITY_MIGRATION_TABLES.put(AGENT, null);
-    ENTITY_MIGRATION_TABLES.put(ARTICLE, "articles");
-    ENTITY_MIGRATION_TABLES.put(AUDIO, null);
-    ENTITY_MIGRATION_TABLES.put(BOOK, null);
-    ENTITY_MIGRATION_TABLES.put(COLLECTION, "collections");
-    ENTITY_MIGRATION_TABLES.put(CORPORATE_BODY, "corporatebodies");
-    ENTITY_MIGRATION_TABLES.put(DIGITAL_OBJECT, "digitalobjects");
-    ENTITY_MIGRATION_TABLES.put(ENTITY, null);
-    ENTITY_MIGRATION_TABLES.put(EVENT, null);
-    ENTITY_MIGRATION_TABLES.put(EXPRESSION, null);
-    ENTITY_MIGRATION_TABLES.put(FAMILY, null);
-    ENTITY_MIGRATION_TABLES.put(GEOLOCATION, "geolocations");
-    ENTITY_MIGRATION_TABLES.put(HEADWORD_ENTRY, null);
-    ENTITY_MIGRATION_TABLES.put(IMAGE, null);
-    ENTITY_MIGRATION_TABLES.put(ITEM, "items");
-    ENTITY_MIGRATION_TABLES.put(MANIFESTATION, null);
-    ENTITY_MIGRATION_TABLES.put(OBJECT_3D, null);
-    ENTITY_MIGRATION_TABLES.put(PERSON, "persons");
-    ENTITY_MIGRATION_TABLES.put(PLACE, null);
-    ENTITY_MIGRATION_TABLES.put(PROJECT, "projects");
-    ENTITY_MIGRATION_TABLES.put(TOPIC, "topics");
-    ENTITY_MIGRATION_TABLES.put(VIDEO, null);
-    ENTITY_MIGRATION_TABLES.put(WEBSITE, "websites");
-    ENTITY_MIGRATION_TABLES.put(WORK, "works");
+    ENTITY_MIGRATION_TABLES.put(Agent.class.getSimpleName(), null);
+    ENTITY_MIGRATION_TABLES.put(Article.class.getSimpleName(), Pair.of("articles", ARTICLE));
+    // ENTITY_MIGRATION_TABLES.put(AUDIO, null);
+    // ENTITY_MIGRATION_TABLES.put(BOOK, null);
+    ENTITY_MIGRATION_TABLES.put(
+        Collection.class.getSimpleName(), Pair.of("collections", COLLECTION));
+    ENTITY_MIGRATION_TABLES.put(
+        CorporateBody.class.getSimpleName(), Pair.of("corporatebodies", CORPORATE_BODY));
+    ENTITY_MIGRATION_TABLES.put(
+        DigitalObject.class.getSimpleName(), Pair.of("digitalobjects", DIGITAL_OBJECT));
+    ENTITY_MIGRATION_TABLES.put(Entity.class.getSimpleName(), null);
+    // ENTITY_MIGRATION_TABLES.put(EVENT, null);
+    // ENTITY_MIGRATION_TABLES.put(EXPRESSION, null);
+    ENTITY_MIGRATION_TABLES.put(Family.class.getSimpleName(), null);
+    ENTITY_MIGRATION_TABLES.put(
+        GeoLocation.class.getSimpleName(), Pair.of("geolocations", GEOLOCATION));
+    ENTITY_MIGRATION_TABLES.put(HeadwordEntry.class.getSimpleName(), null);
+    // ENTITY_MIGRATION_TABLES.put(IMAGE, null);
+    ENTITY_MIGRATION_TABLES.put(Item.class.getSimpleName(), Pair.of("items", ITEM));
+    ENTITY_MIGRATION_TABLES.put(Manifestation.class.getSimpleName(), null);
+    // ENTITY_MIGRATION_TABLES.put(OBJECT_3D, null);
+    ENTITY_MIGRATION_TABLES.put(Person.class.getSimpleName(), Pair.of("persons", PERSON));
+    // ENTITY_MIGRATION_TABLES.put(PLACE, null);
+    ENTITY_MIGRATION_TABLES.put(Project.class.getSimpleName(), Pair.of("projects", PROJECT));
+    ENTITY_MIGRATION_TABLES.put(Topic.class.getSimpleName(), Pair.of("topics", TOPIC));
+    // ENTITY_MIGRATION_TABLES.put(VIDEO, null);
+    ENTITY_MIGRATION_TABLES.put(Website.class.getSimpleName(), Pair.of("websites", WEBSITE));
+    ENTITY_MIGRATION_TABLES.put(Work.class.getSimpleName(), Pair.of("works", WORK));
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(V9_02_02__DML_Fill_urlaliases.class);
@@ -104,31 +113,36 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
     JdbcTemplate jdbcTemplate = new JdbcTemplate(connectionDataSource.getConnection());
 
+    if (jdbcTemplate.queryForInt("SELECT count(*) from url_aliases") > 0) {
+      LOGGER.info("UrlAliases already existing, so nothing to do...");
+      return;
+    }
+
     // Webpages have to be migrated individually, since their URLAliases depend on the
     // the websites, they are bound, too
     migrateWebpages(jdbcTemplate);
 
-    removeIdentifiablesNotToMigrate();
+    removeEntitiesNotToMigrate();
 
     // All other entities have only generic URLAliases
     ENTITY_MIGRATION_TABLES.forEach(
-        (entityType, tableName) -> {
-          if (tableName != null) {
+        (className, attrs) -> {
+          if (attrs != null) {
             try {
-              migrateIdentifiables(jdbcTemplate, tableName, entityType);
+              migrateEntities(jdbcTemplate, attrs.getLeft(), attrs.getRight());
             } catch (SQLException e) {
-              throw new RuntimeException("Cannot migrate " + entityType + ": " + e, e);
+              throw new RuntimeException("Cannot migrate " + attrs.getRight() + ": " + e, e);
             }
           }
         });
   }
 
-  private void removeIdentifiablesNotToMigrate() {
+  private void removeEntitiesNotToMigrate() {
     if (cudamiConfig.getUrlAlias() != null
         && cudamiConfig.getUrlAlias().getGenerationExcludes() != null) {
-      List<EntityType> excludedIdentifiables = cudamiConfig.getUrlAlias().getGenerationExcludes();
-      LOGGER.info("Excluding UrlAlias generation for " + excludedIdentifiables);
-      excludedIdentifiables.forEach(ENTITY_MIGRATION_TABLES::remove);
+      List<String> excludedEntities = cudamiConfig.getUrlAlias().getGenerationExcludes();
+      LOGGER.info("Excluding UrlAlias generation for " + excludedEntities);
+      excludedEntities.forEach(ENTITY_MIGRATION_TABLES::remove);
     }
 
     LOGGER.info(
@@ -215,19 +229,19 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     }
   }
 
-  private void migrateIdentifiables(
-      JdbcTemplate jdbcTemplate, String tableName, EntityType entityType) throws SQLException {
+  private void migrateEntities(JdbcTemplate jdbcTemplate, String tableName, EntityType entityType)
+      throws SQLException {
     String selectQuery = String.format("SELECT uuid,label FROM %s", tableName);
-    List<Map<String, String>> identifiables = jdbcTemplate.queryForList(selectQuery);
+    List<Map<String, String>> entities = jdbcTemplate.queryForList(selectQuery);
 
-    if (identifiables.isEmpty()) {
+    if (entities.isEmpty()) {
       LOGGER.info("No UrlAliases to add for {}", tableName);
       return;
     }
 
     LOGGER.info("Migrating {}", tableName);
 
-    identifiables.forEach(
+    entities.forEach(
         w -> {
           JSONObject jsonObject = new JSONObject(w.toString());
           UUID uuid = UUID.fromString(jsonObject.getString("uuid"));
@@ -256,7 +270,7 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
             throw new RuntimeException("Cannot parse " + w + ": " + e, e);
           }
         });
-    LOGGER.info("Successfully added {} UrlAliases for {}", identifiables.size(), tableName);
+    LOGGER.info("Successfully added {} UrlAliases for {}", entities.size(), tableName);
   }
 
   private UrlAlias buildUrlAlias(
