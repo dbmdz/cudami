@@ -330,7 +330,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       throw new IdentifiableServiceException(e.getMessage());
     }
     try {
-      // If we don't want no UrlAliases for this kind of identifiable, we return early
+      // If we do not want any UrlAliases for this kind of identifiable, we return early
       if (IdentifiableUrlAliasAlignHelper.checkIdentifiableExcluded(identifiable, cudamiConfig)) {
         return repository.getByUuid(identifiable.getUuid());
       }
