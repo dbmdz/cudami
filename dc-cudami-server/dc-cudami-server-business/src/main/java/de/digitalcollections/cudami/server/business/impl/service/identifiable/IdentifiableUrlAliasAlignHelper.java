@@ -175,6 +175,18 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         || actualIdentifiable.getLabel() == null;
   }
 
+  public static <I extends Identifiable> boolean checkIdentifiableExcluded(
+      I actualIdentifiable, CudamiConfig cudamiConfig) throws CudamiServiceException {
+
+    if (actualIdentifiable == null || cudamiConfig == null) {
+      throw new CudamiServiceException("Actual Identifiable and cudami config must not be null!");
+    }
+
+    IdentifiableUrlAliasAlignHelper<I> inst =
+        new IdentifiableUrlAliasAlignHelper<>(actualIdentifiable, null, cudamiConfig, null);
+    return inst.checkIdentifiableExcluded();
+  }
+
   private void ensureDefaultAliasesExist() throws CudamiServiceException {
     if (checkIdentifiableExcluded()) {
       return;
