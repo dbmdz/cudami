@@ -51,6 +51,9 @@ class WebpageServiceImplTest {
     identifierRepository = mock(IdentifierRepository.class);
     urlAliasService = mock(UrlAliasService.class);
     cudamiConfig = mock(CudamiConfig.class);
+    CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
+    when(cudamiConfigUrlAlias.getGenerationExcludes()).thenReturn(List.of("DigitalObject"));
+    when(cudamiConfig.getUrlAlias()).thenReturn(cudamiConfigUrlAlias);
 
     LocaleService localeService = mock(LocaleService.class);
 
