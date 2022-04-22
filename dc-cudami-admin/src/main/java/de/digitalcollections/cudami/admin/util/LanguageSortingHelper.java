@@ -10,7 +10,7 @@ public class LanguageSortingHelper {
   List<Locale> prioritisedSortedLanguages;
 
   public LanguageSortingHelper(List<Locale> prioritisedSortedLanguages) {
-    this.prioritisedSortedLanguages = prioritisedSortedLanguages;
+    this.prioritisedSortedLanguages = List.copyOf(prioritisedSortedLanguages);
   }
 
   public List<Locale> sortLanguages(Locale displayLocale, Collection<Locale> languagesToSort) {

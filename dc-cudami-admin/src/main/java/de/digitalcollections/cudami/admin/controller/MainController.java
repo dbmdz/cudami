@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.security.User;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ public class MainController {
 
   private final UserService<User> userService;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
   public MainController(UserService<User> userService) {
     this.userService = userService;
   }

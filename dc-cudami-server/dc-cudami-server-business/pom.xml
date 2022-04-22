@@ -20,6 +20,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-web</artifactId>
       <version>${version.dc-commons-web}</version>

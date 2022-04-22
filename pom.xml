@@ -89,7 +89,7 @@
     <version.passay>1.6.1</version.passay>
     <version.postgresql>42.3.4</version.postgresql>
     <version.slf4j>1.7.36</version.slf4j>
-    <version.spotbugs>4.2.3</version.spotbugs>
+    <version.spotbugs>4.6.0</version.spotbugs>
     <version.unbescape>1.1.6.RELEASE</version.unbescape>
 
     <!-- plugins -->
@@ -100,7 +100,7 @@
     <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
     <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
     <version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-    <version.spotbugs-maven-plugin>4.5.0.0</version.spotbugs-maven-plugin>
+    <version.spotbugs-maven-plugin>4.6.0.0</version.spotbugs-maven-plugin>
   </properties>
 
   <dependencyManagement>

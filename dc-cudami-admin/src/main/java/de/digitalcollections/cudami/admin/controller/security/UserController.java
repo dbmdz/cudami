@@ -10,6 +10,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +44,7 @@ public class UserController extends AbstractController {
   private final MessageSource messageSource;
   private final UserService<User> service;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
   public UserController(MessageSource messageSource, UserService service) {
     this.messageSource = messageSource;
     this.service = service;

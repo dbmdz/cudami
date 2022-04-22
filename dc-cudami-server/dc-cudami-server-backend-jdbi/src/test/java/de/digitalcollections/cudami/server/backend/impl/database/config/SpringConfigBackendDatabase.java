@@ -84,8 +84,7 @@ public class SpringConfigBackendDatabase {
 
   @Bean
   CudamiConfig cudamiConfig() {
-    var cudamiConfig = new CudamiConfig();
-    cudamiConfig.setOffsetForAlternativePaging(5000);
+    var cudamiConfig = new CudamiConfig(null, null, 5000);
     return cudamiConfig;
   }
 }

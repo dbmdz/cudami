@@ -15,6 +15,7 @@ import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 public abstract class BaseRestClient<T extends Object> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BaseRestClient.class);
@@ -217,12 +219,12 @@ public abstract class BaseRestClient<T extends Object> {
   }
 
   protected List<T> doGetRequestForObjectList(String requestUrl) throws TechnicalException {
-    return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
+    return doGetRequestForObjectList(requestUrl, targetType, null);
   }
 
   protected List doGetRequestForObjectList(String requestUrl, Class<?> targetType)
       throws TechnicalException {
-    return (List<T>) doGetRequestForObjectList(requestUrl, targetType, null);
+    return doGetRequestForObjectList(requestUrl, targetType, null);
   }
 
   protected List doGetRequestForObjectList(

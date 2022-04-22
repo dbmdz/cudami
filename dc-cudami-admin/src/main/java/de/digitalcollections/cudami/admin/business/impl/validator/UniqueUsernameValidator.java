@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.business.impl.validator;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.security.User;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ public class UniqueUsernameValidator implements Validator {
   private final MessageSource messageSource;
   private final UserService userService;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
   public UniqueUsernameValidator(MessageSource messageSource, UserService userService) {
     this.messageSource = messageSource;
     this.userService = userService;
