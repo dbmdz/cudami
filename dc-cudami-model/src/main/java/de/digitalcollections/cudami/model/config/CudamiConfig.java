@@ -1,56 +1,48 @@
 package de.digitalcollections.cudami.model.config;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 public class CudamiConfig {
-  Defaults defaults;
-  UrlAlias urlAlias;
-  int offsetForAlternativePaging = 0;
+  private Defaults defaults;
+  private UrlAlias urlAlias;
+  private int offsetForAlternativePaging = 0;
+
+  public CudamiConfig(Defaults defaults, UrlAlias urlAlias, int offsetForAlternativePaging) {
+    this.defaults = defaults;
+    this.urlAlias = urlAlias;
+    this.offsetForAlternativePaging = offsetForAlternativePaging;
+  }
 
   public Defaults getDefaults() {
     return defaults;
-  }
-
-  public void setDefaults(Defaults defaults) {
-    this.defaults = defaults;
   }
 
   public UrlAlias getUrlAlias() {
     return urlAlias;
   }
 
-  public void setUrlAlias(UrlAlias urlAlias) {
-    this.urlAlias = urlAlias;
+  public int getOffsetForAlternativePaging() {
+    return offsetForAlternativePaging;
   }
 
   public static class Defaults {
-    String language;
-    Locale locale;
+    private String language;
+    private Locale locale;
+
+    public Defaults(String language, Locale locale) {
+      this.language = language;
+      this.locale = locale;
+    }
 
     public String getLanguage() {
       return language;
     }
 
-    public void setLanguage(String language) {
-      this.language = language;
-    }
-
     public Locale getLocale() {
       return locale;
     }
-
-    public void setLocale(Locale locale) {
-      this.locale = locale;
-    }
-  }
-
-  public int getOffsetForAlternativePaging() {
-    return offsetForAlternativePaging;
-  }
-
-  public void setOffsetForAlternativePaging(int offsetForAlternativePaging) {
-    this.offsetForAlternativePaging = offsetForAlternativePaging;
   }
 
   public static class UrlAlias {
@@ -59,19 +51,9 @@ public class CudamiConfig {
     private List<String> generationExcludes;
     private int maxLength = -1;
 
-    public List<String> getGenerationExcludes() {
-      return this.generationExcludes;
-    }
-
-    public void setGenerationExcludes(List<String> generationExcludes) {
-      this.generationExcludes = generationExcludes;
-    }
-
-    public int getMaxLength() {
-      return maxLength;
-    }
-
-    public void setMaxLength(int maxLength) {
+    public UrlAlias(List<String> generationExcludes, int maxLength) {
+      this.generationExcludes =
+          generationExcludes != null ? List.copyOf(generationExcludes) : Collections.EMPTY_LIST;
       if (maxLength > DB_MAX_LENGTH) {
         throw new RuntimeException(
             "The maxLength you configured is invalid, because it is greater than "
@@ -79,6 +61,14 @@ public class CudamiConfig {
                 + " (this is the greatest possible length in the database)!");
       }
       this.maxLength = maxLength;
+    }
+
+    public List<String> getGenerationExcludes() {
+      return List.copyOf(generationExcludes);
+    }
+
+    public int getMaxLength() {
+      return maxLength;
     }
   }
 }
