@@ -35,10 +35,8 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @BeforeEach
   public void setup() {
-    cudamiConfig = new CudamiConfig();
-    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
-    urlAliasConfig.setGenerationExcludes(List.of("DigitalObject"));
-    cudamiConfig.setUrlAlias(urlAliasConfig);
+    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
+    cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
 
     slugGeneratorService = mock(IdentifiableUrlAliasAlignHelper.SlugGeneratorService.class);
   }
