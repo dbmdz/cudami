@@ -46,7 +46,7 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
         DigitalObject.class);
   }
 
-  public List<Locale> findLanguages() throws TechnicalException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList("/v5/projects/languages", Locale.class);
   }
 

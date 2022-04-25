@@ -38,7 +38,7 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
     return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List<T> findAll() throws TechnicalException {
+  public List<T> getAll() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/all");
   }
 

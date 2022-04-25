@@ -38,16 +38,16 @@ public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
         String.format("%s/placeofdeath/%s", baseEndpoint, uuidGeoLocation.toString()), pageRequest);
   }
 
-  public List<DigitalObject> findDigitalObjects(UUID uuidPerson) throws TechnicalException {
+  public List<DigitalObject> getDigitalObjects(UUID uuidPerson) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, uuidPerson), DigitalObject.class);
   }
 
-  public List<Locale> findLanguages() throws TechnicalException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
-  public List findWorks(UUID uuidPerson) throws TechnicalException {
+  public List getWorks(UUID uuidPerson) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/works", baseEndpoint, uuidPerson), Work.class);
   }

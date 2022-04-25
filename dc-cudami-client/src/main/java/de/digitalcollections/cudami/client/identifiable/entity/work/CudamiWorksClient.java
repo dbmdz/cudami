@@ -18,13 +18,13 @@ public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
     super(http, serverUrl, Work.class, mapper, "/v5/works");
   }
 
-  public Set<Agent> findCreators(UUID uuid) throws TechnicalException {
+  public Set<Agent> getCreators(UUID uuid) throws TechnicalException {
     return (Set<Agent>)
         doGetRequestForObjectList(
             String.format("%s/%s/creators", baseEndpoint, uuid), DigitalObject.class);
   }
 
-  public List findItems(UUID uuid) throws TechnicalException {
+  public List getItems(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/items", baseEndpoint, uuid), Item.class);
   }
 }

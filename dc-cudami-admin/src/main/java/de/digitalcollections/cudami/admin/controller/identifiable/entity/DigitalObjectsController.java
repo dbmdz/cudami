@@ -109,7 +109,7 @@ public class DigitalObjectsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "digitalobjects/list";
   }
 
@@ -141,8 +141,8 @@ public class DigitalObjectsController extends AbstractController {
     if (digitalObject == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingCollectionLanguages = this.service.findLanguagesOfCollections(uuid),
-        existingProjectLanguages = this.service.findLanguagesOfProjects(uuid);
+    List<Locale> existingCollectionLanguages = this.service.getLanguagesOfCollections(uuid),
+        existingProjectLanguages = this.service.getLanguagesOfProjects(uuid);
 
     model
         .addAttribute("digitalObject", digitalObject)

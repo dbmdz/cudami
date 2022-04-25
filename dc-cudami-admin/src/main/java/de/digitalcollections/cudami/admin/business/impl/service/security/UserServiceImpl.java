@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   @Override
   public boolean doesActiveAdminUserExist() throws ServiceException {
     try {
-      List<User> findActiveAdminUsers = client.findActiveAdminUsers();
+      List<User> findActiveAdminUsers = client.getActiveAdminUsers();
       if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
         return true;
       }
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   @Override
   public List<User> findAll() throws ServiceException {
     try {
-      return client.findAll();
+      return client.getAll();
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }

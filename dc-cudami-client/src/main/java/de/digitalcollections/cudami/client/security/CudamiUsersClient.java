@@ -13,12 +13,12 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
     super(http, serverUrl, User.class, mapper, "/v5/users");
   }
 
-  public List<User> findActiveAdminUsers() throws TechnicalException {
+  public List<User> getActiveAdminUsers() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s?role=ADMIN&enabled=true", baseEndpoint));
   }
 
   @Override
-  public List<User> findAll() throws TechnicalException {
+  public List<User> getAll() throws TechnicalException {
     return doGetRequestForObjectList("/v5/users");
   }
 

@@ -22,7 +22,7 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List findRelatedArticles(UUID uuid) throws TechnicalException {
+  public List getRelatedArticles(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/related/articles", baseEndpoint, uuid), Article.class);
   }

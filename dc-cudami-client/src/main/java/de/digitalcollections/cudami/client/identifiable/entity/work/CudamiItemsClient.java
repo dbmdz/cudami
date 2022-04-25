@@ -29,12 +29,12 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
             String.format("%s/%s/works/%s", baseEndpoint, itemUuid, workUuid), Boolean.class);
   }
 
-  public List findDigitalObjects(UUID uuid) throws TechnicalException {
+  public List getDigitalObjects(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, uuid), DigitalObject.class);
   }
 
-  public List findWorks(UUID uuid) throws TechnicalException {
+  public List getWorks(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/works", baseEndpoint, uuid), Work.class);
   }
 }

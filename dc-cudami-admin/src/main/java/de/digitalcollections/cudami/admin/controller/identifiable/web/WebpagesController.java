@@ -203,7 +203,7 @@ public class WebpagesController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubpageLanguages));
     model.addAttribute("webpage", webpage);
 
-    List<FileResource> relatedFileResources = service.findRelatedFileResources(uuid);
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);

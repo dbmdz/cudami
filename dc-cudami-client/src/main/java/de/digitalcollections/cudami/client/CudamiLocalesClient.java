@@ -13,12 +13,12 @@ public class CudamiLocalesClient extends BaseRestClient<Locale> {
     super(http, serverUrl, Locale.class, mapper, "/v5/locales");
   }
 
-  public List<String> findAllLanguages() throws TechnicalException {
+  public List<String> getAllLanguages() throws TechnicalException {
     return doGetRequestForObjectList("/v5/languages", String.class);
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findAllLocales() throws TechnicalException {
+  public List<String> getAllLocales() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint, String.class);
   }
 

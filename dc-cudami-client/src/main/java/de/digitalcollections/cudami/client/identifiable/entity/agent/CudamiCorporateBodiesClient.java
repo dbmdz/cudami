@@ -26,7 +26,7 @@ public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateB
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public List<Locale> findLanguages() throws TechnicalException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 }

@@ -25,31 +25,6 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     super(http, serverUrl, DigitalObject.class, mapper, "/v5/digitalobjects");
   }
 
-  public List<DigitalObject> findAllReduced() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
-  }
-
-  public PageResponse<DigitalObject> findAllForParent(DigitalObject parent)
-      throws TechnicalException {
-    if (parent == null) {
-      throw new TechnicalException("Empty parent");
-    }
-
-    PageRequest pageRequest =
-        new PageRequestBuilder()
-            .pageNumber(0)
-            .pageSize(10000)
-            .filtering(
-                Filtering.defaultBuilder().filter("parent.uuid").isEquals(parent.getUuid()).build())
-            .build();
-    return find(pageRequest);
-  }
-
-  public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(0, count, null);
-    return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
-  }
-
   public SearchPageResponse<Collection> findActiveCollections(
       UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
@@ -66,12 +41,38 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         Collection.class);
   }
 
-  public List<FileResource> findFileResources(UUID uuid) throws TechnicalException {
+  public SearchPageResponse<Project> findProjects(UUID uuid, SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
+  }
+
+  public PageResponse<DigitalObject> getAllForParent(DigitalObject parent)
+      throws TechnicalException {
+    if (parent == null) {
+      throw new TechnicalException("Empty parent");
+    }
+
+    PageRequest pageRequest =
+        new PageRequestBuilder()
+            .pageNumber(0)
+            .pageSize(10000)
+            .filtering(
+                Filtering.defaultBuilder().filter("parent.uuid").isEquals(parent.getUuid()).build())
+            .build();
+    return find(pageRequest);
+  }
+
+  public List<DigitalObject> getAllReduced() throws TechnicalException {
+    return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
+  }
+
+  public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);
   }
 
-  public List<ImageFileResource> findImageFileResources(UUID uuid) throws TechnicalException {
+  public List<ImageFileResource> getImageFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources/images", baseEndpoint, uuid), ImageFileResource.class);
   }
@@ -81,24 +82,23 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         doGetRequestForObject(String.format("%s/%s/item", baseEndpoint, uuid), Item.class);
   }
 
-  public List<Locale> findLanguages() throws TechnicalException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
-  public List<Locale> findLanguagesOfCollections(UUID uuid) throws TechnicalException {
+  public List<Locale> getLanguagesOfCollections(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public List<Locale> findLanguagesOfProjects(UUID uuid) throws TechnicalException {
+  public List<Locale> getLanguagesOfProjects(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/projects/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public SearchPageResponse<Project> findProjects(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
+  public PageResponse<DigitalObject> getRandomDigitalObjects(int count) throws TechnicalException {
+    PageRequest pageRequest = new PageRequest(0, count, null);
+    return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
   }
 
   public List<FileResource> setFileResources(UUID uuid, List fileResources)

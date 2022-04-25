@@ -109,7 +109,7 @@ public class CorporateBodiesController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.findLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
     return "corporatebodies/list";
   }
 

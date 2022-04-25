@@ -21,23 +21,6 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     super(http, serverUrl, Webpage.class, mapper, "/v5/webpages");
   }
 
-  public Webpage findActiveOne(UUID uuid, Locale locale) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
-  }
-
-  public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/children?active=true", baseEndpoint, uuid), searchPageRequest);
-  }
-
-  public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/children", baseEndpoint, uuid), searchPageRequest);
-  }
-
   public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -46,19 +29,10 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         Webpage.class);
   }
 
-  public List<Webpage> findActiveChildrenTree(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
-  }
-
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
-    return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
-  }
-
-  public List<Webpage> findChildren(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
+  public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/children?active=true", baseEndpoint, uuid), searchPageRequest);
   }
 
   public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest)
@@ -67,7 +41,33 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
   }
 
-  public List<Webpage> findChildrenTree(UUID uuid) throws TechnicalException {
+  public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/children", baseEndpoint, uuid), searchPageRequest);
+  }
+
+  public List<Webpage> getActiveChildrenTree(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
+  }
+
+  public Webpage getActiveOne(UUID uuid, Locale locale) throws TechnicalException {
+    return doGetRequestForObject(
+        String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
+  }
+
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
+    return (BreadcrumbNavigation)
+        doGetRequestForObject(
+            String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
+  }
+
+  public List<Webpage> getChildren(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
+  }
+
+  public List<Webpage> getChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/childrentree", baseEndpoint, uuid));
   }
 
@@ -75,7 +75,7 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
-  public List<FileResource> findRelatedFileResources(UUID uuid) throws TechnicalException {
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/related/fileresources", baseEndpoint, uuid), FileResource.class);
   }

@@ -28,7 +28,7 @@ class CudamiCorporateBodiesClientTest
   @Test
   @DisplayName("can access the endpoint for getLanguages")
   public void testGetLanguages() throws Exception {
-    client.findLanguages();
+    client.getLanguages();
 
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }

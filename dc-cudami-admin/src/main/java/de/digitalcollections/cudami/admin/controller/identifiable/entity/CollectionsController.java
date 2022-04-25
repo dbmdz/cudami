@@ -196,8 +196,7 @@ public class CollectionsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(
-            displayLocale, service.findLanguagesOfTopCollections()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfTopCollections()));
     return "collections/list";
   }
 
@@ -299,7 +298,7 @@ public class CollectionsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
 
-    List<Collection> parents = service.findParents(uuid);
+    List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);

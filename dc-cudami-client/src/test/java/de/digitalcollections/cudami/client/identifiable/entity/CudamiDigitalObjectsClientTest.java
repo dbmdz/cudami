@@ -23,7 +23,7 @@ class CudamiDigitalObjectsClientTest
     String bodyJson = "[{\"entityType\":\"DIGITAL_OBJECT\"}]";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    List<DigitalObject> actual = client.findAllReduced();
+    List<DigitalObject> actual = client.getAllReduced();
     assertThat(actual).isNotNull();
     assertThat(actual.get(0)).isExactlyInstanceOf(DigitalObject.class);
 
@@ -33,7 +33,7 @@ class CudamiDigitalObjectsClientTest
   @Test
   @DisplayName("can find a number of random DigitalObjects")
   public void testFindRandomDigitalObjects() throws Exception {
-    client.findRandomDigitalObjects(42);
+    client.getRandomDigitalObjects(42);
     verifyHttpRequestByMethodAndRelativeURL("get", "/random?pageNumber=0&pageSize=42");
   }
 
@@ -65,7 +65,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve FileResources for a DigitalObject")
   public void testGetFileResources() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findFileResources(uuid);
+    client.getFileResources(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/fileresources");
   }
 
@@ -73,7 +73,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve ImageFileResources for a DigitalObject")
   public void testGetImageFileResources() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findImageFileResources(uuid);
+    client.getImageFileResources(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/fileresources/images");
   }
 
@@ -88,7 +88,7 @@ class CudamiDigitalObjectsClientTest
   @Test
   @DisplayName("can return the languages for all DigitalObjects")
   public void testGetLanguages() throws Exception {
-    client.findLanguages();
+    client.getLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 
@@ -97,7 +97,7 @@ class CudamiDigitalObjectsClientTest
       "can retrieve the languages of all collections, in which the DigitalObject is contained")
   public void testGetLanguagesForCollections() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findLanguagesOfCollections(uuid);
+    client.getLanguagesOfCollections(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/collections/languages");
   }
 
@@ -106,7 +106,7 @@ class CudamiDigitalObjectsClientTest
       "can retrieve the languages of all projects, in which the DigitalObject is contained")
   public void testGetLanguagesForProjects() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findLanguagesOfProjects(uuid);
+    client.getLanguagesOfProjects(uuid);
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "/projects/languages");
   }
 
@@ -144,7 +144,7 @@ class CudamiDigitalObjectsClientTest
             .withLabel(Locale.GERMAN, "Parent")
             .build();
 
-    client.findAllForParent(parent);
+    client.getAllForParent(parent);
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get", "?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());

@@ -21,7 +21,7 @@ public class CudamiHeadwordEntriesClient extends CudamiEntitiesClient<HeadwordEn
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List findByHeadword(UUID headwordUuid) throws TechnicalException {
+  public List getByHeadword(UUID headwordUuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/headword/%s", baseEndpoint, headwordUuid), HeadwordEntry.class);
   }

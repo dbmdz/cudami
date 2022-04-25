@@ -39,21 +39,30 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         (E) null);
   }
 
-  public List findRandomEntities(int count) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("/v5/entities/random?count=%d", count), Entity.class);
+  public List<EntityRelation> addRelationsForSubject(List relations) throws TechnicalException {
+    return doPutRequestForObjectList(
+        String.format(
+            "/v5/entities/%s/relations",
+            ((EntityRelation) relations.get(0)).getSubject().getUuid()),
+        relations,
+        EntityRelation.class);
   }
 
   public E getByRefId(long refId) throws TechnicalException {
     return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
   }
 
-  public List<FileResource> findRelatedFileResources(UUID uuid) throws TechnicalException {
+  public List getRandomEntities(int count) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("/v5/entities/random?count=%d", count), Entity.class);
+  }
+
+  public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
   }
 
-  public List<EntityRelation> findRelations(UUID subjectEntityUuid) throws TechnicalException {
+  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("/v5/entities/relations/%s", subjectEntityUuid), EntityRelation.class);
   }
@@ -64,14 +73,5 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         String.format("/v5/entities/%s/related/fileresources", uuid),
         fileResources,
         FileResource.class);
-  }
-
-  public List<EntityRelation> addRelationsForSubject(List relations) throws TechnicalException {
-    return doPutRequestForObjectList(
-        String.format(
-            "/v5/entities/%s/relations",
-            ((EntityRelation) relations.get(0)).getSubject().getUuid()),
-        relations,
-        EntityRelation.class);
   }
 }

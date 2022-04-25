@@ -53,7 +53,7 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can return the languages for all FileResources")
   public void testGetLanguages() throws Exception {
-    client.findLanguages();
+    client.getLanguages();
     verifyHttpRequestByMethodAndRelativeURL("get", "/languages");
   }
 }

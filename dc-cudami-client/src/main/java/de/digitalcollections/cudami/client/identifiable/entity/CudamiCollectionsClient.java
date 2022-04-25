@@ -62,26 +62,10 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search?active", searchPageRequest);
   }
 
-  public Collection getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format(baseEndpoint + "/%s?active=true&pLocale=%s", uuid, locale));
-  }
-
   public PageResponse<Collection> findActiveSubcollections(
       UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/subcollections?active=true", uuid), searchPageRequest);
-  }
-
-  public PageResponse<Collection> findSubcollections(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format(baseEndpoint + "/%s/subcollections", uuid), searchPageRequest);
-  }
-
-  public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/top", searchPageRequest);
   }
 
   public PageResponse<Collection> findActiveSubcollections(UUID uuid, PageRequest pageRequest)
@@ -92,27 +76,12 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         Collection.class);
   }
 
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
-    return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
-  }
-
   public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
         searchPageRequest,
         DigitalObject.class);
-  }
-
-  public Collection getParent(UUID uuid) throws TechnicalException {
-    return (Collection)
-        doGetRequestForObject(String.format(baseEndpoint + "/%s/parent", uuid), Collection.class);
-  }
-
-  public List<Collection> findParents(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(String.format(baseEndpoint + "/%s/parents", uuid));
   }
 
   public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
@@ -126,6 +95,12 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         filtering);
   }
 
+  public PageResponse<Collection> findSubcollections(UUID uuid, SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format(baseEndpoint + "/%s/subcollections", uuid), searchPageRequest);
+  }
+
   public PageResponse<Collection> findSubcollections(UUID collectionUuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -134,8 +109,33 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         Collection.class);
   }
 
-  public List<Locale> findLanguagesOfTopCollections() throws TechnicalException {
+  public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/top", searchPageRequest);
+  }
+
+  public Collection getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
+    return doGetRequestForObject(
+        String.format(baseEndpoint + "/%s?active=true&pLocale=%s", uuid, locale));
+  }
+
+  public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
+    return (BreadcrumbNavigation)
+        doGetRequestForObject(
+            String.format(baseEndpoint + "/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+  }
+
+  public List<Locale> getLanguagesOfTopCollections() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint + "/top/languages", Locale.class);
+  }
+
+  public Collection getParent(UUID uuid) throws TechnicalException {
+    return (Collection)
+        doGetRequestForObject(String.format(baseEndpoint + "/%s/parent", uuid), Collection.class);
+  }
+
+  public List<Collection> getParents(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(String.format(baseEndpoint + "/%s/parents", uuid));
   }
 
   public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
@@ -154,6 +154,12 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
                 baseEndpoint + "/%s/subcollections/%s", collectionUuid, subcollectionUuid)));
   }
 
+  public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
+      throws TechnicalException {
+    return doPostRequestForObject(
+        String.format(baseEndpoint + "/%s/collection", parentCollectionUuid), collection);
+  }
+
   public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
     return Boolean.parseBoolean(
@@ -162,11 +168,5 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
                 String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
                 digitalObjects,
                 String.class));
-  }
-
-  public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
-      throws TechnicalException {
-    return doPostRequestForObject(
-        String.format(baseEndpoint + "/%s/collection", parentCollectionUuid), collection);
   }
 }

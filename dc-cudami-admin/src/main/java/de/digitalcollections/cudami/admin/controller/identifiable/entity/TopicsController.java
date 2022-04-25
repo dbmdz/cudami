@@ -152,7 +152,7 @@ public class TopicsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.findTopTopicsLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
     return "topics/list";
   }
 
@@ -207,8 +207,8 @@ public class TopicsController extends AbstractController {
         topic.getChildren().stream()
             .flatMap(child -> child.getLabel().getLocales().stream())
             .collect(Collectors.toList());
-    List<Locale> existingEntityLanguages = this.service.findLanguagesOfEntities(uuid);
-    List<Locale> existingFileResourceLanguages = this.service.findLanguagesOfFileResources(uuid);
+    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid);
+    List<Locale> existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
 
     model
         .addAttribute("existingLanguages", existingLanguages)

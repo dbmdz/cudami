@@ -20,7 +20,7 @@ public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public List<Locale> findLanguages() throws TechnicalException {
+  public List<Locale> getLanguages() throws TechnicalException {
     return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }
