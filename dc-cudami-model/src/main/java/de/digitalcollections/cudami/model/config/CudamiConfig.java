@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.model.config;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -9,7 +12,11 @@ public class CudamiConfig {
   private UrlAlias urlAlias;
   private int offsetForAlternativePaging = 0;
 
-  public CudamiConfig(Defaults defaults, UrlAlias urlAlias, int offsetForAlternativePaging) {
+  @JsonCreator(mode = Mode.PROPERTIES)
+  public CudamiConfig(
+      @JsonProperty(value = "defaults") Defaults defaults,
+      @JsonProperty(value = "urlAlias") UrlAlias urlAlias,
+      @JsonProperty(value = "offsetForAlternativePaging") int offsetForAlternativePaging) {
     this.defaults = defaults;
     this.urlAlias = urlAlias;
     this.offsetForAlternativePaging = offsetForAlternativePaging;
@@ -31,7 +38,10 @@ public class CudamiConfig {
     private String language;
     private Locale locale;
 
-    public Defaults(String language, Locale locale) {
+    @JsonCreator(mode = Mode.PROPERTIES)
+    public Defaults(
+        @JsonProperty(value = "language") String language,
+        @JsonProperty(value = "locale") Locale locale) {
       this.language = language;
       this.locale = locale;
     }
@@ -51,7 +61,10 @@ public class CudamiConfig {
     private List<String> generationExcludes;
     private int maxLength = -1;
 
-    public UrlAlias(List<String> generationExcludes, int maxLength) {
+    @JsonCreator(mode = Mode.PROPERTIES)
+    public UrlAlias(
+        @JsonProperty(value = "generationExcludes") List<String> generationExcludes,
+        @JsonProperty(value = "maxLength") int maxLength) {
       this.generationExcludes =
           generationExcludes != null ? List.copyOf(generationExcludes) : Collections.EMPTY_LIST;
       if (maxLength > DB_MAX_LENGTH) {
