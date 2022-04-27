@@ -34,7 +34,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can find a number of random DigitalObjects")
   public void testFindRandomDigitalObjects() throws Exception {
     client.getRandomDigitalObjects(42);
-    verifyHttpRequestByMethodAndRelativeURL("get", "/random?pageNumber=0&pageSize=42");
+    verifyHttpRequestByMethodAndRelativeURL("get", "/random?count=42");
   }
 
   @Test

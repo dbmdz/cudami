@@ -52,7 +52,7 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
   }
 
-  public Webpage getActiveOne(UUID uuid, Locale locale) throws TechnicalException {
+  public Webpage getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
     return doGetRequestForObject(
         String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
   }

@@ -34,7 +34,7 @@ public class WebpageHtmlController {
         "/v1/webpages/{uuid}.html"
       },
       produces = MediaType.TEXT_HTML_VALUE)
-  public String getWebpageAsHtml(
+  public String getByUuidAsHtml(
       @Parameter(
               example = "",
               description =

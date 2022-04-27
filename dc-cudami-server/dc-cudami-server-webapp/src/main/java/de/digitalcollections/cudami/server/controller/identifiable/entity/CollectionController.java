@@ -168,7 +168,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findAll(
+  public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -188,7 +188,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections/top", "/v2/collections/top", "/latest/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findAllTop(
+  public PageResponse<Collection> findTop(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -207,7 +207,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Collection> findCollections(
+  public SearchPageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -338,7 +338,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -386,7 +386,7 @@ public class CollectionController {
         "/latest/collections/{uuid}/related/corporatebodies"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<CorporateBody> getRelatedCorporateBodies(
+  public List<CorporateBody> findRelatedCorporateBodies(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
@@ -398,7 +398,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections/{uuid}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> getSubcollections(
+  public PageResponse<Collection> findSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

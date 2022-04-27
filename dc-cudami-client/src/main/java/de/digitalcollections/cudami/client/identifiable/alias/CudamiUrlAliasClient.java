@@ -45,18 +45,6 @@ public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
         String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 
-  public LocalizedUrlAliases getAllLinks(UUID websiteUuid, String slug) throws TechnicalException {
-    if (websiteUuid == null) {
-      return (LocalizedUrlAliases)
-          doGetRequestForObject(
-              String.format(baseEndpoint + "/%s", slug), LocalizedUrlAliases.class);
-    }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/%s/%s", slug, websiteUuid), LocalizedUrlAliases.class);
-  }
-
   public LocalizedUrlAliases getPrimaryLinks(UUID websiteUuid, String slug)
       throws TechnicalException {
     if (websiteUuid == null) {

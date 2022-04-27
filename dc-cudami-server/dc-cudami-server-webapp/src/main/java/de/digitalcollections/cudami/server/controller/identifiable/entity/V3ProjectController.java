@@ -61,7 +61,7 @@ public class V3ProjectController {
   @GetMapping(
       value = {"/v3/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getDigitalObjects(
+  public ResponseEntity<String> findDigitalObjects(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",

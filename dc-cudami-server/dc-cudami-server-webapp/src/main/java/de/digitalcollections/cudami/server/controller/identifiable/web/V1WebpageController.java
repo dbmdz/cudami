@@ -14,10 +14,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import org.jdom2.Element;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,14 +67,6 @@ public class V1WebpageController {
     return result;
   }
 
-  private Element createDocumentsElement(List<Element> contents) {
-    Element documents = new Element("documents");
-    for (Element entry : contents) {
-      documents.addContent(entry.clone());
-    }
-    return documents;
-  }
-
   @Operation(
       summary = "Get a webpage in JSON format",
       description = "Get a webpage in JSON format (version 1)",
@@ -99,7 +89,7 @@ public class V1WebpageController {
   @GetMapping(
       value = {"/v1/webpages/{uuid}.json", "/v1/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageV1Json(
+  public ResponseEntity<String> getByUuidV1Json(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",

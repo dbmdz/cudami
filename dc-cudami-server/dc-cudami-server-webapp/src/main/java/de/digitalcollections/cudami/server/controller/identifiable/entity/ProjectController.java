@@ -131,7 +131,7 @@ public class ProjectController {
   @GetMapping(
       value = {"/v6/projects/all", "/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Project> findAll() {
+  public List<Project> getAll() {
     return projectService.findAllFull();
   }
 
@@ -181,7 +181,7 @@ public class ProjectController {
   @GetMapping(
       value = {"/v5/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -247,7 +247,7 @@ public class ProjectController {
         "/latest/projects/{uuid}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity saveDigitalObjects(
+  public ResponseEntity setDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody

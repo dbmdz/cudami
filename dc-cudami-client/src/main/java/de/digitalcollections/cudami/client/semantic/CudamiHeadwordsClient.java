@@ -22,6 +22,11 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
+  public List getRandomHeadwords(int count) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/random?count=%d", baseEndpoint, count), Headword.class);
+  }
+
   public List getRelatedArticles(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/related/articles", baseEndpoint, uuid), Article.class);

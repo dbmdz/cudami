@@ -35,7 +35,7 @@ public class IdentifierTypeController {
   @GetMapping(
       value = {"/v5/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<IdentifierType> findAll(
+  public PageResponse<IdentifierType> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {

@@ -49,7 +49,7 @@ public class HeadwordEntryController {
   @GetMapping(
       value = {"/v5/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<HeadwordEntry> findAll(
+  public PageResponse<HeadwordEntry> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -68,7 +68,7 @@ public class HeadwordEntryController {
         "/v5/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<HeadwordEntry> findByHeadword(
+  public List<HeadwordEntry> getByHeadword(
       @Parameter(
               example = "",
               description =

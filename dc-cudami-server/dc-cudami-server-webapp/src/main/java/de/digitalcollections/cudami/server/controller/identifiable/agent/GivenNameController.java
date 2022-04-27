@@ -43,7 +43,7 @@ public class GivenNameController {
   @GetMapping(
       value = {"/v5/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<GivenName> findAll(
+  public PageResponse<GivenName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,

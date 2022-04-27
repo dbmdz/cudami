@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesClient<E> {
+  private static final String BASE_ENDPOINT_ENTITIES = "/v5/entities";
 
   public CudamiEntitiesClient(
       HttpClient http,
@@ -22,12 +23,13 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
   }
 
   public CudamiEntitiesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    this(http, serverUrl, (Class<E>) Entity.class, mapper, "/v5/entities");
+    this(http, serverUrl, (Class<E>) Entity.class, mapper, BASE_ENDPOINT_ENTITIES);
   }
 
   public void addRelatedFileresource(UUID uuid, UUID fileResourceUuid) throws TechnicalException {
     doPostRequestForObject(
-        String.format("/v5/entities/%s/related/fileresources/%s", uuid, fileResourceUuid),
+        String.format(
+            "%s/%s/related/fileresources/%s", BASE_ENDPOINT_ENTITIES, uuid, fileResourceUuid),
         (E) null);
   }
 
@@ -35,15 +37,16 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
       throws TechnicalException {
     doPostRequestForObject(
         String.format(
-            "/v5/entities/relations/%s/%s/%s", subjectEntityUuid, predicate, objectEntityUuid),
+            "%s/relations/%s/%s/%s",
+            BASE_ENDPOINT_ENTITIES, subjectEntityUuid, predicate, objectEntityUuid),
         (E) null);
   }
 
   public List<EntityRelation> addRelationsForSubject(List relations) throws TechnicalException {
     return doPutRequestForObjectList(
         String.format(
-            "/v5/entities/%s/relations",
-            ((EntityRelation) relations.get(0)).getSubject().getUuid()),
+            "%s/%s/relations",
+            BASE_ENDPOINT_ENTITIES, ((EntityRelation) relations.get(0)).getSubject().getUuid()),
         relations,
         EntityRelation.class);
   }
@@ -54,23 +57,25 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
 
   public List getRandomEntities(int count) throws TechnicalException {
     return doGetRequestForObjectList(
-        String.format("/v5/entities/random?count=%d", count), Entity.class);
+        String.format("%s/random?count=%d", BASE_ENDPOINT_ENTITIES, count), Entity.class);
   }
 
   public List<FileResource> getRelatedFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
-        String.format("/v5/entities/%s/related/fileresources", uuid), FileResource.class);
+        String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
+        FileResource.class);
   }
 
   public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
     return doGetRequestForObjectList(
-        String.format("/v5/entities/relations/%s", subjectEntityUuid), EntityRelation.class);
+        String.format("%s/relations/%s", BASE_ENDPOINT_ENTITIES, subjectEntityUuid),
+        EntityRelation.class);
   }
 
   public List<FileResource> setRelatedFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
     return doPostRequestForObjectList(
-        String.format("/v5/entities/%s/related/fileresources", uuid),
+        String.format("%s/%s/related/fileresources", BASE_ENDPOINT_ENTITIES, uuid),
         fileResources,
         FileResource.class);
   }

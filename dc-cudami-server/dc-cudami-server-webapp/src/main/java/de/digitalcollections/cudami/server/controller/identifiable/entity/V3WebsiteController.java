@@ -112,7 +112,7 @@ public class V3WebsiteController {
   @GetMapping(
       value = {"/v3/websites/{uuid}/rootpages", "/latest/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getRootPages(
+  public ResponseEntity<String> findRootPages(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",

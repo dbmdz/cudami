@@ -79,7 +79,7 @@ public class WebsiteController {
   @GetMapping(
       value = {"/v5/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Website> findAll(
+  public SearchPageResponse<Website> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",
@@ -176,7 +176,7 @@ public class WebsiteController {
   @GetMapping(
       value = {"/v5/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Webpage> getRootPages(
+  public SearchPageResponse<Webpage> findRootPages(
       @Parameter(
               name = "uuid",
               description = "the UUID of the parent webpage",

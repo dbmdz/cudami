@@ -96,9 +96,9 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         String.format("%s/%s/projects/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public PageResponse<DigitalObject> getRandomDigitalObjects(int count) throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(0, count, null);
-    return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
+  public List<DigitalObject> getRandomDigitalObjects(int count) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/random?count=%d", baseEndpoint, count), DigitalObject.class);
   }
 
   public List<FileResource> setFileResources(UUID uuid, List fileResources)

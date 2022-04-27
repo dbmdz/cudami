@@ -64,7 +64,7 @@ public class WebpageController {
   @GetMapping(
       value = {"/v5/webpages", "/v2/webpages", "/latest/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Webpage> findAll(
+  public PageResponse<Webpage> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -140,7 +140,7 @@ public class WebpageController {
   @GetMapping(
       value = {"/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Webpage> getWebpage(
+  public ResponseEntity<Webpage> getByUuid(
       @Parameter(
               example = "",
               description =
@@ -178,7 +178,7 @@ public class WebpageController {
   @GetMapping(
       value = {"/v5/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Webpage> getSubpages(
+  public PageResponse<Webpage> findSubpages(
       @Parameter(
               example = "",
               description =
@@ -206,7 +206,7 @@ public class WebpageController {
   @GetMapping(
       value = {"/v5/webpages/{uuid}/childrentree", "/latest/webpages/{uuid}/childrentree"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Webpage> getWebpageChildrenTree(
+  public List<Webpage> getChildrenTree(
       @Parameter(
               example = "",
               description =
@@ -230,7 +230,7 @@ public class WebpageController {
         "/latest/webpages/{uuid}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Webpage getWebpageParent(
+  public Webpage getParent(
       @Parameter(
               example = "",
               description =
