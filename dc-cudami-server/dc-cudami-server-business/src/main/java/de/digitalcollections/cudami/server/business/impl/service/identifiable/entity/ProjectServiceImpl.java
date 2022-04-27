@@ -62,9 +62,9 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID projectUuid, SearchPageRequest searchPageRequest) {
-    return ((ProjectRepository) repository).getDigitalObjects(projectUuid, searchPageRequest);
+    return ((ProjectRepository) repository).findDigitalObjects(projectUuid, searchPageRequest);
   }
 
   @Override
@@ -78,7 +78,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
-    return ((ProjectRepository) repository).saveDigitalObjects(projectUuid, digitalObjects);
+  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+    return ((ProjectRepository) repository).setDigitalObjects(projectUuid, digitalObjects);
   }
 }

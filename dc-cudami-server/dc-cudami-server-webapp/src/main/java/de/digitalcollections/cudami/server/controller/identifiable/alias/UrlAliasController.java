@@ -52,7 +52,7 @@ public class UrlAliasController {
 
     UrlAlias result;
     try {
-      result = urlAliasService.create(urlAlias);
+      result = urlAliasService.save(urlAlias);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -209,7 +209,7 @@ public class UrlAliasController {
       throws CudamiControllerException {
     LocalizedUrlAliases result;
     try {
-      result = urlAliasService.findPrimaryLinks(websiteUuid, slug, pLocale);
+      result = urlAliasService.getPrimaryUrlAliases(websiteUuid, slug, pLocale);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }

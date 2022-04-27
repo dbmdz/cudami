@@ -188,7 +188,7 @@ public class CollectionController {
   @GetMapping(
       value = {"/v5/collections/top", "/v2/collections/top", "/latest/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findTop(
+  public PageResponse<Collection> findTopCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -232,7 +232,7 @@ public class CollectionController {
         "/latest/collections/{uuid}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
       @Parameter(
               example = "",
               description =
@@ -348,7 +348,7 @@ public class CollectionController {
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    return collectionService.getDigitalObjects(collection, searchPageRequest);
+    return collectionService.findDigitalObjects(collection, searchPageRequest);
   }
 
   @Operation(summary = "Get the first created parent of a collection")
@@ -391,7 +391,7 @@ public class CollectionController {
           UUID uuid,
       @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
     Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
-    return collectionService.getRelatedCorporateBodies(uuid, filtering);
+    return collectionService.findRelatedCorporateBodies(uuid, filtering);
   }
 
   @Operation(summary = "Get (active or all) paged subcollections of a collection")

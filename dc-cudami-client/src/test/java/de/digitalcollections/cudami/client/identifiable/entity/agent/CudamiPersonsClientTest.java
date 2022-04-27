@@ -21,7 +21,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @DisplayName("can find by the place of birth")
   public void testFindByPlaceOfBirth() throws Exception {
     UUID placeUuid = UUID.randomUUID();
-    client.findByPlaceOfBirth(buildExamplePageRequest(), placeUuid);
+    client.findByGeoLocationOfBirth(buildExamplePageRequest(), placeUuid);
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/placeofbirth/"
@@ -33,7 +33,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @DisplayName("can find by the place of death")
   public void testFindByPlaceOfDeath() throws Exception {
     UUID placeUuid = UUID.randomUUID();
-    client.findByPlaceOfDeath(buildExamplePageRequest(), placeUuid);
+    client.findByGeoLocationOfDeath(buildExamplePageRequest(), placeUuid);
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/placeofdeath/"

@@ -109,7 +109,7 @@ public class V3CollectionController {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
     SearchPageResponse<DigitalObject> response =
-        collectionService.getDigitalObjects(collection, searchPageRequest);
+        collectionService.findDigitalObjects(collection, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result =
@@ -180,9 +180,9 @@ public class V3CollectionController {
     PageResponse<Collection> response;
 
     if (active != null) {
-      response = collectionService.getActiveChildren(collectionUuid, pageRequest);
+      response = collectionService.findActiveChildren(collectionUuid, pageRequest);
     } else {
-      response = collectionService.getChildren(collectionUuid, pageRequest);
+      response = collectionService.findChildren(collectionUuid, pageRequest);
     }
     JSONObject result = fixPageResponse(response);
 

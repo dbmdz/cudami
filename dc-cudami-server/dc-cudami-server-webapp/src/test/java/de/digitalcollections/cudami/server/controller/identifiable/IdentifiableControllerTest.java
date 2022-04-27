@@ -38,7 +38,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
     Identifiable dummyIdentifiable = mock(Identifiable.class);
     when(identifiableService.getByUuid(any(UUID.class))).thenReturn(dummyIdentifiable);
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
-    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
+    when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
 
     testJson(path, "/v5/identifiables/localizedUrlAliases_empty.json");
   }
@@ -78,7 +78,7 @@ public class IdentifiableControllerTest extends BaseControllerTest {
                 new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     expected.add(urlAlias1, urlAlias2);
-    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
+    when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);
 
     testJson(path, "/v5/identifiables/localizedUrlAliases.json");
   }

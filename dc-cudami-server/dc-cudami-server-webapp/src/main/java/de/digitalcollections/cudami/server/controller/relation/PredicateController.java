@@ -27,7 +27,7 @@ public class PredicateController {
   @Operation(summary = "Get all predicates")
   @GetMapping(value = {"/v5/predicates", "/v3/predicates", "/latest/predicates"})
   public List<Predicate> getAll() {
-    return predicateService.findAll();
+    return predicateService.getAll();
   }
 
   @Operation(summary = "create or update a predicate, identified by its value")

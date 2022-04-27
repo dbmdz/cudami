@@ -142,7 +142,7 @@ public class UrlAliasRepositoryImplTest {
     this.urlAliasWithWebsite = this.repo.save(this.urlAliasWithWebsite);
 
     LocalizedUrlAliases actual =
-        this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid());
+        this.repo.getAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid());
     LocalizedUrlAliases expected =
         new LocalizedUrlAliases(this.urlAliasWithoutWebsite, this.urlAliasWithWebsite);
     assertTrue(actual.equals(expected));
@@ -169,7 +169,7 @@ public class UrlAliasRepositoryImplTest {
     mainLinkInGerman = repo.save(mainLinkInGerman);
 
     LocalizedUrlAliases
-        allLinks = this.repo.findAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
+        allLinks = this.repo.getAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
         mainLinksWithWebsite =
             this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns", false),
         mainLinksConsideringLang =

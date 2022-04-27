@@ -81,18 +81,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public SearchPageResponse<Collection> getActiveCollections(
+  public SearchPageResponse<Collection> findActiveCollections(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
     Filtering filtering = filteringForActive();
     searchPageRequest.add(filtering);
-    return ((DigitalObjectRepository) repository).getCollections(digitalObject, searchPageRequest);
+    return ((DigitalObjectRepository) repository).findCollections(digitalObject, searchPageRequest);
   }
 
   @Override
-  public SearchPageResponse<Collection> getCollections(
+  public SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     return ((DigitalObjectRepository) repository)
-        .getCollections(digitalObjectUuid, searchPageRequest);
+        .findCollections(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
@@ -122,38 +122,39 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<Locale> getLanguagesOfCollections(UUID uuid) {
-    return ((DigitalObjectRepository) this.repository).getLanguagesOfCollections(uuid);
+    return ((DigitalObjectRepository) repository).getLanguagesOfCollections(uuid);
   }
 
   @Override
   public List<Locale> getLanguagesOfProjects(UUID uuid) {
-    return ((DigitalObjectRepository) this.repository).getLanguagesOfProjects(uuid);
+    return ((DigitalObjectRepository) repository).getLanguagesOfProjects(uuid);
   }
 
   @Override
-  public SearchPageResponse<Project> getProjects(
+  public SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
-    return ((DigitalObjectRepository) repository).getProjects(digitalObjectUuid, searchPageRequest);
+    return ((DigitalObjectRepository) repository)
+        .findProjects(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
-        .saveFileResources(digitalObjectUuid, fileResources);
+        .setFileResources(digitalObjectUuid, fileResources);
   }
 
   @Override
-  public List<FileResource> saveRenderingResources(
+  public List<FileResource> setRenderingResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources) {
     return ((DigitalObjectRepository) repository)
-        .saveRenderingResources(digitalObjectUuid, renderingResources);
+        .setRenderingResources(digitalObjectUuid, renderingResources);
   }
 
   @Override
-  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
     return ((DigitalObjectRepository) repository)
-        .saveLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
+        .setLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
   }
 }

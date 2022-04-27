@@ -90,7 +90,7 @@ public class V3ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
     PageResponse<DigitalObject> response =
-        projectService.getDigitalObjects(project, searchPageRequest);
+        projectService.findDigitalObjects(project, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));

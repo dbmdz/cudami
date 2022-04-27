@@ -95,7 +95,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
 
   @Override
   public List<E> getRandom(int count) {
-    return ((EntityRepository<E>) repository).findRandom(count);
+    return ((EntityRepository<E>) repository).getRandom(count);
   }
 
   @Override
@@ -121,14 +121,14 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(E entity, List<FileResource> fileResources) {
-    return ((EntityRepository<E>) repository).saveRelatedFileResources(entity, fileResources);
+  public List<FileResource> setRelatedFileResources(E entity, List<FileResource> fileResources) {
+    return ((EntityRepository<E>) repository).setRelatedFileResources(entity, fileResources);
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID entityUuid, List<FileResource> fileResources) {
-    return ((EntityRepository<E>) repository).saveRelatedFileResources(entityUuid, fileResources);
+    return ((EntityRepository<E>) repository).setRelatedFileResources(entityUuid, fileResources);
   }
 
   /** Send a notification to an external url when an entity has changed */

@@ -104,7 +104,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  public List<License> findAll() {
+  public List<License> getAll() {
     return retrieveList(SQL_REDUCED_FIELDS_LI, null, null);
   }
 

@@ -29,11 +29,11 @@ public class LocaleServiceImpl implements LocaleService {
 
   @Override
   public List<String> getSupportedLanguages() {
-    return repository.findAllLanguages();
+    return repository.getSupportedLanguages();
   }
 
   @Override
   public List<Locale> getSupportedLocales() {
-    return repository.findAllLocales();
+    return repository.getSupportedLocales();
   }
 }

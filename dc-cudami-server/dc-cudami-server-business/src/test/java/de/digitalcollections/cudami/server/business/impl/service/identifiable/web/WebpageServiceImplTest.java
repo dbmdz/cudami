@@ -167,9 +167,9 @@ class WebpageServiceImplTest {
     when(child1.getChildren()).thenReturn(List.of(child1child1));
     PageResponse<Webpage> child1childrenPageResponse = mock(PageResponse.class);
     when(child1childrenPageResponse.getContent()).thenReturn(List.of(child1child1));
-    when(repo.getChildren(eq(child1Uuid), any(PageRequest.class)))
+    when(repo.findChildren(eq(child1Uuid), any(PageRequest.class)))
         .thenReturn(child1childrenPageResponse);
-    when(repo.getChildren(eq(child1Child1Uuid), any(PageRequest.class)))
+    when(repo.findChildren(eq(child1Child1Uuid), any(PageRequest.class)))
         .thenReturn(mock(PageResponse.class));
 
     // Child 2 has got one or more subchildren, of which the first child has got children, too
@@ -183,19 +183,19 @@ class WebpageServiceImplTest {
     when(child2.getChildren()).thenReturn(List.of(child2child1));
     PageResponse<Webpage> child2childrenPageResponse = mock(PageResponse.class);
     when(child2childrenPageResponse.getContent()).thenReturn(List.of(child2child1));
-    when(repo.getChildren(eq(child2Uuid), any(PageRequest.class)))
+    when(repo.findChildren(eq(child2Uuid), any(PageRequest.class)))
         .thenReturn(child2childrenPageResponse);
     PageResponse<Webpage> child2Child1childrenPageResponse = mock(PageResponse.class);
     when(child2Child1childrenPageResponse.getContent()).thenReturn(List.of(child2child1child1));
-    when(repo.getChildren(eq(child2Child1Uuid), any(PageRequest.class)))
+    when(repo.findChildren(eq(child2Child1Uuid), any(PageRequest.class)))
         .thenReturn(child2Child1childrenPageResponse);
-    when(repo.getChildren(eq(child2Child1Child1Uuid), any(PageRequest.class)))
+    when(repo.findChildren(eq(child2Child1Child1Uuid), any(PageRequest.class)))
         .thenReturn(mock(PageResponse.class));
 
     // Parent Webpage has got two children.
     PageResponse<Webpage> parentPageResponse = mock(PageResponse.class);
     when(parentPageResponse.getContent()).thenReturn(List.of(child1, child2));
-    when(repo.getChildren(eq(parentUuid), any(PageRequest.class))).thenReturn(parentPageResponse);
+    when(repo.findChildren(eq(parentUuid), any(PageRequest.class))).thenReturn(parentPageResponse);
 
     List<Webpage> actual = service.getActiveChildrenTree(parentUuid);
     assertThat(actual.get(0).getChildren()).isNotEmpty();
@@ -237,7 +237,7 @@ class WebpageServiceImplTest {
     Website dummyWebsite = new Website();
     dummyWebsite.setUuid(UUID.randomUUID());
     dummyAlias.setWebsite(dummyWebsite);
-    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(dummyAlias);
+    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(dummyAlias);
     assertThrows(
         IdentifiableServiceException.class,
         () -> {

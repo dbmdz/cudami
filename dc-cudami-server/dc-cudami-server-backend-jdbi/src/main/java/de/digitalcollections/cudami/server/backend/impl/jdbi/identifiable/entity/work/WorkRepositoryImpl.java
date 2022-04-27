@@ -169,13 +169,13 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     // save creators
     List<Agent> creators = work.getCreators();
-    saveCreatorsList(work, creators);
+    setCreatorsList(work, creators);
 
     Work result = getByUuid(work.getUuid());
     return result;
   }
 
-  private void saveCreatorsList(Work work, List<Agent> creators) {
+  private void setCreatorsList(Work work, List<Agent> creators) {
     UUID workUuid = work.getUuid();
 
     // as we store the whole list new: delete old entries
@@ -210,7 +210,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
 
     // save creators
     List<Agent> creators = work.getCreators();
-    saveCreatorsList(work, creators);
+    setCreatorsList(work, creators);
 
     Work result = getByUuid(work.getUuid());
     return result;

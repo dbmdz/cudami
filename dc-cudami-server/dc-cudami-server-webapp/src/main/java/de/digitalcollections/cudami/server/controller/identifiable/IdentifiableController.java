@@ -94,7 +94,7 @@ public class IdentifiableController {
     }
 
     try {
-      return new ResponseEntity<>(urlAliasService.findLocalizedUrlAliases(uuid), HttpStatus.OK);
+      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }

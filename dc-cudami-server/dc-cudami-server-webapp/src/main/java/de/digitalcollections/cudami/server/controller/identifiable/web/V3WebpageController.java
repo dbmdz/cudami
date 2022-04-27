@@ -204,7 +204,7 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}/children", "/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getChildren(
+  public ResponseEntity<String> findChildren(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",
@@ -249,9 +249,9 @@ public class V3WebpageController {
     PageResponse<Webpage> pageResponse;
 
     if (active != null) {
-      pageResponse = webpageService.getActiveChildren(uuid, pageRequest);
+      pageResponse = webpageService.findActiveChildren(uuid, pageRequest);
     } else {
-      pageResponse = webpageService.getChildren(uuid, pageRequest);
+      pageResponse = webpageService.findChildren(uuid, pageRequest);
     }
 
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));

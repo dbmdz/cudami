@@ -94,7 +94,7 @@ public class WebpageController {
         "/latest/webpages/{uuid}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
       @Parameter(
               example = "",
               description =

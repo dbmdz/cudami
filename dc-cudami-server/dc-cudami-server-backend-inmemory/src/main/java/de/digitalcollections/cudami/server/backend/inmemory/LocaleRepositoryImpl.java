@@ -17,12 +17,12 @@ public class LocaleRepositoryImpl implements LocaleRepository {
   }
 
   @Override
-  public List<String> findAllLanguages() {
+  public List<String> getSupportedLanguages() {
     return Arrays.asList(Locale.getISOLanguages());
   }
 
   @Override
-  public List<Locale> findAllLocales() {
+  public List<Locale> getSupportedLocales() {
     return Arrays.asList(Locale.getAvailableLocales());
   }
 

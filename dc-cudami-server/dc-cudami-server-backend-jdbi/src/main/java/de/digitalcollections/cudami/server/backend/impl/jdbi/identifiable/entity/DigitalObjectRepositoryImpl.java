@@ -210,7 +210,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public SearchPageResponse<Collection> getCollections(
+  public SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String tableAliasCollection = collectionRepositoryImpl.getTableAlias();
     final String tableNameCollection = collectionRepositoryImpl.getTableName();
@@ -439,7 +439,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public SearchPageResponse<Project> getProjects(
+  public SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String prTableAlias = projectRepositoryImpl.getTableAlias();
     final String prTableName = projectRepositoryImpl.getTableName();
@@ -619,7 +619,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       UUID digitalObjectUuid, List<FileResource> fileResources) {
 
     // as we store the whole list new: delete old entries
@@ -658,7 +658,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> saveRenderingResources(
+  public List<FileResource> setRenderingResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -696,7 +696,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(

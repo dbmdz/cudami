@@ -32,10 +32,10 @@ public interface ProjectRepository extends EntityRepository<Project> {
     if (project == null) {
       return null;
     }
-    return getDigitalObjects(project.getUuid(), searchPageRequest);
+    return findDigitalObjects(project.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(
+  SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID projectUuid, SearchPageRequest searchPageRequest);
 
   default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
@@ -53,8 +53,8 @@ public interface ProjectRepository extends EntityRepository<Project> {
     if (project == null || digitalObjects == null) {
       return false;
     }
-    return saveDigitalObjects(project.getUuid(), digitalObjects);
+    return setDigitalObjects(project.getUuid(), digitalObjects);
   }
 
-  boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
+  boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 }

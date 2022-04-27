@@ -206,7 +206,7 @@ public class WebsiteController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return websiteService.findRootPages(uuid, searchPageRequest);
+    return websiteService.findRootWebpages(uuid, searchPageRequest);
   }
 
   @Operation(
@@ -294,7 +294,7 @@ public class WebsiteController {
     Website website = new Website();
     website.setUuid(uuid);
 
-    boolean successful = websiteService.updateRootPagesOrder(website, rootPages);
+    boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

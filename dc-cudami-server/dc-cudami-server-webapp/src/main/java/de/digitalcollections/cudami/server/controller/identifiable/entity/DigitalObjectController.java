@@ -115,7 +115,7 @@ public class DigitalObjectController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> getAllReduced() {
-    return digitalObjectService.findAllReduced();
+    return digitalObjectService.getAllReduced();
   }
 
   @Operation(
@@ -230,9 +230,9 @@ public class DigitalObjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return digitalObjectService.getActiveCollections(digitalObject, searchPageRequest);
+      return digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
     }
-    return digitalObjectService.getCollections(digitalObject, searchPageRequest);
+    return digitalObjectService.findCollections(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")
@@ -301,7 +301,7 @@ public class DigitalObjectController {
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return digitalObjectService.getProjects(digitalObject, searchPageRequest);
+    return digitalObjectService.findProjects(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Save a newly created digital object")
@@ -321,11 +321,11 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return digitalObjectService.saveFileResources(uuid, fileResources);
+    return digitalObjectService.setFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update a digital object")

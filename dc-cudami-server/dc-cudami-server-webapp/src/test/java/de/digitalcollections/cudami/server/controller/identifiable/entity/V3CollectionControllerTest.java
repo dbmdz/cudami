@@ -67,7 +67,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
     Collection collection =
         new CollectionBuilder().withUuid(extractFirstUuidFromPath(path)).build();
 
-    when(collectionService.getDigitalObjects(eq(collection), any(SearchPageRequest.class)))
+    when(collectionService.findDigitalObjects(eq(collection), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -112,7 +112,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                     .build())
             .build();
 
-    when(collectionService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

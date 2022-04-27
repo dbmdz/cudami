@@ -60,7 +60,7 @@ public interface HeadwordRepository {
    *
    * @return List of all headwords
    */
-  List<Headword> findAll();
+  List<Headword> getAll();
 
   /**
    * Returns a list of headwords, if available
@@ -73,7 +73,7 @@ public interface HeadwordRepository {
   PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  List<Headword> findRandom(int count);
+  List<Headword> getRandom(int count);
   /**
    * Returns a headword, if available
    *
@@ -81,23 +81,23 @@ public interface HeadwordRepository {
    * @param locale locale of label, e.g. "de"
    * @return Headword or null
    */
-  Headword getByLabelAndLocale(String label, Locale locale);
+  Headword findByLabelAndLocale(String label, Locale locale);
 
   default Headword getByUuid(UUID uuid) {
-    return getByUuidAndFiltering(uuid, null);
+    return findByUuidAndFiltering(uuid, null);
   }
 
-  Headword getByUuidAndFiltering(UUID uuid, Filtering filtering);
+  Headword findByUuidAndFiltering(UUID uuid, Filtering filtering);
 
   List<Locale> getLanguages();
 
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
-  PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
 
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
 
-  PageResponse<FileResource> getRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
+  PageResponse<FileResource> findRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
 
   /**
    * Save a Headword.
@@ -107,9 +107,9 @@ public interface HeadwordRepository {
    */
   Headword save(Headword headword);
 
-  List<Entity> saveRelatedEntities(UUID headwordUuid, List<Entity> entities);
+  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
 
-  List<FileResource> saveRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
+  List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
 
   Headword update(Headword headword);
 }

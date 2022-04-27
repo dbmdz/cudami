@@ -76,7 +76,7 @@ public class HeadwordEntryController {
           @PathVariable("uuid")
           UUID uuid)
       throws IdentifiableServiceException {
-    return headwordEntryService.findByHeadword(uuid);
+    return headwordEntryService.getByHeadword(uuid);
   }
 
   @Operation(summary = "Get an headwordentry by namespace and id")

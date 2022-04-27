@@ -35,7 +35,8 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
   }
 
   @Override
-  public PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuidGeoLocation) {
+  public PageResponse<Person> findByGeoLocationOfBirth(
+      PageRequest pageRequest, UUID uuidGeoLocation) {
     Filtering filtering =
         Filtering.defaultBuilder()
             .filter("placeOfBirth")
@@ -46,7 +47,8 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
   }
 
   @Override
-  public PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuidGeoLocation) {
+  public PageResponse<Person> findByGeoLocationOfDeath(
+      PageRequest pageRequest, UUID uuidGeoLocation) {
     Filtering filtering =
         Filtering.defaultBuilder()
             .filter("placeOfDeath")

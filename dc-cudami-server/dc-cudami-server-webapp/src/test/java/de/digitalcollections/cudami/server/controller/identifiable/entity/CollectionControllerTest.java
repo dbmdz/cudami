@@ -54,7 +54,7 @@ class CollectionControllerTest extends BaseControllerTest {
                 .withHomepageUrl("https://www.whateveryouwanttotest.de/")
                 .build());
 
-    when(collectionService.getRelatedCorporateBodies(any(UUID.class), any(Filtering.class)))
+    when(collectionService.findRelatedCorporateBodies(any(UUID.class), any(Filtering.class)))
         .thenReturn(expected);
 
     testJson(

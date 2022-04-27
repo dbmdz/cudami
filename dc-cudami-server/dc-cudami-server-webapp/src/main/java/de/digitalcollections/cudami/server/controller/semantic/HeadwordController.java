@@ -129,7 +129,7 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.getRelatedEntities(uuid, pageRequest);
+    return headwordService.findRelatedEntities(uuid, pageRequest);
   }
 
   @Operation(summary = "Get related file resources of an headword")
@@ -142,7 +142,7 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.getRelatedFileResources(uuid, pageRequest);
+    return headwordService.findRelatedFileResources(uuid, pageRequest);
   }
 
   @Operation(summary = "Save a newly created headword")
@@ -162,7 +162,7 @@ public class HeadwordController {
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<Entity> entities) {
-    return headwordService.saveRelatedEntities(uuid, entities);
+    return headwordService.setRelatedEntities(uuid, entities);
   }
 
   @Operation(summary = "Save list of related fileresources for a given headword")
@@ -173,7 +173,7 @@ public class HeadwordController {
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return headwordService.saveRelatedFileResources(uuid, fileResources);
+    return headwordService.setRelatedFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update an headword")

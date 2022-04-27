@@ -13,7 +13,7 @@ public interface PredicateService {
   /**
    * @return list of all predicates
    */
-  List<Predicate> findAll();
+  List<Predicate> getAll();
 
   /**
    * Returns a predicate, if available

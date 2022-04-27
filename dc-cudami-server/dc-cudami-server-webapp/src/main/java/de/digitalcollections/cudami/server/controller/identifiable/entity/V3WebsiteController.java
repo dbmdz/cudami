@@ -149,7 +149,7 @@ public class V3WebsiteController {
       searchPageRequest.setSorting(sorting);
     }
 
-    SearchPageResponse<Webpage> response = websiteService.findRootPages(uuid, searchPageRequest);
+    SearchPageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

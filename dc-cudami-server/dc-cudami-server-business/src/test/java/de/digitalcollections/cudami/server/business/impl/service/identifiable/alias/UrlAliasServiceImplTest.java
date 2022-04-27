@@ -101,7 +101,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.create(null);
+          service.save(null);
         });
   }
 
@@ -112,7 +112,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.create(
+          service.save(
               createUrlAlias(
                   "hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
@@ -127,7 +127,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.create(
+          service.save(
               createUrlAlias(
                   "hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID()));
         });
@@ -143,7 +143,7 @@ class UrlAliasServiceImplTest {
 
     when(repo.save(eq(urlAlias))).thenReturn(expected);
 
-    assertThat(service.create(urlAlias)).isEqualTo(expected);
+    assertThat(service.save(urlAlias)).isEqualTo(expected);
   }
 
   @DisplayName("raises a ServiceException when trying to update an empty UrlAlias")
@@ -268,12 +268,12 @@ class UrlAliasServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException()
       throws UrlAliasRepositoryException {
-    when(repo.findAllForTarget(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+    when(repo.getAllForTarget(any(UUID.class))).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findLocalizedUrlAliases(UUID.randomUUID());
+          service.getLocalizedUrlAliases(UUID.randomUUID());
         });
   }
 
@@ -287,9 +287,9 @@ class UrlAliasServiceImplTest {
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
     expected.add(urlAlias);
 
-    when(repo.findAllForTarget(any(UUID.class))).thenReturn(expected);
+    when(repo.getAllForTarget(any(UUID.class))).thenReturn(expected);
 
-    assertThat(service.findLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
+    assertThat(service.getLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
   }
 
   @DisplayName(
@@ -306,7 +306,7 @@ class UrlAliasServiceImplTest {
     when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(new LocalizedUrlAliases());
     when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug))).thenReturn(expected);
 
-    assertThat(service.findPrimaryLinks(uuid, slug, null)).isEqualTo(expected);
+    assertThat(service.getPrimaryUrlAliases(uuid, slug, null)).isEqualTo(expected);
   }
 
   @DisplayName(
@@ -316,12 +316,12 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), null, null);
+          service.getPrimaryUrlAliases(UUID.randomUUID(), null, null);
         });
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), "", null);
+          service.getPrimaryUrlAliases(UUID.randomUUID(), "", null);
         });
   }
 
@@ -336,7 +336,7 @@ class UrlAliasServiceImplTest {
     assertThrows(
         CudamiServiceException.class,
         () -> {
-          service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz", null);
+          service.getPrimaryUrlAliases(UUID.randomUUID(), "hützligrütz", null);
         });
   }
 
@@ -348,7 +348,7 @@ class UrlAliasServiceImplTest {
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
 
-    assertThat(service.findPrimaryLinks(UUID.randomUUID(), "hützligrütz", null))
+    assertThat(service.getPrimaryUrlAliases(UUID.randomUUID(), "hützligrütz", null))
         .isEqualTo(expected);
   }
 
@@ -504,7 +504,7 @@ class UrlAliasServiceImplTest {
     when(repo.findPrimaryLinksForWebsite(eq(null), eq("hurz")))
         .thenReturn(expectedLocalizedUrlAliases);
 
-    LocalizedUrlAliases actual = service.findPrimaryLinks(null, "hurz", null);
+    LocalizedUrlAliases actual = service.getPrimaryUrlAliases(null, "hurz", null);
 
     assertThat(actual).isEqualTo(expectedLocalizedUrlAliases);
   }
@@ -526,7 +526,7 @@ class UrlAliasServiceImplTest {
     targetLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
 
-    when(repo.findAllForTarget(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
+    when(repo.getAllForTarget(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
     when(repo.delete(any(List.class))).thenReturn(1);
 
     assertThat(service.deleteAllForTarget(targetUuid, true)).isTrue();
@@ -809,8 +809,8 @@ class UrlAliasServiceImplTest {
     UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, targetUuid, null);
     UrlAlias ua3 = createUrlAlias("npslug", true, "de", false, targetUuid, null);
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(ua1, ua2, ua3);
-    when(repo.findAllForTarget(eq(targetUuid))).thenReturn(localizedUrlAliases);
-    assertThat(service.findPrimaryLinksForTarget(targetUuid)).containsAll(List.of(ua1, ua2));
+    when(repo.getAllForTarget(eq(targetUuid))).thenReturn(localizedUrlAliases);
+    assertThat(service.getPrimaryUrlAliasesForTarget(targetUuid)).containsAll(List.of(ua1, ua2));
   }
 
   // -------------------------------------------------------------------------

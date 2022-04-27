@@ -103,9 +103,9 @@ public class V3DigitalObjectController {
     digitalObject.setUuid(uuid);
     PageResponse<Collection> response;
     if (active != null) {
-      response = digitalObjectService.getActiveCollections(digitalObject, searchPageRequest);
+      response = digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
     } else {
-      response = digitalObjectService.getCollections(digitalObject, searchPageRequest);
+      response = digitalObjectService.findCollections(digitalObject, searchPageRequest);
     }
 
     // Fix the attributes, which are missing or different in new model
@@ -171,7 +171,7 @@ public class V3DigitalObjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     PageResponse<Project> response =
-        digitalObjectService.getProjects(digitalObject, searchPageRequest);
+        digitalObjectService.findProjects(digitalObject, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));

@@ -123,7 +123,7 @@ public class PersonController {
         "/latest/persons/placeofbirth/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Person> findByPlaceOfBirth(
+  public PageResponse<Person> findByGeoLocationOfBirth(
       @Parameter(
               example = "",
               description =
@@ -138,7 +138,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfBirth(pageRequest, uuid);
+    return personService.findByGeoLocationOfBirth(pageRequest, uuid);
   }
 
   @Operation(summary = "get all persons died at given geo location")
@@ -149,7 +149,7 @@ public class PersonController {
         "/latest/persons/placeofdeath/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Person> findByPlaceOfDeath(
+  public PageResponse<Person> findByGeoLocationOfDeath(
       @Parameter(
               example = "",
               description =
@@ -164,7 +164,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfDeath(pageRequest, uuid);
+    return personService.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
   @Operation(summary = "Get a person by uuid")

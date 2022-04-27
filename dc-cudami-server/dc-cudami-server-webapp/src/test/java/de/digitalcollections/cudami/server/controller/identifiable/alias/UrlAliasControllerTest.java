@@ -118,7 +118,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withWebsite(
                 new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
     String body =
         "{\n"
@@ -259,7 +259,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
       "returns a 404 for primary links, when no primary links for a given slug/webpage tuple exist")
   @Test
   public void nonexistingPrimaryLinks() throws Exception {
-    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("notexisting"), any(Locale.class)))
+    when(urlAliasService.getPrimaryUrlAliases(
+            any(UUID.class), eq("notexisting"), any(Locale.class)))
         .thenReturn(null);
 
     testNotFound("/v5/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
@@ -284,7 +285,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                 new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
-    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"), eq(null)))
+    when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(null)))
         .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
@@ -311,7 +312,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .build());
 
     Locale actualLocale = Locale.forLanguageTag("de");
-    when(urlAliasService.findPrimaryLinks(any(UUID.class), eq("imprint"), eq(actualLocale)))
+    when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(actualLocale)))
         .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987_de.json");
@@ -334,7 +335,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withUuid("12345678-1234-1234-1234-123456789012")
             .build());
 
-    when(urlAliasService.findPrimaryLinks(eq(null), eq("imprint"), eq(null))).thenReturn(expected);
+    when(urlAliasService.getPrimaryUrlAliases(eq(null), eq("imprint"), eq(null)))
+        .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint.json");
   }

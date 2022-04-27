@@ -97,7 +97,7 @@ public class ProjectController {
   @DeleteMapping(
       value = {"/v5/projects/{uuid}", "/v3/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity deleteProject(
+  public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID uuid) {
 
@@ -132,16 +132,18 @@ public class ProjectController {
       value = {"/v6/projects/all", "/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Project> getAll() {
-    return projectService.findAllFull();
+    return projectService.getAllFull();
   }
 
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
-        "/v5/projects/identifier/{namespace}:{id}", "/v5/projects/identifier/{namespace}:{id}.json",
-        "/v3/projects/identifier/{namespace}:{id}", "/v3/projects/identifier/{namespace}:{id}.json",
+        "/v5/projects/identifier/{namespace}:{id}",
+        "/v5/projects/identifier/{namespace}:{id}.json",
+        "/v3/projects/identifier/{namespace}:{id}",
+        "/v3/projects/identifier/{namespace}:{id}.json",
         "/latest/projects/identifier/{namespace}:{id}",
-            "/latest/projects/identifier/{namespace}:{id}.json"
+        "/latest/projects/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project getByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -191,7 +193,7 @@ public class ProjectController {
 
     Project project = new Project();
     project.setUuid(projectUuid);
-    return projectService.getDigitalObjects(project, searchPageRequest);
+    return projectService.findDigitalObjects(project, searchPageRequest);
   }
 
   @Operation(summary = "Get languages of all projects")
@@ -255,7 +257,7 @@ public class ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = projectService.saveDigitalObjects(project, digitalObjects);
+    boolean successful = projectService.setDigitalObjects(project, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

@@ -106,14 +106,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     Filtering filtering = filteringForActive();
     PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
-    return getChildren(uuid, pageRequest).getContent();
+    return findChildren(uuid, pageRequest).getContent();
   }
 
   @Override
-  public PageResponse<Collection> getActiveChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
-    return getChildren(uuid, pageRequest);
+    return findChildren(uuid, pageRequest);
   }
 
   @Override
@@ -127,14 +127,15 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getChildren(UUID nodeUuid, PageRequest pageRequest) {
-    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid, pageRequest);
+  public PageResponse<Collection> findChildren(UUID nodeUuid, PageRequest pageRequest) {
+    return ((NodeRepository<Collection>) repository).findChildren(nodeUuid, pageRequest);
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest) {
-    return ((CollectionRepository) repository).getDigitalObjects(collectionUuid, searchPageRequest);
+    return ((CollectionRepository) repository)
+        .findDigitalObjects(collectionUuid, searchPageRequest);
   }
 
   @Override
@@ -148,14 +149,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering) {
-    return ((CollectionRepository) repository).getRelatedCorporateBodies(uuid, filtering);
+  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+    return ((CollectionRepository) repository).findRelatedCorporateBodies(uuid, filtering);
   }
 
   @Override
-  public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
-    return ((NodeRepository<Collection>) repository).getRootNodes(pageRequest);
+    return ((NodeRepository<Collection>) repository).findRootNodes(pageRequest);
   }
 
   @Override
@@ -180,8 +181,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
-    return ((CollectionRepository) repository).saveDigitalObjects(collectionUuid, digitalObjects);
+  public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+    return ((CollectionRepository) repository).setDigitalObjects(collectionUuid, digitalObjects);
   }
 
   @Override

@@ -97,8 +97,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .build()))
                 .build();
 
-    when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
-    when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(webpageService.findChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
     testJson(path.replaceAll("latest", "v3")); // v3 equals latest
   }
@@ -170,8 +170,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .build()))
                 .build();
 
-    when(webpageService.getChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
-    when(webpageService.getActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(webpageService.findChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
     testJson(path, "/v3/webpages/news.json");
   }

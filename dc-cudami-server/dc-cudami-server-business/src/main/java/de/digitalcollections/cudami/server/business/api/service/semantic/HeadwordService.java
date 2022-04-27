@@ -51,7 +51,7 @@ public interface HeadwordService {
    * @return list of ALL headwords. USE WITH CARE (only for internal workflow, NOT FOR USER
    *     INTERACTION!)!!!
    */
-  List<Headword> findAll();
+  List<Headword> getAll();
 
   List<Headword> findByLabelAndLocale(String label, Locale locale);
 
@@ -73,7 +73,7 @@ public interface HeadwordService {
 
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
-  PageResponse<Entity> getRelatedEntities(UUID uuid, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(UUID uuid, PageRequest pageRequest);
 
   default List<FileResource> getRelatedFileResources(Headword headword) {
     if (headword == null) {
@@ -84,7 +84,7 @@ public interface HeadwordService {
 
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
 
-  PageResponse<FileResource> getRelatedFileResources(UUID uuid, PageRequest pageRequest);
+  PageResponse<FileResource> findRelatedFileResources(UUID uuid, PageRequest pageRequest);
 
   Headword save(Headword headword) throws ServiceException;
 
@@ -100,10 +100,10 @@ public interface HeadwordService {
     if (headword == null || entities == null) {
       return null;
     }
-    return saveRelatedEntities(headword.getUuid(), entities);
+    return setRelatedEntities(headword.getUuid(), entities);
   }
 
-  List<Entity> saveRelatedEntities(UUID headwordUuid, List<Entity> entities);
+  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
 
   /**
    * Save list of file resources related to an Headword. Prerequisite: file resources have been
@@ -118,10 +118,10 @@ public interface HeadwordService {
     if (headword == null || fileResources == null) {
       return null;
     }
-    return saveRelatedFileResources(headword.getUuid(), fileResources);
+    return setRelatedFileResources(headword.getUuid(), fileResources);
   }
 
-  List<FileResource> saveRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
+  List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
 
   Headword update(Headword headword) throws ServiceException;
 }

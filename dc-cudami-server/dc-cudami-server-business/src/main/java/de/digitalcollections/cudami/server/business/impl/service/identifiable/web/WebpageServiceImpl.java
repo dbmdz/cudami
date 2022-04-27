@@ -68,9 +68,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootPagesForWebsite(
+  public SearchPageResponse<Webpage> findRootWebpagesForWebsite(
       UUID websiteUuid, SearchPageRequest pageRequest) {
-    return ((WebpageRepository) repository).findRootPagesForWebsite(websiteUuid, pageRequest);
+    return ((WebpageRepository) repository).findRootWebpagesForWebsite(websiteUuid, pageRequest);
   }
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
@@ -111,14 +111,14 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
     Filtering filtering = filteringForActive();
     PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
-    return getChildren(uuid, pageRequest).getContent();
+    return findChildren(uuid, pageRequest).getContent();
   }
 
   @Override
-  public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
-    return getChildren(uuid, pageRequest);
+    return findChildren(uuid, pageRequest);
   }
 
   @Override
@@ -145,8 +145,8 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).getChildren(uuid, pageRequest);
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
+    return ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
   }
 
   @Override
@@ -168,8 +168,8 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public PageResponse<Webpage> getRootNodes(PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).getRootNodes(pageRequest);
+  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
   }
 
   @Override
@@ -220,7 +220,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       throws IdentifiableServiceException {
     try {
       if (webpage.getUuid() == null) {
-        webpage = this.save(webpage);
+        webpage = save(webpage);
       }
       return ((WebpageRepository) repository)
           .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);

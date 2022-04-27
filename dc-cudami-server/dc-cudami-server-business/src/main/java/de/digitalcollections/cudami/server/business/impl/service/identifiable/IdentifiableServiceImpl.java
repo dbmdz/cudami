@@ -124,13 +124,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public List<I> findAllFull() {
-    return repository.findAllFull();
+  public List<I> getAllFull() {
+    return repository.getAllFull();
   }
 
   @Override
-  public List<I> findAllReduced() {
-    return repository.findAllReduced();
+  public List<I> getAllReduced() {
+    return repository.getAllReduced();
   }
 
   @Override
@@ -214,7 +214,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
-      I savedIdentifiable = this.repository.save(identifiable);
+      I savedIdentifiable = repository.save(identifiable);
       saveIdentifiers(identifiable.getIdentifiers(), savedIdentifiable);
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
@@ -233,7 +233,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
           // since we have the identifiable's UUID just here
           // the targetUuid must be set at this point
           urlAlias.setTargetUuid(savedIdentifiable.getUuid());
-          UrlAlias savedAlias = this.urlAliasService.create(urlAlias);
+          UrlAlias savedAlias = urlAliasService.save(urlAlias);
           savedUrlAliases.add(savedAlias);
         }
         savedIdentifiable.setLocalizedUrlAliases(savedUrlAliases);
@@ -266,14 +266,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
-    return repository.saveRelatedEntities(identifiableUuid, entities);
+  public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
+    return repository.setRelatedEntities(identifiableUuid, entities);
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources) {
-    return repository.saveRelatedFileResources(identifiableUuid, fileResources);
+    return repository.setRelatedFileResources(identifiableUuid, fileResources);
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {
@@ -349,7 +349,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
             // these haven't been removed from DB so we must update them
             urlAliasService.update(urlAlias);
           } else {
-            urlAliasService.create(urlAlias, true);
+            urlAliasService.save(urlAlias, true);
           }
         }
       }

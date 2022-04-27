@@ -44,20 +44,20 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   List<Collection> getActiveChildren(UUID uuid);
 
-  PageResponse<Collection> getActiveChildren(UUID uuid, PageRequest pageRequest);
+  PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest);
 
-  default SearchPageResponse<DigitalObject> getDigitalObjects(
+  default SearchPageResponse<DigitalObject> findDigitalObjects(
       Collection collection, SearchPageRequest searchPageRequest) {
     if (collection == null) {
       return null;
     }
-    return getDigitalObjects(collection.getUuid(), searchPageRequest);
+    return findDigitalObjects(collection.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(
+  SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest);
 
-  List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
+  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
@@ -80,8 +80,8 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
     if (collection == null || digitalObjects == null) {
       return false;
     }
-    return saveDigitalObjects(collection.getUuid(), digitalObjects);
+    return setDigitalObjects(collection.getUuid(), digitalObjects);
   }
 
-  boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+  boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 }

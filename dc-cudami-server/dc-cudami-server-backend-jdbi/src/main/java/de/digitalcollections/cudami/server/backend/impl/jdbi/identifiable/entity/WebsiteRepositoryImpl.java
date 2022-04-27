@@ -125,7 +125,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public List<Webpage> getRootPages(UUID uuid) {
+  public List<Webpage> getRootWebpages(UUID uuid) {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
@@ -170,7 +170,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
+  public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
     if (websiteUuid == null || rootPages == null) {
       return false;
     }

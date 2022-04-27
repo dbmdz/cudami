@@ -68,8 +68,8 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public List<Headword> findAll() {
-    return repository.findAll();
+  public List<Headword> getAll() {
+    return repository.getAll();
   }
 
   @Override
@@ -97,7 +97,7 @@ public class HeadwordServiceImpl implements HeadwordService {
 
   @Override
   public List<Headword> getRandom(int count) {
-    return repository.findRandom(count);
+    return repository.getRandom(count);
   }
 
   @Override
@@ -106,8 +106,8 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
-    return repository.getRelatedEntities(headwordUuid, pageRequest);
+  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+    return repository.findRelatedEntities(headwordUuid, pageRequest);
   }
 
   @Override
@@ -116,9 +116,9 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public PageResponse<FileResource> getRelatedFileResources(
+  public PageResponse<FileResource> findRelatedFileResources(
       UUID headwordUuid, PageRequest pageRequest) {
-    return repository.getRelatedFileResources(headwordUuid, pageRequest);
+    return repository.findRelatedFileResources(headwordUuid, pageRequest);
   }
 
   @Override
@@ -132,14 +132,14 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public List<Entity> saveRelatedEntities(UUID headwordUuid, List<Entity> entities) {
-    return repository.saveRelatedEntities(headwordUuid, entities);
+  public List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities) {
+    return repository.setRelatedEntities(headwordUuid, entities);
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID headwordUuid, List<FileResource> fileResources) {
-    return repository.saveRelatedFileResources(headwordUuid, fileResources);
+    return repository.setRelatedFileResources(headwordUuid, fileResources);
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {

@@ -56,7 +56,7 @@ public class V3ProjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(projectService.getDigitalObjects(any(Project.class), any(SearchPageRequest.class)))
+    when(projectService.findDigitalObjects(any(Project.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

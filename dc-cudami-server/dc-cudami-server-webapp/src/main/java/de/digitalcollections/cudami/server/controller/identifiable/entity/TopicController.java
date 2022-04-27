@@ -120,7 +120,7 @@ public class TopicController {
         "/latest/topics/{uuid}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<BreadcrumbNavigation> getBreadcrumb(
+  public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
       @Parameter(
               example = "",
               description = "UUID of the topic, e.g. <tt>6119d8e9-9c92-4091-8dcb-bc4053385406</tt>")
@@ -218,7 +218,7 @@ public class TopicController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getEntities(
       @Parameter(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
-    return topicService.getAllEntities(uuid);
+    return topicService.getEntities(uuid);
   }
 
   @Operation(summary = "Get paged entities of a topic")
@@ -240,7 +240,7 @@ public class TopicController {
       Filtering filtering = Filtering.defaultBuilder().add("entityType", entityType).build();
       pageRequest.setFiltering(filtering);
     }
-    return topicService.getEntities(topicUuid, pageRequest);
+    return topicService.findEntities(topicUuid, pageRequest);
   }
 
   @Operation(summary = "Get file resources of topic")
@@ -255,7 +255,7 @@ public class TopicController {
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    return topicService.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
+    return topicService.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @Operation(summary = "Get all languages of entities of a topic")
@@ -392,7 +392,7 @@ public class TopicController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
-    return topicService.saveEntities(uuid, entities);
+    return topicService.setEntities(uuid, entities);
   }
 
   @Operation(summary = "Save fileresources of topic")
@@ -405,7 +405,7 @@ public class TopicController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setFileresources(
       @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
-    return topicService.saveFileResources(uuid, fileResources);
+    return topicService.setFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Save a newly created topic and add it to parent")

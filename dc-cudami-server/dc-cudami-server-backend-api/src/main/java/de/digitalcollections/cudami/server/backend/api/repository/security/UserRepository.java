@@ -15,7 +15,7 @@ public interface UserRepository {
 
   PageResponse<User> find(PageRequest pageRequest);
 
-  List<User> findActiveAdminUsers();
+  List<User> getActiveAdminUsers();
 
   User getByEmail(String email);
 

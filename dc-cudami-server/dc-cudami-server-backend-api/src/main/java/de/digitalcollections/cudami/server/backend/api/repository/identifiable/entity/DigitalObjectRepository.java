@@ -18,12 +18,12 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   void deleteFileResources(UUID digitalObjectUuid);
 
-  default SearchPageResponse<Collection> getCollections(
+  default SearchPageResponse<Collection> findCollections(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return getCollections(digitalObject.getUuid(), searchPageRequest);
+    return findCollections(digitalObject.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<Collection> getCollections(
+  SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
@@ -65,10 +65,10 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   default SearchPageResponse<Project> getProjects(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return getProjects(digitalObject.getUuid(), searchPageRequest);
+    return findProjects(digitalObject.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<Project> getProjects(
+  SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
 
   default List<FileResource> saveFileResources(
@@ -76,20 +76,20 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
     if (fileResources == null) {
       return null;
     }
-    return saveFileResources(digitalObject.getUuid(), fileResources);
+    return setFileResources(digitalObject.getUuid(), fileResources);
   }
 
-  List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 
   default List<FileResource> saveRenderingResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) {
     if (renderingResources == null) {
       return null;
     }
-    return saveRenderingResources(digitalObject.getUuid(), renderingResources);
+    return setRenderingResources(digitalObject.getUuid(), renderingResources);
   }
 
-  List<FileResource> saveRenderingResources(
+  List<FileResource> setRenderingResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources);
 
   default List<LinkedDataFileResource> saveLinkedDataFileResources(
@@ -98,9 +98,9 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
       return null;
     }
 
-    return saveLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
+    return setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
   }
 
-  List<LinkedDataFileResource> saveLinkedDataFileResources(
+  List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
 }
