@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
@@ -46,9 +47,12 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
   public PageResponse<Person> findByGeoLocationOfBirth(
       PageRequest pageRequest, UUID uuidGeoLocation) {
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("placeOfBirth")
-            .isEquals(uuidGeoLocation.toString())
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("placeOfBirth")
+                    .isEquals(uuidGeoLocation.toString())
+                    .build())
             .build();
     pageRequest.setFiltering(filtering);
     return ((PersonRepository) repository).find(pageRequest);
@@ -58,9 +62,12 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
   public PageResponse<Person> findByGeoLocationOfDeath(
       PageRequest pageRequest, UUID uuidGeoLocation) {
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("placeOfDeath")
-            .isEquals(uuidGeoLocation.toString())
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("placeOfDeath")
+                    .isEquals(uuidGeoLocation.toString())
+                    .build())
             .build();
     pageRequest.setFiltering(filtering);
     return ((PersonRepository) repository).find(pageRequest);

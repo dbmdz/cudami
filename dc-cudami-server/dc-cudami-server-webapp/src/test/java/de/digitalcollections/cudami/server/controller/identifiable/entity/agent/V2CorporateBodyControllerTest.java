@@ -6,10 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,14 +27,14 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
   void testFindAll(String path) throws Exception {
     SearchPageResponse<CorporateBody> expected =
         (SearchPageResponse<CorporateBody>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(75)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withContent(
-                    new CorporateBodyBuilder()
+                    CorporateBody.builder()
                         .createdAt("2020-09-30T16:29:58.150463")
                         .withIdentifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
                         .withLabel(Locale.GERMAN, "Abensberg")

@@ -8,10 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,13 +33,13 @@ public class V2CollectionControllerTest extends BaseControllerTest {
       })
   public void collectionList(String path) throws Exception {
     PageResponse<Collection> expected =
-        new PageResponseBuilder<>()
+        PageResponse.builder()
             .forPageSize(1)
             .forAscendingOrderedField("label", "de")
             .forAscendingOrderedField("label")
             .withTotalElements(139)
             .withContent(
-                new CollectionBuilder()
+                Collection.builder()
                     .withUuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
                     .createdAt("2020-03-03T16:12:08.686626")
                     .withLabel(
@@ -76,7 +74,7 @@ public class V2CollectionControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v2/collections/?pageNumber=0&pageSize=1&active=true"})
   public void collectionListForInactive(String path) throws Exception {
     PageResponse<Collection> expected =
-        new PageResponseBuilder<>()
+        PageResponse.builder()
             .forPageSize(1)
             .forAscendingOrderedField("label", "de")
             .forAscendingOrderedField("label")

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.paging.PageRequest;
@@ -88,7 +89,10 @@ public class V3EntityRelationController {
 
     if (StringUtils.hasText(predicate)) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
+          Filtering.builder()
+              .add(
+                  FilterCriterion.builder().withExpression("predicate").isEquals(predicate).build())
+              .build();
       pageRequest.add(filtering);
     }
     PageResponse<EntityRelation> response = entityRelationService.find(pageRequest);

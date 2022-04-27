@@ -6,10 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,11 +27,11 @@ public class V2ProjectControllerTest extends BaseControllerTest {
   public void projectList(String path) throws Exception {
     SearchPageResponse<Project> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(395)
                 .withContent(
-                    new ProjectBuilder()
+                    Project.builder()
                         .createdAt("2020-09-30T16:25:10.609465")
                         .withIdentifier(
                             "mdz-proj", "1467037957", "898947e9-0d61-4572-b87e-05a01868001d")

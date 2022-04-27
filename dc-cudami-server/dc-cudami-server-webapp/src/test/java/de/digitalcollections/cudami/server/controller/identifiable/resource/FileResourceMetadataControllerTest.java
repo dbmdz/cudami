@@ -13,10 +13,8 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.resource.PlainFileResourceBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
@@ -40,13 +38,13 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   public void find(String path) throws Exception {
     SearchPageResponse<FileResource> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(1)
                 .withContent(
-                    new PlainFileResourceBuilder()
+                    FileResource.builder()
                         .withUuid("12345678-abcd-1234-abcd-123456789012")
                         .withLabel(Locale.GERMAN, "Test-Label")
                         .withMimeType(MimeType.MIME_APPLICATION_XML)

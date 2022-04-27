@@ -9,15 +9,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -43,12 +39,12 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void digitalObjectsForCollection(String path) throws Exception {
     SearchPageResponse<DigitalObject> expected =
         (SearchPageResponse<DigitalObject>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
                     List.of(
-                        new DigitalObjectBuilder()
+                        DigitalObject.builder()
                             .createdAt("2020-09-29T10:58:30.458925")
                             .withIdentifier(
                                 "mdz-obj", "bsb00000610", "5a4c1a74-40c9-4175-8f25-e5267eddaabc")
@@ -64,8 +60,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    Collection collection =
-        new CollectionBuilder().withUuid(extractFirstUuidFromPath(path)).build();
+    Collection collection = Collection.builder().withUuid(extractFirstUuidFromPath(path)).build();
 
     when(collectionService.findDigitalObjects(eq(collection), any(SearchPageRequest.class)))
         .thenReturn(expected);
@@ -81,14 +76,14 @@ public class V3CollectionControllerTest extends BaseControllerTest {
       })
   public void subcollections(String path) throws Exception {
     PageResponse<Collection> expected =
-        new PageResponseBuilder(Collection.class)
+        PageResponse.builder(Collection.class)
             .forRequestPage(0)
             .forPageSize(1)
             .forStartDate("publicationStart", "2021-04-12")
             .forEndDate("publicationEnd", "2021-04-12")
             .withTotalElements(8)
             .withContent(
-                new CollectionBuilder()
+                Collection.builder()
                     .createdAt("2020-07-10T12:12:33.099312")
                     .withDescription(
                         Locale.GERMAN,
@@ -125,7 +120,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void activeCollections(String path) throws Exception {
     PageResponse<Collection> expected =
         (PageResponse)
-            new PageResponseBuilder()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
@@ -133,7 +128,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                 .forEndDate("publicationEnd", "2021-04-16")
                 .withTotalElements(105)
                 .withContent(
-                    new CollectionBuilder()
+                    Collection.builder()
                         .createdAt("2020-03-03T16:12:08.686626")
                         .withLabel(Locale.GERMAN, "Test")
                         .withLabel(Locale.ENGLISH, "test")
@@ -166,14 +161,14 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void searchCollections(String path) throws Exception {
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(145)
                 .withContent(
-                    new CollectionBuilder()
+                    Collection.builder()
                         .createdAt("2020-03-03T16:12:08.686626")
                         .withLabel(Locale.GERMAN, "Test")
                         .withLabel(Locale.ENGLISH, "test")

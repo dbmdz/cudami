@@ -8,9 +8,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
+import de.digitalcollections.model.identifiable.entity.Project;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,7 +35,7 @@ class EntityControllerTest extends BaseControllerTest {
   public void returnByRefid(String path) throws Exception {
 
     Entity expected =
-        new CollectionBuilder()
+        Collection.builder()
             .withUuid("7ff8a9ab-d596-4e5d-a8e1-7956d553293b")
             .createdAt("2020-07-13T11:14:13.397483")
             .withLabel(Locale.GERMAN, "Perikopenbuch Heinrichs II.")
@@ -60,7 +60,7 @@ class EntityControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/latest/entities/identifier/mdz-proj:1328176523.json"})
   public void returnByIdentifier(String path) {
     Entity expected =
-        new ProjectBuilder()
+        Project.builder()
             .createdAt("2020-09-30T16:25:09.365401")
             .withIdentifier("mdz-proj", "1328176523", "54edc946-5e10-495a-bda2-cdc2ebd4e3d6")
             .withLabel(

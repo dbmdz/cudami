@@ -149,7 +149,7 @@ public class LicenseRepositoryImplTest {
     license4 = repo.save(license4);
 
     // do find
-    PageRequest pageRequest = PageRequest.defaultBuilder().pageSize(2).pageNumber(0).build();
+    PageRequest pageRequest = PageRequest.builder().pageSize(2).pageNumber(0).build();
     PageResponse<License> pageResponse = repo.find(pageRequest);
     assertThat(pageResponse.getTotalPages()).isEqualTo(2);
     assertThat(pageResponse.getTotalElements()).isEqualTo(4);

@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -35,7 +34,7 @@ class CollectionControllerTest extends BaseControllerTest {
   public void relatedByPredicate(String path) throws Exception {
     List<CorporateBody> expected =
         List.of(
-            new CorporateBodyBuilder()
+            CorporateBody.builder()
                 .createdAt("2020-10-20T14:38:07.757894")
                 .withIdentifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
                 .withLabel(Locale.GERMAN, "Institution 1")

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -10,7 +11,6 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageRequestBuilder;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
@@ -54,11 +54,17 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     }
 
     PageRequest pageRequest =
-        new PageRequestBuilder()
+        PageRequest.builder()
             .pageNumber(0)
             .pageSize(10000)
             .filtering(
-                Filtering.defaultBuilder().filter("parent.uuid").isEquals(parent.getUuid()).build())
+                Filtering.builder()
+                    .add(
+                        FilterCriterion.builder()
+                            .withExpression("parent.uuid")
+                            .isEquals(parent.getUuid())
+                            .build())
+                    .build())
             .build();
     return find(pageRequest);
   }

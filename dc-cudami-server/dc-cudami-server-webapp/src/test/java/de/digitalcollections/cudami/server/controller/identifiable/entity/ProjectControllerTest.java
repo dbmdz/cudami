@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +24,7 @@ class ProjectControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v2/projects/ae2a0a61-5255-46d4-8acf-cfddd3527338"})
   public void getProjectForUuid(String path) throws Exception {
     Project expected =
-        new ProjectBuilder()
+        Project.builder()
             .createdAt("2020-09-30T16:25:10.609465")
             .withIdentifier("mdz-proj", "1467037957", "c938279a-dedb-4531-9e94-55091b8e6f72")
             .withLabel(Locale.GERMAN, "100(0) Dokumente")

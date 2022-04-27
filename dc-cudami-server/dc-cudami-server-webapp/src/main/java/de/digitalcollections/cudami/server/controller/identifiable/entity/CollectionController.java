@@ -390,7 +390,7 @@ public class CollectionController {
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
-    Filtering filtering = Filtering.defaultBuilder().add("predicate", predicate).build();
+    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
     return collectionService.findRelatedCorporateBodies(uuid, filtering);
   }
 

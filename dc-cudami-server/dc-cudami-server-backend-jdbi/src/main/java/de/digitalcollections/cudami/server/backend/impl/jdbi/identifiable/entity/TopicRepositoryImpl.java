@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -460,7 +461,13 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filterNative("tt.child_topic_uuid").isEquals(nodeUuid).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression("tt.child_topic_uuid")
+                    .isEquals(nodeUuid)
+                    .build())
+            .build();
 
     Topic result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 

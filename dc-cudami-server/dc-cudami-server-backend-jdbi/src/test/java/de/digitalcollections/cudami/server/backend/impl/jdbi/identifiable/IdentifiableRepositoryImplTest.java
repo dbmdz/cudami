@@ -106,7 +106,7 @@ class IdentifiableRepositoryImplTest {
     Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
     assertThat(repo.getOrderBy(sorting)).isEqualTo("i.last_modified DESC, i.uuid ASC");
 
-    sorting = new Sorting(Order.defaultBuilder().property("label").subProperty("de").build());
+    sorting = new Sorting(Order.builder().property("label").subProperty("de").build());
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo("COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC");
 
@@ -118,12 +118,8 @@ class IdentifiableRepositoryImplTest {
     sorting =
         new Sorting(
             new Order(Direction.DESC, "created"),
-            Order.defaultBuilder().property("label").subProperty("de").build(),
-            Order.defaultBuilder()
-                .property("label")
-                .subProperty("en")
-                .direction(Direction.DESC)
-                .build());
+            Order.builder().property("label").subProperty("de").build(),
+            Order.builder().property("label").subProperty("en").direction(Direction.DESC).build());
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo(
             "i.created DESC, "

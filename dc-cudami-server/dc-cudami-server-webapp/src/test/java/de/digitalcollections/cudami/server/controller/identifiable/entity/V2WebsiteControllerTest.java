@@ -6,11 +6,9 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
-import de.digitalcollections.model.identifiable.web.WebpageBuilder;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -31,14 +29,14 @@ class V2WebsiteControllerTest extends BaseControllerTest {
   public void pagedWebsites(String path) throws Exception {
     SearchPageResponse<Website> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .forRequestPage(0)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(82)
                 .withContent(
-                    new WebsiteBuilder()
+                    Website.builder()
                         .createdAt("2018-05-02T13:32:52.582")
                         .withDescription(Locale.GERMAN, "")
                         .withLabel(Locale.GERMAN, "Testseite")
@@ -64,7 +62,7 @@ class V2WebsiteControllerTest extends BaseControllerTest {
       })
   public void returnWebsiteV2Json(String path) throws Exception {
     Website expected =
-        new WebsiteBuilder()
+        Website.builder()
             .createdAt("2018-05-04T09:05:47.493")
             .lastModifiedAt("2018-05-04T09:05:47.493")
             .withLabel(Locale.GERMAN, "Altsinica")
@@ -74,21 +72,21 @@ class V2WebsiteControllerTest extends BaseControllerTest {
             .withUrl("https://ostasien.digitale-sammlungen.de/")
             .withRootPages(
                 List.of(
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .withUuid("6d9adace-187a-4f14-9a5a-e768558028a3")
                         .createdAt("2018-05-04T09:06:05.333")
                         .lastModifiedAt("2020-09-30T16:23:44.393791")
                         .withLabel(Locale.GERMAN, "Impressum")
                         .withPublicationStartAt("2020-09-30")
                         .build(),
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .withUuid("b0739393-2fdc-4703-8af1-c3b440292872")
                         .createdAt("2020-03-12T12:28:57.082438")
                         .lastModifiedAt("2020-09-30T16:24:43.844093")
                         .withLabel(Locale.GERMAN, "Barrierefreiheit")
                         .withPublicationStartAt("2020-09-30")
                         .build(),
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .withUuid("cbb85056-5e30-49cf-bd87-fd09486b9aa9")
                         .createdAt("2018-05-04T09:06:19.201")
                         .lastModifiedAt("2020-09-30T16:24:23.379512")

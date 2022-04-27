@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -205,7 +206,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E getByRefId(long refId) {
-    Filtering filtering = Filtering.defaultBuilder().filter("refId").isEquals(refId).build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
+            .build();
 
     return retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
   }

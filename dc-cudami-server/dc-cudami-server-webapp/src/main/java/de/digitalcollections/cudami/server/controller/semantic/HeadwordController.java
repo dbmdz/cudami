@@ -83,11 +83,11 @@ public class HeadwordController {
     if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
       if (labelCriterion != null) {
-        filtering.add(Filtering.defaultBuilder().add("label", labelCriterion).build());
+        filtering.add("label", labelCriterion);
       }
       if (localeCriterion != null) {
         filtering.add(
-            Filtering.defaultBuilder()
+            Filtering.builder()
                 .add(
                     new FilterCriterion<Locale>(
                         "locale",

@@ -10,12 +10,10 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.alias.UrlAliasBuilder;
 import de.digitalcollections.model.identifiable.entity.EntityType;
-import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -46,7 +44,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void existingUrlAlias(String path) throws Exception {
     UrlAlias expectedUrlAlias =
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
@@ -55,8 +53,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(expectedUrlAlias);
 
@@ -106,7 +103,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/urlaliases"})
   public void save(String path) throws Exception {
     UrlAlias expectedUrlAlias =
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
@@ -115,8 +112,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -141,7 +137,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void update(String path) throws Exception {
     UrlAlias expectedUrlAlias =
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
@@ -150,8 +146,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -203,7 +198,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void findWithEmptyResult(String path) throws Exception {
     SearchPageResponse<LocalizedUrlAliases> expected =
         (SearchPageResponse<LocalizedUrlAliases>)
-            new SearchPageResponseBuilder().forPageSize(1).withTotalElements(0).build();
+            SearchPageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
     when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
 
@@ -216,13 +211,13 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void findWithFilledResult(String path) throws Exception {
     SearchPageResponse<LocalizedUrlAliases> expected =
         (SearchPageResponse<LocalizedUrlAliases>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
                     List.of(
                         new LocalizedUrlAliases(
-                            new UrlAliasBuilder()
+                            UrlAlias.builder()
                                 .createdAt("2021-08-17T15:18:01.000001")
                                 .lastPublishedAt("2021-08-17T15:18:01.000001")
                                 .isPrimary()
@@ -232,7 +227,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                 .withTargetUuid("23456789-2345-2345-2345-234567890123")
                                 .withUuid("12345678-1234-1234-1234-123456789012")
                                 .withWebsite(
-                                    new WebsiteBuilder()
+                                    Website.builder()
                                         .withUuid("87654321-4321-4321-4321-876543210987")
                                         .build())
                                 .build())))
@@ -272,7 +267,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void existingPrimaryLinks(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
@@ -281,8 +276,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.RESOURCE, null)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
     when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(null)))
@@ -298,7 +292,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void existingPrimaryLinksWithLocale(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
@@ -307,8 +301,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .withTargetType(IdentifiableType.RESOURCE, null)
             .withTargetUuid("23456789-2345-2345-2345-234567890123")
             .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
     Locale actualLocale = Locale.forLanguageTag("de");
@@ -324,7 +317,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void existingPrimaryLinksForEmptyWebsiteUuid(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
-        new UrlAliasBuilder()
+        UrlAlias.builder()
             .createdAt("2021-08-17T15:18:01.000001")
             .lastPublishedAt("2021-08-17T15:18:01.000001")
             .isPrimary()
