@@ -76,8 +76,7 @@ public class PersonController {
     }
 
     if (previewImageFilter != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("previewImage", previewImageFilter).build();
+      Filtering filtering = Filtering.builder().add("previewImage", previewImageFilter).build();
       searchPageRequest.setFiltering(filtering);
     }
     if (initial == null) {

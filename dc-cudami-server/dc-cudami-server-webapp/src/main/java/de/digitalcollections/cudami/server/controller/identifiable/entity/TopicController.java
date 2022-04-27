@@ -237,7 +237,7 @@ public class TopicController {
       @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
     if (entityType != null) {
-      Filtering filtering = Filtering.defaultBuilder().add("entityType", entityType).build();
+      Filtering filtering = Filtering.builder().add("entityType", entityType).build();
       pageRequest.setFiltering(filtering);
     }
     return topicService.findEntities(topicUuid, pageRequest);

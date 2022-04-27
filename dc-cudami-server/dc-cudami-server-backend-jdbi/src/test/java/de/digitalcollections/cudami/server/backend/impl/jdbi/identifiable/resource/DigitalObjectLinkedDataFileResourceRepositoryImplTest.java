@@ -7,9 +7,7 @@ import de.digitalcollections.cudami.server.backend.impl.database.config.SpringCo
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import java.util.List;
 import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
@@ -57,7 +55,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   void setLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
@@ -67,7 +65,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withLabel(Locale.GERMAN, "Linked Data")
             .withContext("https://foo.bar/blubb.xml")
             .withObjectType("XML")
@@ -87,7 +85,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   void getLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
@@ -97,7 +95,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withLabel(Locale.GERMAN, "Linked Data")
             .withContext("https://foo.bar/blubb.xml")
             .withObjectType("XML")

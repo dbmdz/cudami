@@ -9,7 +9,6 @@ import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageRequestBuilder;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
@@ -184,7 +183,7 @@ class IdentifierTypeRepositoryImplTest {
     type2 = repo.save(type2);
 
     PageRequest pageRequest =
-        new PageRequestBuilder()
+        PageRequest.builder()
             .pageNumber(0)
             .pageSize(99)
             .filtering(

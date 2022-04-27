@@ -65,8 +65,7 @@ public class EntityController<E extends Entity> {
       pageRequest.setSorting(sorting);
     }
     if (entityTypeCriterion != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
+      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
     return entityService.find(pageRequest);
@@ -88,8 +87,7 @@ public class EntityController<E extends Entity> {
       pageRequest.setSorting(sorting);
     }
     if (entityTypeCriterion != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
+      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
     return entityService.find(pageRequest);

@@ -8,10 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -54,12 +52,12 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnChildrenOfAWebpage(String path) throws Exception {
     PageResponse<Webpage> expected =
         (PageResponse)
-            new PageResponseBuilder<>()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(25)
                 .withContent(
                     List.of(
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-07-07T17:09:33.375772")
                             .withLabel(Locale.GERMAN, "Kontakt")
                             .withLabel(Locale.ENGLISH, "Contact")
@@ -68,7 +66,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .withPublicationStartAt("2020-07-07")
                             .notShownInNavigation()
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-09-09T15:02:35.186941")
                             .withLabel(Locale.GERMAN, "Impressum")
                             .withLabel(Locale.ENGLISH, "Imprint")
@@ -77,7 +75,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .withPublicationStartAt("2020-07-07")
                             .shownInNavigation()
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-09-09T15:03:02.077221")
                             .withLabel(Locale.GERMAN, "Datenschutzerklärung")
                             .withLabel(Locale.ENGLISH, "Privacy Policy")
@@ -86,7 +84,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .withPublicationStartAt("2020-07-07")
                             .shownInNavigation()
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-03-12T12:38:45.902257")
                             .withLabel(Locale.GERMAN, "Barrierefreiheit")
                             .withLabel(Locale.ENGLISH, "Accessibility")
@@ -126,42 +124,42 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnSortOrderOfChildrenOfAWebpage(String path) throws Exception {
     PageResponse<Webpage> expected =
         (PageResponse)
-            new PageResponseBuilder<>()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(5)
                 .forDescendingOrderedField("publicationStart")
                 .withTotalElements(81)
                 .withContent(
                     List.of(
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2021-04-19T09:36:44.248372")
                             .withLabel(Locale.GERMAN, "1")
                             .lastModifiedAt("2021-04-19T09:37:21.839009")
                             .withUuid("ed86dcc0-a1aa-4e82-872a-8d82d2536846")
                             .withPublicationStartAt("2021-04-19")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-05-15T11:14:44.52781")
                             .withLabel(Locale.GERMAN, "2")
                             .lastModifiedAt("2020-07-01T17:31:36.627785")
                             .withUuid("97113300-3b04-4b6f-9082-294d10fd778b")
                             .withPublicationStartAt("2020-06-30")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-05-15T11:14:42.588253")
                             .withLabel(Locale.GERMAN, "3")
                             .lastModifiedAt("2021-02-04T08:29:18.210378")
                             .withUuid("5c2cd93c-73f5-4abd-b200-9141c5473df1")
                             .withPublicationStartAt("2020-05-29")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-05-15T11:14:43.640695")
                             .withLabel(Locale.GERMAN, "4")
                             .lastModifiedAt("2020-11-05T16:52:42.353087")
                             .withUuid("38e4b7b0-b75a-4ded-a109-4213352130fa")
                             .withPublicationStartAt("2020-05-29")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-05-15T11:14:45.997827")
                             .withLabel(Locale.GERMAN, "5")
                             .lastModifiedAt("2020-05-29T16:31:23.556613")
@@ -266,7 +264,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   public void returnWebpageWithChildrentree(String path) throws Exception {
     List<Webpage> expected =
         List.of(
-            new WebpageBuilder()
+            Webpage.builder()
                 .createdAt("2019-10-31T11:25:10.696785")
                 .withDescription("de", "Test-Text")
                 .withLabel(Locale.GERMAN, "Test")
@@ -283,7 +281,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                 .withPublicationStartAt("2020-10-01")
                 .withChildren(
                     List.of(
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-10-31T11:26:26.357575")
                             .withLabel(Locale.GERMAN, "Technologien und Softwareentwicklung")
                             .lastModifiedAt("2021-01-11T14:20:33.920896")
@@ -292,7 +290,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .notShownInNavigation()
                             .withChildren(
                                 List.of(
-                                    new WebpageBuilder()
+                                    Webpage.builder()
                                         .createdAt("2019-12-09T13:40:54.644153")
                                         .withLabel(Locale.GERMAN, "IIIF und Mirador")
                                         .lastModifiedAt("2019-12-09T13:41:28.196622")
@@ -300,14 +298,14 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                                         .withPublicationStartAt("2019-12-09")
                                         .build()))
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-10-31T11:26:41.189086")
                             .withLabel(Locale.GERMAN, "Test1")
                             .lastModifiedAt("2019-12-09T14:02:08.693881")
                             .withUuid("b383e248-82d5-405b-b33b-9d879913044a")
                             .withPublicationStartAt("2019-12-09")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-10-31T11:26:52.877568")
                             .withLabel(Locale.GERMAN, "Test2")
                             .withLabel(Locale.ENGLISH, "test2")
@@ -318,7 +316,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .withTemplateName("timeline")
                             .build()))
                 .build(),
-            new WebpageBuilder()
+            Webpage.builder()
                 .createdAt("2019-10-31T11:27:58.409698")
                 .withLabel(Locale.GERMAN, "Hilfe")
                 .lastModifiedAt("2020-10-19T16:08:52.672063")
@@ -326,7 +324,7 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                 .withPublicationStartAt("2020-10-19")
                 .withChildren(
                     List.of(
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-10-31T11:28:14.191666")
                             .withLabel(Locale.GERMAN, "Hilfe zur Suche")
                             .lastModifiedAt("2021-02-11T10:52:01.433945")

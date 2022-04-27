@@ -7,10 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -28,13 +26,13 @@ public class V2DigitalObjectControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v2/digitalobjects?pageNumber=0&pageSize=1"})
   public void getPagedList(String path) throws Exception {
     PageResponse<DigitalObject> expected =
-        new PageResponseBuilder<>()
+        PageResponse.builder()
             .forPageSize(1)
             .forAscendingOrderedField("label", "de")
             .forAscendingOrderedField("label")
             .withTotalElements(1305745)
             .withContent(
-                new DigitalObjectBuilder()
+                DigitalObject.builder()
                     .withUuid("3d01a4b5-deb9-4d04-a1ee-9f9ac16f510f")
                     .createdAt("2020-09-29T12:06:32.360852")
                     .withIdentifier(

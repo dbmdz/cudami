@@ -21,10 +21,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
@@ -87,7 +85,7 @@ class DigitalObjectServiceImplTest {
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
   void saveLinkedDataFileResources() throws ValidationException, IdentifiableServiceException {
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withLabel(Locale.GERMAN, "Linked Data")
             .withContext("https://foo.bar/blubb.xml")
             .withObjectType("XML")
@@ -98,7 +96,7 @@ class DigitalObjectServiceImplTest {
     Identifier identifier = new Identifier(null, "foo", "bar");
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
@@ -120,18 +118,36 @@ class DigitalObjectServiceImplTest {
   @DisplayName("fills LinkedDataResources for a retrieved DigitalObject by uuid")
   void fillLinkedDataResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
     UUID uuid = UUID.randomUUID();
+
     DigitalObject persistedDigitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withUuid(uuid)
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
             .withDescription(Locale.ENGLISH, "description")
             .build();
+
+    new DigitalObject.Builder()
+        .withUuid(uuid)
+        .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+        .withLabel(Locale.ENGLISH, "english label")
+        .withDescription(Locale.GERMAN, "Beschreibung")
+        .withDescription(Locale.ENGLISH, "description")
+        .build();
+
+    // DigitalObject persistedDigitalObject =
+    //    new DigitalObjectBuilder()
+    //        .withUuid(uuid)
+    //        .withLabel(Locale.GERMAN, "deutschsprachiges Label")
+    //       .withLabel(Locale.ENGLISH, "english label")
+    //       .withDescription(Locale.GERMAN, "Beschreibung")
+    //       .withDescription(Locale.ENGLISH, "description")
+    //       .build();
     when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
 
     LinkedDataFileResource persistedLinkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withLabel(Locale.GERMAN, "Linked Data")
             .withContext("https://foo.bar/blubb.xml")
             .withObjectType("XML")
@@ -161,7 +177,7 @@ class DigitalObjectServiceImplTest {
     Identifier identifier = new Identifier(null, "foo", "bar");
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
@@ -185,7 +201,7 @@ class DigitalObjectServiceImplTest {
   void fillRenderingResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withUuid(uuid)
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")

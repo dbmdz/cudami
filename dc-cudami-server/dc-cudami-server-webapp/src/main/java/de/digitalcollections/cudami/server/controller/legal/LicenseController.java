@@ -109,11 +109,11 @@ public class LicenseController {
     if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
       if (labelCriterion != null) {
-        filtering.add(Filtering.defaultBuilder().add("label", labelCriterion).build());
+        filtering.add(Filtering.builder().add("label", labelCriterion).build());
       }
       if (localeCriterion != null) {
         filtering.add(
-            Filtering.defaultBuilder()
+            Filtering.builder()
                 .add(
                     new FilterCriterion<Locale>(
                         "locale",

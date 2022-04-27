@@ -78,7 +78,7 @@ public class WebpageController {
       pageRequest.setSorting(sorting);
     }
     Filtering filtering =
-        Filtering.defaultBuilder()
+        Filtering.builder()
             .add("publicationStart", publicationStart)
             .add("publicationEnd", publicationEnd)
             .build();

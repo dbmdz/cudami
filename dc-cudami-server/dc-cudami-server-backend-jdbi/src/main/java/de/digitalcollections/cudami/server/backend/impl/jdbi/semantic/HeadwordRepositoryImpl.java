@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -205,18 +206,17 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   @Override
   public List<Headword> find(String label, Locale locale) {
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("label")
-            .isEquals(label)
-            .filter("locale")
-            .isEquals(locale)
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
             .build();
+
     // TODO make PageRequest able to return all items (one page)
     PageRequest request =
         new PageRequest(
             0,
             10000,
-            Sorting.defaultBuilder().order(new Order(Direction.ASC, "label")).build(),
+            Sorting.builder().order(new Order(Direction.ASC, "label")).build(),
             filtering);
     PageResponse<Headword> response = find(request);
     return response.getContent();
@@ -229,13 +229,16 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public List<Headword> findByLabel(String label) {
-    Filtering filtering = Filtering.defaultBuilder().filter("label").isEquals(label).build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .build();
     // FIXME make PageRequest able to return all items (one page)
     PageRequest request =
         new PageRequest(
             0,
             10000,
-            Sorting.defaultBuilder().order(new Order(Direction.ASC, "label")).build(),
+            Sorting.builder().order(new Order(Direction.ASC, "label")).build(),
             filtering);
     PageResponse<Headword> response = find(request);
     return response.getContent();
@@ -257,9 +260,9 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
     // add filtering
     if (filtering == null) {
-      filtering = Filtering.defaultBuilder().build();
+      filtering = Filtering.builder().build();
     }
-    filtering.add(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build());
+    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
     Map<String, Object> argumentMappings = new HashMap<>();
     addFiltering(filtering, sqlQuery, argumentMappings);
 
@@ -284,11 +287,9 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
     // add filtering
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("label")
-            .isEquals(label)
-            .filter("locale")
-            .isEquals(locale)
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
             .build();
     Map<String, Object> argumentMappings = new HashMap<>();
     addFiltering(filtering, sqlQuery, argumentMappings);

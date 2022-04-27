@@ -8,14 +8,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +35,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
 
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .withoutContent()
                 .forRequestPage(0)
                 .forPageSize(1000)
@@ -48,9 +44,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .build();
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder().withUuid(extractFirstUuidFromPath(path)).build();
+        DigitalObject.builder().withUuid(extractFirstUuidFromPath(path)).build();
     when(digitalObjectService.findActiveCollections(
-            eq(digitalObject), any(SearchPageRequest.class)))
+        eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -65,14 +61,14 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
   public void collectionsForDigitalObject(String path) throws Exception {
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forStartDate("c.publication_start", "2021-04-12")
                 .forEndDate("c.publication_end", "2021-04-12")
                 .withTotalElements(1)
                 .withContent(
-                    new CollectionBuilder()
+                    Collection.builder()
                         .createdAt("2020-07-16T11:51:33.981829")
                         .withLabel(Locale.GERMAN, "Lateinische Handschriften")
                         .withLabel(Locale.ENGLISH, "Latin Manuscripts")
@@ -106,12 +102,12 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
   public void projectsForDigitalObject(String path) throws Exception {
     SearchPageResponse<Project> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(1)
                 .withContent(
-                    new ProjectBuilder()
+                    Project.builder()
                         .createdAt("2020-07-16T11:51:33.981829")
                         .withLabel(Locale.GERMAN, "Lateinische Handschriften")
                         .withLabel(Locale.ENGLISH, "Latin Manuscripts")

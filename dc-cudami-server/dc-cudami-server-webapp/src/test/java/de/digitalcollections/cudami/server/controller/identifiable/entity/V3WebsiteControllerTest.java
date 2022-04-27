@@ -6,12 +6,9 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -36,13 +33,13 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
   public void pagedRootpages(String path) throws Exception {
     SearchPageResponse<Webpage> expected =
         (SearchPageResponse<Webpage>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(25)
                 .forRequestPage(0)
                 .withTotalElements(4)
                 .withContent(
                     List.of(
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-08-19T15:04:29.397957")
                             .withLabel(Locale.GERMAN, "Startseite")
                             .withLabel(Locale.ENGLISH, "MDZ Homepage")
@@ -51,7 +48,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .withPublicationStartAt("2020-10-01")
                             .shownInNavigation()
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2019-09-09T15:05:17.356311")
                             .withLabel(Locale.GERMAN, "News")
                             .lastModifiedAt("2019-09-09T15:05:17.356343")
@@ -59,7 +56,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .withPublicationStartAt("2019-09-09")
                             .notShownInNavigation()
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-06-30T11:27:57.050954")
                             .withDescription(
                                 "de",
@@ -69,7 +66,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .withUuid("6d52141c-5c5d-48b4-aee8-7df5404d245e")
                             .withPublicationStartAt("2020-06-30")
                             .build(),
-                        new WebpageBuilder()
+                        Webpage.builder()
                             .createdAt("2020-07-07T17:04:52.129368")
                             .withLabel(Locale.GERMAN, "Footer")
                             .lastModifiedAt("2020-07-07T17:04:52.129378")
@@ -90,7 +87,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v3/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
   public void websiteByUuid(String path) throws Exception {
     Website expected =
-        new WebsiteBuilder()
+        Website.builder()
             .withUuid(extractFirstUuidFromPath(path))
             .createdAt("2019-08-12T16:28:52.171814")
             .withLabel(Locale.GERMAN, "MDZ Homepage")
@@ -99,14 +96,14 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
             .withUrl("https://www.digitale-sammlungen.de/")
             .withRootPages(
                 List.of(
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .createdAt("2020-07-07T17:04:52.129368")
                         .withLabel(Locale.GERMAN, "Footer")
                         .lastModifiedAt("2020-07-07T17:04:52.129378")
                         .withUuid("157f5428-5a5a-4d47-971e-f092f1836246")
                         .withPublicationStartAt("2020-07-07")
                         .build(),
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .createdAt("2019-09-09T15:05:17.356311")
                         .withLabel(Locale.GERMAN, "News")
                         .lastModifiedAt("2019-09-09T15:05:17.356343")
@@ -114,7 +111,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                         .withPublicationStartAt("2019-09-09")
                         .notShownInNavigation()
                         .build(),
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .createdAt("2020-06-30T11:27:57.050954")
                         .withDescription(
                             "de", "technischer Knoten, der alle Webpages des Hauptmenüs enthält")
@@ -123,7 +120,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                         .withUuid("6d52141c-5c5d-48b4-aee8-7df5404d245e")
                         .withPublicationStartAt("2020-06-30")
                         .build(),
-                    new WebpageBuilder()
+                    Webpage.builder()
                         .createdAt("2019-08-19T15:04:29.397957")
                         .withLabel(Locale.GERMAN, "Startseite")
                         .withLabel(Locale.ENGLISH, "MDZ Homepage")

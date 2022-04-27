@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -20,26 +19,20 @@ import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.legal.LicenseBuilder;
 import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.OrderBuilder;
-import de.digitalcollections.model.paging.PageRequestBuilder;
+import de.digitalcollections.model.paging.Order;
+import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
-import de.digitalcollections.model.production.CreationInfoBuilder;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
@@ -98,7 +91,7 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private PersonRepositoryImpl personRepositoryImpl;
 
   private static final License EXISTING_LICENSE =
-      new LicenseBuilder()
+      License.builder()
           .withUuid(UUID.randomUUID())
           .withAcronym("CC0 1.0")
           .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
@@ -134,38 +127,40 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
-            .build();
+        (CorporateBody)
+            CorporateBody.builder()
+                .withUuid(UUID.randomUUID())
+                .withLabel(Locale.GERMAN, "Körperschaft")
+                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        new GeoLocationBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Ort")
-            .build();
+        (GeoLocation)
+            GeoLocation.builder()
+                .withUuid(UUID.randomUUID())
+                .withLabel(Locale.GERMAN, "Ort")
+                .build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
-        new CreationInfoBuilder()
+        CreationInfo.builder()
             .withCreator(creator)
             .withDate("2022-02-25")
             .withGeoLocation(creationPlace)
             .build();
 
     DigitalObject parent =
-        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().withLabel(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")
@@ -205,7 +200,7 @@ class DigitalObjectRepositoryImplTest {
     repo.save(digitalObject);
 
     PageResponse<DigitalObject> response =
-        repo.find(new PageRequestBuilder().pageSize(1).pageNumber(0).build());
+        repo.find(PageRequest.builder().pageSize(1).pageNumber(0).build());
     assertThat(response).isNotNull();
     assertThat(response.getContent()).isNotEmpty();
     DigitalObject actualReduced = response.getContent().get(0);
@@ -235,8 +230,8 @@ class DigitalObjectRepositoryImplTest {
     searchPageRequest.setPageNumber(0);
     searchPageRequest.setQuery(query);
     searchPageRequest.setSorting(
-        Sorting.defaultBuilder()
-            .order(new OrderBuilder().property("refId").direction(Direction.ASC).build())
+        Sorting.builder()
+            .order(Order.builder().property("refId").direction(Direction.ASC).build())
             .build());
 
     SearchPageResponse response = repo.find(searchPageRequest);
@@ -280,8 +275,7 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("returns all identifiers for a DigitalObject")
   void returnIdentifiers() {
     // Step1: Create the DigitalObject
-    DigitalObject digitalObject =
-        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Label").build();
+    DigitalObject digitalObject = DigitalObject.builder().withLabel(Locale.GERMAN, "Label").build();
     DigitalObject persisted = repo.save(digitalObject);
 
     // Step2: Create the identifiers and connect with with the DigitalObject
@@ -292,7 +286,7 @@ class DigitalObjectRepositoryImplTest {
 
     // Step3: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
-        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Anderes Label").build();
+        DigitalObject.builder().withLabel(Locale.GERMAN, "Anderes Label").build();
     DigitalObject otherPersisted = repo.save(otherDigitalObject);
     identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
 
@@ -340,28 +334,30 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
-            .build();
+        (CorporateBody)
+            CorporateBody.builder()
+                .withUuid(UUID.randomUUID())
+                .withLabel(Locale.GERMAN, "Körperschaft")
+                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        new GeoLocationBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Ort")
-            .build();
+        (GeoLocation)
+            GeoLocation.builder()
+                .withUuid(UUID.randomUUID())
+                .withLabel(Locale.GERMAN, "Ort")
+                .build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     // Insert a LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withUuid(UUID.randomUUID())
             .withLabel(Locale.GERMAN, "Linked Data")
             .withContext("https://foo.bar/blubb.xml")
@@ -385,7 +381,7 @@ class DigitalObjectRepositoryImplTest {
 
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
-        new CreationInfoBuilder()
+        CreationInfo.builder()
             .withCreator(creator)
             .withDate("2022-02-25")
             .withGeoLocation(creationPlace)
@@ -393,10 +389,10 @@ class DigitalObjectRepositoryImplTest {
 
     // Build a parent DigitalObject, save and retrieve it
     DigitalObject parent =
-        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().withLabel(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withLabel(Locale.GERMAN, "deutschsprachiges Label")
             .withLabel(Locale.ENGLISH, "english label")
             .withDescription(Locale.GERMAN, "Beschreibung")

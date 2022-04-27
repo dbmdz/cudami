@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.text.LocalizedText;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -87,7 +86,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   public void testFind() throws MalformedURLException, Exception {
     License license = createTestLicenseSaved();
     PageResponse<License> pageResponse =
-        new PageResponseBuilder<>()
+        PageResponse.builder()
             .forRequestPage(0)
             .forPageSize(1)
             .withTotalElements(1)

@@ -6,13 +6,11 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelationBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,15 +30,15 @@ public class V3EntityRelationControllerTest extends BaseControllerTest {
   public void listOfRelatedEntities(String path) throws Exception {
     PageResponse<EntityRelation> expected =
         (PageResponse<EntityRelation>)
-            new PageResponseBuilder()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forEqualPredicate("predicate", "is_part_of")
                 .withTotalElements(109)
                 .withContent(
-                    new EntityRelationBuilder()
+                    EntityRelation.builder()
                         .withObject(
-                            new CollectionBuilder()
+                            Collection.builder()
                                 .createdAt("2020-08-12T18:14:26.032971")
                                 .withLabel(Locale.GERMAN, "Test-Archiv")
                                 .lastModifiedAt("2020-10-19T16:45:18.55684")
@@ -58,7 +56,7 @@ public class V3EntityRelationControllerTest extends BaseControllerTest {
                                 .build())
                         .withPredicate("is_part_of")
                         .withSubject(
-                            new ProjectBuilder()
+                            Project.builder()
                                 .createdAt("2020-09-30T16:25:10.901715")
                                 .withIdentifier(
                                     "mdz-proj",

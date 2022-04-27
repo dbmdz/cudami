@@ -73,7 +73,7 @@ public class FileResourceMetadataController {
               encodedUriFilterCriterion.getOperation(),
               URLDecoder.decode(
                   (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      Filtering filtering = Filtering.builder().add("uri", uri).build();
       searchPageRequest.setFiltering(filtering);
     }
 
@@ -130,7 +130,9 @@ public class FileResourceMetadataController {
     }
     if (prefix != null) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("mimeType").startsWith(prefix).build();
+          Filtering.builder()
+              .add(FilterCriterion.builder().withExpression("mimeType").startsWith(prefix).build())
+              .build();
       pageRequest.add(filtering);
     }
     return metadataService.find(pageRequest);

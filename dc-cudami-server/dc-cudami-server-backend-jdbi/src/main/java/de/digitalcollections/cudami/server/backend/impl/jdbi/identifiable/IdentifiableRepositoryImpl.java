@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -462,14 +463,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // add special filter
     Filtering filtering = pageRequest.getFiltering();
     if (filtering == null) {
-      filtering = Filtering.defaultBuilder().build();
+      filtering = Filtering.builder().build();
       pageRequest.setFiltering(filtering);
     }
 
     Filtering initialFiltering =
-        Filtering.defaultBuilder()
-            .filter(tableAlias + ".label ->> :language")
-            .startsWith(":initial")
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(tableAlias + ".label ->> :language")
+                    .startsWith(":initial")
+                    .build())
             .build();
     filtering.add(initialFiltering);
 
@@ -477,9 +481,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     Sorting sorting = pageRequest.getSorting();
 
     Sorting labelSorting =
-        Sorting.defaultBuilder()
+        Sorting.builder()
             .order(
-                Order.defaultBuilder()
+                Order.builder()
                     .property("label")
                     .subProperty(language)
                     .direction(Direction.ASC)
@@ -502,9 +506,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   public I getByUuidAndFiltering(UUID uuid, Filtering filtering) {
     if (filtering == null) {
-      filtering = Filtering.defaultBuilder().build();
+      filtering = Filtering.builder().build();
     }
-    filtering.add(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build());
+    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
 
     I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
     return result;
@@ -534,11 +538,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 IdentifierRepositoryImpl.TABLE_NAME,
                 IdentifierRepositoryImpl.TABLE_ALIAS));
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filterNative(IdentifierRepositoryImpl.TABLE_ALIAS + ".identifier")
-            .isEquals(identifierId)
-            .filterNative(IdentifierRepositoryImpl.TABLE_ALIAS + ".namespace")
-            .isEquals(namespace)
+        Filtering.builder()
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression(IdentifierRepositoryImpl.TABLE_ALIAS + ".identifier")
+                    .isEquals(identifierId)
+                    .build())
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression(IdentifierRepositoryImpl.TABLE_ALIAS + ".namespace")
+                    .isEquals(namespace)
+                    .build())
             .build();
     Map<String, Object> arguments = new HashMap<>();
     addFiltering(filtering, innerSelect, arguments);

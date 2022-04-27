@@ -13,13 +13,10 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -42,7 +39,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
   public void getByUuid(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withUuid("12345678-abcd-1234-abcd-123456789012")
             .withContext("Test-context")
             .withObjectType("Test-objectType")
@@ -61,12 +58,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/?pageNumber=0&pageSize=1"})
   public void pagedList(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
-        new PageResponseBuilder()
+        PageResponse.builder()
             .forPageSize(1)
             .forRequestPage(0)
             .withContent(
                 List.of(
-                    new LinkedDataFileResourceBuilder()
+                    LinkedDataFileResource.builder()
                         .withUuid("12345678-abcd-1234-abcd-123456789012")
                         .withContext("Test-context")
                         .withObjectType("Test-objectType")
@@ -90,13 +87,13 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   public void find(String path) throws Exception {
     SearchPageResponse<LinkedDataFileResource> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(1)
                 .withContent(
-                    new LinkedDataFileResourceBuilder()
+                    LinkedDataFileResource.builder()
                         .withUuid("12345678-abcd-1234-abcd-123456789012")
                         .withContext("Test-context")
                         .withObjectType("Test-objectType")
@@ -130,7 +127,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources"})
   public void save(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withUuid("12345678-abcd-1234-abcd-123456789012")
             .withContext("Test-context")
             .withObjectType("Test-objectType")
@@ -165,7 +162,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
   public void update(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
+        LinkedDataFileResource.builder()
             .withUuid("12345678-abcd-1234-abcd-123456789012")
             .withContext("Test-context")
             .withObjectType("Test-objectType")

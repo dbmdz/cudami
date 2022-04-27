@@ -6,7 +6,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
-import de.digitalcollections.model.text.contentblock.ParagraphBuilder;
+import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +18,7 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
     LocalizedStructuredContent content = new LocalizedStructuredContent();
     StructuredContent structuredContentDe = new StructuredContent();
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
+        Paragraph.builder()
             .addText("Bayerische Staatsbibliothek", "strong")
             .addText(
                 "                                                                                              ")
@@ -31,11 +31,11 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
             .addText("80539 München")
             .build());
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder().addText("Gesetzlicher Vertreter:", "strong").build());
+        Paragraph.builder().addText("Gesetzlicher Vertreter:", "strong").build());
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder().addText("Generaldirektor Dr. Klaus Ceynowa").build());
+        Paragraph.builder().addText("Generaldirektor Dr. Klaus Ceynowa").build());
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
+        Paragraph.builder()
             .addText("Telefon: ", "strong")
             .addText("+49 89 28638-0")
             .addHardBreak()
@@ -43,7 +43,7 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
             .addText("+49 89 28638-2200")
             .build());
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
+        Paragraph.builder()
             .addText("E-Mail: ", "strong")
             .addText("direktion[at]bsb-muenchen.de")
             .addHardBreak()
@@ -66,7 +66,7 @@ public class BaseWebpageControllerTest extends BaseControllerTest {
             .addText("DE-811259539                              ")
             .build());
     structuredContentDe.addContentBlock(
-        new ParagraphBuilder()
+        Paragraph.builder()
             .addText("Die Bayerische Staatsbibliothek ist eine dem ")
             .addLinkWithTitle(
                 "Bayerischen Staatsministerium für Wissenschaft und Kunst",

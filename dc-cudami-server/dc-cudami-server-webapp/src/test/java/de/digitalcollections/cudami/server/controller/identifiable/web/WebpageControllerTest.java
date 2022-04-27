@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +31,7 @@ class WebpageControllerTest extends BaseControllerTest {
       })
   public void pagedRootpages(String path) throws Exception {
     Website expected =
-        new WebsiteBuilder()
+        Website.builder()
             .withLabel(Locale.GERMAN, "MDZ Homepage Relaunch")
             .withUuid("7a2f1935-c5b8-40fb-8622-c675de0a6242")
             .withRefId(29)

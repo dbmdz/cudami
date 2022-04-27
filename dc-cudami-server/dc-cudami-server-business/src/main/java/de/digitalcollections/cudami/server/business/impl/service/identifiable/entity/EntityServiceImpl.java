@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
@@ -81,11 +82,17 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
     // business logic that defines, what "active" means
     LocalDate now = LocalDate.now();
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("publicationStart")
-            .lessOrEqualAndSet(now)
-            .filter("publicationEnd")
-            .greaterOrNotSet(now)
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("publicationStart")
+                    .lessOrEqualAndSet(now)
+                    .build())
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("publicationEnd")
+                    .greaterOrNotSet(now)
+                    .build())
             .build();
     return filtering;
   }

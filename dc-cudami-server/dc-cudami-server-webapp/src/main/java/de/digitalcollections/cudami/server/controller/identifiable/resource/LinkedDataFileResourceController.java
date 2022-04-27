@@ -71,7 +71,7 @@ public class LinkedDataFileResourceController {
               encodedUriFilterCriterion.getOperation(),
               URLDecoder.decode(
                   (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      Filtering filtering = Filtering.builder().add("uri", uri).build();
       pageRequest.setFiltering(filtering);
     }
 
@@ -101,7 +101,7 @@ public class LinkedDataFileResourceController {
               encodedUriFilterCriterion.getOperation(),
               URLDecoder.decode(
                   (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      Filtering filtering = Filtering.builder().add("uri", uri).build();
       searchPageRequest.setFiltering(filtering);
     }
 

@@ -12,7 +12,6 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import java.util.List;
@@ -44,7 +43,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   public void getDigitalObjectByIdentifier(String path) throws Exception {
 
     DigitalObject expected =
-        new DigitalObjectBuilder()
+        DigitalObject.builder()
             .withUuid("1c419226-8d61-4efa-923a-7fbaf961eb9d")
             .createdAt("2020-08-21T07:49:37.004443")
             .withIdentifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
@@ -76,7 +75,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
     PageResponse<DigitalObject> expected = new PageResponse<>();
     expected.setContent(
         List.of(
-            new DigitalObjectBuilder()
+            DigitalObject.builder()
                 .withUuid("7593c90e-6fb7-49b4-a70b-032761c9bbcd")
                 .createdAt("2020-08-21T07:49:37.004443")
                 .withIdentifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
@@ -87,7 +86,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
                     "abe16b03-c5d5-41a6-9475-f742e06ae881",
                     "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb10000001_00003/full/250,/0/default.jpg")
                 .withRefId(72)
-                .withParent(new DigitalObjectBuilder().withUuid(parentUuid).build())
+                .withParent(DigitalObject.builder().withUuid(parentUuid).build())
                 .build()));
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
