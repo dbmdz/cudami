@@ -13,6 +13,7 @@ import de.digitalcollections.model.filter.FilterCriterion;
 import de.digitalcollections.model.filter.FilterOperation;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
@@ -44,7 +45,7 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("label")
                 .withTotalElements(1)
                 .withContent(
-                    FileResource.builder()
+                    LinkedDataFileResource.builder()
                         .withUuid("12345678-abcd-1234-abcd-123456789012")
                         .withLabel(Locale.GERMAN, "Test-Label")
                         .withMimeType(MimeType.MIME_APPLICATION_XML)

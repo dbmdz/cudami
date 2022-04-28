@@ -1,14 +1,14 @@
 {
   "content": [
     {
-      "objectType": "FILE_RESOURCE",
+      "objectType": "LINKED_DATA",
       "uuid": "12345678-abcd-1234-abcd-123456789012",
       "identifiers": [],
       "label": {
         "de": "Test-Label"
       },
       "type": "RESOURCE",
-      "fileResourceType": "UNDEFINED",
+      "fileResourceType": "LINKED_DATA",
       "filename": "bla.xml",
       "mimeType": "application/xml",
       "readonly": false,
