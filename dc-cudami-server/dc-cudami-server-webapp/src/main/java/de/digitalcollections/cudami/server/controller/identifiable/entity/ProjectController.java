@@ -127,14 +127,6 @@ public class ProjectController {
     return projectService.find(searchPageRequest);
   }
 
-  @Operation(summary = "Get all projects as list")
-  @GetMapping(
-      value = {"/v6/projects/all", "/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Project> getAll() {
-    return projectService.getAllFull();
-  }
-
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
