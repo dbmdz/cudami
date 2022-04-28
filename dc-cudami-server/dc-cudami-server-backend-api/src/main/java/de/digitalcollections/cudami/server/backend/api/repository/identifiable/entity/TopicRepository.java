@@ -57,7 +57,7 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   List<Topic> getTopicsOfFileResource(UUID fileResourceUuid);
 
-  default List<Entity> saveEntities(Topic topic, List<Entity> entities) {
+  default List<Entity> setEntities(Topic topic, List<Entity> entities) {
     if (topic == null) {
       return null;
     }
@@ -66,7 +66,7 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   List<Entity> setEntities(UUID topicUuid, List<Entity> entities);
 
-  default List<FileResource> saveFileResources(Topic topic, List<FileResource> fileResources) {
+  default List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources) {
     if (topic == null) {
       return null;
     }

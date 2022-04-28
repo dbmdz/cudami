@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.advice;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.security.Role;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class GlobalControllerAdvice {
   private final RoleEditor roleEditor;
   private final String version;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
   public GlobalControllerAdvice(
       RoleEditor roleEditor, @Value("${info.app.project.version}") String version) {
     this.roleEditor = roleEditor;

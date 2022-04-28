@@ -49,7 +49,7 @@ public interface ProjectRepository extends EntityRepository<Project> {
 
   boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
 
-  default boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
+  default boolean setDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     if (project == null || digitalObjects == null) {
       return false;
     }

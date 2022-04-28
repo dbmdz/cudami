@@ -68,6 +68,8 @@ public class EntityRelationRepositoryTest {
             Map.of(Locale.ENGLISH, "subject entity label"),
             Map.of(Locale.ENGLISH, "object entity label"),
             predicate.getValue());
+    entityRepository.save(entityRelation.getSubject());
+    entityRepository.save(entityRelation.getObject());
     predicateRepository.save(predicate);
     List<EntityRelation> actual = repository.save(List.of(entityRelation));
 
@@ -96,6 +98,11 @@ public class EntityRelationRepositoryTest {
                       "is_test");
               relations.add(entityRelation);
             });
+    relations.forEach(
+        rel -> {
+          entityRepository.save(rel.getSubject());
+          entityRepository.save(rel.getObject());
+        });
     repository.save(relations);
 
     PageRequest request = new PageRequest(0, 10);

@@ -19,6 +19,7 @@ import org.apache.tomcat.util.http.fileupload.FileItemStream;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +35,8 @@ public class FileResourceBinaryController {
 
   public FileResourceBinaryController(
       FileResourceBinaryService binaryService,
-      FileResourceMetadataService<FileResource> metadataService) {
+      @Qualifier("fileResourceMetadataService")
+          FileResourceMetadataService<FileResource> metadataService) {
     this.binaryService = binaryService;
     this.metadataService = metadataService;
   }

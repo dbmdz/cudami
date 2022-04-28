@@ -3,9 +3,11 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.paging.SearchPageRequest;
@@ -31,9 +33,17 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
       WebsiteRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
       CudamiConfig cudamiConfig,
+      LocaleService localeService,
       WebpageService webpageService) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
     this.webpageService = webpageService;
   }
 

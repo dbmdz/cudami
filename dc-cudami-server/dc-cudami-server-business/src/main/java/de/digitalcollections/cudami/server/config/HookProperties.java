@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.config;
 
 import de.digitalcollections.model.identifiable.entity.EntityType;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -19,6 +20,6 @@ public class HookProperties {
   }
 
   public void setHooks(Map<String, String> hooks) {
-    this.hooks = hooks;
+    this.hooks = hooks != null ? Map.copyOf(hooks) : Collections.EMPTY_MAP;
   }
 }

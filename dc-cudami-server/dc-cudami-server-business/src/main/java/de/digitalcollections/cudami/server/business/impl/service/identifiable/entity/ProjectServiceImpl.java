@@ -3,8 +3,10 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -16,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -25,13 +26,20 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
-  @Autowired
   public ProjectServiceImpl(
       ProjectRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
   }
 
   @Override

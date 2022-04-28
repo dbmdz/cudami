@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -40,8 +41,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       WebpageRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(repository, identifierRepository, urlAliasService, localeService, cudamiConfig);
   }
 
   @Override

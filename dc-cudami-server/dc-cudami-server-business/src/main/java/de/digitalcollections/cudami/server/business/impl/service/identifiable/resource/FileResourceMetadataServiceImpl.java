@@ -28,8 +28,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -40,31 +38,27 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataServiceImpl.class);
 
-  private final ApplicationFileResourceService applicationFileResourceService;
-  private final AudioFileResourceService audioFileResourceService;
-  private final ImageFileResourceService imageFileResourceService;
-  private final LinkedDataFileResourceService linkedDataFileResourceService;
+  protected final ApplicationFileResourceService applicationFileResourceService;
+  protected final AudioFileResourceService audioFileResourceService;
+  protected final ImageFileResourceService imageFileResourceService;
+  protected final LinkedDataFileResourceService linkedDataFileResourceService;
   private final LocaleService localeService;
-  private final TextFileResourceService textFileResourceService;
-  private final VideoFileResourceService videoFileResourceService;
+  protected final TextFileResourceService textFileResourceService;
+  protected final VideoFileResourceService videoFileResourceService;
 
-  @Autowired
   public FileResourceMetadataServiceImpl(
-      @Qualifier("fileResourceMetadataRepositoryImpl")
-          FileResourceMetadataRepository<FileResource> metadataRepository,
-      @Qualifier("applicationFileResourceServiceImpl")
-          ApplicationFileResourceService applicationFileResourceService,
-      @Qualifier("audioFileResourceServiceImpl") AudioFileResourceService audioFileResourceService,
-      @Qualifier("imageFileResourceServiceImpl") ImageFileResourceService imageFileResourceService,
-      @Qualifier("linkedDataFileResourceServiceImpl")
-          LinkedDataFileResourceService linkedDataFileResourceService,
-      @Qualifier("textFileResourceServiceImpl") TextFileResourceService textFileResourceService,
-      @Qualifier("videoFileResourceServiceImpl") VideoFileResourceService videoFileResourceService,
+      FileResourceMetadataRepository<FileResource> metadataRepository,
+      ApplicationFileResourceService applicationFileResourceService,
+      AudioFileResourceService audioFileResourceService,
+      ImageFileResourceService imageFileResourceService,
+      LinkedDataFileResourceService linkedDataFileResourceService,
+      TextFileResourceService textFileResourceService,
+      VideoFileResourceService videoFileResourceService,
       LocaleService localeService,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
       CudamiConfig cudamiConfig) {
-    super(metadataRepository, identifierRepository, urlAliasService, cudamiConfig);
+    super(metadataRepository, identifierRepository, urlAliasService, localeService, cudamiConfig);
     this.applicationFileResourceService = applicationFileResourceService;
     this.audioFileResourceService = audioFileResourceService;
     this.imageFileResourceService = imageFileResourceService;

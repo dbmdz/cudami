@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -126,7 +127,7 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can save and retrieve a DigitalObject with all of its embedded resources")
+  @DisplayName("can save and retrieve a DigitalObject with its directly embedded resources")
   void saveDigitalObject() {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
@@ -152,30 +153,6 @@ class DigitalObjectRepositoryImplTest {
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
-    // Insert a LinkedDataFileResource
-    LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .build();
-
-    linkedDataFileResourceRepository.save(linkedDataFileResource);
-
-    // Insert a rendering FileResource
-    FileResource renderingResource = new FileResource();
-    renderingResource.setUri(URI.create("https://bla.bla/foo.jpg"));
-    renderingResource.setMimeType(MimeType.MIME_IMAGE);
-    renderingResource.setUuid(UUID.randomUUID());
-    renderingResource.setFilename("foo.jpg");
-    renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
-    FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
-        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
-    fileResourceMetadataRepository.save(renderingResource);
-
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
         new CreationInfoBuilder()
@@ -195,8 +172,6 @@ class DigitalObjectRepositoryImplTest {
             .withDescription(Locale.ENGLISH, "description")
             .withLicense(EXISTING_LICENSE)
             .withCreationInfo(creationInfo)
-            .withLinkedDataFileResource(linkedDataFileResource)
-            .withRenderingResource(renderingResource)
             .withParent(parent)
             .build();
 
@@ -215,12 +190,6 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
         .isEqualTo("2022-02-25");
     assertThat(actual.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
-
-    assertThat(actual.getLinkedDataResources()).hasSize(1);
-    assertThat(actual.getLinkedDataResources().get(0)).isEqualTo(linkedDataFileResource);
-
-    assertThat(actual.getRenderingResources()).hasSize(1);
-    assertThat(actual.getRenderingResources().get(0)).isEqualTo(renderingResource);
 
     assertThat(actual.getParent()).isNotNull();
     assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
@@ -322,7 +291,10 @@ class DigitalObjectRepositoryImplTest {
         identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace2", "2"));
 
     // Step3: Create and persist an identifier for another DigitalObject
-    identifierRepositoryImpl.save(new Identifier(UUID.randomUUID(), "namespace1", "other"));
+    DigitalObject otherDigitalObject =
+        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Anderes Label").build();
+    DigitalObject otherPersisted = repo.save(otherDigitalObject);
+    identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
@@ -339,7 +311,7 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("returns the fully filled DigitalObject by getByIdentifer")
+  @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() {
     DigitalObject digitalObject = buildDigitalObject();
     digitalObject = repo.save(digitalObject);
@@ -351,8 +323,6 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualCreationInfo).isNotNull();
     assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
         .isEqualTo("Körperschaft");
-    assertThat(actual.getLinkedDataResources()).isNotEmpty();
-    assertThat(actual.getRenderingResources()).isNotEmpty();
     assertThat(actual.getParent()).isNotNull();
   }
 

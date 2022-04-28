@@ -65,7 +65,7 @@ public interface CollectionRepository
    */
   boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
 
-  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }

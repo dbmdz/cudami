@@ -7,7 +7,11 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Search
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +114,35 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         sqlInsertFields,
         sqlInsertValues,
         sqlUpdateFieldValues,
+        offsetForAlternativePaging);
+  }
+
+  protected FileResourceMetadataRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      String sqlSelectAllFields,
+      String sqlSelectReducedFields,
+      String sqlInsertFields,
+      String sqlInsertValues,
+      String sqlUpdateFieldValues,
+      String sqlSelectAllFieldsJoins,
+      BiFunction<Map<UUID, F>, RowView, Map<UUID, F>> additionalReduceRowsBiFunction,
+      int offsetForAlternativePaging) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        FileResource.class,
+        sqlSelectAllFields,
+        sqlSelectReducedFields,
+        sqlInsertFields,
+        sqlInsertValues,
+        sqlUpdateFieldValues,
+        sqlSelectAllFieldsJoins,
+        additionalReduceRowsBiFunction,
         offsetForAlternativePaging);
   }
 

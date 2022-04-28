@@ -25,13 +25,11 @@ import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationB
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.production.CreationInfo;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -65,10 +63,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + " AS "
           + LicenseRepositoryImpl.TABLE_ALIAS
           + " ON "
-          + LicenseRepositoryImpl.TABLE_ALIAS
-          + ".uuid = "
           + TABLE_ALIAS
-          + ".license_uuid";
+          + ".license_uuid = "
+          + LicenseRepositoryImpl.TABLE_ALIAS
+          + ".uuid";
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
@@ -327,58 +325,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    final String ldfrTableAlias = linkedDataFileResourceRepositoryImpl.getTableAlias();
-    final String ldfrTableName = linkedDataFileResourceRepositoryImpl.getTableName();
-    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT dl.sortindex as idx, * FROM "
-                + ldfrTableName
-                + " AS "
-                + ldfrTableAlias
-                + " INNER JOIN digitalobject_linkeddataresources AS dl ON "
-                + ldfrTableAlias
-                + ".uuid = dl.linkeddata_fileresource_uuid"
-                + " WHERE dl.digitalobject_uuid = :uuid"
-                + " ORDER by idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<LinkedDataFileResource> linkedDataFileResources =
-        linkedDataFileResourceRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return linkedDataFileResources;
-  }
-
-  @Override
-  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
-    final String rfrTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
-    final String rfrTableName = fileResourceMetadataRepositoryImpl.getTableName();
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT dr.sortindex as idx, * FROM "
-                + rfrTableName
-                + " AS "
-                + rfrTableAlias
-                + " INNER JOIN digitalobject_renderingresources AS dr ON "
-                + rfrTableAlias
-                + ".uuid = dr.fileresource_uuid"
-                + " WHERE dr.digitalobject_uuid = :uuid"
-                + " ORDER by idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<FileResource> fileResources =
-        fileResourceMetadataRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return fileResources;
-  }
-
-  @Override
   public Item getItem(UUID digitalObjectUuid) {
     final String itTableAlias = itemRepositoryImpl.getTableAlias();
     String sqlAdditionalJoins =
@@ -534,20 +480,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       return;
     }
 
-    UUID uuid = digitalObject.getUuid();
-
-    // Look for linked data file resources. If they exist, fill the DigitalObject
-    List<LinkedDataFileResource> linkedDataFileResources = getLinkedDataFileResources(uuid);
-    if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
-      digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
-    }
-
-    // Look for rendering resources. If they exist, fill the object
-    List<FileResource> renderingResources = getRenderingFileResources(uuid);
-    if (renderingResources != null && !renderingResources.isEmpty()) {
-      digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
-    }
-
     // Fill the previewImage
     UUID previewImageUuid =
         digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;
@@ -606,14 +538,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public DigitalObject save(DigitalObject digitalObject) {
     super.save(digitalObject);
 
-    // save the rendering resources, which are also FileResources
-    final List<FileResource> renderingResources = digitalObject.getRenderingResources();
-    saveRenderingResources(digitalObject, renderingResources);
-
-    // save the linked data resources
-    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
-    saveLinkedDataFileResources(digitalObject, linkedDataResources);
-
     DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;
   }
@@ -658,92 +582,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> setRenderingResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
-    // as we store the whole list new: delete old entries
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM digitalobject_renderingresources WHERE digitalobject_uuid = :uuid")
-                .bind("uuid", digitalObjectUuid)
-                .execute());
-
-    if (renderingResources != null) {
-      // first save rendering resources
-      for (FileResource renderingResource : renderingResources) {
-        if (renderingResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save(renderingResource);
-        }
-      }
-
-      // second: save relations to digital object
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO digitalobject_renderingresources(digitalobject_uuid, fileresource_uuid, sortIndex) VALUES(:uuid, :fileResourceUuid, :sortIndex)");
-            for (FileResource renderingResource : renderingResources) {
-              preparedBatch
-                  .bind("uuid", digitalObjectUuid)
-                  .bind("fileResourceUuid", renderingResource.getUuid())
-                  .bind("sortIndex", getIndex(renderingResources, renderingResource))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
-    }
-    return getRenderingFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
-    // as we store the whole list new: delete old entries
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM digitalobject_linkeddataresources WHERE digitalobject_uuid = :uuid")
-                .bind("uuid", digitalObjectUuid)
-                .execute());
-
-    if (linkedDataFileResources != null) {
-      // first save linked data resources
-      for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
-        if (linkedDataFileResource.getUuid() == null) {
-          linkedDataFileResourceRepositoryImpl.save(linkedDataFileResource);
-        }
-      }
-
-      // second: save relations to digital object
-      dbi.useHandle(
-          handle -> {
-            PreparedBatch preparedBatch =
-                handle.prepareBatch(
-                    "INSERT INTO digitalobject_linkeddataresources(digitalobject_uuid, linkeddata_fileresource_uuid, sortIndex) VALUES(:uuid, :linkedDataFileResourceUuid, :sortIndex)");
-            for (LinkedDataFileResource linkedDataFileResource : linkedDataFileResources) {
-              preparedBatch
-                  .bind("uuid", digitalObjectUuid)
-                  .bind("linkedDataFileResourceUuid", linkedDataFileResource.getUuid())
-                  .bind("sortIndex", getIndex(linkedDataFileResources, linkedDataFileResource))
-                  .add();
-            }
-            preparedBatch.execute();
-          });
-    }
-    return getLinkedDataFileResources(digitalObjectUuid);
-  }
-
-  @Override
   public DigitalObject update(DigitalObject digitalObject) {
     super.update(digitalObject);
-
-    // save the rendering resources, which are also FileResources
-    final List<FileResource> renderingResources = digitalObject.getRenderingResources();
-    saveRenderingResources(digitalObject, renderingResources);
-
-    // save the linked data resources
-    final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
-    saveLinkedDataFileResources(digitalObject, linkedDataResources);
 
     DigitalObject result = getByUuid(digitalObject.getUuid());
     return result;

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.a
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.FamilyNameRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
@@ -24,7 +25,8 @@ public class FamilyNameServiceImpl extends IdentifiableServiceImpl<FamilyName>
       FamilyNameRepository repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(repository, identifierRepository, urlAliasService, localeService, cudamiConfig);
   }
 }

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -22,7 +23,6 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
@@ -50,12 +50,14 @@ class IdentifiableServiceImplTest {
     urlAliasService = mock(UrlAliasService.class);
     when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
     identifierRepository = mock(IdentifierRepository.class);
-    CudamiConfig cudamiConfig = new CudamiConfig();
-    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias();
-    urlAliasConfig.setGenerationExcludes(List.of(EntityType.DIGITAL_OBJECT));
-    cudamiConfig.setUrlAlias(urlAliasConfig);
+    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
+    CudamiConfig cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
+
+    LocaleService localeService = mock(LocaleService.class);
+
     service =
-        new IdentifiableServiceImpl(repo, identifierRepository, urlAliasService, cudamiConfig);
+        new IdentifiableServiceImpl(
+            repo, identifierRepository, urlAliasService, localeService, cudamiConfig);
   }
 
   @DisplayName("can add related entities by delegating it to the repository")

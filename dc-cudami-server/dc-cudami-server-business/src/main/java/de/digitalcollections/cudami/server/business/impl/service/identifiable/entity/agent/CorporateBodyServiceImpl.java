@@ -4,17 +4,18 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
+import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
+import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -27,15 +28,22 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
   private final ExternalCorporateBodyRepository externalRepository;
   private final ImageFileResourceService imageFileResourceService;
 
-  @Autowired
   public CorporateBodyServiceImpl(
       CorporateBodyRepository repository,
       ExternalCorporateBodyRepository externalRepository,
       ImageFileResourceService imageFileResourceService,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      HookProperties hookProperties,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
-    super(repository, identifierRepository, urlAliasService, cudamiConfig);
+    super(
+        repository,
+        identifierRepository,
+        urlAliasService,
+        hookProperties,
+        localeService,
+        cudamiConfig);
     this.externalRepository = externalRepository;
     this.imageFileResourceService = imageFileResourceService;
   }

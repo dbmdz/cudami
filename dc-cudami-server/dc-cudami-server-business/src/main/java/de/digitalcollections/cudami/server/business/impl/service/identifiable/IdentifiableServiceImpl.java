@@ -32,7 +32,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,21 +44,22 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   private CudamiConfig cudamiConfig;
   protected IdentifierRepository identifierRepository;
 
-  @Autowired private LocaleService localeService;
+  private LocaleService localeService;
 
   protected IdentifiableRepository<I> repository;
 
   private UrlAliasService urlAliasService;
 
-  @Autowired
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
+      LocaleService localeService,
       CudamiConfig cudamiConfig) {
     this.repository = repository;
     this.identifierRepository = identifierRepository;
     this.urlAliasService = urlAliasService;
+    this.localeService = localeService;
     this.cudamiConfig = cudamiConfig;
   }
 
@@ -330,6 +330,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       throw new IdentifiableServiceException(e.getMessage());
     }
     try {
+      // If we do not want any UrlAliases for this kind of identifiable, we return early
+      if (IdentifiableUrlAliasAlignHelper.checkIdentifiableExcluded(identifiable, cudamiConfig)) {
+        return repository.getByUuid(identifiable.getUuid());
+      }
+
       // UrlAliases
       IdentifiableUrlAliasAlignHelper.alignForUpdate(
           identifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);

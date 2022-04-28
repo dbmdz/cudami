@@ -370,7 +370,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     Filtering filtering =
         Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build();
     filtering.add(
-        Filtering.defaultBuilder().filter("targetLanguage").isEquals(targetLanguage).build());
+        Filtering.defaultBuilder()
+            .filter("targetLanguage")
+            .isEquals(targetLanguage.getLanguage())
+            .build());
     filtering.add(Filtering.defaultBuilder().filter("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
     addFiltering(filtering, sql, bindings);
@@ -429,6 +432,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createQuery(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
+                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
@@ -456,6 +460,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createUpdate(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
+                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
                       .execute());
       if (affected != 1) {
         throw new UrlAliasRepositoryException(

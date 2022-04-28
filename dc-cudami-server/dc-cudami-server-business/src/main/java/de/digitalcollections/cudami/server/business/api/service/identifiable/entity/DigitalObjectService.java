@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -47,11 +48,12 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
 
-  default List<FileResource> getRenderingResources(DigitalObject digitalObject) {
+  default List<FileResource> getRenderingResources(DigitalObject digitalObject)
+      throws CudamiServiceException {
     return getRenderingResources(digitalObject.getUuid());
   }
 
-  List<FileResource> getRenderingResources(UUID digitalObjectUuid);
+  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
 
   default Item getItem(DigitalObject digitalObject) {
     if (digitalObject == null) {
@@ -84,18 +86,19 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 
-  default List<FileResource> setRenderingResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources) {
-    if (renderingResources == null) {
+  default List<FileResource> setRenderingFileResources(
+      DigitalObject digitalObject, List<FileResource> renderingFileResources)
+      throws CudamiServiceException {
+    if (renderingFileResources == null) {
       return null;
     }
-    return setRenderingResources(digitalObject.getUuid(), renderingResources);
+    return setRenderingFileResources(digitalObject.getUuid(), renderingFileResources);
   }
 
-  List<FileResource> setRenderingResources(
+  List<FileResource> setRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingFileResources);
 
-  default List<LinkedDataFileResource> saveLinkedDataFileResources(
+  default List<LinkedDataFileResource> setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources) {
     if (linkedDataFileResources == null) {
       return null;
