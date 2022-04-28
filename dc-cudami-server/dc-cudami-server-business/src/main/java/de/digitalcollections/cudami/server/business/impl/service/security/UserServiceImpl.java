@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
 
   @Override
   public boolean doesActiveAdminUserExist() {
-    List findActiveAdminUsers = userRepository.findActiveAdminUsers();
+    List findActiveAdminUsers = userRepository.getActiveAdminUsers();
     if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
       return true;
     }
@@ -75,8 +75,8 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
 
   @Override
   //  @Transactional(readOnly = true)
-  public List<User> findActiveAdminUsers() {
-    return userRepository.findActiveAdminUsers();
+  public List<User> getActiveAdminUsers() {
+    return userRepository.getActiveAdminUsers();
   }
 
   @Override
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   */
   @Override
   //  @Transactional(readOnly = true, noRollbackFor = UsernameNotFoundException.class)
-  public User loadUserByUsername(String username) throws UsernameNotFoundException {
+  public User getByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.getByEmail(username);
     if (user == null || !user.isEnabled()) {
       throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));

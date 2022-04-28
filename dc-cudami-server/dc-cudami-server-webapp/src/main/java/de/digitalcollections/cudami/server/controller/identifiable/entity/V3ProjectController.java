@@ -61,7 +61,7 @@ public class V3ProjectController {
   @GetMapping(
       value = {"/v3/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getDigitalObjects(
+  public ResponseEntity<String> findDigitalObjects(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",
@@ -90,7 +90,7 @@ public class V3ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
     PageResponse<DigitalObject> response =
-        projectService.getDigitalObjects(project, searchPageRequest);
+        projectService.findDigitalObjects(project, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));

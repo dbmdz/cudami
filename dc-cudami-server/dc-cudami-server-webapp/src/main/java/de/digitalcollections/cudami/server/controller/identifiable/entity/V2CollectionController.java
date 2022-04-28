@@ -117,7 +117,7 @@ public class V2CollectionController {
   @GetMapping(
       value = {"/v2/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findAll(
+  public ResponseEntity<String> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",

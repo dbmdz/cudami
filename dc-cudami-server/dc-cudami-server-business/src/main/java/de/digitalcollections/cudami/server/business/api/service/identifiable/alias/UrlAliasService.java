@@ -19,8 +19,8 @@ public interface UrlAliasService {
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  default UrlAlias create(UrlAlias urlAlias) throws CudamiServiceException {
-    return this.create(urlAlias, false);
+  default UrlAlias save(UrlAlias urlAlias) throws CudamiServiceException {
+    return save(urlAlias, false);
   }
   /**
    * Create an UrlAlias in the database
@@ -30,7 +30,7 @@ public interface UrlAliasService {
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  UrlAlias create(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
+  UrlAlias save(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
 
   /**
    * Delete a single UrlAlias by its UUID
@@ -63,7 +63,7 @@ public interface UrlAliasService {
    * @throws CudamiServiceException
    */
   default boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException {
-    return this.deleteAllForTarget(uuid, false);
+    return deleteAllForTarget(uuid, false);
   }
 
   /**
@@ -93,7 +93,7 @@ public interface UrlAliasService {
    * @return the LocalizedUrlAliases, if found, or null
    * @throws CudamiServiceException in case of an error
    */
-  LocalizedUrlAliases findLocalizedUrlAliases(UUID uuid) throws CudamiServiceException;
+  LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws CudamiServiceException;
 
   /**
    * Returns the primary Links (one per language) as LocalizedUrlAliases for a given slug for a
@@ -107,7 +107,7 @@ public interface UrlAliasService {
    * @return LocalizedUrlAliases, if a primary link exists; otherwise: null.
    * @throws CudamiServiceException in case of an error
    */
-  LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug, Locale pLocale)
+  LocalizedUrlAliases getPrimaryUrlAliases(UUID websiteUuid, String slug, Locale pLocale)
       throws CudamiServiceException;
 
   /**
@@ -116,7 +116,7 @@ public interface UrlAliasService {
    * @param targetUuid UUID of the identifiable that the primaries should be found for
    * @return {@code List}, not {@code null}
    */
-  List<UrlAlias> findPrimaryLinksForTarget(UUID targetUuid) throws CudamiServiceException;
+  List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws CudamiServiceException;
 
   /**
    * Generates a not yet existing slug for the provided label, language and websiteUuid. If the

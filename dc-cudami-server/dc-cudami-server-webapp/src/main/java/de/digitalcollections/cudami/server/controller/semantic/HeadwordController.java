@@ -69,7 +69,7 @@ public class HeadwordController {
   @GetMapping(
       value = {"/v5/headwords"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Headword> findAll(
+  public PageResponse<Headword> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -104,7 +104,7 @@ public class HeadwordController {
   @GetMapping(
       value = {"/v5/headwords/random"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Headword> findRandom(
+  public List<Headword> getRandom(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return headwordService.getRandom(count);
   }
@@ -123,26 +123,26 @@ public class HeadwordController {
   @GetMapping(
       value = {"/v5/headwords/{uuid}/related/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Entity> getRelatedEntities(
+  public PageResponse<Entity> findRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.getRelatedEntities(uuid, pageRequest);
+    return headwordService.findRelatedEntities(uuid, pageRequest);
   }
 
   @Operation(summary = "Get related file resources of an headword")
   @GetMapping(
       value = {"/v5/headwords/{uuid}/related/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<FileResource> getRelatedFileResources(
+  public PageResponse<FileResource> findRelatedFileResources(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.getRelatedFileResources(uuid, pageRequest);
+    return headwordService.findRelatedFileResources(uuid, pageRequest);
   }
 
   @Operation(summary = "Save a newly created headword")
@@ -158,22 +158,22 @@ public class HeadwordController {
   @PostMapping(
       value = {"/v5/headwords/{uuid}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> saveRelatedEntities(
+  public List<Entity> setRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<Entity> entities) {
-    return headwordService.saveRelatedEntities(uuid, entities);
+    return headwordService.setRelatedEntities(uuid, entities);
   }
 
   @Operation(summary = "Save list of related fileresources for a given headword")
   @PostMapping(
       value = {"/v5/headwords/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return headwordService.saveRelatedFileResources(uuid, fileResources);
+    return headwordService.setRelatedFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update an headword")

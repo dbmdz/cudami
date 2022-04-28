@@ -179,7 +179,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public LocalizedUrlAliases findAllForTarget(UUID uuid) throws UrlAliasRepositoryException {
+  public LocalizedUrlAliases getAllForTarget(UUID uuid) throws UrlAliasRepositoryException {
     if (uuid == null) {
       return new LocalizedUrlAliases();
     }

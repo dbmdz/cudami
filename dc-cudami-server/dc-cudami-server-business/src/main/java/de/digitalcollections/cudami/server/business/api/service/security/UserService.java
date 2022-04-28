@@ -25,11 +25,11 @@ public interface UserService<T extends User> {
 
   PageResponse<T> find(PageRequest pageRequest);
 
-  List<T> findActiveAdminUsers();
+  List<T> getActiveAdminUsers();
 
   T getByUuid(UUID uuid);
 
-  T loadUserByUsername(String string) throws UsernameNotFoundException;
+  T getByUsername(String string) throws UsernameNotFoundException;
 
   T save(T user, Errors results);
 

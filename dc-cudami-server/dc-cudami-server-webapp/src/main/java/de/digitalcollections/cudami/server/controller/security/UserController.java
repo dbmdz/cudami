@@ -36,7 +36,7 @@ public class UserController {
   @GetMapping(
       value = {"/v5/users", "/v2/users", "/latest/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<User> findAll(
+  public PageResponse<User> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
@@ -55,7 +55,8 @@ public class UserController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<User> getByRoleAndStatus(
       @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
-    return userService.findActiveAdminUsers();
+    // FIXME: ignores role, just returns admins? what if we want other role users?
+    return userService.getActiveAdminUsers();
   }
 
   @Operation(summary = "Get user by email address")
@@ -64,7 +65,7 @@ public class UserController {
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User getByUsername(@RequestParam(name = "email") String email) {
-    return userService.loadUserByUsername(email);
+    return userService.getByUsername(email);
   }
 
   @Operation(summary = "Get user by uuid")

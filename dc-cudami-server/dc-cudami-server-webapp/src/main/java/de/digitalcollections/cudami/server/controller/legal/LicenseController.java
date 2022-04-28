@@ -130,8 +130,8 @@ public class LicenseController {
   @GetMapping(
       value = {"/v5/licenses/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<License> findAll() {
-    return service.findAll();
+  public List<License> getAll() {
+    return service.getAll();
   }
 
   @Operation(summary = "Get a license by url")

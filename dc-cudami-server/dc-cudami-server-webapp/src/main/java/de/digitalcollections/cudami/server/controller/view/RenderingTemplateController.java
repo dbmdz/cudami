@@ -35,7 +35,7 @@ public class RenderingTemplateController {
   @GetMapping(
       value = {"/v5/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<RenderingTemplate> findAll(
+  public PageResponse<RenderingTemplate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {

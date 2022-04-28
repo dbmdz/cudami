@@ -26,8 +26,8 @@ public class PredicateServiceImpl implements PredicateService {
   }
 
   @Override
-  public List<Predicate> findAll() {
-    return repository.findAll();
+  public List<Predicate> getAll() {
+    return repository.getAll();
   }
 
   @Override

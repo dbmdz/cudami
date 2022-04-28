@@ -82,7 +82,7 @@ public class ItemController {
   @GetMapping(
       value = {"/v5/items", "/v2/items", "/latest/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Item> findAll(
+  public PageResponse<Item> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,

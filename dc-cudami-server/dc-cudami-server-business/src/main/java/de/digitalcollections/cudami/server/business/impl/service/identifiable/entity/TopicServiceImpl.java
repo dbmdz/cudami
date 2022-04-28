@@ -58,8 +58,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Entity> getAllEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getAllEntities(topicUuid);
+  public List<Entity> getEntities(UUID topicUuid) {
+    return ((TopicRepository) repository).getEntities(topicUuid);
   }
 
   @Override
@@ -73,13 +73,13 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public PageResponse<Topic> getChildren(UUID nodeUuid, PageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).getChildren(nodeUuid, pageRequest);
+  public PageResponse<Topic> findChildren(UUID nodeUuid, PageRequest pageRequest) {
+    return ((NodeRepository<Topic>) repository).findChildren(nodeUuid, pageRequest);
   }
 
   @Override
-  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).getEntities(topicUuid, pageRequest);
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).findEntities(topicUuid, pageRequest);
   }
 
   @Override
@@ -88,8 +88,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).getFileResources(topicUuid, pageRequest);
+  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).findFileResources(topicUuid, pageRequest);
   }
 
   @Override
@@ -113,8 +113,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public PageResponse<Topic> getRootNodes(PageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).getRootNodes(pageRequest);
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Topic>) repository).findRootNodes(pageRequest);
   }
 
   @Override
@@ -138,13 +138,13 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Entity> saveEntities(UUID topicUuid, List<Entity> entities) {
-    return ((TopicRepository) repository).saveEntities(topicUuid, entities);
+  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
+    return ((TopicRepository) repository).setEntities(topicUuid, entities);
   }
 
   @Override
-  public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
-    return ((TopicRepository) repository).saveFileResources(topicUuid, fileResources);
+  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources) {
+    return ((TopicRepository) repository).setFileResources(topicUuid, fileResources);
   }
 
   @Override

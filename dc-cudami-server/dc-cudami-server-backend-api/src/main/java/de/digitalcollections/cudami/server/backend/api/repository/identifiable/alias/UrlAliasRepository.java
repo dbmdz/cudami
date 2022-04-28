@@ -31,7 +31,7 @@ public interface UrlAliasRepository {
    * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
    * @throws UrlAliasRepositoryException
    */
-  LocalizedUrlAliases findAllForTarget(UUID uuid) throws UrlAliasRepositoryException;
+  LocalizedUrlAliases getAllForTarget(UUID uuid) throws UrlAliasRepositoryException;
 
   /**
    * Retrieve all primary links corresponding to a slug. The owning website is ignored.

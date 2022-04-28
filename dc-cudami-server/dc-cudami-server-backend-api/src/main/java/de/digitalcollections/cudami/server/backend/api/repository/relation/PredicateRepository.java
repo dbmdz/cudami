@@ -15,7 +15,7 @@ public interface PredicateRepository {
    *
    * @return List of all predicates
    */
-  List<Predicate> findAll();
+  List<Predicate> getAll();
 
   /**
    * Returns a predicate, if available

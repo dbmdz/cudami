@@ -24,7 +24,7 @@ public class UniqueUsernameValidator implements Validator {
   public void validate(Object target, Errors errors) {
     User user = (User) target;
     try {
-      User existingUser = userService.loadUserByUsername(user.getEmail());
+      User existingUser = userService.getByUsername(user.getEmail());
       if (existingUser != null) {
         errors.rejectValue("email", "error.username_already_exists");
       }

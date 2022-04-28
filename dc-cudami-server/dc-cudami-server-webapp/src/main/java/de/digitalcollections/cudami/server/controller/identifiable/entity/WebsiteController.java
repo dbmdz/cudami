@@ -79,7 +79,7 @@ public class WebsiteController {
   @GetMapping(
       value = {"/v5/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Website> findAll(
+  public SearchPageResponse<Website> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",
@@ -176,7 +176,7 @@ public class WebsiteController {
   @GetMapping(
       value = {"/v5/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Webpage> getRootPages(
+  public SearchPageResponse<Webpage> findRootPages(
       @Parameter(
               name = "uuid",
               description = "the UUID of the parent webpage",
@@ -206,7 +206,7 @@ public class WebsiteController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return websiteService.findRootPages(uuid, searchPageRequest);
+    return websiteService.findRootWebpages(uuid, searchPageRequest);
   }
 
   @Operation(
@@ -294,7 +294,7 @@ public class WebsiteController {
     Website website = new Website();
     website.setUuid(uuid);
 
-    boolean successful = websiteService.updateRootPagesOrder(website, rootPages);
+    boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

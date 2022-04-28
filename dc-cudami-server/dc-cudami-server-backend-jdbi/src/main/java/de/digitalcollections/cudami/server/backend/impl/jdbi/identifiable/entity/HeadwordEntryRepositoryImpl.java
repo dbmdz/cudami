@@ -129,7 +129,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public List<HeadwordEntry> findByHeadword(UUID headwordUuid) {
+  public List<HeadwordEntry> getByHeadword(UUID headwordUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -251,13 +251,13 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
-    saveCreatorsList(headwordEntry, creators);
+    setCreatorsList(headwordEntry, creators);
 
     HeadwordEntry result = getByUuid(headwordEntry.getUuid());
     return result;
   }
 
-  private void saveCreatorsList(HeadwordEntry headwordEntry, List<Agent> creators) {
+  private void setCreatorsList(HeadwordEntry headwordEntry, List<Agent> creators) {
     UUID headwordEntryUuid = headwordEntry.getUuid();
 
     // as we store the whole list new: delete old entries
@@ -298,7 +298,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
-    saveCreatorsList(headwordEntry, creators);
+    setCreatorsList(headwordEntry, creators);
 
     HeadwordEntry result = getByUuid(headwordEntry.getUuid());
     return result;

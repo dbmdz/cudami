@@ -32,7 +32,7 @@ public class EntityRelationController {
   @GetMapping(
       value = {"/v5/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<EntityRelation> getEntitiesRelations(
+  public PageResponse<EntityRelation> findByPredicate(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "predicate", required = false) String predicate) {
@@ -74,7 +74,7 @@ public class EntityRelationController {
   @PutMapping(
       value = {"/v5/entities/relations", "/v3/entities/relations", "/latest/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityRelation> saveEntityRelations(@RequestBody List<EntityRelation> entityRelations) {
+  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations) {
     return entityRelationService.save(entityRelations);
   }
 }

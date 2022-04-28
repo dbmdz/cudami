@@ -11,5 +11,5 @@ public interface EntityRepository<E extends Entity> extends IdentifiableReposito
 
   E getByRefId(long refId);
 
-  List<E> findRandom(int count);
+  List<E> getRandom(int count);
 }

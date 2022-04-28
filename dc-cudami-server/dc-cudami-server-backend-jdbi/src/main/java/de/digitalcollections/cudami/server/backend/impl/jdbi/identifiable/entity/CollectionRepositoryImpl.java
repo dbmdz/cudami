@@ -320,7 +320,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Collection> findChildren(UUID uuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -370,7 +370,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
@@ -419,7 +419,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public PageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
@@ -493,7 +493,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
     final String cbTableAlias = corporateBodyRepositoryImpl.getTableAlias();
     final String cbTableName = corporateBodyRepositoryImpl.getTableName();
 
@@ -533,7 +533,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -621,7 +621,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+  public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->

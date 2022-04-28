@@ -97,7 +97,7 @@ public class ProjectController {
   @DeleteMapping(
       value = {"/v5/projects/{uuid}", "/v3/projects/{uuid}", "/latest/projects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity deleteProject(
+  public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID uuid) {
 
@@ -110,11 +110,11 @@ public class ProjectController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @Operation(summary = "Get all projects in reduced form (no identifiers)")
+  @Operation(summary = "Get all projects as (sorted, paged) list")
   @GetMapping(
       value = {"/v5/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Project> findAll(
+  public PageResponse<Project> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -127,22 +127,15 @@ public class ProjectController {
     return projectService.find(searchPageRequest);
   }
 
-  @Operation(summary = "Get all projects as list")
-  @GetMapping(
-      value = {"/v5/projectlist", "/v2/projectlist", "/latest/projectlist"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Project> findAllReducedAsList() {
-    // TODO test if reduced is sufficient for use cases...
-    return projectService.findAllReduced();
-  }
-
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
-        "/v5/projects/identifier/{namespace}:{id}", "/v5/projects/identifier/{namespace}:{id}.json",
-        "/v3/projects/identifier/{namespace}:{id}", "/v3/projects/identifier/{namespace}:{id}.json",
+        "/v5/projects/identifier/{namespace}:{id}",
+        "/v5/projects/identifier/{namespace}:{id}.json",
+        "/v3/projects/identifier/{namespace}:{id}",
+        "/v3/projects/identifier/{namespace}:{id}.json",
         "/latest/projects/identifier/{namespace}:{id}",
-            "/latest/projects/identifier/{namespace}:{id}.json"
+        "/latest/projects/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project getByIdentifier(@PathVariable String namespace, @PathVariable String id)
@@ -182,7 +175,7 @@ public class ProjectController {
   @GetMapping(
       value = {"/v5/projects/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -192,7 +185,7 @@ public class ProjectController {
 
     Project project = new Project();
     project.setUuid(projectUuid);
-    return projectService.getDigitalObjects(project, searchPageRequest);
+    return projectService.findDigitalObjects(project, searchPageRequest);
   }
 
   @Operation(summary = "Get languages of all projects")
@@ -248,7 +241,7 @@ public class ProjectController {
         "/latest/projects/{uuid}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity saveDigitalObjects(
+  public ResponseEntity setDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
@@ -256,7 +249,7 @@ public class ProjectController {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = projectService.saveDigitalObjects(project, digitalObjects);
+    boolean successful = projectService.setDigitalObjects(project, digitalObjects);
 
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);

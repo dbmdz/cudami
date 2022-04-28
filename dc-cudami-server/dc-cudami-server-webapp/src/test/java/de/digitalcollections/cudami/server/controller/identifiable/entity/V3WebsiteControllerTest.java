@@ -79,7 +79,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(websiteService.findRootPages(any(UUID.class), any(SearchPageRequest.class)))
+    when(websiteService.findRootWebpages(any(UUID.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

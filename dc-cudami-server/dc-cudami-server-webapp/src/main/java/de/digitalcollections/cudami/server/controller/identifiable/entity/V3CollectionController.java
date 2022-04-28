@@ -73,7 +73,7 @@ public class V3CollectionController {
         "/latest/collections/{uuid}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getDigitalObjects(
+  public ResponseEntity<String> findDigitalObjects(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",
@@ -109,7 +109,7 @@ public class V3CollectionController {
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
     SearchPageResponse<DigitalObject> response =
-        collectionService.getDigitalObjects(collection, searchPageRequest);
+        collectionService.findDigitalObjects(collection, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result =
@@ -145,7 +145,7 @@ public class V3CollectionController {
         "/latest/collections/{uuid}/subcollections"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getSubcollections(
+  public ResponseEntity<String> findSubcollections(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",
@@ -180,9 +180,9 @@ public class V3CollectionController {
     PageResponse<Collection> response;
 
     if (active != null) {
-      response = collectionService.getActiveChildren(collectionUuid, pageRequest);
+      response = collectionService.findActiveChildren(collectionUuid, pageRequest);
     } else {
-      response = collectionService.getChildren(collectionUuid, pageRequest);
+      response = collectionService.findChildren(collectionUuid, pageRequest);
     }
     JSONObject result = fixPageResponse(response);
 
@@ -211,7 +211,7 @@ public class V3CollectionController {
   @GetMapping(
       value = {"/v3/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findAll(
+  public ResponseEntity<String> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",
@@ -265,7 +265,7 @@ public class V3CollectionController {
   @GetMapping(
       value = {"/v3/collections/search", "/latest/collections/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findCollections(
+  public ResponseEntity<String> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",

@@ -23,7 +23,7 @@ class CudamiDigitalObjectsClientTest
     String bodyJson = "[{\"entityType\":\"DIGITAL_OBJECT\"}]";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    List<DigitalObject> actual = client.findAllReduced();
+    List<DigitalObject> actual = client.getAllReduced();
     assertThat(actual).isNotNull();
     assertThat(actual.get(0)).isExactlyInstanceOf(DigitalObject.class);
 
@@ -33,15 +33,15 @@ class CudamiDigitalObjectsClientTest
   @Test
   @DisplayName("can find a number of random DigitalObjects")
   public void testFindRandomDigitalObjects() throws Exception {
-    client.findRandomDigitalObjects(42);
-    verifyHttpRequestByMethodAndRelativeURL("get", "/random?pageNumber=0&pageSize=42");
+    client.getRandomDigitalObjects(42);
+    verifyHttpRequestByMethodAndRelativeURL("get", "/random?count=42");
   }
 
   @Test
   @DisplayName("can retrieve active collections of a DigitalObject by a SearchPageRequest")
   public void testGetActiveCollectionsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getActiveCollections(uuid, buildExampleSearchPageRequest());
+    client.findActiveCollections(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -53,7 +53,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve collections of a DigitalObject by a SearchPageRequest")
   public void testGetCollectionsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getCollections(uuid, buildExampleSearchPageRequest());
+    client.findCollections(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -114,7 +114,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve projects of a DigitalObject by a SearchPageRequest")
   public void testGetProjectsBySearchPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.getProjects(uuid, buildExampleSearchPageRequest());
+    client.findProjects(uuid, buildExampleSearchPageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -129,7 +129,7 @@ class CudamiDigitalObjectsClientTest
     FileResource fileResource = new FileResource();
     List<FileResource> fileResources = List.of(fileResource);
 
-    client.saveFileResources(uuid, fileResources);
+    client.setFileResources(uuid, fileResources);
 
     verifyHttpRequestByMethodRelativeUrlAndRequestBody(
         "post", "/" + uuid + "/fileresources", fileResources);
@@ -144,7 +144,7 @@ class CudamiDigitalObjectsClientTest
             .withLabel(Locale.GERMAN, "Parent")
             .build();
 
-    client.findAllForParent(parent);
+    client.getAllForParent(parent);
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get", "?pageNumber=0&pageSize=10000&parent.uuid=eq:" + parent.getUuid());

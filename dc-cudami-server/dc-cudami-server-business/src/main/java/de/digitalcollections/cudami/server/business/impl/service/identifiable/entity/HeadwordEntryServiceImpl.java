@@ -42,8 +42,8 @@ public class HeadwordEntryServiceImpl extends EntityServiceImpl<HeadwordEntry>
   }
 
   @Override
-  public List<HeadwordEntry> findByHeadword(UUID headwordUuid) {
-    return ((HeadwordEntryRepository) repository).findByHeadword(headwordUuid);
+  public List<HeadwordEntry> getByHeadword(UUID headwordUuid) {
+    return ((HeadwordEntryRepository) repository).getByHeadword(headwordUuid);
   }
 
   @Override

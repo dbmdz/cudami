@@ -6,9 +6,9 @@ import java.util.Locale;
 /** Repository for Locale persistence handling. */
 public interface LocaleRepository {
 
-  List<String> findAllLanguages();
+  List<String> getSupportedLanguages();
 
-  List<Locale> findAllLocales();
+  List<Locale> getSupportedLocales();
 
   String getDefaultLanguage();
 

@@ -21,9 +21,12 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
     super(http, serverUrl, Webpage.class, mapper, "/v5/webpages");
   }
 
-  public Webpage findActiveOne(UUID uuid, Locale locale) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
+  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/children?active=true", baseEndpoint, uuid),
+        pageRequest,
+        Webpage.class);
   }
 
   public PageResponse<Webpage> findActiveSubpages(UUID uuid, SearchPageRequest searchPageRequest)
@@ -32,23 +35,26 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
         String.format("%s/%s/children?active=true", baseEndpoint, uuid), searchPageRequest);
   }
 
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
+  }
+
   public PageResponse<Webpage> findSubpages(UUID uuid, SearchPageRequest searchPageRequest)
       throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/children", baseEndpoint, uuid), searchPageRequest);
   }
 
-  public PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/children?active=true", baseEndpoint, uuid),
-        pageRequest,
-        Webpage.class);
-  }
-
   public List<Webpage> getActiveChildrenTree(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/childrentree?active=true", baseEndpoint, uuid));
+  }
+
+  public Webpage getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
+    return doGetRequestForObject(
+        String.format("%s/%s?active=true&pLocale=%s", baseEndpoint, uuid, locale));
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
@@ -59,12 +65,6 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
 
   public List<Webpage> getChildren(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
-  }
-
-  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
   }
 
   public List<Webpage> getChildrenTree(UUID uuid) throws TechnicalException {

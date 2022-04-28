@@ -26,14 +26,14 @@ public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
-  public PageResponse<Person> findByPlaceOfBirth(PageRequest pageRequest, UUID uuidGeoLocation)
-      throws TechnicalException {
+  public PageResponse<Person> findByGeoLocationOfBirth(
+      PageRequest pageRequest, UUID uuidGeoLocation) throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/placeofbirth/%s", baseEndpoint, uuidGeoLocation.toString()), pageRequest);
   }
 
-  public PageResponse<Person> findByPlaceOfDeath(PageRequest pageRequest, UUID uuidGeoLocation)
-      throws TechnicalException {
+  public PageResponse<Person> findByGeoLocationOfDeath(
+      PageRequest pageRequest, UUID uuidGeoLocation) throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/placeofdeath/%s", baseEndpoint, uuidGeoLocation.toString()), pageRequest);
   }

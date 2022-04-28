@@ -443,12 +443,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public List<I> findAllFull() {
+  public List<I> getAllFull() {
     return retrieveList(sqlSelectAllFields, null, null, null);
   }
 
   @Override
-  public List<I> findAllReduced() {
+  public List<I> getAllReduced() {
     return retrieveList(sqlSelectReducedFields, null, null, null);
   }
 
@@ -879,7 +879,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
+  public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -909,7 +909,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;

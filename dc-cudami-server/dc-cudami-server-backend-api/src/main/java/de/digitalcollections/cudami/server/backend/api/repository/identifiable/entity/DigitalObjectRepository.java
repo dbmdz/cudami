@@ -17,12 +17,12 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   void deleteFileResources(UUID digitalObjectUuid);
 
-  default SearchPageResponse<Collection> getCollections(
+  default SearchPageResponse<Collection> findCollections(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return getCollections(digitalObject.getUuid(), searchPageRequest);
+    return findCollections(digitalObject.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<Collection> getCollections(
+  SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
@@ -52,19 +52,19 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   default SearchPageResponse<Project> getProjects(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return getProjects(digitalObject.getUuid(), searchPageRequest);
+    return findProjects(digitalObject.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<Project> getProjects(
+  SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
 
-  default List<FileResource> saveFileResources(
+  default List<FileResource> setFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;
     }
-    return saveFileResources(digitalObject.getUuid(), fileResources);
+    return setFileResources(digitalObject.getUuid(), fileResources);
   }
 
-  List<FileResource> saveFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
 }

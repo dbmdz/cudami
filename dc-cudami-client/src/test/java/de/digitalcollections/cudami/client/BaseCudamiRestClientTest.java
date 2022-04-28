@@ -78,7 +78,7 @@ public abstract class BaseCudamiRestClientTest<
   @Test
   @DisplayName("can find all")
   public void testFindAll() throws Exception {
-    client.findAll();
+    client.getAll();
     verifyHttpRequestByMethodAndRelativeURL("get", "/all");
   }
 

@@ -48,22 +48,22 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest pageRequest) {
-    return webpageService.findRootPagesForWebsite(uuid, pageRequest);
+  public SearchPageResponse<Webpage> findRootWebpages(UUID uuid, SearchPageRequest pageRequest) {
+    return webpageService.findRootWebpagesForWebsite(uuid, pageRequest);
   }
 
   @Override
-  public List<Webpage> getRootPages(UUID uuid) {
-    return ((WebsiteRepository) repository).getRootPages(uuid);
+  public List<Webpage> getRootWebpages(UUID uuid) {
+    return ((WebsiteRepository) repository).getRootWebpages(uuid);
   }
 
   @Override
-  public boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
-    return ((WebsiteRepository) repository).updateRootPagesOrder(website, rootPages);
+  public boolean updateRootWebpagesOrder(Website website, List<Webpage> rootPages) {
+    return ((WebsiteRepository) repository).updateRootWebpagesOrder(website, rootPages);
   }
 
   @Override
-  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
-    return ((WebsiteRepository) repository).updateRootPagesOrder(websiteUuid, rootPages);
+  public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
+    return ((WebsiteRepository) repository).updateRootWebpagesOrder(websiteUuid, rootPages);
   }
 }

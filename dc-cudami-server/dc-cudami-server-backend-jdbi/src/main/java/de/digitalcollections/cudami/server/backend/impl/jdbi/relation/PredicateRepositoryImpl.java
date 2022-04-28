@@ -50,7 +50,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
-  public List<Predicate> findAll() {
+  public List<Predicate> getAll() {
     final String sql =
         "SELECT " + SQL_REDUCED_FIELDS_PRED + " FROM " + tableName + " AS " + tableAlias;
 

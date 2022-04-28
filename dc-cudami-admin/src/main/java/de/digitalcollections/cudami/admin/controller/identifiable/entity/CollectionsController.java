@@ -151,7 +151,7 @@ public class CollectionsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.getDigitalObjects(uuid, searchPageRequest);
+    return service.findDigitalObjects(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/collections/{uuid}/subcollections")
@@ -196,7 +196,7 @@ public class CollectionsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getTopCollectionsLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfTopCollections()));
     return "collections/list";
   }
 

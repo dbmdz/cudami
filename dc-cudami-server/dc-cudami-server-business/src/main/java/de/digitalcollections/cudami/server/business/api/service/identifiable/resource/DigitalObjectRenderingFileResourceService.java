@@ -6,10 +6,9 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.UUID;
 
-public interface DigitalObjectRenderingFileResourceService
-    extends FileResourceMetadataService<FileResource> {
+public interface DigitalObjectRenderingFileResourceService {
 
-  default List<FileResource> saveForDigitalObject(
+  default List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources)
       throws CudamiServiceException {
     if (digitalObject == null) {
@@ -18,19 +17,19 @@ public interface DigitalObjectRenderingFileResourceService
     if (renderingResources == null) {
       return null;
     }
-    return saveForDigitalObject(digitalObject.getUuid(), renderingResources);
+    return setRenderingFileResources(digitalObject.getUuid(), renderingResources);
   }
 
-  List<FileResource> saveForDigitalObject(
+  List<FileResource> setRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources);
 
-  default List<FileResource> getForDigitalObject(DigitalObject digitalObject)
+  default List<FileResource> getRenderingFileResources(DigitalObject digitalObject)
       throws CudamiServiceException {
     if (digitalObject == null) {
       throw new CudamiServiceException("DigitalObject must not be null");
     }
-    return getForDigitalObject(digitalObject.getUuid());
+    return getRenderingFileResources(digitalObject.getUuid());
   }
 
-  List<FileResource> getForDigitalObject(UUID digitalObjectUuid);
+  List<FileResource> getRenderingFileResources(UUID digitalObjectUuid);
 }

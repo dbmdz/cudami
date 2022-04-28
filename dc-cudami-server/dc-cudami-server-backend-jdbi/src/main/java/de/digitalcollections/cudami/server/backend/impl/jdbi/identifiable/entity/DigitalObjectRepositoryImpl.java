@@ -208,7 +208,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public SearchPageResponse<Collection> getCollections(
+  public SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String tableAliasCollection = collectionRepositoryImpl.getTableAlias();
     final String tableNameCollection = collectionRepositoryImpl.getTableName();
@@ -385,7 +385,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public SearchPageResponse<Project> getProjects(
+  public SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     final String prTableAlias = projectRepositoryImpl.getTableAlias();
     final String prTableName = projectRepositoryImpl.getTableName();
@@ -543,7 +543,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       UUID digitalObjectUuid, List<FileResource> fileResources) {
 
     // as we store the whole list new: delete old entries

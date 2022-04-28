@@ -60,7 +60,7 @@ public class PersonController {
   @GetMapping(
       value = {"/v5/persons", "/v2/persons", "/latest/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Person> findAll(
+  public PageResponse<Person> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -123,7 +123,7 @@ public class PersonController {
         "/latest/persons/placeofbirth/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Person> getByPlaceOfBirth(
+  public PageResponse<Person> findByGeoLocationOfBirth(
       @Parameter(
               example = "",
               description =
@@ -138,7 +138,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfBirth(pageRequest, uuid);
+    return personService.findByGeoLocationOfBirth(pageRequest, uuid);
   }
 
   @Operation(summary = "get all persons died at given geo location")
@@ -149,7 +149,7 @@ public class PersonController {
         "/latest/persons/placeofdeath/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Person> getByPlaceOfDeath(
+  public PageResponse<Person> findByGeoLocationOfDeath(
       @Parameter(
               example = "",
               description =
@@ -164,7 +164,7 @@ public class PersonController {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByLocationOfDeath(pageRequest, uuid);
+    return personService.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
   @Operation(summary = "Get a person by uuid")

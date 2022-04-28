@@ -192,13 +192,13 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     // save creators
     List<Agent> creators = article.getCreators();
-    saveCreatorsList(article, creators);
+    setCreatorsList(article, creators);
 
     Article result = getByUuid(article.getUuid());
     return result;
   }
 
-  private void saveCreatorsList(Article article, List<Agent> creators) {
+  private void setCreatorsList(Article article, List<Agent> creators) {
     UUID articleUuid = article.getUuid();
 
     // as we store the whole list new: delete old entries
@@ -233,7 +233,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
 
     // save creators
     List<Agent> creators = article.getCreators();
-    saveCreatorsList(article, creators);
+    setCreatorsList(article, creators);
 
     Article result = getByUuid(article.getUuid());
     return result;

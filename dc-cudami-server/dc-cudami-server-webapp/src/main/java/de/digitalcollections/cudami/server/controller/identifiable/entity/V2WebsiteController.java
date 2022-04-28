@@ -66,7 +66,7 @@ public class V2WebsiteController {
   @GetMapping(
       value = {"/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findAll(
+  public ResponseEntity<String> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",

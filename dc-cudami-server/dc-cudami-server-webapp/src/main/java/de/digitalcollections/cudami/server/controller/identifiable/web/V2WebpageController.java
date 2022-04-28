@@ -79,7 +79,7 @@ public class V2WebpageController {
   @GetMapping(
       value = {"/v2/webpages/{uuid}.json", "/v2/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageV2Json(
+  public ResponseEntity<String> getByUuidV2Json(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",

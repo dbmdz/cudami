@@ -49,7 +49,7 @@ public class ArticleController {
   @GetMapping(
       value = {"/v5/articles", "/v2/articles", "/latest/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Article> findAll(
+  public PageResponse<Article> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -66,7 +66,7 @@ public class ArticleController {
   @GetMapping(
       value = {"/v5/articles/{uuid}", "/v2/articles/{uuid}", "/latest/articles/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Article> getArticle(
+  public ResponseEntity<Article> getByUuid(
       @Parameter(
               example = "",
               description =

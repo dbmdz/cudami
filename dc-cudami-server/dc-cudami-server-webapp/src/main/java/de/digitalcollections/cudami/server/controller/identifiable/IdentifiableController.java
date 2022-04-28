@@ -77,7 +77,7 @@ public class IdentifiableController {
   @GetMapping(
       value = {"/v5/identifiables/{uuid}/localizedUrlAliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LocalizedUrlAliases> findLocalizedUrlAliases(
+  public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
       @Parameter(
               description =
                   "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
@@ -94,7 +94,7 @@ public class IdentifiableController {
     }
 
     try {
-      return new ResponseEntity<>(urlAliasService.findLocalizedUrlAliases(uuid), HttpStatus.OK);
+      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }

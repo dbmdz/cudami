@@ -17,12 +17,12 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
     if (topic == null) {
       return null;
     }
-    return getAllEntities(topic.getUuid());
+    return getEntities(topic.getUuid());
   }
 
-  List<Entity> getAllEntities(UUID topicUuid);
+  List<Entity> getEntities(UUID topicUuid);
 
-  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest);
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest);
 
   default List<FileResource> getFileResources(Topic topic) {
     if (topic == null) {
@@ -33,7 +33,7 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   List<FileResource> getFileResources(UUID topicUuid);
 
-  PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest);
+  PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest);
 
   List<Locale> getLanguagesOfEntities(UUID topicUuid);
 
@@ -57,21 +57,21 @@ public interface TopicRepository extends NodeRepository<Topic>, EntityRepository
 
   List<Topic> getTopicsOfFileResource(UUID fileResourceUuid);
 
-  default List<Entity> saveEntities(Topic topic, List<Entity> entities) {
+  default List<Entity> setEntities(Topic topic, List<Entity> entities) {
     if (topic == null) {
       return null;
     }
-    return saveEntities(topic.getUuid(), entities);
+    return setEntities(topic.getUuid(), entities);
   }
 
-  List<Entity> saveEntities(UUID topicUuid, List<Entity> entities);
+  List<Entity> setEntities(UUID topicUuid, List<Entity> entities);
 
-  default List<FileResource> saveFileResources(Topic topic, List<FileResource> fileResources) {
+  default List<FileResource> setFileResources(Topic topic, List<FileResource> fileResources) {
     if (topic == null) {
       return null;
     }
-    return saveFileResources(topic.getUuid(), fileResources);
+    return setFileResources(topic.getUuid(), fileResources);
   }
 
-  List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources);
+  List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources);
 }

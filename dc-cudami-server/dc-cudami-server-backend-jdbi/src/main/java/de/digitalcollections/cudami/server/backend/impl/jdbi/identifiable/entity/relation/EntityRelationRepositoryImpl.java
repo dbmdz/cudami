@@ -104,16 +104,16 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
+  public List<EntityRelation> getBySubject(UUID subjectEntityUuid) {
     Entity subjectEntity = entityRepositoryImpl.getByUuid(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
     }
-    return findBySubject(subjectEntity);
+    return getBySubject(subjectEntity);
   }
 
   @Override
-  public List<EntityRelation> findBySubject(Entity subjectEntity) {
+  public List<EntityRelation> getBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
         "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"

@@ -11,10 +11,9 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.Id
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -26,6 +25,7 @@ public class LinkedDataFileResourceServiceImpl
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LinkedDataFileResourceServiceImpl.class);
 
+  @Autowired
   public LinkedDataFileResourceServiceImpl(
       LinkedDataFileResourceRepository linkedDataFileResourceRepository,
       IdentifierRepository identifierRepository,
@@ -43,19 +43,5 @@ public class LinkedDataFileResourceServiceImpl
   @Override
   public FileResource createByMimeType(MimeType mimeType) {
     return ((FileResourceMetadataRepository) repository).createByMimeType(mimeType);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResourcesForDigitalObjectUuid(
-      UUID digitalObjectUuid) {
-    return ((LinkedDataFileResourceRepository) repository)
-        .getLinkedDataFileResourcesForDigitalObjectUuid(digitalObjectUuid);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> saveLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
-    return ((LinkedDataFileResourceRepository) repository)
-        .saveLinkedDataFileResources(digitalObjectUuid, linkedDataFileResources);
   }
 }

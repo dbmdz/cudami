@@ -32,7 +32,7 @@ public interface WebpageService extends NodeService<Webpage> {
 
   SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
 
-  SearchPageResponse<Webpage> findRootPagesForWebsite(
+  SearchPageResponse<Webpage> findRootWebpagesForWebsite(
       UUID websiteUuid, SearchPageRequest searchPageRequest);
 
   Webpage getActive(UUID uuid);
@@ -47,7 +47,7 @@ public interface WebpageService extends NodeService<Webpage> {
    */
   List<Webpage> getActiveChildren(UUID uuid);
 
-  PageResponse<Webpage> getActiveChildren(UUID uuid, PageRequest pageRequest);
+  PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest);
 
   /**
    * Returns a list of active children, with recursivly all children have their active children set

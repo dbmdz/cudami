@@ -15,15 +15,15 @@ public class CudamiEntityRelationsClient extends BaseRestClient<EntityRelation> 
     super(http, serverUrl, EntityRelation.class, mapper, "/v5/entities/relations");
   }
 
-  public PageResponse<EntityRelation> getRelationsByPredicate(
-      String predicate, PageRequest pageRequest) throws TechnicalException {
+  public PageResponse<EntityRelation> findByPredicate(String predicate, PageRequest pageRequest)
+      throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s?predicate=%s", baseEndpoint, predicate),
         pageRequest,
         EntityRelation.class);
   }
 
-  public List<EntityRelation> saveRelations(List relations) throws TechnicalException {
+  public List<EntityRelation> save(List relations) throws TechnicalException {
     return doPutRequestForObjectList("/v5/entities/relations", relations, EntityRelation.class);
   }
 }

@@ -15,7 +15,7 @@ public class CudamiPredicatesClient extends BaseRestClient<Predicate> {
     super(http, serverUrl, Predicate.class, mapper, "/v5/predicates");
   }
 
-  public List<Predicate> findAllPredicates() throws TechnicalException {
+  public List<Predicate> getAll() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint, Predicate.class);
   }
 

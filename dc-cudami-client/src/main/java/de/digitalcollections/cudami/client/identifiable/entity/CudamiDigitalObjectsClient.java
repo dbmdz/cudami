@@ -25,11 +25,29 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     super(http, serverUrl, DigitalObject.class, mapper, "/v5/digitalobjects");
   }
 
-  public List<DigitalObject> findAllReduced() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
+  public SearchPageResponse<Collection> findActiveCollections(
+      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
+        searchPageRequest,
+        Collection.class);
   }
 
-  public PageResponse<DigitalObject> findAllForParent(DigitalObject parent)
+  public SearchPageResponse<Collection> findCollections(
+      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/collections", baseEndpoint, uuid),
+        searchPageRequest,
+        Collection.class);
+  }
+
+  public SearchPageResponse<Project> findProjects(UUID uuid, SearchPageRequest searchPageRequest)
+      throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(
+        String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
+  }
+
+  public PageResponse<DigitalObject> getAllForParent(DigitalObject parent)
       throws TechnicalException {
     if (parent == null) {
       throw new TechnicalException("Empty parent");
@@ -45,25 +63,8 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return find(pageRequest);
   }
 
-  public PageResponse<DigitalObject> findRandomDigitalObjects(int count) throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(0, count, null);
-    return doGetRequestForPagedObjectList(baseEndpoint + "/random", pageRequest);
-  }
-
-  public SearchPageResponse<Collection> getActiveCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
-        searchPageRequest,
-        Collection.class);
-  }
-
-  public SearchPageResponse<Collection> getCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/collections", baseEndpoint, uuid),
-        searchPageRequest,
-        Collection.class);
+  public List<DigitalObject> getAllReduced() throws TechnicalException {
+    return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
   }
 
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
@@ -95,13 +96,12 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         String.format("%s/%s/projects/languages", baseEndpoint, uuid), Locale.class);
   }
 
-  public SearchPageResponse<Project> getProjects(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
+  public List<DigitalObject> getRandomDigitalObjects(int count) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/random?count=%d", baseEndpoint, count), DigitalObject.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources)
+  public List<FileResource> setFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
     return doPostRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid),

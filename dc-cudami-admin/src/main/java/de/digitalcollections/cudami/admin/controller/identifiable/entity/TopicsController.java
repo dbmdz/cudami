@@ -128,7 +128,7 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws TechnicalException {
-    return this.service.getEntities(uuid, new PageRequest(pageNumber, pageSize));
+    return this.service.findEntities(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/api/topics/{uuid}")
@@ -144,7 +144,7 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
       throws TechnicalException {
-    return this.service.getFileResources(uuid, new PageRequest(pageNumber, pageSize));
+    return this.service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
   }
 
   @GetMapping("/topics")

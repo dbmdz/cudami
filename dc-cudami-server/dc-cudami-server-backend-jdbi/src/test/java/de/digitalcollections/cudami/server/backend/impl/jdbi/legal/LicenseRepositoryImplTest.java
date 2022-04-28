@@ -178,7 +178,7 @@ public class LicenseRepositoryImplTest {
     license4 = repo.save(license4);
 
     // do find
-    List<License> list = repo.findAll();
+    List<License> list = repo.getAll();
     assertThat(list.size()).isEqualTo(4);
 
     // do cleanup

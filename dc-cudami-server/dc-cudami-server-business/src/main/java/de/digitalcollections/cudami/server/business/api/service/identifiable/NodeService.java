@@ -85,7 +85,7 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
 
   List<N> getChildren(UUID nodeUuid);
 
-  PageResponse<N> getChildren(UUID uuid, PageRequest pageRequest);
+  PageResponse<N> findChildren(UUID uuid, PageRequest pageRequest);
 
   SearchPageResponse<N> findChildren(UUID uuid, SearchPageRequest searchPageRequest);
 
@@ -100,7 +100,7 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
 
   List<N> getParents(UUID uuid);
 
-  PageResponse<N> getRootNodes(PageRequest pageRequest);
+  PageResponse<N> findRootNodes(PageRequest pageRequest);
 
   SearchPageResponse<N> findRootNodes(SearchPageRequest searchPageRequest);
 
@@ -124,9 +124,9 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
   default N saveWithParent(N child, UUID parentUuid)
       throws IdentifiableServiceException, ValidationException {
     if (child.getUuid() == null) {
-      child = this.save(child);
+      child = save(child);
     }
-    return this.saveWithParent(child.getUuid(), parentUuid);
+    return saveWithParent(child.getUuid(), parentUuid);
   }
 
   /**

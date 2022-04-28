@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.paging.Direction;
 import de.digitalcollections.model.paging.NullHandling;
 import de.digitalcollections.model.paging.Order;
@@ -76,5 +77,12 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
 
   public I getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
     return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+  }
+
+  public LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws TechnicalException {
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format(baseEndpoint + "/%s/localizedUrlAliases", uuid),
+            LocalizedUrlAliases.class);
   }
 }

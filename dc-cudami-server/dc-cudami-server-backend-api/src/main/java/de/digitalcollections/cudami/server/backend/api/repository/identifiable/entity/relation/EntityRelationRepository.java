@@ -30,11 +30,11 @@ public interface EntityRelationRepository {
    */
   PageResponse<EntityRelation> find(PageRequest pageRequest);
 
-  default List<EntityRelation> findBySubject(Entity subjectEntity) {
-    return findBySubject(subjectEntity.getUuid());
+  default List<EntityRelation> getBySubject(Entity subjectEntity) {
+    return getBySubject(subjectEntity.getUuid());
   }
 
-  List<EntityRelation> findBySubject(UUID subjectEntityUuid);
+  List<EntityRelation> getBySubject(UUID subjectEntityUuid);
 
   default void save(EntityRelation relation) {
     save(relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());

@@ -28,30 +28,33 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
-    classes = {LinkedDataFileResourceRepositoryImpl.class})
+    classes = {DigitalObjectLinkedDataFileResourceRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
-@DisplayName("The LinkedDataFileResource Repository")
-class LinkedDataFileResourceRepositoryImplTest {
+@DisplayName("The DigitalObjectLinkedDataFileResource Repository")
+class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
-  LinkedDataFileResourceRepositoryImpl repo;
+  DigitalObjectLinkedDataFileResourceRepositoryImpl repo;
 
   @Autowired CudamiConfig cudamiConfig;
 
   @Autowired PostgreSQLContainer postgreSQLContainer;
 
   @Autowired private DigitalObjectRepositoryImpl digitalObjectRepository;
+  @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
 
   @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new LinkedDataFileResourceRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new DigitalObjectLinkedDataFileResourceRepositoryImpl(
+            jdbi, cudamiConfig, linkedDataFileResourceRepositoryImpl);
   }
 
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
   @Test
-  void saveLinkedDataFileResourceForDigitalObject() {
+  void setLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
@@ -73,7 +76,7 @@ class LinkedDataFileResourceRepositoryImplTest {
             .build();
 
     List<LinkedDataFileResource> actual =
-        repo.saveLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
 
     assertThat(actual).hasSize(1);
     assertThat(actual.get(0).getUuid()).isNotNull();
@@ -81,7 +84,7 @@ class LinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can retrieve LinkedDataFileResources for a DigitalObject")
   @Test
-  void retrieveLinkedDataFileResourcesForDigitalObject() {
+  void getLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         new DigitalObjectBuilder()
@@ -102,10 +105,9 @@ class LinkedDataFileResourceRepositoryImplTest {
             .withMimeType(MimeType.MIME_APPLICATION_XML)
             .build();
     List<LinkedDataFileResource> persisted =
-        repo.saveLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
 
-    List<LinkedDataFileResource> actual =
-        repo.getLinkedDataFileResourcesForDigitalObjectUuid(digitalObject.getUuid());
+    List<LinkedDataFileResource> actual = repo.getLinkedDataFileResources(digitalObject.getUuid());
 
     assertThat(actual).isNotEmpty();
     assertThat(actual).isEqualTo(persisted);

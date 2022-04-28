@@ -51,7 +51,7 @@ public interface LicenseRepository {
    *
    * @return list of all licenses
    */
-  List<License> findAll();
+  List<License> getAll();
 
   /**
    * Return license with url

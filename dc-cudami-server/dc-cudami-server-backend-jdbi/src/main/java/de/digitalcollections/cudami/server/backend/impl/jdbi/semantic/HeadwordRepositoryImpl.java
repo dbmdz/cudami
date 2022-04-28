@@ -223,7 +223,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public List<Headword> findAll() {
+  public List<Headword> getAll() {
     return retrieveList(SQL_REDUCED_FIELDS_HW, null, null);
   }
 
@@ -249,7 +249,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public Headword getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Headword findByUuidAndFiltering(UUID uuid, Filtering filtering) {
     // basic query
     StringBuilder sqlQuery =
         new StringBuilder(
@@ -276,7 +276,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public Headword getByLabelAndLocale(String label, Locale locale) {
+  public Headword findByLabelAndLocale(String label, Locale locale) {
     // basic query
     StringBuilder sqlQuery =
         new StringBuilder(
@@ -306,7 +306,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public List<Headword> findRandom(int count) {
+  public List<Headword> getRandom(int count) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
@@ -351,7 +351,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public PageResponse<Entity> getRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
@@ -363,7 +363,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public PageResponse<FileResource> getRelatedFileResources(
+  public PageResponse<FileResource> findRelatedFileResources(
       UUID headwordUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
@@ -453,13 +453,13 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public List<Entity> saveRelatedEntities(UUID headwordUuid, List<Entity> entities) {
+  public List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID headwordUuid, List<FileResource> fileResources) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.

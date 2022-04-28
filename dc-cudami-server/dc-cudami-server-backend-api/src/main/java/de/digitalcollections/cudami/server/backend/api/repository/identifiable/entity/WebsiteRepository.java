@@ -12,17 +12,17 @@ public interface WebsiteRepository extends EntityRepository<Website> {
     if (website == null) {
       return null;
     }
-    return getRootPages(website.getUuid());
+    return getRootWebpages(website.getUuid());
   }
 
-  List<Webpage> getRootPages(UUID uuid);
+  List<Webpage> getRootWebpages(UUID uuid);
 
-  default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
+  default boolean updateRootWebpagesOrder(Website website, List<Webpage> rootPages) {
     if (website == null || rootPages == null) {
       return false;
     }
-    return updateRootPagesOrder(website.getUuid(), rootPages);
+    return updateRootWebpagesOrder(website.getUuid(), rootPages);
   }
 
-  boolean updateRootPagesOrder(UUID website, List<Webpage> rootPages);
+  boolean updateRootWebpagesOrder(UUID website, List<Webpage> rootPages);
 }

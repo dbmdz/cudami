@@ -55,7 +55,7 @@ public class GeoLocationController {
   @GetMapping(
       value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<GeoLocation> findAll(
+  public PageResponse<GeoLocation> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,

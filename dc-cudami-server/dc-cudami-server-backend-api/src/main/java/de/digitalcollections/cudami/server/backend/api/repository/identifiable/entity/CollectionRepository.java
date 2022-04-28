@@ -38,15 +38,15 @@ public interface CollectionRepository
     if (collection == null) {
       return null;
     }
-    return getDigitalObjects(collection.getUuid(), pageRequest);
+    return findDigitalObjects(collection.getUuid(), pageRequest);
   }
 
-  PageResponse<DigitalObject> getDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
+  PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(
+  SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID collectionUuid, SearchPageRequest searchPageRequest);
 
-  List<CorporateBody> getRelatedCorporateBodies(UUID uuid, Filtering filtering);
+  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
@@ -65,12 +65,12 @@ public interface CollectionRepository
    */
   boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
 
-  default boolean saveDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
       return false;
     }
-    return saveDigitalObjects(collection.getUuid(), digitalObjects);
+    return setDigitalObjects(collection.getUuid(), digitalObjects);
   }
 
-  boolean saveDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+  boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 }

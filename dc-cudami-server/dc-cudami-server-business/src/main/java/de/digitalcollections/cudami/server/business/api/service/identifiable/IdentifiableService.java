@@ -89,7 +89,7 @@ public interface IdentifiableService<I extends Identifiable> {
    * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow,
    *     NOT FOR USER INTERACTION!)!!!
    */
-  List<I> findAllFull();
+  List<I> getAllFull();
 
   /**
    * Returns a list of all identifiables, reduced to their identifiers and last modification date
@@ -97,7 +97,7 @@ public interface IdentifiableService<I extends Identifiable> {
    * @return partially filled complete list of all identifiables of implementing repository entity
    *     type
    */
-  List<I> findAllReduced();
+  List<I> getAllReduced();
 
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
@@ -144,10 +144,10 @@ public interface IdentifiableService<I extends Identifiable> {
     if (identifiable == null || entities == null) {
       return null;
     }
-    return saveRelatedEntities(identifiable.getUuid(), entities);
+    return setRelatedEntities(identifiable.getUuid(), entities);
   }
 
-  List<Entity> saveRelatedEntities(UUID identifiableUuid, List<Entity> entities);
+  List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities);
 
   /**
    * Save list of file resources related to an identifiable. Prerequisite: file resources have been
@@ -157,15 +157,15 @@ public interface IdentifiableService<I extends Identifiable> {
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
    */
-  default List<FileResource> saveRelatedFileResources(
+  default List<FileResource> setRelatedFileResources(
       I identifiable, List<FileResource> fileResources) {
     if (identifiable == null || fileResources == null) {
       return null;
     }
-    return saveRelatedFileResources(identifiable.getUuid(), fileResources);
+    return setRelatedFileResources(identifiable.getUuid(), fileResources);
   }
 
-  List<FileResource> saveRelatedFileResources(
+  List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources);
 
   I update(I identifiable) throws IdentifiableServiceException, ValidationException;

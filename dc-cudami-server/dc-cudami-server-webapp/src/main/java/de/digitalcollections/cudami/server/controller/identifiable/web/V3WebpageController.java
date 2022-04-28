@@ -70,7 +70,7 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}.json", "/v3/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageJson(
+  public ResponseEntity<String> getByUuidV3Json(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",
@@ -142,7 +142,7 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}", "/v3/webpages/{uuid}.xml"},
       produces = MediaType.APPLICATION_XML_VALUE)
-  public ResponseEntity<String> getWebpageXml(
+  public ResponseEntity<String> getByUuidV3Xml(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",
@@ -204,7 +204,7 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}/children", "/latest/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageChildren(
+  public ResponseEntity<String> findChildren(
       @Parameter(
               name = "uuid",
               description = "the UUID of the webpage",
@@ -249,9 +249,9 @@ public class V3WebpageController {
     PageResponse<Webpage> pageResponse;
 
     if (active != null) {
-      pageResponse = webpageService.getActiveChildren(uuid, pageRequest);
+      pageResponse = webpageService.findActiveChildren(uuid, pageRequest);
     } else {
-      pageResponse = webpageService.getChildren(uuid, pageRequest);
+      pageResponse = webpageService.findChildren(uuid, pageRequest);
     }
 
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));
@@ -293,7 +293,7 @@ public class V3WebpageController {
   @GetMapping(
       value = {"/v3/webpages/{uuid}/childrentree"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getWebpageChildrenTree(
+  public ResponseEntity<String> getChildrenTree(
       @Parameter(
               name = "uuid",
               description = "the UUID of the root webpage",

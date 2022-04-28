@@ -27,6 +27,24 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 
+  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
+  }
+
+  public PageResponse<Entity> findEntities(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/entities", baseEndpoint, uuid), pageRequest, Entity.class);
+  }
+
+  public PageResponse<FileResource> findFileResources(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/fileresources", baseEndpoint, uuid), pageRequest, FileResource.class);
+  }
+
   public PageResponse<Topic> findSubtopics(UUID uuid, SearchPageRequest searchPageRequest)
       throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
@@ -35,13 +53,8 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
 
   public SearchPageResponse<Topic> findTopTopics(SearchPageRequest searchPageRequest)
       throws TechnicalException {
-    // FIXME: findTopCollections? wrong method, we just have top topics!
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/top", baseEndpoint), searchPageRequest);
-  }
-
-  public PageResponse<Topic> findTopTopics(PageRequest pageRequest) throws TechnicalException {
-    return doGetRequestForPagedObjectList(String.format("%s/top", baseEndpoint), pageRequest);
   }
 
   public List<Entity> getAllEntities(UUID uuid) throws TechnicalException {
@@ -57,24 +70,6 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
 
   public List<Topic> getChildren(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/children", baseEndpoint, uuid));
-  }
-
-  public PageResponse<Topic> getChildren(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/children", baseEndpoint, uuid), pageRequest);
-  }
-
-  public PageResponse<Entity> getEntities(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/entities", baseEndpoint, uuid), pageRequest, Entity.class);
-  }
-
-  public PageResponse<FileResource> getFileResources(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/fileresources", baseEndpoint, uuid), pageRequest, FileResource.class);
   }
 
   public List<Locale> getLanguagesOfEntities(UUID topicUuid) throws TechnicalException {
@@ -109,21 +104,23 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
             String.format("%s/%s/children/%s", baseEndpoint, parentUuid, childUuid)));
   }
 
-  public List<Entity> saveEntities(UUID uuid, List entities) throws TechnicalException {
+  public Topic saveWithParentTopic(Topic subtopic, UUID parentTopicUuid) throws TechnicalException {
+    return doPostRequestForObject(
+        String.format("%s/%s/subtopic", baseEndpoint, parentTopicUuid), subtopic);
+  }
+
+  public List<Entity> setEntities(UUID uuid, List entities) throws TechnicalException {
+    // FIXME: should be PUT
     return doPostRequestForObjectList(
         String.format("%s/%s/entities", baseEndpoint, uuid), entities, Entity.class);
   }
 
-  public List<FileResource> saveFileResources(UUID uuid, List fileResources)
+  public List<FileResource> setFileResources(UUID uuid, List fileResources)
       throws TechnicalException {
+    // FIXME: should be PUT
     return doPostRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid),
         fileResources,
         FileResource.class);
-  }
-
-  public Topic saveWithParentTopic(Topic subtopic, UUID parentTopicUuid) throws TechnicalException {
-    return doPostRequestForObject(
-        String.format("%s/%s/subtopic", baseEndpoint, parentTopicUuid), subtopic);
   }
 }

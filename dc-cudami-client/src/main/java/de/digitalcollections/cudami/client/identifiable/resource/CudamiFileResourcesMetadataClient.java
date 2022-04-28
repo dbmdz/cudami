@@ -25,7 +25,7 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public SearchPageResponse<FileResource> findFileResourcesByType(
+  public SearchPageResponse<FileResource> findByType(
       SearchPageRequest searchPageRequest, String type) throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/type/%s", baseEndpoint, type), searchPageRequest);

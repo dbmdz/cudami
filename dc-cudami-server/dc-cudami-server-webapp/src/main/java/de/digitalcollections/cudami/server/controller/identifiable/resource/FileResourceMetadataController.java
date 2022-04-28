@@ -54,7 +54,7 @@ public class FileResourceMetadataController {
   @GetMapping(
       value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<FileResource> findAll(
+  public PageResponse<FileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -90,7 +90,7 @@ public class FileResourceMetadataController {
         "/latest/fileresources/type/{type}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<FileResource> findFileResourcesByType(
+  public SearchPageResponse<FileResource> findByType(
       @Parameter(example = "", description = "Type of the fileresource, e.g. <tt>image</tt>")
           @PathVariable("type")
           String type,

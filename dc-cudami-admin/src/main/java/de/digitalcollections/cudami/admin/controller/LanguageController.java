@@ -19,7 +19,7 @@ public class LanguageController {
 
   @GetMapping("/api/languages")
   public List<String> getLanguages() throws TechnicalException {
-    return service.findAllLanguages();
+    return service.getAllLanguages();
   }
 
   @GetMapping("/api/languages/default")

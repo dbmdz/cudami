@@ -52,7 +52,7 @@ public class LinkedDataFileResourceController {
   @GetMapping(
       value = {"/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<LinkedDataFileResource> findAll(
+  public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -82,7 +82,7 @@ public class LinkedDataFileResourceController {
   @GetMapping(
       value = {"/v5/linkeddatafileresources/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<LinkedDataFileResource> search(
+  public SearchPageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -112,7 +112,7 @@ public class LinkedDataFileResourceController {
   @GetMapping(
       value = {"/v5/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LinkedDataFileResource> get(
+  public ResponseEntity<LinkedDataFileResource> getByUuid(
       @Parameter(
               example = "",
               description =

@@ -146,7 +146,7 @@ public class FileResourcesMetadataController extends AbstractController {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return service.findFileResourcesByType(searchPageRequest, type);
+    return service.findByType(searchPageRequest, type);
   }
 
   @PutMapping("/api/fileresources/{uuid}")

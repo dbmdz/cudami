@@ -76,7 +76,7 @@ public class EntityController<E extends Entity> {
   @GetMapping(
       value = {"/v5/entities", "/v3/entities", "/latest/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Entity> findAll(
+  public PageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -99,7 +99,7 @@ public class EntityController<E extends Entity> {
   @GetMapping(
       value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> findRandomEntities(
+  public List<Entity> getRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return entityService.getRandom(count);
   }

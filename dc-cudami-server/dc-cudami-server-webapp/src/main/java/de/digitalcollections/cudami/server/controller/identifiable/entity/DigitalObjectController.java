@@ -86,7 +86,7 @@ public class DigitalObjectController {
   @GetMapping(
       value = {"/v5/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> findAll(
+  public PageResponse<DigitalObject> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -114,8 +114,8 @@ public class DigitalObjectController {
         "/latest/digitalobjects/reduced"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<DigitalObject> findAllReduced() {
-    return digitalObjectService.findAllReduced();
+  public List<DigitalObject> getAllReduced() {
+    return digitalObjectService.getAllReduced();
   }
 
   @Operation(
@@ -128,7 +128,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/search"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
+  public SearchPageResponse<DigitalObject> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -156,7 +156,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/item"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Item findItemOfDigitalObject(@PathVariable UUID uuid) {
+  public Item getItem(@PathVariable UUID uuid) {
     return digitalObjectService.getItem(uuid);
   }
 
@@ -168,7 +168,7 @@ public class DigitalObjectController {
         "/latest/digitalobjects/random"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<DigitalObject> findRandomDigitalObjects(
+  public List<DigitalObject> getRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
     return digitalObjectService.getRandom(count);
   }
@@ -230,9 +230,9 @@ public class DigitalObjectController {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return digitalObjectService.getActiveCollections(digitalObject, searchPageRequest);
+      return digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
     }
-    return digitalObjectService.getCollections(digitalObject, searchPageRequest);
+    return digitalObjectService.findCollections(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")
@@ -291,7 +291,7 @@ public class DigitalObjectController {
   @GetMapping(
       value = {"/v5/digitalobjects/{uuid}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Project> getProjects(
+  public SearchPageResponse<Project> findProjects(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -301,7 +301,7 @@ public class DigitalObjectController {
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return digitalObjectService.getProjects(digitalObject, searchPageRequest);
+    return digitalObjectService.findProjects(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Save a newly created digital object")
@@ -321,11 +321,11 @@ public class DigitalObjectController {
         "/latest/digitalobjects/{uuid}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return digitalObjectService.saveFileResources(uuid, fileResources);
+    return digitalObjectService.setFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update a digital object")

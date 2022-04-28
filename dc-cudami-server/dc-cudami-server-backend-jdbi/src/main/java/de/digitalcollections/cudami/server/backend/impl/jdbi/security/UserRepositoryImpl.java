@@ -60,7 +60,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  public List<User> findActiveAdminUsers() {
+  public List<User> getActiveAdminUsers() {
     return dbi.withHandle(
         h ->
             h.createQuery(

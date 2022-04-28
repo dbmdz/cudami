@@ -191,7 +191,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> getAllEntities(UUID topicUuid) {
+  public List<Entity> getEntities(UUID topicUuid) {
     final String entityTableAlias = entityRepositoryImpl.getTableAlias();
     final String entityTableName = entityRepositoryImpl.getTableName();
 
@@ -294,7 +294,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Topic> getChildren(UUID nodeUuid, PageRequest pageRequest) {
+  public PageResponse<Topic> findChildren(UUID nodeUuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -326,7 +326,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Entity> getEntities(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + entityRepositoryImpl.getTableName()
@@ -367,7 +367,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     PageRequest request = new PageRequest(0, 100);
     Set<FileResource> fileResources = new HashSet<>();
     do {
-      response = this.getFileResources(topicUuid, request);
+      response = this.findFileResources(topicUuid, request);
       if (response == null || !response.hasContent()) {
         break;
       }
@@ -377,7 +377,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<FileResource> getFileResources(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
     String commonSql =
@@ -486,7 +486,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Topic> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -578,7 +578,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> saveEntities(UUID topicUuid, List<Entity> entities) {
+  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -603,11 +603,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             preparedBatch.execute();
           });
     }
-    return getAllEntities(topicUuid);
+    return getEntities(topicUuid);
   }
 
   @Override
-  public List<FileResource> saveFileResources(UUID topicUuid, List<FileResource> fileResources) {
+  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->

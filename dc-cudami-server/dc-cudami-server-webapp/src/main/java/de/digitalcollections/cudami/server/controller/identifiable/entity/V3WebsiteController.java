@@ -112,7 +112,7 @@ public class V3WebsiteController {
   @GetMapping(
       value = {"/v3/websites/{uuid}/rootpages", "/latest/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getRootPages(
+  public ResponseEntity<String> findRootPages(
       @Parameter(
               name = "uuid",
               description = "the UUID of the collection",
@@ -149,7 +149,7 @@ public class V3WebsiteController {
       searchPageRequest.setSorting(sorting);
     }
 
-    SearchPageResponse<Webpage> response = websiteService.findRootPages(uuid, searchPageRequest);
+    SearchPageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

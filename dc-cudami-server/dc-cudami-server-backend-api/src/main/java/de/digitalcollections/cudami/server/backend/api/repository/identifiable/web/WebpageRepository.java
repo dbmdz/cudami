@@ -11,7 +11,7 @@ import java.util.UUID;
 /** Repository for Webpage persistence handling. */
 public interface WebpageRepository extends NodeRepository<Webpage> {
 
-  SearchPageResponse<Webpage> findRootPagesForWebsite(
+  SearchPageResponse<Webpage> findRootWebpagesForWebsite(
       UUID websiteUuid, SearchPageRequest searchPageRequest);
 
   /**

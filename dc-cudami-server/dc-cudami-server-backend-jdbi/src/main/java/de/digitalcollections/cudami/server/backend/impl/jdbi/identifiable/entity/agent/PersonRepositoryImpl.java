@@ -324,15 +324,15 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
 
     // save given names
     List<GivenName> givenNames = person.getGivenNames();
-    saveRelatedGivenNames(givenNames, person);
+    setRelatedGivenNames(givenNames, person);
     // save family names
     List<FamilyName> familyNames = person.getFamilyNames();
-    saveRelatedFamilyNames(familyNames, person);
+    setRelatedFamilyNames(familyNames, person);
     Person result = getByUuid(person.getUuid());
     return result;
   }
 
-  private void saveRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
+  private void setRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
     // we assume that relations are new (existing ones were deleted before (e.g. see update))
     if (familyNames != null) {
       dbi.useHandle(
@@ -354,7 +354,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     }
   }
 
-  private void saveRelatedGivenNames(List<GivenName> givenNames, Person person) {
+  private void setRelatedGivenNames(List<GivenName> givenNames, Person person) {
     // we assume that relations are new (existing ones were deleted before (e.g. see update))
     if (givenNames != null) {
       dbi.useHandle(
@@ -395,7 +395,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
             h.createUpdate("DELETE FROM person_givennames WHERE person_uuid = :uuid")
                 .bind("uuid", person.getUuid())
                 .execute());
-    saveRelatedGivenNames(givenNames, person);
+    setRelatedGivenNames(givenNames, person);
     // save family names
     List<FamilyName> familyNames = person.getFamilyNames();
     // as we store the whole list new: delete old entries
@@ -404,7 +404,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
             h.createUpdate("DELETE FROM person_familynames WHERE person_uuid = :uuid")
                 .bind("uuid", person.getUuid())
                 .execute());
-    saveRelatedFamilyNames(familyNames, person);
+    setRelatedFamilyNames(familyNames, person);
     Person result = getByUuid(person.getUuid());
     return result;
   }

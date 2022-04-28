@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -48,16 +47,13 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   protected final VideoFileResourceService videoFileResourceService;
 
   public FileResourceMetadataServiceImpl(
-      @Qualifier("fileResourceMetadataRepositoryImpl")
-          FileResourceMetadataRepository<FileResource> metadataRepository,
-      @Qualifier("applicationFileResourceServiceImpl")
-          ApplicationFileResourceService applicationFileResourceService,
-      @Qualifier("audioFileResourceServiceImpl") AudioFileResourceService audioFileResourceService,
-      @Qualifier("imageFileResourceServiceImpl") ImageFileResourceService imageFileResourceService,
-      @Qualifier("linkedDataFileResourceServiceImpl")
-          LinkedDataFileResourceService linkedDataFileResourceService,
-      @Qualifier("textFileResourceServiceImpl") TextFileResourceService textFileResourceService,
-      @Qualifier("videoFileResourceServiceImpl") VideoFileResourceService videoFileResourceService,
+      FileResourceMetadataRepository<FileResource> metadataRepository,
+      ApplicationFileResourceService applicationFileResourceService,
+      AudioFileResourceService audioFileResourceService,
+      ImageFileResourceService imageFileResourceService,
+      LinkedDataFileResourceService linkedDataFileResourceService,
+      TextFileResourceService textFileResourceService,
+      VideoFileResourceService videoFileResourceService,
       LocaleService localeService,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,

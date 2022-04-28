@@ -10,23 +10,23 @@ import java.util.UUID;
 /** Service for Website. */
 public interface WebsiteService extends EntityService<Website> {
 
-  SearchPageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest);
+  SearchPageResponse<Webpage> findRootWebpages(UUID uuid, SearchPageRequest searchPageRequest);
 
-  default List<Webpage> getRootPages(Website website) {
+  default List<Webpage> getRootWebpages(Website website) {
     if (website == null) {
       return null;
     }
-    return getRootPages(website.getUuid());
+    return getRootWebpages(website.getUuid());
   }
 
-  List<Webpage> getRootPages(UUID uuid);
+  List<Webpage> getRootWebpages(UUID uuid);
 
-  default boolean updateRootPagesOrder(Website website, List<Webpage> rootPages) {
+  default boolean updateRootWebpagesOrder(Website website, List<Webpage> rootPages) {
     if (website == null || rootPages == null) {
       return false;
     }
-    return updateRootPagesOrder(website.getUuid(), rootPages);
+    return updateRootWebpagesOrder(website.getUuid(), rootPages);
   }
 
-  boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootPages);
+  boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootPages);
 }

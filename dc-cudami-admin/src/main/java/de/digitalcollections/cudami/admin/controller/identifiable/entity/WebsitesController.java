@@ -109,7 +109,7 @@ public class WebsitesController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.findRootPages(uuid, searchPageRequest);
+    return service.findRootWebpages(uuid, searchPageRequest);
   }
 
   @GetMapping("/api/websites/{uuid}")
@@ -157,7 +157,7 @@ public class WebsitesController extends AbstractController {
   @PutMapping("/api/websites/{uuid}/webpages")
   public ResponseEntity updateRootPagesOrder(
       @PathVariable UUID uuid, @RequestBody List<Webpage> rootPages) throws TechnicalException {
-    boolean successful = service.updateRootPagesOrder(uuid, rootPages);
+    boolean successful = service.updateRootWebpagesOrder(uuid, rootPages);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }

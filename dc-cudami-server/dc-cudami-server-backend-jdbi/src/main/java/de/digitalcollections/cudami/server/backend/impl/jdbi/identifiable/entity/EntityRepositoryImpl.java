@@ -211,7 +211,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<E> findRandom(int count) {
+  public List<E> getRandom(int count) {
     // Warning: could be very slow if random is used on tables with many million records
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
@@ -279,7 +279,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<FileResource> saveRelatedFileResources(
+  public List<FileResource> setRelatedFileResources(
       UUID entityUuid, List<FileResource> fileResources) {
     if (fileResources == null) {
       return null;

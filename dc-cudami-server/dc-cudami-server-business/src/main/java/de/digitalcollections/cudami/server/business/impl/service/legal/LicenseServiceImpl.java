@@ -52,8 +52,8 @@ public class LicenseServiceImpl implements LicenseService {
   }
 
   @Override
-  public List<License> findAll() {
-    return repository.findAll();
+  public List<License> getAll() {
+    return repository.getAll();
   }
 
   @Override

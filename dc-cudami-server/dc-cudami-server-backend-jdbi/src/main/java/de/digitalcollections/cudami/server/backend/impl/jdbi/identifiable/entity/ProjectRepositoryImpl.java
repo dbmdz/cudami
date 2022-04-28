@@ -113,7 +113,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> getDigitalObjects(
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID projectUuid, SearchPageRequest searchPageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
@@ -200,7 +200,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->

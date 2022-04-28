@@ -28,47 +28,6 @@ public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
         baseEndpoint + "/search", searchPageRequest, LocalizedUrlAliases.class);
   }
 
-  public LocalizedUrlAliases findAllLinks(UUID websiteUuid, String slug) throws TechnicalException {
-    if (websiteUuid == null) {
-      return (LocalizedUrlAliases)
-          doGetRequestForObject(
-              String.format(baseEndpoint + "/%s", slug), LocalizedUrlAliases.class);
-    }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/%s/%s", slug, websiteUuid), LocalizedUrlAliases.class);
-  }
-
-  public LocalizedUrlAliases findPrimaryLinks(UUID websiteUuid, String slug)
-      throws TechnicalException {
-    if (websiteUuid == null) {
-      return (LocalizedUrlAliases)
-          doGetRequestForObject(
-              String.format(baseEndpoint + "/primary/%s", slug), LocalizedUrlAliases.class);
-    }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/primary/%s/%s", slug, websiteUuid),
-            LocalizedUrlAliases.class);
-  }
-
-  public LocalizedUrlAliases findPrimaryLinksForLocale(
-      UUID websiteUuid, String slug, Locale pLocale) throws TechnicalException {
-    if (websiteUuid == null) {
-      return (LocalizedUrlAliases)
-          doGetRequestForObject(
-              String.format(baseEndpoint + "/primary/%s?pLocale=%s", slug, pLocale),
-              LocalizedUrlAliases.class);
-    }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
-            LocalizedUrlAliases.class);
-  }
-
   public String generateSlug(Locale locale, String label, UUID websiteUuid)
       throws TechnicalException {
     String encodedLabel;
@@ -86,8 +45,37 @@ public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
         String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 
+  public LocalizedUrlAliases getPrimaryLinks(UUID websiteUuid, String slug)
+      throws TechnicalException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format(baseEndpoint + "/primary/%s", slug), LocalizedUrlAliases.class);
+    }
+
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format(baseEndpoint + "/primary/%s/%s", slug, websiteUuid),
+            LocalizedUrlAliases.class);
+  }
+
+  public LocalizedUrlAliases getPrimaryLinksForLocale(UUID websiteUuid, String slug, Locale pLocale)
+      throws TechnicalException {
+    if (websiteUuid == null) {
+      return (LocalizedUrlAliases)
+          doGetRequestForObject(
+              String.format(baseEndpoint + "/primary/%s?pLocale=%s", slug, pLocale),
+              LocalizedUrlAliases.class);
+    }
+
+    return (LocalizedUrlAliases)
+        doGetRequestForObject(
+            String.format(baseEndpoint + "/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
+            LocalizedUrlAliases.class);
+  }
+
   public boolean isPrimary(UUID websiteUuid, String slug) throws TechnicalException {
-    LocalizedUrlAliases localizedUrlAliases = findPrimaryLinks(websiteUuid, slug);
+    LocalizedUrlAliases localizedUrlAliases = getPrimaryLinks(websiteUuid, slug);
     if (localizedUrlAliases == null || localizedUrlAliases.isEmpty()) {
       return false;
     }

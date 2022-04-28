@@ -49,7 +49,8 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
 
     DigitalObject digitalObject =
         new DigitalObjectBuilder().withUuid(extractFirstUuidFromPath(path)).build();
-    when(digitalObjectService.getActiveCollections(eq(digitalObject), any(SearchPageRequest.class)))
+    when(digitalObjectService.findActiveCollections(
+            eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -89,7 +90,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(digitalObjectService.getActiveCollections(
+    when(digitalObjectService.findActiveCollections(
             any(DigitalObject.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
@@ -127,7 +128,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(digitalObjectService.getProjects(any(DigitalObject.class), any(SearchPageRequest.class)))
+    when(digitalObjectService.findProjects(any(DigitalObject.class), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

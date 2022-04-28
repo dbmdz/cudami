@@ -4,6 +4,7 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
+import java.util.List;
 import java.util.UUID;
 
 public interface EntityHeadwordRepository {
@@ -27,11 +28,11 @@ public interface EntityHeadwordRepository {
 
   PageResponse<Entity> findEntitiesByHeadword(PageRequest pageRequest, UUID headwordUuid);
 
-  default Headword findHeadwordsForEntity(Entity entity) {
-    return findHeadwordsForEntity(entity.getUuid());
+  default List<Headword> getHeadwordsForEntity(Entity entity) {
+    return getHeadwordsForEntity(entity.getUuid());
   }
 
-  Headword findHeadwordsForEntity(UUID entityUuid);
+  List<Headword> getHeadwordsForEntity(UUID entityUuid);
 
   default void remove(Entity entity, Headword headword) {
     remove(entity.getUuid(), headword.getUuid());

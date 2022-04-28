@@ -8,6 +8,7 @@ import de.digitalcollections.model.paging.SearchPageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
 
@@ -18,6 +19,14 @@ public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
   @Override
   public SearchPageResponse<Article> find(SearchPageRequest pageRequest) throws TechnicalException {
     return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
+  }
+
+  public Article getByUuid(UUID uuid, Locale locale) throws TechnicalException {
+    if (locale != null) {
+      return doGetRequestForObject(String.format(baseEndpoint + "/%s?pLocale=%s", uuid, locale));
+    } else {
+      return doGetRequestForObject(String.format(baseEndpoint + "/%s", uuid));
+    }
   }
 
   public List<Locale> getLanguages() throws TechnicalException {

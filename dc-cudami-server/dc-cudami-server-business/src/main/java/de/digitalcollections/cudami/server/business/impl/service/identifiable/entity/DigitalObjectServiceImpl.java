@@ -11,8 +11,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -44,7 +44,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   private final CollectionService collectionService;
   private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
-  private final LinkedDataFileResourceService linkedDataFileResourceService;
+  private final DigitalObjectLinkedDataFileResourceService
+      digitalObjectLinkedDataFileResourceService;
   private final ProjectService projectService;
 
   public DigitalObjectServiceImpl(
@@ -53,7 +54,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       ProjectService projectService,
       IdentifierRepository identifierRepository,
       UrlAliasService urlAliasService,
-      LinkedDataFileResourceService linkedDataFileResourceService,
+      DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
       HookProperties hookProperties,
       LocaleService localeService,
@@ -68,7 +69,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     this.collectionService = collectionService;
     this.projectService = projectService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
-    this.linkedDataFileResourceService = linkedDataFileResourceService;
+    this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
   }
 
   @Override
@@ -103,18 +104,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public SearchPageResponse<Collection> getActiveCollections(
+  public SearchPageResponse<Collection> findActiveCollections(
       DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
     Filtering filtering = filteringForActive();
     searchPageRequest.add(filtering);
-    return ((DigitalObjectRepository) repository).getCollections(digitalObject, searchPageRequest);
+    return ((DigitalObjectRepository) repository).findCollections(digitalObject, searchPageRequest);
   }
 
   @Override
-  public SearchPageResponse<Collection> getCollections(
+  public SearchPageResponse<Collection> findCollections(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
     return ((DigitalObjectRepository) repository)
-        .getCollections(digitalObjectUuid, searchPageRequest);
+        .findCollections(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
@@ -129,13 +130,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    return linkedDataFileResourceService.getLinkedDataFileResourcesForDigitalObjectUuid(
-        digitalObjectUuid);
+    return digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(digitalObjectUuid);
   }
 
   @Override
   public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
-    return digitalObjectRenderingFileResourceService.getForDigitalObject(digitalObjectUuid);
+    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -145,38 +145,39 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<Locale> getLanguagesOfCollections(UUID uuid) {
-    return ((DigitalObjectRepository) this.repository).getLanguagesOfCollections(uuid);
+    return ((DigitalObjectRepository) repository).getLanguagesOfCollections(uuid);
   }
 
   @Override
   public List<Locale> getLanguagesOfProjects(UUID uuid) {
-    return ((DigitalObjectRepository) this.repository).getLanguagesOfProjects(uuid);
+    return ((DigitalObjectRepository) repository).getLanguagesOfProjects(uuid);
   }
 
   @Override
-  public SearchPageResponse<Project> getProjects(
+  public SearchPageResponse<Project> findProjects(
       UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
-    return ((DigitalObjectRepository) repository).getProjects(digitalObjectUuid, searchPageRequest);
+    return ((DigitalObjectRepository) repository)
+        .findProjects(digitalObjectUuid, searchPageRequest);
   }
 
   @Override
-  public List<FileResource> saveFileResources(
+  public List<FileResource> setFileResources(
       UUID digitalObjectUuid, List<FileResource> fileResources) {
     return ((DigitalObjectRepository) repository)
-        .saveFileResources(digitalObjectUuid, fileResources);
+        .setFileResources(digitalObjectUuid, fileResources);
   }
 
   @Override
-  public List<FileResource> saveRenderingResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
-    return digitalObjectRenderingFileResourceService.saveForDigitalObject(
-        digitalObjectUuid, renderingResources);
+  public List<FileResource> setRenderingFileResources(
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources) {
+    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+        digitalObjectUuid, renderingFileResources);
   }
 
   @Override
-  public List<LinkedDataFileResource> saveLinkedDataFileResources(
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
-    return linkedDataFileResourceService.saveLinkedDataFileResources(
+    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
         digitalObjectUuid, linkedDataFileResources);
   }
 
@@ -216,11 +217,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     digitalObject = super.save(digitalObject);
 
     // save the linked data resources
-    saveLinkedDataFileResources(digitalObject, linkedDataResources);
+    setLinkedDataFileResources(digitalObject, linkedDataResources);
 
     // save the rendering resources
     try {
-      saveRenderingResources(digitalObject, renderingResources);
+      setRenderingFileResources(digitalObject, renderingResources);
     } catch (CudamiServiceException e) {
       throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
     }
@@ -239,11 +240,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     digitalObject = super.update(digitalObject);
 
     // save the linked data resources
-    saveLinkedDataFileResources(digitalObject, linkedDataResources);
+    setLinkedDataFileResources(digitalObject, linkedDataResources);
 
     // save the rendering resources
     try {
-      saveRenderingResources(digitalObject, renderingResources);
+      setRenderingFileResources(digitalObject, renderingResources);
     } catch (CudamiServiceException e) {
       throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
     }
@@ -254,15 +255,15 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<FileResource> getRenderingResources(DigitalObject digitalObject)
       throws CudamiServiceException {
-    return digitalObjectRenderingFileResourceService.getForDigitalObject(digitalObject);
+    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObject);
   }
 
   @Override
-  public List<FileResource> saveRenderingResources(
-      DigitalObject digitalObject, List<FileResource> renderingResources)
+  public List<FileResource> setRenderingFileResources(
+      DigitalObject digitalObject, List<FileResource> renderingFileResources)
       throws CudamiServiceException {
-    return digitalObjectRenderingFileResourceService.saveForDigitalObject(
-        digitalObject, renderingResources);
+    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+        digitalObject, renderingFileResources);
   }
 
   private DigitalObject fillDigitalObject(DigitalObject digitalObject) {

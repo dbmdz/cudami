@@ -25,23 +25,23 @@ public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
     return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
   }
 
-  public PageResponse<Webpage> findRootPages(UUID uuid, SearchPageRequest searchPageRequest)
+  public PageResponse<Webpage> findRootWebpages(UUID uuid, SearchPageRequest searchPageRequest)
       throws TechnicalException {
     return doGetSearchRequestForPagedObjectList(
         String.format("%s/%s/rootpages", baseEndpoint, uuid), searchPageRequest, Webpage.class);
+  }
+
+  public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/rootpages", baseEndpoint, uuid), pageRequest, Webpage.class);
   }
 
   public List<Locale> getLanguages() throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
-  public PageResponse<Webpage> getRootPages(UUID uuid, PageRequest pageRequest)
-      throws TechnicalException {
-    return doGetRequestForPagedObjectList(
-        String.format("%s/%s/rootpages", baseEndpoint, uuid), pageRequest, Webpage.class);
-  }
-
-  public boolean updateRootPagesOrder(UUID websiteUuid, List<Webpage> rootpages)
+  public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootpages)
       throws TechnicalException {
     return Boolean.parseBoolean(
         doPutRequestForString(

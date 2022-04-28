@@ -15,8 +15,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -45,7 +45,7 @@ class DigitalObjectServiceImplTest {
   private DigitalObjectRepository repo;
   protected HookProperties hookProperties;
   private IdentifierRepository identifierRepository;
-  private LinkedDataFileResourceService linkedDataFileResourceService;
+  private DigitalObjectLinkedDataFileResourceService linkedDataFileResourceService;
   private LocaleService localeService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
@@ -58,7 +58,7 @@ class DigitalObjectServiceImplTest {
         mock(DigitalObjectRenderingFileResourceService.class);
     hookProperties = mock(HookProperties.class);
     identifierRepository = mock(IdentifierRepository.class);
-    linkedDataFileResourceService = mock(LinkedDataFileResourceService.class);
+    linkedDataFileResourceService = mock(DigitalObjectLinkedDataFileResourceService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
     projectService = mock(ProjectService.class);
@@ -138,7 +138,7 @@ class DigitalObjectServiceImplTest {
             .withFilename("blubb.xml") // required!!
             .withMimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    when(linkedDataFileResourceService.getLinkedDataFileResourcesForDigitalObjectUuid(eq(uuid)))
+    when(linkedDataFileResourceService.getLinkedDataFileResources(eq(uuid)))
         .thenReturn(List.of(persistedLinkedDataFileResource));
 
     DigitalObject actual = service.getByUuidAndLocale(uuid, Locale.ROOT);
@@ -201,7 +201,7 @@ class DigitalObjectServiceImplTest {
     persistedRenderingResource.setUuid(UUID.randomUUID());
     persistedRenderingResource.setFilename("foo.html");
     persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
-    when(digitalObjectRenderingFileResourceService.getForDigitalObject(eq(uuid)))
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(eq(uuid)))
         .thenReturn(List.of(persistedRenderingResource));
 
     DigitalObject actual = service.getByUuidAndLocale(uuid, Locale.ROOT);

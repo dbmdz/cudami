@@ -1,16 +1,12 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
-import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.TextFileResourceService;
@@ -32,81 +28,39 @@ import org.springframework.stereotype.Service;
  * This service persists all rendering resources (which can be of any type, derived from
  * FileResource) of a DigitalObject
  */
-public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceMetadataServiceImpl
+public class DigitalObjectRenderingFileResourceServiceImpl
     implements DigitalObjectRenderingFileResourceService {
 
-  private final DigitalObjectRenderingFileResourceRepository renderingFileResourceRepository;
+  protected final ApplicationFileResourceService applicationFileResourceService;
+  protected final AudioFileResourceService audioFileResourceService;
+  private final DigitalObjectRenderingFileResourceRepository
+      digitalObjectRenderingFileResourceRepository;
+  protected final FileResourceMetadataService<FileResource> fileResourceMetadataService;
+  protected final ImageFileResourceService imageFileResourceService;
+  protected final LinkedDataFileResourceService linkedDataFileResourceService;
+  protected final TextFileResourceService textFileResourceService;
+  protected final VideoFileResourceService videoFileResourceService;
 
   public DigitalObjectRenderingFileResourceServiceImpl(
-      @Qualifier("fileResourceMetadataRepositoryImpl")
-          FileResourceMetadataRepository<FileResource> metadataRepository,
-      @Qualifier("applicationFileResourceServiceImpl")
-          ApplicationFileResourceService applicationFileResourceService,
-      @Qualifier("audioFileResourceServiceImpl") AudioFileResourceService audioFileResourceService,
-      @Qualifier("imageFileResourceServiceImpl") ImageFileResourceService imageFileResourceService,
-      @Qualifier("linkedDataFileResourceServiceImpl")
-          LinkedDataFileResourceService linkedDataFileResourceService,
-      @Qualifier("textFileResourceServiceImpl") TextFileResourceService textFileResourceService,
-      @Qualifier("videoFileResourceServiceImpl") VideoFileResourceService videoFileResourceService,
-      DigitalObjectRenderingFileResourceRepository renderingFileResourceRepository,
-      IdentifierRepository identifierRepository,
-      UrlAliasService urlAliasService,
-      LocaleService localeService,
-      CudamiConfig cudamiConfig) {
-    super(
-        metadataRepository,
-        applicationFileResourceService,
-        audioFileResourceService,
-        imageFileResourceService,
-        linkedDataFileResourceService,
-        textFileResourceService,
-        videoFileResourceService,
-        localeService,
-        identifierRepository,
-        urlAliasService,
-        cudamiConfig);
-    this.renderingFileResourceRepository = renderingFileResourceRepository;
-  }
+      ApplicationFileResourceService applicationFileResourceService,
+      AudioFileResourceService audioFileResourceService,
+      @Qualifier("fileResourceMetadataService")
+          FileResourceMetadataService<FileResource> fileResourceMetadataService,
+      ImageFileResourceService imageFileResourceService,
+      LinkedDataFileResourceService linkedDataFileResourceService,
+      TextFileResourceService textFileResourceService,
+      VideoFileResourceService videoFileResourceService,
+      DigitalObjectRenderingFileResourceRepository digitalObjectRenderingFileResourceRepository) {
 
-  @Override
-  public List<FileResource> saveForDigitalObject(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
-
-    // Remove the old rendering resources, if present
-    List<FileResource> existingRenderingResources = getForDigitalObject(digitalObjectUuid);
-    existingRenderingResources.forEach(
-        r -> {
-          try {
-            deleteRenderingResource(r);
-          } catch (IdentifiableServiceException e) {
-            throw new RuntimeException("Cannot save rendering resource=" + r + ": " + e, e);
-          }
-        });
-
-    // Remove the old relations
-    renderingFileResourceRepository.removeByDigitalObject(digitalObjectUuid);
-
-    // Persist the new rendering resources
-    if (renderingResources != null) {
-      // first save rendering resources
-      renderingResources =
-          renderingResources.stream()
-              .map(
-                  r -> {
-                    try {
-                      return saveRenderingResource(r);
-                    } catch (Exception e) {
-                      throw new RuntimeException(
-                          "Cannot save rendering resource=" + r + ": " + e, e);
-                    }
-                  })
-              .collect(Collectors.toList());
-
-      // Persist the new relations
-      renderingFileResourceRepository.saveForDigitalObject(digitalObjectUuid, renderingResources);
-    }
-
-    return renderingResources;
+    this.applicationFileResourceService = applicationFileResourceService;
+    this.audioFileResourceService = audioFileResourceService;
+    this.imageFileResourceService = imageFileResourceService;
+    this.fileResourceMetadataService = fileResourceMetadataService;
+    this.linkedDataFileResourceService = linkedDataFileResourceService;
+    this.textFileResourceService = textFileResourceService;
+    this.videoFileResourceService = videoFileResourceService;
+    this.digitalObjectRenderingFileResourceRepository =
+        digitalObjectRenderingFileResourceRepository;
   }
 
   private boolean deleteRenderingResource(FileResource renderingResource)
@@ -123,11 +77,17 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
       case "video":
         return videoFileResourceService.delete(renderingResource.getUuid());
       default:
-        return delete(renderingResource.getUuid());
+        return fileResourceMetadataService.delete(renderingResource.getUuid());
     }
   }
 
-  private FileResource saveRenderingResource(FileResource renderingResource)
+  @Override
+  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
+    return digitalObjectRenderingFileResourceRepository.getRenderingFileResources(
+        digitalObjectUuid);
+  }
+
+  private FileResource saveRenderingFileResource(FileResource renderingResource)
       throws ValidationException, IdentifiableServiceException {
     if (renderingResource.getUuid() == null) {
       switch (renderingResource.getMimeType().getPrimaryType()) {
@@ -142,7 +102,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
         case "video":
           return videoFileResourceService.save((VideoFileResource) renderingResource);
         default:
-          return save(renderingResource);
+          return fileResourceMetadataService.save(renderingResource);
       }
     }
 
@@ -150,7 +110,44 @@ public class DigitalObjectRenderingFileResourceServiceImpl extends FileResourceM
   }
 
   @Override
-  public List<FileResource> getForDigitalObject(UUID digitalObjectUuid) {
-    return renderingFileResourceRepository.findByDigitalObject(digitalObjectUuid);
+  public List<FileResource> setRenderingFileResources(
+      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+
+    // Remove the old rendering resources, if present
+    List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObjectUuid);
+    existingRenderingResources.forEach(
+        r -> {
+          try {
+            deleteRenderingResource(r);
+          } catch (IdentifiableServiceException e) {
+            throw new RuntimeException("Cannot save rendering resource=" + r + ": " + e, e);
+          }
+        });
+
+    // Remove the old relations
+    digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObjectUuid);
+
+    // Persist the new rendering resources
+    if (renderingResources != null) {
+      // first save rendering resources
+      renderingResources =
+          renderingResources.stream()
+              .map(
+                  r -> {
+                    try {
+                      return saveRenderingFileResource(r);
+                    } catch (Exception e) {
+                      throw new RuntimeException(
+                          "Cannot save rendering resource=" + r + ": " + e, e);
+                    }
+                  })
+              .collect(Collectors.toList());
+
+      // Persist the new relations
+      digitalObjectRenderingFileResourceRepository.saveRenderingFileResources(
+          digitalObjectUuid, renderingResources);
+    }
+
+    return renderingResources;
   }
 }

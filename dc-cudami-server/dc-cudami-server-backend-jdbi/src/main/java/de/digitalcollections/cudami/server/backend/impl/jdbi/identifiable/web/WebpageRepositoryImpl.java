@@ -199,7 +199,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootPagesForWebsite(
+  public SearchPageResponse<Webpage> findRootWebpagesForWebsite(
       UUID uuid, SearchPageRequest searchPageRequest) {
     String commonSql =
         " FROM "
@@ -327,7 +327,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public PageResponse<Webpage> getChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -412,7 +412,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public PageResponse<Webpage> getRootNodes(PageRequest pageRequest) {
+  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName

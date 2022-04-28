@@ -124,7 +124,7 @@ class IdentifiableServiceImplTest {
       "throws an Exception to trigger a rollback on save, when creating and saving an UrlAlias fails")
   @Test
   public void exceptionOnSaveWhenSavingUrlAliasFails() throws CudamiServiceException {
-    when(urlAliasService.create(any(UrlAlias.class))).thenThrow(new CudamiServiceException("boo"));
+    when(urlAliasService.save(any(UrlAlias.class))).thenThrow(new CudamiServiceException("boo"));
 
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
@@ -152,13 +152,13 @@ class IdentifiableServiceImplTest {
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setPrimary(true);
     urlAlias.setSlug("label");
-    when(urlAliasService.create(any(UrlAlias.class))).thenReturn(urlAlias);
+    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(urlAlias);
 
     Identifiable actual = service.save(identifiable);
     assertThat(actual).isNotNull();
 
     verify(repo, times(1)).save(any(Identifiable.class));
-    verify(urlAliasService, times(1)).create(any(UrlAlias.class));
+    verify(urlAliasService, times(1)).save(any(UrlAlias.class));
   }
 
   @DisplayName(
@@ -248,7 +248,7 @@ class IdentifiableServiceImplTest {
 
     service.update(identifiable);
 
-    verify(urlAliasService, times(1)).create(any(UrlAlias.class), eq(true));
+    verify(urlAliasService, times(1)).save(any(UrlAlias.class), eq(true));
   }
 
   @DisplayName(
@@ -291,7 +291,7 @@ class IdentifiableServiceImplTest {
     when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
     when(repo.update(identifiable)).thenReturn(identifiable);
 
-    when(urlAliasService.findPrimaryLinksForTarget(any())).thenReturn(new ArrayList<>());
+    when(urlAliasService.getPrimaryUrlAliasesForTarget(any())).thenReturn(new ArrayList<>());
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
         .validate(eq(localizedUrlAliases));
@@ -425,7 +425,7 @@ class IdentifiableServiceImplTest {
 
     localizedUrlAliases.add(firstPrimaryUrlAlias, secondPrimaryUrlAlias);
 
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(localizedUrlAliases);
+    when(urlAliasService.getLocalizedUrlAliases(eq(targetUuid))).thenReturn(localizedUrlAliases);
 
     Identifiable identifiableInDb = new Identifiable();
     identifiableInDb.setUuid(targetUuid);
@@ -450,7 +450,7 @@ class IdentifiableServiceImplTest {
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
 
     assertThat(service.update(identifiable)).isEqualTo(expected);
-    verify(urlAliasService, never()).create(any(), eq(true));
+    verify(urlAliasService, never()).save(any(), eq(true));
     verify(urlAliasService, times(2)).update(any());
   }
 
@@ -483,7 +483,7 @@ class IdentifiableServiceImplTest {
 
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.getLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
 
     Identifiable identifiableInDb = new Identifiable();
     identifiableInDb.setUuid(targetUuid);
@@ -519,10 +519,10 @@ class IdentifiableServiceImplTest {
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
-    verify(urlAliasService, times(2)).create(any(), eq(true));
+    verify(urlAliasService, times(2)).save(any(), eq(true));
     verify(urlAliasService, times(2)).update(any());
-    verify(urlAliasService).create(eq(firstPrimaryUrlAlias), eq(true));
-    verify(urlAliasService).create(eq(secondPrimaryUrlAlias), eq(true));
+    verify(urlAliasService).save(eq(firstPrimaryUrlAlias), eq(true));
+    verify(urlAliasService).save(eq(secondPrimaryUrlAlias), eq(true));
     // the stored UrlAliases must have been changed to primary == false
     assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isFalse();
     assertThat(secondStoredPrimaryUrlAlias.isPrimary()).isFalse();
@@ -559,7 +559,7 @@ class IdentifiableServiceImplTest {
 
     storedUrlAliases.add(firstStoredPrimaryUrlAlias, secondStoredPrimaryUrlAlias);
 
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.getLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
 
     Identifiable identifiableInDb = new Identifiable();
     identifiableInDb.setUuid(targetUuid);
@@ -589,9 +589,9 @@ class IdentifiableServiceImplTest {
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
-    verify(urlAliasService, times(1)).create(any(), eq(true));
+    verify(urlAliasService, times(1)).save(any(), eq(true));
     verify(urlAliasService, times(2)).update(any());
-    verify(urlAliasService).create(eq(firstPrimaryUrlAlias), eq(true));
+    verify(urlAliasService).save(eq(firstPrimaryUrlAlias), eq(true));
     // the german stored UrlAliases must have been changed to primary == false
     assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isFalse();
     assertThat(secondStoredPrimaryUrlAlias.isPrimary()).isTrue();
@@ -617,7 +617,7 @@ class IdentifiableServiceImplTest {
 
     LocalizedUrlAliases storedUrlAliases = new LocalizedUrlAliases(firstStoredPrimaryUrlAlias);
 
-    when(urlAliasService.findLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
+    when(urlAliasService.getLocalizedUrlAliases(eq(targetUuid))).thenReturn(storedUrlAliases);
 
     Identifiable identifiableInDb = new Identifiable();
     identifiableInDb.setUuid(targetUuid);
@@ -657,7 +657,7 @@ class IdentifiableServiceImplTest {
     when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
-    verify(urlAliasService, times(1)).create(eq(secondPrimaryUrlAlias), eq(true));
+    verify(urlAliasService, times(1)).save(eq(secondPrimaryUrlAlias), eq(true));
     verify(urlAliasService, times(1)).update(eq(firstPrimaryUrlAlias));
     assertThat(firstStoredPrimaryUrlAlias.isPrimary()).isTrue();
   }
@@ -691,7 +691,7 @@ class IdentifiableServiceImplTest {
     when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(List.of(identifierToDelete));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
-    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
+    when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
     Identifiable actual = service.update(identifiableToUpdate);
 
@@ -741,7 +741,7 @@ class IdentifiableServiceImplTest {
     when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
-    when(urlAliasService.findLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
+    when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
     Identifiable actual = service.update(identifiableToUpdate);
     List<Identifier> actualIdentifiers = new ArrayList<>(actual.getIdentifiers());

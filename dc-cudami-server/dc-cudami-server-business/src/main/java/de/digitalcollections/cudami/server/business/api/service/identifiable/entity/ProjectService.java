@@ -26,15 +26,15 @@ public interface ProjectService extends EntityService<Project> {
 
   boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 
-  default SearchPageResponse<DigitalObject> getDigitalObjects(
+  default SearchPageResponse<DigitalObject> findDigitalObjects(
       Project project, SearchPageRequest searchPageRequest) {
     if (project == null) {
       return null;
     }
-    return getDigitalObjects(project.getUuid(), searchPageRequest);
+    return findDigitalObjects(project.getUuid(), searchPageRequest);
   }
 
-  SearchPageResponse<DigitalObject> getDigitalObjects(
+  SearchPageResponse<DigitalObject> findDigitalObjects(
       UUID projectUuid, SearchPageRequest searchPageRequest);
 
   default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
@@ -55,12 +55,12 @@ public interface ProjectService extends EntityService<Project> {
 
   boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid);
 
-  default boolean saveDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
+  default boolean setDigitalObjects(Project project, List<DigitalObject> digitalObjects) {
     if (project == null || digitalObjects == null) {
       return false;
     }
-    return saveDigitalObjects(project.getUuid(), digitalObjects);
+    return setDigitalObjects(project.getUuid(), digitalObjects);
   }
 
-  boolean saveDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
+  boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 }

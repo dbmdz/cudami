@@ -61,7 +61,7 @@ public class V3EntityRelationController {
   @GetMapping(
       value = {"/v3/entities/relations", "/latest/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> getEntitiesRelations(
+  public ResponseEntity<String> findByPredicate(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",

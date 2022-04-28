@@ -61,7 +61,7 @@ public class V3RenderingTemplateController {
   @GetMapping(
       value = {"/v3/renderingtemplates", "/latest/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> findAll(
+  public ResponseEntity<String> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",

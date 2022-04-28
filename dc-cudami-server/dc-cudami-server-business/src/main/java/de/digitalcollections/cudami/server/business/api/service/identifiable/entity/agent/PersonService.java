@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface PersonService extends EntityService<Person> {
 
-  PageResponse<Person> findByLocationOfBirth(PageRequest pageRequest, UUID uuid);
+  PageResponse<Person> findByGeoLocationOfBirth(PageRequest pageRequest, UUID uuid);
 
-  PageResponse<Person> findByLocationOfDeath(PageRequest pageRequest, UUID uuid);
+  PageResponse<Person> findByGeoLocationOfDeath(PageRequest pageRequest, UUID uuid);
 
   Set<DigitalObject> getDigitalObjects(UUID uuidPerson);
 
