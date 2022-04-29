@@ -46,7 +46,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
     DigitalObject digitalObject =
         DigitalObject.builder().withUuid(extractFirstUuidFromPath(path)).build();
     when(digitalObjectService.findActiveCollections(
-        eq(digitalObject), any(SearchPageRequest.class)))
+            eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
