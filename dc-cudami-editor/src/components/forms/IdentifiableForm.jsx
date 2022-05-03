@@ -39,6 +39,24 @@ import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 
+const typeToClassNamesMapping = {
+  article: [{className: 'Article'}],
+  collection: [{className: 'Collection'}],
+  corporateBody: [{className: 'CorporateBody'}],
+  fileResource: [
+    {className: 'ApplicationFileResource', mimeType: 'application/'},
+    {className: 'AudioFileResource', mimeType: 'audio/'},
+    {className: 'ImageFileResource', mimeType: 'image/'},
+    {className: 'LinkedDataFileResource', mimeType: 'application/'},
+    {className: 'TextFileResource', mimeType: 'text/'},
+    {className: 'VideoFileResource', mimeType: 'video/'},
+  ],
+  project: [{className: 'Project'}],
+  topic: [{className: 'Topic'}],
+  webpage: [{className: 'Webpage'}],
+  website: [{className: 'Website'}],
+}
+
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
     'article',
@@ -242,13 +260,20 @@ class IdentifiableForm extends Component {
   }
 
   getGeneratedUrlAliases = async () => {
+    const {parentWebsite, type} = this.props
     const {
       existingLanguages,
       generationExcludes,
-      identifiable: {entityType, label, localizedUrlAliases},
+      identifiable: {label, localizedUrlAliases, mimeType: mime},
       initialLabel,
     } = this.state
-    if (entityType && generationExcludes.includes(entityType)) {
+    if (
+      typeToClassNamesMapping[type].some(
+        ({className, mimeType}) =>
+          (mimeType ? mime?.startsWith(mimeType) : true) &&
+          generationExcludes.includes(className),
+      )
+    ) {
       return {}
     }
     const languagesWithoutGeneratedUrlAliases = existingLanguages.filter(
@@ -256,7 +281,7 @@ class IdentifiableForm extends Component {
         const listOfAliases = localizedUrlAliases[language]
         /* filter the aliases that are connected with the parent website */
         const existingDefaultUrlAlias = listOfAliases.filter(
-          ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
+          ({website}) => website?.uuid === parentWebsite?.uuid,
         )
         const labelChanged =
           initialLabel?.[language] &&
@@ -275,13 +300,13 @@ class IdentifiableForm extends Component {
       const listOfAliases = localizedUrlAliases[language]
       /* filter the aliases that are connected with the parent website */
       const existingDefaultUrlAlias = listOfAliases.filter(
-        ({website}) => website?.uuid === this.props.parentWebsite?.uuid,
+        ({website}) => website?.uuid === parentWebsite?.uuid,
       )
       /* add an alias with the parent website if there are no existing aliases for the language */
       if (!existingDefaultUrlAlias.length) {
         const newAlias = await this.getGeneratedUrlAliasForLanguageAndWebsite(
           language,
-          this.props.parentWebsite,
+          parentWebsite,
         )
         generatedUrlAliases[language].push(newAlias)
         continue
