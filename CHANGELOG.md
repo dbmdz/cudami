@@ -39,6 +39,12 @@ Methods returning one object renamed from `find...` to `getBy...`:
 - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
 - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
 
+## [5.2.4](https://github.com/dbmdz/cudami/releases/tag/5.2.4) - 2022-04-26
+
+### Fixed
+
+- Missing `ORDER BY` keywords in SQL select statement
+
 ## [5.2.3](https://github.com/dbmdz/cudami/releases/tag/5.2.3) - 2022-04-01
 
 ### Changed
