@@ -40,26 +40,26 @@ public class V2CollectionControllerTest extends BaseControllerTest {
             .withTotalElements(139)
             .withContent(
                 Collection.builder()
-                    .withUuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
-                    .createdAt("2020-03-03T16:12:08.686626")
-                    .withLabel(
+                    .uuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
+                    .created("2020-03-03T16:12:08.686626")
+                    .label(
                         Locale.GERMAN,
                         "100(0) Schlüsseldokumente - zur deutschen Geschichte im 20. Jahrhundert sowie zur russischen und sowjetischen Geschichte (1917-1991)")
-                    .withLabel(
+                    .label(
                         Locale.ENGLISH,
                         "100(0) Key Documents on German History of the 20th Century and of the Russian and Soviet History (1917-1991)")
-                    .lastModifiedAt("2020-10-19T17:04:07.889254")
-                    .withPreviewImage(
+                    .lastModified("2020-10-19T17:04:07.889254")
+                    .previewImage(
                         "1000_Schluesseldokumente_neutrales_Logo.jpg",
                         "cc3893e8-9530-4602-b640-118a3218e826",
                         "file:///cudami/image/jpg/cc38/93e8/9530/4602/b640/118a/3218/e826/resource.jpg",
                         MimeType.MIME_IMAGE_JPEG,
                         "https://api.digitale-sammlungen.de/iiif/image/v2/cc3893e8-9530-4602-b640-118a3218e826")
-                    .withAltTextFromLabel()
-                    .withTitleFromLabel()
-                    .withOpenPreviewImageInNewWindow()
-                    .withRefId(14)
-                    .withPublicationStart("2020-10-01")
+                    .altTextFromLabel()
+                    .titleFromLabel()
+                    .openPreviewImageInNewWindow()
+                    .refId(14)
+                    .publicationStart("2020-10-01")
                     .build())
             .build();
 

@@ -44,7 +44,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .build();
 
     DigitalObject digitalObject =
-        DigitalObject.builder().withUuid(extractFirstUuidFromPath(path)).build();
+        DigitalObject.builder().uuid(extractFirstUuidFromPath(path)).build();
     when(digitalObjectService.findActiveCollections(
             eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
@@ -69,20 +69,20 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .withTotalElements(1)
                 .withContent(
                     Collection.builder()
-                        .createdAt("2020-07-16T11:51:33.981829")
-                        .withLabel(Locale.GERMAN, "Lateinische Handschriften")
-                        .withLabel(Locale.ENGLISH, "Latin Manuscripts")
-                        .lastModifiedAt("2020-11-04T15:46:42.81741")
-                        .withPreviewImage(
+                        .created("2020-07-16T11:51:33.981829")
+                        .label(Locale.GERMAN, "Lateinische Handschriften")
+                        .label(Locale.ENGLISH, "Latin Manuscripts")
+                        .lastModified("2020-11-04T15:46:42.81741")
+                        .previewImage(
                             "Lateinische_Handschriften_bsb00131281_27.jpg",
                             "2780bee1-eeec-4b50-a95b-bba90793fc6a",
                             "file:///cudami/image/jpg/2780/bee1/eeec/4b50/a95b/bba9/0793/fc6a/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/2780bee1-eeec-4b50-a95b-bba90793fc6a")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
-                        .withRefId(148)
-                        .withPublicationStart("2020-11-01")
+                        .openPreviewImageInNewWindow()
+                        .uuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
+                        .refId(148)
+                        .publicationStart("2020-11-01")
                         .build())
                 .build();
 
@@ -108,19 +108,19 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .withTotalElements(1)
                 .withContent(
                     Project.builder()
-                        .createdAt("2020-07-16T11:51:33.981829")
-                        .withLabel(Locale.GERMAN, "Lateinische Handschriften")
-                        .withLabel(Locale.ENGLISH, "Latin Manuscripts")
-                        .lastModifiedAt("2020-11-04T15:46:42.81741")
-                        .withPreviewImage(
+                        .created("2020-07-16T11:51:33.981829")
+                        .label(Locale.GERMAN, "Lateinische Handschriften")
+                        .label(Locale.ENGLISH, "Latin Manuscripts")
+                        .lastModified("2020-11-04T15:46:42.81741")
+                        .previewImage(
                             "Lateinische_Handschriften_bsb00131281_27.jpg",
                             "2780bee1-eeec-4b50-a95b-bba90793fc6a",
                             "file:///cudami/image/jpg/2780/bee1/eeec/4b50/a95b/bba9/0793/fc6a/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/2780bee1-eeec-4b50-a95b-bba90793fc6a")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
-                        .withRefId(148)
+                        .openPreviewImageInNewWindow()
+                        .uuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
+                        .refId(148)
                         .build())
                 .build();
 

@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- Using `digitalcollections-model` in version `9.2.0`
+- **Breaking** Using `digitalcollections-model` in version `10.0.0` (affects the client)
 - Database update for the updated `DigitalObject`
 - Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions

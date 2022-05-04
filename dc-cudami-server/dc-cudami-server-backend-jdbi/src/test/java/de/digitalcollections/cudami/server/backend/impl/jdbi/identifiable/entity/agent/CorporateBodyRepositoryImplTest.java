@@ -46,8 +46,8 @@ class CorporateBodyRepositoryImplTest {
     CorporateBody creator =
         (CorporateBody)
             CorporateBody.builder()
-                .withLabel(Locale.GERMAN, "Körperschaft")
-                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .label(Locale.GERMAN, "Körperschaft")
+                .label(Locale.ENGLISH, "Corporate Body")
                 .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
@@ -64,8 +64,8 @@ class CorporateBodyRepositoryImplTest {
     CorporateBody creator =
         (CorporateBody)
             CorporateBody.builder()
-                .withLabel(Locale.GERMAN, "Körperschaft")
-                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .label(Locale.GERMAN, "Körperschaft")
+                .label(Locale.ENGLISH, "Corporate Body")
                 .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =

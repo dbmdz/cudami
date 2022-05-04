@@ -614,14 +614,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
         CreationInfo creationInfo = new CreationInfo();
         if (creationCreatorUuid != null) {
-          creationInfo.setCreator((Agent) Agent.builder().withUuid(creationCreatorUuid).build());
+          creationInfo.setCreator((Agent) Agent.builder().uuid(creationCreatorUuid).build());
         }
         if (creationDate != null) {
           creationInfo.setDate(creationDate);
         }
         if (creationGeolocationUuid != null) {
           creationInfo.setGeoLocation(
-              (GeoLocation) GeoLocation.builder().withUuid(creationGeolocationUuid).build());
+              (GeoLocation) GeoLocation.builder().uuid(creationGeolocationUuid).build());
         }
         digitalObject.setCreationInfo(creationInfo);
       }
@@ -647,8 +647,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // Fill the parent (empty, only with uuid), if present.
     UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
     if (parentUuid != null) {
-      ((DigitalObject) identifiable)
-          .setParent(DigitalObject.builder().withUuid(parentUuid).build());
+      ((DigitalObject) identifiable).setParent(DigitalObject.builder().uuid(parentUuid).build());
     }
   }
 

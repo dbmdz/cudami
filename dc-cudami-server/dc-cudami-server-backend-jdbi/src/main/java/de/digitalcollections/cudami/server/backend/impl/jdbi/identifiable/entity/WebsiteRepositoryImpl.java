@@ -119,6 +119,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     switch (modelProperty) {
       case "url":
         return tableAlias + ".url";
+      case "registrationDate":
+        return tableAlias + ".registration_date";
       default:
         return null;
     }

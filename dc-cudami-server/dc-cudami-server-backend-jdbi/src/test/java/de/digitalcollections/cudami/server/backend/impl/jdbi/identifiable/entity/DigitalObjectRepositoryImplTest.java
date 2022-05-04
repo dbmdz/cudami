@@ -92,12 +92,11 @@ class DigitalObjectRepositoryImplTest {
 
   private static final License EXISTING_LICENSE =
       License.builder()
-          .withUuid(UUID.randomUUID())
-          .withAcronym("CC0 1.0")
-          .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
-          .withLabel(
-              Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
-          .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
+          .uuid(UUID.randomUUID())
+          .acronym("CC0 1.0")
+          .url("http://rightsstatements.org/vocab/NoC-NC/1.0/")
+          .label(Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
+          .label(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
 
   @BeforeEach
@@ -129,9 +128,9 @@ class DigitalObjectRepositoryImplTest {
     CorporateBody creator =
         (CorporateBody)
             CorporateBody.builder()
-                .withUuid(UUID.randomUUID())
-                .withLabel(Locale.GERMAN, "Körperschaft")
-                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .uuid(UUID.randomUUID())
+                .label(Locale.GERMAN, "Körperschaft")
+                .label(Locale.ENGLISH, "Corporate Body")
                 .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
@@ -140,10 +139,7 @@ class DigitalObjectRepositoryImplTest {
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         (GeoLocation)
-            GeoLocation.builder()
-                .withUuid(UUID.randomUUID())
-                .withLabel(Locale.GERMAN, "Ort")
-                .build();
+            GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
@@ -151,23 +147,23 @@ class DigitalObjectRepositoryImplTest {
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
         CreationInfo.builder()
-            .withCreator(creator)
-            .withDate("2022-02-25")
-            .withGeoLocation(creationPlace)
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
             .build();
 
     DigitalObject parent =
-        repo.save(DigitalObject.builder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
         DigitalObject.builder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLicense(EXISTING_LICENSE)
-            .withCreationInfo(creationInfo)
-            .withParent(parent)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .parent(parent)
             .build();
 
     // The "save" method internally retrieves the object by findOne
@@ -275,7 +271,7 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("returns all identifiers for a DigitalObject")
   void returnIdentifiers() {
     // Step1: Create the DigitalObject
-    DigitalObject digitalObject = DigitalObject.builder().withLabel(Locale.GERMAN, "Label").build();
+    DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
     DigitalObject persisted = repo.save(digitalObject);
 
     // Step2: Create the identifiers and connect with with the DigitalObject
@@ -286,7 +282,7 @@ class DigitalObjectRepositoryImplTest {
 
     // Step3: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
-        DigitalObject.builder().withLabel(Locale.GERMAN, "Anderes Label").build();
+        DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
     DigitalObject otherPersisted = repo.save(otherDigitalObject);
     identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
 
@@ -336,9 +332,9 @@ class DigitalObjectRepositoryImplTest {
     CorporateBody creator =
         (CorporateBody)
             CorporateBody.builder()
-                .withUuid(UUID.randomUUID())
-                .withLabel(Locale.GERMAN, "Körperschaft")
-                .withLabel(Locale.ENGLISH, "Corporate Body")
+                .uuid(UUID.randomUUID())
+                .label(Locale.GERMAN, "Körperschaft")
+                .label(Locale.ENGLISH, "Corporate Body")
                 .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
@@ -347,10 +343,7 @@ class DigitalObjectRepositoryImplTest {
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         (GeoLocation)
-            GeoLocation.builder()
-                .withUuid(UUID.randomUUID())
-                .withLabel(Locale.GERMAN, "Ort")
-                .build();
+            GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
@@ -358,12 +351,12 @@ class DigitalObjectRepositoryImplTest {
     // Insert a LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
     linkedDataFileResourceRepository.save(linkedDataFileResource);
@@ -382,26 +375,26 @@ class DigitalObjectRepositoryImplTest {
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
         CreationInfo.builder()
-            .withCreator(creator)
-            .withDate("2022-02-25")
-            .withGeoLocation(creationPlace)
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
             .build();
 
     // Build a parent DigitalObject, save and retrieve it
     DigitalObject parent =
-        repo.save(DigitalObject.builder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
         DigitalObject.builder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLicense(EXISTING_LICENSE)
-            .withCreationInfo(creationInfo)
-            .withLinkedDataFileResource(linkedDataFileResource)
-            .withRenderingResource(renderingResource)
-            .withParent(parent)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .linkedDataFileResource(linkedDataFileResource)
+            .renderingResource(renderingResource)
+            .parent(parent)
             .build();
     return digitalObject;
   }

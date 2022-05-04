@@ -35,17 +35,17 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("label")
                 .withContent(
                     CorporateBody.builder()
-                        .createdAt("2020-09-30T16:29:58.150463")
-                        .withIdentifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
-                        .withLabel(Locale.GERMAN, "Abensberg")
-                        .lastModifiedAt("2020-09-30T16:29:58.150464")
-                        .withPreviewImage(
+                        .created("2020-09-30T16:29:58.150463")
+                        .identifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
+                        .label(Locale.GERMAN, "Abensberg")
+                        .lastModified("2020-09-30T16:29:58.150464")
+                        .previewImage(
                             "Wappen%20von%20Abensberg.svg",
                             "2d67f93a-e12c-416b-8b31-796ec667d561",
                             "https://commons.wikimedia.org/wiki/Special:FilePath/Wappen%20von%20Abensberg.svg?width=270")
-                        .withUuid("fa34206a-0f2a-49ae-be42-22d011fc71ff")
-                        .withRefId(1300707)
-                        .withHomepageUrl("https://www.abensberg.de/")
+                        .uuid("fa34206a-0f2a-49ae-be42-22d011fc71ff")
+                        .refId(1300707)
+                        .homepageUrl("https://www.abensberg.de/")
                         .build())
                 .build();
 

@@ -36,10 +36,10 @@ class V3RenderingTemplateControllerTest extends BaseControllerTest {
                 .withTotalElements(2)
                 .withContent(
                     RenderingTemplate.builder()
-                        .withName("accordion")
-                        .withUuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
-                        .withDescription(Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
-                        .withLabel(Locale.GERMAN, "Akkordeon")
+                        .name("accordion")
+                        .uuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
+                        .description(Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
+                        .label(Locale.GERMAN, "Akkordeon")
                         .build())
                 .build();
 

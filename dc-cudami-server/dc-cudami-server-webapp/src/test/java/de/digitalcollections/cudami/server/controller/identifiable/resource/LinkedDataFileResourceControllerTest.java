@@ -40,12 +40,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   public void getByUuid(String path) throws Exception {
     LinkedDataFileResource expected =
         LinkedDataFileResource.builder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
@@ -64,12 +64,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .withContent(
                 List.of(
                     LinkedDataFileResource.builder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withContext("Test-context")
-                        .withObjectType("Test-objectType")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .objectType("Test-objectType")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build()))
             .build();
 
@@ -94,12 +94,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
                 .withTotalElements(1)
                 .withContent(
                     LinkedDataFileResource.builder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withContext("Test-context")
-                        .withObjectType("Test-objectType")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .objectType("Test-objectType")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build())
                 .build();
 
@@ -128,12 +128,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   public void save(String path) throws Exception {
     LinkedDataFileResource expected =
         LinkedDataFileResource.builder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.save(any(LinkedDataFileResource.class)))
@@ -163,12 +163,12 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   public void update(String path) throws Exception {
     LinkedDataFileResource expected =
         LinkedDataFileResource.builder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.update(any(LinkedDataFileResource.class)))
