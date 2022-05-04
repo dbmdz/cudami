@@ -87,7 +87,7 @@ public class UrlAliasRepositoryImplTest {
     urlAlias.setSlug("impressum");
     urlAlias.setTargetLanguage(Locale.GERMAN);
     urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    Webpage webpage = Webpage.builder().withLabel(Locale.GERMAN, "webpage").build();
+    Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
     webpage = webpageRepository.save(webpage);
     urlAlias.setTargetUuid(webpage.getUuid());
     return urlAlias;

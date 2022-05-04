@@ -44,17 +44,17 @@ class DigitalObjectControllerTest extends BaseControllerTest {
 
     DigitalObject expected =
         DigitalObject.builder()
-            .withUuid("1c419226-8d61-4efa-923a-7fbaf961eb9d")
-            .createdAt("2020-08-21T07:49:37.004443")
-            .withIdentifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
-            .withLabel(
+            .uuid("1c419226-8d61-4efa-923a-7fbaf961eb9d")
+            .created("2020-08-21T07:49:37.004443")
+            .identifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
+            .label(
                 "Actorum Bohemicorum, ... Theil, Das ist: Warhaffte vnd eigentliche Beschreibung aller fürnembsten vnd denckwürdigsten Historien vnd Geschichten, Welche sich im Königreich Böheim vnd dessen incorporirten Ländern ... begeben vnd zugetragen haben : Auß allerhand glaubwürdigen Publicis scriptis in eine feine richtige Ordnung zusammen verfasset, jetzo mit fleiß ubersehen, gemehret vnd auffs newe zugerichtet")
-            .lastModifiedAt("2020-08-21T07:49:37.00445")
-            .withPreviewImage(
+            .lastModified("2020-08-21T07:49:37.00445")
+            .previewImage(
                 "default.jpg",
                 "abe16b03-c5d5-41a6-9475-f742e06ae881",
                 "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb10000001_00003/full/250,/0/default.jpg")
-            .withRefId(72)
+            .refId(72)
             .build();
 
     when(digitalObjectService.getByIdentifier(any(String.class), any(String.class)))
@@ -76,17 +76,17 @@ class DigitalObjectControllerTest extends BaseControllerTest {
     expected.setContent(
         List.of(
             DigitalObject.builder()
-                .withUuid("7593c90e-6fb7-49b4-a70b-032761c9bbcd")
-                .createdAt("2020-08-21T07:49:37.004443")
-                .withIdentifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
-                .withLabel("Label")
-                .lastModifiedAt("2020-08-21T07:49:37.00445")
-                .withPreviewImage(
+                .uuid("7593c90e-6fb7-49b4-a70b-032761c9bbcd")
+                .created("2020-08-21T07:49:37.004443")
+                .identifier("mdz-obj", "bsb10000001", "53e3e619-47a3-4110-84f7-acba12a52298")
+                .label("Label")
+                .lastModified("2020-08-21T07:49:37.00445")
+                .previewImage(
                     "default.jpg",
                     "abe16b03-c5d5-41a6-9475-f742e06ae881",
                     "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb10000001_00003/full/250,/0/default.jpg")
-                .withRefId(72)
-                .withParent(DigitalObject.builder().withUuid(parentUuid).build())
+                .refId(72)
+                .parent(DigitalObject.builder().uuid(parentUuid).build())
                 .build()));
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);

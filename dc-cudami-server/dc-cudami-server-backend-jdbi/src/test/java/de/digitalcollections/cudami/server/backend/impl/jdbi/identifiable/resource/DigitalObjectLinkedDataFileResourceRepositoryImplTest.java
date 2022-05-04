@@ -56,21 +56,21 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
     digitalObject = digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
     List<LinkedDataFileResource> actual =
@@ -86,21 +86,21 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
     digitalObject = digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
     List<LinkedDataFileResource> persisted =
         repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));

@@ -138,10 +138,7 @@ class CudamiDigitalObjectsClientTest
   @DisplayName("can retrieve all ADOs for a parent DigitalObject")
   public void retrieveAdosForParent() throws Exception {
     DigitalObject parent =
-        DigitalObject.builder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Parent")
-            .build();
+        DigitalObject.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Parent").build();
 
     client.getAllForParent(parent);
 

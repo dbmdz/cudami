@@ -32,10 +32,10 @@ class V2IdentifierTypeControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("namespace")
                 .withContent(
                     IdentifierType.builder()
-                        .withLabel("MDZ-ID")
-                        .withNamespace("mdz-obj")
-                        .withPattern("^bsb[0-9]{8}$")
-                        .withUuid("d0e7f4b8-7d0c-4233-b58d-20437477672b")
+                        .label("MDZ-ID")
+                        .namespace("mdz-obj")
+                        .pattern("^bsb[0-9]{8}$")
+                        .uuid("d0e7f4b8-7d0c-4233-b58d-20437477672b")
                         .build())
                 .build();
 

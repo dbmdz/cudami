@@ -45,15 +45,15 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void existingUrlAlias(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("hurz")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("hurz")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(expectedUrlAlias);
 
@@ -104,15 +104,15 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void save(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("hurz")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("hurz")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -138,15 +138,15 @@ class UrlAliasControllerTest extends BaseControllerTest {
   public void update(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("hurz")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("hurz")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
@@ -218,17 +218,17 @@ class UrlAliasControllerTest extends BaseControllerTest {
                     List.of(
                         new LocalizedUrlAliases(
                             UrlAlias.builder()
-                                .createdAt("2021-08-17T15:18:01.000001")
-                                .lastPublishedAt("2021-08-17T15:18:01.000001")
+                                .created("2021-08-17T15:18:01.000001")
+                                .lastPublished("2021-08-17T15:18:01.000001")
                                 .isPrimary()
-                                .withSlug("hurz")
-                                .withTargetLanguage("de")
-                                .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-                                .withTargetUuid("23456789-2345-2345-2345-234567890123")
-                                .withUuid("12345678-1234-1234-1234-123456789012")
-                                .withWebsite(
+                                .slug("hurz")
+                                .targetLanguage("de")
+                                .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+                                .targetUuid("23456789-2345-2345-2345-234567890123")
+                                .uuid("12345678-1234-1234-1234-123456789012")
+                                .website(
                                     Website.builder()
-                                        .withUuid("87654321-4321-4321-4321-876543210987")
+                                        .uuid("87654321-4321-4321-4321-876543210987")
                                         .build())
                                 .build())))
                 .build();
@@ -268,15 +268,15 @@ class UrlAliasControllerTest extends BaseControllerTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("imprint")
-            .withTargetLanguage("en")
-            .withTargetType(IdentifiableType.RESOURCE, null)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("imprint")
+            .targetLanguage("en")
+            .targetType(IdentifiableType.RESOURCE, null)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
     when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(null)))
@@ -293,15 +293,15 @@ class UrlAliasControllerTest extends BaseControllerTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("imprint")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.RESOURCE, null)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(Website.builder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("imprint")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.RESOURCE, null)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
     Locale actualLocale = Locale.forLanguageTag("de");
@@ -318,14 +318,14 @@ class UrlAliasControllerTest extends BaseControllerTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         UrlAlias.builder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("imprint")
-            .withTargetLanguage("en")
-            .withTargetType(IdentifiableType.RESOURCE, null)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
+            .slug("imprint")
+            .targetLanguage("en")
+            .targetType(IdentifiableType.RESOURCE, null)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
             .build());
 
     when(urlAliasService.getPrimaryUrlAliases(eq(null), eq("imprint"), eq(null)))

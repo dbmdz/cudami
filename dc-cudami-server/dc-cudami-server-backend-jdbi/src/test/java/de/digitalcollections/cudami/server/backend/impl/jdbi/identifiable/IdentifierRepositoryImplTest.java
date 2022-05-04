@@ -103,8 +103,8 @@ class IdentifierRepositoryImplTest {
   private void saveIdentifiable(UUID uuid) {
     Webpage webpage =
         Webpage.builder()
-            .withLabel(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
-            .withUuid(uuid.toString())
+            .label(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
+            .uuid(uuid)
             .build();
     webpageRepository.save(webpage);
   }

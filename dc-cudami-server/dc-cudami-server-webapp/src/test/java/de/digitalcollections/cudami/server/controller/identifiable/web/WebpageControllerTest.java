@@ -32,9 +32,9 @@ class WebpageControllerTest extends BaseControllerTest {
   public void pagedRootpages(String path) throws Exception {
     Website expected =
         Website.builder()
-            .withLabel(Locale.GERMAN, "MDZ Homepage Relaunch")
-            .withUuid("7a2f1935-c5b8-40fb-8622-c675de0a6242")
-            .withRefId(29)
+            .label(Locale.GERMAN, "MDZ Homepage Relaunch")
+            .uuid("7a2f1935-c5b8-40fb-8622-c675de0a6242")
+            .refId(29)
             .build();
 
     when(webpageService.getWebsite(any(UUID.class))).thenReturn(expected);

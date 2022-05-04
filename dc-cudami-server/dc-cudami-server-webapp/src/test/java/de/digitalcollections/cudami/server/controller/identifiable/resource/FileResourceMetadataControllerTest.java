@@ -46,10 +46,10 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
                 .withTotalElements(1)
                 .withContent(
                     LinkedDataFileResource.builder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build())
                 .build();
 
