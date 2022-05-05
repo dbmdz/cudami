@@ -136,14 +136,6 @@ class DigitalObjectServiceImplTest {
         .description(Locale.ENGLISH, "description")
         .build();
 
-    // DigitalObject persistedDigitalObject =
-    //    new DigitalObjectBuilder()
-    //        .withUuid(uuid)
-    //        .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-    //       .withLabel(Locale.ENGLISH, "english label")
-    //       .withDescription(Locale.GERMAN, "Beschreibung")
-    //       .withDescription(Locale.ENGLISH, "description")
-    //       .build();
     when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
 
     LinkedDataFileResource persistedLinkedDataFileResource =

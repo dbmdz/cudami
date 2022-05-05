@@ -44,11 +44,10 @@ class CorporateBodyRepositoryImplTest {
   @DisplayName("can save a CorporateBody")
   public void saveCorporateBody() {
     CorporateBody creator =
-        (CorporateBody)
-            CorporateBody.builder()
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build();
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
@@ -62,11 +61,10 @@ class CorporateBodyRepositoryImplTest {
   @DisplayName("can retrieve a CorporateBody")
   public void saveAndRetrieveCorporateBody() {
     CorporateBody creator =
-        (CorporateBody)
-            CorporateBody.builder()
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build();
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
