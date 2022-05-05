@@ -30,6 +30,10 @@ public abstract class BaseControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
+  public MockMvc getMockMvc() {
+    return mockMvc;
+  }
+
   @Deprecated
   protected <T> PageResponse<T> buildStandardPageResponse(Class<T> type, List<T> content) {
     PageResponse<T> pageResponse = new PageResponse<>();

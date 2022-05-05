@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.agent;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -11,12 +12,13 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URI;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -56,33 +58,26 @@ public class FamilyNameController {
     return familyNameService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a familyname by namespace and id")
+  @Operation(
+      summary = "Get a familyname by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {
-        "/v6/familynames/identifier/{namespace}:{id}",
-        "/v6/familynames/identifier/{namespace}:{id}.json",
-        "/v5/familynames/identifier/{namespace}:{id}",
-        "/v5/familynames/identifier/{namespace}:{id}.json"
-      },
+      value = {"/v5/familynames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FamilyName> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    FamilyName result = familyNameService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a familyname by namespace and id")
-  @GetMapping(
-      value = {"/v6/familynames/identifier", "/v5/familynames/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
+  public ResponseEntity<FamilyName> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+    Pair<String, String> namespaceAndId =
+        ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
+    if (namespaceAndId.getLeft().isBlank()
+        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
+      throw new InvalidParameterException(
+          "No namespace and/or id were provided in a colon separated manner");
+    }
+
+    FamilyName result =
+        familyNameService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
   @Operation(summary = "Get a familyname by uuid")
