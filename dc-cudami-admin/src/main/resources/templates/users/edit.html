@@ -17,7 +17,7 @@
             <script th:inline="javascript">
               UserEditor({
                 allRoles: /*[[${allRoles}]]*/ [],
-                apiContextPath: "/",
+                apiContextPath: /*[[@{/}]]*/ '',
                 id: "editor",
                 uiLocale: /*[[${#locale.language}]]*/ "",
                 uuid: /*[[${user.uuid}]]*/ ""
