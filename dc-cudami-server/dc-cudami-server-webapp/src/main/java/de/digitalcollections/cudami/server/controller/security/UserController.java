@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.server.controller.security;
 
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import io.swagger.v3.oas.annotations.Operation;

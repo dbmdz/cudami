@@ -3,14 +3,14 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,7 +73,7 @@ public class FileResourceMetadataController {
               encodedUriFilterCriterion.getOperation(),
               URLDecoder.decode(
                   (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.defaultBuilder().add("uri", uri).build();
+      Filtering filtering = Filtering.builder().add("uri", uri).build();
       searchPageRequest.setFiltering(filtering);
     }
 
@@ -130,7 +130,9 @@ public class FileResourceMetadataController {
     }
     if (prefix != null) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("mimeType").startsWith(prefix).build();
+          Filtering.builder()
+              .add(FilterCriterion.builder().withExpression("mimeType").startsWith(prefix).build())
+              .build();
       pageRequest.add(filtering);
     }
     return metadataService.find(pageRequest);

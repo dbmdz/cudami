@@ -11,9 +11,8 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.alias.UrlAliasBuilder;
 import de.digitalcollections.model.identifiable.entity.EntityType;
-import de.digitalcollections.model.identifiable.entity.WebsiteBuilder;
+import de.digitalcollections.model.identifiable.entity.Website;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,30 +51,28 @@ public class IdentifiableControllerTest extends BaseControllerTest {
     when(identifiableService.getByUuid(any(UUID.class))).thenReturn(dummyIdentifiable);
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     UrlAlias urlAlias1 =
-        new UrlAliasBuilder()
-            .createdAt("2021-08-17T15:18:01.000001")
-            .lastPublishedAt("2021-08-17T15:18:01.000001")
+        UrlAlias.builder()
+            .created("2021-08-17T15:18:01.000001")
+            .lastPublished("2021-08-17T15:18:01.000001")
             .isPrimary()
-            .withSlug("hurz")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
-            .withTargetUuid("23456789-2345-2345-2345-234567890123")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("hurz")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     UrlAlias urlAlias2 =
-        new UrlAliasBuilder()
-            .createdAt("2021-08-17T15:18:01.000002")
-            .lastPublishedAt("2021-08-17T15:18:01.000002")
+        UrlAlias.builder()
+            .created("2021-08-17T15:18:01.000002")
+            .lastPublished("2021-08-17T15:18:01.000002")
             .isPrimary()
-            .withSlug("hützligrütz")
-            .withTargetLanguage("de")
-            .withTargetType(IdentifiableType.ENTITY, EntityType.DIGITAL_OBJECT)
-            .withTargetUuid("23456789-2345-2345-2345-234567890124")
-            .withUuid("12345678-1234-1234-1234-123456789012")
-            .withWebsite(
-                new WebsiteBuilder().withUuid("87654321-4321-4321-4321-876543210987").build())
+            .slug("hützligrütz")
+            .targetLanguage("de")
+            .targetType(IdentifiableType.ENTITY, EntityType.DIGITAL_OBJECT)
+            .targetUuid("23456789-2345-2345-2345-234567890124")
+            .uuid("12345678-1234-1234-1234-123456789012")
+            .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
     expected.add(urlAlias1, urlAlias2);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(expected);

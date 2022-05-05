@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- Using `digitalcollections-model` in version `9.2.0`
+- **Breaking** Using `digitalcollections-model` in version `10.0.0` (affects the client)
 - Database update for the updated `DigitalObject`
 - Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions
@@ -38,6 +38,12 @@ Methods returning one object renamed from `find...` to `getBy...`:
 - `findOneByLabelAndLocale`-methods, use `getByLabelAndLocale`-method instead
 - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
 - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
+
+## [5.2.4](https://github.com/dbmdz/cudami/releases/tag/5.2.4) - 2022-04-26
+
+### Fixed
+
+- Missing `ORDER BY` keywords in SQL select statement
 
 ## [5.2.3](https://github.com/dbmdz/cudami/releases/tag/5.2.3) - 2022-04-01
 

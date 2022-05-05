@@ -3,12 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
@@ -385,7 +386,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         " INNER JOIN webpage_webpages ww ON " + tableAlias + ".uuid = ww.parent_webpage_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filterNative("ww.child_webpage_uuid").isEquals(uuid).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression("ww.child_webpage_uuid")
+                    .isEquals(uuid)
+                    .build())
+            .build();
 
     Webpage result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
 

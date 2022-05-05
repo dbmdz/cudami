@@ -3,14 +3,14 @@ package de.digitalcollections.cudami.server.controller.semantic;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -83,11 +83,11 @@ public class HeadwordController {
     if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
       if (labelCriterion != null) {
-        filtering.add(Filtering.defaultBuilder().add("label", labelCriterion).build());
+        filtering.add("label", labelCriterion);
       }
       if (localeCriterion != null) {
         filtering.add(
-            Filtering.defaultBuilder()
+            Filtering.builder()
                 .add(
                     new FilterCriterion<Locale>(
                         "locale",

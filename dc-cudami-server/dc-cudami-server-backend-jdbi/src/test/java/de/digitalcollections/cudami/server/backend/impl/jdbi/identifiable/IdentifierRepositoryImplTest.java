@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.w
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.identifiable.web.WebpageBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -103,9 +102,9 @@ class IdentifierRepositoryImplTest {
 
   private void saveIdentifiable(UUID uuid) {
     Webpage webpage =
-        new WebpageBuilder()
-            .withLabel(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
-            .withUuid(uuid.toString())
+        Webpage.builder()
+            .label(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
+            .uuid(uuid)
             .build();
     webpageRepository.save(webpage);
   }

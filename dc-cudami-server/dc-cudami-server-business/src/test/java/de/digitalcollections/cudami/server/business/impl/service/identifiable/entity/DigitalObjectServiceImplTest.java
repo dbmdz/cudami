@@ -21,10 +21,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
@@ -87,23 +85,23 @@ class DigitalObjectServiceImplTest {
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
   void saveLinkedDataFileResources() throws ValidationException, IdentifiableServiceException {
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
     Identifier identifier = new Identifier(null, "foo", "bar");
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLinkedDataFileResource(linkedDataFileResource)
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .linkedDataFileResource(linkedDataFileResource)
             .build();
 
     DigitalObject savedDigitalObject = digitalObject;
@@ -120,23 +118,33 @@ class DigitalObjectServiceImplTest {
   @DisplayName("fills LinkedDataResources for a retrieved DigitalObject by uuid")
   void fillLinkedDataResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
     UUID uuid = UUID.randomUUID();
+
     DigitalObject persistedDigitalObject =
-        new DigitalObjectBuilder()
-            .withUuid(uuid)
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
+
+    DigitalObject.builder()
+        .uuid(uuid)
+        .label(Locale.GERMAN, "deutschsprachiges Label")
+        .label(Locale.ENGLISH, "english label")
+        .description(Locale.GERMAN, "Beschreibung")
+        .description(Locale.ENGLISH, "description")
+        .build();
+
     when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
 
     LinkedDataFileResource persistedLinkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
     when(linkedDataFileResourceService.getLinkedDataFileResources(eq(uuid)))
         .thenReturn(List.of(persistedLinkedDataFileResource));
@@ -161,12 +169,12 @@ class DigitalObjectServiceImplTest {
     Identifier identifier = new Identifier(null, "foo", "bar");
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withRenderingResource(renderingResource)
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .renderingResource(renderingResource)
             .build();
 
     DigitalObject savedDigitalObject = digitalObject;
@@ -185,12 +193,12 @@ class DigitalObjectServiceImplTest {
   void fillRenderingResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
-        new DigitalObjectBuilder()
-            .withUuid(uuid)
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
     when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
 

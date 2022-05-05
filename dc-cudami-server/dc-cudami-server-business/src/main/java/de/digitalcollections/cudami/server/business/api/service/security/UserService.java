@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.security;
 
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;

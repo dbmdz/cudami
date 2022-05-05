@@ -8,9 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageRequestBuilder;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -36,7 +35,7 @@ public abstract class BaseControllerTest {
     PageResponse<T> pageResponse = new PageResponse<>();
     pageResponse.setContent(content);
     pageResponse.setTotalElements(content.size());
-    PageRequest pageRequest = new PageRequestBuilder().pageSize(25).pageNumber(0).build();
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     pageResponse.setPageRequest(pageRequest);
     return pageResponse;
   }

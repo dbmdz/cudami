@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
 import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,9 +44,9 @@ class CorporateBodyRepositoryImplTest {
   @DisplayName("can save a CorporateBody")
   public void saveCorporateBody() {
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
             .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
@@ -62,9 +61,9 @@ class CorporateBodyRepositoryImplTest {
   @DisplayName("can retrieve a CorporateBody")
   public void saveAndRetrieveCorporateBody() {
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
             .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =

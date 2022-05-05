@@ -9,15 +9,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -43,29 +39,28 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void digitalObjectsForCollection(String path) throws Exception {
     SearchPageResponse<DigitalObject> expected =
         (SearchPageResponse<DigitalObject>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
                     List.of(
-                        new DigitalObjectBuilder()
-                            .createdAt("2020-09-29T10:58:30.458925")
-                            .withIdentifier(
+                        DigitalObject.builder()
+                            .created("2020-09-29T10:58:30.458925")
+                            .identifier(
                                 "mdz-obj", "bsb00000610", "5a4c1a74-40c9-4175-8f25-e5267eddaabc")
-                            .withLabel(
+                            .label(
                                 "Die neuesten Schlager aus: Wenn Liebe erwacht : Hollandweibchen, Liebe im Schnee, Strohwitwe ... und viele andere ; Schlager u. Modelieder zum Mitsingen")
-                            .lastModifiedAt("2020-09-29T10:58:30.458928")
-                            .withPreviewImage(
+                            .lastModified("2020-09-29T10:58:30.458928")
+                            .previewImage(
                                 "/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg",
                                 "94091a4d-c3ce-448c-93d1-7e86d8c3448a",
                                 "https://api-dev.digitale-sammlungen.de/iiif/image/v2/bsb00000610_00002/full/250,/0/default.jpg")
-                            .withUuid("66cdabfc-5b15-44f5-a01e-41aa8be2b9e2")
-                            .withRefId(441)
+                            .uuid("66cdabfc-5b15-44f5-a01e-41aa8be2b9e2")
+                            .refId(441)
                             .build()))
                 .build();
 
-    Collection collection =
-        new CollectionBuilder().withUuid(extractFirstUuidFromPath(path)).build();
+    Collection collection = Collection.builder().uuid(extractFirstUuidFromPath(path)).build();
 
     when(collectionService.findDigitalObjects(eq(collection), any(SearchPageRequest.class)))
         .thenReturn(expected);
@@ -81,34 +76,34 @@ public class V3CollectionControllerTest extends BaseControllerTest {
       })
   public void subcollections(String path) throws Exception {
     PageResponse<Collection> expected =
-        new PageResponseBuilder(Collection.class)
+        PageResponse.builder(Collection.class)
             .forRequestPage(0)
             .forPageSize(1)
             .forStartDate("publicationStart", "2021-04-12")
             .forEndDate("publicationEnd", "2021-04-12")
             .withTotalElements(8)
             .withContent(
-                new CollectionBuilder()
-                    .createdAt("2020-07-10T12:12:33.099312")
-                    .withDescription(
+                Collection.builder()
+                    .created("2020-07-10T12:12:33.099312")
+                    .description(
                         Locale.GERMAN,
                         "Mittelalterliche und neuzeitliche Handschriften aus aller Welt, Briefe und Autographen, Musikhandschriften")
-                    .withDescription(
+                    .description(
                         Locale.ENGLISH,
                         "Medieval and modern manuscripts from all over the world, letters and autographs, music manuscripts")
-                    .withLabel(Locale.GERMAN, "Handschriften")
-                    .withLabel(Locale.ENGLISH, "Manuscripts")
-                    .lastModifiedAt("2020-11-05T17:00:27.181566")
-                    .withPreviewImage(
+                    .label(Locale.GERMAN, "Handschriften")
+                    .label(Locale.ENGLISH, "Manuscripts")
+                    .lastModified("2020-11-05T17:00:27.181566")
+                    .previewImage(
                         "Hauptsammlung_Handschriften.jpg",
                         "fb167832-e1d2-4729-a3b9-f68af5fca0c3",
                         "file:///cudami/image/jpg/fb16/7832/e1d2/4729/a3b9/f68a/f5fc/a0c3/resource.jpg",
                         MimeType.MIME_IMAGE_JPEG,
                         "https://api.digitale-sammlungen.de/iiif/image/v2/fb167832-e1d2-4729-a3b9-f68af5fca0c3")
-                    .withOpenPreviewImageInNewWindow()
-                    .withUuid("888db95f-f837-4b17-bd3c-c00fd8c5205c")
-                    .withRefId(115)
-                    .withPublicationStart("2020-10-01")
+                    .openPreviewImageInNewWindow()
+                    .uuid("888db95f-f837-4b17-bd3c-c00fd8c5205c")
+                    .refId(115)
+                    .publicationStart("2020-10-01")
                     .build())
             .build();
 
@@ -125,7 +120,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void activeCollections(String path) throws Exception {
     PageResponse<Collection> expected =
         (PageResponse)
-            new PageResponseBuilder()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
@@ -133,25 +128,25 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                 .forEndDate("publicationEnd", "2021-04-16")
                 .withTotalElements(105)
                 .withContent(
-                    new CollectionBuilder()
-                        .createdAt("2020-03-03T16:12:08.686626")
-                        .withLabel(Locale.GERMAN, "Test")
-                        .withLabel(Locale.ENGLISH, "test")
-                        .lastModifiedAt("2020-10-19T17:04:07.889254")
-                        .withPreviewImage(
+                    Collection.builder()
+                        .created("2020-03-03T16:12:08.686626")
+                        .label(Locale.GERMAN, "Test")
+                        .label(Locale.ENGLISH, "test")
+                        .lastModified("2020-10-19T17:04:07.889254")
+                        .previewImage(
                             "Test_Logo.jpg",
                             "cc3893e8-9530-4602-b640-118a3218e826",
                             "file:///cudami/image/jpg/cc38/93e8/9530/4602/b640/118a/3218/e826/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/cc3893e8-9530-4602-b640-118a3218e826")
-                        .withAltText(Locale.GERMAN, "Test")
-                        .withAltText(Locale.ENGLISH, "test")
-                        .withTitle(Locale.GERMAN, "Test")
-                        .withTitle(Locale.ENGLISH, "test")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
-                        .withRefId(14)
-                        .withPublicationStart("2020-10-01")
+                        .altText(Locale.GERMAN, "Test")
+                        .altText(Locale.ENGLISH, "test")
+                        .title(Locale.GERMAN, "Test")
+                        .title(Locale.ENGLISH, "test")
+                        .openPreviewImageInNewWindow()
+                        .uuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
+                        .refId(14)
+                        .publicationStart("2020-10-01")
                         .build())
                 .build();
     when(collectionService.findActive(any(PageRequest.class))).thenReturn(expected);
@@ -166,32 +161,32 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   public void searchCollections(String path) throws Exception {
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(145)
                 .withContent(
-                    new CollectionBuilder()
-                        .createdAt("2020-03-03T16:12:08.686626")
-                        .withLabel(Locale.GERMAN, "Test")
-                        .withLabel(Locale.ENGLISH, "test")
-                        .lastModifiedAt("2020-10-19T17:04:07.889254")
-                        .withPreviewImage(
+                    Collection.builder()
+                        .created("2020-03-03T16:12:08.686626")
+                        .label(Locale.GERMAN, "Test")
+                        .label(Locale.ENGLISH, "test")
+                        .lastModified("2020-10-19T17:04:07.889254")
+                        .previewImage(
                             "Test_Logo.jpg",
                             "cc3893e8-9530-4602-b640-118a3218e826",
                             "file:///cudami/image/jpg/cc38/93e8/9530/4602/b640/118a/3218/e826/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/cc3893e8-9530-4602-b640-118a3218e826")
-                        .withAltText(Locale.GERMAN, "Test")
-                        .withAltText(Locale.ENGLISH, "test")
-                        .withTitle(Locale.GERMAN, "Test")
-                        .withTitle(Locale.ENGLISH, "test")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
-                        .withRefId(14)
-                        .withPublicationStart("2020-10-01")
+                        .altText(Locale.GERMAN, "Test")
+                        .altText(Locale.ENGLISH, "test")
+                        .title(Locale.GERMAN, "Test")
+                        .title(Locale.ENGLISH, "test")
+                        .openPreviewImageInNewWindow()
+                        .uuid("0b0b89e1-3f8a-4928-b8f3-67a8c4b3ff57")
+                        .refId(14)
+                        .publicationStart("2020-10-01")
                         .build())
                 .build();
     when(collectionService.find(any(SearchPageRequest.class))).thenReturn(expected);

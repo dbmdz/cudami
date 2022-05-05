@@ -7,9 +7,7 @@ import de.digitalcollections.cudami.server.backend.impl.database.config.SpringCo
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import java.util.List;
 import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
@@ -57,22 +55,22 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   void setLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
     digitalObject = digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
     List<LinkedDataFileResource> actual =
@@ -87,22 +85,22 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   void getLinkedDataFileResourcesForDigitalObject() {
     // Persist the DigitalObject
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
             .build();
     digitalObject = digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
     List<LinkedDataFileResource> persisted =
         repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));

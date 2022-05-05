@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -14,32 +13,26 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.legal.LicenseBuilder;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.OrderBuilder;
-import de.digitalcollections.model.paging.PageRequestBuilder;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
-import de.digitalcollections.model.production.CreationInfoBuilder;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
@@ -98,13 +91,12 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private PersonRepositoryImpl personRepositoryImpl;
 
   private static final License EXISTING_LICENSE =
-      new LicenseBuilder()
-          .withUuid(UUID.randomUUID())
-          .withAcronym("CC0 1.0")
-          .withUrl("http://rightsstatements.org/vocab/NoC-NC/1.0/")
-          .withLabel(
-              Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
-          .withLabel(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
+      License.builder()
+          .uuid(UUID.randomUUID())
+          .acronym("CC0 1.0")
+          .url("http://rightsstatements.org/vocab/NoC-NC/1.0/")
+          .label(Locale.GERMAN, "Kein Urheberrechtsschutz – nur nicht-kommerzielle Nutzung erlaubt")
+          .label(Locale.ENGLISH, "No Copyright – Non-Commercial Use Only")
           .build();
 
   @BeforeEach
@@ -134,10 +126,10 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
@@ -145,34 +137,31 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        new GeoLocationBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Ort")
-            .build();
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
-        new CreationInfoBuilder()
-            .withCreator(creator)
-            .withDate("2022-02-25")
-            .withGeoLocation(creationPlace)
+        CreationInfo.builder()
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
             .build();
 
     DigitalObject parent =
-        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLicense(EXISTING_LICENSE)
-            .withCreationInfo(creationInfo)
-            .withParent(parent)
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .parent(parent)
             .build();
 
     // The "save" method internally retrieves the object by findOne
@@ -205,7 +194,7 @@ class DigitalObjectRepositoryImplTest {
     repo.save(digitalObject);
 
     PageResponse<DigitalObject> response =
-        repo.find(new PageRequestBuilder().pageSize(1).pageNumber(0).build());
+        repo.find(PageRequest.builder().pageSize(1).pageNumber(0).build());
     assertThat(response).isNotNull();
     assertThat(response.getContent()).isNotEmpty();
     DigitalObject actualReduced = response.getContent().get(0);
@@ -235,8 +224,8 @@ class DigitalObjectRepositoryImplTest {
     searchPageRequest.setPageNumber(0);
     searchPageRequest.setQuery(query);
     searchPageRequest.setSorting(
-        Sorting.defaultBuilder()
-            .order(new OrderBuilder().property("refId").direction(Direction.ASC).build())
+        Sorting.builder()
+            .order(Order.builder().property("refId").direction(Direction.ASC).build())
             .build());
 
     SearchPageResponse response = repo.find(searchPageRequest);
@@ -280,8 +269,7 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("returns all identifiers for a DigitalObject")
   void returnIdentifiers() {
     // Step1: Create the DigitalObject
-    DigitalObject digitalObject =
-        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Label").build();
+    DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
     DigitalObject persisted = repo.save(digitalObject);
 
     // Step2: Create the identifiers and connect with with the DigitalObject
@@ -292,7 +280,7 @@ class DigitalObjectRepositoryImplTest {
 
     // Step3: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
-        new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Anderes Label").build();
+        DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
     DigitalObject otherPersisted = repo.save(otherDigitalObject);
     identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
 
@@ -340,10 +328,10 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        new CorporateBodyBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Körperschaft")
-            .withLabel(Locale.ENGLISH, "Corporate Body")
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
@@ -351,23 +339,20 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        new GeoLocationBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Ort")
-            .build();
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
 
     // Insert a LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
-        new LinkedDataFileResourceBuilder()
-            .withUuid(UUID.randomUUID())
-            .withLabel(Locale.GERMAN, "Linked Data")
-            .withContext("https://foo.bar/blubb.xml")
-            .withObjectType("XML")
-            .withFilename("blubb.xml") // required!!
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
+        LinkedDataFileResource.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
 
     linkedDataFileResourceRepository.save(linkedDataFileResource);
@@ -385,27 +370,27 @@ class DigitalObjectRepositoryImplTest {
 
     // Build a CreationInfo object with the formerly persisted contents
     CreationInfo creationInfo =
-        new CreationInfoBuilder()
-            .withCreator(creator)
-            .withDate("2022-02-25")
-            .withGeoLocation(creationPlace)
+        CreationInfo.builder()
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
             .build();
 
     // Build a parent DigitalObject, save and retrieve it
     DigitalObject parent =
-        repo.save(new DigitalObjectBuilder().withLabel(Locale.GERMAN, "Parent").build());
+        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder()
-            .withLabel(Locale.GERMAN, "deutschsprachiges Label")
-            .withLabel(Locale.ENGLISH, "english label")
-            .withDescription(Locale.GERMAN, "Beschreibung")
-            .withDescription(Locale.ENGLISH, "description")
-            .withLicense(EXISTING_LICENSE)
-            .withCreationInfo(creationInfo)
-            .withLinkedDataFileResource(linkedDataFileResource)
-            .withRenderingResource(renderingResource)
-            .withParent(parent)
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .linkedDataFileResource(linkedDataFileResource)
+            .renderingResource(renderingResource)
+            .parent(parent)
             .build();
     return digitalObject;
   }

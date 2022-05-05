@@ -1,15 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
-import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,25 +25,25 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
   void testFindAll(String path) throws Exception {
     SearchPageResponse<CorporateBody> expected =
         (SearchPageResponse<CorporateBody>)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(75)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withContent(
-                    new CorporateBodyBuilder()
-                        .createdAt("2020-09-30T16:29:58.150463")
-                        .withIdentifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
-                        .withLabel(Locale.GERMAN, "Abensberg")
-                        .lastModifiedAt("2020-09-30T16:29:58.150464")
-                        .withPreviewImage(
+                    CorporateBody.builder()
+                        .created("2020-09-30T16:29:58.150463")
+                        .identifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
+                        .label(Locale.GERMAN, "Abensberg")
+                        .lastModified("2020-09-30T16:29:58.150464")
+                        .previewImage(
                             "Wappen%20von%20Abensberg.svg",
                             "2d67f93a-e12c-416b-8b31-796ec667d561",
                             "https://commons.wikimedia.org/wiki/Special:FilePath/Wappen%20von%20Abensberg.svg?width=270")
-                        .withUuid("fa34206a-0f2a-49ae-be42-22d011fc71ff")
-                        .withRefId(1300707)
-                        .withHomepageUrl("https://www.abensberg.de/")
+                        .uuid("fa34206a-0f2a-49ae-be42-22d011fc71ff")
+                        .refId(1300707)
+                        .homepageUrl("https://www.abensberg.de/")
                         .build())
                 .build();
 

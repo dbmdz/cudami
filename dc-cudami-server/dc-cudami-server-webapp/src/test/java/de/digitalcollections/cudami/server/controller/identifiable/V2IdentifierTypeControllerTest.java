@@ -6,10 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.identifiable.IdentifierTypeBuilder;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -28,16 +26,16 @@ class V2IdentifierTypeControllerTest extends BaseControllerTest {
   public void identifierTypesList(String path) throws Exception {
     PageResponse<IdentifierType> expected =
         (PageResponse)
-            new PageResponseBuilder<>()
+            PageResponse.builder()
                 .forPageSize(5)
                 .forRequestPage(0)
                 .forAscendingOrderedField("namespace")
                 .withContent(
-                    new IdentifierTypeBuilder()
-                        .withLabel("MDZ-ID")
-                        .withNamespace("mdz-obj")
-                        .withPattern("^bsb[0-9]{8}$")
-                        .withUuid("d0e7f4b8-7d0c-4233-b58d-20437477672b")
+                    IdentifierType.builder()
+                        .label("MDZ-ID")
+                        .namespace("mdz-obj")
+                        .pattern("^bsb[0-9]{8}$")
+                        .uuid("d0e7f4b8-7d0c-4233-b58d-20437477672b")
                         .build())
                 .build();
 

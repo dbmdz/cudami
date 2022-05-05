@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -88,7 +89,10 @@ public class V3EntityRelationController {
 
     if (StringUtils.hasText(predicate)) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
+          Filtering.builder()
+              .add(
+                  FilterCriterion.builder().withExpression("predicate").isEquals(predicate).build())
+              .build();
       pageRequest.add(filtering);
     }
     PageResponse<EntityRelation> response = entityRelationService.find(pageRequest);

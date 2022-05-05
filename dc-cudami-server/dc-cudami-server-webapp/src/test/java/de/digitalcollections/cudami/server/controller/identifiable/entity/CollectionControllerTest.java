@@ -7,9 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBodyBuilder;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -35,23 +34,23 @@ class CollectionControllerTest extends BaseControllerTest {
   public void relatedByPredicate(String path) throws Exception {
     List<CorporateBody> expected =
         List.of(
-            new CorporateBodyBuilder()
-                .createdAt("2020-10-20T14:38:07.757894")
-                .withIdentifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
-                .withLabel(Locale.GERMAN, "Institution 1")
-                .withLabel(Locale.ENGLISH, "institution 1")
-                .lastModifiedAt("2021-02-25T09:05:34.039316")
-                .withPreviewImage(
+            CorporateBody.builder()
+                .created("2020-10-20T14:38:07.757894")
+                .identifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                .label(Locale.GERMAN, "Institution 1")
+                .label(Locale.ENGLISH, "institution 1")
+                .lastModified("2021-02-25T09:05:34.039316")
+                .previewImage(
                     "instituion_logo.svg",
                     "fbd286db-df7c-4170-bc21-2ad943252a1a",
                     "https://commons.wikimedia.org/wiki/Special:FilePath/institution_logo.svg?width=270",
                     MimeType.MIME_IMAGE)
-                .withAltText(Locale.GERMAN, "Logo der Institution 1. Zur Startseite")
-                .withAltText(Locale.ENGLISH, "Logo of the institution 1. Navigate to main page")
-                .withoutOpenPreviewInNewWindow()
-                .withUuid("2d72fc41-e7a7-4666-a76f-38e3d565eb48")
-                .withRefId(1191463)
-                .withHomepageUrl("https://www.whateveryouwanttotest.de/")
+                .altText(Locale.GERMAN, "Logo der Institution 1. Zur Startseite")
+                .altText(Locale.ENGLISH, "Logo of the institution 1. Navigate to main page")
+                .dontOpenPreviewImageInNewWindow()
+                .uuid("2d72fc41-e7a7-4666-a76f-38e3d565eb48")
+                .refId(1191463)
+                .homepageUrl("https://www.whateveryouwanttotest.de/")
                 .build());
 
     when(collectionService.findRelatedCorporateBodies(any(UUID.class), any(Filtering.class)))

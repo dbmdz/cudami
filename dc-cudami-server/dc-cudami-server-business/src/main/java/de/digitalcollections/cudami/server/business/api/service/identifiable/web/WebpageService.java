@@ -2,11 +2,12 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.we
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDate;
@@ -21,12 +22,19 @@ public interface WebpageService extends NodeService<Webpage> {
     // business logic that defines, what "active" means
     LocalDate now = LocalDate.now();
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filter("publicationStart")
-            .lessOrEqualAndSet(now)
-            .filter("publicationEnd")
-            .greaterOrNotSet(now)
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("publicationStart")
+                    .lessOrEqualAndSet(now)
+                    .build())
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("publicationEnd")
+                    .greaterOrNotSet(now)
+                    .build())
             .build();
+
     return filtering;
   }
 

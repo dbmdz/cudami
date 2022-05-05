@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.database;
 
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

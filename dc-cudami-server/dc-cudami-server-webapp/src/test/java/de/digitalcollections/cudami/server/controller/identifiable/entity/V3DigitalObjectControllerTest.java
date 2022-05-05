@@ -8,14 +8,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.CollectionBuilder;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +35,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
 
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .withoutContent()
                 .forRequestPage(0)
                 .forPageSize(1000)
@@ -48,7 +44,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .build();
 
     DigitalObject digitalObject =
-        new DigitalObjectBuilder().withUuid(extractFirstUuidFromPath(path)).build();
+        DigitalObject.builder().uuid(extractFirstUuidFromPath(path)).build();
     when(digitalObjectService.findActiveCollections(
             eq(digitalObject), any(SearchPageRequest.class)))
         .thenReturn(expected);
@@ -65,28 +61,28 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
   public void collectionsForDigitalObject(String path) throws Exception {
     SearchPageResponse<Collection> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forStartDate("c.publication_start", "2021-04-12")
                 .forEndDate("c.publication_end", "2021-04-12")
                 .withTotalElements(1)
                 .withContent(
-                    new CollectionBuilder()
-                        .createdAt("2020-07-16T11:51:33.981829")
-                        .withLabel(Locale.GERMAN, "Lateinische Handschriften")
-                        .withLabel(Locale.ENGLISH, "Latin Manuscripts")
-                        .lastModifiedAt("2020-11-04T15:46:42.81741")
-                        .withPreviewImage(
+                    Collection.builder()
+                        .created("2020-07-16T11:51:33.981829")
+                        .label(Locale.GERMAN, "Lateinische Handschriften")
+                        .label(Locale.ENGLISH, "Latin Manuscripts")
+                        .lastModified("2020-11-04T15:46:42.81741")
+                        .previewImage(
                             "Lateinische_Handschriften_bsb00131281_27.jpg",
                             "2780bee1-eeec-4b50-a95b-bba90793fc6a",
                             "file:///cudami/image/jpg/2780/bee1/eeec/4b50/a95b/bba9/0793/fc6a/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/2780bee1-eeec-4b50-a95b-bba90793fc6a")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
-                        .withRefId(148)
-                        .withPublicationStart("2020-11-01")
+                        .openPreviewImageInNewWindow()
+                        .uuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
+                        .refId(148)
+                        .publicationStart("2020-11-01")
                         .build())
                 .build();
 
@@ -106,25 +102,25 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
   public void projectsForDigitalObject(String path) throws Exception {
     SearchPageResponse<Project> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(1)
                 .withContent(
-                    new ProjectBuilder()
-                        .createdAt("2020-07-16T11:51:33.981829")
-                        .withLabel(Locale.GERMAN, "Lateinische Handschriften")
-                        .withLabel(Locale.ENGLISH, "Latin Manuscripts")
-                        .lastModifiedAt("2020-11-04T15:46:42.81741")
-                        .withPreviewImage(
+                    Project.builder()
+                        .created("2020-07-16T11:51:33.981829")
+                        .label(Locale.GERMAN, "Lateinische Handschriften")
+                        .label(Locale.ENGLISH, "Latin Manuscripts")
+                        .lastModified("2020-11-04T15:46:42.81741")
+                        .previewImage(
                             "Lateinische_Handschriften_bsb00131281_27.jpg",
                             "2780bee1-eeec-4b50-a95b-bba90793fc6a",
                             "file:///cudami/image/jpg/2780/bee1/eeec/4b50/a95b/bba9/0793/fc6a/resource.jpg",
                             MimeType.MIME_IMAGE_JPEG,
                             "https://api.digitale-sammlungen.de/iiif/image/v2/2780bee1-eeec-4b50-a95b-bba90793fc6a")
-                        .withOpenPreviewImageInNewWindow()
-                        .withUuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
-                        .withRefId(148)
+                        .openPreviewImageInNewWindow()
+                        .uuid("25198d8b-38d4-49f7-9ef0-d99b3e607e30")
+                        .refId(148)
                         .build())
                 .build();
 

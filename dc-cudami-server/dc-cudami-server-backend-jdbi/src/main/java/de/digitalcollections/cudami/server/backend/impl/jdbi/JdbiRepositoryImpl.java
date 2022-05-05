@@ -1,10 +1,28 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import static de.digitalcollections.model.list.filtering.FilterOperation.BETWEEN;
+import static de.digitalcollections.model.list.filtering.FilterOperation.CONTAINS;
+import static de.digitalcollections.model.list.filtering.FilterOperation.EQUALS;
+import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN;
+import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN_OR_EQUAL_TO;
+import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN_OR_NOT_SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.IN;
+import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN;
+import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_AND_SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO;
+import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO_OR_NOT_SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_EQUALS;
+import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_IN;
+import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.SET;
+import static de.digitalcollections.model.list.filtering.FilterOperation.STARTS_WITH;
+
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.paging.PageRequest;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;

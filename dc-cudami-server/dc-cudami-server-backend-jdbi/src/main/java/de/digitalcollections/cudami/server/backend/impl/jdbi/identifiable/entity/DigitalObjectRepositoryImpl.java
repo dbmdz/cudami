@@ -10,22 +10,19 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.DigitalObjectBuilder;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.agent.AgentBuilder;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationBuilder;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.legal.License;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.production.CreationInfo;
@@ -331,9 +328,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         " LEFT JOIN item_digitalobjects AS ido ON " + itTableAlias + ".uuid = ido.item_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder()
-            .filterNative("ido.digitalobject_uuid")
-            .isEquals(digitalObjectUuid)
+        Filtering.builder()
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression("ido.digitalobject_uuid")
+                    .isEquals(digitalObjectUuid)
+                    .build())
             .build();
 
     Item result =
@@ -614,14 +614,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
         CreationInfo creationInfo = new CreationInfo();
         if (creationCreatorUuid != null) {
-          creationInfo.setCreator(new AgentBuilder().withUuid(creationCreatorUuid).build());
+          creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
         }
         if (creationDate != null) {
           creationInfo.setDate(creationDate);
         }
         if (creationGeolocationUuid != null) {
-          creationInfo.setGeoLocation(
-              new GeoLocationBuilder().withUuid(creationGeolocationUuid).build());
+          creationInfo.setGeoLocation(GeoLocation.builder().uuid(creationGeolocationUuid).build());
         }
         digitalObject.setCreationInfo(creationInfo);
       }
@@ -647,8 +646,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     // Fill the parent (empty, only with uuid), if present.
     UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
     if (parentUuid != null) {
-      ((DigitalObject) identifiable)
-          .setParent(new DigitalObjectBuilder().withUuid(parentUuid).build());
+      ((DigitalObject) identifiable).setParent(DigitalObject.builder().uuid(parentUuid).build());
     }
   }
 

@@ -3,17 +3,17 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -65,8 +65,7 @@ public class EntityController<E extends Entity> {
       pageRequest.setSorting(sorting);
     }
     if (entityTypeCriterion != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
+      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
     return entityService.find(pageRequest);
@@ -88,8 +87,7 @@ public class EntityController<E extends Entity> {
       pageRequest.setSorting(sorting);
     }
     if (entityTypeCriterion != null) {
-      Filtering filtering =
-          Filtering.defaultBuilder().add("entityType", entityTypeCriterion).build();
+      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
       pageRequest.setFiltering(filtering);
     }
     return entityService.find(pageRequest);

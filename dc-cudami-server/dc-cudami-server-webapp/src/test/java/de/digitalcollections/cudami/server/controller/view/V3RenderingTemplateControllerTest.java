@@ -5,11 +5,9 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
-import de.digitalcollections.model.view.RenderingTemplateBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,18 +28,18 @@ class V3RenderingTemplateControllerTest extends BaseControllerTest {
   public void renderingTemplatesList(String path) throws Exception {
     PageResponse<RenderingTemplate> expected =
         (PageResponse)
-            new PageResponseBuilder<>()
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("name")
                 .withTotalElements(2)
                 .withContent(
-                    new RenderingTemplateBuilder()
-                        .withName("accordion")
-                        .withUuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
-                        .withDescription(Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
-                        .withLabel(Locale.GERMAN, "Akkordeon")
+                    RenderingTemplate.builder()
+                        .name("accordion")
+                        .uuid("ba62495c-fb69-4d4a-9ca0-19e106a11aa7")
+                        .description(Locale.GERMAN, "Template für ein Akkordion (z.B. FAQs)")
+                        .label(Locale.GERMAN, "Akkordeon")
                         .build())
                 .build();
 

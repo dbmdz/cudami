@@ -3,14 +3,14 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
@@ -465,7 +465,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid = cc.parent_collection_uuid";
 
     Filtering filtering =
-        Filtering.defaultBuilder().filterNative("cc.child_collection_uuid").isEquals(uuid).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.nativeBuilder()
+                    .withExpression("cc.child_collection_uuid")
+                    .isEquals(uuid)
+                    .build())
+            .build();
 
     Collection result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
     return result;

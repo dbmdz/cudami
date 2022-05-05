@@ -1,15 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.ProjectBuilder;
-import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,18 +25,18 @@ public class V2ProjectControllerTest extends BaseControllerTest {
   public void projectList(String path) throws Exception {
     SearchPageResponse<Project> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(395)
                 .withContent(
-                    new ProjectBuilder()
-                        .createdAt("2020-09-30T16:25:10.609465")
-                        .withIdentifier(
+                    Project.builder()
+                        .created("2020-09-30T16:25:10.609465")
+                        .identifier(
                             "mdz-proj", "1467037957", "898947e9-0d61-4572-b87e-05a01868001d")
-                        .withLabel(Locale.GERMAN, "100(0) Dokumente")
-                        .lastModifiedAt("2021-04-13T04:15:01.274821")
-                        .withUuid("ae2a0a61-5255-46d4-8acf-cfddd3527338")
-                        .withRefId(1300623)
+                        .label(Locale.GERMAN, "100(0) Dokumente")
+                        .lastModified("2021-04-13T04:15:01.274821")
+                        .uuid("ae2a0a61-5255-46d4-8acf-cfddd3527338")
+                        .refId(1300623)
                         .build())
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")

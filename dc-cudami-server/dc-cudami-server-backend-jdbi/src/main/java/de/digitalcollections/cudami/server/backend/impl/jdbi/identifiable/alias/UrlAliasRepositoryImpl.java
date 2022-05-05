@@ -4,13 +4,14 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -120,15 +121,15 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
 
     Filtering filtering = searchPageRequest.getFiltering();
-    Filtering slug =
+    FilterCriterion slug =
         StringUtils.hasText(searchPageRequest.getQuery())
-            ? Filtering.defaultBuilder()
-                .filter("slug")
+            ? FilterCriterion.builder()
+                .withExpression("slug")
                 .contains(searchPageRequest.getQuery())
                 .build()
             : null;
     if (filtering == null) {
-      filtering = slug;
+      filtering = Filtering.builder().add(slug).build();
     } else {
       filtering.add(slug);
     }
@@ -193,7 +194,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                 + tableAlias
                 + WEBSITESJOIN);
     Map<String, Object> bindings = new HashMap<>();
-    Filtering target = Filtering.defaultBuilder().filter("targetUuid").isEquals(uuid).build();
+    Filtering target =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("targetUuid").isEquals(uuid).build())
+            .build();
     addFiltering(target, sql, bindings);
     try {
       UrlAlias[] resultset =
@@ -229,10 +233,13 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
             String.format(
                 "(SELECT %2$s.target_uuid, %2$s.target_language FROM %1$s AS %2$s ",
                 tableName, tableAlias));
-    Filtering innerFiltering = Filtering.defaultBuilder().filter("slug").isEquals(slug).build();
+    Filtering innerFiltering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("slug").isEquals(slug).build())
+            .build();
     if (useWebsite) {
       innerFiltering.add(
-          Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build());
+          FilterCriterion.builder().withExpression("websiteUuid").isEquals(websiteUuid).build());
     }
     Map<String, Object> bindings = new HashMap<>();
     addFiltering(innerFiltering, innerSel, bindings);
@@ -254,10 +261,13 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     if (considerLanguage) {
       sql.append(" AND " + tableAlias + ".target_language IN (SELECT language FROM target)");
     }
-    Filtering outerFiltering = Filtering.defaultBuilder().filter("primary").isEquals(true).build();
+    Filtering outerFiltering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("primary").isEquals(true).build())
+            .build();
     if (useWebsite) {
       outerFiltering.add(
-          Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build());
+          FilterCriterion.builder().withExpression("websiteUuid").isEquals(websiteUuid).build());
     }
     addFiltering(outerFiltering, sql, bindings);
     try {
@@ -302,7 +312,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                 + tableAlias
                 + WEBSITESJOIN);
     Map<String, Object> bindings = new HashMap<>();
-    addFiltering(Filtering.defaultBuilder().filter("uuid").isEquals(uuid).build(), sql, bindings);
+    addFiltering(
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build())
+            .build(),
+        sql,
+        bindings);
     try {
       return dbi.withHandle(
           h ->
@@ -368,13 +383,19 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     }
     StringBuilder sql = new StringBuilder("SELECT uuid FROM " + tableName + " AS " + tableAlias);
     Filtering filtering =
-        Filtering.defaultBuilder().filter("websiteUuid").isEquals(websiteUuid).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("websiteUuid")
+                    .isEquals(websiteUuid)
+                    .build())
+            .build();
     filtering.add(
-        Filtering.defaultBuilder()
-            .filter("targetLanguage")
+        FilterCriterion.builder()
+            .withExpression("targetLanguage")
             .isEquals(targetLanguage.getLanguage())
             .build());
-    filtering.add(Filtering.defaultBuilder().filter("slug").isEquals(slug).build());
+    filtering.add(FilterCriterion.builder().withExpression("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
     addFiltering(filtering, sql, bindings);
     try {

@@ -2,12 +2,12 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -30,7 +30,13 @@ public class JdbiRepositoryImplTest {
     final LocalDate minDate = LocalDate.of(2020, Month.JANUARY, 1);
     final LocalDate maxDate = LocalDate.of(2020, Month.JANUARY, 31);
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).between(minDate, maxDate).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .between(minDate, maxDate)
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 42);
 
@@ -47,7 +53,13 @@ public class JdbiRepositoryImplTest {
     // NOT_IN
     String filteringProperty = "label";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).contains("Schiff").build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .contains("Schiff")
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -61,7 +73,10 @@ public class JdbiRepositoryImplTest {
 
     // EQUALS
     String filteringProperty = "age";
-    Filtering filtering = Filtering.defaultBuilder().filter(filteringProperty).isEquals(73).build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).isEquals(73).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -75,7 +90,10 @@ public class JdbiRepositoryImplTest {
 
     // GREATER_THAN
     String filteringProperty = "age";
-    Filtering filtering = Filtering.defaultBuilder().filter(filteringProperty).greater(18).build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).greater(18).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -90,7 +108,13 @@ public class JdbiRepositoryImplTest {
     // GREATER_THAN_OR_EQUAL_TO
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).greaterOrEqual(18).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .greaterOrEqual(18)
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -105,7 +129,13 @@ public class JdbiRepositoryImplTest {
     // GREATER_THAN_OR_NOT_SET
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).greaterOrNotSet(18).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .greaterOrNotSet(18)
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -119,7 +149,10 @@ public class JdbiRepositoryImplTest {
 
     // LESS_THAN
     String filteringProperty = "age";
-    Filtering filtering = Filtering.defaultBuilder().filter(filteringProperty).less(18).build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).less(18).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -134,7 +167,9 @@ public class JdbiRepositoryImplTest {
     // LESS_THAN_AND_SET
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).lessAndSet(18).build();
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).lessAndSet(18).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -149,7 +184,10 @@ public class JdbiRepositoryImplTest {
     // LESS_THAN_OR_EQUAL_TO
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).lessOrEqual(18).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder().withExpression(filteringProperty).lessOrEqual(18).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -164,7 +202,13 @@ public class JdbiRepositoryImplTest {
     // LESS_THAN_OR_EQUAL_TO_AND_SET
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).lessOrEqualAndSet(18).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .lessOrEqualAndSet(18)
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -179,7 +223,13 @@ public class JdbiRepositoryImplTest {
     // LESS_THAN_OR_EQUAL_TO_OR_NOT_SET
     String filteringProperty = "age";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).lessOrEqualOrNotSet(18).build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .lessOrEqualOrNotSet(18)
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -194,7 +244,13 @@ public class JdbiRepositoryImplTest {
     // NOT_EQUALS
     String filteringProperty = "label";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).notEquals("undefined").build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .notEquals("undefined")
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -210,7 +266,9 @@ public class JdbiRepositoryImplTest {
     String filteringProperty = "name";
     List<String> values = Arrays.asList("Hans", "Sepp", "Max", "Moritz");
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).notIn(values).build();
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).notIn(values).build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -229,7 +287,10 @@ public class JdbiRepositoryImplTest {
 
     // NOT_SET
     String filteringProperty = "lastModified";
-    Filtering filtering = Filtering.defaultBuilder().filter(filteringProperty).notSet().build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).notSet().build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -243,7 +304,10 @@ public class JdbiRepositoryImplTest {
 
     // SET
     String filteringProperty = "lastModified";
-    Filtering filtering = Filtering.defaultBuilder().filter(filteringProperty).set().build();
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression(filteringProperty).set().build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 
@@ -258,7 +322,13 @@ public class JdbiRepositoryImplTest {
     // STARTS_WITH
     String filteringProperty = "label";
     Filtering filtering =
-        Filtering.defaultBuilder().filter(filteringProperty).startsWith("Donau").build();
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .startsWith("Donau")
+                    .build())
+            .build();
     FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
     String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
 

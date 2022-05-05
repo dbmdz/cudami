@@ -4,13 +4,13 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -109,11 +109,11 @@ public class LicenseController {
     if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
       if (labelCriterion != null) {
-        filtering.add(Filtering.defaultBuilder().add("label", labelCriterion).build());
+        filtering.add(Filtering.builder().add("label", labelCriterion).build());
       }
       if (localeCriterion != null) {
         filtering.add(
-            Filtering.defaultBuilder()
+            Filtering.builder()
                 .add(
                     new FilterCriterion<Locale>(
                         "locale",

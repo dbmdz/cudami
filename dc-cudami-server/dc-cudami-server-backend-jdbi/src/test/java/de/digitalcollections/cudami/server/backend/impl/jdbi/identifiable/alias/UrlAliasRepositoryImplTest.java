@@ -11,14 +11,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Url
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
-import de.digitalcollections.model.filter.FilteringBuilder;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.identifiable.web.WebpageBuilder;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -87,7 +87,7 @@ public class UrlAliasRepositoryImplTest {
     urlAlias.setSlug("impressum");
     urlAlias.setTargetLanguage(Locale.GERMAN);
     urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    Webpage webpage = new WebpageBuilder().withLabel(Locale.GERMAN, "webpage").build();
+    Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
     webpage = webpageRepository.save(webpage);
     urlAlias.setTargetUuid(webpage.getUuid());
     return urlAlias;
@@ -200,7 +200,13 @@ public class UrlAliasRepositoryImplTest {
   public void find() throws UrlAliasRepositoryException {
     var searchPageRequest = new SearchPageRequest("ueber", 0, 10);
     searchPageRequest.add(
-        new FilteringBuilder().filter("targetLanguage").isEquals(Locale.GERMAN.toString()).build());
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("targetLanguage")
+                    .isEquals(Locale.GERMAN.toString())
+                    .build())
+            .build());
 
     var searchPageResponse = this.repo.find(searchPageRequest);
     assertTrue(searchPageResponse.hasContent());

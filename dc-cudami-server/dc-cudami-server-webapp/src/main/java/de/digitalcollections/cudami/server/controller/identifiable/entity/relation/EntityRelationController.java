@@ -1,10 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -40,7 +41,11 @@ public class EntityRelationController {
 
     if (StringUtils.hasText(predicate)) {
       Filtering filtering =
-          Filtering.defaultBuilder().filter("predicate").isEquals(predicate).build();
+          Filtering.builder()
+              .add(
+                  FilterCriterion.builder().withExpression("predicate").isEquals(predicate).build())
+              .build();
+
       pageRequest.add(filtering);
     }
     return entityRelationService.find(pageRequest);

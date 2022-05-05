@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,14 +8,13 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.resource.PlainFileResourceBuilder;
+import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
@@ -40,17 +38,17 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   public void find(String path) throws Exception {
     SearchPageResponse<FileResource> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(1)
                 .withContent(
-                    new PlainFileResourceBuilder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                    LinkedDataFileResource.builder()
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build())
                 .build();
 

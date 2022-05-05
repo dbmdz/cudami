@@ -9,17 +9,13 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.identifiable.resource.LinkedDataFileResourceBuilder;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.PageResponseBuilder;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.SearchPageRequest;
 import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.SearchPageResponseBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -42,13 +38,13 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
   public void getByUuid(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+        LinkedDataFileResource.builder()
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
@@ -61,18 +57,18 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/?pageNumber=0&pageSize=1"})
   public void pagedList(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
-        new PageResponseBuilder()
+        PageResponse.builder()
             .forPageSize(1)
             .forRequestPage(0)
             .withContent(
                 List.of(
-                    new LinkedDataFileResourceBuilder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withContext("Test-context")
-                        .withObjectType("Test-objectType")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                    LinkedDataFileResource.builder()
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .objectType("Test-objectType")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build()))
             .build();
 
@@ -90,19 +86,19 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   public void find(String path) throws Exception {
     SearchPageResponse<LinkedDataFileResource> expected =
         (SearchPageResponse)
-            new SearchPageResponseBuilder<>()
+            SearchPageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
                 .withTotalElements(1)
                 .withContent(
-                    new LinkedDataFileResourceBuilder()
-                        .withUuid("12345678-abcd-1234-abcd-123456789012")
-                        .withContext("Test-context")
-                        .withObjectType("Test-objectType")
-                        .withLabel(Locale.GERMAN, "Test-Label")
-                        .withMimeType(MimeType.MIME_APPLICATION_XML)
-                        .withUri("http://foo.bar/bla.xml")
+                    LinkedDataFileResource.builder()
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .objectType("Test-objectType")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
                         .build())
                 .build();
 
@@ -130,13 +126,13 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources"})
   public void save(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+        LinkedDataFileResource.builder()
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.save(any(LinkedDataFileResource.class)))
@@ -165,13 +161,13 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
   public void update(String path) throws Exception {
     LinkedDataFileResource expected =
-        new LinkedDataFileResourceBuilder()
-            .withUuid("12345678-abcd-1234-abcd-123456789012")
-            .withContext("Test-context")
-            .withObjectType("Test-objectType")
-            .withLabel(Locale.GERMAN, "Test-Label")
-            .withMimeType(MimeType.MIME_APPLICATION_XML)
-            .withUri("http://foo.bar/bla.xml")
+        LinkedDataFileResource.builder()
+            .uuid("12345678-abcd-1234-abcd-123456789012")
+            .context("Test-context")
+            .objectType("Test-objectType")
+            .label(Locale.GERMAN, "Test-Label")
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .uri("http://foo.bar/bla.xml")
             .build();
 
     when(linkedDataFileResourceService.update(any(LinkedDataFileResource.class)))
