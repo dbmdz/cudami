@@ -11,8 +11,7 @@ import de.digitalcollections.model.paging.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.security.InvalidParameterException;
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -63,25 +62,17 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
-      value = {"/v5/familynames/identifier/**"},
+      value = {
+        "/v5/familynames/identifier/{namespace}:{id}",
+        "/v5/familynames/identifier/{namespace}:{id}.json"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FamilyName> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException {
-    String paramString =
-        request.getRequestURI().replaceFirst("^.*?/identifier/", "").replaceFirst("\\.json$", "");
-    if (!paramString.contains(":")) {
-      throw new InvalidParameterException(
-          paramString + " violates expected format <namespace>:<id>");
-    }
-    String[] params = paramString.split(":");
-
-    String namespace = params[0];
-    String id = String.join(":", Arrays.copyOfRange(params, 1, params.length));
+  public ResponseEntity<FamilyName> getByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     FamilyName result = familyNameService.getByIdentifier(namespace, id);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  /*
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
       value = {"/v5/familynames/identifier"},
@@ -95,8 +86,6 @@ public class FamilyNameController {
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
-
-   */
 
   @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
