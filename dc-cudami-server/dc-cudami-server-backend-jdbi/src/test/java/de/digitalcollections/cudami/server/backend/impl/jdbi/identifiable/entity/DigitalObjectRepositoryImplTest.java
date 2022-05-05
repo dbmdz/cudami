@@ -126,20 +126,18 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        (CorporateBody)
-            CorporateBody.builder()
-                .uuid(UUID.randomUUID())
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build();
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        (GeoLocation)
-            GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);
@@ -330,20 +328,18 @@ class DigitalObjectRepositoryImplTest {
 
     // Insert a corporate body with UUID
     CorporateBody creator =
-        (CorporateBody)
-            CorporateBody.builder()
-                .uuid(UUID.randomUUID())
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build();
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
         new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
-        (GeoLocation)
-            GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
         new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
     geoLocationRepository.save(creationPlace);

@@ -614,14 +614,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
         CreationInfo creationInfo = new CreationInfo();
         if (creationCreatorUuid != null) {
-          creationInfo.setCreator((Agent) Agent.builder().uuid(creationCreatorUuid).build());
+          creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
         }
         if (creationDate != null) {
           creationInfo.setDate(creationDate);
         }
         if (creationGeolocationUuid != null) {
-          creationInfo.setGeoLocation(
-              (GeoLocation) GeoLocation.builder().uuid(creationGeolocationUuid).build());
+          creationInfo.setGeoLocation(GeoLocation.builder().uuid(creationGeolocationUuid).build());
         }
         digitalObject.setCreationInfo(creationInfo);
       }
