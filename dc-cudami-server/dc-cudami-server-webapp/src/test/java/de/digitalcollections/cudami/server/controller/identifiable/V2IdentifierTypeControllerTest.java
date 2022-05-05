@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.identifiable.IdentifierTypeBuilder;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.paging.PageResponseBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

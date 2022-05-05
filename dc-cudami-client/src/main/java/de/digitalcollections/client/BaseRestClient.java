@@ -1,20 +1,22 @@
 package de.digitalcollections.client;
 
+import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.MIN_MAX_VALUES;
+import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.MULTIVALUE;
+import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.SINGLEVALUE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.NullHandling;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -270,6 +272,13 @@ public abstract class BaseRestClient<T extends Object> {
     if (filtering != null) {
       requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
     }
+
+    String searchTerm = pageRequest.getSearchTerm();
+    if (searchTerm != null) {
+      requestUrl =
+          requestUrl + "&searchTerm=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
+    }
+
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
@@ -283,6 +292,8 @@ public abstract class BaseRestClient<T extends Object> {
         return null;
       }
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
+      // TODO no longer needed, as this should be done by server?
+      // result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
@@ -307,53 +318,6 @@ public abstract class BaseRestClient<T extends Object> {
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
-  }
-
-  protected <X extends Object> SearchPageResponse<X> doGetSearchRequestForPagedObjectList(
-      String requestUrl, SearchPageRequest searchPageRequest, Class<X> type)
-      throws TechnicalException {
-    if (!requestUrl.contains("?")) {
-      requestUrl = requestUrl + "?";
-    } else {
-      if (!requestUrl.endsWith("&")) {
-        requestUrl = requestUrl + "&";
-      }
-    }
-    String findParams = getFindParamsAsString(searchPageRequest);
-    requestUrl = requestUrl + findParams;
-    Filtering filtering = searchPageRequest.getFiltering();
-    if (filtering != null) {
-      requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
-    }
-    String searchTerm = searchPageRequest.getQuery();
-    if (searchTerm != null) {
-      requestUrl =
-          requestUrl + "&searchTerm=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
-    }
-    HttpRequest req = createGetRequest(requestUrl);
-    try {
-      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.statusCode();
-      if (statusCode >= 400) {
-        throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
-      }
-      // This is the most performant approach for Jackson
-      final byte[] body = response.body();
-      if (body == null || body.length == 0) {
-        return null;
-      }
-      SearchPageResponse<X> result = mapper.readerFor(SearchPageResponse.class).readValue(body);
-      result.setQuery(searchTerm);
-      return result;
-    } catch (IOException | InterruptedException e) {
-      throw new TechnicalException("Failed to retrieve response due to connection error", e);
-    }
-  }
-
-  protected SearchPageResponse<T> doGetSearchRequestForPagedObjectList(
-      String requestUrl, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        requestUrl, searchPageRequest, (Class<T>) getClass());
   }
 
   protected String doPatchRequestForString(String requestUrl) throws TechnicalException {

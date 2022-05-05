@@ -5,14 +5,12 @@ import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.NullHandling;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -33,13 +31,9 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
     super(http, serverUrl, (Class<I>) Identifiable.class, mapper, "/v5/identifiables");
   }
 
-  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search", searchPageRequest);
-  }
-
   public List<I> find(String searchTerm, int maxResults) throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<I> response = find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest(searchTerm, 0, maxResults, null);
+    PageResponse<I> response = find(pageRequest);
     return response.getContent();
   }
 

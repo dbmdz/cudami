@@ -79,7 +79,6 @@
     <version.byte-buddy>1.12.10</version.byte-buddy>
     <version.commons-beanutils>1.9.4</version.commons-beanutils>
     <version.commons-lang3>3.12.0</version.commons-lang3>
-    <version.dc-model>9.2.0</version.dc-model>
     <version.flyway>8.5.10</version.flyway>
     <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
     <version.junit>5.8.2</version.junit>
@@ -183,17 +182,17 @@
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model-jackson</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model-xml</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>

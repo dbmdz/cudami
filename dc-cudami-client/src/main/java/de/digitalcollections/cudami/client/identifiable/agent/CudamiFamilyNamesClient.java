@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 
 public class CudamiFamilyNamesClient extends CudamiIdentifiablesClient<FamilyName> {
@@ -15,8 +15,7 @@ public class CudamiFamilyNamesClient extends CudamiIdentifiablesClient<FamilyNam
   }
 
   @Override
-  public SearchPageResponse<FamilyName> find(SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
+  public PageResponse<FamilyName> find(PageRequest pageRequest) throws TechnicalException {
+    return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
   }
 }

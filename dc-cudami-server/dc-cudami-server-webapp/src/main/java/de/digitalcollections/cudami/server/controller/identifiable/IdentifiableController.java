@@ -7,10 +7,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,12 +54,13 @@ public class IdentifiableController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return identifiableService.find(pageRequest);
+    PageResponse pageResponse = identifiableService.find(pageRequest);
+    // add "query": "hallo" to request JSON
   }
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
