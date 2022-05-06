@@ -49,7 +49,7 @@
     "react-date-picker": "^8.4.0",
     "react-dom": "^17.0.2",
     "react-file-drop": "^3.1.4",
-    "react-i18next": "^11.16.7",
+    "react-i18next": "^11.16.8",
     "react-icons": "^4.3.1",
     "react-intersection-observer": "^9.1.0",
     "react-movable": "^3.0.4",
