@@ -4,8 +4,6 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,11 +25,9 @@ public interface IdentifierRepository {
 
   PageResponse<Identifier> find(PageRequest pageRequest);
 
-  SearchPageResponse<Identifier> find(SearchPageRequest searchPageRequest);
-
   default List<Identifier> find(String searchTerm, int maxResults) {
-    SearchPageRequest request = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<Identifier> response = find(request);
+    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
+    PageResponse<Identifier> response = find(request);
     return response.getContent();
   }
 

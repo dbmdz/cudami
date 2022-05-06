@@ -5,8 +5,6 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.Locale;
@@ -45,11 +43,9 @@ public interface HeadwordRepository {
    */
   PageResponse<Headword> find(PageRequest pageRequest);
 
-  SearchPageResponse<Headword> find(SearchPageRequest searchPageRequest);
-
   default List<Headword> find(String searchTerm, int maxResults) {
-    SearchPageRequest request = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<Headword> response = find(request);
+    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
+    PageResponse<Headword> response = find(request);
     return response.getContent();
   }
 
