@@ -7,11 +7,11 @@ import de.digitalcollections.cudami.server.backend.impl.database.config.SpringCo
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
@@ -154,13 +154,13 @@ class IdentifiableRepositoryImplTest {
               repo.save(createDigitalObjectWithLabels("test" + i));
             });
 
-    String query = "test";
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    searchPageRequest.setPageSize(10);
-    searchPageRequest.setPageNumber(0);
-    searchPageRequest.setQuery(query);
+    String searchTerm = "test";
+    PageRequest pageRequest = new PageRequest();
+    pageRequest.setPageSize(10);
+    pageRequest.setPageNumber(0);
+    pageRequest.setSearchTerm(searchTerm);
 
-    SearchPageResponse response = repo.find(searchPageRequest);
+    PageResponse response = repo.find(pageRequest);
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);

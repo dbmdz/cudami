@@ -24,8 +24,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
@@ -380,20 +378,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return term;
   }
 
-  @Override
-  public PageResponse<I> find(PageRequest pageRequest) {
-    return find(pageRequest, null, new HashMap<>());
-  }
+  protected PageResponse<I> find(PageRequest pageRequest, Map<String, Object> argumentMappings) {
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
 
-  protected PageResponse<I> find(
-      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    if (commonSql == null) {
-      commonSql = " FROM " + tableName + " AS " + tableAlias;
+    // handle search term
+    String searchTerm = pageRequest.getSearchTerm();
+    final boolean hasSearchTerm = StringUtils.hasText(searchTerm);
+    String executedSearchTerm = null;
+    if (hasSearchTerm) {
+      // select with search term
+      commonSql += " WHERE " + getCommonSearchSql(tableAlias);
+      executedSearchTerm = this.escapeTermForJsonpath(searchTerm);
+      argumentMappings.put("searchTerm", executedSearchTerm);
     }
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
-
     List<I> result =
         retrieveList(
             sqlSelectReducedFields,
@@ -401,46 +402,21 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             argumentMappings,
             getOrderBy(pageRequest.getSorting()));
 
-    StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, sqlCount, argumentMappings);
-    long total = retrieveCount(sqlCount, argumentMappings);
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
+    addFiltering(pageRequest, countQuery, argumentMappings);
+    long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total);
+    final PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
+    if (hasSearchTerm) {
+      pageResponse.setExecutedSearchTerm(executedSearchTerm);
+    }
+    return pageResponse;
   }
 
   @Override
-  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, new HashMap<>());
-    }
-
-    commonSql += " WHERE " + getCommonSearchSql(tableAlias);
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-
-    return find(searchPageRequest, commonSql, argumentMappings);
-  }
-
-  protected SearchPageResponse<I> find(
-      SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-    addPageRequestParams(searchPageRequest, innerQuery);
-    List<I> result =
-        retrieveList(
-            sqlSelectReducedFields,
-            innerQuery,
-            argumentMappings,
-            getOrderBy(searchPageRequest.getSorting()));
-
-    StringBuilder countQuery =
-        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new SearchPageResponse<>(result, searchPageRequest, total);
+  public PageResponse<I> find(PageRequest pageRequest) {
+    return find(pageRequest, new HashMap<>(0));
   }
 
   @Override
@@ -500,7 +476,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     argumentMappings.put("language", language);
     argumentMappings.put("initial", initial);
 
-    return this.find(pageRequest, null, argumentMappings);
+    return this.find(pageRequest, argumentMappings);
   }
 
   @Override
@@ -550,7 +526,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                     .isEquals(namespace)
                     .build())
             .build();
-    Map<String, Object> arguments = new HashMap<>();
+    Map<String, Object> arguments = new HashMap<>(0);
     addFiltering(filtering, innerSelect, arguments);
     innerSelect.append(")");
     I result =
@@ -859,7 +835,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   public I save(I identifiable, Map<String, Object> bindings) {
     if (bindings == null) {
-      bindings = new HashMap<>();
+      bindings = new HashMap<>(0);
     }
     // add preview image uuid
     final UUID previewImageUuid =
@@ -952,7 +928,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   public I update(I identifiable, Map<String, Object> bindings) {
     if (bindings == null) {
-      bindings = new HashMap<>();
+      bindings = new HashMap<>(0);
     }
     final UUID previewImageUuid =
         identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
