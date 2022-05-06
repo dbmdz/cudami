@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsername
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.paging.PageRequest;
 import de.digitalcollections.model.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -150,7 +151,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     User user;
     try {
       user = client.getByEmail(username);
-    } catch (TechnicalException ex) {
+    } catch (ResourceNotFoundException | TechnicalException ex) {
       throw new UsernameNotFoundException(
           String.format("User \"%s\" was not found.", username), ex);
     }
