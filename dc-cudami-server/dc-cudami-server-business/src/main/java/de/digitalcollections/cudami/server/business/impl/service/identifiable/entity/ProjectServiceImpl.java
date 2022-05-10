@@ -10,8 +10,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -70,9 +70,8 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID projectUuid, SearchPageRequest searchPageRequest) {
-    return ((ProjectRepository) repository).findDigitalObjects(projectUuid, searchPageRequest);
+  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
+    return ((ProjectRepository) repository).findDigitalObjects(projectUuid, pageRequest);
   }
 
   @Override

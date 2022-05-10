@@ -8,8 +8,8 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -19,16 +19,21 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   void deleteFileResources(UUID digitalObjectUuid);
 
-  SearchPageResponse<Collection> findActiveCollections(
-      DigitalObject digitalObject, SearchPageRequest pageRequest);
+  PageResponse<Collection> findActiveCollections(
+      DigitalObject digitalObject, PageRequest pageRequest);
 
-  default SearchPageResponse<Collection> findCollections(
-      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return findCollections(digitalObject.getUuid(), searchPageRequest);
+  default PageResponse<Collection> findCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    return findCollections(digitalObject.getUuid(), pageRequest);
   }
 
-  SearchPageResponse<Collection> findCollections(
-      UUID digitalObjectUuid, SearchPageRequest pageRequest);
+  PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest);
+
+  default PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+    return findProjects(digitalObject.getUuid(), pageRequest);
+  }
+
+  PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
@@ -41,19 +46,6 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
-
-  default List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject) {
-    return getLinkedDataFileResources(digitalObject.getUuid());
-  }
-
-  List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
-
-  default List<FileResource> getRenderingResources(DigitalObject digitalObject)
-      throws CudamiServiceException {
-    return getRenderingResources(digitalObject.getUuid());
-  }
-
-  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
 
   default Item getItem(DigitalObject digitalObject) {
     if (digitalObject == null) {
@@ -68,13 +60,18 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<Locale> getLanguagesOfProjects(UUID uuid);
 
-  default SearchPageResponse<Project> findProjects(
-      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    return findProjects(digitalObject.getUuid(), searchPageRequest);
+  default List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject) {
+    return getLinkedDataFileResources(digitalObject.getUuid());
   }
 
-  SearchPageResponse<Project> findProjects(
-      UUID digitalObjectUuid, SearchPageRequest searchPageRequest);
+  List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
+
+  default List<FileResource> getRenderingResources(DigitalObject digitalObject)
+      throws CudamiServiceException {
+    return getRenderingResources(digitalObject.getUuid());
+  }
+
+  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
 
   default List<FileResource> setFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) {
@@ -85,6 +82,17 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+
+  default List<LinkedDataFileResource> setLinkedDataFileResources(
+      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources) {
+    if (linkedDataFileResources == null) {
+      return null;
+    }
+    return setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
+  }
+
+  List<LinkedDataFileResource> setLinkedDataFileResources(
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
 
   default List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
@@ -97,15 +105,4 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<FileResource> setRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingFileResources);
-
-  default List<LinkedDataFileResource> setLinkedDataFileResources(
-      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources) {
-    if (linkedDataFileResources == null) {
-      return null;
-    }
-    return setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
-  }
-
-  List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
 }

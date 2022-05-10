@@ -10,8 +10,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.web
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootWebpages(UUID uuid, SearchPageRequest pageRequest) {
+  public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest) {
     return webpageService.findRootWebpagesForWebsite(uuid, pageRequest);
   }
 

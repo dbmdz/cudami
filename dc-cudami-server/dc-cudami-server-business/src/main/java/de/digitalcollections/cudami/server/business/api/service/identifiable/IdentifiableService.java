@@ -8,8 +8,6 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
@@ -80,8 +78,6 @@ public interface IdentifiableService<I extends Identifiable> {
   boolean deleteIdentifiers(UUID identifiableUuid);
 
   PageResponse<I> find(PageRequest pageRequest);
-
-  SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
 
   List<I> find(String searchTerm, int maxResults);
 

@@ -9,8 +9,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.Locale;
@@ -57,19 +55,8 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public SearchPageResponse<Headword> find(SearchPageRequest searchPageRequest) {
-    setDefaultSorting(searchPageRequest);
-    return repository.find(searchPageRequest);
-  }
-
-  @Override
   public List<Headword> find(String searchTerm, int maxResults) {
     return repository.find(searchTerm, maxResults);
-  }
-
-  @Override
-  public List<Headword> getAll() {
-    return repository.getAll();
   }
 
   @Override
@@ -83,6 +70,22 @@ public class HeadwordServiceImpl implements HeadwordService {
     PageResponse<Headword> result =
         repository.findByLanguageAndInitial(pageRequest, language, initial);
     return result;
+  }
+
+  @Override
+  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+    return repository.findRelatedEntities(headwordUuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<FileResource> findRelatedFileResources(
+      UUID headwordUuid, PageRequest pageRequest) {
+    return repository.findRelatedFileResources(headwordUuid, pageRequest);
+  }
+
+  @Override
+  public List<Headword> getAll() {
+    return repository.getAll();
   }
 
   @Override
@@ -106,19 +109,8 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
-    return repository.findRelatedEntities(headwordUuid, pageRequest);
-  }
-
-  @Override
   public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
     return repository.getRelatedFileResources(headwordUuid);
-  }
-
-  @Override
-  public PageResponse<FileResource> findRelatedFileResources(
-      UUID headwordUuid, PageRequest pageRequest) {
-    return repository.findRelatedFileResources(headwordUuid, pageRequest);
   }
 
   @Override
@@ -131,6 +123,13 @@ public class HeadwordServiceImpl implements HeadwordService {
     }
   }
 
+  protected void setDefaultSorting(PageRequest pageRequest) {
+    if (!pageRequest.hasSorting()) {
+      Sorting sorting = new Sorting(Direction.ASC, "label", "uuid");
+      pageRequest.setSorting(sorting);
+    }
+  }
+
   @Override
   public List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities) {
     return repository.setRelatedEntities(headwordUuid, entities);
@@ -140,13 +139,6 @@ public class HeadwordServiceImpl implements HeadwordService {
   public List<FileResource> setRelatedFileResources(
       UUID headwordUuid, List<FileResource> fileResources) {
     return repository.setRelatedFileResources(headwordUuid, fileResources);
-  }
-
-  protected void setDefaultSorting(PageRequest pageRequest) {
-    if (!pageRequest.hasSorting()) {
-      Sorting sorting = new Sorting(Direction.ASC, "label", "uuid");
-      pageRequest.setSorting(sorting);
-    }
   }
 
   @Override

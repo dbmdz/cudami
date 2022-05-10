@@ -8,8 +8,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -38,10 +36,9 @@ public interface WebpageService extends NodeService<Webpage> {
     return filtering;
   }
 
-  SearchPageResponse<Webpage> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
+  PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest);
 
-  SearchPageResponse<Webpage> findRootWebpagesForWebsite(
-      UUID websiteUuid, SearchPageRequest searchPageRequest);
+  PageResponse<Webpage> findRootWebpagesForWebsite(UUID websiteUuid, PageRequest pageRequest);
 
   Webpage getActive(UUID uuid);
 
@@ -55,8 +52,6 @@ public interface WebpageService extends NodeService<Webpage> {
    */
   List<Webpage> getActiveChildren(UUID uuid);
 
-  PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest);
-
   /**
    * Returns a list of active children, with recursivly all children have their active children set
    *
@@ -64,6 +59,7 @@ public interface WebpageService extends NodeService<Webpage> {
    * @return List of acrive children Webpages
    */
   List<Webpage> getActiveChildrenTree(UUID uuid);
+
   /**
    * Returns a list of children, with recursively all children have their children set
    *

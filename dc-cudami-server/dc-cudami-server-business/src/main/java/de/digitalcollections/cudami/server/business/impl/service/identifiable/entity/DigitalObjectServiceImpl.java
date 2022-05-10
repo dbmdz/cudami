@@ -23,8 +23,8 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,9 +43,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
   private final CollectionService collectionService;
-  private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private final DigitalObjectLinkedDataFileResourceService
       digitalObjectLinkedDataFileResourceService;
+  private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private final ProjectService projectService;
 
   public DigitalObjectServiceImpl(
@@ -103,19 +103,59 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     ((DigitalObjectRepository) repository).deleteFileResources(digitalObjectUuid);
   }
 
-  @Override
-  public SearchPageResponse<Collection> findActiveCollections(
-      DigitalObject digitalObject, SearchPageRequest searchPageRequest) {
-    Filtering filtering = filteringForActive();
-    searchPageRequest.add(filtering);
-    return ((DigitalObjectRepository) repository).findCollections(digitalObject, searchPageRequest);
+  private DigitalObject fillDigitalObject(DigitalObject digitalObject) {
+    if (digitalObject == null) {
+      return null;
+    }
+
+    // Look for linked data file resources. If they exist, fill the DigitalObject
+    List<LinkedDataFileResource> linkedDataFileResources =
+        getLinkedDataFileResources(digitalObject.getUuid());
+    if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
+      digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
+    }
+
+    // Look for rendering resources. If they exist, fill the object
+    List<FileResource> renderingResources = getRenderingResources(digitalObject.getUuid());
+    if (renderingResources != null && !renderingResources.isEmpty()) {
+      digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
+    }
+
+    return digitalObject;
   }
 
   @Override
-  public SearchPageResponse<Collection> findCollections(
-      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
-    return ((DigitalObjectRepository) repository)
-        .findCollections(digitalObjectUuid, searchPageRequest);
+  public PageResponse<Collection> findActiveCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    Filtering filtering = filteringForActive();
+    pageRequest.add(filtering);
+    return ((DigitalObjectRepository) repository).findCollections(digitalObject, pageRequest);
+  }
+
+  @Override
+  public PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).findCollections(digitalObjectUuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
+    return ((DigitalObjectRepository) repository).findProjects(digitalObjectUuid, pageRequest);
+  }
+
+  @Override
+  public DigitalObject getByIdentifier(Identifier identifier) {
+    return fillDigitalObject(super.getByIdentifier(identifier));
+  }
+
+  @Override
+  public DigitalObject getByRefId(long refId) {
+    return fillDigitalObject(super.getByRefId(refId));
+  }
+
+  @Override
+  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale)
+      throws IdentifiableServiceException {
+    return fillDigitalObject(super.getByUuidAndLocale(uuid, locale));
   }
 
   @Override
@@ -126,16 +166,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
     return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    return digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
-    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -154,47 +184,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public SearchPageResponse<Project> findProjects(
-      UUID digitalObjectUuid, SearchPageRequest searchPageRequest) {
-    return ((DigitalObjectRepository) repository)
-        .findProjects(digitalObjectUuid, searchPageRequest);
-  }
-
-  @Override
-  public List<FileResource> setFileResources(
-      UUID digitalObjectUuid, List<FileResource> fileResources) {
-    return ((DigitalObjectRepository) repository)
-        .setFileResources(digitalObjectUuid, fileResources);
-  }
-
-  @Override
-  public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources) {
-    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
-        digitalObjectUuid, renderingFileResources);
-  }
-
-  @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
-    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
-        digitalObjectUuid, linkedDataFileResources);
-  }
-
-  @Override
-  public DigitalObject getByIdentifier(Identifier identifier) {
-    return fillDigitalObject(super.getByIdentifier(identifier));
-  }
-
-  @Override
-  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale)
-      throws IdentifiableServiceException {
-    return fillDigitalObject(super.getByUuidAndLocale(uuid, locale));
-  }
-
-  @Override
-  public DigitalObject getByRefId(long refId) {
-    return fillDigitalObject(super.getByRefId(refId));
+  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
+    return digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -204,6 +195,17 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       return digitalObjects;
     }
     return digitalObjects.stream().map(this::fillDigitalObject).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
+    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObjectUuid);
+  }
+
+  @Override
+  public List<FileResource> getRenderingResources(DigitalObject digitalObject)
+      throws CudamiServiceException {
+    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObject);
   }
 
   @Override
@@ -230,6 +232,35 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public List<FileResource> setFileResources(
+      UUID digitalObjectUuid, List<FileResource> fileResources) {
+    return ((DigitalObjectRepository) repository)
+        .setFileResources(digitalObjectUuid, fileResources);
+  }
+
+  @Override
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
+    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
+        digitalObjectUuid, linkedDataFileResources);
+  }
+
+  @Override
+  public List<FileResource> setRenderingFileResources(
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources) {
+    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+        digitalObjectUuid, renderingFileResources);
+  }
+
+  @Override
+  public List<FileResource> setRenderingFileResources(
+      DigitalObject digitalObject, List<FileResource> renderingFileResources)
+      throws CudamiServiceException {
+    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
+        digitalObject, renderingFileResources);
+  }
+
+  @Override
   public DigitalObject update(DigitalObject digitalObject)
       throws IdentifiableServiceException, ValidationException {
     // Keep the resources for later saving, because the repository save
@@ -250,40 +281,5 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     }
 
     return fillDigitalObject(digitalObject);
-  }
-
-  @Override
-  public List<FileResource> getRenderingResources(DigitalObject digitalObject)
-      throws CudamiServiceException {
-    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObject);
-  }
-
-  @Override
-  public List<FileResource> setRenderingFileResources(
-      DigitalObject digitalObject, List<FileResource> renderingFileResources)
-      throws CudamiServiceException {
-    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
-        digitalObject, renderingFileResources);
-  }
-
-  private DigitalObject fillDigitalObject(DigitalObject digitalObject) {
-    if (digitalObject == null) {
-      return null;
-    }
-
-    // Look for linked data file resources. If they exist, fill the DigitalObject
-    List<LinkedDataFileResource> linkedDataFileResources =
-        getLinkedDataFileResources(digitalObject.getUuid());
-    if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
-      digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
-    }
-
-    // Look for rendering resources. If they exist, fill the object
-    List<FileResource> renderingResources = getRenderingResources(digitalObject.getUuid());
-    if (renderingResources != null && !renderingResources.isEmpty()) {
-      digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
-    }
-
-    return digitalObject;
   }
 }
