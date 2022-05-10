@@ -248,11 +248,11 @@ class DigitalObjectRepositoryImplTest {
     repo.save(ado);
 
     // Retrieve the ADO by filtering the parent uuid
-    PageRequest searchPageRequest = new PageRequest();
-    searchPageRequest.setFiltering(
+    PageRequest pageRequest = new PageRequest();
+    pageRequest.setFiltering(
         new Filtering(
             List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
-    PageResponse response = repo.find(searchPageRequest);
+    PageResponse response = repo.find(pageRequest);
 
     List<DigitalObject> actuals = response.getContent();
     assertThat(actuals).hasSize(1);

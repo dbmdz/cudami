@@ -407,7 +407,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   @Deprecated
   /**
-   * @deprecated use method with SearchPageRequest signature instead
+   * @deprecated use method with PageRequest signature instead
    */
   public PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) {
@@ -447,7 +447,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     pageRequest.setSorting(sorting);
 
-    Map<String, Object> argumentMappings = new HashMap<>();
+    Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("language", language);
     argumentMappings.put("initial", initial);
 

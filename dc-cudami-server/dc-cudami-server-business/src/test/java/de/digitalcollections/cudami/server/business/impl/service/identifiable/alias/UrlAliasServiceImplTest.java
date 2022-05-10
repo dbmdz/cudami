@@ -804,8 +804,8 @@ class UrlAliasServiceImplTest {
 
     when(repo.find(any(PageRequest.class))).thenReturn(expected);
 
-    PageRequest searchPageRequest = new PageRequest();
-    assertThat(service.find(searchPageRequest)).isEqualTo(expected);
+    PageRequest pageRequest = new PageRequest();
+    assertThat(service.find(pageRequest)).isEqualTo(expected);
   }
 
   @DisplayName("creates and saves an UrlAlias and returns it with set UUID")
