@@ -25,7 +25,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(AbstractPagingAndSortingRepositoryImpl.class);
-  protected static Pattern SELECT_STMT_SPLITTER;
+  private static Pattern SELECT_STMT_SPLITTER;
   protected int offsetForAlternativePaging;
 
   private void addLimit(PageRequest pageRequest, StringBuilder sqlQuery) {
