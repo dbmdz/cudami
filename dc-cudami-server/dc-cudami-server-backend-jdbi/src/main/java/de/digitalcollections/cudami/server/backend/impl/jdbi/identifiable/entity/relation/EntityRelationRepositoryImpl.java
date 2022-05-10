@@ -56,17 +56,16 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<EntityRelation> find(PageRequest pageRequest) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
+    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
     StringBuilder query =
         new StringBuilder(
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object"
                 + commonSql);
-    Map<String, Object> argumentMappings = new HashMap<>();
-
-    // handle optional filtering params
-    addFiltering(pageRequest, query, argumentMappings);
     addPageRequestParams(pageRequest, query);
-
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
@@ -89,18 +88,24 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                           return acc;
                         }));
 
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery, argumentMappings);
+    String countQuery = "SELECT count(*)" + commonSql;
     long count =
         dbi.withHandle(
             h ->
-                h.createQuery(countQuery.toString())
+                h.createQuery(countQuery)
                     .bindMap(argumentMappings)
                     .mapTo(Long.class)
                     .findOne()
                     .get());
-    PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
+
+    PageResponse<EntityRelation> pageResponse =
+        new PageResponse<>(result, pageRequest, count, executedSearchTerm);
     return pageResponse;
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("subject", "predicate", "object"));
   }
 
   @Override
@@ -135,12 +140,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("subject", "predicate", "object"));
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

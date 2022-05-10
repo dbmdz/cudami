@@ -82,16 +82,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Website website = super.getByUuidAndFiltering(uuid, filtering);
-
-    if (website != null) {
-      website.setRootPages(getRootPages(website));
-    }
-    return website;
-  }
-
-  @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
     allowedOrderByFields.addAll(Arrays.asList("url"));
@@ -109,7 +99,17 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Website website = super.getByUuidAndFiltering(uuid, filtering);
+
+    if (website != null) {
+      website.setRootPages(getRootPages(website));
+    }
+    return website;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

@@ -29,18 +29,8 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  public Version getByUuid(UUID uuid) {
-    final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
-
-    Version version =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", uuid)
-                    .mapToBean(Version.class)
-                    .findOne()
-                    .orElse(null));
-    return version;
+  protected List<String> getAllowedOrderByFields() {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Override
@@ -60,12 +50,22 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public Version getByUuid(UUID uuid) {
+    final String sql = "SELECT * FROM " + tableName + " WHERE uuid = :uuid";
+
+    Version version =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("uuid", uuid)
+                    .mapToBean(Version.class)
+                    .findOne()
+                    .orElse(null));
+    return version;
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 

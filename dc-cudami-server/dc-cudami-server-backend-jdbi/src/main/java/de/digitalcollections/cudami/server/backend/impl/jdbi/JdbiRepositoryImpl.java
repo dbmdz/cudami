@@ -19,18 +19,17 @@ import static de.digitalcollections.model.list.filtering.FilterOperation.SET;
 import static de.digitalcollections.model.list.filtering.FilterOperation.STARTS_WITH;
 
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -40,16 +39,13 @@ import org.springframework.util.StringUtils;
 
 public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
-
-  private static Pattern selectStmtSplitter;
+  private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
 
   protected final Jdbi dbi;
   protected final String mappingPrefix;
   protected final String tableAlias;
   protected final String tableName;
-  protected int offsetForAlternativePaging;
 
   public JdbiRepositoryImpl(
       Jdbi dbi,
@@ -88,102 +84,64 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     }
   }
 
-  @Override
-  protected void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
-    if (pageRequest.getOffset() < offsetForAlternativePaging) {
-      super.addPageRequestParams(pageRequest, sqlQuery);
-    } else {
-      buildPageRequestSql(pageRequest, sqlQuery);
+  protected String addSearchTerm(
+      PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object> argumentMappings) {
+    // handle search term
+    String searchTerm = pageRequest.getSearchTerm();
+    String executedSearchTerm = null;
+    if (StringUtils.hasText(searchTerm)) {
+      String commonSql = innerQuery.toString();
+      if (commonSql.toUpperCase().contains(" WHERE ")
+          || commonSql.toUpperCase().contains(" WHERE(")) {
+        innerQuery.append(" AND ");
+      } else {
+        innerQuery.append(" WHERE ");
+      }
+      // select with search term
+      innerQuery.append(getCommonSearchSql(tableAlias));
+      executedSearchTerm = escapeTermForJsonpath(searchTerm);
+      argumentMappings.put("searchTerm", executedSearchTerm);
     }
-  }
-
-  /**
-   * For examples showing what should happen here see JdbiRepositoryImplTest#testAlternativePaging
-   * and following ones.
-   */
-  @SuppressFBWarnings(
-      value = "LI_LAZY_INIT_STATIC",
-      justification = "Spotbugs complains about l. 95 - ignore it")
-  protected void buildPageRequestSql(PageRequest pageRequest, StringBuilder innerSql) {
-    if (pageRequest == null || innerSql == null) {
-      return;
-    }
-    if (JdbiRepositoryImpl.selectStmtSplitter == null) {
-      // init this field here where we use it to keep it in sight
-      // the flags at the start stand for:
-      // - i: case insensitive
-      // - u: unicode aware case folding
-      JdbiRepositoryImpl.selectStmtSplitter =
-          Pattern.compile(
-              "(?iu)^\\s*(SELECT\\s+(?<fields>.+)\\s+)?FROM\\s+(?<fromwhere>(?<table>\\w+\\b)(\\s+AS\\s+(?<tablealias>\\w+))?.*?(\\sWHERE.+?)?)(\\sORDER BY\\s+(?<orderings>.+))?\\s*$");
-    }
-    Matcher selectStmtMatcher = selectStmtSplitter.matcher(innerSql.toString());
-    if (!selectStmtMatcher.find()) {
-      JdbiRepositoryImpl.LOGGER.warn(
-          "Regex 'selectStmtSplitter' did not match on << {} >>", innerSql.toString());
-      super.addPageRequestParams(pageRequest, innerSql);
-      return;
-    }
-    String fields = selectStmtMatcher.group("fields");
-    String fromWherePart = selectStmtMatcher.group("fromwhere");
-    String table = selectStmtMatcher.group("table").strip();
-    String tableAlias = selectStmtMatcher.group("tablealias");
-    String orderings = selectStmtMatcher.group("orderings");
-    String pageRequestOrderings = getOrderBy(pageRequest.getSorting());
-    if (!StringUtils.hasText(orderings) && StringUtils.hasText(pageRequestOrderings)) {
-      orderings = pageRequestOrderings.strip();
-    } else if (StringUtils.hasText(orderings) && StringUtils.hasText(pageRequestOrderings)) {
-      orderings = String.format("%s, %s", orderings.strip(), pageRequestOrderings.strip());
-    }
-    int offset = pageRequest.getOffset();
-    int pageSize = pageRequest.getPageSize();
-    // clear passed StringBuilder and rebuild the select statement
-    innerSql.delete(0, innerSql.length());
-    // outer SELECT part
-    innerSql.append("SELECT * FROM (");
-    // inner SELECT part
-    if (fields != null && fields.contains("*")) {
-      fields =
-          fields.replaceFirst(
-              "(\\w+[.])?[*]",
-              String.format(
-                  "%s.%s rnsetid", tableAlias != null ? tableAlias : table, getUniqueField()));
-    } else if (fields == null) {
-      fields =
-          String.format("%s.%s rnsetid", tableAlias != null ? tableAlias : table, getUniqueField());
-    }
-    innerSql
-        .append("SELECT row_number() OVER (")
-        .append(
-            StringUtils.hasText(orderings) ? String.format("ORDER BY %s", orderings.strip()) : "")
-        .append(") rn, ")
-        .append(fields);
-    // inner FROM and WHERE parts
-    innerSql.append(String.format(" FROM %s", fromWherePart));
-    // outer SELECT statement goes on: FROM part
-    innerSql.append(") innerselect_rownumber ");
-    if (fields.contains("rnsetid")) {
-      // add a join
-      innerSql
-          .append("INNER JOIN ")
-          .append(table)
-          .append(
-              String.format(" ON %s.%s = innerselect_rownumber.rnsetid ", table, getUniqueField()));
-    }
-    // last but not least: outer WHERE part
-    // we are using a range here since its costs are lower than of a BETWEEN or two comparisons
-    // see also https://www.postgresql.org/docs/12/rangetypes.html,
-    // https://www.postgresql.org/docs/12/functions-range.html
-    // it is simply written as a mathematics intervall
-    innerSql.append(
-        String.format(
-            "WHERE '(%d,%d]'::int8range @> innerselect_rownumber.rn", offset, offset + pageSize));
+    return executedSearchTerm;
   }
 
   public long count() {
     final String sql = "SELECT count(*) FROM " + tableName;
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
+  }
+
+  /**
+   * Escape characters that must not appear in jsonpath inner strings.
+   *
+   * <p>This method should always be used to clean up strings, e.g. search terms, that are intended
+   * to appear in an jsonpath inner string, i.e. between double quotes. If the inserted term
+   * contains double quotes then the jsonpath breaks. Hence we remove double quotes at start and end
+   * of the provided string (they do not have any meaning for the search at all) and escape the
+   * remaining ones with a backslash.
+   *
+   * @param term can be null
+   * @return term with forbidden characters removed or escaped
+   */
+  private String escapeTermForJsonpath(String term) {
+    if (term == null) {
+      return null;
+    }
+    if (term.startsWith("\"") && term.endsWith("\"")) {
+      // 1st step: remove useless surrounding quotes
+      term = term.replaceAll("^\"(.+)\"$", "$1");
+    }
+    if (term.contains("\"")) {
+      // 2nd step: escape remaining double quotes; yes, looks ugly...
+      term = term.replaceAll("\"", "\\\\\"");
+    }
+    return term;
+  }
+
+  public String getCommonSearchSql(String tblAlias) {
+    return "("
+        + getSearchTermTemplates(tblAlias).stream().collect(Collectors.joining(" OR "))
+        + ")";
   }
 
   protected String getFilterClauses(Filtering filtering, Map<String, Object> argumentMappings) {
@@ -206,6 +164,13 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
   public String getMappingPrefix() {
     return mappingPrefix;
+  }
+
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return new ArrayList<>(
+        Arrays.asList(
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
   }
 
   public String getTableAlias() {
@@ -444,6 +409,26 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       }
     }
     return query.toString();
+  }
+
+  /*
+   * if filtering has other target object type than actual (this) repository instance
+   * use this method to rename filter expression names to target table alias and column names
+   */
+  protected void mapFilterExpressionsToOtherTableColumnNames(
+      Filtering filtering, AbstractPagingAndSortingRepositoryImpl otherRepository) {
+    if (filtering != null) {
+      List<FilterCriterion> filterCriteria =
+          filtering.getFilterCriteria().stream()
+              .map(
+                  fc -> {
+                    fc.setExpression(otherRepository.getColumnName(fc.getExpression()));
+                    fc.setNativeExpression(true);
+                    return fc;
+                  })
+              .collect(Collectors.toList());
+      filtering.setFilterCriteria(filterCriteria);
+    }
   }
 
   protected Integer retrieveNextSortIndexForParentChildren(

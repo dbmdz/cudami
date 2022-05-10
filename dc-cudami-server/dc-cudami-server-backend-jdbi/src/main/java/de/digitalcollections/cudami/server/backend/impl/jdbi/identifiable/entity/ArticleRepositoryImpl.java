@@ -96,12 +96,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Article article = super.getByUuidAndFiltering(uuid, filtering);
+  public Article getByIdentifier(Identifier identifier) {
+    Article article = super.getByIdentifier(identifier);
 
     if (article != null) {
-      List<Agent> creators = getCreators(uuid);
-      article.setCreators(creators);
+      article.setCreators(getCreators(article.getUuid()));
     }
     return article;
   }
@@ -117,11 +116,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByIdentifier(Identifier identifier) {
-    Article article = super.getByIdentifier(identifier);
+  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Article article = super.getByUuidAndFiltering(uuid, filtering);
 
     if (article != null) {
-      article.setCreators(getCreators(article.getUuid()));
+      List<Agent> creators = getCreators(uuid);
+      article.setCreators(creators);
     }
     return article;
   }

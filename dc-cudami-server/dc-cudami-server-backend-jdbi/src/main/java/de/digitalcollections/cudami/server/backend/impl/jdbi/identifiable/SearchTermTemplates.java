@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 public enum SearchTermTemplates {
   ILIKE_SEARCH("%s.%s ILIKE '%%' || :searchTerm || '%%'"),
+  ILIKE_STARTS_WITH("%s.%s ILIKE :searchTerm || '%%'"),
   // FYI: [JSON Path
   // Functions](https://www.postgresql.org/docs/12/functions-json.html#FUNCTIONS-SQLJSON-PATH)
   // and [Data type](https://www.postgresql.org/docs/12/datatype-json.html#DATATYPE-JSONPATH)

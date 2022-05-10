@@ -161,7 +161,29 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public Identifier getByUuid(UUID identifierUuid) {
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " "
+            + tableAlias
+            + " WHERE uuid = :uuid";
+
+    Identifier result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("uuid", identifierUuid)
+                    .mapTo(Identifier.class)
+                    .findOne()
+                    .orElse(null));
+    return result;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -211,28 +233,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                 h.createQuery(sql)
                     .bindBean(identifier)
                     .mapToBean(Identifier.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
-  }
-
-  @Override
-  public Identifier getByUuid(UUID identifierUuid) {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_ID
-            + " FROM "
-            + tableName
-            + " "
-            + tableAlias
-            + " WHERE uuid = :uuid";
-
-    Identifier result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", identifierUuid)
-                    .mapTo(Identifier.class)
                     .findOne()
                     .orElse(null));
     return result;

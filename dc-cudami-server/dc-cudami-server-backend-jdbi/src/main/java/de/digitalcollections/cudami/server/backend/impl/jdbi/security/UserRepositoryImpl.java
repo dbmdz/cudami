@@ -20,18 +20,18 @@ import org.springframework.stereotype.Repository;
 public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserRepository {
 
   public static final String MAPPING_PREFIX = "u";
-  public static final String TABLE_ALIAS = "u";
-  public static final String TABLE_NAME = "users";
 
   public static final String SQL_INSERT_FIELDS =
       " email, enabled, firstname, lastname, passwordhash, roles, uuid";
   public static final String SQL_INSERT_VALUES =
       " :email, :enabled, :firstname, :lastname, :passwordHash, :roles, :uuid";
+  public static final String TABLE_ALIAS = "u";
   public static final String SQL_REDUCED_FIELDS_US =
       String.format(
           " %1$s.uuid, %1$s.created, %1$s.email, %1$s.enabled, %1$s.firstname, %1$s.lastname, %1$s.last_modified, %1$s.passwordhash, %1$s.roles",
           TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_US = SQL_REDUCED_FIELDS_US;
+  public static final String TABLE_NAME = "users";
 
   @Autowired
   public UserRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -54,7 +54,9 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     addPageRequestParams(pageRequest, query);
     List<User> result =
         dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(User.class).list());
+
     long total = count();
+
     PageResponse<User> pageResponse = new PageResponse<>(result, pageRequest, total);
     return pageResponse;
   }
@@ -75,6 +77,11 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                         + "' = any(roles)")
                 .mapToBean(User.class)
                 .list());
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("email", "firstname", "lastname"));
   }
 
   @Override
@@ -122,12 +129,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("email", "firstname", "lastname"));
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

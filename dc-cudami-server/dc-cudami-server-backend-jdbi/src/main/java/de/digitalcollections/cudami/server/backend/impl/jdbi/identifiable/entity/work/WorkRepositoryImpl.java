@@ -87,22 +87,22 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Work work = super.getByUuidAndFiltering(uuid, filtering);
+  public Work getByIdentifier(Identifier identifier) {
+    Work work = super.getByIdentifier(identifier);
 
     if (work != null) {
-      List<Agent> creators = getCreators(uuid);
+      List<Agent> creators = getCreators(work.getUuid());
       work.setCreators(creators);
     }
     return work;
   }
 
   @Override
-  public Work getByIdentifier(Identifier identifier) {
-    Work work = super.getByIdentifier(identifier);
+  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Work work = super.getByUuidAndFiltering(uuid, filtering);
 
     if (work != null) {
-      List<Agent> creators = getCreators(work.getUuid());
+      List<Agent> creators = getCreators(uuid);
       work.setCreators(creators);
     }
     return work;

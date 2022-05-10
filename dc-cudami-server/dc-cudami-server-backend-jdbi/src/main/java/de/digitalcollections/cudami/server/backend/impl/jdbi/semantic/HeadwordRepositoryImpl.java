@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -12,13 +13,10 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements HeadwordRepository {
@@ -144,19 +141,13 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public PageResponse<Headword> find(PageRequest pageRequest) {
-    return find(pageRequest, null, new HashMap<>());
-  }
+    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-  protected PageResponse<Headword> find(
-      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    if (commonSql == null) {
-      commonSql = " FROM " + tableName + " AS " + tableAlias;
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
     addPageRequestParams(pageRequest, innerQuery);
-
     List<Headword> result =
         retrieveList(
             SQL_REDUCED_FIELDS_HW,
@@ -164,43 +155,11 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             argumentMappings,
             getOrderBy(pageRequest.getSorting()));
 
-    StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, sqlCount, argumentMappings);
-    long total = retrieveCount(sqlCount, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public SearchPageResponse<Headword> find(SearchPageRequest searchPageRequest) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-
-    commonSql += " WHERE label ILIKE :searchTerm || '%' ";
-    return find(searchPageRequest, commonSql, Map.of("searchTerm", searchTerm));
-  }
-
-  protected SearchPageResponse<Headword> find(
-      SearchPageRequest searchPageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-    addPageRequestParams(searchPageRequest, innerQuery);
-    List<Headword> result =
-        retrieveList(
-            SQL_REDUCED_FIELDS_HW,
-            innerQuery,
-            argumentMappings,
-            getOrderBy(searchPageRequest.getSorting()));
-
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new SearchPageResponse<>(result, searchPageRequest, total);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
@@ -223,11 +182,6 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public List<Headword> getAll() {
-    return retrieveList(SQL_REDUCED_FIELDS_HW, null, null);
-  }
-
-  @Override
   public List<Headword> findByLabel(String label) {
     Filtering filtering =
         Filtering.builder()
@@ -242,6 +196,34 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             filtering);
     PageResponse<Headword> response = find(request);
     return response.getContent();
+  }
+
+  @Override
+  public Headword findByLabelAndLocale(String label, Locale locale) {
+    // basic query
+    StringBuilder sqlQuery =
+        new StringBuilder(
+            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
+
+    // add filtering
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
+            .build();
+    Map<String, Object> argumentMappings = new HashMap<>();
+    addFiltering(filtering, sqlQuery, argumentMappings);
+
+    // get it
+    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
+    Optional<Headword> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlQuery.toString())
+                    .bindMap(bindMap)
+                    .mapToBean(Headword.class)
+                    .findFirst());
+    return result.orElse(null);
   }
 
   @Override
@@ -279,37 +261,21 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public Headword findByLabelAndLocale(String label, Locale locale) {
-    // basic query
-    StringBuilder sqlQuery =
-        new StringBuilder(
-            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
-
-    // add filtering
-    Filtering filtering =
-        Filtering.builder()
-            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
-            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
-            .build();
-    Map<String, Object> argumentMappings = new HashMap<>();
-    addFiltering(filtering, sqlQuery, argumentMappings);
-
-    // get it
-    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
-    Optional<Headword> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlQuery.toString())
-                    .bindMap(bindMap)
-                    .mapToBean(Headword.class)
-                    .findFirst());
-    return result.orElse(null);
+  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(
+        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public List<Headword> getRandom(int count) {
+  public PageResponse<FileResource> findRelatedFileResources(
+      UUID headwordUuid, PageRequest pageRequest) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  }
+
+  @Override
+  public List<Headword> getAll() {
+    return retrieveList(SQL_REDUCED_FIELDS_HW, null, null);
   }
 
   @Override
@@ -318,7 +284,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -346,13 +312,13 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public List<Entity> getRelatedEntities(UUID headwordUuid) {
+  public List<Headword> getRandom(int count) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 
   @Override
-  public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
+  public List<Entity> getRelatedEntities(UUID headwordUuid) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
@@ -364,10 +330,8 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  public PageResponse<FileResource> findRelatedFileResources(
-      UUID headwordUuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return List.of(SearchTermTemplates.ILIKE_STARTS_WITH.renderTemplate(tableAlias, "label"));
   }
 
   @Override

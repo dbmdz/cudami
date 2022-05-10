@@ -19,7 +19,8 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -198,8 +199,8 @@ public class UrlAliasRepositoryImplTest {
   @Order(6)
   @Test
   public void find() throws UrlAliasRepositoryException {
-    var searchPageRequest = new SearchPageRequest("ueber", 0, 10);
-    searchPageRequest.add(
+    PageRequest pageRequest = new PageRequest("ueber", 0, 10);
+    pageRequest.add(
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
@@ -208,12 +209,12 @@ public class UrlAliasRepositoryImplTest {
                     .build())
             .build());
 
-    var searchPageResponse = this.repo.find(searchPageRequest);
-    assertTrue(searchPageResponse.hasContent());
-    assertThat(searchPageResponse.getTotalElements()).isEqualTo(1);
-    assertThat(searchPageResponse.getContent().size()).isEqualTo(1);
-    assertTrue(searchPageResponse.getContent().get(0).containsKey(Locale.GERMAN));
-    assertThat(searchPageResponse.getContent().get(0).get(Locale.GERMAN))
+    PageResponse<LocalizedUrlAliases> pageResponse = this.repo.find(pageRequest);
+    assertTrue(pageResponse.hasContent());
+    assertThat(pageResponse.getTotalElements()).isEqualTo(1);
+    assertThat(pageResponse.getContent().size()).isEqualTo(1);
+    assertTrue(pageResponse.getContent().get(0).containsKey(Locale.GERMAN));
+    assertThat(pageResponse.getContent().get(0).get(Locale.GERMAN))
         .isEqualTo(List.of(this.urlAliasWithWebsite));
   }
 

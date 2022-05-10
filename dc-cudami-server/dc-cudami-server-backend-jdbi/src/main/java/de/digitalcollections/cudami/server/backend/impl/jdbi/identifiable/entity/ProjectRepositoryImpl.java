@@ -4,8 +4,9 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
@@ -113,40 +113,39 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID projectUuid, SearchPageRequest searchPageRequest) {
-    final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
-    final String doTableName = digitalObjectRepositoryImpl.getTableName();
+  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
+    final String crossTableAlias = "xtable";
 
-    String commonSql =
-        " FROM "
-            + doTableName
-            + " AS "
-            + doTableAlias
-            + " INNER JOIN project_digitalobjects AS pd ON "
-            + doTableAlias
-            + ".uuid = pd.digitalobject_uuid"
-            + " WHERE pd.project_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
+    final String digitalObjectTableAlias = digitalObjectRepositoryImpl.getTableAlias();
+    final String digitalObjectTableName = digitalObjectRepositoryImpl.getTableName();
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + digitalObjectTableName
+                + " AS "
+                + digitalObjectTableAlias
+                + " INNER JOIN project_digitalobjects AS "
+                + crossTableAlias
+                + " ON "
+                + digitalObjectTableAlias
+                + ".uuid = "
+                + crossTableAlias
+                + ".digitalobject_uuid"
+                + " WHERE "
+                + crossTableAlias
+                + ".project_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", projectUuid);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (digitalobject) than this repository (project)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-    String searchTerm = searchPageRequest.getQuery();
-    if (StringUtils.hasText(searchTerm)) {
-      commonSql += " AND " + getCommonSearchSql(doTableAlias);
-      argumentMappings.put("searchTerm", this.escapeTermForJsonpath(searchTerm));
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT pd.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-
-    String orderBy = null;
-    if (searchPageRequest.getSorting() == null) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(
-          " ORDER BY pd.sortindex"); // must be the column itself to use window functions
-    }
-    addPageRequestParams(searchPageRequest, innerQuery);
-
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
+    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
@@ -155,10 +154,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
             orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new SearchPageResponse<>(result, searchPageRequest, total);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override

@@ -30,8 +30,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
@@ -219,17 +217,17 @@ class DigitalObjectRepositoryImplTest {
             });
 
     String query = "test";
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    searchPageRequest.setPageSize(10);
-    searchPageRequest.setPageNumber(0);
-    searchPageRequest.setQuery(query);
-    searchPageRequest.setSorting(
+    PageRequest pageRequest = new PageRequest();
+    pageRequest.setPageSize(10);
+    pageRequest.setPageNumber(0);
+    pageRequest.setSearchTerm(query);
+    pageRequest.setSorting(
         Sorting.builder()
             .order(Order.builder().property("refId").direction(Direction.ASC).build())
             .build());
 
-    SearchPageResponse response = repo.find(searchPageRequest);
-    assertThat(((SearchPageRequest) response.getPageRequest()).getQuery()).isEqualTo(query);
+    PageResponse response = repo.find(pageRequest);
+    assertThat(response.getExecutedSearchTerm()).isEqualTo(query);
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);
@@ -250,11 +248,11 @@ class DigitalObjectRepositoryImplTest {
     repo.save(ado);
 
     // Retrieve the ADO by filtering the parent uuid
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
+    PageRequest searchPageRequest = new PageRequest();
     searchPageRequest.setFiltering(
         new Filtering(
             List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
-    SearchPageResponse response = repo.find(searchPageRequest);
+    PageResponse response = repo.find(searchPageRequest);
 
     List<DigitalObject> actuals = response.getContent();
     assertThat(actuals).hasSize(1);

@@ -242,6 +242,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     this.sqlUpdateFieldValues = sqlUpdateFieldValues;
   }
 
+  protected String addCrossTablePageRequestParams(
+      PageRequest pageRequest, StringBuilder innerQuery, final String crossTableAlias) {
+    String orderBy = getOrderBy(pageRequest.getSorting());
+    if (!StringUtils.hasText(orderBy)) {
+      orderBy = "ORDER BY idx ASC";
+      innerQuery.append(
+          " ORDER BY "
+              + crossTableAlias
+              + ".sortindex"); // must be the column itself to use window functions
+    }
+    addPageRequestParams(pageRequest, innerQuery);
+    return orderBy;
+  }
+
   @Override
   public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
     Integer sortIndex =
@@ -331,16 +345,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     };
   }
 
-  /**
-   * Extend the reduced Identifiable by the contents of the provided RowView
-   *
-   * @param identifiable the reduced Identifiable
-   * @param rowView the rowView
-   */
-  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
-    // do nothing by default
-  }
-
   @Override
   public boolean delete(List<UUID> uuids) {
     dbi.withHandle(
@@ -352,48 +356,30 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   /**
-   * Escape characters that must not appear in jsonpath inner strings.
+   * Extend the reduced Identifiable by the contents of the provided RowView
    *
-   * <p>This method should always be used to clean up strings, e.g. search terms, that are intended
-   * to appear in an jsonpath inner string, i.e. between double quotes. If the inserted term
-   * contains double quotes then the jsonpath breaks. Hence we remove double quotes at start and end
-   * of the provided string (they do not have any meaning for the search at all) and escape the
-   * remaining ones with a backslash.
-   *
-   * @param term, can be null
-   * @return term with forbidden characters removed or escaped
+   * @param identifiable the reduced Identifiable
+   * @param rowView the rowView
    */
-  protected String escapeTermForJsonpath(String term) {
-    if (term == null) {
-      return null;
-    }
-    if (term.startsWith("\"") && term.endsWith("\"")) {
-      // 1st step: remove useless surrounding quotes
-      term = term.replaceAll("^\"(.+)\"$", "$1");
-    }
-    if (term.contains("\"")) {
-      // 2nd step: escape remaining double quotes; yes, looks ugly...
-      term = term.replaceAll("\"", "\\\\\"");
-    }
-    return term;
+  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
+    // do nothing by default
   }
 
   protected PageResponse<I> find(PageRequest pageRequest, Map<String, Object> argumentMappings) {
     String commonSql = " FROM " + tableName + " AS " + tableAlias;
+    return find(pageRequest, commonSql, argumentMappings);
+  }
 
-    // handle search term
-    String searchTerm = pageRequest.getSearchTerm();
-    final boolean hasSearchTerm = StringUtils.hasText(searchTerm);
-    String executedSearchTerm = null;
-    if (hasSearchTerm) {
-      // select with search term
-      commonSql += " WHERE " + getCommonSearchSql(tableAlias);
-      executedSearchTerm = this.escapeTermForJsonpath(searchTerm);
-      argumentMappings.put("searchTerm", executedSearchTerm);
+  protected PageResponse<I> find(
+      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
+    if (argumentMappings == null) {
+      argumentMappings = new HashMap<>(0);
     }
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
     addPageRequestParams(pageRequest, innerQuery);
     List<I> result =
         retrieveList(
@@ -403,30 +389,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             getOrderBy(pageRequest.getSorting()));
 
     StringBuilder countQuery =
-        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(pageRequest, countQuery, argumentMappings);
+        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    final PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
-    if (hasSearchTerm) {
-      pageResponse.setExecutedSearchTerm(executedSearchTerm);
-    }
-    return pageResponse;
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  protected PageResponse<I> find(PageRequest pageRequest, String commonSql) {
+    return find(pageRequest, commonSql, null);
   }
 
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
-    return find(pageRequest, new HashMap<>(0));
-  }
-
-  @Override
-  public List<I> getAllFull() {
-    return retrieveList(sqlSelectAllFields, null, null, null);
-  }
-
-  @Override
-  public List<I> getAllReduced() {
-    return retrieveList(sqlSelectReducedFields, null, null, null);
+    return find(pageRequest, (Map<String, Object>) null);
   }
 
   @Override
@@ -476,18 +451,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     argumentMappings.put("language", language);
     argumentMappings.put("initial", initial);
 
-    return this.find(pageRequest, argumentMappings);
+    return find(pageRequest, argumentMappings);
   }
 
   @Override
-  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    if (filtering == null) {
-      filtering = Filtering.builder().build();
-    }
-    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
+  public List<I> getAllFull() {
+    return retrieveList(sqlSelectAllFields, null, null, null);
+  }
 
-    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
-    return result;
+  @Override
+  public List<I> getAllReduced() {
+    return retrieveList(sqlSelectReducedFields, null, null, null);
   }
 
   @Override
@@ -536,7 +510,18 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    if (filtering == null) {
+      filtering = Filtering.builder().build();
+    }
+    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
+
+    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
+    return result;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -558,12 +543,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       default:
         return null;
     }
-  }
-
-  protected String getCommonSearchSql(String tblAlias) {
-    return "("
-        + getSearchTermTemplates(tblAlias).stream().collect(Collectors.joining(" OR "))
-        + ")";
   }
 
   public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
@@ -603,20 +582,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public String getOrderBy(Sorting sorting) {
-    if (sorting == null || sorting.getOrders() == null) {
-      return null;
-    }
-    String orderBy = super.getOrderBy(sorting);
-    // Does it work in general or do we have to restrict it to labels?
-    // The COALESCE function returns the first of its arguments that is not null. Null is returned
-    // only if all arguments are null. (from Postgres doc)
-    return orderBy.replaceAll(
-        "(?i)(?<jsonfield>(?<col>[\\w._]+)->>'.+?') +(?<sorting>asc|desc)",
-        "COALESCE(${jsonfield}, ${col}->>'') COLLATE \"ucs_basic\" ${sorting}");
-  }
-
-  @Override
   public List<Entity> getRelatedEntities(UUID identifiableUuid) {
     String query =
         "SELECT * FROM entities e"
@@ -650,13 +615,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                     .mapToBean(FileResource.class)
                     .list());
     return result;
-  }
-
-  protected List<String> getSearchTermTemplates(String tableAlias) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
   }
 
   public String getSqlSelectAllFields() {

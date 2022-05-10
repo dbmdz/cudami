@@ -19,13 +19,12 @@ import org.springframework.stereotype.Repository;
 public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements PredicateRepository {
 
   public static final String MAPPING_PREFIX = "pred";
-  public static final String TABLE_ALIAS = "pred";
-  public static final String TABLE_NAME = "predicates";
 
   public static final String SQL_INSERT_FIELDS =
       " value, label, description, created, last_modified, uuid";
   public static final String SQL_INSERT_VALUES =
       " :value, :label::JSONB, :description::JSONB, :created, :lastModified, :uuid";
+  public static final String TABLE_ALIAS = "pred";
   // FIXME: using the mapping prefix leads to mapping issues (the corresponding test in
   // EntityRelationRepositoryTest#L71 fails)
   public static final String SQL_REDUCED_FIELDS_PRED =
@@ -33,6 +32,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
           " %1$s.uuid, %1$s.value, %1$s.label, %1$s.created, %1$s.last_modified", TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_PRED =
       SQL_REDUCED_FIELDS_PRED + String.format(", %s.description", TABLE_ALIAS);
+  public static final String TABLE_NAME = "predicates";
 
   @Autowired
   public PredicateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -61,6 +61,11 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified"));
+  }
+
+  @Override
   public Predicate getByValue(String value) {
     String query =
         "SELECT "
@@ -77,12 +82,7 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified"));
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

@@ -47,7 +47,7 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     return null;
   }
 

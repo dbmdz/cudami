@@ -149,12 +149,11 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
+  public HeadwordEntry getByIdentifier(Identifier identifier) {
+    HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
 
     if (headwordEntry != null) {
-      List<Agent> creators = getCreators(uuid);
-      headwordEntry.setCreators(creators);
+      headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
     }
     return headwordEntry;
   }
@@ -170,11 +169,12 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByIdentifier(Identifier identifier) {
-    HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
+  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
 
     if (headwordEntry != null) {
-      headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
+      List<Agent> creators = getCreators(uuid);
+      headwordEntry.setCreators(creators);
     }
     return headwordEntry;
   }
