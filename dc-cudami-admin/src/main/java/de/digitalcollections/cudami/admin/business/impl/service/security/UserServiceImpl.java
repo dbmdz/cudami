@@ -98,10 +98,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public boolean doesActiveAdminUserExist() throws ServiceException {
     try {
       List<User> findActiveAdminUsers = client.getActiveAdminUsers();
-      if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
-        return true;
-      }
-      return false;
+      return findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty();
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
