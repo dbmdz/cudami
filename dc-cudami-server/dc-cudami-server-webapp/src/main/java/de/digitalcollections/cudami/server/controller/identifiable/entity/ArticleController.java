@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
 import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,14 +47,14 @@ public class ArticleController {
 
   @Operation(summary = "Get all articles")
   @GetMapping(
-      value = {"/v5/articles", "/v2/articles", "/latest/articles"},
+      value = {"/v6/articles"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Article> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);

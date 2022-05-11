@@ -1,0 +1,25 @@
+{
+  "content": [],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "DESC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "lastModified"
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "uuid"
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 5,
+    "query": "hasdjklhfkjsadlhfkjlas"
+  },
+  "totalElements": 0
+}

@@ -7,10 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,30 +33,6 @@ public class IdentifiableController {
       UrlAliasService urlAliasService) {
     this.identifiableService = identifiableService;
     this.urlAliasService = urlAliasService;
-  }
-
-  @Operation(
-      summary =
-          "Find limited amount of identifiables containing searchTerm in label or description")
-  @GetMapping(
-      value = {
-        "/v5/identifiables/search",
-        "/v2/identifiables/search",
-        "/latest/identifiables/search"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Identifiable> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    PageResponse pageResponse = identifiableService.find(pageRequest);
-    // add "query": "hallo" to request JSON
   }
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")

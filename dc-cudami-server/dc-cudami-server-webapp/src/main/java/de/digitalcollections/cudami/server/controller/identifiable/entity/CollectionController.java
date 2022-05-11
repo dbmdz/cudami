@@ -13,8 +13,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -164,16 +162,21 @@ public class CollectionController {
     return collectionService.count();
   }
 
-  @Operation(summary = "Get all collections")
+  @Operation(
+      summary =
+          "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
       value = {"/v5/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
+  // if unknown)
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -184,44 +187,78 @@ public class CollectionController {
     return collectionService.find(pageRequest);
   }
 
+  @Operation(summary = "Get paged digital objects of a collection")
+  @GetMapping(
+      value = {"/v5/collections/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public SearchPageResponse<DigitalObject> findDigitalObjects(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+
+    Collection collection = new Collection();
+    collection.setUuid(collectionUuid);
+    return collectionService.findDigitalObjects(collection, searchPageRequest);
+  }
+
+  @Operation(
+      summary = "Get all related - by the given predicate - corporate bodies of a collection")
+  @GetMapping(
+      value = {
+        "/v5/collections/{uuid}/related/corporatebodies",
+        "/v3/collections/{uuid}/related/corporatebodies",
+        "/latest/collections/{uuid}/related/corporatebodies"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<CorporateBody> findRelatedCorporateBodies(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
+    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
+    return collectionService.findRelatedCorporateBodies(uuid, filtering);
+  }
+
+  @Operation(summary = "Get (active or all) paged subcollections of a collection")
+  @GetMapping(
+      value = {"/v6/collections/{uuid}/subcollections"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Collection> findSubcollections(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    if (active != null) {
+      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+    }
+    return collectionService.findChildren(collectionUuid, searchPageRequest);
+  }
+
   @Operation(summary = "Get all top collections")
   @GetMapping(
-      value = {"/v5/collections/top", "/v2/collections/top", "/latest/collections/top"},
+      value = {"/v6/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> findTopCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return collectionService.findRootNodes(searchPageRequest);
-  }
-
-  @Operation(
-      summary =
-          "Find limited amount of (active or all) collections containing searchTerm in label or description")
-  @GetMapping(
-      value = {"/v5/collections/search"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Collection> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "active", required = false) String active) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    if (active != null) {
-      return collectionService.findActive(pageRequest);
-    }
-    return collectionService.find(pageRequest);
+    return collectionService.findRootNodes(pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a collection")
@@ -334,23 +371,6 @@ public class CollectionController {
     return new ResponseEntity<>(collection, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get paged digital objects of a collection")
-  @GetMapping(
-      value = {"/v5/collections/{uuid}/digitalobjects"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-
-    Collection collection = new Collection();
-    collection.setUuid(collectionUuid);
-    return collectionService.findDigitalObjects(collection, searchPageRequest);
-  }
-
   @Operation(summary = "Get the first created parent of a collection")
   @GetMapping(
       value = {
@@ -375,46 +395,6 @@ public class CollectionController {
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid) {
     return collectionService.getParents(collectionUuid);
-  }
-
-  @Operation(
-      summary = "Get all related - by the given predicate - corporate bodies of a collection")
-  @GetMapping(
-      value = {
-        "/v5/collections/{uuid}/related/corporatebodies",
-        "/v3/collections/{uuid}/related/corporatebodies",
-        "/latest/collections/{uuid}/related/corporatebodies"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<CorporateBody> findRelatedCorporateBodies(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
-    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
-    return collectionService.findRelatedCorporateBodies(uuid, filtering);
-  }
-
-  @Operation(summary = "Get (active or all) paged subcollections of a collection")
-  @GetMapping(
-      value = {"/v5/collections/{uuid}/subcollections"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findSubcollections(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (active != null) {
-      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
-    }
-    return collectionService.findChildren(collectionUuid, searchPageRequest);
   }
 
   @Operation(summary = "Get languages of all top collections")
