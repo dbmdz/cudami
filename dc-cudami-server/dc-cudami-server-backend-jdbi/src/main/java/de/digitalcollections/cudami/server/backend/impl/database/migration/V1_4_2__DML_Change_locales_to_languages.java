@@ -13,7 +13,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 public class V1_4_2__DML_Change_locales_to_languages extends BaseJavaMigration {
 
   @Override
-  public void migrate(Context context) throws Exception {
+  public void migrate(Context context) throws SQLException {
     JdbcTemplate jdbcTemplate =
         new JdbcTemplate(
             new SingleConnectionDataSource(context.getConnection(), true).getConnection());

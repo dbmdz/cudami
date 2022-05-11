@@ -19,7 +19,7 @@ public class V1_4_0__DML_Refactor_localized_content extends BaseJavaMigration {
       LoggerFactory.getLogger(V1_4_0__DML_Refactor_localized_content.class);
 
   @Override
-  public void migrate(Context context) throws Exception {
+  public void migrate(Context context) throws SQLException {
     JdbcTemplate jdbcTemplate =
         new JdbcTemplate(
             new SingleConnectionDataSource(context.getConnection(), true).getConnection());

@@ -21,8 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
             version = "5",
             description = "cultural digital asset management system"))
 public class Application {
-
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
   }
 }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.database.migration;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -11,7 +12,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 public class V9_05_01__DDL_Add_missing_column_to_predicates extends BaseJavaMigration {
 
   @Override
-  public void migrate(Context context) throws Exception {
+  public void migrate(Context context) throws SQLException {
     JdbcTemplate jdbcTemplate =
         new JdbcTemplate(
             new SingleConnectionDataSource(context.getConnection(), true).getConnection());

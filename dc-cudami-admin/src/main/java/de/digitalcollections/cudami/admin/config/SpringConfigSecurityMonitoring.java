@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
@@ -14,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @Order(1)
+@SuppressFBWarnings(
+    value = "THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION",
+    justification = "Spring Security throws java.lang.exeption...")
 public class SpringConfigSecurityMonitoring extends WebSecurityConfigurerAdapter {
 
   @Value("${management.endpoints.web.base-path}")

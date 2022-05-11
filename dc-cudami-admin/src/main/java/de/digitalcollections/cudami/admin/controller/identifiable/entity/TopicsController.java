@@ -58,7 +58,7 @@ public class TopicsController extends AbstractController {
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
-      throws Exception {
+      throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);

@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void afterPropertiesSet() {
     this.uniqueUsernameValidator = new UniqueUsernameValidator(messageSource, this);
   }
 

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.info.InfoEndpoint;
@@ -8,6 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @Configuration
+@SuppressFBWarnings(
+    value = "THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION",
+    justification = "Spring Security throws java.lang.exeption...")
 public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
 
   @Override

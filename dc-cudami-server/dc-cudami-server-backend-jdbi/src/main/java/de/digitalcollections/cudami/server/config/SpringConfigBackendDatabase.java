@@ -51,7 +51,7 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
-  public JdbiFactoryBean jdbi(DataSource ds, ObjectMapper objectMapper) throws Exception {
+  public JdbiFactoryBean jdbi(DataSource ds, ObjectMapper objectMapper) {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(ds);
     List plugins = new ArrayList();
     plugins.add(new SqlObjectPlugin());

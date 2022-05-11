@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.database.migration;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
@@ -11,7 +12,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 public class V1_7_2__DML_Fix_imagefileresource_external_filename extends BaseJavaMigration {
 
   @Override
-  public void migrate(Context context) throws Exception {
+  public void migrate(Context context) throws SQLException {
     JdbcTemplate jdbcTemplate =
         new JdbcTemplate(
             new SingleConnectionDataSource(context.getConnection(), true).getConnection());
