@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -59,10 +60,7 @@ public class V5IdentifiableController {
       pageRequest.setSorting(sorting);
     }
     PageResponse<Identifiable> pageResponse = identifiableService.find(pageRequest);
-    // add "query": "hallo" to request JSON instead of "executedSearchTerm"/"searchTerm": "hallo"
-    String result = objectMapper.writeValueAsString(pageResponse);
-    result = result.replaceAll("executedSearchTerm", "query");
-    result = result.replaceAll("searchTerm", "query");
+    String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }
