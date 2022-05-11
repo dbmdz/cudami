@@ -1,0 +1,38 @@
+{
+  "content": [
+    {
+      "objectType": "COLLECTION",
+      "created": "2020-03-03T00:00:00.000000",
+      "identifiers": [],
+      "label": {
+        "de": "Testcollection"
+      },
+      "lastModified": "2020-03-03T00:00:00.000000",
+      "previewImage": {
+        "identifiers": [],
+        "type": "RESOURCE",
+        "uuid": "b308c760-5d88-4e88-89b7-a40b11c8b88d",
+        "fileResourceType": "IMAGE",
+        "filename": "Testbild.jpg",
+        "httpBaseUrl": "https://api.digitale-sammlungen.de/iiif/image/v2/b308c760-5d88-4e88-89b7-a40b11c8b88d",
+        "mimeType": "image/jpeg",
+        "readonly": false,
+        "sizeInBytes": 0,
+        "uri": "file:///tmp/b308/c760/5d88/4e88/89b7/a40b/11c8/b88d/resource.jpg",
+        "height": 0,
+        "width": 0,
+        "filenameExtension": "jpg"
+      },
+      "type": "ENTITY",
+      "uuid": "96f02509-478f-4d80-a6ba-bd68acf9e23a",
+      "entityType": "COLLECTION",
+      "refId": 16,
+      "publicationStart": "2020-10-01"
+    }
+  ],
+  "pageRequest": {
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 1
+}

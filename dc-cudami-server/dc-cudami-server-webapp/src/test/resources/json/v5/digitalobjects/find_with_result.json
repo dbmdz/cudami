@@ -1,0 +1,78 @@
+{
+  "content": [
+    {
+      "objectType": "DIGITAL_OBJECT",
+      "created": "2020-10-14T00:00:00.000000",
+      "identifiers": [
+        {
+          "id": "bsb12345678",
+          "identifiable": "e2e75cd3-87c3-4b70-b29a-58086ce5ad4d",
+          "namespace": "mdz-obj",
+          "uuid": "4bbe38a4-96e9-4200-9360-740da00f104f"
+        }
+      ],
+      "label": {
+        "": "Testdigitalisat"
+      },
+      "lastModified": "2020-10-14T00:00:00.000000",
+      "previewImage": {
+        "identifiers": [],
+        "type": "RESOURCE",
+        "uuid": "6f31e675-b6a2-4dc3-921b-ef10048a3038",
+        "fileResourceType": "IMAGE",
+        "filename": "default.jpg",
+        "httpBaseUrl": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb12345678_00003",
+        "mimeType": "image/*",
+        "readonly": false,
+        "sizeInBytes": 0,
+        "uri": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb12345678_00003/full/250,/0/default.jpg",
+        "height": 0,
+        "width": 0,
+        "filenameExtension": "jpg"
+      },
+      "type": "ENTITY",
+      "uuid": "e2e75cd3-87c3-4b70-b29a-58086ce5ad4d",
+      "customAttributes": {
+        "showDfg": true
+      },
+      "entityType": "DIGITAL_OBJECT",
+      "refId": 37423,
+      "fileResources": []
+    }
+  ],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": "de",
+          "ascending": true,
+          "descending": false
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "subProperty": "",
+          "ascending": true,
+          "descending": false
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "uuid",
+          "ascending": true,
+          "descending": false
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 1365676
+}

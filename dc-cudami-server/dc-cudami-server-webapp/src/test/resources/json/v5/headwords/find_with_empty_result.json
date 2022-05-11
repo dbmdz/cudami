@@ -1,0 +1,28 @@
+{
+  "content": [],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "label",
+          "ascending": true,
+          "descending": false
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "uuid",
+          "ascending": true,
+          "descending": false
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 0
+}

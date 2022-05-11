@@ -1,0 +1,46 @@
+{
+  "content": [
+    {
+      "objectType": "WEBSITE",
+      "created": "2018-05-02T00:00:00.00000",
+      "description": {
+        "de": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph"
+            }
+          ]
+        }
+      },
+      "identifiers": [],
+      "label": {
+        "de": "Test-Website"
+      },
+      "lastModified": "2018-05-02T00:00:00.00000",
+      "type": "ENTITY",
+      "uuid": "786f8c74-2a9e-4f74-888f-667522df6538",
+      "entityType": "WEBSITE",
+      "refId": 59,
+      "url": "http://foo.bar"
+    }
+  ],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "DESC",
+          "ignoreCase": false,
+          "nullHandling": "NULLS_FIRST",
+          "property": "label",
+          "subProperty": "de",
+          "ascending": false,
+          "descending": true
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 82
+}
