@@ -42,7 +42,11 @@ public class CorporateBodyController {
 
   @Operation(summary = "Fetch a corporate body by GND-ID from external system and save it")
   @PostMapping(
-      value = {"/v5/corporatebodies/gnd/{gndId}", "/v3/corporatebodies/gnd/{gndId}"},
+      value = {
+        "/v6/corporatebodies/gnd/{gndId}",
+        "/v5/corporatebodies/gnd/{gndId}",
+        "/v3/corporatebodies/gnd/{gndId}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody fetchAndSaveByGndId(
       @Parameter(
@@ -77,6 +81,8 @@ public class CorporateBodyController {
   @Operation(summary = "Get corporate body by namespace and id")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/identifier/{namespace}:{id}",
+        "/v6/corporatebodies/identifier/{namespace}:{id}.json",
         "/v5/corporatebodies/identifier/{namespace}:{id}",
         "/v5/corporatebodies/identifier/{namespace}:{id}.json",
         "/v3/corporatebodies/identifier/{namespace}:{id}",
@@ -96,6 +102,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get corporate body by refId")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/{refId:[0-9]+}",
         "/v5/corporatebodies/{refId:[0-9]+}",
         "/v3/corporatebodies/{refId:[0-9]+}",
         "/latest/corporatebodies/{refId:[0-9]+}"
@@ -110,6 +117,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get a corporate body by uuid")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -142,6 +150,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get languages of all corporatebodies")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/languages",
         "/v5/corporatebodies/languages",
         "/v3/corporatebodies/languages",
         "/latest/corporatebodies/languages"
@@ -153,7 +162,12 @@ public class CorporateBodyController {
 
   @Operation(summary = "Save a newly created corporate body")
   @PostMapping(
-      value = {"/v5/corporatebodies", "/v2/corporatebodies", "/latest/corporatebodies"},
+      value = {
+        "/v6/corporatebodies",
+        "/v5/corporatebodies",
+        "/v2/corporatebodies",
+        "/latest/corporatebodies"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -163,6 +177,7 @@ public class CorporateBodyController {
   @Operation(summary = "Update a corporate body")
   @PutMapping(
       value = {
+        "/v6/corporatebodies/{uuid}",
         "/v5/corporatebodies/{uuid}",
         "/v2/corporatebodies/{uuid}",
         "/latest/corporatebodies/{uuid}"

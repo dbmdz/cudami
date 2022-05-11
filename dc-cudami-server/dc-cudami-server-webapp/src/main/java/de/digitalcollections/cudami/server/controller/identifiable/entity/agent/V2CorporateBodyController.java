@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -93,12 +94,12 @@ public class V2CorporateBodyController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
       throws JsonProcessingException {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    PageResponse<CorporateBody> response = corporateBodyService.find(searchPageRequest);
+    PageResponse<CorporateBody> response = corporateBodyService.find(pageRequest);
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(response));
@@ -110,9 +111,7 @@ public class V2CorporateBodyController {
           "de.digitalcollections.model.impl.identifiable.entity.agent.CorporateBodyImpl");
     }
 
-    String resultStr = result.toString();
-
-    // TODO replace "query"
+    String resultStr = V5MigrationHelper.migrateToV5(result.toString());
     return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 }

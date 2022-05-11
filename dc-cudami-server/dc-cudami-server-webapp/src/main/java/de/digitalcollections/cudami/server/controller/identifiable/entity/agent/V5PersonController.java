@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -14,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +33,11 @@ public class V5PersonController {
 
   private final PersonService personService;
 
-  public V5PersonController(PersonService personService) {
+  private final ObjectMapper objectMapper;
+
+  public V5PersonController(PersonService personService, ObjectMapper objectMapper) {
     this.personService = personService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(summary = "get all persons")
@@ -44,7 +52,8 @@ public class V5PersonController {
       @RequestParam(name = "initial", required = false) String initial,
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -55,13 +64,18 @@ public class V5PersonController {
       Filtering filtering = Filtering.builder().add("previewImage", previewImageFilter).build();
       searchPageRequest.setFiltering(filtering);
     }
-    PageResponse<Person> response;
+    PageResponse<Person> pageResponse;
     if (initial == null) {
-      response = personService.find(searchPageRequest);
+      pageResponse = personService.find(searchPageRequest);
     } else {
-      response = personService.findByLanguageAndInitial(searchPageRequest, language, initial);
+      pageResponse = personService.findByLanguageAndInitial(searchPageRequest, language, initial);
     }
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

@@ -12,6 +12,8 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -194,11 +196,11 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases"})
   public void findWithEmptyResult(String path) throws Exception {
-    SearchPageResponse<LocalizedUrlAliases> expected =
-        (SearchPageResponse<LocalizedUrlAliases>)
-            SearchPageResponse.builder().forPageSize(1).withTotalElements(0).build();
+    PageResponse<LocalizedUrlAliases> expected =
+        (PageResponse<LocalizedUrlAliases>)
+            PageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
-    when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/empty.json");
   }
@@ -207,9 +209,9 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases?pageNumber=0&pageSize=1"})
   public void findWithFilledResult(String path) throws Exception {
-    SearchPageResponse<LocalizedUrlAliases> expected =
-        (SearchPageResponse<LocalizedUrlAliases>)
-            SearchPageResponse.builder()
+    PageResponse<LocalizedUrlAliases> expected =
+        (PageResponse<LocalizedUrlAliases>)
+            PageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
@@ -231,7 +233,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                 .build())))
                 .build();
 
-    when(urlAliasService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/find_with_result.json");
   }

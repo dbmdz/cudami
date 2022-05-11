@@ -50,7 +50,12 @@ public class PersonController {
 
   @Operation(summary = "count all persons")
   @GetMapping(
-      value = {"/v5/persons/count", "/v2/persons/count", "/latest/persons/count"},
+      value = {
+        "/v6/persons/count",
+        "/v5/persons/count",
+        "/v2/persons/count",
+        "/latest/persons/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return personService.count();
@@ -88,6 +93,7 @@ public class PersonController {
   @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
       value = {
+        "/v6/persons/placeofbirth/{uuid}",
         "/v5/persons/placeofbirth/{uuid}",
         "/v2/persons/placeofbirth/{uuid}",
         "/latest/persons/placeofbirth/{uuid}"
@@ -114,6 +120,7 @@ public class PersonController {
   @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
       value = {
+        "/v6/persons/placeofdeath/{uuid}",
         "/v5/persons/placeofdeath/{uuid}",
         "/v2/persons/placeofdeath/{uuid}",
         "/latest/persons/placeofdeath/{uuid}"
@@ -140,6 +147,8 @@ public class PersonController {
   @Operation(summary = "Get a person by namespace and id")
   @GetMapping(
       value = {
+        "/v6/persons/identifier/{namespace}:{id}",
+        "/v6/persons/identifier/{namespace}:{id}.json",
         "/v5/persons/identifier/{namespace}:{id}",
         "/v5/persons/identifier/{namespace}:{id}.json",
         "/v2/persons/identifier/{namespace}:{id}",
@@ -156,7 +165,12 @@ public class PersonController {
 
   @Operation(summary = "Get a person by namespace and id")
   @GetMapping(
-      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
+      value = {
+        "/v6/persons/identifier",
+        "/v5/persons/identifier",
+        "/v2/persons/identifier",
+        "/latest/persons/identifier"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -171,6 +185,7 @@ public class PersonController {
   @Operation(summary = "Get a person by uuid")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -203,6 +218,7 @@ public class PersonController {
   @Operation(summary = "Get a person's digital objects")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid}/digitalobjects",
         "/v5/persons/{uuid}/digitalobjects",
         "/v2/persons/{uuid}/digitalobjects",
         "/latest/persons/{uuid}/digitalobjects"
@@ -215,7 +231,12 @@ public class PersonController {
 
   @Operation(summary = "Get languages of all persons")
   @GetMapping(
-      value = {"/v5/persons/languages", "/v3/persons/languages", "/latest/persons/languages"},
+      value = {
+        "/v6/persons/languages",
+        "/v5/persons/languages",
+        "/v3/persons/languages",
+        "/latest/persons/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return personService.getLanguages();
@@ -224,6 +245,7 @@ public class PersonController {
   @Operation(summary = "Get a person's works")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid}/works",
         "/v5/persons/{uuid}/works",
         "/v2/persons/{uuid}/works",
         "/latest/persons/{uuid}/works"
@@ -235,7 +257,7 @@ public class PersonController {
 
   @Operation(summary = "save a newly created person")
   @PostMapping(
-      value = {"/v5/persons", "/v2/persons", "/latest/persons"},
+      value = {"/v6/persons", "/v5/persons", "/v2/persons", "/latest/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -244,7 +266,12 @@ public class PersonController {
 
   @Operation(summary = "update a person")
   @PutMapping(
-      value = {"/v5/persons/{uuid}", "/v2/persons/{uuid}", "/latest/persons/{uuid}"},
+      value = {
+        "/v5/persons/{uuid}",
+        "/v6/persons/{uuid}",
+        "/v2/persons/{uuid}",
+        "/latest/persons/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)

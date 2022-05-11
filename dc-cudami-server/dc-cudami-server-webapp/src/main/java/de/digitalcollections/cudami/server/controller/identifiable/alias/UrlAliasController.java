@@ -41,7 +41,7 @@ public class UrlAliasController {
 
   @Operation(summary = "Create and persist an UrlAlias")
   @PostMapping(
-      value = {"/v5/urlaliases"},
+      value = {"/v6/urlaliases", "/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
       throws CudamiControllerException {
@@ -63,6 +63,7 @@ public class UrlAliasController {
   @Operation(summary = "Delete an UrlAlias by uuid")
   @DeleteMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       })
   public ResponseEntity<Void> delete(
@@ -117,6 +118,8 @@ public class UrlAliasController {
   @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
   @GetMapping(
       value = {
+        "/v6/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/slug/{pLocale}/{label}",
         "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/slug/{pLocale}/{label}"
       },
@@ -156,6 +159,7 @@ public class UrlAliasController {
   @Operation(summary = "Get an UrlAlias by uuid")
   @GetMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -186,6 +190,8 @@ public class UrlAliasController {
           "Get the primary LocalizedUrlAliases for a given website uuid (null if empty) and slug, and optionally filtered by a locale")
   @GetMapping(
       value = {
+        "/v6/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/primary/{slug}",
         "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/primary/{slug}"
       },
@@ -224,6 +230,7 @@ public class UrlAliasController {
   @Operation(summary = "update an UrlAlias")
   @PutMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)

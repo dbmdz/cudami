@@ -15,16 +15,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@WebMvcTest(V2CorporateBodyController.class)
-@DisplayName("The V2 CorporateBodyController")
-public class V2CorporateBodyControllerTest extends BaseControllerTest {
+@WebMvcTest(V5CorporateBodyController.class)
+@DisplayName("The V5 CorporateBodyController")
+class V5CorporateBodyControllerTest extends BaseControllerTest {
 
   @MockBean private CorporateBodyService corporateBodyService;
 
-  @DisplayName("shall return a list of corporate bodies")
+  @DisplayName("shall return a paged list of corporate bodies")
   @ParameterizedTest
-  @ValueSource(strings = {"/v2/corporatebodies?pageSize=1"})
-  void testFindAll(String path) throws Exception {
+  @ValueSource(strings = {"/v5/corporatebodies?pageSize=1&pageNumber=0"})
+  void testFind(String path) throws Exception {
     PageResponse<CorporateBody> expected =
         (PageResponse<CorporateBody>)
             PageResponse.builder()
@@ -51,6 +51,6 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
 
     when(corporateBodyService.find(any(PageRequest.class))).thenReturn(expected);
 
-    testJson(path, "/v2/corporatebodies/corporatebodies.json");
+    testJson(path, "/v5/corporatebodies/find_with_result.json");
   }
 }
