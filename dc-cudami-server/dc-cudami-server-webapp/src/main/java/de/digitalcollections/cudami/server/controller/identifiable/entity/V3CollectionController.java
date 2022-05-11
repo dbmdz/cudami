@@ -13,8 +13,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -103,12 +101,12 @@ public class V3CollectionController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
+    PageRequest searchPageRequest =
+        new PageRequest(searchTerm, pageNumber, pageSize, new Sorting());
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    SearchPageResponse<DigitalObject> response =
+    PageResponse<DigitalObject> response =
         collectionService.findDigitalObjects(collection, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
@@ -116,7 +114,10 @@ public class V3CollectionController {
         fixPageResponse(
             response, "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 
   @Operation(
@@ -303,12 +304,12 @@ public class V3CollectionController {
           @RequestParam(name = "active", required = false)
           String active)
       throws JsonProcessingException {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    SearchPageResponse<Collection> response;
+    PageResponse<Collection> response;
     if (active != null) {
       response = collectionService.findActive(pageRequest);
     } else {
@@ -317,7 +318,11 @@ public class V3CollectionController {
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = fixPageResponse(response);
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 
   private JSONObject fixPageResponse(

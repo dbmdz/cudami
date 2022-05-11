@@ -24,7 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(UrlAliasController.class)
 @DisplayName("The UrlAliasController")
-class UrlAliasControllerTest extends BaseControllerTest {
+class V5UrlAliasControllerTest extends BaseControllerTest {
 
   @MockBean private UrlAliasService urlAliasService;
 

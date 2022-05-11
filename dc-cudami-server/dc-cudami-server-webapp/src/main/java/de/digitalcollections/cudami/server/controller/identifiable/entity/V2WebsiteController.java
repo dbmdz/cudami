@@ -6,10 +6,10 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -97,12 +97,12 @@ public class V2WebsiteController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    SearchPageResponse response = websiteService.find(searchPageRequest);
+    PageResponse response = websiteService.find(searchPageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -115,7 +115,10 @@ public class V2WebsiteController {
       website.put("className", "de.digitalcollections.model.impl.identifiable.entity.WebsiteImpl");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 
   @Operation(

@@ -45,41 +45,18 @@ public class EntityController<E extends Entity> {
     return entityService.count();
   }
 
-  @Operation(
-      summary = "Find limited amount of entities containing searchTerm in label or description")
-  @GetMapping(
-      value = {"/v5/entities/search", "/v2/entities/search", "/latest/entities/search"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Entity> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "entityType", required = false)
-          FilterCriterion<String> entityTypeCriterion) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (entityTypeCriterion != null) {
-      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
-      pageRequest.setFiltering(filtering);
-    }
-    return entityService.find(pageRequest);
-  }
-
   @Operation(summary = "Get all entities")
   @GetMapping(
-      value = {"/v5/entities", "/v3/entities", "/latest/entities"},
+      value = {"/v6/entities", "/v5/entities", "/v3/entities", "/latest/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "entityType", required = false)
           FilterCriterion<String> entityTypeCriterion) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -89,15 +66,6 @@ public class EntityController<E extends Entity> {
       pageRequest.setFiltering(filtering);
     }
     return entityService.find(pageRequest);
-  }
-
-  @Operation(summary = "Find limited amount of random entites")
-  @GetMapping(
-      value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> getRandomEntities(
-      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return entityService.getRandom(count);
   }
 
   @Operation(summary = "Get entity by namespace and id")
@@ -144,6 +112,15 @@ public class EntityController<E extends Entity> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity getByUuid(@PathVariable UUID uuid) {
     return entityService.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Find limited amount of random entites")
+  @GetMapping(
+      value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Entity> getRandomEntities(
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+    return entityService.getRandom(count);
   }
 
   @Operation(summary = "Get related file resources of entity")

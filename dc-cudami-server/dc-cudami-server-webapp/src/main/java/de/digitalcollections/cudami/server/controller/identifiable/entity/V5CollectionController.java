@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,7 @@ public class V5CollectionController {
   @GetMapping(
       value = {"/v5/collections/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> find(
+  public ResponseEntity<String> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
@@ -55,8 +56,9 @@ public class V5CollectionController {
     PageResponse<Collection> response;
     if (active != null) {
       response = collectionService.findActive(pageRequest);
+    } else {
+      response = collectionService.find(pageRequest);
     }
-    response = collectionService.find(pageRequest);
     // TODO
     return null;
   }
@@ -65,7 +67,7 @@ public class V5CollectionController {
   @GetMapping(
       value = {"/v5/collections/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> findDigitalObjects(
+  public ResponseEntity<String> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -85,7 +87,7 @@ public class V5CollectionController {
   @GetMapping(
       value = {"/v5/collections/{uuid}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findSubcollections(
+  public ResponseEntity<String> findSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -101,8 +103,9 @@ public class V5CollectionController {
     PageResponse<Collection> response;
     if (active != null) {
       response = collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+    } else {
+      response = collectionService.findChildren(collectionUuid, searchPageRequest);
     }
-    response = collectionService.findChildren(collectionUuid, searchPageRequest);
     // TODO
     return null;
   }
@@ -111,7 +114,7 @@ public class V5CollectionController {
   @GetMapping(
       value = {"/v5/collections/top", "/v2/collections/top", "/latest/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findTopCollections(
+  public ResponseEntity<String> findTopCollections(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,

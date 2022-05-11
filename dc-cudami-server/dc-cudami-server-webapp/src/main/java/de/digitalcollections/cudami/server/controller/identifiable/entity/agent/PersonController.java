@@ -12,7 +12,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "Person controller")
 public class PersonController {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
   private final PersonService personService;
@@ -58,7 +58,7 @@ public class PersonController {
 
   @Operation(summary = "get all persons")
   @GetMapping(
-      value = {"/v5/persons", "/v2/persons", "/latest/persons"},
+      value = {"/v6/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -69,7 +69,7 @@ public class PersonController {
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -83,35 +83,6 @@ public class PersonController {
       return personService.find(searchPageRequest);
     }
     return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
-  }
-
-  @Operation(summary = "Get a person by namespace and id")
-  @GetMapping(
-      value = {
-        "/v5/persons/identifier/{namespace}:{id}", "/v5/persons/identifier/{namespace}:{id}.json",
-        "/v2/persons/identifier/{namespace}:{id}", "/v2/persons/identifier/{namespace}:{id}.json",
-        "/latest/persons/identifier/{namespace}:{id}",
-            "/latest/persons/identifier/{namespace}:{id}.json"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    Person result = personService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a person by namespace and id")
-  @GetMapping(
-      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
-      throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -164,6 +135,37 @@ public class PersonController {
       pageRequest.setSorting(sorting);
     }
     return personService.findByGeoLocationOfDeath(pageRequest, uuid);
+  }
+
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {
+        "/v5/persons/identifier/{namespace}:{id}",
+        "/v5/persons/identifier/{namespace}:{id}.json",
+        "/v2/persons/identifier/{namespace}:{id}",
+        "/v2/persons/identifier/{namespace}:{id}.json",
+        "/latest/persons/identifier/{namespace}:{id}",
+        "/latest/persons/identifier/{namespace}:{id}.json"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Person> getByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    Person result = personService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Void> getByIdentifier(
+      @RequestParam(name = "namespace", required = true) String namespace,
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request)
+      throws IdentifiableServiceException {
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
   }
 
   @Operation(summary = "Get a person by uuid")

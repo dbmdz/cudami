@@ -6,11 +6,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -77,9 +76,9 @@ public class WebsiteController {
                     schema = @Schema(implementation = PageResponseWebsite.class)))
       })
   @GetMapping(
-      value = {"/v5/websites"},
+      value = {"/v6/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Website> find(
+  public PageResponse<Website> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",
@@ -109,12 +108,60 @@ public class WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
     return websiteService.find(searchPageRequest);
+  }
+
+  @Operation(
+      summary = "Get root pages of a website",
+      description = "Get a paged, filtered and sorted list of root pages of a website",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "SearchPageResponse&lt;Webpage&gt;",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = PageResponseWebpage.class)))
+      })
+  @GetMapping(
+      value = {"/v6/websites/{uuid}/rootpages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Webpage> findRootPages(
+      @Parameter(
+              name = "uuid",
+              description = "the UUID of the parent webpage",
+              example = "599a120c-2dd5-11e8-b467-0ed5f89f718b",
+              schema = @Schema(implementation = UUID.class))
+          @PathVariable("uuid")
+          UUID uuid,
+      @Parameter(
+              name = "pageNumber",
+              description = "the page number (starting with 0); if unset, defaults to 0.",
+              example = "0",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
+          int pageNumber,
+      @Parameter(
+              name = "pageSize",
+              description = "the page size; if unset, defaults to 25",
+              example = "25",
+              schema = @Schema(type = "integer"))
+          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
+          int pageSize,
+      @Parameter(
+              name = "searchTerm",
+              description = "the search term, of which the result is filtered (substring match)",
+              example = "Test",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "searchTerm", required = false)
+          String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    return websiteService.findRootWebpages(uuid, searchPageRequest);
   }
 
   @Operation(
@@ -159,54 +206,6 @@ public class WebsiteController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return websiteService.getLanguages();
-  }
-
-  @Operation(
-      summary = "Get root pages of a website",
-      description = "Get a paged, filtered and sorted list of root pages of a website",
-      responses = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "SearchPageResponse&lt;Webpage&gt;",
-            content =
-                @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = SearchPageResponseWebpage.class)))
-      })
-  @GetMapping(
-      value = {"/v5/websites/{uuid}/rootpages"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Webpage> findRootPages(
-      @Parameter(
-              name = "uuid",
-              description = "the UUID of the parent webpage",
-              example = "599a120c-2dd5-11e8-b467-0ed5f89f718b",
-              schema = @Schema(implementation = UUID.class))
-          @PathVariable("uuid")
-          UUID uuid,
-      @Parameter(
-              name = "pageNumber",
-              description = "the page number (starting with 0); if unset, defaults to 0.",
-              example = "0",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
-          int pageNumber,
-      @Parameter(
-              name = "pageSize",
-              description = "the page size; if unset, defaults to 25",
-              example = "25",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
-          int pageSize,
-      @Parameter(
-              name = "searchTerm",
-              description = "the search term, of which the result is filtered (substring match)",
-              example = "Test",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return websiteService.findRootWebpages(uuid, searchPageRequest);
   }
 
   @Operation(
@@ -305,8 +304,8 @@ public class WebsiteController {
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
   // ----------------- cannot yet handle generics
   @Hidden
-  private static class PageResponseWebsite extends PageResponse<Website> {}
+  private static class PageResponseWebpage extends PageResponse<Webpage> {}
 
   @Hidden
-  private static class SearchPageResponseWebpage extends SearchPageResponse<Webpage> {}
+  private static class PageResponseWebsite extends PageResponse<Website> {}
 }

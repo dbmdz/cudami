@@ -189,15 +189,15 @@ public class CollectionController {
 
   @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
-      value = {"/v5/collections/{uuid}/digitalobjects"},
+      value = {"/v6/collections/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
+  public PageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);

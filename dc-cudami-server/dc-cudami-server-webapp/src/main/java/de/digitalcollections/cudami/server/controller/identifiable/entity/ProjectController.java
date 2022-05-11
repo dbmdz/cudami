@@ -5,11 +5,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -112,19 +111,36 @@ public class ProjectController {
 
   @Operation(summary = "Get all projects as (sorted, paged) list")
   @GetMapping(
-      value = {"/v5/projects"},
+      value = {"/v6/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
     return projectService.find(searchPageRequest);
+  }
+
+  @Operation(summary = "Get paged digital objects of a project")
+  @GetMapping(
+      value = {"/v6/projects/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<DigitalObject> findDigitalObjects(
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
+          UUID projectUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+
+    Project project = new Project();
+    project.setUuid(projectUuid);
+    return projectService.findDigitalObjects(project, searchPageRequest);
   }
 
   @Operation(summary = "Get project by namespace and id")
@@ -169,23 +185,6 @@ public class ProjectController {
       project = projectService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(project, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get paged digital objects of a project")
-  @GetMapping(
-      value = {"/v5/projects/{uuid}/digitalobjects"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
-          UUID projectUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-
-    Project project = new Project();
-    project.setUuid(projectUuid);
-    return projectService.findDigitalObjects(project, searchPageRequest);
   }
 
   @Operation(summary = "Get languages of all projects")
