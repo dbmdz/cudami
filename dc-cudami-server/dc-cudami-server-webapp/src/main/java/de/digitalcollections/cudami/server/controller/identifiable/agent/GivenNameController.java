@@ -41,15 +41,16 @@ public class GivenNameController {
 
   @Operation(summary = "get all given names")
   @GetMapping(
-      value = {"/v5/givennames"},
+      value = {"/v5/givennames", "/v6/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -64,7 +65,9 @@ public class GivenNameController {
   @GetMapping(
       value = {
         "/v5/givennames/identifier/{namespace}:{id}",
-        "/v5/givennames/identifier/{namespace}:{id}.json"
+        "/v5/givennames/identifier/{namespace}:{id}.json",
+        "/v6/givennames/identifier/{namespace}:{id}",
+        "/v6/givennames/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> getByIdentifier(
@@ -75,7 +78,7 @@ public class GivenNameController {
 
   @Operation(summary = "Get a givenname by namespace and id")
   @GetMapping(
-      value = {"/v5/givennames/identifier"},
+      value = {"/v5/givennames/identifier", "/v6/givennames/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -89,7 +92,7 @@ public class GivenNameController {
 
   @Operation(summary = "Get a givenname by uuid")
   @GetMapping(
-      value = {"/v5/givennames/{uuid}"},
+      value = {"/v5/givennames/{uuid}", "/v6/givennames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> getByUuid(
       @Parameter(
@@ -117,7 +120,7 @@ public class GivenNameController {
 
   @Operation(summary = "save a newly created givenname")
   @PostMapping(
-      value = {"/v5/givennames"},
+      value = {"/v5/givennames", "/v6/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -126,7 +129,7 @@ public class GivenNameController {
 
   @Operation(summary = "update a givenname")
   @PutMapping(
-      value = {"/v5/givennames/{uuid}"},
+      value = {"/v5/givennames/{uuid}", "/v6/givennames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
