@@ -53,6 +53,7 @@ public class CollectionController {
   @Operation(summary = "Add an existing digital object to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -81,6 +82,7 @@ public class CollectionController {
   @Operation(summary = "Add existing digital objects to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects",
         "/v5/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects",
         "/latest/collections/{uuid}/digitalobjects"
@@ -105,6 +107,7 @@ public class CollectionController {
   @Operation(summary = "Add an existing collection to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
@@ -133,6 +136,7 @@ public class CollectionController {
   @Operation(summary = "Add existing collections to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections",
         "/v5/collections/{uuid}/subcollections",
         "/v3/collections/{uuid}/subcollections",
         "/latest/collections/{uuid}/subcollections"
@@ -156,7 +160,12 @@ public class CollectionController {
 
   @Operation(summary = "Get count of collections")
   @GetMapping(
-      value = {"/v5/collections/count", "/v2/collections/count", "/latest/collections/count"},
+      value = {
+        "/v6/collections/count",
+        "/v5/collections/count",
+        "/v2/collections/count",
+        "/latest/collections/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return collectionService.count();
@@ -166,7 +175,7 @@ public class CollectionController {
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v5/collections"},
+      value = {"/v6/collections", "/v5/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
   // if unknown)
@@ -208,6 +217,7 @@ public class CollectionController {
       summary = "Get all related - by the given predicate - corporate bodies of a collection")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/related/corporatebodies",
         "/v5/collections/{uuid}/related/corporatebodies",
         "/v3/collections/{uuid}/related/corporatebodies",
         "/latest/collections/{uuid}/related/corporatebodies"
@@ -264,6 +274,7 @@ public class CollectionController {
   @Operation(summary = "Get the breadcrumb for a collection")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/breadcrumb",
         "/v5/collections/{uuid}/breadcrumb",
         "/v3/collections/{uuid}/breadcrumb",
         "/latest/collections/{uuid}/breadcrumb"
@@ -303,6 +314,8 @@ public class CollectionController {
   @Operation(summary = "Get a collection by namespace and id")
   @GetMapping(
       value = {
+        "/v6/collections/identifier/{namespace}:{id}",
+        "/v6/collections/identifier/{namespace}:{id}.json",
         "/v5/collections/identifier/{namespace}:{id}",
         "/v5/collections/identifier/{namespace}:{id}.json",
         "/v2/collections/identifier/{namespace}:{id}",
@@ -318,7 +331,11 @@ public class CollectionController {
 
   @Operation(summary = "Get a collection by refId")
   @GetMapping(
-      value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"},
+      value = {
+        "/v6/collections/{refId:[0-9]+}",
+        "/v5/collections/{refId:[0-9]+}",
+        "/latest/collections/{refId:[0-9]+}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Collection> getByRefId(
       @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
@@ -332,6 +349,7 @@ public class CollectionController {
   @Operation(summary = "Get a collection by uuid")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -374,6 +392,7 @@ public class CollectionController {
   @Operation(summary = "Get the first created parent of a collection")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/parent",
         "/v5/collections/{uuid}/parent",
         "/v3/collections/{uuid}/parent",
         "/latest/collections/{uuid}/parent"
@@ -386,6 +405,7 @@ public class CollectionController {
   @Operation(summary = "Get parent collections")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/parents",
         "/v5/collections/{uuid}/parents",
         "/v3/collections/{uuid}/parents",
         "/latest/collections/{uuid}/parents"
@@ -400,6 +420,7 @@ public class CollectionController {
   @Operation(summary = "Get languages of all top collections")
   @GetMapping(
       value = {
+        "/v6/collections/top/languages",
         "/v5/collections/top/languages",
         "/v2/collections/top/languages",
         "/latest/collections/top/languages"
@@ -412,6 +433,7 @@ public class CollectionController {
   @Operation(summary = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -440,6 +462,7 @@ public class CollectionController {
   @Operation(summary = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
@@ -467,7 +490,7 @@ public class CollectionController {
 
   @Operation(summary = "Save a newly created collection")
   @PostMapping(
-      value = {"/v5/collections", "/v2/collections", "/latest/collections"},
+      value = {"/v6/collections", "/v5/collections", "/v2/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -477,6 +500,7 @@ public class CollectionController {
   @Operation(summary = "Save existing digital objects into an existing collection")
   @PutMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects",
         "/v5/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects",
         "/latest/collections/{uuid}/digitalobjects"
@@ -501,6 +525,7 @@ public class CollectionController {
   @Operation(summary = "Save a newly created collection with parent collection")
   @PostMapping(
       value = {
+        "/v6/collections/{parentUuid}/collection",
         "/v5/collections/{parentUuid}/collection",
         "/v2/collections/{parentUuid}/collection",
         "/latest/collections/{parentUuid}/collection"
@@ -517,7 +542,12 @@ public class CollectionController {
 
   @Operation(summary = "Update a collection")
   @PutMapping(
-      value = {"/v5/collections/{uuid}", "/v2/collections/{uuid}", "/latest/collections/{uuid}"},
+      value = {
+        "/v6/collections/{uuid}",
+        "/v5/collections/{uuid}",
+        "/v2/collections/{uuid}",
+        "/latest/collections/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)

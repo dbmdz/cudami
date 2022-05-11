@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -31,9 +31,9 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
         "/v3/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242/rootpages?pageNumber=0&pageSize=20"
       })
   public void pagedRootpages(String path) throws Exception {
-    SearchPageResponse<Webpage> expected =
-        (SearchPageResponse<Webpage>)
-            SearchPageResponse.builder()
+    PageResponse<Webpage> expected =
+        (PageResponse<Webpage>)
+            PageResponse.builder()
                 .forPageSize(25)
                 .forRequestPage(0)
                 .withTotalElements(4)
@@ -76,7 +76,7 @@ public class V3WebsiteControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(websiteService.findRootWebpages(any(UUID.class), any(SearchPageRequest.class)))
+    when(websiteService.findRootWebpages(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

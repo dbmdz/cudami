@@ -29,9 +29,10 @@ class V5PersonControllerTest extends BaseControllerTest {
             PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
-                .withTotalElements(75)
+                .withTotalElements(0)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
+                .forAscendingOrderedField("uuid")
                 .build();
 
     when(personService.find(any(PageRequest.class))).thenReturn(expected);

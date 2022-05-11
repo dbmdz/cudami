@@ -1,0 +1,54 @@
+{
+  "content": [
+    {
+      "objectType": "ARTICLE",
+      "created": "2020-02-10T00:00:00",
+      "lastModified":  "2020-02-10T00:00:00",
+      "uuid": "32638dd2-28ce-4cf1-af65-e998060426d3",
+      "description": {
+        "de": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Test-Text"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "identifiers": [],
+      "label": {
+        "de": "Test-Artikel"
+      },
+      "type": "ENTITY",
+      "entityType": "ARTICLE",
+      "creators": []
+    }
+  ],
+  "pageRequest": {
+    "sorting": {
+      "orders": [
+        {
+          "direction": "DESC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "lastModified"
+        },
+        {
+          "direction": "ASC",
+          "ignoreCase": false,
+          "nullHandling": "NATIVE",
+          "property": "uuid"
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 4
+}

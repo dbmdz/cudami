@@ -13,9 +13,8 @@ import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -84,9 +83,9 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
         "/v5/linkeddatafileresources/search?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"
       })
   public void find(String path) throws Exception {
-    SearchPageResponse<LinkedDataFileResource> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<LinkedDataFileResource> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
@@ -102,23 +101,23 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(linkedDataFileResourceService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(linkedDataFileResourceService.find(any(PageRequest.class))).thenReturn(expected);
 
-    ArgumentCaptor<SearchPageRequest> searchPageRequestArgumentCaptor =
-        ArgumentCaptor.forClass(SearchPageRequest.class);
+    ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
+        ArgumentCaptor.forClass(PageRequest.class);
 
-    SearchPageRequest expectedSearchPageRequest = new SearchPageRequest();
-    expectedSearchPageRequest.setPageSize(1);
-    expectedSearchPageRequest.setPageNumber(0);
+    PageRequest expectedPageRequest = new PageRequest();
+    expectedPageRequest.setPageSize(1);
+    expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
         new FilterCriterion("uri", FilterOperation.EQUALS, "http://foo.bar/bla.xml");
     Filtering filtering = new Filtering(List.of(filterCriterion));
-    expectedSearchPageRequest.setFiltering(filtering);
+    expectedPageRequest.setFiltering(filtering);
 
     testJson(path, "/v5/linkeddatafileresources/filteredlist.json");
 
-    verify(linkedDataFileResourceService, times(1)).find(searchPageRequestArgumentCaptor.capture());
-    assertThat(searchPageRequestArgumentCaptor.getValue()).isEqualTo(expectedSearchPageRequest);
+    verify(linkedDataFileResourceService, times(1)).find(pageRequestArgumentCaptor.capture());
+    assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);
   }
 
   @DisplayName("successfully creates a LinkedDataFileResource")

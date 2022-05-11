@@ -19,8 +19,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@WebMvcTest(UrlAliasController.class)
-@DisplayName("The UrlAliasController")
+@WebMvcTest(V5UrlAliasController.class)
+@DisplayName("The V5UrlAliasController")
 class V5UrlAliasControllerTest extends BaseControllerTest {
 
   @MockBean private UrlAliasService urlAliasService;

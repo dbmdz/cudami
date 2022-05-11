@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,8 +14,8 @@ import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
@@ -36,9 +37,9 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   @ValueSource(
       strings = {"/v5/fileresources?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"})
   public void find(String path) throws Exception {
-    SearchPageResponse<FileResource> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<FileResource> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
                 .forAscendingOrderedField("label")
@@ -52,22 +53,22 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(fileResourceMetadataService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(fileResourceMetadataService.find(any(PageRequest.class))).thenReturn(expected);
 
-    ArgumentCaptor<SearchPageRequest> searchPageRequestArgumentCaptor =
-        ArgumentCaptor.forClass(SearchPageRequest.class);
+    ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
+        ArgumentCaptor.forClass(PageRequest.class);
 
-    SearchPageRequest expectedSearchPageRequest = new SearchPageRequest();
-    expectedSearchPageRequest.setPageSize(1);
-    expectedSearchPageRequest.setPageNumber(0);
+    PageRequest expectedPageRequest = new PageRequest();
+    expectedPageRequest.setPageSize(1);
+    expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
         new FilterCriterion("uri", FilterOperation.EQUALS, "http://foo.bar/bla.xml");
     Filtering filtering = new Filtering(List.of(filterCriterion));
-    expectedSearchPageRequest.setFiltering(filtering);
+    expectedPageRequest.setFiltering(filtering);
 
     testJson(path, "/v5/fileresources/filteredlist.json");
 
-    verify(fileResourceMetadataService, times(1)).find(searchPageRequestArgumentCaptor.capture());
-    assertThat(searchPageRequestArgumentCaptor.getValue()).isEqualTo(expectedSearchPageRequest);
+    verify(fileResourceMetadataService, times(1)).find(pageRequestArgumentCaptor.capture());
+    assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);
   }
 }

@@ -46,7 +46,7 @@ public class WorkController {
 
   @Operation(summary = "count all works")
   @GetMapping(
-      value = {"/v5/works/count", "/v2/works/count", "/latest/works/count"},
+      value = {"/v6/works/count", "/v5/works/count", "/v2/works/count", "/latest/works/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return workService.count();
@@ -54,15 +54,16 @@ public class WorkController {
 
   @Operation(summary = "get all works")
   @GetMapping(
-      value = {"/v5/works", "/v2/works", "/latest/works"},
+      value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Work> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -76,6 +77,8 @@ public class WorkController {
   @Operation(summary = "Get a work by namespace and id")
   @GetMapping(
       value = {
+        "/v6/works/identifier/{namespace}:{id}",
+        "/v6/works/identifier/{namespace}:{id}.json",
         "/v5/works/identifier/{namespace}:{id}",
         "/v5/works/identifier/{namespace}:{id}.json",
         "/v2/works/identifier/{namespace}:{id}",
@@ -93,6 +96,7 @@ public class WorkController {
   @Operation(summary = "Get a work by namespace and id")
   @GetMapping(
       value = {
+        "/v6/works/identifier",
         "/v5/works/identifier",
         "/v2/works/identifier",
         "/latest/works/identifier",
@@ -111,6 +115,7 @@ public class WorkController {
   @Operation(summary = "Get a work by uuid")
   @GetMapping(
       value = {
+        "/v6/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/works/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -142,6 +147,7 @@ public class WorkController {
   @Operation(summary = "Get creators of a work")
   @GetMapping(
       value = {
+        "/v6/works/{uuid}/creators",
         "/v5/works/{uuid}/creators",
         "/v2/works/{uuid}/creators",
         "/latest/works/{uuid}/creators"
@@ -153,7 +159,12 @@ public class WorkController {
 
   @Operation(summary = "Get items of a work")
   @GetMapping(
-      value = {"/v5/works/{uuid}/items", "/v2/works/{uuid}/items", "/latest/works/{uuid}/items"},
+      value = {
+        "/v6/works/{uuid}/items",
+        "/v5/works/{uuid}/items",
+        "/v2/works/{uuid}/items",
+        "/latest/works/{uuid}/items"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Item> getItems(@PathVariable UUID uuid) {
     return workService.getItems(uuid);
@@ -161,7 +172,7 @@ public class WorkController {
 
   @Operation(summary = "save a newly created work")
   @PostMapping(
-      value = {"/v5/works", "/v2/works", "/latest/works"},
+      value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -170,7 +181,7 @@ public class WorkController {
 
   @Operation(summary = "update a work")
   @PutMapping(
-      value = {"/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
+      value = {"/v6/works/{uuid}", "/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {

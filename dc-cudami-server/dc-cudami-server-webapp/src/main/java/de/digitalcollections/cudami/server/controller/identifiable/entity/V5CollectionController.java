@@ -1,7 +1,11 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -15,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +36,13 @@ public class V5CollectionController {
   private final CollectionService collectionService;
   private final LocaleService localeService;
 
-  public V5CollectionController(CollectionService collectionService, LocaleService localeService) {
+  private final ObjectMapper objectMapper;
+
+  public V5CollectionController(
+      CollectionService collectionService, LocaleService localeService, ObjectMapper objectMapper) {
     this.collectionService = collectionService;
     this.localeService = localeService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(
@@ -47,20 +56,26 @@ public class V5CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "active", required = false) String active) {
+      @RequestParam(name = "active", required = false) String active)
+      throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    PageResponse<Collection> response;
+    PageResponse<Collection> pageResponse;
     if (active != null) {
-      response = collectionService.findActive(pageRequest);
+      pageResponse = collectionService.findActive(pageRequest);
     } else {
-      response = collectionService.find(pageRequest);
+      pageResponse = collectionService.find(pageRequest);
     }
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get paged digital objects of a collection")
@@ -72,15 +87,21 @@ public class V5CollectionController {
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    PageResponse<DigitalObject> response =
+    PageResponse<DigitalObject> pageResponse =
         collectionService.findDigitalObjects(collection, searchPageRequest);
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get (active or all) paged subcollections of a collection")
@@ -94,20 +115,26 @@ public class V5CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    PageResponse<Collection> response;
+    PageResponse<Collection> pageResponse;
     if (active != null) {
-      response = collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+      pageResponse = collectionService.findActiveChildren(collectionUuid, searchPageRequest);
     } else {
-      response = collectionService.findChildren(collectionUuid, searchPageRequest);
+      pageResponse = collectionService.findChildren(collectionUuid, searchPageRequest);
     }
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get all top collections")
@@ -118,14 +145,19 @@ public class V5CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    PageResponse<Collection> response = collectionService.findRootNodes(searchPageRequest);
-    // TODO
-    return null;
+    PageResponse<Collection> pageResponse = collectionService.findRootNodes(searchPageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

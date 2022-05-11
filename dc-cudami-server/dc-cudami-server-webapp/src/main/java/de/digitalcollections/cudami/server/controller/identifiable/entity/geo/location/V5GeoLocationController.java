@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -11,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +30,11 @@ public class V5GeoLocationController {
 
   private final GeoLocationService geoLocationService;
 
-  public V5GeoLocationController(GeoLocationService geoLocationservice) {
+  private final ObjectMapper objectMapper;
+
+  public V5GeoLocationController(GeoLocationService geoLocationservice, ObjectMapper objectMapper) {
     this.geoLocationService = geoLocationservice;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(summary = "get all geo locations")
@@ -39,19 +47,26 @@ public class V5GeoLocationController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false) String language,
       @RequestParam(name = "initial", required = false) String initial,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    PageResponse<GeoLocation> response;
+    PageResponse<GeoLocation> pageResponse;
     if (language == null && initial == null) {
-      response = geoLocationService.find(searchPageRequest);
+      pageResponse = geoLocationService.find(searchPageRequest);
     } else {
-      response = geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
+      pageResponse =
+          geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
     }
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

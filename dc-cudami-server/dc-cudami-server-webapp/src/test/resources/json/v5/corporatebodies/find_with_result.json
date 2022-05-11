@@ -2,41 +2,28 @@
   "content": [
     {
       "objectType": "CORPORATE_BODY",
-      "created": "2016-12-22T00:00:00",
-      "lastModified": "2016-12-22T00:00:00",
+      "created": "2020-09-30T16:29:58.150463",
+      "lastModified": "2020-09-30T16:29:58.150464",
       "uuid": "fdfaa0d2-0c62-4ffa-995b-5386aea720be",
-      "identifiers": [
-        {
-          "created": "2016-12-22T00:00:00",
-          "lastModified": "2016-12-22T00:00:00",
-          "uuid": "d5d0bb18-61bf-4d13-b3c8-c9b8b8452fbb",
-          "id": "2031351-2",
-          "identifiable": "fdfaa0d2-0c62-4ffa-995b-5386aea720be",
-          "namespace": "gnd"
-        }
-      ],
       "label": {
         "de": "Bayerische Staatsbibliothek"
       },
       "type": "ENTITY",
       "entityType": "CORPORATE_BODY",
-      "refId": 1300738
+      "refId": 1300707
     }
   ],
   "pageRequest": {
     "sorting": {
       "orders": [
         {
-          "direction": "DESC",
-          "ignoreCase": false,
-          "nullHandling": "NATIVE",
-          "property": "lastModified"
+          "direction": "ASC",
+          "property": "label",
+          "subProperty": "de"
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
-          "nullHandling": "NATIVE",
-          "property": "uuid"
+          "property": "label"
         }
       ]
     },

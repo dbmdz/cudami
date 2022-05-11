@@ -5,29 +5,16 @@
       "orders": [
         {
           "direction": "ASC",
-          "ignoreCase": false,
-          "nullHandling": "NATIVE",
           "property": "label",
-          "subProperty": "de",
-          "ascending": true,
-          "descending": false
+          "subProperty": "de"
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
-          "nullHandling": "NATIVE",
-          "property": "label",
-          "subProperty": "",
-          "ascending": true,
-          "descending": false
+          "property": "label"
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
-          "nullHandling": "NATIVE",
-          "property": "uuid",
-          "ascending": true,
-          "descending": false
+          "property": "uuid"
         }
       ]
     },
