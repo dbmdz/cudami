@@ -5,13 +5,12 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.client.BaseCudamiRestClientTest;
 import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.NullHandling;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
@@ -23,7 +22,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     extends BaseCudamiRestClientTest<I, C> {
 
   /**
-   * Creates an example SearchPageRequest, which fills all possible fields:
+   * Creates an example PageRequest, which fills all possible fields:
    *
    * <ul>
    *   <li>order: Descending for property "sortable" and nulls first
@@ -32,13 +31,13 @@ public abstract class BaseCudamiIdentifiablesClientTest<
    *   <li>searchTerm: "foo"
    * </ul>
    *
-   * @return example SearchPageRequest with defined pageSize, pageNumber, sorting and searchTerm
+   * @return example PageRequest with defined pageSize, pageNumber, sorting and searchTerm
    */
-  protected SearchPageRequest buildExampleSearchPageRequest() {
+  protected PageRequest buildExamplePageRequest() {
     Direction direction = Direction.DESC;
     Order order = new Order(direction, true, NullHandling.NULLS_FIRST, "sortable");
     Sorting sorting = new Sorting(order);
-    return new SearchPageRequest("foo", 1, 2, sorting);
+    return new PageRequest("foo", 1, 2, sorting);
   }
 
   @Test
@@ -70,13 +69,13 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   }
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
-  public void testFindWithSearchPageRequest() throws Exception {
+  @DisplayName("can execute the find method with a PageRequest")
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson = "{}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<I> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<I> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL("get", "/search?pageNumber=0&pageSize=0");

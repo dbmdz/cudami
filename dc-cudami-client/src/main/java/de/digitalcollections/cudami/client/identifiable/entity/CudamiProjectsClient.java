@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +14,7 @@ import java.util.UUID;
 public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
 
   public CudamiProjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Project.class, mapper, "/v5/projects");
+    super(http, serverUrl, Project.class, mapper, API_VERSION_PREFIX + "/projects");
   }
 
   public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
@@ -32,22 +32,16 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
             String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid), digitalObjects));
   }
 
-  @Override
-  public SearchPageResponse<Project> find(SearchPageRequest searchPageRequest)
+  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest)
       throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
-  }
-
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID projectUuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
+    return doGetRequestForPagedObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid),
-        searchPageRequest,
+        pageRequest,
         DigitalObject.class);
   }
 
   public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList("/v5/projects/languages", Locale.class);
+    return doGetRequestForObjectList(API_VERSION_PREFIX + "/projects/languages", Locale.class);
   }
 
   public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)

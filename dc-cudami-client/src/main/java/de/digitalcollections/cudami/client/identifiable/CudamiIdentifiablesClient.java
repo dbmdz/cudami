@@ -28,7 +28,12 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
   }
 
   public CudamiIdentifiablesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, (Class<I>) Identifiable.class, mapper, "/v5/identifiables");
+    super(
+        http,
+        serverUrl,
+        (Class<I>) Identifiable.class,
+        mapper,
+        API_VERSION_PREFIX + "/identifiables");
   }
 
   public List<I> find(String searchTerm, int maxResults) throws TechnicalException {

@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.client.identifiable.alias;
 
+import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -19,13 +21,11 @@ import java.util.stream.Collectors;
 public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
 
   public CudamiUrlAliasClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, UrlAlias.class, mapper, "/v5/urlaliases");
+    super(http, serverUrl, UrlAlias.class, mapper, API_VERSION_PREFIX + "/urlaliases");
   }
 
-  public SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        baseEndpoint + "/search", searchPageRequest, LocalizedUrlAliases.class);
+  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws TechnicalException {
+    return doGetRequestForPagedObjectList(baseEndpoint, pageRequest, LocalizedUrlAliases.class);
   }
 
   public String generateSlug(Locale locale, String label, UUID websiteUuid)

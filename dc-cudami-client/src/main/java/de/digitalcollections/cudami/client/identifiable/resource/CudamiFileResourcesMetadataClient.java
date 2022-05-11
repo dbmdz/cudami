@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -16,19 +16,13 @@ import java.util.Locale;
 public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient<FileResource> {
 
   public CudamiFileResourcesMetadataClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, FileResource.class, mapper, "/v5/fileresources");
+    super(http, serverUrl, FileResource.class, mapper, API_VERSION_PREFIX + "/fileresources");
   }
 
-  @Override
-  public SearchPageResponse<FileResource> find(SearchPageRequest searchPageRequest)
+  public PageResponse<FileResource> findByType(PageRequest pageRequest, String type)
       throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint, searchPageRequest);
-  }
-
-  public SearchPageResponse<FileResource> findByType(
-      SearchPageRequest searchPageRequest, String type) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/type/%s", baseEndpoint, type), searchPageRequest);
+    return doGetRequestForPagedObjectList(
+        String.format("%s/type/%s", baseEndpoint, type), pageRequest);
   }
 
   public List<Locale> getLanguages() throws TechnicalException {

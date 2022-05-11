@@ -2,18 +2,16 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -22,29 +20,27 @@ import java.util.UUID;
 public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObject> {
 
   public CudamiDigitalObjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, DigitalObject.class, mapper, "/v5/digitalobjects");
+    super(http, serverUrl, DigitalObject.class, mapper, API_VERSION_PREFIX + "/digitalobjects");
   }
 
-  public SearchPageResponse<Collection> findActiveCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
-        searchPageRequest,
-        Collection.class);
-  }
-
-  public SearchPageResponse<Collection> findCollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/collections", baseEndpoint, uuid),
-        searchPageRequest,
-        Collection.class);
-  }
-
-  public SearchPageResponse<Project> findProjects(UUID uuid, SearchPageRequest searchPageRequest)
+  public PageResponse<Collection> findActiveCollections(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/projects", baseEndpoint, uuid), searchPageRequest, Project.class);
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/collections?active=true", baseEndpoint, uuid),
+        pageRequest,
+        Collection.class);
+  }
+
+  public PageResponse<Collection> findCollections(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/collections", baseEndpoint, uuid), pageRequest, Collection.class);
+  }
+
+  public PageResponse<Project> findProjects(UUID uuid, PageRequest pageRequest)
+      throws TechnicalException {
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/projects", baseEndpoint, uuid), pageRequest, Project.class);
   }
 
   public PageResponse<DigitalObject> getAllForParent(DigitalObject parent)

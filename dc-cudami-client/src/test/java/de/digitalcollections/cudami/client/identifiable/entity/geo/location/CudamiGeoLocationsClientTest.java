@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.client.identifiable.entity.BaseCudamiEntitiesClientTest;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,15 +16,15 @@ class CudamiGeoLocationsClientTest
     extends BaseCudamiEntitiesClientTest<GeoLocation, CudamiGeoLocationsClient> {
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
+  @DisplayName("can execute the find method with a PageRequest")
   @Override
-  public void testFindWithSearchPageRequest() throws Exception {
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson =
         "{\"content\":[{\"objectType\":\"GEO_LOCATION\", \"geoLocation\":{\"entityType\":\"GEO_LOCATION\",\"identifiableType\":\"ENTITY\"}}]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<GeoLocation> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<GeoLocation> response = client.find(pageRequest);
     assertThat(response).isNotNull();
     assertThat(response.getContent().get(0)).isExactlyInstanceOf(GeoLocation.class);
 

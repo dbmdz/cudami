@@ -10,6 +10,11 @@ public class CudamiLinkedDataFileResourcesClient
 
   public CudamiLinkedDataFileResourcesClient(
       HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, LinkedDataFileResource.class, mapper, "/v5/linkeddatafileresources");
+    super(
+        http,
+        serverUrl,
+        LinkedDataFileResource.class,
+        mapper,
+        API_VERSION_PREFIX + "/linkeddatafileresources");
   }
 }

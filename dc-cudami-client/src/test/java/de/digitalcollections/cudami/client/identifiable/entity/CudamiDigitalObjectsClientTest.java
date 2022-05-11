@@ -37,10 +37,10 @@ class CudamiDigitalObjectsClientTest
   }
 
   @Test
-  @DisplayName("can retrieve active collections of a DigitalObject by a SearchPageRequest")
-  public void testGetActiveCollectionsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve active collections of a DigitalObject by a PageRequest")
+  public void testGetActiveCollectionsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findActiveCollections(uuid, buildExampleSearchPageRequest());
+    client.findActiveCollections(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -49,10 +49,10 @@ class CudamiDigitalObjectsClientTest
   }
 
   @Test
-  @DisplayName("can retrieve collections of a DigitalObject by a SearchPageRequest")
-  public void testGetCollectionsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve collections of a DigitalObject by a PageRequest")
+  public void testGetCollectionsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findCollections(uuid, buildExampleSearchPageRequest());
+    client.findCollections(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
@@ -110,10 +110,10 @@ class CudamiDigitalObjectsClientTest
   }
 
   @Test
-  @DisplayName("can retrieve projects of a DigitalObject by a SearchPageRequest")
-  public void testGetProjectsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve projects of a DigitalObject by a PageRequest")
+  public void testGetProjectsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findProjects(uuid, buildExampleSearchPageRequest());
+    client.findProjects(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"

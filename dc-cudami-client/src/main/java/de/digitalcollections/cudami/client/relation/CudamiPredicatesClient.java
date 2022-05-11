@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.client.relation;
 
+import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -12,7 +14,7 @@ import java.util.List;
 public class CudamiPredicatesClient extends BaseRestClient<Predicate> {
 
   public CudamiPredicatesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Predicate.class, mapper, "/v5/predicates");
+    super(http, serverUrl, Predicate.class, mapper, API_VERSION_PREFIX + "/predicates");
   }
 
   public List<Predicate> getAll() throws TechnicalException {

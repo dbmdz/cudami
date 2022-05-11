@@ -8,6 +8,6 @@ import java.net.http.HttpClient;
 public class CudamiGivenNamesClient extends CudamiIdentifiablesClient<GivenName> {
 
   public CudamiGivenNamesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, GivenName.class, mapper, "/v5/givennames");
+    super(http, serverUrl, GivenName.class, mapper, API_VERSION_PREFIX + "/givennames");
   }
 }
