@@ -16,8 +16,7 @@ public class RequestIdLoggingInterceptor implements HandlerInterceptor {
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
       @NonNull Object handler,
-      ModelAndView modelAndView)
-      throws Exception {
+      ModelAndView modelAndView) {
     MDC.clear();
   }
 
@@ -30,8 +29,7 @@ public class RequestIdLoggingInterceptor implements HandlerInterceptor {
   public boolean preHandle(
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
-      @NonNull Object handler)
-      throws Exception {
+      @NonNull Object handler) {
     String requestId = request.getHeader("X-Request-Id");
     if (!Strings.isNullOrEmpty(requestId)) {
       MDC.put("request_id", requestId);

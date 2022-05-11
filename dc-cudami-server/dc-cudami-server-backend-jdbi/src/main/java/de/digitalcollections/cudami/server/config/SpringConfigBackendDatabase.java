@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
 import de.digitalcollections.model.view.BreadcrumbNode;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import javax.sql.DataSource;
@@ -42,6 +43,9 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
+  @SuppressFBWarnings(
+      value = "THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION",
+      justification = "Jdbi throws java.lang.Exception...")
   public Jdbi dbi(JdbiFactoryBean factory) throws Exception {
     Jdbi dbi = factory.getObject();
     if (dbi != null) {
@@ -51,7 +55,7 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
-  public JdbiFactoryBean jdbi(DataSource ds, ObjectMapper objectMapper) throws Exception {
+  public JdbiFactoryBean jdbi(DataSource ds, ObjectMapper objectMapper) {
     JdbiFactoryBean jdbiFactoryBean = new JdbiFactoryBean(ds);
     List plugins = new ArrayList();
     plugins.add(new SqlObjectPlugin());
