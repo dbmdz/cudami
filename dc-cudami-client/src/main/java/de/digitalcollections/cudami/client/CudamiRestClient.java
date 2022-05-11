@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> {
 
-  public static String API_VERSION_PREFIX = "/v6";
+  public static final String API_VERSION_PREFIX = "/v6";
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiRestClient.class);
 
   public CudamiRestClient(
