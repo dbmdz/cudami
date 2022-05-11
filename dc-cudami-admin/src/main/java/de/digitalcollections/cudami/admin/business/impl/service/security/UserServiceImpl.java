@@ -62,8 +62,12 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public long count() {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public long count() throws ServiceException {
+    try {
+      return client.count();
+    } catch (TechnicalException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
