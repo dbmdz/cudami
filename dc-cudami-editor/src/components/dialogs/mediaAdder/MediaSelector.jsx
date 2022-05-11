@@ -21,7 +21,7 @@ import FeedbackMessage from '../../FeedbackMessage'
 import FileUploadForm from '../../FileUploadForm'
 import InfoTooltip from '../../InfoTooltip'
 import PreviewImage from '../../PreviewImage'
-import {getMediaUrl} from '../../utils'
+import {getLabelValue, getMediaUrl} from '../../utils'
 import MediaLabelInput from './MediaLabelInput'
 
 const upload = async (apiContextPath, file, mediaType, updateProgress) => {
@@ -53,7 +53,7 @@ const upload = async (apiContextPath, file, mediaType, updateProgress) => {
 
 const MediaSelector = ({
   activeLanguage,
-  fileResource,
+  fileResource: {filename, label, previewImage, uri, uuid},
   mediaType,
   onChange,
   onTabChange,
@@ -64,7 +64,6 @@ const MediaSelector = ({
   const [progress, setProgress] = useState(0)
   const [feedbackMessage, setFeedbackMessage] = useState()
   const {t} = useTranslation()
-  const {label, previewImage, uri} = fileResource
   const toggleTab = (tab, evt) => {
     if (tab !== activeTab && evt.currentTarget.id === evt.target.id) {
       onTabChange()
@@ -76,7 +75,7 @@ const MediaSelector = ({
     onChange(
       {
         label: {
-          [Object.keys(fileResource.label)[0]]: newLabel,
+          [Object.keys(label)[0]]: newLabel,
         },
       },
       isUpdate,
@@ -146,13 +145,15 @@ const MediaSelector = ({
       <CardBody className="text-center">
         <TabContent activeTab={activeTab} className="border-0 p-0">
           <TabPane tabId="upload">
-            {previewImage && (
+            {uuid && (
               <PreviewImage
                 className="mx-auto"
                 image={previewImage}
                 renderingHints={{
                   caption: {
-                    [defaultLanguage]: previewImage.filename,
+                    [defaultLanguage]: label
+                      ? getLabelValue(label, activeLanguage, defaultLanguage)
+                      : filename,
                   },
                 }}
                 showCaption={true}
@@ -193,7 +194,14 @@ const MediaSelector = ({
           </TabPane>
           <TabPane tabId="url">
             {uri && (
-              <PreviewImage className="mx-auto" image={{uri}} width={250} />
+              <PreviewImage
+                className="mx-auto"
+                image={{uri}}
+                renderingHints={{
+                  altText: {[defaultLanguage]: `${t(mediaType)}: ${uri}`},
+                }}
+                width={250}
+              />
             )}
             <FormGroup>
               <Input
@@ -214,13 +222,15 @@ const MediaSelector = ({
             />
           </TabPane>
           <TabPane tabId="search">
-            {previewImage && (
+            {uuid && (
               <PreviewImage
                 className="mx-auto"
                 image={previewImage}
                 renderingHints={{
                   caption: {
-                    [defaultLanguage]: previewImage.filename,
+                    [defaultLanguage]: label
+                      ? getLabelValue(label, activeLanguage, defaultLanguage)
+                      : filename,
                   },
                 }}
                 showCaption={true}
