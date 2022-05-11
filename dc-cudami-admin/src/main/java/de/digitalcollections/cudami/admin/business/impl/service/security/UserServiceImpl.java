@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsername
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.ArrayList;
