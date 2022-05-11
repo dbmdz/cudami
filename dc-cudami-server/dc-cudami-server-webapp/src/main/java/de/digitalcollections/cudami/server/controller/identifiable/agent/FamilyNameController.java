@@ -41,7 +41,7 @@ public class FamilyNameController {
 
   @Operation(summary = "get all family names")
   @GetMapping(
-      value = {"/v5/familynames", "/v6/familynames"},
+      value = {"/v6/familynames", "/v5/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FamilyName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -64,10 +64,10 @@ public class FamilyNameController {
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
       value = {
-        "/v5/familynames/identifier/{namespace}:{id}",
-        "/v5/familynames/identifier/{namespace}:{id}.json",
         "/v6/familynames/identifier/{namespace}:{id}",
-        "/v6/familynames/identifier/{namespace}:{id}.json"
+        "/v6/familynames/identifier/{namespace}:{id}.json",
+        "/v5/familynames/identifier/{namespace}:{id}",
+        "/v5/familynames/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByIdentifier(
@@ -78,7 +78,7 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
-      value = {"/v5/familynames/identifier", "/v6/familynames/identifier"},
+      value = {"/v6/familynames/identifier", "/v5/familynames/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -92,7 +92,7 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
-      value = {"/v5/familynames/{uuid}", "/v6/familynames/{uuid}"},
+      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByUuid(
       @Parameter(
@@ -120,7 +120,7 @@ public class FamilyNameController {
 
   @Operation(summary = "save a newly created family")
   @PostMapping(
-      value = {"/v5/familynames", "/v6/familynames"},
+      value = {"/v6/familynames", "/v5/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -129,7 +129,7 @@ public class FamilyNameController {
 
   @Operation(summary = "update a familyname")
   @PutMapping(
-      value = {"/v5/familynames/{uuid}", "/v6/familynames/{uuid}"},
+      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
