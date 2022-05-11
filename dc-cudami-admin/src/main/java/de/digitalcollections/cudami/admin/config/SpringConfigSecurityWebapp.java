@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.config;
 
 import de.digitalcollections.model.security.Role;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
 
 @Configuration
 @Order(2)
+@SuppressFBWarnings(
+    value = "THROWS_METHOD_THROWS_CLAUSE_BASIC_EXCEPTION",
+    justification = "Spring Security throws java.lang.Exception...")
 /*
  * - actuator user ("admin") from application.yml (password unencrypted)
  * - webapp users from database (password bcrypted)

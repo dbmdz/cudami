@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.versioning;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.versioning.VersionRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.versioning.VersionService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -50,14 +51,14 @@ public class VersionServiceImpl implements VersionService {
   }
 
   @Override
-  public Version save(Version version) throws Exception {
+  public Version save(Version version) {
     return repository.save(version);
   }
 
   @Override
-  public Version update(Version version) throws Exception {
+  public Version update(Version version) throws ValidationException {
     if (version == null || version.getUuid() == null || version.getStatus() == null) {
-      throw new Exception("Version must have a uuid and a status: " + version);
+      throw new ValidationException("Version must have a uuid and a status: " + version);
     }
     return repository.update(version);
   }

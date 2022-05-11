@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.interceptors;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +33,7 @@ public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSo
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-      throws Exception {
+      throws ServiceException {
     LOGGER.info("checking if admin user exists...");
     boolean activeAdminUserExists = service.doesActiveAdminUserExist();
     if (!activeAdminUserExists) {
@@ -47,7 +48,7 @@ public class CreateAdminUserInterceptor implements HandlerInterceptor, MessageSo
       HttpServletResponse response,
       Object handler,
       ModelAndView modelAndView)
-      throws Exception {
+      throws IllegalStateException {
     final Object doCreateAdminUser = request.getAttribute("createAdminUser");
     if (doCreateAdminUser != null) {
       boolean createAdminUser = (boolean) doCreateAdminUser;
