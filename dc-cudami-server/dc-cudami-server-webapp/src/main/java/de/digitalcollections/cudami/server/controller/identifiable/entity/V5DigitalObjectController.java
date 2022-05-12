@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -15,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +33,12 @@ public class V5DigitalObjectController {
 
   private final DigitalObjectService digitalObjectService;
 
-  public V5DigitalObjectController(DigitalObjectService digitalObjectService) {
+  private final ObjectMapper objectMapper;
+
+  public V5DigitalObjectController(
+      DigitalObjectService digitalObjectService, ObjectMapper objectMapper) {
     this.digitalObjectService = digitalObjectService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(
@@ -48,7 +57,8 @@ public class V5DigitalObjectController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
+          FilterCriterion<UUID> parentUuidFilterCriterion)
+      throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -59,9 +69,13 @@ public class V5DigitalObjectController {
       pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
     }
 
-    PageResponse<DigitalObject> response = digitalObjectService.find(pageRequest);
-    // TODO
-    return null;
+    PageResponse<DigitalObject> pageResponse = digitalObjectService.find(pageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get paged projects of a digital objects")
@@ -73,15 +87,20 @@ public class V5DigitalObjectController {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    PageResponse<Project> response =
-        digitalObjectService.findProjects(digitalObject, searchPageRequest);
-    // TODO
-    return null;
+    PageResponse<Project> pageResponse =
+        digitalObjectService.findProjects(digitalObject, pageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(summary = "Get (active or all) paged collections of a digital objects")
@@ -94,19 +113,24 @@ public class V5DigitalObjectController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
 
-    PageResponse<Collection> response;
+    PageResponse<Collection> pageResponse;
     if (active != null) {
-      response = digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
+      pageResponse = digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
     } else {
-      response = digitalObjectService.findCollections(digitalObject, searchPageRequest);
+      pageResponse = digitalObjectService.findCollections(digitalObject, searchPageRequest);
     }
-    // TODO
-    return null;
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

@@ -1,19 +1,50 @@
 package de.digitalcollections.cudami.server.controller.legacy;
 
+import static de.digitalcollections.model.list.sorting.Direction.ASC;
+import static de.digitalcollections.model.list.sorting.Direction.DESC;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONObject;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import java.util.Iterator;
 
 public class V5MigrationHelper {
 
+  private V5MigrationHelper() {}
+
   public static String migrateToV5(PageResponse<?> pageResponse, ObjectMapper objectMapper)
       throws JsonProcessingException {
-    // add "query": "hallo" to request JSON instead of "executedSearchTerm"/"searchTerm": "hallo"
-    String jsonPageResponse = objectMapper.writeValueAsString(pageResponse);
-    return migrateToV5(jsonPageResponse);
-  }
+    if (pageResponse == null) {
+      return null;
+    }
 
-  private V5MigrationHelper() {}
+    // For each order of the sorting, we have to re-append the values for ascending and descending
+    JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));
+    if (result.has("pageRequest")) {
+      JSONObject pageRequest = (JSONObject) result.get("pageRequest");
+      if (pageRequest.has("sorting")) {
+        JSONObject sorting = (JSONObject) pageRequest.get("sorting");
+        if (sorting.has("orders")) {
+          JSONArray orders = (JSONArray) sorting.get("orders");
+          JSONObject migratedSorting = new JSONObject();
+          for (Iterator it = orders.iterator(); it.hasNext(); ) {
+            JSONObject order = (JSONObject) it.next();
+            Direction direction = Direction.fromString((String) order.get("direction"));
+            order.put("ascending", direction == ASC);
+            order.put("descending", direction == DESC);
+            migratedSorting.append("orders", order);
+          }
+          pageRequest.put("sorting", migratedSorting);
+        }
+        result.put("pageRequest", pageRequest);
+      }
+    }
+
+    return migrateToV5(result.toString());
+  }
 
   public static String migrateToV5(String unmigratedJson) {
     String migratedJson = unmigratedJson.replaceAll("executedSearchTerm", "query");

@@ -48,6 +48,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get count of digital objects")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/count",
         "/v5/digitalobjects/count",
         "/v2/digitalobjects/count",
         "/latest/digitalobjects/count"
@@ -60,6 +61,7 @@ public class DigitalObjectController {
   @Operation(summary = "Delete a digital object with all its relations")
   @DeleteMapping(
       value = {
+        "/v6/digitalobjects/{uuid}",
         "/v5/digitalobjects/{uuid}",
         "/v2/digitalobjects/{uuid}",
         "/latest/digitalobjects/{uuid}"
@@ -128,6 +130,7 @@ public class DigitalObjectController {
           "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/reduced",
         "/v5/digitalobjects/reduced",
         "/v3/digitalobjects/reduced",
         "/latest/digitalobjects/reduced"
@@ -140,6 +143,8 @@ public class DigitalObjectController {
   @Operation(summary = "Get digital object by namespace and id")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/identifier/{namespace}:{id}",
+        "/v6/digitalobjects/identifier/{namespace}:{id}.json",
         "/v5/digitalobjects/identifier/{namespace}:{id}",
         "/v5/digitalobjects/identifier/{namespace}:{id}.json",
         "/v2/digitalobjects/identifier/{namespace}:{id}",
@@ -169,6 +174,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get a digital object by uuid")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -202,6 +208,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get file resources of a digital object")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources",
         "/v5/digitalobjects/{uuid}/fileresources",
         "/v2/digitalobjects/{uuid}/fileresources",
         "/latest/digitalobjects/{uuid}/fileresources"
@@ -214,6 +221,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get image file resources of a digital object")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources/images",
         "/v5/digitalobjects/{uuid}/fileresources/images",
         "/v2/digitalobjects/{uuid}/fileresources/images",
         "/latest/digitalobjects/{uuid}/fileresources/images"
@@ -226,6 +234,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get item for digital object by digital object uuid")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/item",
         "/v5/digitalobjects/{uuid}/item",
         "/v2/digitalobjects/{uuid}/item",
         "/latest/digitalobjects/{uuid}/item"
@@ -238,6 +247,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get languages of all digital objects")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/languages",
         "/v5/digitalobjects/languages",
         "/v3/digitalobjects/languages",
         "/latest/digitalobjects/languages"
@@ -249,7 +259,10 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all languages of a digital object's collections")
   @GetMapping(
-      value = "/v5/digitalobjects/{uuid}/collections/languages",
+      value = {
+        "/v6/digitalobjects/{uuid}/collections/languages",
+        "/v5/digitalobjects/{uuid}/collections/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
     return this.digitalObjectService.getLanguagesOfCollections(uuid);
@@ -257,7 +270,10 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all languages of a digital object's projects")
   @GetMapping(
-      value = "/v5/digitalobjects/{uuid}/projects/languages",
+      value = {
+        "/v6/digitalobjects/{uuid}/projects/languages",
+        "/v5/digitalobjects/{uuid}/projects/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
     return this.digitalObjectService.getLanguagesOfProjects(uuid);
@@ -266,6 +282,7 @@ public class DigitalObjectController {
   @Operation(summary = "Find limited amount of random digital objects")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/random",
         "/v5/digitalobjects/random",
         "/v2/digitalobjects/random",
         "/latest/digitalobjects/random"
@@ -278,7 +295,12 @@ public class DigitalObjectController {
 
   @Operation(summary = "Save a newly created digital object")
   @PostMapping(
-      value = {"/v5/digitalobjects", "/v2/digitalobjects", "/latest/digitalobjects"},
+      value = {
+        "/v6/digitalobjects",
+        "/v5/digitalobjects",
+        "/v2/digitalobjects",
+        "/latest/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -288,6 +310,7 @@ public class DigitalObjectController {
   @Operation(summary = "Save list of fileresources for a given digital object")
   @PostMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources",
         "/v5/digitalobjects/{uuid}/fileresources",
         "/v3/digitalobjects/{uuid}/fileresources",
         "/latest/digitalobjects/{uuid}/fileresources"
@@ -303,6 +326,7 @@ public class DigitalObjectController {
   @Operation(summary = "Update a digital object")
   @PutMapping(
       value = {
+        "/v6/digitalobjects/{uuid}",
         "/v5/digitalobjects/{uuid}",
         "/v2/digitalobjects/{uuid}",
         "/latest/digitalobjects/{uuid}"
