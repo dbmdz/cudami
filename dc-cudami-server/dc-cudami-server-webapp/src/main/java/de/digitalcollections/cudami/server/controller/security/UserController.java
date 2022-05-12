@@ -34,7 +34,7 @@ public class UserController {
 
   @Operation(summary = "Get all users")
   @GetMapping(
-      value = {"/v5/users", "/v2/users", "/latest/users"},
+      value = {"/v6/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<User> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -50,7 +50,7 @@ public class UserController {
 
   @Operation(summary = "Get all users with given role and enabled status")
   @GetMapping(
-      value = {"/v5/users", "/v2/users", "/latest/users"},
+      value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       params = {"role", "enabled"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<User> getByRoleAndStatus(
@@ -61,7 +61,7 @@ public class UserController {
 
   @Operation(summary = "Get user by email address")
   @GetMapping(
-      value = {"/v5/users", "/v2/users", "/latest/users"},
+      value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User getByUsername(@RequestParam(name = "email") String email) {
@@ -70,7 +70,7 @@ public class UserController {
 
   @Operation(summary = "Get user by uuid")
   @GetMapping(
-      value = {"/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {"/v6/users", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User getByUuid(@PathVariable UUID uuid) {
     return userService.getByUuid(uuid);
@@ -78,7 +78,7 @@ public class UserController {
 
   @Operation(summary = "Save a newly created user")
   @PostMapping(
-      value = {"/v5/users", "/v2/users", "/latest/users"},
+      value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User save(@RequestBody User user, BindingResult errors) {
     return userService.save(user, errors);
@@ -86,7 +86,7 @@ public class UserController {
 
   @Operation(summary = "Update a user")
   @PutMapping(
-      value = {"/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {"/v6/users", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());
