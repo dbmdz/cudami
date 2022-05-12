@@ -125,6 +125,22 @@ public class CollectionsController extends AbstractController {
     return "collections/edit";
   }
 
+  @GetMapping({"/api/collections/search", "/api/subcollections/search"})
+  @ResponseBody
+  public PageResponse<Collection> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws TechnicalException {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.find(pageRequest);
+  }
+
   @GetMapping("/api/collections/{uuid}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> findDigitalObjects(
@@ -244,22 +260,6 @@ public class CollectionsController extends AbstractController {
       LOGGER.error("Cannot save collection: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
-  }
-
-  @GetMapping({"/api/collections/search", "/api/subcollections/search"})
-  @ResponseBody
-  public PageResponse<Collection> search(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
   }
 
   @PutMapping("/api/collections/{uuid}")
