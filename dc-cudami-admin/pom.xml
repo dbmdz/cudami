@@ -18,19 +18,6 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <timestamp>${maven.build.timestamp}</timestamp>
     <versionName>${project.version} manually built by ${user.name} at ${maven.build.timestamp}</versionName>
-
-    <version.dc-commons-server>4.1.1</version.dc-commons-server>
-    <version.dc-commons-springboot>4.1.1</version.dc-commons-springboot>
-    <version.dc-commons-springmvc>4.2.0</version.dc-commons-springmvc>
-    <version.webjar-admin-lte>3.2.0</version.webjar-admin-lte>
-    <version.webjar-source-sans-pro>4.2.2</version.webjar-source-sans-pro>
-    <version.webjar-url-search-params-polyfill>8.1.1</version.webjar-url-search-params-polyfill>
-    <version.webjar-webjars-locator>0.45</version.webjar-webjars-locator>
-
-    <!-- plugins -->
-    <version.frontend-maven-plugin>1.12.1</version.frontend-maven-plugin>
-    <version.node>v12.16.1</version.node>
-    <version.npm>6.14.4</version.npm>
   </properties>
 
   <dependencies>
@@ -45,17 +32,17 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
-      <version>${version.dc-commons-server}</version>
+      <version>4.1.1</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springboot</artifactId>
-      <version>${version.dc-commons-springboot}</version>
+      <version>4.1.1</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>
-      <version>${version.dc-commons-springmvc}</version>
+      <version>5.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -180,22 +167,22 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>AdminLTE</artifactId>
-      <version>${version.webjar-admin-lte}</version>
+      <version>3.2.0</version>
     </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
-      <version>${version.webjar-webjars-locator}</version>
+      <version>0.45</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>fontsource__source-sans-pro</artifactId>
-      <version>${version.webjar-source-sans-pro}</version>
+      <version>4.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>url-search-params-polyfill</artifactId>
-      <version>${version.webjar-url-search-params-polyfill}</version>
+      <version>8.1.1</version>
     </dependency>
   </dependencies>
 
@@ -253,7 +240,7 @@
           <plugin>
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
-            <version>${version.frontend-maven-plugin}</version>
+            <version>1.12.1</version>
             <configuration>
               <installDirectory>../dc-cudami-editor/bin</installDirectory>
               <workingDirectory>../dc-cudami-editor</workingDirectory>
@@ -261,8 +248,8 @@
             <executions>
               <execution>
                 <configuration>
-                  <nodeVersion>${version.node}</nodeVersion>
-                  <npmVersion>${version.npm}</npmVersion>
+                  <nodeVersion>v12.16.1</nodeVersion>
+                  <npmVersion>6.14.4</npmVersion>
                 </configuration>
                 <goals>
                   <goal>install-node-and-npm</goal>

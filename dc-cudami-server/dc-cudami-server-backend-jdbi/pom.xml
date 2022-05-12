@@ -13,13 +13,6 @@
   <artifactId>dc-cudami-server-backend-jdbi</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <version.dc-commons-jdbi>4.2.3</version.dc-commons-jdbi>
-    <version.jdbi>3.28.0</version.jdbi>
-    <version.testcontainers>1.17.1</version.testcontainers>
-    <version.dc-commons-web>1.0.1</version.dc-commons-web>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.github.openjson</groupId>
@@ -32,12 +25,12 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-jdbi</artifactId>
-      <version>${version.dc-commons-jdbi}</version>
+      <version>4.2.3</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-web</artifactId>
-      <version>${version.dc-commons-web}</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -67,27 +60,27 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-core</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.28.0</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-freemarker</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.28.0</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-postgres</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.28.0</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-spring5</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.28.0</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-sqlobject</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.28.0</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -128,19 +121,19 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>${version.testcontainers}</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>${version.testcontainers}</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>${version.testcontainers}</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
