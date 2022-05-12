@@ -2,7 +2,7 @@
   "content": [
     {
       "objectType": "WEBSITE",
-      "created": "2018-05-02T00:00:00.00000",
+      "created": "2019-02-14T00:00:00",
       "description": {
         "de": {
           "type": "doc",
@@ -17,7 +17,7 @@
       "label": {
         "de": "Test-Website"
       },
-      "lastModified": "2018-05-02T00:00:00.00000",
+      "lastModified": "2019-02-14T00:00:00",
       "type": "ENTITY",
       "uuid": "786f8c74-2a9e-4f74-888f-667522df6538",
       "entityType": "WEBSITE",
@@ -31,7 +31,7 @@
         {
           "direction": "DESC",
           "ignoreCase": false,
-          "nullHandling": "NULLS_FIRST",
+          "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": "de",
           "ascending": false,

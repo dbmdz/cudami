@@ -2,7 +2,7 @@
   "content": [
     {
       "objectType": "WEBPAGE",
-      "created": "2018-05-02T00:00:00.000",
+      "created": "2018-05-02T00:00:00",
       "description": {
         "de": {
           "type": "doc",
@@ -17,7 +17,7 @@
       "label": {
         "de": "Impressum"
       },
-      "lastModified": "2018-05-02T00:00:00.000",
+      "lastModified": "2018-05-02T00:00:00",
       "type": "RESOURCE",
       "uuid": "0b591826-6c1e-4e2b-87c3-6fbcdc934934",
       "publicationStart": "2018-07-02"

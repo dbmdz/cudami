@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -16,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +34,11 @@ public class V5WebsiteController {
 
   private final WebsiteService websiteService;
 
-  public V5WebsiteController(WebsiteService websiteService) {
+  private final ObjectMapper objectMapper;
+
+  public V5WebsiteController(WebsiteService websiteService, ObjectMapper objectMapper) {
     this.websiteService = websiteService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(
@@ -77,15 +85,20 @@ public class V5WebsiteController {
               example = "Test",
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+          String searchTerm)
+      throws CudamiControllerException {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    PageResponse<Website> response = websiteService.find(searchPageRequest);
-    // TODO
-    return null;
+    PageResponse<Website> pageResponse = websiteService.find(pageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(
@@ -131,11 +144,16 @@ public class V5WebsiteController {
               example = "Test",
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
+          String searchTerm)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    PageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
-    // TODO
-    return null;
+    PageResponse<Webpage> pageResponse = websiteService.findRootWebpages(uuid, searchPageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
