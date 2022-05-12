@@ -7,10 +7,6 @@ import de.digitalcollections.cudami.client.BaseCudamiRestClientTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.NullHandling;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
@@ -20,25 +16,6 @@ import org.junit.jupiter.api.Test;
 public abstract class BaseCudamiIdentifiablesClientTest<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>
     extends BaseCudamiRestClientTest<I, C> {
-
-  /**
-   * Creates an example PageRequest, which fills all possible fields:
-   *
-   * <ul>
-   *   <li>order: Descending for property "sortable" and nulls first
-   *   <li>pageNumber: 1
-   *   <li>pageSize: 2
-   *   <li>searchTerm: "foo"
-   * </ul>
-   *
-   * @return example PageRequest with defined pageSize, pageNumber, sorting and searchTerm
-   */
-  protected PageRequest buildExamplePageRequest() {
-    Direction direction = Direction.DESC;
-    Order order = new Order(direction, true, NullHandling.NULLS_FIRST, "sortable");
-    Sorting sorting = new Sorting(order);
-    return new PageRequest("foo", 1, 2, sorting);
-  }
 
   @Test
   @DisplayName("can find by language and initial with plain attributes")
@@ -65,7 +42,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
@@ -78,7 +55,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     PageResponse<I> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
-    verifyHttpRequestByMethodAndRelativeURL("get", "/search?pageNumber=0&pageSize=0");
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");
   }
 
   @Test
@@ -89,8 +66,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     assertThat(client.find("foo", 100)).isNotNull();
 
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/search?pageNumber=0&pageSize=100&searchTerm=foo");
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=100&searchTerm=foo");
   }
 
   @Test

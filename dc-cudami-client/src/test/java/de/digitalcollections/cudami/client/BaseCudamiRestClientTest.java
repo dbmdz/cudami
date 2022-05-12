@@ -36,6 +36,7 @@ public abstract class BaseCudamiRestClientTest<
    *   <li>order: Descending for property "sortable" and nulls first
    *   <li>pageNumber: 1
    *   <li>pageSize: 2
+   *   <li>searchTerm: "hello"
    * </ul>
    *
    * @return example PageRequest with defined pageSize, pageNumber, sorting and two filters
@@ -48,7 +49,7 @@ public abstract class BaseCudamiRestClientTest<
     FilterCriterion filterCriterion2 =
         new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
     Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
-    return new PageRequest(1, 2, sorting, filtering);
+    return new PageRequest(1, 2, sorting, filtering, "hello");
   }
 
   @Test
@@ -96,7 +97,7 @@ public abstract class BaseCudamiRestClientTest<
     client.find(buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
