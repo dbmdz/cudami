@@ -47,7 +47,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get all headwordentries")
   @GetMapping(
-      value = {"/v6/headwordentries", "/v5/headwordentries"},
+      value = {"/v6/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<HeadwordEntry> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -65,6 +65,7 @@ public class HeadwordEntryController {
   @Operation(summary = "Get all headwordentries by headword")
   @GetMapping(
       value = {
+        "/v6/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,6 +83,8 @@ public class HeadwordEntryController {
   @Operation(summary = "Get an headwordentry by namespace and id")
   @GetMapping(
       value = {
+        "/v6/headwordentries/identifier/{namespace}:{id}",
+        "/v6/headwordentries/identifier/{namespace}:{id}.json",
         "/v5/headwordentries/identifier/{namespace}:{id}",
         "/v5/headwordentries/identifier/{namespace}:{id}.json"
       },
@@ -99,6 +102,7 @@ public class HeadwordEntryController {
   @Operation(summary = "Get an headwordentry")
   @GetMapping(
       value = {
+        "/v6/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -128,7 +132,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get languages of all headwordentries")
   @GetMapping(
-      value = {"/v5/headwordentries/languages"},
+      value = {"/v6/headwordentries/languages", "/v5/headwordentries/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return this.headwordEntryService.getLanguages();
@@ -136,7 +140,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Save a newly created headwordentry")
   @PostMapping(
-      value = {"/v5/headwordentries"},
+      value = {"/v6/headwordentries", "/v5/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry save(@RequestBody HeadwordEntry headwordEntry, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -145,7 +149,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Update an headwordentry")
   @PutMapping(
-      value = {"/v5/headwordentries/{uuid}"},
+      value = {"/v6/headwordentries/{uuid}", "/v5/headwordentries/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry update(
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)

@@ -42,6 +42,7 @@ public class ProjectController {
   @Operation(summary = "Add an existing digital object to an existing project")
   @PostMapping(
       value = {
+        "/v6/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -70,6 +71,7 @@ public class ProjectController {
   @Operation(summary = "Add existing digital objects to an existing project")
   @PostMapping(
       value = {
+        "/v6/projects/{uuid}/digitalobjects",
         "/v5/projects/{uuid}/digitalobjects",
         "/v3/projects/{uuid}/digitalobjects",
         "/latest/projects/{uuid}/digitalobjects"
@@ -94,7 +96,12 @@ public class ProjectController {
   @Operation(
       summary = "Delete an existing project and the identifiers, which belong to this project")
   @DeleteMapping(
-      value = {"/v5/projects/{uuid}", "/v3/projects/{uuid}", "/latest/projects/{uuid}"},
+      value = {
+        "/v6/projects/{uuid}",
+        "/v5/projects/{uuid}",
+        "/v3/projects/{uuid}",
+        "/latest/projects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -146,6 +153,8 @@ public class ProjectController {
   @Operation(summary = "Get project by namespace and id")
   @GetMapping(
       value = {
+        "/v6/projects/identifier/{namespace}:{id}",
+        "/v6/projects/identifier/{namespace}:{id}.json",
         "/v5/projects/identifier/{namespace}:{id}",
         "/v5/projects/identifier/{namespace}:{id}.json",
         "/v3/projects/identifier/{namespace}:{id}",
@@ -161,7 +170,12 @@ public class ProjectController {
 
   @Operation(summary = "Get a project by uuid")
   @GetMapping(
-      value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
+      value = {
+        "/v6/projects/{uuid}",
+        "/v5/projects/{uuid}",
+        "/v2/projects/{uuid}",
+        "/latest/projects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Project> getByUuid(
       @Parameter(
@@ -189,7 +203,12 @@ public class ProjectController {
 
   @Operation(summary = "Get languages of all projects")
   @GetMapping(
-      value = {"/v5/projects/languages", "/v3/projects/languages", "/latest/projects/languages"},
+      value = {
+        "/v6/projects/languages",
+        "/v5/projects/languages",
+        "/v3/projects/languages",
+        "/latest/projects/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return projectService.getLanguages();
@@ -198,6 +217,7 @@ public class ProjectController {
   @Operation(summary = "Remove an existing digital object from an existing project")
   @DeleteMapping(
       value = {
+        "/v6/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -225,7 +245,7 @@ public class ProjectController {
 
   @Operation(summary = "Save a newly created project")
   @PostMapping(
-      value = {"/v5/projects", "/v2/projects", "/latest/projects"},
+      value = {"/v6/projects", "/v5/projects", "/v2/projects", "/latest/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project save(@RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -235,6 +255,7 @@ public class ProjectController {
   @Operation(summary = "Save existing digital objects into an existing project")
   @PutMapping(
       value = {
+        "/v6/projects/{uuid}/digitalobjects",
         "/v5/projects/{uuid}/digitalobjects",
         "/v3/projects/{uuid}/digitalobjects",
         "/latest/projects/{uuid}/digitalobjects"
@@ -258,7 +279,12 @@ public class ProjectController {
 
   @Operation(summary = "Update an project")
   @PutMapping(
-      value = {"/v5/projects/{uuid}", "/v2/projects/{uuid}", "/latest/projects/{uuid}"},
+      value = {
+        "/v6/projects/{uuid}",
+        "/v5/projects/{uuid}",
+        "/v2/projects/{uuid}",
+        "/latest/projects/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {

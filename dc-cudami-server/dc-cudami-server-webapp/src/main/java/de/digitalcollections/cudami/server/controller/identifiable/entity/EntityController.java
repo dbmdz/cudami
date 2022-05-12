@@ -39,7 +39,12 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get count of entities")
   @GetMapping(
-      value = {"/v5/entities/count", "/v3/entities/count", "/latest/entities/count"},
+      value = {
+        "/v6/entities/count",
+        "/v5/entities/count",
+        "/v3/entities/count",
+        "/latest/entities/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return entityService.count();
@@ -47,7 +52,7 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get all entities")
   @GetMapping(
-      value = {"/v6/entities", "/v5/entities", "/v3/entities", "/latest/entities"},
+      value = {"/v6/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -71,6 +76,8 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get entity by namespace and id")
   @GetMapping(
       value = {
+        "/v6/entities/identifier/{namespace}:{id}",
+        "/v6/entities/identifier/{namespace}:{id}.json",
         "/v5/entities/identifier/{namespace}:{id}",
         "/v5/entities/identifier/{namespace}:{id}.json",
         "/latest/entities/identifier/{namespace}:{id}",
@@ -85,7 +92,11 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Get entity by reference id")
   @GetMapping(
-      value = {"/v5/entities/{refId:[0-9]+}", "/latest/entities/{refId:[0-9]+}"},
+      value = {
+        "/v6/entities/{refId:[0-9]+}",
+        "/v5/entities/{refId:[0-9]+}",
+        "/latest/entities/{refId:[0-9]+}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity getByRefId(@PathVariable long refId) {
     Entity entity = entityService.getByRefId(refId);
@@ -105,6 +116,7 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get entity by uuid")
   @GetMapping(
       value = {
+        "/v6/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -116,7 +128,12 @@ public class EntityController<E extends Entity> {
 
   @Operation(summary = "Find limited amount of random entites")
   @GetMapping(
-      value = {"/v5/entities/random", "/v2/entities/random", "/latest/entities/random"},
+      value = {
+        "/v6/entities/random",
+        "/v5/entities/random",
+        "/v2/entities/random",
+        "/latest/entities/random"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
@@ -126,6 +143,7 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get related file resources of entity")
   @GetMapping(
       value = {
+        "/v6/entities/{uuid}/related/fileresources",
         "/v5/entities/{uuid}/related/fileresources",
         "/v2/entities/{uuid}/related/fileresources",
         "/latest/entities/{uuid}/related/fileresources"
@@ -138,6 +156,7 @@ public class EntityController<E extends Entity> {
   @Operation(summary = "Get relations for an entity (being the subject)")
   @GetMapping(
       value = {
+        "/v6/entities/relations/{uuid}",
         "/v5/entities/relations/{uuid}",
         "/v2/entities/relations/{uuid}",
         "/latest/entities/relations/{uuid}"

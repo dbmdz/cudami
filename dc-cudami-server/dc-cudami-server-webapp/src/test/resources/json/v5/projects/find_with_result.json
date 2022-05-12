@@ -2,7 +2,7 @@
   "content": [
     {
       "objectType": "PROJECT",
-      "created": "2020-10-15T00:00:00.000000",
+      "created": "2020-10-15T00:00:00",
       "identifiers": [
         {
           "id": "1467037957",
@@ -14,7 +14,7 @@
       "label": {
         "de": "Testprojekt"
       },
-      "lastModified": "2020-10-15T00:00:00.000000",
+      "lastModified": "2020-10-15T00:00:00",
       "type": "ENTITY",
       "uuid": "cfa1af83-1d6e-4eed-b36c-75c10b255a21",
       "entityType": "PROJECT",

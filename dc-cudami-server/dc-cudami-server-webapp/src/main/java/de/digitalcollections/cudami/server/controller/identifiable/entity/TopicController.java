@@ -49,6 +49,7 @@ public class TopicController {
   @Operation(summary = "Add an existing topic to an existing parent topic")
   @PostMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/v5/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
@@ -71,7 +72,7 @@ public class TopicController {
 
   @Operation(summary = "Get count of topics")
   @GetMapping(
-      value = {"/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
+      value = {"/v6/topics/count", "/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return topicService.count();
@@ -96,11 +97,7 @@ public class TopicController {
 
   @Operation(summary = "Get paged entities of a topic")
   @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/entities",
-        "/v3/topics/{uuid}/entities",
-        "/latest/topics/{uuid}/entities"
-      },
+      value = {"/v6/topics/{uuid}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> findEntities(
       @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
@@ -118,11 +115,7 @@ public class TopicController {
 
   @Operation(summary = "Get file resources of topic")
   @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/fileresources",
-        "/v3/topics/{uuid}/fileresources",
-        "/latest/topics/{uuid}/fileresources"
-      },
+      value = {"/v6/topics/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findFileResources(
       @PathVariable UUID uuid,
@@ -172,6 +165,7 @@ public class TopicController {
   @Operation(summary = "Get the breadcrumb for a topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/breadcrumb",
         "/v5/topics/{uuid}/breadcrumb",
         "/v3/topics/{uuid}/breadcrumb",
         "/latest/topics/{uuid}/breadcrumb"
@@ -209,6 +203,7 @@ public class TopicController {
   @Operation(summary = "Get topic by refId")
   @GetMapping(
       value = {
+        "/v6/topics/{refId:[0-9]+}",
         "/v5/topics/{refId:[0-9]+}",
         "/v3/topics/{refId:[0-9]+}",
         "/latest/topics/{refId:[0-9]+}"
@@ -226,6 +221,7 @@ public class TopicController {
   @Operation(summary = "Get topic by uuid (and optional locale)")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -256,6 +252,7 @@ public class TopicController {
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/children",
         "/v5/topics/{uuid}/children",
         "/v3/topics/{uuid}/children",
         "/latest/topics/{uuid}/children"
@@ -268,6 +265,7 @@ public class TopicController {
   @Operation(summary = "Get all entities of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/entities/all",
         "/v5/topics/{uuid}/entities/all",
         "/v3/topics/{uuid}/entities/all",
         "/latest/topics/{uuid}/entities/all"
@@ -280,7 +278,7 @@ public class TopicController {
 
   @Operation(summary = "Get all languages of entities of a topic")
   @GetMapping(
-      value = "/v5/topics/{uuid}/entities/languages",
+      value = {"/v6/topics/{uuid}/entities/languages", "/v5/topics/{uuid}/entities/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) {
     return this.topicService.getLanguagesOfEntities(uuid);
@@ -288,7 +286,10 @@ public class TopicController {
 
   @Operation(summary = "Get all languages of file resources of a topic")
   @GetMapping(
-      value = "/v5/topics/{uuid}/fileresources/languages",
+      value = {
+        "/v6/topics/{uuid}/fileresources/languages",
+        "/v5/topics/{uuid}/fileresources/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) {
     return this.topicService.getLanguagesOfFileResources(uuid);
@@ -297,6 +298,7 @@ public class TopicController {
   @Operation(summary = "Get parent topic of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/parent",
         "/v5/topics/{uuid}/parent",
         "/v3/topics/{uuid}/parent",
         "/latest/topics/{uuid}/parent"
@@ -319,6 +321,7 @@ public class TopicController {
   @Operation(summary = "Get languages of all top topics")
   @GetMapping(
       value = {
+        "/v6/topics/top/languages",
         "/v5/topics/top/languages",
         "/v3/topics/top/languages",
         "/latest/topics/top/languages"
@@ -331,6 +334,7 @@ public class TopicController {
   @Operation(summary = "Get topics an entity is linked to")
   @GetMapping(
       value = {
+        "/v6/topics/entity/{uuid}",
         "/v5/topics/entity/{uuid}",
         "/v3/topics/entity/{uuid}",
         "/latest/topics/entity/{uuid}"
@@ -343,6 +347,7 @@ public class TopicController {
   @Operation(summary = "Get topics a fileresource is linked to")
   @GetMapping(
       value = {
+        "/v6/topics/fileresource/{uuid}",
         "/v5/topics/fileresource/{uuid}",
         "/v3/topics/fileresource/{uuid}",
         "/latest/topics/fileresource/{uuid}"
@@ -355,6 +360,7 @@ public class TopicController {
   @Operation(summary = "Remove child-relation of the given subtopic to the given parent topic")
   @DeleteMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/v5/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/v3/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}"
@@ -375,7 +381,7 @@ public class TopicController {
 
   @Operation(summary = "Save a newly created topic")
   @PostMapping(
-      value = {"/v5/topics", "/v2/topics", "/latest/topics"},
+      value = {"/v6/topics", "/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -385,6 +391,7 @@ public class TopicController {
   @Operation(summary = "Save a newly created topic and add it to parent")
   @PostMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/subtopic",
         "/v5/topics/{parentTopicUuid}/subtopic",
         "/v3/topics/{parentTopicUuid}/subtopic",
         "/latest/topics/{parentTopicUuid}/subtopic"
@@ -403,6 +410,7 @@ public class TopicController {
   @Operation(summary = "Save entities of topic")
   @PostMapping(
       value = {
+        "/v6/topics/{uuid}/entities",
         "/v5/topics/{uuid}/entities",
         "/v3/topics/{uuid}/entities",
         "/latest/topics/{uuid}/entities"
@@ -415,6 +423,7 @@ public class TopicController {
   @Operation(summary = "Save fileresources of topic")
   @PostMapping(
       value = {
+        "/v6/topics/{uuid}/fileresources",
         "/v5/topics/{uuid}/fileresources",
         "/v3/topics/{uuid}/fileresources",
         "/latest/topics/{uuid}/fileresources"
@@ -427,7 +436,12 @@ public class TopicController {
 
   @Operation(summary = "Update a topic")
   @PutMapping(
-      value = {"/v5/topics/{uuid}", "/v2/topics/{uuid}", "/latest/topics/{uuid}"},
+      value = {
+        "/v6/topics/{uuid}",
+        "/v5/topics/{uuid}",
+        "/v2/topics/{uuid}",
+        "/latest/topics/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
