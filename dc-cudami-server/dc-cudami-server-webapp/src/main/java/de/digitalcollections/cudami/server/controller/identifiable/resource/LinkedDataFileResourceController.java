@@ -48,7 +48,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Get a paged list of all linkedDataFileResources")
   @GetMapping(
-      value = {"/v5/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

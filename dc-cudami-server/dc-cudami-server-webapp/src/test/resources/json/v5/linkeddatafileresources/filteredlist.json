@@ -15,7 +15,6 @@
       "sizeInBytes": 0,
       "uri": "http://foo.bar/bla.xml",
       "context": "Test-context",
-      "objectType": "Test-objectType",
       "filenameExtension": "xml"
     }
   ],

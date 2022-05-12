@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -17,6 +21,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +38,14 @@ public class V5FileResourceMetadataController {
 
   private final FileResourceMetadataService<FileResource> metadataService;
 
+  private final ObjectMapper objectMapper;
+
   public V5FileResourceMetadataController(
       @Qualifier("fileResourceMetadataService")
-          FileResourceMetadataService<FileResource> metadataService) {
+          FileResourceMetadataService<FileResource> metadataService,
+      ObjectMapper objectMapper) {
     this.metadataService = metadataService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(summary = "Get all fileresources")
@@ -49,7 +58,8 @@ public class V5FileResourceMetadataController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
+          FilterCriterion<String> encodedUriFilterCriterion)
+      throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -66,9 +76,13 @@ public class V5FileResourceMetadataController {
       searchPageRequest.setFiltering(filtering);
     }
 
-    PageResponse<FileResource> response = metadataService.find(searchPageRequest);
-    // TODO
-    return null;
+    PageResponse<FileResource> pageResponse = metadataService.find(searchPageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 
   @Operation(
@@ -88,7 +102,8 @@ public class V5FileResourceMetadataController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -127,8 +142,12 @@ public class V5FileResourceMetadataController {
       pageRequest.add(filtering);
     }
 
-    PageResponse<FileResource> response = metadataService.find(pageRequest);
-    // TODO
-    return null;
+    PageResponse<FileResource> pageResponse = metadataService.find(pageRequest);
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

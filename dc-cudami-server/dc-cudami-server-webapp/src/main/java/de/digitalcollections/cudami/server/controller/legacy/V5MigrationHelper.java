@@ -22,9 +22,23 @@ public class V5MigrationHelper {
     }
 
     // For each order of the sorting, we have to re-append the values for ascending and descending
-    JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));
-    if (result.has("pageRequest")) {
-      JSONObject pageRequest = (JSONObject) result.get("pageRequest");
+    JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(pageResponse));
+    return migrateToV5(jsonObject, objectMapper);
+  }
+
+  public static String migrateToV5(String unmigratedJson) {
+    String migratedJson = unmigratedJson.replaceAll("executedSearchTerm", "query");
+    migratedJson = migratedJson.replaceAll("searchTerm", "query");
+    return migratedJson;
+  }
+
+  public static String migrateToV5(JSONObject jsonObject, ObjectMapper objectMapper) {
+    if (jsonObject == null) {
+      return null;
+    }
+
+    if (jsonObject.has("pageRequest")) {
+      JSONObject pageRequest = (JSONObject) jsonObject.get("pageRequest");
       if (pageRequest.has("sorting")) {
         JSONObject sorting = (JSONObject) pageRequest.get("sorting");
         if (sorting.has("orders")) {
@@ -39,16 +53,10 @@ public class V5MigrationHelper {
           }
           pageRequest.put("sorting", migratedSorting);
         }
-        result.put("pageRequest", pageRequest);
+        jsonObject.put("pageRequest", pageRequest);
       }
     }
 
-    return migrateToV5(result.toString());
-  }
-
-  public static String migrateToV5(String unmigratedJson) {
-    String migratedJson = unmigratedJson.replaceAll("executedSearchTerm", "query");
-    migratedJson = migratedJson.replaceAll("searchTerm", "query");
-    return migratedJson;
+    return migrateToV5(jsonObject.toString());
   }
 }

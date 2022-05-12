@@ -1,8 +1,12 @@
 package de.digitalcollections.cudami.server.controller.identifiable.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -13,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +32,13 @@ public class V5WebpageController {
   private final LocaleService localeService;
   private final WebpageService webpageService;
 
-  public V5WebpageController(LocaleService localeService, WebpageService webpageService) {
+  private final ObjectMapper objectMapper;
+
+  public V5WebpageController(
+      LocaleService localeService, WebpageService webpageService, ObjectMapper objectMapper) {
     this.localeService = localeService;
     this.webpageService = webpageService;
+    this.objectMapper = objectMapper;
   }
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
@@ -48,20 +57,25 @@ public class V5WebpageController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
 
-    PageResponse<Webpage> response;
+    PageResponse<Webpage> pageResponse;
     if (active != null) {
-      response = webpageService.findActiveChildren(uuid, searchPageRequest);
+      pageResponse = webpageService.findActiveChildren(uuid, searchPageRequest);
     } else {
-      response = webpageService.findChildren(uuid, searchPageRequest);
+      pageResponse = webpageService.findChildren(uuid, searchPageRequest);
     }
-    // TODO
-    return null;
+
+    try {
+      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
   }
 }

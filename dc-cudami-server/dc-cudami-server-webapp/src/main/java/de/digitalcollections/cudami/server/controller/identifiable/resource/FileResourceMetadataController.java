@@ -136,6 +136,8 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get a fileresource by namespace and id")
   @GetMapping(
       value = {
+        "/v6/fileresources/identifier/{namespace}:{id}",
+        "/v6/fileresources/identifier/{namespace}:{id}.json",
         "/v5/fileresources/identifier/{namespace}:{id}",
         "/v5/fileresources/identifier/{namespace}:{id}.json",
         "/v2/fileresources/identifier/{namespace}:{id}",
@@ -154,6 +156,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get a fileresource by uuid")
   @GetMapping(
       value = {
+        "/v6/fileresources/{uuid}",
         "/v5/fileresources/{uuid}",
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"
@@ -185,6 +188,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get languages of all websites")
   @GetMapping(
       value = {
+        "/v6/fileresources/languages",
         "/v5/fileresources/languages",
         "/v2/fileresources/languages",
         "/latest/fileresources/languages"
@@ -196,7 +200,12 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
-      value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
+      value = {
+        "/v6/fileresources",
+        "/v5/fileresources",
+        "/v2/fileresources",
+        "/latest/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException, ValidationException {
@@ -206,6 +215,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Update a fileresource")
   @PutMapping(
       value = {
+        "/v6/fileresources/{uuid}",
         "/v5/fileresources/{uuid}",
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"

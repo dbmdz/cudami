@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.openjson.JSONObject;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -24,16 +25,23 @@ class V5MigrationHelperTest {
     objectMapper = new DigitalCollectionsObjectMapper();
   }
 
-  @DisplayName("does not modify a null pageresult")
+  @DisplayName("does not modify a null pageresponse")
   @Test
-  public void nullPageResult() throws JsonProcessingException {
-    String actual = V5MigrationHelper.migrateToV5(null, objectMapper);
+  public void nullPageResponse() throws JsonProcessingException {
+    String actual = V5MigrationHelper.migrateToV5((PageResponse) null, objectMapper);
+    assertThat(actual).isNull();
+  }
+
+  @DisplayName("does not modify a null JsonObject")
+  @Test
+  public void nullJsonObject() throws JsonProcessingException {
+    String actual = V5MigrationHelper.migrateToV5((JSONObject) null, objectMapper);
     assertThat(actual).isNull();
   }
 
   @DisplayName("can work with an empty pageresult")
   @Test
-  public void emptyPageResult() throws JsonProcessingException {
+  public void emptyPageResponse() throws JsonProcessingException {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
 
     String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);

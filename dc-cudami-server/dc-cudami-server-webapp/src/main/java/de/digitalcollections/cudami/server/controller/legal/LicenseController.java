@@ -47,7 +47,7 @@ public class LicenseController {
 
   @Operation(summary = "Get count of licenses")
   @GetMapping(
-      value = {"/v5/licenses/count"},
+      value = {"/v6/licenses/count", "/v5/licenses/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return service.count();
@@ -55,7 +55,7 @@ public class LicenseController {
 
   @Operation(summary = "Delete license by given url")
   @DeleteMapping(
-      value = {"/v5/licenses"},
+      value = {"/v6/licenses", "/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url) {
@@ -69,6 +69,7 @@ public class LicenseController {
   @Operation(summary = "Delete a license by uuid")
   @DeleteMapping(
       value = {
+        "/v6/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +82,7 @@ public class LicenseController {
 
   @Operation(summary = "Delete licenses by given uuid list")
   @DeleteMapping(
-      value = {"/v5/licenses"},
+      value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids) {
     // WARNING: a DELETE request with body seems not to be spec allowed?
@@ -91,9 +92,10 @@ public class LicenseController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
+  // No need for a v5 controller, since the v5 url were never actually used
   @Operation(summary = "Get all licenses as (filtered, sorted, paged) list")
   @GetMapping(
-      value = {"/v5/licenses"},
+      value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<License> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -128,7 +130,7 @@ public class LicenseController {
 
   @Operation(summary = "Get all licenses in reduced form")
   @GetMapping(
-      value = {"/v5/licenses/all"},
+      value = {"/v6/licenses/all", "/v5/licenses/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<License> getAll() {
     return service.getAll();
@@ -136,7 +138,7 @@ public class LicenseController {
 
   @Operation(summary = "Get a license by url")
   @GetMapping(
-      value = {"/v5/licenses"},
+      value = {"/v6/licenses", "/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License getByUrl(@RequestParam(name = "url", required = true) URL url)
@@ -147,6 +149,7 @@ public class LicenseController {
   @Operation(summary = "Get a license by uuid")
   @GetMapping(
       value = {
+        "/v6/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -161,7 +164,7 @@ public class LicenseController {
 
   @Operation(summary = "Save a newly created license")
   @PostMapping(
-      value = {"/v5/licenses"},
+      value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License save(@RequestBody License license, BindingResult errors)
       throws IdentifiableServiceException, ServiceException {
@@ -170,7 +173,7 @@ public class LicenseController {
 
   @Operation(summary = "Update a license")
   @PutMapping(
-      value = {"/v5/licenses/{uuid}"},
+      value = {"/v6/licenses/{uuid}", "/v5/licenses/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License update(
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid,

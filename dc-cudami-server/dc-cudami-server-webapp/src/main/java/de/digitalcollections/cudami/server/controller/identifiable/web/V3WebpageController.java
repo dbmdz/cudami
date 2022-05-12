@@ -7,6 +7,8 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -240,7 +242,7 @@ public class V3WebpageController {
               schema = @Schema(implementation = Boolean.class))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, CudamiControllerException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -269,7 +271,8 @@ public class V3WebpageController {
     }
 
     result.put("content", contentDesc);
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+    return new ResponseEntity<>(V5MigrationHelper.migrateToV5(result, objectMapper), HttpStatus.OK);
   }
 
   @Operation(
