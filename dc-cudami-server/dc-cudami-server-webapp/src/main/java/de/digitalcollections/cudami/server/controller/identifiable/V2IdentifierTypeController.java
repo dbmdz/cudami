@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -87,7 +88,8 @@ public class V2IdentifierTypeController {
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);
+      Sorting sorting = new Sorting(migratedSortBy);
       pageRequest.setSorting(sorting);
     }
 

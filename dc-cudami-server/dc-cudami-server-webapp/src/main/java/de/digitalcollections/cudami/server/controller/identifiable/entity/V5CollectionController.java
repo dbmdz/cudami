@@ -60,7 +60,7 @@ public class V5CollectionController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<Collection> pageResponse;
@@ -119,7 +119,7 @@ public class V5CollectionController {
       throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
     PageResponse<Collection> pageResponse;
@@ -149,7 +149,7 @@ public class V5CollectionController {
       throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
     PageResponse<Collection> pageResponse = collectionService.findRootNodes(searchPageRequest);

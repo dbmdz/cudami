@@ -56,7 +56,7 @@ public class V5IdentifiableController {
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<Identifiable> pageResponse = identifiableService.find(pageRequest);

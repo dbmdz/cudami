@@ -56,7 +56,7 @@ public class V5PersonController {
       throws CudamiControllerException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
 

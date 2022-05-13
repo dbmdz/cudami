@@ -42,7 +42,7 @@ public class V5UserController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse pageResponse = userService.find(pageRequest);

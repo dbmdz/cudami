@@ -46,7 +46,7 @@ public class V5HumanSettlementsController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<HumanSettlement> pageResponse;

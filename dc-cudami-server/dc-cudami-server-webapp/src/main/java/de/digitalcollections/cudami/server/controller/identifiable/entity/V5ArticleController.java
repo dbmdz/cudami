@@ -45,8 +45,7 @@ public class V5ArticleController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);
-      Sorting sorting = new Sorting(migratedSortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<Article> pageResponse = articleService.find(pageRequest);

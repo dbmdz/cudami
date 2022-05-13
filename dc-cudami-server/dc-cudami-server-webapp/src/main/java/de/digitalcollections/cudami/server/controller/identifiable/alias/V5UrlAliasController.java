@@ -48,7 +48,8 @@ public class V5UrlAliasController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);
+      Sorting sorting = new Sorting(migratedSortBy);
       pageRequest.setSorting(sorting);
     }
 

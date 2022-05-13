@@ -658,6 +658,10 @@ public abstract class BaseRestClient<T extends Object> {
                   } else if (nullHandling == NullHandling.NULLS_LAST) {
                     order.append(".nullslast");
                   }
+                  boolean ignoreCase = o.isIgnoreCase();
+                  if (ignoreCase) {
+                    order.append(".ignorecase");
+                  }
                   return order.toString();
                 })
             .collect(Collectors.joining(","));

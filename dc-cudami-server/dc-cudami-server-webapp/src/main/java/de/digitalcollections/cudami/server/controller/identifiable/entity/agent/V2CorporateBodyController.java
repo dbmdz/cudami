@@ -96,7 +96,7 @@ public class V2CorporateBodyController {
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<CorporateBody> response = corporateBodyService.find(pageRequest);
