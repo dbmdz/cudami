@@ -108,7 +108,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")
   @GetMapping(
-      value = {"/v5/linkeddatafileresources/{uuid}"},
+      value = {"/v6/linkeddatafileresources/{uuid}", "/v5/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LinkedDataFileResource> getByUuid(
       @Parameter(
@@ -135,7 +135,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Save a newly created linkedDataFileResource")
   @PostMapping(
-      value = {"/v5/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources", "/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource save(@RequestBody LinkedDataFileResource linkedDataFileResource)
       throws IdentifiableServiceException, ValidationException {
@@ -144,7 +144,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Update a linkedDataFileResource")
   @PutMapping(
-      value = {"/v5/linkeddatafileresources/{uuid}"},
+      value = {"/v5/linkeddatafileresources/{uuid}", "/v6/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource update(
       @PathVariable UUID uuid,

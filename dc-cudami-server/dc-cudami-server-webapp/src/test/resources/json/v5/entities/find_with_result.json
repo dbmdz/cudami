@@ -29,7 +29,7 @@
       "orders": [
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": "de",
@@ -38,7 +38,7 @@
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": "",
@@ -47,7 +47,7 @@
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "uuid",
           "ascending": true,

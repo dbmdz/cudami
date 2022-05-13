@@ -33,7 +33,7 @@ public class RenderingTemplateController {
 
   @Operation(summary = "Get all rendering templates")
   @GetMapping(
-      value = {"/v5/renderingtemplates"},
+      value = {"/v6/renderingtemplates", "/v5/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<RenderingTemplate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -50,6 +50,7 @@ public class RenderingTemplateController {
   @Operation(summary = "Get rendering template by uuid")
   @GetMapping(
       value = {
+        "/v6/renderingtemplates/{uuid}",
         "/v5/renderingtemplates/{uuid}",
         "/v3/renderingtemplates/{uuid}",
         "/latest/renderingtemplates/{uuid}"
@@ -61,7 +62,12 @@ public class RenderingTemplateController {
 
   @Operation(summary = "Save a newly created rendering template")
   @PostMapping(
-      value = {"/v5/renderingtemplates", "/v3/renderingtemplates", "/latest/renderingtemplates"},
+      value = {
+        "/v6/renderingtemplates",
+        "/v5/renderingtemplates",
+        "/v3/renderingtemplates",
+        "/latest/renderingtemplates"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate save(@RequestBody RenderingTemplate template, BindingResult errors) {
     return renderingTemplateService.save(template);
@@ -70,6 +76,7 @@ public class RenderingTemplateController {
   @Operation(summary = "Update a rendering template")
   @PutMapping(
       value = {
+        "/v6/renderingtemplates/{uuid}",
         "/v5/renderingtemplates/{uuid}",
         "/v3/renderingtemplates/{uuid}",
         "/latest/renderingtemplates/{uuid}"

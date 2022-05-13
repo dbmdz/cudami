@@ -30,7 +30,7 @@
       "orders": [
         {
           "direction": "DESC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": "de",

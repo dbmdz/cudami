@@ -45,7 +45,7 @@ public class HumanSettlementController {
 
   @Operation(summary = "get all human settlements")
   @GetMapping(
-      value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
+      value = {"/v6/humansettlements"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<HumanSettlement> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

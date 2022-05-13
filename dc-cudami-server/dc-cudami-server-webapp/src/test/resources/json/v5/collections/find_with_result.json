@@ -19,13 +19,13 @@
       "orders": [
         {
           "direction": "DESC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "lastModified"
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "uuid"
         }
