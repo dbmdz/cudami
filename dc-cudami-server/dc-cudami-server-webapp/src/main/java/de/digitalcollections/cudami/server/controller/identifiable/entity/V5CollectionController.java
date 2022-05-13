@@ -147,12 +147,12 @@ public class V5CollectionController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws CudamiControllerException {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    PageResponse<Collection> pageResponse = collectionService.findRootNodes(searchPageRequest);
+    PageResponse<Collection> pageResponse = collectionService.findRootNodes(pageRequest);
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);

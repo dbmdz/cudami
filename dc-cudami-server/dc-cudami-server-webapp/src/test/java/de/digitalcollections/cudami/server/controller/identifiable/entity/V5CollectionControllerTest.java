@@ -12,6 +12,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -61,9 +62,40 @@ class V5CollectionControllerTest extends BaseControllerTest {
         "/v5/collections/900fbf70-12de-4483-a0e3-9d77ea49626e/digitalobjects?pageSize=1&pageNumber=0"
       })
   void testFindDigitalobjects(String path) throws Exception {
+    PageResponse<DigitalObject> expected =
+        (PageResponse<DigitalObject>)
+            PageResponse.builder()
+                .forRequestPage(0)
+                .forPageSize(1)
+                .withTotalElements(71)
+                .forDescendingOrderedField("lastModified")
+                .forAscendingOrderedField("uuid")
+                .withContent(
+                    List.of(
+                        DigitalObject.builder()
+                            .created("2020-10-14T00:00:00")
+                            .lastModified("2020-10-14T00:00:00")
+                            .uuid("dde78cea-985b-4863-a782-1233978db71a")
+                            .label(Locale.GERMAN, "Testdigitalisat")
+                            .identifier(
+                                "mdz-obj", "bsb12345678", "73724e05-4972-436c-a8ba-79240f675b46")
+                            .refId(529)
+                            .build()))
+                .build();
 
-    // FIXME ab hier gehts weiter
+    when(collectionService.findDigitalObjects(any(Collection.class), any(PageRequest.class)))
+        .thenReturn(expected);
 
+    testJson(path, "/v5/collections/900fbf70-12de-4483-a0e3-9d77ea49626e_digitalobjects.json");
+  }
+
+  @DisplayName("shall return a paged list of subcollections for a collection")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v5/collections/900fbf70-12de-4483-a0e3-9d77ea49626e/subcollections?pageSize=1&pageNumber=0"
+      })
+  void testFindSubcollections(String path) throws Exception {
     PageResponse<Collection> expected =
         (PageResponse<Collection>)
             PageResponse.builder()
@@ -74,16 +106,46 @@ class V5CollectionControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("uuid")
                 .withContent(
                     List.of(
-                        DigitalObject.builder()
+                        Collection.builder()
                             .created("2022-03-31T11:32:04.189939")
                             .lastModified("2022-05-02T16:18:52.710802")
                             .uuid("900fbf70-12de-4483-a0e3-9d77ea49626e")
                             .label(Locale.GERMAN, "Test-Sammlung")
+                            .publicationStart("2022-05-02")
                             .build()))
                 .build();
 
-    when(collectionService.find(any(PageRequest.class))).thenReturn(expected);
+    when(collectionService.findChildren(any(UUID.class), any(PageRequest.class)))
+        .thenReturn(expected);
 
-    testJson(path, "/v5/collections//900fbf70-12de-4483-a0e3-9d77ea49626e_digitalobjects.json");
+    testJson(path, "/v5/collections/find_with_result.json");
+  }
+
+  @DisplayName("shall return a paged list of top collections")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v5/collections/top?pageSize=1&pageNumber=0"})
+  void testFindTopCollections(String path) throws Exception {
+    PageResponse<Collection> expected =
+        (PageResponse<Collection>)
+            PageResponse.builder()
+                .forRequestPage(0)
+                .forPageSize(1)
+                .withTotalElements(156)
+                .forDescendingOrderedField("lastModified")
+                .forAscendingOrderedField("uuid")
+                .withContent(
+                    List.of(
+                        Collection.builder()
+                            .created("2022-03-31T11:32:04.189939")
+                            .lastModified("2022-05-02T16:18:52.710802")
+                            .uuid("900fbf70-12de-4483-a0e3-9d77ea49626e")
+                            .label(Locale.GERMAN, "Test-Sammlung")
+                            .publicationStart("2022-05-02")
+                            .build()))
+                .build();
+
+    when(collectionService.findRootNodes(any(PageRequest.class))).thenReturn(expected);
+
+    testJson(path, "/v5/collections/find_with_result.json");
   }
 }

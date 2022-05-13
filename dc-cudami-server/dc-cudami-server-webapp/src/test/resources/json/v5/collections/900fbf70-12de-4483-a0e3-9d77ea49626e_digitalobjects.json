@@ -2,7 +2,7 @@
   "content": [
     {
       "objectType": "DIGITAL_OBJECT",
-      "created": "2020-10-14T00:00:00.000000",
+      "created": "2020-10-14T00:00:00",
       "identifiers": [
         {
           "id": "bsb12345678",
@@ -12,24 +12,9 @@
         }
       ],
       "label": {
-        "": "Testdigitalisat"
+        "de": "Testdigitalisat"
       },
-      "lastModified": "2020-10-14T00:00:00.000000",
-      "previewImage": {
-        "identifiers": [],
-        "type": "RESOURCE",
-        "uuid": "a80da74b-a0cd-47c1-8759-e3c80edd739c",
-        "fileResourceType": "IMAGE",
-        "filename": "default.jpg",
-        "httpBaseUrl": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb12345678_00003",
-        "mimeType": "image/*",
-        "readonly": false,
-        "sizeInBytes": 0,
-        "uri": "https://api.digitale-sammlungen.de/iiif/image/v2/bsb12345678_00003/full/250,/0/default.jpg",
-        "height": 0,
-        "width": 0,
-        "filenameExtension": "jpg"
-      },
+      "lastModified": "2020-10-14T00:00:00",
       "type": "ENTITY",
       "uuid": "dde78cea-985b-4863-a782-1233978db71a",
       "entityType": "DIGITAL_OBJECT",

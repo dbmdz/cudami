@@ -34,37 +34,38 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
 
   @DisplayName("can return a LinkedDataFileResource with its specific attributes")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
+  @ValueSource(strings = {"/v6/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012"})
   public void getByUuid(String path) throws Exception {
     LinkedDataFileResource expected =
         LinkedDataFileResource.builder()
             .uuid("12345678-abcd-1234-abcd-123456789012")
             .context("Test-context")
-            .objectType("Test-objectType")
             .label(Locale.GERMAN, "Test-Label")
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .uri("http://foo.bar/bla.xml")
+            .objectType("LINKED_DATA")
             .build();
 
     when(linkedDataFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
 
-    testJson(path);
+    testJson(path, "/v6/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012.json");
   }
 
   @DisplayName("can return a paged list of LinkedDataFileResources")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/linkeddatafileresources/?pageNumber=0&pageSize=1"})
+  @ValueSource(strings = {"/v6/linkeddatafileresources/?pageNumber=0&pageSize=1"})
   public void pagedList(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
         PageResponse.builder()
             .forPageSize(1)
             .forRequestPage(0)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
             .withContent(
                 List.of(
                     LinkedDataFileResource.builder()
                         .uuid("12345678-abcd-1234-abcd-123456789012")
                         .context("Test-context")
-                        .objectType("Test-objectType")
                         .label(Locale.GERMAN, "Test-Label")
                         .mimeType(MimeType.MIME_APPLICATION_XML)
                         .uri("http://foo.bar/bla.xml")
@@ -73,14 +74,14 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
 
     when(linkedDataFileResourceService.find(any(PageRequest.class))).thenReturn(expected);
 
-    testJson(path, "/v5/linkeddatafileresources/pagedlist.json");
+    testJson(path, "/v6/linkeddatafileresources/pagedlist.json");
   }
 
   @DisplayName("can return a filtered and paged list of LinkedDataFileResources")
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v5/linkeddatafileresources/search?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"
+        "/v6/linkeddatafileresources/search?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"
       })
   public void find(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
@@ -94,7 +95,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
                     LinkedDataFileResource.builder()
                         .uuid("12345678-abcd-1234-abcd-123456789012")
                         .context("Test-context")
-                        .objectType("Test-objectType")
+                        .objectType("LINKED_DATA")
                         .label(Locale.GERMAN, "Test-Label")
                         .mimeType(MimeType.MIME_APPLICATION_XML)
                         .uri("http://foo.bar/bla.xml")
@@ -114,7 +115,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 
-    testJson(path, "/v5/linkeddatafileresources/filteredlist.json");
+    testJson(path, "/v6/linkeddatafileresources/filteredlist.json");
 
     verify(linkedDataFileResourceService, times(1)).find(pageRequestArgumentCaptor.capture());
     assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);

@@ -35,7 +35,7 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   @DisplayName("can return a filtered and paged list of LinkedDataFileResources")
   @ParameterizedTest
   @ValueSource(
-      strings = {"/v5/fileresources?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"})
+      strings = {"/v6/fileresources?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"})
   public void find(String path) throws Exception {
     PageResponse<FileResource> expected =
         (PageResponse)
@@ -66,7 +66,7 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 
-    testJson(path, "/v5/fileresources/filteredlist.json");
+    testJson(path, "/v6/fileresources/filteredlist.json");
 
     verify(fileResourceMetadataService, times(1)).find(pageRequestArgumentCaptor.capture());
     assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);

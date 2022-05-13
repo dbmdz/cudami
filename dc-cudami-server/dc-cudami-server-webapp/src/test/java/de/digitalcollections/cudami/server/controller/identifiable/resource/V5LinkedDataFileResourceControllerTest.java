@@ -11,7 +11,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(V5LinkedDataFileResourceController.class)
 @DisplayName("The V5 LinkedDataFileResource Controller")
-@Disabled("No idea, why they give errors")
 class V5LinkedDataFileResourceControllerTest extends BaseControllerTest {
 
   @MockBean private LinkedDataFileResourceService linkedDataFileResourceService;
@@ -30,26 +28,23 @@ class V5LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources?pageSize=1&pageNumber=0"})
   void testFind(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
-        (PageResponse<LinkedDataFileResource>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(1)
-                .forAscendingOrderedField("label", "de")
-                .forAscendingOrderedField("label")
-                .withContent(
-                    List.of(
-                        LinkedDataFileResource.builder()
-                            .label(Locale.GERMAN, "Test-Label")
-                            .filename("bla.xml")
-                            .mimeType(MimeType.MIME_APPLICATION_XML)
-                            .uri("http://foo.bar/bla.xml")
-                            .uuid("12345678-abcd-1234-abcd-123456789012")
-                            .build()))
-                .build();
+        PageResponse.builder()
+            .forPageSize(1)
+            .forRequestPage(0)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
+            .withContent(
+                List.of(
+                    LinkedDataFileResource.builder()
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
+                        .build()))
+            .build();
 
     when(linkedDataFileResourceService.find(any(PageRequest.class))).thenReturn(expected);
-
     testJson(path, "/v5/linkeddatafileresources/pagedlist.json");
   }
 
@@ -58,23 +53,21 @@ class V5LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/linkeddatafileresources/search?pageSize=1&pageNumber=0"})
   void testSearch(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
-        (PageResponse<LinkedDataFileResource>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(1)
-                .forAscendingOrderedField("label", "de")
-                .forAscendingOrderedField("label")
-                .withContent(
-                    List.of(
-                        LinkedDataFileResource.builder()
-                            .label(Locale.GERMAN, "Test-Label")
-                            .filename("bla.xml")
-                            .mimeType(MimeType.MIME_APPLICATION_XML)
-                            .uri("http://foo.bar/bla.xml")
-                            .uuid("12345678-abcd-1234-abcd-123456789012")
-                            .build()))
-                .build();
+        PageResponse.builder()
+            .forPageSize(1)
+            .forRequestPage(0)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
+            .withContent(
+                List.of(
+                    LinkedDataFileResource.builder()
+                        .uuid("12345678-abcd-1234-abcd-123456789012")
+                        .context("Test-context")
+                        .label(Locale.GERMAN, "Test-Label")
+                        .mimeType(MimeType.MIME_APPLICATION_XML)
+                        .uri("http://foo.bar/bla.xml")
+                        .build()))
+            .build();
 
     when(linkedDataFileResourceService.find(any(PageRequest.class))).thenReturn(expected);
 
