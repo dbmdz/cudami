@@ -33,7 +33,7 @@ public class IdentifierTypeController {
 
   @Operation(summary = "Get all identifier types")
   @GetMapping(
-      value = {"/v5/identifiertypes"},
+      value = {"/v6/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<IdentifierType> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

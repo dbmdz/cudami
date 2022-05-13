@@ -31,7 +31,7 @@ public class EntityRelationController {
 
   @Operation(summary = "Get paged, sorted, filtered relations")
   @GetMapping(
-      value = {"/v6/entities/relations", "/v5/entities/relations"},
+      value = {"/v6/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<EntityRelation> findByPredicate(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

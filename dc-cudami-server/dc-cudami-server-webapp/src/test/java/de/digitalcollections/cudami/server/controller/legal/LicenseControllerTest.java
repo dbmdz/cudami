@@ -94,7 +94,7 @@ public class LicenseControllerTest extends BaseControllerTest {
             .build();
     when(licenseService.find(any(PageRequest.class))).thenReturn(pageResponse);
 
-    testJson("/v5/licenses?pageNumber=0&pageSize=1", "/v5/legal/licenses/find_with_result.json");
+    testJson("/v6/licenses?pageNumber=0&pageSize=1", "/v6/legal/licenses/find_with_result.json");
   }
 
   @Test

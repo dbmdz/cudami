@@ -80,7 +80,7 @@ public class ItemController {
 
   @Operation(summary = "get all items")
   @GetMapping(
-      value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
+      value = {"/v6/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Item> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

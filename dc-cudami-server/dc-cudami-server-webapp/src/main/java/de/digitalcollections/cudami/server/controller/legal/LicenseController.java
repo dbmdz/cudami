@@ -95,7 +95,7 @@ public class LicenseController {
   // No need for a v5 controller, since the v5 url were never actually used
   @Operation(summary = "Get all licenses as (filtered, sorted, paged) list")
   @GetMapping(
-      value = {"/v6/licenses", "/v5/licenses"},
+      value = {"/v6/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<License> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

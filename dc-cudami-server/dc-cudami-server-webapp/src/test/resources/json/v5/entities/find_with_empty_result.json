@@ -1,0 +1,18 @@
+{
+  "content": [],
+  "pageRequest": {
+    "filtering": {
+      "filterCriteria": [
+        {
+          "expression": "predicate",
+          "nativeExpression": false,
+          "operation": "EQUALS",
+          "value": "is_part_of"
+        }
+      ]
+    },
+    "pageNumber": 0,
+    "pageSize": 1
+  },
+  "totalElements": 0
+}

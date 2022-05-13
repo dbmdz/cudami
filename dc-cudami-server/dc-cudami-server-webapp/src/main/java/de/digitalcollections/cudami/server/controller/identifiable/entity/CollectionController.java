@@ -175,7 +175,7 @@ public class CollectionController {
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v6/collections", "/v5/collections"},
+      value = {"/v6/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
   // if unknown)

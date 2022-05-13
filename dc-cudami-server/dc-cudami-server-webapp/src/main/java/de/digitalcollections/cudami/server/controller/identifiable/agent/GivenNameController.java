@@ -41,7 +41,7 @@ public class GivenNameController {
 
   @Operation(summary = "get all given names")
   @GetMapping(
-      value = {"/v6/givennames", "/v5/givennames"},
+      value = {"/v6/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

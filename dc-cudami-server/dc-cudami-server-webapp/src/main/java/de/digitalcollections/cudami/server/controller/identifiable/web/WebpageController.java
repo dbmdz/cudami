@@ -61,7 +61,7 @@ public class WebpageController {
 
   @Operation(summary = "Get all webpages")
   @GetMapping(
-      value = {"/v5/webpages", "/v2/webpages", "/latest/webpages"},
+      value = {"/v6/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

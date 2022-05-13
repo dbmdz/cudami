@@ -23,6 +23,32 @@ class V5WebpageControllerTest extends BaseControllerTest {
   @MockBean private LocaleService localeService;
   @MockBean private WebpageService webpageService;
 
+  @DisplayName("shall return a paged list of webpages ")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v5/webpages/?pageSize=1&pageNumber=0",
+        "/v2/webpages/?pageSize=1&pageNumber=0",
+        "/latest/webpages/?pageSize=1&pageNumber=0"
+      })
+  void testFindAll(String path) throws Exception {
+    PageResponse<Webpage> expected =
+        (PageResponse<Webpage>)
+            PageResponse.builder()
+                .forRequestPage(0)
+                .forPageSize(1)
+                .withTotalElements(0)
+                .forAscendingOrderedField("label", "de")
+                .forAscendingOrderedField("label")
+                .forAscendingOrderedField("uuid")
+                .withoutContent()
+                .build();
+
+    when(webpageService.find(any(PageRequest.class))).thenReturn(expected);
+
+    testJson(path, "/v5/webpages/find_with_empty_result.json");
+  }
+
   @DisplayName("shall return a paged list of webpages for a parent uuid")
   @ParameterizedTest
   @ValueSource(

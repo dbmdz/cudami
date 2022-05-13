@@ -54,7 +54,7 @@ public class WorkController {
 
   @Operation(summary = "get all works")
   @GetMapping(
-      value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},
+      value = {"/v6/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Work> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

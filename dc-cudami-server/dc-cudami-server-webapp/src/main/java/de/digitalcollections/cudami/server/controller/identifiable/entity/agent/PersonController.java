@@ -92,12 +92,7 @@ public class PersonController {
 
   @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
-      value = {
-        "/v6/persons/placeofbirth/{uuid}",
-        "/v5/persons/placeofbirth/{uuid}",
-        "/v2/persons/placeofbirth/{uuid}",
-        "/latest/persons/placeofbirth/{uuid}"
-      },
+      value = {"/v6/persons/placeofbirth/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfBirth(
       @Parameter(
@@ -119,12 +114,7 @@ public class PersonController {
 
   @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
-      value = {
-        "/v6/persons/placeofdeath/{uuid}",
-        "/v5/persons/placeofdeath/{uuid}",
-        "/v2/persons/placeofdeath/{uuid}",
-        "/latest/persons/placeofdeath/{uuid}"
-      },
+      value = {"/v6/persons/placeofdeath/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfDeath(
       @Parameter(

@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,6 +73,72 @@ public class V5PersonController {
       pageResponse = personService.findByLanguageAndInitial(searchPageRequest, language, initial);
     }
 
+    try {
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
+  }
+
+  @Operation(summary = "get all persons born at given geo location")
+  @GetMapping(
+      value = {
+        "/v5/persons/placeofbirth/{uuid}",
+        "/v2/persons/placeofbirth/{uuid}",
+        "/latest/persons/placeofbirth/{uuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> findByGeoLocationOfBirth(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the geo location of birth, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws CudamiControllerException {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<Person> pageResponse = personService.findByGeoLocationOfBirth(pageRequest, uuid);
+    try {
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
+  }
+
+  @Operation(summary = "get all persons died at given geo location")
+  @GetMapping(
+      value = {
+        "/v5/persons/placeofdeath/{uuid}",
+        "/v2/persons/placeofdeath/{uuid}",
+        "/latest/persons/placeofdeath/{uuid}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> findByGeoLocationOfDeath(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the geo location of death, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws CudamiControllerException {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<Person> pageResponse = personService.findByGeoLocationOfDeath(pageRequest, uuid);
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
