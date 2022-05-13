@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.openjson.JSONObject;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,15 +28,8 @@ class V5MigrationHelperTest {
 
   @DisplayName("does not modify a null pageresponse")
   @Test
-  public void nullPageResponse() throws JsonProcessingException {
-    String actual = V5MigrationHelper.migrateToV5((PageResponse) null, objectMapper);
-    assertThat(actual).isNull();
-  }
-
-  @DisplayName("does not modify a null JsonObject")
-  @Test
-  public void nullJsonObject() throws JsonProcessingException {
-    String actual = V5MigrationHelper.migrateToV5((JSONObject) null, objectMapper);
+  public void nullPageResult() throws JsonProcessingException {
+    String actual = V5MigrationHelper.migrate(null, objectMapper);
     assertThat(actual).isNull();
   }
 
@@ -44,7 +38,7 @@ class V5MigrationHelperTest {
   public void emptyPageResponse() throws JsonProcessingException {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).isNotNull();
     assertThat(actual).contains("pageRequest");
   }
@@ -57,7 +51,7 @@ class V5MigrationHelperTest {
     pageResponse.setPageRequest(pageRequest);
     pageResponse.setExecutedSearchTerm("hugo");
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("query\":\"hugo");
     assertThat(actual).doesNotContain("executedSearchTerm");
   }
@@ -70,7 +64,7 @@ class V5MigrationHelperTest {
         PageRequest.builder().search("blubb").pageSize(1).pageNumber(0).build();
     pageResponse.setPageRequest(pageRequest);
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("query\":\"blubb");
     assertThat(actual).doesNotContain("searchTerm");
   }
@@ -84,7 +78,7 @@ class V5MigrationHelperTest {
     pageResponse.setPageRequest(pageRequest);
     pageResponse.setExecutedSearchTerm("hugo");
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("query\":\"blubb");
     assertThat(actual).contains("query\":\"hugo");
     assertThat(actual).doesNotContain("searchTerm");
@@ -104,7 +98,7 @@ class V5MigrationHelperTest {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     pageResponse.setPageRequest(pageRequest);
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("ascending\":true");
     assertThat(actual).contains("descending\":false");
   }
@@ -125,7 +119,7 @@ class V5MigrationHelperTest {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     pageResponse.setPageRequest(pageRequest);
 
-    String actual = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("ascending\":true");
     assertThat(actual).contains("descending\":false");
     assertThat(actual).contains("ascending\":false");
@@ -134,4 +128,15 @@ class V5MigrationHelperTest {
 
   // TODO: NullHandling output
 
+  @Test
+  public void testMigrateOrderList() {
+    List<Order> list =
+        List.of(
+            new Order(Direction.DESC, false, NullHandling.NULLS_LAST, "prop1"),
+            new Order(Direction.DESC, true, NullHandling.NULLS_LAST, "prop1"));
+    List<Order> migratedList = V5MigrationHelper.migrate(list);
+    for (Order order : migratedList) {
+      assertThat(order.isIgnoreCase()).isTrue();
+    }
+  }
 }

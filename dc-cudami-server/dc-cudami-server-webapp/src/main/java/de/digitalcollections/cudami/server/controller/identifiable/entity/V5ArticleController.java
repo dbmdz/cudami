@@ -45,13 +45,14 @@ public class V5ArticleController {
       throws CudamiControllerException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);
+      Sorting sorting = new Sorting(migratedSortBy);
       pageRequest.setSorting(sorting);
     }
     PageResponse<Article> pageResponse = articleService.find(pageRequest);
 
     try {
-      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (JsonProcessingException e) {
       throw new CudamiControllerException(e);

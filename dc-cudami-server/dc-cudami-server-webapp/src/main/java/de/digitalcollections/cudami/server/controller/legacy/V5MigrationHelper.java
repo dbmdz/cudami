@@ -9,13 +9,29 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class V5MigrationHelper {
 
-  private V5MigrationHelper() {}
+  public static List<Order> migrate(List<Order> sortBy) {
+    List<Order> result = null;
+    if (sortBy != null) {
+      result =
+          sortBy.stream()
+              .map(
+                  o -> {
+                    o.setIgnoreCase(true);
+                    return o;
+                  })
+              .collect(Collectors.toList());
+    }
+    return result;
+  }
 
-  public static String migrateToV5(PageResponse<?> pageResponse, ObjectMapper objectMapper)
+  public static String migrate(PageResponse<?> pageResponse, ObjectMapper objectMapper)
       throws JsonProcessingException {
     if (pageResponse == null) {
       return null;
@@ -59,4 +75,6 @@ public class V5MigrationHelper {
 
     return migrateToV5(jsonObject.toString());
   }
+
+  private V5MigrationHelper() {}
 }

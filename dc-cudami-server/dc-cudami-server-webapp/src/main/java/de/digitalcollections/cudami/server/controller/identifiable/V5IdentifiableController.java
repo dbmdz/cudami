@@ -60,7 +60,7 @@ public class V5IdentifiableController {
       pageRequest.setSorting(sorting);
     }
     PageResponse<Identifiable> pageResponse = identifiableService.find(pageRequest);
-    String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+    String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 }

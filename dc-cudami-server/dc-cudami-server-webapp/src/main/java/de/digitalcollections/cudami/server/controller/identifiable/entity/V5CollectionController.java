@@ -71,7 +71,7 @@ public class V5CollectionController {
     }
 
     try {
-      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (JsonProcessingException e) {
       throw new CudamiControllerException(e);
@@ -97,7 +97,7 @@ public class V5CollectionController {
         collectionService.findDigitalObjects(collection, searchPageRequest);
 
     try {
-      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (JsonProcessingException e) {
       throw new CudamiControllerException(e);
@@ -130,7 +130,7 @@ public class V5CollectionController {
     }
 
     try {
-      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (JsonProcessingException e) {
       throw new CudamiControllerException(e);
@@ -154,7 +154,7 @@ public class V5CollectionController {
     }
     PageResponse<Collection> pageResponse = collectionService.findRootNodes(searchPageRequest);
     try {
-      String result = V5MigrationHelper.migrateToV5(pageResponse, objectMapper);
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (JsonProcessingException e) {
       throw new CudamiControllerException(e);
