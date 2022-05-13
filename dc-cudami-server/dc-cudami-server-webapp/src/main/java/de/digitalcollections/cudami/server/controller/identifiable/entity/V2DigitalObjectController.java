@@ -102,6 +102,7 @@ public class V2DigitalObjectController {
           "className", "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String migratedResult = V5MigrationHelper.migrateToV5(result, objectMapper);
+    return new ResponseEntity<>(migratedResult, HttpStatus.OK);
   }
 }

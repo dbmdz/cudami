@@ -107,9 +107,7 @@ public class V2ProjectController {
       project.put("className", "de.digitalcollections.model.impl.identifiable.entity.ProjectImpl");
     }
 
-    String resultStr = result.toString();
-
-    // TODO replace "query"
-    return new ResponseEntity<>(resultStr, HttpStatus.OK);
+    String migratedResult = V5MigrationHelper.migrateToV5(result, objectMapper);
+    return new ResponseEntity<>(migratedResult, HttpStatus.OK);
   }
 }

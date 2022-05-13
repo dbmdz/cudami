@@ -45,6 +45,40 @@ public class V5DigitalObjectController {
       summary =
           "Find limited amount of digital objects containing searchTerm in label or description")
   @GetMapping(
+      value = {"/v5/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<String> findWithLimit(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "parent.uuid", required = false)
+          FilterCriterion<UUID> parentUuidFilterCriterion)
+      throws CudamiControllerException {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
+      pageRequest.setSorting(sorting);
+    }
+    if (parentUuidFilterCriterion != null) {
+      parentUuidFilterCriterion.setExpression("parent.uuid");
+      pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
+    }
+
+    PageResponse<DigitalObject> pageResponse = digitalObjectService.find(pageRequest);
+
+    try {
+      String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
+      return new ResponseEntity<>(result, HttpStatus.OK);
+    } catch (JsonProcessingException e) {
+      throw new CudamiControllerException(e);
+    }
+  }
+
+  @Operation(
+      summary =
+          "Find limited amount of digital objects containing searchTerm in label or description")
+  @GetMapping(
       value = {
         "/v5/digitalobjects/search",
         "/v3/digitalobjects/search",

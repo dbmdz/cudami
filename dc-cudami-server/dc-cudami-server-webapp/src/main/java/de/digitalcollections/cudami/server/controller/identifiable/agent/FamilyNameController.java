@@ -41,7 +41,7 @@ public class FamilyNameController {
 
   @Operation(summary = "get all family names")
   @GetMapping(
-      value = {"/v6/familynames", "/v5/familynames"},
+      value = {"/v6/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FamilyName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

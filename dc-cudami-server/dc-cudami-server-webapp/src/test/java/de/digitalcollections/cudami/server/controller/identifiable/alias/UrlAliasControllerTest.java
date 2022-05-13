@@ -194,7 +194,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("can return a find result with empty content")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases"})
+  @ValueSource(strings = {"/v6/urlaliases"})
   public void findWithEmptyResult(String path) throws Exception {
     PageResponse<LocalizedUrlAliases> expected =
         (PageResponse<LocalizedUrlAliases>)
@@ -202,12 +202,12 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
     when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
-    testJson(path, "/v5/urlaliases/empty.json");
+    testJson(path, "/v6/urlaliases/empty.json");
   }
 
   @DisplayName("can return a find result with existing content")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases?pageNumber=0&pageSize=1"})
+  @ValueSource(strings = {"/v6/urlaliases?pageNumber=0&pageSize=1"})
   public void findWithFilledResult(String path) throws Exception {
     PageResponse<LocalizedUrlAliases> expected =
         (PageResponse<LocalizedUrlAliases>)
@@ -235,7 +235,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
     when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
-    testJson(path, "/v5/urlaliases/find_with_result.json");
+    testJson(path, "/v6/urlaliases/find_with_result.json");
   }
 
   @DisplayName(

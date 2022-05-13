@@ -174,6 +174,7 @@ public class V2CollectionController {
           "className", "de.digitalcollections.model.impl.identifiable.entity.CollectionImpl");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String migratedResult = V5MigrationHelper.migrateToV5(result, objectMapper);
+    return new ResponseEntity<>(migratedResult, HttpStatus.OK);
   }
 }
