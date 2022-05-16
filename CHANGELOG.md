@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Changed default sorting of identifiables in `dc-cudami-server-webapp` from `label` in default language to `lastModified` and `uuid`
 - Updated multiple dependencies
 - Normalize method names: `getBy` for returning one object, `findBy` for returning a list of objects, "set" for saving a list after deleting previous list
+- set default case sensitivity for sorting to `ignoreCase`
 
 ### Removed
 
