@@ -23,7 +23,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     client.findByLanguageAndInitial(1, 2, "label", "ASC", "NATIVE", "de", "a");
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=label.asc");
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=label.asc.ignorecase");
   }
 
   @Test
@@ -31,7 +31,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   public void testFindByLanguageInitialAndPagingAttributes() throws Exception {
     client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc.ignorecase");
   }
 
   @Test
@@ -42,7 +42,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
