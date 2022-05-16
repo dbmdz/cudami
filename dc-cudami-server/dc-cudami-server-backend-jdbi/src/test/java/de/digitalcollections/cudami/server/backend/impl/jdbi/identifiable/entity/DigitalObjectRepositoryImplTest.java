@@ -260,7 +260,8 @@ class DigitalObjectRepositoryImplTest {
     DigitalObject actual = actuals.get(0);
     assertThat(actual.getUuid()).isNotEqualTo(parent.getUuid()); // Because actual is the ADO
     assertThat(actual.getParent().getUuid())
-        .isEqualTo(parent.getUuid()); // Only the UUID of the parent is filled in a search result
+        .isEqualTo(
+            parent.getUuid()); // Only the UUID of the parent is filled in a searchTerm result
   }
 
   @Test

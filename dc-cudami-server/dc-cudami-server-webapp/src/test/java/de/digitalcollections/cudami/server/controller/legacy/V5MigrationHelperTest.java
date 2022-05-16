@@ -61,7 +61,7 @@ class V5MigrationHelperTest {
   public void renameSearchTerm() throws JsonProcessingException {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     PageRequest pageRequest =
-        PageRequest.builder().search("blubb").pageSize(1).pageNumber(0).build();
+        PageRequest.builder().searchTerm("blubb").pageSize(1).pageNumber(0).build();
     pageResponse.setPageRequest(pageRequest);
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -74,7 +74,7 @@ class V5MigrationHelperTest {
   public void renameSearchTermAndExecutedSearchTerm() throws JsonProcessingException {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     PageRequest pageRequest =
-        PageRequest.builder().search("blubb").pageSize(1).pageNumber(0).build();
+        PageRequest.builder().searchTerm("blubb").pageSize(1).pageNumber(0).build();
     pageResponse.setPageRequest(pageRequest);
     pageResponse.setExecutedSearchTerm("hugo");
 
