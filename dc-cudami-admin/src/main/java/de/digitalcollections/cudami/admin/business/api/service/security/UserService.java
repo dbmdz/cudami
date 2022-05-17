@@ -16,7 +16,7 @@ import org.springframework.validation.Errors;
  */
 public interface UserService<U extends User> extends UserDetailsService {
 
-  long count();
+  long count() throws ServiceException;
 
   U create();
 

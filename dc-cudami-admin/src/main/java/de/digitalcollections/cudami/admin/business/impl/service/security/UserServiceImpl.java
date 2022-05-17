@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsername
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -61,8 +62,12 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public long count() {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public long count() throws ServiceException {
+    try {
+      return client.count();
+    } catch (TechnicalException ex) {
+      throw new ServiceException(ex.getMessage(), ex);
+    }
   }
 
   @Override
@@ -93,10 +98,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   public boolean doesActiveAdminUserExist() throws ServiceException {
     try {
       List<User> findActiveAdminUsers = client.getActiveAdminUsers();
-      if (findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty()) {
-        return true;
-      }
-      return false;
+      return findActiveAdminUsers != null && !findActiveAdminUsers.isEmpty();
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
@@ -150,7 +152,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     User user;
     try {
       user = client.getByEmail(username);
-    } catch (TechnicalException ex) {
+    } catch (ResourceNotFoundException | TechnicalException ex) {
       throw new UsernameNotFoundException(
           String.format("User \"%s\" was not found.", username), ex);
     }
