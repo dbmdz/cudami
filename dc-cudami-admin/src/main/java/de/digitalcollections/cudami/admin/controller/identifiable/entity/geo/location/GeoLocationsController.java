@@ -6,10 +6,10 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -50,12 +50,12 @@ public class GeoLocationsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    return service.find(searchPageRequest);
+    return service.find(pageRequest);
   }
 
   @GetMapping("/geolocations")

@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -20,8 +20,14 @@ public interface UrlAliasRepository {
    */
   int delete(List<UUID> urlAliasUuids) throws UrlAliasRepositoryException;
 
-  /** Generic search method. */
-  SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest searchPageRequest)
+  /**
+   * Generic request method for getting a parametrized list.
+   *
+   * @param pageRequest request params for list
+   * @return pagable result list
+   * @throws UrlAliasRepositoryException
+   */
+  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
       throws UrlAliasRepositoryException;
 
   /**
@@ -71,6 +77,7 @@ public interface UrlAliasRepository {
   /**
    * Retrieve the {@code UrlAlias} with the supplied UUID (PK).
    *
+   * @param uuid UUID of url alias
    * @return the found {@code UrlAlias} or {@code null}
    * @throws UrlAliasRepositoryException
    */
@@ -82,6 +89,8 @@ public interface UrlAliasRepository {
    * @param slug not null
    * @param websiteUuid can be null
    * @param targetLanguage can be null
+   * @return true if slug of website has an url alias for given language
+   * @throws UrlAliasRepositoryException
    */
   boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
       throws UrlAliasRepositoryException;

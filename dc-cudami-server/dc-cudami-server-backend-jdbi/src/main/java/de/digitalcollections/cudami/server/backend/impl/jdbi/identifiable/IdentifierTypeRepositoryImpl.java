@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,18 +22,18 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
     implements IdentifierTypeRepository {
 
   public static final String MAPPING_PREFIX = "idt";
-  public static final String TABLE_ALIAS = "idt";
-  public static final String TABLE_NAME = "identifiertypes";
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, label, namespace, pattern, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :label, :namespace, :pattern, :lastModified";
+  public static final String TABLE_ALIAS = "idt";
   public static final String SQL_REDUCED_FIELDS_IDT =
       String.format(
           " %1$s.uuid, %1$s.created, %1$s.label, %1$s.namespace, %1$s.pattern, %1$s.last_modified",
           TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
+  public static final String TABLE_NAME = "identifiertypes";
 
   @Autowired
   public IdentifierTypeRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -52,7 +52,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
-    Map<String, Object> argumentMappings = new HashMap<>();
+    Map<String, Object> argumentMappings = new HashMap<>(0);
     // Actually "*" should be used in select, but here we don't need it as there is no outer select
     StringBuilder innerQuery =
         new StringBuilder(
@@ -86,6 +86,27 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("label", "namespace", "pattern"));
+  }
+
+  @Override
+  public IdentifierType getByNamespace(String namespace) {
+    final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
+
+    IdentifierType identifierType =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("namespace", namespace)
+                    .mapToBean(IdentifierType.class)
+                    .findOne()
+                    .orElse(null));
+
+    return identifierType;
+  }
+
+  @Override
   public IdentifierType getByUuid(UUID uuid) {
     final String sql =
         "SELECT "
@@ -109,28 +130,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType getByNamespace(String namespace) {
-    final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
-
-    IdentifierType identifierType =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("namespace", namespace)
-                    .mapToBean(IdentifierType.class)
-                    .findOne()
-                    .orElse(null));
-
-    return identifierType;
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("label", "namespace", "pattern"));
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

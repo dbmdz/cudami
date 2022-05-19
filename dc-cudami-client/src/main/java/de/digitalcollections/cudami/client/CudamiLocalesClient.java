@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.client;
 
+import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -10,11 +12,11 @@ import java.util.Locale;
 public class CudamiLocalesClient extends BaseRestClient<Locale> {
 
   public CudamiLocalesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Locale.class, mapper, "/v5/locales");
+    super(http, serverUrl, Locale.class, mapper, API_VERSION_PREFIX + "/locales");
   }
 
   public List<String> getAllLanguages() throws TechnicalException {
-    return doGetRequestForObjectList("/v5/languages", String.class);
+    return doGetRequestForObjectList(API_VERSION_PREFIX + "/languages", String.class);
   }
 
   @SuppressWarnings("unchecked")
@@ -23,7 +25,7 @@ public class CudamiLocalesClient extends BaseRestClient<Locale> {
   }
 
   public Locale getDefaultLanguage() throws TechnicalException {
-    return doGetRequestForObject("/v5/languages/default");
+    return doGetRequestForObject(API_VERSION_PREFIX + "/languages/default");
   }
 
   public String getDefaultLocale() throws TechnicalException {

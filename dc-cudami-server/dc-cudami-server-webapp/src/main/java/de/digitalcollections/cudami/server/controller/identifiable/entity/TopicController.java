@@ -4,16 +4,15 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,6 +49,7 @@ public class TopicController {
   @Operation(summary = "Add an existing topic to an existing parent topic")
   @PostMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/v5/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/v3/topics/{parentTopicUuid}/subtopic/{subtopicUuid}",
         "/latest/topics/{parentTopicUuid}/subtopic/{subtopicUuid}"
@@ -72,7 +72,7 @@ public class TopicController {
 
   @Operation(summary = "Get count of topics")
   @GetMapping(
-      value = {"/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
+      value = {"/v6/topics/count", "/v5/topics/count", "/v2/topics/count", "/latest/topics/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return topicService.count();
@@ -80,14 +80,14 @@ public class TopicController {
 
   @Operation(summary = "Get all topics")
   @GetMapping(
-      value = {"/v5/topics", "/v2/topics", "/latest/topics"},
+      value = {"/v6/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -95,16 +95,66 @@ public class TopicController {
     return topicService.find(pageRequest);
   }
 
+  @Operation(summary = "Get paged entities of a topic")
+  @GetMapping(
+      value = {"/v6/topics/{uuid}/entities"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Entity> findEntities(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
+    if (entityType != null) {
+      Filtering filtering = Filtering.builder().add("entityType", entityType).build();
+      pageRequest.setFiltering(filtering);
+    }
+    return topicService.findEntities(topicUuid, pageRequest);
+  }
+
+  @Operation(summary = "Get file resources of topic")
+  @GetMapping(
+      value = {"/v6/topics/{uuid}/fileresources"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<FileResource> findFileResources(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
+    return topicService.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+  }
+
+  @Operation(summary = "Get paged subtopics of a topic")
+  @GetMapping(
+      value = {
+        "/v6/topics/{uuid}/subtopics",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Topic> findSubtopics(
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    return topicService.findChildren(topicUuid, searchPageRequest);
+  }
+
   @Operation(summary = "Get all top topics")
   @GetMapping(
-      value = {"/v5/topics/top", "/v3/topics/top", "/latest/topics/top"},
+      value = {"/v6/topics/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> findTopTopics(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -115,6 +165,7 @@ public class TopicController {
   @Operation(summary = "Get the breadcrumb for a topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/breadcrumb",
         "/v5/topics/{uuid}/breadcrumb",
         "/v3/topics/{uuid}/breadcrumb",
         "/latest/topics/{uuid}/breadcrumb"
@@ -152,6 +203,7 @@ public class TopicController {
   @Operation(summary = "Get topic by refId")
   @GetMapping(
       value = {
+        "/v6/topics/{refId:[0-9]+}",
         "/v5/topics/{refId:[0-9]+}",
         "/v3/topics/{refId:[0-9]+}",
         "/latest/topics/{refId:[0-9]+}"
@@ -169,6 +221,7 @@ public class TopicController {
   @Operation(summary = "Get topic by uuid (and optional locale)")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -199,6 +252,7 @@ public class TopicController {
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/children",
         "/v5/topics/{uuid}/children",
         "/v3/topics/{uuid}/children",
         "/latest/topics/{uuid}/children"
@@ -211,6 +265,7 @@ public class TopicController {
   @Operation(summary = "Get all entities of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/entities/all",
         "/v5/topics/{uuid}/entities/all",
         "/v3/topics/{uuid}/entities/all",
         "/latest/topics/{uuid}/entities/all"
@@ -221,46 +276,9 @@ public class TopicController {
     return topicService.getEntities(uuid);
   }
 
-  @Operation(summary = "Get paged entities of a topic")
-  @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/entities",
-        "/v3/topics/{uuid}/entities",
-        "/latest/topics/{uuid}/entities"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Entity> findEntities(
-      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
-          UUID topicUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
-    if (entityType != null) {
-      Filtering filtering = Filtering.builder().add("entityType", entityType).build();
-      pageRequest.setFiltering(filtering);
-    }
-    return topicService.findEntities(topicUuid, pageRequest);
-  }
-
-  @Operation(summary = "Get file resources of topic")
-  @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/fileresources",
-        "/v3/topics/{uuid}/fileresources",
-        "/latest/topics/{uuid}/fileresources"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<FileResource> findFileResources(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    return topicService.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
-  }
-
   @Operation(summary = "Get all languages of entities of a topic")
   @GetMapping(
-      value = "/v5/topics/{uuid}/entities/languages",
+      value = {"/v6/topics/{uuid}/entities/languages", "/v5/topics/{uuid}/entities/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) {
     return this.topicService.getLanguagesOfEntities(uuid);
@@ -268,7 +286,10 @@ public class TopicController {
 
   @Operation(summary = "Get all languages of file resources of a topic")
   @GetMapping(
-      value = "/v5/topics/{uuid}/fileresources/languages",
+      value = {
+        "/v6/topics/{uuid}/fileresources/languages",
+        "/v5/topics/{uuid}/fileresources/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) {
     return this.topicService.getLanguagesOfFileResources(uuid);
@@ -277,6 +298,7 @@ public class TopicController {
   @Operation(summary = "Get parent topic of topic")
   @GetMapping(
       value = {
+        "/v6/topics/{uuid}/parent",
         "/v5/topics/{uuid}/parent",
         "/v3/topics/{uuid}/parent",
         "/latest/topics/{uuid}/parent"
@@ -284,27 +306,6 @@ public class TopicController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   Topic getParent(@PathVariable UUID uuid) {
     return topicService.getParent(uuid);
-  }
-
-  @Operation(summary = "Get paged subtopics of a topic")
-  @GetMapping(
-      value = {
-        "/v5/topics/{uuid}/subtopics",
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Topic> findSubtopics(
-      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
-          UUID topicUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return topicService.findChildren(topicUuid, searchPageRequest);
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -320,6 +321,7 @@ public class TopicController {
   @Operation(summary = "Get languages of all top topics")
   @GetMapping(
       value = {
+        "/v6/topics/top/languages",
         "/v5/topics/top/languages",
         "/v3/topics/top/languages",
         "/latest/topics/top/languages"
@@ -332,6 +334,7 @@ public class TopicController {
   @Operation(summary = "Get topics an entity is linked to")
   @GetMapping(
       value = {
+        "/v6/topics/entity/{uuid}",
         "/v5/topics/entity/{uuid}",
         "/v3/topics/entity/{uuid}",
         "/latest/topics/entity/{uuid}"
@@ -344,6 +347,7 @@ public class TopicController {
   @Operation(summary = "Get topics a fileresource is linked to")
   @GetMapping(
       value = {
+        "/v6/topics/fileresource/{uuid}",
         "/v5/topics/fileresource/{uuid}",
         "/v3/topics/fileresource/{uuid}",
         "/latest/topics/fileresource/{uuid}"
@@ -356,6 +360,7 @@ public class TopicController {
   @Operation(summary = "Remove child-relation of the given subtopic to the given parent topic")
   @DeleteMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/v5/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/v3/topics/{parentTopicUuid}/children/{subtopicUuid}",
         "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}"
@@ -376,41 +381,17 @@ public class TopicController {
 
   @Operation(summary = "Save a newly created topic")
   @PostMapping(
-      value = {"/v5/topics", "/v2/topics", "/latest/topics"},
+      value = {"/v6/topics", "/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
     return topicService.save(topic);
   }
 
-  @Operation(summary = "Save entities of topic")
-  @PostMapping(
-      value = {
-        "/v5/topics/{uuid}/entities",
-        "/v3/topics/{uuid}/entities",
-        "/latest/topics/{uuid}/entities"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
-    return topicService.setEntities(uuid, entities);
-  }
-
-  @Operation(summary = "Save fileresources of topic")
-  @PostMapping(
-      value = {
-        "/v5/topics/{uuid}/fileresources",
-        "/v3/topics/{uuid}/fileresources",
-        "/latest/topics/{uuid}/fileresources"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> setFileresources(
-      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
-    return topicService.setFileResources(uuid, fileResources);
-  }
-
   @Operation(summary = "Save a newly created topic and add it to parent")
   @PostMapping(
       value = {
+        "/v6/topics/{parentTopicUuid}/subtopic",
         "/v5/topics/{parentTopicUuid}/subtopic",
         "/v3/topics/{parentTopicUuid}/subtopic",
         "/latest/topics/{parentTopicUuid}/subtopic"
@@ -426,9 +407,41 @@ public class TopicController {
     return topicService.saveWithParent(topic, parentTopicUuid);
   }
 
+  @Operation(summary = "Save entities of topic")
+  @PostMapping(
+      value = {
+        "/v6/topics/{uuid}/entities",
+        "/v5/topics/{uuid}/entities",
+        "/v3/topics/{uuid}/entities",
+        "/latest/topics/{uuid}/entities"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
+    return topicService.setEntities(uuid, entities);
+  }
+
+  @Operation(summary = "Save fileresources of topic")
+  @PostMapping(
+      value = {
+        "/v6/topics/{uuid}/fileresources",
+        "/v5/topics/{uuid}/fileresources",
+        "/v3/topics/{uuid}/fileresources",
+        "/latest/topics/{uuid}/fileresources"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<FileResource> setFileresources(
+      @PathVariable UUID uuid, @RequestBody List<FileResource> fileResources) {
+    return topicService.setFileResources(uuid, fileResources);
+  }
+
   @Operation(summary = "Update a topic")
   @PutMapping(
-      value = {"/v5/topics/{uuid}", "/v2/topics/{uuid}", "/latest/topics/{uuid}"},
+      value = {
+        "/v6/topics/{uuid}",
+        "/v5/topics/{uuid}",
+        "/v2/topics/{uuid}",
+        "/latest/topics/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {

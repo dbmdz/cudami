@@ -3,20 +3,18 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,6 +48,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get count of digital objects")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/count",
         "/v5/digitalobjects/count",
         "/v2/digitalobjects/count",
         "/latest/digitalobjects/count"
@@ -62,6 +61,7 @@ public class DigitalObjectController {
   @Operation(summary = "Delete a digital object with all its relations")
   @DeleteMapping(
       value = {
+        "/v6/digitalobjects/{uuid}",
         "/v5/digitalobjects/{uuid}",
         "/v2/digitalobjects/{uuid}",
         "/latest/digitalobjects/{uuid}"
@@ -82,17 +82,20 @@ public class DigitalObjectController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Get all digital objects")
+  @Operation(
+      summary =
+          "Find limited amount of digital objects containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v5/digitalobjects"},
+      value = {"/v6/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "parent.uuid", required = false)
           FilterCriterion<UUID> parentUuidFilterCriterion) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -101,7 +104,25 @@ public class DigitalObjectController {
       parentUuidFilterCriterion.setExpression("parent.uuid");
       pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
     }
+
     return digitalObjectService.find(pageRequest);
+  }
+
+  @Operation(summary = "Get paged projects of a digital objects")
+  @GetMapping(
+      value = {"/v6/digitalobjects/{uuid}/projects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Project> findProjects(
+      @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+
+    DigitalObject digitalObject = new DigitalObject();
+    digitalObject.setUuid(uuid);
+    return digitalObjectService.findProjects(digitalObject, searchPageRequest);
   }
 
   @Operation(
@@ -109,6 +130,7 @@ public class DigitalObjectController {
           "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/reduced",
         "/v5/digitalobjects/reduced",
         "/v3/digitalobjects/reduced",
         "/latest/digitalobjects/reduced"
@@ -118,64 +140,11 @@ public class DigitalObjectController {
     return digitalObjectService.getAllReduced();
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of digital objects containing searchTerm in label or description")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/search",
-        "/v3/digitalobjects/search",
-        "/latest/digitalobjects/search"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (parentUuidFilterCriterion != null) {
-      parentUuidFilterCriterion.setExpression("parent.uuid");
-      pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
-    }
-
-    return digitalObjectService.find(pageRequest);
-  }
-
-  @Operation(summary = "Get item for digital object by digital object uuid")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/{uuid}/item",
-        "/v2/digitalobjects/{uuid}/item",
-        "/latest/digitalobjects/{uuid}/item"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Item getItem(@PathVariable UUID uuid) {
-    return digitalObjectService.getItem(uuid);
-  }
-
-  @Operation(summary = "Find limited amount of random digital objects")
-  @GetMapping(
-      value = {
-        "/v5/digitalobjects/random",
-        "/v2/digitalobjects/random",
-        "/latest/digitalobjects/random"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<DigitalObject> getRandomDigitalObjects(
-      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return digitalObjectService.getRandom(count);
-  }
-
   @Operation(summary = "Get digital object by namespace and id")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/identifier/{namespace}:{id}",
+        "/v6/digitalobjects/identifier/{namespace}:{id}.json",
         "/v5/digitalobjects/identifier/{namespace}:{id}",
         "/v5/digitalobjects/identifier/{namespace}:{id}.json",
         "/v2/digitalobjects/identifier/{namespace}:{id}",
@@ -205,6 +174,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get a digital object by uuid")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -216,7 +186,7 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get (active or all) paged collections of a digital objects")
   @GetMapping(
-      value = {"/v5/digitalobjects/{uuid}/collections"},
+      value = {"/v6/digitalobjects/{uuid}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> getCollections(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -225,7 +195,7 @@ public class DigitalObjectController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
@@ -238,6 +208,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get file resources of a digital object")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources",
         "/v5/digitalobjects/{uuid}/fileresources",
         "/v2/digitalobjects/{uuid}/fileresources",
         "/latest/digitalobjects/{uuid}/fileresources"
@@ -250,6 +221,7 @@ public class DigitalObjectController {
   @Operation(summary = "Get image file resources of a digital object")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources/images",
         "/v5/digitalobjects/{uuid}/fileresources/images",
         "/v2/digitalobjects/{uuid}/fileresources/images",
         "/latest/digitalobjects/{uuid}/fileresources/images"
@@ -259,9 +231,23 @@ public class DigitalObjectController {
     return digitalObjectService.getImageFileResources(uuid);
   }
 
+  @Operation(summary = "Get item for digital object by digital object uuid")
+  @GetMapping(
+      value = {
+        "/v6/digitalobjects/{uuid}/item",
+        "/v5/digitalobjects/{uuid}/item",
+        "/v2/digitalobjects/{uuid}/item",
+        "/latest/digitalobjects/{uuid}/item"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Item getItem(@PathVariable UUID uuid) {
+    return digitalObjectService.getItem(uuid);
+  }
+
   @Operation(summary = "Get languages of all digital objects")
   @GetMapping(
       value = {
+        "/v6/digitalobjects/languages",
         "/v5/digitalobjects/languages",
         "/v3/digitalobjects/languages",
         "/latest/digitalobjects/languages"
@@ -273,7 +259,10 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all languages of a digital object's collections")
   @GetMapping(
-      value = "/v5/digitalobjects/{uuid}/collections/languages",
+      value = {
+        "/v6/digitalobjects/{uuid}/collections/languages",
+        "/v5/digitalobjects/{uuid}/collections/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
     return this.digitalObjectService.getLanguagesOfCollections(uuid);
@@ -281,32 +270,37 @@ public class DigitalObjectController {
 
   @Operation(summary = "Get all languages of a digital object's projects")
   @GetMapping(
-      value = "/v5/digitalobjects/{uuid}/projects/languages",
+      value = {
+        "/v6/digitalobjects/{uuid}/projects/languages",
+        "/v5/digitalobjects/{uuid}/projects/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
     return this.digitalObjectService.getLanguagesOfProjects(uuid);
   }
 
-  @Operation(summary = "Get paged projects of a digital objects")
+  @Operation(summary = "Find limited amount of random digital objects")
   @GetMapping(
-      value = {"/v5/digitalobjects/{uuid}/projects"},
+      value = {
+        "/v6/digitalobjects/random",
+        "/v5/digitalobjects/random",
+        "/v2/digitalobjects/random",
+        "/latest/digitalobjects/random"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Project> findProjects(
-      @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setUuid(uuid);
-    return digitalObjectService.findProjects(digitalObject, searchPageRequest);
+  public List<DigitalObject> getRandomDigitalObjects(
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+    return digitalObjectService.getRandom(count);
   }
 
   @Operation(summary = "Save a newly created digital object")
   @PostMapping(
-      value = {"/v5/digitalobjects", "/v2/digitalobjects", "/latest/digitalobjects"},
+      value = {
+        "/v6/digitalobjects",
+        "/v5/digitalobjects",
+        "/v2/digitalobjects",
+        "/latest/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -316,6 +310,7 @@ public class DigitalObjectController {
   @Operation(summary = "Save list of fileresources for a given digital object")
   @PostMapping(
       value = {
+        "/v6/digitalobjects/{uuid}/fileresources",
         "/v5/digitalobjects/{uuid}/fileresources",
         "/v3/digitalobjects/{uuid}/fileresources",
         "/latest/digitalobjects/{uuid}/fileresources"
@@ -331,6 +326,7 @@ public class DigitalObjectController {
   @Operation(summary = "Update a digital object")
   @PutMapping(
       value = {
+        "/v6/digitalobjects/{uuid}",
         "/v5/digitalobjects/{uuid}",
         "/v2/digitalobjects/{uuid}",
         "/latest/digitalobjects/{uuid}"

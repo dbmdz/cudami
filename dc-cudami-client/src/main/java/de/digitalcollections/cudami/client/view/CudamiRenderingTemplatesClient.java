@@ -8,6 +8,11 @@ import java.net.http.HttpClient;
 public class CudamiRenderingTemplatesClient extends CudamiRestClient<RenderingTemplate> {
 
   public CudamiRenderingTemplatesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, RenderingTemplate.class, mapper, "/v5/renderingtemplates");
+    super(
+        http,
+        serverUrl,
+        RenderingTemplate.class,
+        mapper,
+        API_VERSION_PREFIX + "/renderingtemplates");
   }
 }

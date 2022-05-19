@@ -4,16 +4,15 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -62,7 +61,7 @@ public class WebpageController {
 
   @Operation(summary = "Get all webpages")
   @GetMapping(
-      value = {"/v5/webpages", "/v2/webpages", "/latest/webpages"},
+      value = {"/v6/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -84,6 +83,34 @@ public class WebpageController {
             .build();
     pageRequest.setFiltering(filtering);
     return webpageService.find(pageRequest);
+  }
+
+  @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
+  @GetMapping(
+      value = {"/v6/webpages/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Webpage> findSubpages(
+      @Parameter(
+              example = "",
+              description =
+                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws IdentifiableServiceException {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    if (active != null) {
+      return webpageService.findActiveChildren(uuid, searchPageRequest);
+    }
+    return webpageService.findChildren(uuid, searchPageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a webpage")
@@ -124,18 +151,6 @@ public class WebpageController {
     return new ResponseEntity<>(breadcrumbNavigation, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get file resources related to webpage")
-  @GetMapping(
-      value = {
-        "/v5/webpages/{uuid}/related/fileresources",
-        "/v2/webpages/{uuid}/related/fileresources",
-        "/latest/webpages/{uuid}/related/fileresources"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return webpageService.getRelatedFileResources(uuid);
-  }
-
   @Operation(summary = "Get a webpage by uuid")
   @GetMapping(
       value = {"/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
@@ -172,34 +187,6 @@ public class WebpageController {
       }
     }
     return new ResponseEntity<>(webpage, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
-  @GetMapping(
-      value = {"/v5/webpages/{uuid}/children"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Webpage> findSubpages(
-      @Parameter(
-              example = "",
-              description =
-                  "UUID of the parent webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws IdentifiableServiceException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (active != null) {
-      return webpageService.findActiveChildren(uuid, searchPageRequest);
-    }
-    return webpageService.findChildren(uuid, searchPageRequest);
   }
 
   @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")
@@ -239,6 +226,18 @@ public class WebpageController {
           UUID uuid)
       throws IdentifiableServiceException {
     return webpageService.getParent(uuid);
+  }
+
+  @Operation(summary = "Get file resources related to webpage")
+  @GetMapping(
+      value = {
+        "/v5/webpages/{uuid}/related/fileresources",
+        "/v2/webpages/{uuid}/related/fileresources",
+        "/latest/webpages/{uuid}/related/fileresources"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+    return webpageService.getRelatedFileResources(uuid);
   }
 
   @Operation(summary = "Get website of a webpage as JSON")

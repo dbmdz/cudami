@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -94,7 +94,7 @@ public class LicenseControllerTest extends BaseControllerTest {
             .build();
     when(licenseService.find(any(PageRequest.class))).thenReturn(pageResponse);
 
-    testJson("/v5/licenses?pageNumber=0&pageSize=1", "/v5/legal/licenses/find_with_result.json");
+    testJson("/v6/licenses?pageNumber=0&pageSize=1", "/v6/legal/licenses/find_with_result.json");
   }
 
   @Test

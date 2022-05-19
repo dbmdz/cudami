@@ -15,13 +15,11 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.HashSet;
 import java.util.List;
@@ -113,14 +111,15 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public SearchPageResponse<I> find(SearchPageRequest searchPageRequest) {
-    setDefaultSorting(searchPageRequest);
-    return repository.find(searchPageRequest);
+  public List<I> find(String searchTerm, int maxResults) {
+    return repository.find(searchTerm, maxResults);
   }
 
   @Override
-  public List<I> find(String searchTerm, int maxResults) {
-    return repository.find(searchTerm, maxResults);
+  public PageResponse<I> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial) {
+    PageResponse<I> result = repository.findByLanguageAndInitial(pageRequest, language, initial);
+    return result;
   }
 
   @Override
@@ -131,13 +130,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public List<I> getAllReduced() {
     return repository.getAllReduced();
-  }
-
-  @Override
-  public PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
-    PageResponse<I> result = repository.findByLanguageAndInitial(pageRequest, language, initial);
-    return result;
   }
 
   @Override
@@ -265,6 +257,15 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
   }
 
+  protected void setDefaultSorting(PageRequest pageRequest) {
+    // business logic: default sorting if no other sorting given: lastModified descending, uuid
+    // ascending
+    if (!pageRequest.hasSorting()) {
+      Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
+      pageRequest.setSorting(sorting);
+    }
+  }
+
   @Override
   public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
     return repository.setRelatedEntities(identifiableUuid, entities);
@@ -274,15 +275,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources) {
     return repository.setRelatedFileResources(identifiableUuid, fileResources);
-  }
-
-  protected void setDefaultSorting(PageRequest pageRequest) {
-    // business logic: default sorting if no other sorting given: lastModified descending, uuid
-    // ascending
-    if (!pageRequest.hasSorting()) {
-      Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
-      pageRequest.setSorting(sorting);
-    }
   }
 
   @Override

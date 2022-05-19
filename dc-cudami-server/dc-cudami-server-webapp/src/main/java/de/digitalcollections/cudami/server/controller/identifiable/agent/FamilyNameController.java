@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,15 +41,16 @@ public class FamilyNameController {
 
   @Operation(summary = "get all family names")
   @GetMapping(
-      value = {"/v5/familynames"},
+      value = {"/v6/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FamilyName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -63,6 +64,8 @@ public class FamilyNameController {
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
       value = {
+        "/v6/familynames/identifier/{namespace}:{id}",
+        "/v6/familynames/identifier/{namespace}:{id}.json",
         "/v5/familynames/identifier/{namespace}:{id}",
         "/v5/familynames/identifier/{namespace}:{id}.json"
       },
@@ -75,7 +78,7 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by namespace and id")
   @GetMapping(
-      value = {"/v5/familynames/identifier"},
+      value = {"/v6/familynames/identifier", "/v5/familynames/identifier"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -89,7 +92,7 @@ public class FamilyNameController {
 
   @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
-      value = {"/v5/familynames/{uuid}"},
+      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByUuid(
       @Parameter(
@@ -117,7 +120,7 @@ public class FamilyNameController {
 
   @Operation(summary = "save a newly created family")
   @PostMapping(
-      value = {"/v5/familynames"},
+      value = {"/v6/familynames", "/v5/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -126,7 +129,7 @@ public class FamilyNameController {
 
   @Operation(summary = "update a familyname")
   @PutMapping(
-      value = {"/v5/familynames/{uuid}"},
+      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)

@@ -6,10 +6,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,7 +41,7 @@ public class UrlAliasController {
 
   @Operation(summary = "Create and persist an UrlAlias")
   @PostMapping(
-      value = {"/v5/urlaliases"},
+      value = {"/v6/urlaliases", "/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
       throws CudamiControllerException {
@@ -63,6 +63,7 @@ public class UrlAliasController {
   @Operation(summary = "Delete an UrlAlias by uuid")
   @DeleteMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       })
   public ResponseEntity<Void> delete(
@@ -90,21 +91,21 @@ public class UrlAliasController {
       summary =
           "Find limited amounts of LocalizedUrlAliases. If the searchTerm is used, the slugs to be returned have to match the searchTerm")
   @GetMapping(
-      value = {"/v5/urlaliases"},
+      value = {"/v6/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<SearchPageResponse<LocalizedUrlAliases>> find(
+  public ResponseEntity<PageResponse<LocalizedUrlAliases>> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws CudamiControllerException {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
 
-    SearchPageResponse<LocalizedUrlAliases> result;
+    PageResponse<LocalizedUrlAliases> result;
     try {
       result = urlAliasService.find(pageRequest);
     } catch (CudamiServiceException e) {
@@ -117,6 +118,8 @@ public class UrlAliasController {
   @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
   @GetMapping(
       value = {
+        "/v6/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/slug/{pLocale}/{label}",
         "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/slug/{pLocale}/{label}"
       },
@@ -156,6 +159,7 @@ public class UrlAliasController {
   @Operation(summary = "Get an UrlAlias by uuid")
   @GetMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -186,6 +190,8 @@ public class UrlAliasController {
           "Get the primary LocalizedUrlAliases for a given website uuid (null if empty) and slug, and optionally filtered by a locale")
   @GetMapping(
       value = {
+        "/v6/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/primary/{slug}",
         "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/primary/{slug}"
       },
@@ -224,6 +230,7 @@ public class UrlAliasController {
   @Operation(summary = "update an UrlAlias")
   @PutMapping(
       value = {
+        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)

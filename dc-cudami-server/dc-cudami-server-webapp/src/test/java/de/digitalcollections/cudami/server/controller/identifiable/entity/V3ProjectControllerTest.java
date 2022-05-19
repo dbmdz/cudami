@@ -8,8 +8,8 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,9 +29,9 @@ public class V3ProjectControllerTest extends BaseControllerTest {
         "/v3/projects/d0e3ce0f-f030-4c7f-8f78-5606173f1a11/digitalobjects?pageNumber=0&pageSize=1"
       })
   public void getDigitalObjectsForProject(String path) throws Exception {
-    SearchPageResponse<DigitalObject> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<DigitalObject> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forPageSize(1)
                 .forRequestPage(0)
                 .withTotalElements(45)
@@ -54,7 +54,7 @@ public class V3ProjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(projectService.findDigitalObjects(any(Project.class), any(SearchPageRequest.class)))
+    when(projectService.findDigitalObjects(any(Project.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

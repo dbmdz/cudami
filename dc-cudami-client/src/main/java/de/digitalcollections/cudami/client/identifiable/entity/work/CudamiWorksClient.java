@@ -15,7 +15,7 @@ import java.util.UUID;
 public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
 
   public CudamiWorksClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Work.class, mapper, "/v5/works");
+    super(http, serverUrl, Work.class, mapper, API_VERSION_PREFIX + "/works");
   }
 
   public Set<Agent> getCreators(UUID uuid) throws TechnicalException {

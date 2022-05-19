@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> {
 
+  public static final String API_VERSION_PREFIX = "/v6";
   private static final Logger LOGGER = LoggerFactory.getLogger(CudamiRestClient.class);
 
   public CudamiRestClient(

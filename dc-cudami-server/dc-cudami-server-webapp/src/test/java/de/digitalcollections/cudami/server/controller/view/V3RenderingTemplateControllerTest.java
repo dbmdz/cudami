@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;

@@ -65,7 +65,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${version.maven-failsafe-plugin}</version>
+        <version>3.0.0-M6</version>
         <configuration>
           <skipITs>${skipIntegrationTests}</skipITs>
         </configuration>
@@ -81,7 +81,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>${version.maven-failsafe-plugin}</version>
+            <version>3.0.0-M6</version>
             <executions>
               <execution>
                 <goals>

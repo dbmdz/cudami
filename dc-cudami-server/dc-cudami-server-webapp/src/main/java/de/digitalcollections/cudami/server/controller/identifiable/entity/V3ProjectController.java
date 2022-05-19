@@ -7,9 +7,9 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -84,8 +84,7 @@ public class V3ProjectController {
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(null, pageNumber, pageSize, new Sorting());
+    PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize, new Sorting());
 
     Project project = new Project();
     project.setUuid(projectUuid);
@@ -101,6 +100,9 @@ public class V3ProjectController {
           "className", "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 }

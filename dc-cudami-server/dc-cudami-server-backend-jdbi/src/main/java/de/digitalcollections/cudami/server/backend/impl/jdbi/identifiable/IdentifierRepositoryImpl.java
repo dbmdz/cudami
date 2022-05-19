@@ -4,10 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +18,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements IdentifierRepository {
@@ -71,20 +70,36 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
 
   @Override
   public PageResponse<Identifier> find(PageRequest pageRequest) {
-    Map<String, Object> argumentMappings = new HashMap<>();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT " + SQL_REDUCED_FIELDS_ID + " FROM " + tableName + " AS " + tableAlias);
+    String selectSql =
+        "SELECT " + SQL_REDUCED_FIELDS_ID + " FROM " + tableName + " AS " + tableAlias;
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    // handle search term
+    String searchTerm = pageRequest.getSearchTerm();
+    final boolean hasSearchTerm = StringUtils.hasText(searchTerm);
+    String executedSearchTerm = null;
+    if (hasSearchTerm) {
+      // select with search term
+      selectSql += " WHERE namespace ILIKE '%' || :searchTerm || '%'";
+      executedSearchTerm = searchTerm;
+      argumentMappings.put("searchTerm", executedSearchTerm);
+    }
+
+    StringBuilder innerQuery = new StringBuilder(selectSql);
     addFiltering(pageRequest, innerQuery, argumentMappings);
     addPageRequestParams(pageRequest, innerQuery);
 
     final String sql = innerQuery.toString();
-
     List<Identifier> result =
         dbi.withHandle(
             h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Identifier.class).list());
 
-    StringBuilder sqlCount = new StringBuilder("SELECT count(*) FROM " + tableName);
+    String countSql = "SELECT count(*) FROM " + tableName;
+    if (hasSearchTerm) {
+      // select with search term
+      countSql += " WHERE namespace ILIKE '%' || :searchTerm || '%'";
+    }
+    StringBuilder sqlCount = new StringBuilder(countSql);
     addFiltering(pageRequest, sqlCount, argumentMappings);
     long total =
         dbi.withHandle(
@@ -96,51 +111,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                     .get());
 
     return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public SearchPageResponse<Identifier> find(SearchPageRequest searchPageRequest) {
-    Map<String, Object> argumentMappings = new HashMap<>();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT "
-                + SQL_REDUCED_FIELDS_ID
-                + " FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-    addPageRequestParams(searchPageRequest, innerQuery);
-
-    final String sql = innerQuery.toString();
-
-    List<Identifier> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("searchTerm", searchPageRequest.getQuery())
-                    .bindMap(argumentMappings)
-                    .mapTo(Identifier.class)
-                    .list());
-
-    StringBuilder countQuery =
-        new StringBuilder(
-            "SELECT count(*) FROM "
-                + tableName
-                + " WHERE namespace ILIKE '%' || :searchTerm || '%'");
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(countQuery.toString())
-                    .bind("searchTerm", searchPageRequest.getQuery())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-
-    return new SearchPageResponse<>(result, searchPageRequest, total);
   }
 
   @Override
@@ -191,7 +161,29 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public Identifier getByUuid(UUID identifierUuid) {
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_ID
+            + " FROM "
+            + tableName
+            + " "
+            + tableAlias
+            + " WHERE uuid = :uuid";
+
+    Identifier result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("uuid", identifierUuid)
+                    .mapTo(Identifier.class)
+                    .findOne()
+                    .orElse(null));
+    return result;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -241,28 +233,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
                 h.createQuery(sql)
                     .bindBean(identifier)
                     .mapToBean(Identifier.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
-  }
-
-  @Override
-  public Identifier getByUuid(UUID identifierUuid) {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_ID
-            + " FROM "
-            + tableName
-            + " "
-            + tableAlias
-            + " WHERE uuid = :uuid";
-
-    Identifier result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", identifierUuid)
-                    .mapTo(Identifier.class)
                     .findOne()
                     .orElse(null));
     return result;

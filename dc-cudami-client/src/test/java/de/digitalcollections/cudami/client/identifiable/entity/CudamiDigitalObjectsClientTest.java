@@ -37,27 +37,27 @@ class CudamiDigitalObjectsClientTest
   }
 
   @Test
-  @DisplayName("can retrieve active collections of a DigitalObject by a SearchPageRequest")
-  public void testGetActiveCollectionsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve active collections of a DigitalObject by a PageRequest")
+  public void testGetActiveCollectionsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findActiveCollections(uuid, buildExampleSearchPageRequest());
+    client.findActiveCollections(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
             + uuid
-            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&searchTerm=foo");
+            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
-  @DisplayName("can retrieve collections of a DigitalObject by a SearchPageRequest")
-  public void testGetCollectionsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve collections of a DigitalObject by a PageRequest")
+  public void testGetCollectionsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findCollections(uuid, buildExampleSearchPageRequest());
+    client.findCollections(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
             + uuid
-            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&searchTerm=foo");
+            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
@@ -110,15 +110,15 @@ class CudamiDigitalObjectsClientTest
   }
 
   @Test
-  @DisplayName("can retrieve projects of a DigitalObject by a SearchPageRequest")
-  public void testGetProjectsBySearchPageRequest() throws Exception {
+  @DisplayName("can retrieve projects of a DigitalObject by a PageRequest")
+  public void testGetProjectsByPageRequest() throws Exception {
     UUID uuid = UUID.randomUUID();
-    client.findProjects(uuid, buildExampleSearchPageRequest());
+    client.findProjects(uuid, buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
         "/"
             + uuid
-            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&searchTerm=foo");
+            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test

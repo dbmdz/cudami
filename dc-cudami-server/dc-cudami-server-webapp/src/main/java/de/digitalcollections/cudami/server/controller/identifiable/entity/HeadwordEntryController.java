@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,14 +47,14 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get all headwordentries")
   @GetMapping(
-      value = {"/v5/headwordentries"},
+      value = {"/v6/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<HeadwordEntry> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -65,6 +65,7 @@ public class HeadwordEntryController {
   @Operation(summary = "Get all headwordentries by headword")
   @GetMapping(
       value = {
+        "/v6/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,6 +83,8 @@ public class HeadwordEntryController {
   @Operation(summary = "Get an headwordentry by namespace and id")
   @GetMapping(
       value = {
+        "/v6/headwordentries/identifier/{namespace}:{id}",
+        "/v6/headwordentries/identifier/{namespace}:{id}.json",
         "/v5/headwordentries/identifier/{namespace}:{id}",
         "/v5/headwordentries/identifier/{namespace}:{id}.json"
       },
@@ -99,6 +102,7 @@ public class HeadwordEntryController {
   @Operation(summary = "Get an headwordentry")
   @GetMapping(
       value = {
+        "/v6/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -128,7 +132,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get languages of all headwordentries")
   @GetMapping(
-      value = {"/v5/headwordentries/languages"},
+      value = {"/v6/headwordentries/languages", "/v5/headwordentries/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return this.headwordEntryService.getLanguages();
@@ -136,7 +140,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Save a newly created headwordentry")
   @PostMapping(
-      value = {"/v5/headwordentries"},
+      value = {"/v6/headwordentries", "/v5/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry save(@RequestBody HeadwordEntry headwordEntry, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -145,7 +149,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Update an headwordentry")
   @PutMapping(
-      value = {"/v5/headwordentries/{uuid}"},
+      value = {"/v6/headwordentries/{uuid}", "/v5/headwordentries/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry update(
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)

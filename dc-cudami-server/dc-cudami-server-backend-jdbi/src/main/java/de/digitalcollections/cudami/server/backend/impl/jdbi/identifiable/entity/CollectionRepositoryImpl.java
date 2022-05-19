@@ -3,20 +3,17 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
@@ -155,70 +151,133 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public SearchPageResponse<Collection> findChildren(
-      UUID uuid, SearchPageRequest searchPageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " INNER JOIN collection_collections cc ON "
-            + tableAlias
-            + ".uuid = cc.child_collection_uuid"
-            + " WHERE cc.parent_collection_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
+  public PageResponse<Collection> findChildren(UUID uuid, PageRequest pageRequest) {
+    final String crossTableAlias = "xtable";
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN collection_collections AS "
+                + crossTableAlias
+                + " ON "
+                + tableAlias
+                + ".uuid = "
+                + crossTableAlias
+                + ".child_collection_uuid"
+                + " WHERE "
+                + crossTableAlias
+                + ".parent_collection_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-    String searchTerm = searchPageRequest.getQuery();
-    if (StringUtils.hasText(searchTerm)) {
-      commonSql += " AND " + getCommonSearchSql(tableAlias);
-      argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-
-    String orderBy = getOrderBy(searchPageRequest.getSorting());
-    if (!StringUtils.hasText(orderBy)) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(
-          " ORDER BY cc.sortindex"); // must be the column itself to use window functions
-    }
-    addPageRequestParams(searchPageRequest, innerQuery);
-
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
+    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Collection> result =
         retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new SearchPageResponse<>(result, searchPageRequest, total);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
-  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Collection collection = super.getByUuidAndFiltering(uuid, filtering);
+  public PageResponse<DigitalObject> findDigitalObjects(
+      UUID collectionUuid, PageRequest pageRequest) {
+    final String crossTableAlias = "xtable";
 
-    if (collection != null) {
-      collection.setChildren(getChildren(collection));
+    final String digitalObjectTableAlias = digitalObjectRepositoryImpl.getTableAlias();
+    final String digitalObjectTableName = digitalObjectRepositoryImpl.getTableName();
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + digitalObjectTableName
+                + " AS "
+                + digitalObjectTableAlias
+                + " INNER JOIN collection_digitalobjects AS "
+                + crossTableAlias
+                + " ON "
+                + digitalObjectTableAlias
+                + ".uuid = "
+                + crossTableAlias
+                + ".digitalobject_uuid"
+                + " WHERE "
+                + crossTableAlias
+                + ".collection_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("uuid", collectionUuid);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (digitalobject) than this repository (collection)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
+    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    List<DigitalObject> result =
+        digitalObjectRepositoryImpl.retrieveList(
+            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  @Override
+  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+    final String cbTableAlias = corporateBodyRepositoryImpl.getTableAlias();
+    final String cbTableName = corporateBodyRepositoryImpl.getTableName();
+
+    // We do a double join with "rel_entity_entities" because we have two different
+    // predicates:
+    // - one is fix ("is_part_of"): defines the relation between collection and project
+    // - the other one is given as part of the parameter "filtering" for defining relation
+    //   between corporatebody and project
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + cbTableName
+                + " AS "
+                + cbTableAlias
+                + " LEFT JOIN rel_entity_entities AS r ON "
+                + cbTableAlias
+                + ".uuid = r.object_uuid"
+                + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
+                + " WHERE rel.object_uuid = :uuid"
+                + " AND rel.predicate = 'is_part_of'");
+    FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
+    if (predicate != null) {
+      String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
+      innerQuery.append(predicateFilter);
     }
-    return collection;
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", uuid);
+    List<CorporateBody> result =
+        corporateBodyRepositoryImpl.retrieveList(
+            corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            null);
+
+    return result;
   }
 
   @Override
-  public Collection getByRefId(long refId) {
-    Collection collection = super.getByRefId(refId);
-
-    if (collection != null) {
-      collection.setChildren(getChildren(collection));
-    }
-    return collection;
-  }
-
-  @Override
-  public SearchPageResponse<Collection> findRootNodes(SearchPageRequest searchPageRequest) {
+  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
     String commonSql =
         " FROM "
             + tableName
@@ -228,17 +287,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + " NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
             + tableAlias
             + ".uuid))";
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (!StringUtils.hasText(searchTerm)) {
-      return find(searchPageRequest, commonSql, Collections.EMPTY_MAP);
-    }
-
-    commonSql += " AND " + getCommonSearchSql(tableAlias);
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
-    return find(searchPageRequest, commonSql, argumentMappings);
+    return find(pageRequest, commonSql);
   }
 
   @Override
@@ -299,6 +348,26 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public Collection getByRefId(long refId) {
+    Collection collection = super.getByRefId(refId);
+
+    if (collection != null) {
+      collection.setChildren(getChildren(collection));
+    }
+    return collection;
+  }
+
+  @Override
+  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Collection collection = super.getByUuidAndFiltering(uuid, filtering);
+
+    if (collection != null) {
+      collection.setChildren(getChildren(collection));
+    }
+    return collection;
+  }
+
+  @Override
   public List<Collection> getChildren(UUID uuid) {
     StringBuilder innerQuery =
         new StringBuilder(
@@ -320,39 +389,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> findChildren(UUID uuid, PageRequest pageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " INNER JOIN collection_collections cc ON "
-            + tableAlias
-            + ".uuid = cc.child_collection_uuid"
-            + " WHERE cc.parent_collection_uuid = :uuid";
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuid);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT cc.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
-    pageRequest.setSorting(null);
-    innerQuery.append(
-        " ORDER BY cc.sortindex"); // must be the column itself to use window functions
-    addPageRequestParams(pageRequest, innerQuery);
-
-    List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -367,94 +404,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       default:
         return null;
     }
-  }
-
-  @Override
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, SearchPageRequest searchPageRequest) {
-    final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
-    final String doTableName = digitalObjectRepositoryImpl.getTableName();
-
-    String commonSql =
-        " FROM "
-            + doTableName
-            + " AS "
-            + doTableAlias
-            + " INNER JOIN collection_digitalobjects AS cd ON "
-            + doTableAlias
-            + ".uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", collectionUuid);
-
-    String searchTerm = searchPageRequest.getQuery();
-    if (StringUtils.hasText(searchTerm)) {
-      commonSql += " AND " + getCommonSearchSql(doTableAlias);
-      argumentMappings.put("searchTerm", escapeTermForJsonpath(searchTerm));
-    }
-
-    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
-    addFiltering(searchPageRequest, innerQuery, argumentMappings);
-
-    String orderBy = null;
-    if (searchPageRequest.getSorting() == null) {
-      orderBy = "ORDER BY idx ASC";
-      innerQuery.append(
-          " ORDER BY cd.sortindex"); // must be the column itself to use window functions
-    }
-    addPageRequestParams(searchPageRequest, innerQuery);
-
-    List<DigitalObject> result =
-        digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(searchPageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new SearchPageResponse<>(result, searchPageRequest, total);
-  }
-
-  @Override
-  public PageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, PageRequest pageRequest) {
-    final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
-    final String doTableName = digitalObjectRepositoryImpl.getTableName();
-
-    String commonSql =
-        " FROM "
-            + doTableName
-            + " AS "
-            + doTableAlias
-            + " INNER JOIN collection_digitalobjects AS cd ON "
-            + doTableAlias
-            + ".uuid = cd.digitalobject_uuid"
-            + " WHERE cd.collection_uuid = :uuid";
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", collectionUuid);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT cd.sortindex AS idx, *" + commonSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
-    pageRequest.setSorting(null);
-    innerQuery.append(
-        " ORDER BY cd.sortindex"); // must be the column itself to use window functions
-    addPageRequestParams(pageRequest, innerQuery);
-
-    List<DigitalObject> result =
-        digitalObjectRepositoryImpl.retrieveList(
-            digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            "ORDER BY idx ASC");
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, countQuery, argumentMappings);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -496,59 +445,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     List<Collection> result =
         retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
     return result;
-  }
-
-  @Override
-  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
-    final String cbTableAlias = corporateBodyRepositoryImpl.getTableAlias();
-    final String cbTableName = corporateBodyRepositoryImpl.getTableName();
-
-    // We do a double join with "rel_entity_entities" because we have two different
-    // predicates:
-    // - one is fix ("is_part_of"): defines the relation between collection and project
-    // - the other one is given as part of the parameter "filtering" for defining relation
-    //   between corporatebody and project
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + cbTableName
-                + " AS "
-                + cbTableAlias
-                + " LEFT JOIN rel_entity_entities AS r ON "
-                + cbTableAlias
-                + ".uuid = r.object_uuid"
-                + " LEFT JOIN rel_entity_entities AS rel ON r.subject_uuid = rel.subject_uuid"
-                + " WHERE rel.object_uuid = :uuid"
-                + " AND rel.predicate = 'is_part_of'");
-    FilterCriterion predicate = filtering.getFilterCriterionFor("predicate");
-    if (predicate != null) {
-      String predicateFilter = String.format(" AND r.predicate = '%s'", predicate.getValue());
-      innerQuery.append(predicateFilter);
-    }
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuid);
-    List<CorporateBody> result =
-        corporateBodyRepositoryImpl.retrieveList(
-            corporateBodyRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            null);
-
-    return result;
-  }
-
-  @Override
-  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
-            + tableAlias
-            + ".uuid)";
-    return find(pageRequest, commonSql, new HashMap<>());
   }
 
   @Override
@@ -627,6 +523,25 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
+  public Collection saveWithParent(UUID childUuid, UUID parentUuid) {
+    Integer nextSortIndex =
+        retrieveNextSortIndexForParentChildren(
+            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
+
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortindex)"
+                        + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
+                .bind("parent_collection_uuid", parentUuid)
+                .bind("child_collection_uuid", childUuid)
+                .bind("sortindex", nextSortIndex)
+                .execute());
+
+    return getByUuid(childUuid);
+  }
+
+  @Override
   public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -654,25 +569,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       return true;
     }
     return false;
-  }
-
-  @Override
-  public Collection saveWithParent(UUID childUuid, UUID parentUuid) {
-    Integer nextSortIndex =
-        retrieveNextSortIndexForParentChildren(
-            dbi, "collection_collections", "parent_collection_uuid", parentUuid);
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "INSERT INTO collection_collections(parent_collection_uuid, child_collection_uuid, sortindex)"
-                        + " VALUES (:parent_collection_uuid, :child_collection_uuid, :sortindex)")
-                .bind("parent_collection_uuid", parentUuid)
-                .bind("child_collection_uuid", childUuid)
-                .bind("sortindex", nextSortIndex)
-                .execute());
-
-    return getByUuid(childUuid);
   }
 
   @Override

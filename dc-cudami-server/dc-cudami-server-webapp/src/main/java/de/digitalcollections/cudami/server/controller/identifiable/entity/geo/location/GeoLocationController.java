@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,7 +45,12 @@ public class GeoLocationController {
 
   @Operation(summary = "count all geolocations")
   @GetMapping(
-      value = {"/v5/geolocations/count", "/v2/geolocations/count", "/latest/geolocations/count"},
+      value = {
+        "/v6/geolocations/count",
+        "/v5/geolocations/count",
+        "/v2/geolocations/count",
+        "/latest/geolocations/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return geoLocationService.count();
@@ -53,7 +58,7 @@ public class GeoLocationController {
 
   @Operation(summary = "get all geo locations")
   @GetMapping(
-      value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
+      value = {"/v6/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GeoLocation> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -62,7 +67,7 @@ public class GeoLocationController {
       @RequestParam(name = "language", required = false) String language,
       @RequestParam(name = "initial", required = false) String initial,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -76,6 +81,8 @@ public class GeoLocationController {
   @Operation(summary = "Get a geolocation by namespace and id")
   @GetMapping(
       value = {
+        "/v6/geolocations/identifier/{namespace}:{id}",
+        "/v6/geolocations/identifier/{namespace}:{id}.json",
         "/v5/geolocations/identifier/{namespace}:{id}",
         "/v5/geolocations/identifier/{namespace}:{id}.json",
         "/v2/geolocations/identifier/{namespace}:{id}",
@@ -93,6 +100,7 @@ public class GeoLocationController {
   @Operation(summary = "Get a geolocation by namespace and id")
   @GetMapping(
       value = {
+        "/v6/geolocations/identifier",
         "/v5/geolocations/identifier",
         "/v2/geolocations/identifier",
         "/latest/geolocations/identifier"
@@ -110,7 +118,12 @@ public class GeoLocationController {
 
   @Operation(summary = "Get a geolocation by uuid")
   @GetMapping(
-      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
+      value = {
+        "/v6/geolocations/{uuid}",
+        "/v5/geolocations/{uuid}",
+        "/v2/geolocations/{uuid}",
+        "/latest/geolocations/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByUuid(
       @Parameter(
@@ -139,6 +152,7 @@ public class GeoLocationController {
   @Operation(summary = "Get languages of all geolocations")
   @GetMapping(
       value = {
+        "/v6/geolocations/languages",
         "/v5/geolocations/languages",
         "/v3/geolocations/languages",
         "/latest/geolocations/languages"
@@ -150,7 +164,7 @@ public class GeoLocationController {
 
   @Operation(summary = "save a newly created geolocation")
   @PostMapping(
-      value = {"/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
+      value = {"/v6/geolocations", "/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -159,7 +173,12 @@ public class GeoLocationController {
 
   @Operation(summary = "update a geolocation")
   @PutMapping(
-      value = {"/v5/geolocations/{uuid}", "/v2/geolocations/{uuid}", "/latest/geolocations/{uuid}"},
+      value = {
+        "/v6/geolocations/{uuid}",
+        "/v5/geolocations/{uuid}",
+        "/v2/geolocations/{uuid}",
+        "/latest/geolocations/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)

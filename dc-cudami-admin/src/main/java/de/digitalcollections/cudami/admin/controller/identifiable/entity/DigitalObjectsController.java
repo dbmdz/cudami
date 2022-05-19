@@ -9,11 +9,10 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -40,7 +39,7 @@ public class DigitalObjectsController extends AbstractController {
     this.service = client.forDigitalObjects();
   }
 
-  @GetMapping("/api/digitalobjects")
+  @GetMapping({"/api/digitalobjects", "/api/digitalobjects/search"})
   @ResponseBody
   public PageResponse<DigitalObject> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -48,12 +47,12 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    return service.find(searchPageRequest);
+    return service.find(pageRequest);
   }
 
   @GetMapping(
@@ -66,8 +65,8 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.findCollections(uuid, searchPageRequest);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    return this.service.findCollections(uuid, pageRequest);
   }
 
   @GetMapping(
@@ -80,8 +79,8 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.findProjects(uuid, searchPageRequest);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    return this.service.findProjects(uuid, pageRequest);
   }
 
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
@@ -116,22 +115,6 @@ public class DigitalObjectsController extends AbstractController {
   @ModelAttribute("menu")
   protected String module() {
     return "digitalobjects";
-  }
-
-  @GetMapping("/api/digitalobjects/search")
-  @ResponseBody
-  public SearchPageResponse<DigitalObject> search(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return service.find(searchPageRequest);
   }
 
   @GetMapping("/digitalobjects/{uuid}")

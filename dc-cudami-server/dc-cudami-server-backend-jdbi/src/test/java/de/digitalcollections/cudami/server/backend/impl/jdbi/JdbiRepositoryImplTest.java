@@ -2,12 +2,12 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -514,7 +514,7 @@ public class JdbiRepositoryImplTest {
     }
 
     @Override
-    protected String getColumnName(String modelProperty) {
+    public String getColumnName(String modelProperty) {
       return modelProperty;
     }
 

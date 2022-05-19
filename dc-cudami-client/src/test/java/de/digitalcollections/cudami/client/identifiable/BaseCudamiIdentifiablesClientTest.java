@@ -5,13 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.client.BaseCudamiRestClientTest;
 import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.NullHandling;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
@@ -22,32 +17,13 @@ public abstract class BaseCudamiIdentifiablesClientTest<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>
     extends BaseCudamiRestClientTest<I, C> {
 
-  /**
-   * Creates an example SearchPageRequest, which fills all possible fields:
-   *
-   * <ul>
-   *   <li>order: Descending for property "sortable" and nulls first
-   *   <li>pageNumber: 1
-   *   <li>pageSize: 2
-   *   <li>searchTerm: "foo"
-   * </ul>
-   *
-   * @return example SearchPageRequest with defined pageSize, pageNumber, sorting and searchTerm
-   */
-  protected SearchPageRequest buildExampleSearchPageRequest() {
-    Direction direction = Direction.DESC;
-    Order order = new Order(direction, true, NullHandling.NULLS_FIRST, "sortable");
-    Sorting sorting = new Sorting(order);
-    return new SearchPageRequest("foo", 1, 2, sorting);
-  }
-
   @Test
   @DisplayName("can find by language and initial with plain attributes")
   public void testFindByLanguageAndInitial() throws Exception {
     client.findByLanguageAndInitial(1, 2, "label", "ASC", "NATIVE", "de", "a");
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=label.asc");
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=label.asc.ignorecase");
   }
 
   @Test
@@ -55,7 +31,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   public void testFindByLanguageInitialAndPagingAttributes() throws Exception {
     client.findByLanguageAndInitial(1, 2, "sortable", "asc", "NATIVE", "de", "a");
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc");
+        "get", "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.asc.ignorecase");
   }
 
   @Test
@@ -66,20 +42,20 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
-  public void testFindWithSearchPageRequest() throws Exception {
+  @DisplayName("can execute the find method with a PageRequest")
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson = "{}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<I> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<I> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
-    verifyHttpRequestByMethodAndRelativeURL("get", "/search?pageNumber=0&pageSize=0");
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");
   }
 
   @Test
@@ -90,8 +66,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     assertThat(client.find("foo", 100)).isNotNull();
 
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/search?pageNumber=0&pageSize=100&searchTerm=foo");
+    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=100&searchTerm=foo");
   }
 
   @Test

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.view;
 
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.UUID;
 

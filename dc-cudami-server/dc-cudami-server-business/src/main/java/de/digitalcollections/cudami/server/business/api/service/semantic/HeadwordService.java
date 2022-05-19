@@ -3,10 +3,8 @@ package de.digitalcollections.cudami.server.business.api.service.semantic;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.Locale;
@@ -43,20 +41,22 @@ public interface HeadwordService {
 
   PageResponse<Headword> find(PageRequest pageRequest);
 
-  SearchPageResponse<Headword> find(SearchPageRequest searchPageRequest);
-
   List<Headword> find(String searchTerm, int maxResults);
+
+  List<Headword> findByLabelAndLocale(String label, Locale locale);
+
+  PageResponse<Headword> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial);
+
+  PageResponse<Entity> findRelatedEntities(UUID uuid, PageRequest pageRequest);
+
+  PageResponse<FileResource> findRelatedFileResources(UUID uuid, PageRequest pageRequest);
 
   /**
    * @return list of ALL headwords. USE WITH CARE (only for internal workflow, NOT FOR USER
    *     INTERACTION!)!!!
    */
   List<Headword> getAll();
-
-  List<Headword> findByLabelAndLocale(String label, Locale locale);
-
-  PageResponse<Headword> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial);
 
   Headword getByUuid(UUID uuid);
 
@@ -73,8 +73,6 @@ public interface HeadwordService {
 
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
-  PageResponse<Entity> findRelatedEntities(UUID uuid, PageRequest pageRequest);
-
   default List<FileResource> getRelatedFileResources(Headword headword) {
     if (headword == null) {
       return null;
@@ -83,8 +81,6 @@ public interface HeadwordService {
   }
 
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
-
-  PageResponse<FileResource> findRelatedFileResources(UUID uuid, PageRequest pageRequest);
 
   Headword save(Headword headword) throws ServiceException;
 
@@ -103,8 +99,6 @@ public interface HeadwordService {
     return setRelatedEntities(headword.getUuid(), entities);
   }
 
-  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
-
   /**
    * Save list of file resources related to an Headword. Prerequisite: file resources have been
    * saved before (exist already)
@@ -120,6 +114,8 @@ public interface HeadwordService {
     }
     return setRelatedFileResources(headword.getUuid(), fileResources);
   }
+
+  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
 
   List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
 

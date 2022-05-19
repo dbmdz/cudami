@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;

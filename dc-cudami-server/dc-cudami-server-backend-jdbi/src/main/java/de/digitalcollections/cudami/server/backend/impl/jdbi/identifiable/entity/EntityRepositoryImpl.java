@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -205,6 +205,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("entityType", "refId"));
+    return allowedOrderByFields;
+  }
+
+  @Override
   public E getByRefId(long refId) {
     Filtering filtering =
         Filtering.builder()
@@ -215,23 +222,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<E> getRandom(int count) {
-    // Warning: could be very slow if random is used on tables with many million records
-    // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
-    StringBuilder innerQuery =
-        new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
-    return retrieveList(sqlSelectReducedFields, innerQuery, null, null);
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("entityType", "refId"));
-    return allowedOrderByFields;
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
@@ -248,6 +239,15 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       default:
         return null;
     }
+  }
+
+  @Override
+  public List<E> getRandom(int count) {
+    // Warning: could be very slow if random is used on tables with many million records
+    // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
+    return retrieveList(sqlSelectReducedFields, innerQuery, null, null);
   }
 
   @Override

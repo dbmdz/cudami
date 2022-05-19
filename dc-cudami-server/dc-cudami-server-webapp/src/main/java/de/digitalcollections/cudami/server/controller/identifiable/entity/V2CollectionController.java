@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -151,7 +152,8 @@ public class V2CollectionController {
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);
+      Sorting sorting = new Sorting(migratedSortBy);
       pageRequest.setSorting(sorting);
     }
 
@@ -172,6 +174,7 @@ public class V2CollectionController {
           "className", "de.digitalcollections.model.impl.identifiable.entity.CollectionImpl");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String migratedResult = V5MigrationHelper.migrateToV5(result, objectMapper);
+    return new ResponseEntity<>(migratedResult, HttpStatus.OK);
   }
 }

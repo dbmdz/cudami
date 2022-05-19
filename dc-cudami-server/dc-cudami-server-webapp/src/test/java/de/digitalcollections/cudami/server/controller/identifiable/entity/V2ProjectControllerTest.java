@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,9 +25,9 @@ public class V2ProjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v2/projects/?pageNumber=0&pageSize=1"})
   public void projectList(String path) throws Exception {
-    SearchPageResponse<Project> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Project> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(395)
                 .withContent(
@@ -44,7 +44,7 @@ public class V2ProjectControllerTest extends BaseControllerTest {
                 .forAscendingOrderedField("label")
                 .build();
 
-    when(projectService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(projectService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v2/projects/projects.json");
   }

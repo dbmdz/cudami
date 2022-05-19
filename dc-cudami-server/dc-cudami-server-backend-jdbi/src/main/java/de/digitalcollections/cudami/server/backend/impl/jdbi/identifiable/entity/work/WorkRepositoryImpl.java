@@ -4,11 +4,11 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,22 +87,22 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Work work = super.getByUuidAndFiltering(uuid, filtering);
+  public Work getByIdentifier(Identifier identifier) {
+    Work work = super.getByIdentifier(identifier);
 
     if (work != null) {
-      List<Agent> creators = getCreators(uuid);
+      List<Agent> creators = getCreators(work.getUuid());
       work.setCreators(creators);
     }
     return work;
   }
 
   @Override
-  public Work getByIdentifier(Identifier identifier) {
-    Work work = super.getByIdentifier(identifier);
+  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Work work = super.getByUuidAndFiltering(uuid, filtering);
 
     if (work != null) {
-      List<Agent> creators = getCreators(work.getUuid());
+      List<Agent> creators = getCreators(uuid);
       work.setCreators(creators);
     }
     return work;

@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
@@ -13,6 +12,7 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.HashMap;
 import java.util.List;
@@ -149,12 +149,11 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
+  public HeadwordEntry getByIdentifier(Identifier identifier) {
+    HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
 
     if (headwordEntry != null) {
-      List<Agent> creators = getCreators(uuid);
-      headwordEntry.setCreators(creators);
+      headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
     }
     return headwordEntry;
   }
@@ -170,11 +169,12 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByIdentifier(Identifier identifier) {
-    HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
+  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
 
     if (headwordEntry != null) {
-      headwordEntry.setCreators(getCreators(headwordEntry.getUuid()));
+      List<Agent> creators = getCreators(uuid);
+      headwordEntry.setCreators(creators);
     }
     return headwordEntry;
   }

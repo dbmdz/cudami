@@ -6,11 +6,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,7 +57,12 @@ public class WebsiteController {
                     examples = {@ExampleObject(name = "example", value = "42")}))
       })
   @GetMapping(
-      value = {"/v5/websites/count", "/v2/websites/count", "/latest/websites/count"},
+      value = {
+        "/v6/websites/count",
+        "/v5/websites/count",
+        "/v2/websites/count",
+        "/latest/websites/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return websiteService.count();
@@ -77,9 +81,9 @@ public class WebsiteController {
                     schema = @Schema(implementation = PageResponseWebsite.class)))
       })
   @GetMapping(
-      value = {"/v5/websites"},
+      value = {"/v6/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Website> find(
+  public PageResponse<Website> find(
       @Parameter(
               name = "pageNumber",
               description = "the page number (starting with 0); if unset, defaults to 0.",
@@ -109,56 +113,12 @@ public class WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
     return websiteService.find(searchPageRequest);
-  }
-
-  @Operation(
-      summary = "Get a website",
-      description = "Get a website by its uuid",
-      responses = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Website",
-            content =
-                @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = Website.class)))
-      })
-  @GetMapping(
-      value = {"/v5/websites/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Website> getByUuid(
-      @Parameter(
-              name = "uuid",
-              description = "the UUID of the website",
-              example = "7a2f1935-c5b8-40fb-8622-c675de0a6242",
-              schema = @Schema(implementation = UUID.class))
-          @PathVariable
-          UUID uuid)
-      throws JsonProcessingException {
-    Website website = websiteService.getByUuid(uuid);
-
-    if (website == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(website, HttpStatus.OK);
-  }
-
-  @Operation(
-      summary = "Get languages of all websites",
-      description = "Get languages of all websites",
-      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
-  @GetMapping(
-      value = {"/v5/websites/languages", "/v2/websites/languages", "/latest/websites/languages"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return websiteService.getLanguages();
   }
 
   @Operation(
@@ -171,12 +131,12 @@ public class WebsiteController {
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = SearchPageResponseWebpage.class)))
+                    schema = @Schema(implementation = PageResponseWebpage.class)))
       })
   @GetMapping(
-      value = {"/v5/websites/{uuid}/rootpages"},
+      value = {"/v6/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Webpage> findRootPages(
+  public PageResponse<Webpage> findRootPages(
       @Parameter(
               name = "uuid",
               description = "the UUID of the parent webpage",
@@ -205,8 +165,57 @@ public class WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     return websiteService.findRootWebpages(uuid, searchPageRequest);
+  }
+
+  @Operation(
+      summary = "Get a website",
+      description = "Get a website by its uuid",
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Website",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = Website.class)))
+      })
+  @GetMapping(
+      value = {"/v6/websites/{uuid}", "/v5/websites/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Website> getByUuid(
+      @Parameter(
+              name = "uuid",
+              description = "the UUID of the website",
+              example = "7a2f1935-c5b8-40fb-8622-c675de0a6242",
+              schema = @Schema(implementation = UUID.class))
+          @PathVariable
+          UUID uuid)
+      throws JsonProcessingException {
+    Website website = websiteService.getByUuid(uuid);
+
+    if (website == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    return new ResponseEntity<>(website, HttpStatus.OK);
+  }
+
+  @Operation(
+      summary = "Get languages of all websites",
+      description = "Get languages of all websites",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {
+        "/v6/websites/languages",
+        "/v5/websites/languages",
+        "/v2/websites/languages",
+        "/latest/websites/languages"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return websiteService.getLanguages();
   }
 
   @Operation(
@@ -222,7 +231,7 @@ public class WebsiteController {
                     schema = @Schema(implementation = Website.class)))
       })
   @PostMapping(
-      value = {"/v5/websites", "/v2/websites", "/latest/websites"},
+      value = {"/v6/websites", "/v5/websites", "/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -242,7 +251,12 @@ public class WebsiteController {
                     schema = @Schema(implementation = Website.class)))
       })
   @PutMapping(
-      value = {"/v5/websites/{uuid}", "/v2/websites/{uuid}", "/latest/websites/{uuid}"},
+      value = {
+        "/v6/websites/{uuid}",
+        "/v5/websites/{uuid}",
+        "/v2/websites/{uuid}",
+        "/latest/websites/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website update(
       @Parameter(
@@ -276,6 +290,7 @@ public class WebsiteController {
       })
   @PutMapping(
       value = {
+        "/v6/websites/{uuid}/rootpages",
         "/v5/websites/{uuid}/rootpages",
         "/v3/websites/{uuid}/rootpages",
         "/latest/websites/{uuid}/rootpages"
@@ -305,8 +320,8 @@ public class WebsiteController {
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
   // ----------------- cannot yet handle generics
   @Hidden
-  private static class PageResponseWebsite extends PageResponse<Website> {}
+  private static class PageResponseWebpage extends PageResponse<Webpage> {}
 
   @Hidden
-  private static class SearchPageResponseWebpage extends SearchPageResponse<Webpage> {}
+  private static class PageResponseWebsite extends PageResponse<Website> {}
 }

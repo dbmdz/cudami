@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -82,9 +82,9 @@ public interface UrlAliasService {
    *
    * @param pageRequest the PageRequest
    * @return a SearchPageResponse with the found LocalizedUrlAliases as paged content
+   * @throws CudamiServiceException in case of an error
    */
-  SearchPageResponse<LocalizedUrlAliases> find(SearchPageRequest pageRequest)
-      throws CudamiServiceException;
+  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws CudamiServiceException;
 
   /**
    * Returns the LocalizedUrlAliases for an identifiable, identified by its UUID
@@ -115,6 +115,7 @@ public interface UrlAliasService {
    *
    * @param targetUuid UUID of the identifiable that the primaries should be found for
    * @return {@code List}, not {@code null}
+   * @throws CudamiServiceException in case of an error
    */
   List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws CudamiServiceException;
 

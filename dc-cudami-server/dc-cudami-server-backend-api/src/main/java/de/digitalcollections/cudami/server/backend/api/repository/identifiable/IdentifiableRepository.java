@@ -1,14 +1,12 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,11 +42,9 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   PageResponse<I> find(PageRequest pageRequest);
 
-  SearchPageResponse<I> find(SearchPageRequest searchPageRequest);
-
   default List<I> find(String searchTerm, int maxResults) {
-    SearchPageRequest request = new SearchPageRequest(searchTerm, 0, maxResults, null);
-    SearchPageResponse<I> response = find(request);
+    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
+    PageResponse<I> response = find(request);
     return response.getContent();
   }
 

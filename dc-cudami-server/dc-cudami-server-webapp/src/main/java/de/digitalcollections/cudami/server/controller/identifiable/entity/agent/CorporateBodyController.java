@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +42,11 @@ public class CorporateBodyController {
 
   @Operation(summary = "Fetch a corporate body by GND-ID from external system and save it")
   @PostMapping(
-      value = {"/v5/corporatebodies/gnd/{gndId}", "/v3/corporatebodies/gnd/{gndId}"},
+      value = {
+        "/v6/corporatebodies/gnd/{gndId}",
+        "/v5/corporatebodies/gnd/{gndId}",
+        "/v3/corporatebodies/gnd/{gndId}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody fetchAndSaveByGndId(
       @Parameter(
@@ -59,14 +63,14 @@ public class CorporateBodyController {
 
   @Operation(summary = "Get all corporate bodies")
   @GetMapping(
-      value = {"/v5/corporatebodies"},
+      value = {"/v6/corporatebodies"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<CorporateBody> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -77,6 +81,8 @@ public class CorporateBodyController {
   @Operation(summary = "Get corporate body by namespace and id")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/identifier/{namespace}:{id}",
+        "/v6/corporatebodies/identifier/{namespace}:{id}.json",
         "/v5/corporatebodies/identifier/{namespace}:{id}",
         "/v5/corporatebodies/identifier/{namespace}:{id}.json",
         "/v3/corporatebodies/identifier/{namespace}:{id}",
@@ -96,6 +102,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get corporate body by refId")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/{refId:[0-9]+}",
         "/v5/corporatebodies/{refId:[0-9]+}",
         "/v3/corporatebodies/{refId:[0-9]+}",
         "/latest/corporatebodies/{refId:[0-9]+}"
@@ -110,6 +117,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get a corporate body by uuid")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -142,6 +150,7 @@ public class CorporateBodyController {
   @Operation(summary = "Get languages of all corporatebodies")
   @GetMapping(
       value = {
+        "/v6/corporatebodies/languages",
         "/v5/corporatebodies/languages",
         "/v3/corporatebodies/languages",
         "/latest/corporatebodies/languages"
@@ -153,7 +162,12 @@ public class CorporateBodyController {
 
   @Operation(summary = "Save a newly created corporate body")
   @PostMapping(
-      value = {"/v5/corporatebodies", "/v2/corporatebodies", "/latest/corporatebodies"},
+      value = {
+        "/v6/corporatebodies",
+        "/v5/corporatebodies",
+        "/v2/corporatebodies",
+        "/latest/corporatebodies"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -163,6 +177,7 @@ public class CorporateBodyController {
   @Operation(summary = "Update a corporate body")
   @PutMapping(
       value = {
+        "/v6/corporatebodies/{uuid}",
         "/v5/corporatebodies/{uuid}",
         "/v2/corporatebodies/{uuid}",
         "/latest/corporatebodies/{uuid}"

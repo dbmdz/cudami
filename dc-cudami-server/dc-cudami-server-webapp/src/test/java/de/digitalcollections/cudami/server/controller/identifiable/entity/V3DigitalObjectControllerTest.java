@@ -10,8 +10,8 @@ import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,9 +33,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
       })
   public void emptyCollectionsForDigitalObject(String path) throws Exception {
 
-    SearchPageResponse<Collection> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Collection> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .withoutContent()
                 .forRequestPage(0)
                 .forPageSize(1000)
@@ -45,8 +45,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
 
     DigitalObject digitalObject =
         DigitalObject.builder().uuid(extractFirstUuidFromPath(path)).build();
-    when(digitalObjectService.findActiveCollections(
-            eq(digitalObject), any(SearchPageRequest.class)))
+    when(digitalObjectService.findActiveCollections(eq(digitalObject), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -59,9 +58,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
         "/v3/digitalobjects/6bfbe6dc-2c14-4e61-b88b-ce56cea712c7/collections?active=true&pageNumber=0&pageSize=1"
       })
   public void collectionsForDigitalObject(String path) throws Exception {
-    SearchPageResponse<Collection> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Collection> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forStartDate("c.publication_start", "2021-04-12")
@@ -87,7 +86,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                 .build();
 
     when(digitalObjectService.findActiveCollections(
-            any(DigitalObject.class), any(SearchPageRequest.class)))
+            any(DigitalObject.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -100,9 +99,9 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
         "/v3/digitalobjects/6bfbe6dc-2c14-4e61-b88b-ce56cea712c7/projects?pageNumber=0&pageSize=1"
       })
   public void projectsForDigitalObject(String path) throws Exception {
-    SearchPageResponse<Project> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Project> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(1)
@@ -124,7 +123,7 @@ public class V3DigitalObjectControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(digitalObjectService.findProjects(any(DigitalObject.class), any(SearchPageRequest.class)))
+    when(digitalObjectService.findProjects(any(DigitalObject.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);

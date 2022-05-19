@@ -14,7 +14,16 @@
   ],
   "pageRequest": {
     "pageNumber": 0,
-    "pageSize": 1
+    "pageSize": 1,
+    "sorting": {
+      "orders": [
+        {
+          "direction": "ASC",
+          "property": "label",
+          "subProperty": "de"
+        }
+      ]
+    }
   },
   "totalElements": 1
 }

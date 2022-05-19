@@ -74,33 +74,6 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <version.assertj-core>3.22.0</version.assertj-core>
-    <version.byte-buddy>1.12.10</version.byte-buddy>
-    <version.commons-beanutils>1.9.4</version.commons-beanutils>
-    <version.commons-lang3>3.12.0</version.commons-lang3>
-    <version.dc-model>10.0.0-SNAPSHOT</version.dc-model>
-    <version.flyway>8.5.10</version.flyway>
-    <version.javax.servlet-api>4.0.1</version.javax.servlet-api>
-    <version.junit>5.8.2</version.junit>
-    <version.logstash-logback-encoder>7.1.1</version.logstash-logback-encoder>
-    <version.mockito-core>4.5.1</version.mockito-core>
-    <version.openjson>1.0.12</version.openjson>
-    <version.passay>1.6.1</version.passay>
-    <version.postgresql>42.3.5</version.postgresql>
-    <version.slf4j>1.7.36</version.slf4j>
-    <version.spotbugs>4.6.0</version.spotbugs>
-    <version.unbescape>1.1.6.RELEASE</version.unbescape>
-
-    <!-- plugins -->
-    <version.githook-maven-plugin>1.0.5</version.githook-maven-plugin>
-    <version.jacoco-maven-plugin>0.8.8</version.jacoco-maven-plugin>
-    <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
-    <version.maven-fmt-plugin>2.18</version.maven-fmt-plugin>
-    <version.maven-gpg-plugin>3.0.1</version.maven-gpg-plugin>
-    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
-    <version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-    <version.spotbugs-maven-plugin>4.6.0.0</version.spotbugs-maven-plugin>
   </properties>
 
   <dependencyManagement>
@@ -108,17 +81,17 @@
       <dependency>
         <groupId>com.github.openjson</groupId>
         <artifactId>openjson</artifactId>
-        <version>${version.openjson}</version>
+        <version>1.0.12</version>
       </dependency>
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>${version.spotbugs}</version>
+        <version>4.6.0</version>
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils</artifactId>
-        <version>${version.commons-beanutils}</version>
+        <version>1.9.4</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.cudami</groupId>
@@ -183,82 +156,82 @@
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model-jackson</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>de.digitalcollections.model</groupId>
         <artifactId>dc-model-xml</artifactId>
-        <version>${version.dc-model}</version>
+        <version>10.0.0-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>${version.javax.servlet-api}</version>
+        <version>4.0.1</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <version>${version.byte-buddy}</version>
+        <version>1.12.10</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>net.logstash.logback</groupId>
         <artifactId>logstash-logback-encoder</artifactId>
-        <version>${version.logstash-logback-encoder}</version>
+        <version>7.1.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>${version.commons-lang3}</version>
+        <version>3.12.0</version>
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>${version.assertj-core}</version>
+        <version>3.22.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-core</artifactId>
-        <version>${version.flyway}</version>
+        <version>8.5.10</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>${version.junit}</version>
+        <version>5.8.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>${version.mockito-core}</version>
+        <version>4.5.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.passay</groupId>
         <artifactId>passay</artifactId>
-        <version>${version.passay}</version>
+        <version>1.6.1</version>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>${version.postgresql}</version>
+        <version>42.3.5</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${version.slf4j}</version>
+        <version>1.7.36</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>${version.slf4j}</version>
+        <version>1.7.36</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -268,7 +241,7 @@
       <dependency>
         <groupId>org.unbescape</groupId>
         <artifactId>unbescape</artifactId>
-        <version>${version.unbescape}</version>
+        <version>1.1.6.RELEASE</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -278,7 +251,7 @@
       <plugin>
         <groupId>io.github.phillipuniverse</groupId>
         <artifactId>githook-maven-plugin</artifactId>
-        <version>${version.githook-maven-plugin}</version>
+        <version>1.0.5</version>
         <executions>
           <execution>
             <goals>
@@ -304,7 +277,7 @@
       <plugin>
         <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
-        <version>${version.maven-fmt-plugin}</version>
+        <version>2.18</version>
         <executions>
           <execution>
             <goals>
@@ -316,13 +289,13 @@
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>${version.spotbugs-maven-plugin}</version>
+        <version>4.6.0.0</version>
         <dependencies>
           <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
           <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs</artifactId>
-            <version>${version.spotbugs}</version>
+            <version>4.6.0</version>
           </dependency>
         </dependencies>
         <executions>
@@ -343,7 +316,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>${version.maven-failsafe-plugin}</version>
+        <version>3.0.0-M6</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -372,12 +345,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${version.maven-surefire-plugin}</version>
+        <version>3.0.0-M6</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${version.jacoco-maven-plugin}</version>
+        <version>0.8.8</version>
         <executions>
           <execution>
             <id>pre-unit-test</id>
@@ -407,7 +380,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>${version.nexus-staging-maven-plugin}</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -453,7 +426,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${version.jacoco-maven-plugin}</version>
+        <version>0.8.8</version>
       </plugin>
     </plugins>
   </reporting>
@@ -466,7 +439,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>${version.maven-gpg-plugin}</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

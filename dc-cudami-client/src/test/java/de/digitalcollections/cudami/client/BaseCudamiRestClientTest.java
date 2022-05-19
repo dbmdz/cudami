@@ -5,15 +5,15 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.client.BaseRestClientTest;
 import de.digitalcollections.model.UniqueObject;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.NullHandling;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +36,7 @@ public abstract class BaseCudamiRestClientTest<
    *   <li>order: Descending for property "sortable" and nulls first
    *   <li>pageNumber: 1
    *   <li>pageSize: 2
+   *   <li>searchTerm: "hello"
    * </ul>
    *
    * @return example PageRequest with defined pageSize, pageNumber, sorting and two filters
@@ -48,7 +49,7 @@ public abstract class BaseCudamiRestClientTest<
     FilterCriterion filterCriterion2 =
         new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
     Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
-    return new PageRequest(1, 2, sorting, filtering);
+    return new PageRequest(1, 2, sorting, filtering, "hello");
   }
 
   @Test
@@ -96,7 +97,7 @@ public abstract class BaseCudamiRestClientTest<
     client.find(buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test

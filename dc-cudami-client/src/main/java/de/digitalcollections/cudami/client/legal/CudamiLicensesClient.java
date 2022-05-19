@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class CudamiLicensesClient extends CudamiRestClient<License> {
 
   public CudamiLicensesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, License.class, mapper, "/v5/licenses");
+    super(http, serverUrl, License.class, mapper, API_VERSION_PREFIX + "/licenses");
   }
 
   /**

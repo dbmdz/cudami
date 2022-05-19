@@ -10,11 +10,10 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -101,12 +100,12 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
+      pageRequest.setSorting(sorting);
     }
-    return this.service.findTopTopics(searchPageRequest);
+    return this.service.findTopTopics(pageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}/subtopics")
@@ -117,8 +116,8 @@ public class TopicsController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubtopics(uuid, searchPageRequest);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubtopics(uuid, pageRequest);
   }
 
   @GetMapping("/api/topics/{uuid}/entities")

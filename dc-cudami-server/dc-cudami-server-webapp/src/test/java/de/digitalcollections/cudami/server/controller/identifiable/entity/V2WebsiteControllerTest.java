@@ -7,8 +7,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -27,9 +27,9 @@ class V2WebsiteControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v2/websites?pageNumber=0&pageSize=1"})
   public void pagedWebsites(String path) throws Exception {
-    SearchPageResponse<Website> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Website> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forPageSize(1)
                 .forRequestPage(0)
                 .forAscendingOrderedField("label", "de")
@@ -47,7 +47,7 @@ class V2WebsiteControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(websiteService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(websiteService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path);
   }

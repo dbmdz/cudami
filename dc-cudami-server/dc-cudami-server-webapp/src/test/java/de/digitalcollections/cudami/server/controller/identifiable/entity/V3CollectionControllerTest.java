@@ -10,10 +10,8 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -37,9 +35,9 @@ public class V3CollectionControllerTest extends BaseControllerTest {
         "/v3/collections/a014a33b-6803-4b17-a876-a8f68758f2a7/digitalobjects?pageNumber=0&pageSize=1"
       })
   public void digitalObjectsForCollection(String path) throws Exception {
-    SearchPageResponse<DigitalObject> expected =
-        (SearchPageResponse<DigitalObject>)
-            SearchPageResponse.builder()
+    PageResponse<DigitalObject> expected =
+        (PageResponse<DigitalObject>)
+            PageResponse.builder()
                 .forPageSize(1)
                 .withTotalElements(319)
                 .withContent(
@@ -62,7 +60,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
 
     Collection collection = Collection.builder().uuid(extractFirstUuidFromPath(path)).build();
 
-    when(collectionService.findDigitalObjects(eq(collection), any(SearchPageRequest.class)))
+    when(collectionService.findDigitalObjects(eq(collection), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path);
@@ -159,9 +157,9 @@ public class V3CollectionControllerTest extends BaseControllerTest {
   @ValueSource(
       strings = {"/v3/collections/search?pageSize=1", "/latest/collections/search?pageSize=1"})
   public void searchCollections(String path) throws Exception {
-    SearchPageResponse<Collection> expected =
-        (SearchPageResponse)
-            SearchPageResponse.builder()
+    PageResponse<Collection> expected =
+        (PageResponse)
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forAscendingOrderedField("label", "de")
@@ -189,7 +187,7 @@ public class V3CollectionControllerTest extends BaseControllerTest {
                         .publicationStart("2020-10-01")
                         .build())
                 .build();
-    when(collectionService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(collectionService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v3/collections/search.json");
   }

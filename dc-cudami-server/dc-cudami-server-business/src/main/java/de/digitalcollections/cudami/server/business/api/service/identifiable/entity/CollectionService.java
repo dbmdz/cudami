@@ -1,14 +1,12 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -34,30 +32,25 @@ public interface CollectionService extends NodeService<Collection>, EntityServic
 
   PageResponse<Collection> findActive(PageRequest pageRequest);
 
-  SearchPageResponse<Collection> findActive(SearchPageRequest searchPageRequest);
+  PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest);
 
-  SearchPageResponse<Collection> findActiveChildren(UUID uuid, SearchPageRequest searchPageRequest);
+  default PageResponse<DigitalObject> findDigitalObjects(
+      Collection collection, PageRequest pageRequest) {
+    if (collection == null) {
+      return null;
+    }
+    return findDigitalObjects(collection.getUuid(), pageRequest);
+  }
+
+  PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
+
+  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   Collection getActive(UUID uuid);
 
   Collection getActive(UUID uuid, Locale pLocale);
 
   List<Collection> getActiveChildren(UUID uuid);
-
-  PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest);
-
-  default SearchPageResponse<DigitalObject> findDigitalObjects(
-      Collection collection, SearchPageRequest searchPageRequest) {
-    if (collection == null) {
-      return null;
-    }
-    return findDigitalObjects(collection.getUuid(), searchPageRequest);
-  }
-
-  SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, SearchPageRequest searchPageRequest);
-
-  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering);
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {

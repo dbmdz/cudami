@@ -11,8 +11,8 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -114,8 +114,8 @@ public class WebpagesController extends AbstractController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubpages(uuid, searchPageRequest);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    return service.findSubpages(uuid, pageRequest);
   }
 
   @GetMapping("/api/webpages/{uuid}")

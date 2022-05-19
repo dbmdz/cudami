@@ -3,10 +3,8 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.Arrays;
 import java.util.List;
@@ -87,8 +85,6 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
 
   PageResponse<N> findChildren(UUID uuid, PageRequest pageRequest);
 
-  SearchPageResponse<N> findChildren(UUID uuid, SearchPageRequest searchPageRequest);
-
   default N getParent(N node) {
     if (node == null) {
       return null;
@@ -101,8 +97,6 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
   List<N> getParents(UUID uuid);
 
   PageResponse<N> findRootNodes(PageRequest pageRequest);
-
-  SearchPageResponse<N> findRootNodes(SearchPageRequest searchPageRequest);
 
   List<Locale> getRootNodesLanguages();
 

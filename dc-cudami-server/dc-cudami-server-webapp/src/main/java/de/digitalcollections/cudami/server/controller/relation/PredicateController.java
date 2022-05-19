@@ -25,14 +25,19 @@ public class PredicateController {
   }
 
   @Operation(summary = "Get all predicates")
-  @GetMapping(value = {"/v5/predicates", "/v3/predicates", "/latest/predicates"})
+  @GetMapping(value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"})
   public List<Predicate> getAll() {
     return predicateService.getAll();
   }
 
   @Operation(summary = "create or update a predicate, identified by its value")
   @PutMapping(
-      value = {"/v5/predicates/{value}", "/v3/predicates/{value}", "/latest/predicates/{value}"},
+      value = {
+        "/v6/predicates/{value}",
+        "/v5/predicates/{value}",
+        "/v3/predicates/{value}",
+        "/latest/predicates/{value}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("value") String value, @RequestBody Predicate predicate, BindingResult errors)

@@ -12,10 +12,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -53,13 +51,24 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public SearchPageResponse<Topic> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Topic>) repository).findChildren(uuid, searchPageRequest);
+  public PageResponse<Topic> findChildren(UUID nodeUuid, PageRequest pageRequest) {
+    return ((NodeRepository<Topic>) repository).findChildren(nodeUuid, pageRequest);
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getEntities(topicUuid);
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).findEntities(topicUuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
+    return ((TopicRepository) repository).findFileResources(topicUuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
+    return ((NodeRepository<Topic>) repository).findRootNodes(pageRequest);
   }
 
   @Override
@@ -73,23 +82,13 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public PageResponse<Topic> findChildren(UUID nodeUuid, PageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).findChildren(nodeUuid, pageRequest);
-  }
-
-  @Override
-  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).findEntities(topicUuid, pageRequest);
+  public List<Entity> getEntities(UUID topicUuid) {
+    return ((TopicRepository) repository).getEntities(topicUuid);
   }
 
   @Override
   public List<FileResource> getFileResources(UUID topicUuid) {
     return ((TopicRepository) repository).getFileResources(topicUuid);
-  }
-
-  @Override
-  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
-    return ((TopicRepository) repository).findFileResources(topicUuid, pageRequest);
   }
 
   @Override
@@ -113,11 +112,6 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
-    return ((NodeRepository<Topic>) repository).findRootNodes(pageRequest);
-  }
-
-  @Override
   public List<Locale> getRootNodesLanguages() {
     return ((NodeRepository<Topic>) repository).getRootNodesLanguages();
   }
@@ -138,6 +132,11 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
+  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws IdentifiableServiceException {
+    return ((NodeRepository<Topic>) repository).saveWithParent(childUuid, parentUuid);
+  }
+
+  @Override
   public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
     return ((TopicRepository) repository).setEntities(topicUuid, entities);
   }
@@ -148,18 +147,7 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws IdentifiableServiceException {
-    return ((NodeRepository<Topic>) repository).saveWithParent(childUuid, parentUuid);
-  }
-
-  @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<Topic> children) {
     return ((NodeRepository<Topic>) repository).updateChildrenOrder(parentUuid, children);
-  }
-
-  @Override
-  public SearchPageResponse<Topic> findRootNodes(SearchPageRequest searchPageRequest) {
-    setDefaultSorting(searchPageRequest);
-    return ((NodeRepository<Topic>) repository).findRootNodes(searchPageRequest);
   }
 }

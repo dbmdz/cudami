@@ -47,4 +47,18 @@
                 <activatedProfile>production</activatedProfile>
             </activatedProfiles>
         </action>
+        <action>
+            <actionName>CUSTOM-mvn clean install -Pproduction -DskipTests=true</actionName>
+            <displayName>mvn clean install -Pproduction -DskipTests=true</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>production</activatedProfile>
+            </activatedProfiles>
+        </action>
     </actions>

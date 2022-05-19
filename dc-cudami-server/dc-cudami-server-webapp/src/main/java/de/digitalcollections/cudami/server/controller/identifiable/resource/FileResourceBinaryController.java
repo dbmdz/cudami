@@ -43,7 +43,7 @@ public class FileResourceBinaryController {
 
   @Operation(summary = "Save a file to the disk")
   @PostMapping(
-      value = {"/v5/files", "/v2/files", "/latest/files"},
+      value = {"/v6/files", "/v5/files", "/v2/files", "/latest/files"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource upload(HttpServletRequest request) throws IOException, ValidationException {
     FileResource fileResource = null;

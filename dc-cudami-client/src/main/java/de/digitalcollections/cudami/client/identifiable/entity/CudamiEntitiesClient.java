@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesClient<E> {
-  private static final String BASE_ENDPOINT_ENTITIES = "/v5/entities";
+
+  private static final String BASE_ENDPOINT_ENTITIES = API_VERSION_PREFIX + "/entities";
 
   public CudamiEntitiesClient(
       HttpClient http,

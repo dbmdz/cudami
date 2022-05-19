@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.resource;
 
+import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -29,7 +31,7 @@ public class CudamiFileResourcesBinaryClient {
 
   private FileResource doPost(HttpEntity entity) throws TechnicalException {
     try {
-      HttpPost post = new HttpPost(serverUri + "/v5/files");
+      HttpPost post = new HttpPost(serverUri + API_VERSION_PREFIX + "/files");
       post.setEntity(entity);
       HttpClient client = HttpClientBuilder.create().build();
       HttpResponse response = client.execute(post);

@@ -6,15 +6,14 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -103,12 +102,12 @@ public class V3CollectionController {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest =
-        new SearchPageRequest(searchTerm, pageNumber, pageSize, new Sorting());
+    PageRequest searchPageRequest =
+        new PageRequest(searchTerm, pageNumber, pageSize, new Sorting());
 
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    SearchPageResponse<DigitalObject> response =
+    PageResponse<DigitalObject> response =
         collectionService.findDigitalObjects(collection, searchPageRequest);
 
     // Fix the attributes, which are missing or different in new model
@@ -116,7 +115,10 @@ public class V3CollectionController {
         fixPageResponse(
             response, "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 
   @Operation(
@@ -244,7 +246,7 @@ public class V3CollectionController {
       throws JsonProcessingException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
     PageResponse<Collection> response;
@@ -303,12 +305,12 @@ public class V3CollectionController {
           @RequestParam(name = "active", required = false)
           String active)
       throws JsonProcessingException {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       pageRequest.setSorting(sorting);
     }
-    SearchPageResponse<Collection> response;
+    PageResponse<Collection> response;
     if (active != null) {
       response = collectionService.findActive(pageRequest);
     } else {
@@ -317,7 +319,11 @@ public class V3CollectionController {
 
     // Fix the attributes, which are missing or different in new model
     JSONObject result = fixPageResponse(response);
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 
   private JSONObject fixPageResponse(

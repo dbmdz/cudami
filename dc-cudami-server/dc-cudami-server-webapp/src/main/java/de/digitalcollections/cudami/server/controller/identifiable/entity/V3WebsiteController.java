@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -143,13 +144,13 @@ public class V3WebsiteController {
           @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy)
       throws JsonProcessingException {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(null, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
+      Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
 
-    SearchPageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
+    PageResponse<Webpage> response = websiteService.findRootWebpages(uuid, searchPageRequest);
     if (response == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -165,6 +166,9 @@ public class V3WebsiteController {
       rootPage.put("entityPartType", "WEBPAGE");
     }
 
-    return new ResponseEntity<>(result.toString(), HttpStatus.OK);
+    String resultStr = result.toString();
+
+    // TODO replace "query"
+    return new ResponseEntity<>(resultStr, HttpStatus.OK);
   }
 }

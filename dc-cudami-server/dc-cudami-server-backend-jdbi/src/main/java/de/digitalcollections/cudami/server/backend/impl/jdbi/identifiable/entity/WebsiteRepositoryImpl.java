@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -82,16 +82,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Website website = super.getByUuidAndFiltering(uuid, filtering);
-
-    if (website != null) {
-      website.setRootPages(getRootPages(website));
-    }
-    return website;
-  }
-
-  @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
     allowedOrderByFields.addAll(Arrays.asList("url"));
@@ -109,7 +99,17 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Website website = super.getByUuidAndFiltering(uuid, filtering);
+
+    if (website != null) {
+      website.setRootPages(getRootPages(website));
+    }
+    return website;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

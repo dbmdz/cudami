@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.view.RenderingTemplateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,18 +19,18 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
     implements RenderingTemplateRepository {
 
   public static final String MAPPING_PREFIX = "rt";
-  public static final String TABLE_ALIAS = "rt";
-  public static final String TABLE_NAME = "rendering_templates";
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, created, label, description, name, last_modified";
   public static final String SQL_INSERT_VALUES =
       " :uuid, :created, :label::JSONB, :description::JSONB, :name, :lastModified";
+  public static final String TABLE_ALIAS = "rt";
   public static final String SQL_REDUCED_FIELDS_RT =
       String.format(
           " %1$s.uuid, %1$s.created, %1$s.label, %1$s.name, %1$s.last_modified", TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_RT =
       SQL_REDUCED_FIELDS_RT + String.format(", %s.description", TABLE_ALIAS);
+  public static final String TABLE_NAME = "rendering_templates";
 
   public RenderingTemplateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
@@ -49,6 +49,11 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
             h -> h.createQuery(query.toString()).mapToBean(RenderingTemplate.class).list());
     long total = count();
     return new PageResponse(result, pageRequest, total);
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("label", "name"));
   }
 
   @Override
@@ -71,12 +76,7 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("label", "name"));
-  }
-
-  @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

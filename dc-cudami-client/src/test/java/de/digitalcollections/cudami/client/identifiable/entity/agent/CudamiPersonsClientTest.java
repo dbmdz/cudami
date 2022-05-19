@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.client.identifiable.entity.BaseCudamiEntitiesClientTest;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +26,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
         "get",
         "/placeofbirth/"
             + placeUuid
-            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
@@ -38,7 +38,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
         "get",
         "/placeofdeath/"
             + placeUuid
-            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst&foo=eq:bar&gnarf=eq:krchch");
+            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
   }
 
   @Test
@@ -70,14 +70,14 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   }
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
+  @DisplayName("can execute the find method with a PageRequest")
   @Override
-  public void testFindWithSearchPageRequest() throws Exception {
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson = "{}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<Person> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<Person> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");

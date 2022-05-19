@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.client.identifiable.BaseCudamiIdentifiablesClientTest;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,20 +18,20 @@ class CudamiFileResourcesMetadataClientTest
   @Test
   @DisplayName("can find FileResources by their type")
   public void testFindFileResourcesByType() throws Exception {
-    client.findByType(new SearchPageRequest(), "jpg");
+    client.findByType(new PageRequest(), "jpg");
     verifyHttpRequestByMethodAndRelativeURL("get", "/type/jpg?pageNumber=0&pageSize=0");
   }
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
+  @DisplayName("can execute the find method with a PageRequest")
   @Override
-  public void testFindWithSearchPageRequest() throws Exception {
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson =
         "{\"content\":[{\"objectType\":\"FILE_RESOURCE\", \"fileResource\":{\"entityType\":\"FILE_RESOURCE\",\"identifiableType\":\"ENTITY\"}}]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<FileResource> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<FileResource> response = client.find(pageRequest);
     assertThat(response).isNotNull();
     assertThat(response.getContent().get(0)).isExactlyInstanceOf(FileResource.class);
 

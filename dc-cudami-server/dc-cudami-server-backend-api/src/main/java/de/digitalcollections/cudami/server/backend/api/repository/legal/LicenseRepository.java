@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.api.repository.legal;
 
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;

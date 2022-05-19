@@ -19,7 +19,12 @@ public class CudamiIdentifiablesClientTest
 
     public CudamiIdentifiablesClientForIdentifiables(
         HttpClient httpClient, String serverUrl, ObjectMapper objectMapper) {
-      super(httpClient, serverUrl, Identifiable.class, objectMapper, "/v5/identifiable");
+      super(
+          httpClient,
+          serverUrl,
+          Identifiable.class,
+          objectMapper,
+          API_VERSION_PREFIX + "/identifiable");
     }
   }
 }

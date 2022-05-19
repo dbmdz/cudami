@@ -13,7 +13,7 @@ import java.util.UUID;
 public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
 
   public CudamiItemsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Item.class, mapper, "/v5/items");
+    super(http, serverUrl, Item.class, mapper, API_VERSION_PREFIX + "/items");
   }
 
   public Boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) throws TechnicalException {

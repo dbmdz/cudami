@@ -6,10 +6,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -72,7 +72,7 @@ public class ItemController {
 
   @Operation(summary = "count all items")
   @GetMapping(
-      value = {"/v5/items/count", "/v2/items/count", "/latest/items/count"},
+      value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return itemService.count();
@@ -80,15 +80,16 @@ public class ItemController {
 
   @Operation(summary = "get all items")
   @GetMapping(
-      value = {"/v5/items", "/v2/items", "/latest/items"},
+      value = {"/v6/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Item> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "initial", required = false) String initial) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -102,10 +103,14 @@ public class ItemController {
   @Operation(summary = "Get an item by namespace and id")
   @GetMapping(
       value = {
-        "/v5/items/identifier/{namespace}:{id}", "/v5/items/identifier/{namespace}:{id}.json",
-        "/v2/items/identifier/{namespace}:{id}", "/v2/items/identifier/{namespace}:{id}.json",
+        "/v6/items/identifier/{namespace}:{id}",
+        "/v6/items/identifier/{namespace}:{id}.json",
+        "/v5/items/identifier/{namespace}:{id}",
+        "/v5/items/identifier/{namespace}:{id}.json",
+        "/v2/items/identifier/{namespace}:{id}",
+        "/v2/items/identifier/{namespace}:{id}.json",
         "/latest/items/identifier/{namespace}:{id}",
-            "/latest/items/identifier/{namespace}:{id}.json"
+        "/latest/items/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(
@@ -116,7 +121,12 @@ public class ItemController {
 
   @Operation(summary = "Get an item by namespace and id")
   @GetMapping(
-      value = {"/v5/items/identifier", "/v2/items/identifier", "/latest/items/identifier"},
+      value = {
+        "/v6/items/identifier",
+        "/v5/items/identifier",
+        "/v2/items/identifier",
+        "/latest/items/identifier"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> getByIdentifier(
       @RequestParam(name = "namespace", required = true) String namespace,
@@ -130,7 +140,7 @@ public class ItemController {
 
   @Operation(summary = "Get an item by uuid")
   @GetMapping(
-      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
+      value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByUuid(
       @Parameter(
@@ -175,7 +185,7 @@ public class ItemController {
 
   @Operation(summary = "save a newly created item")
   @PostMapping(
-      value = {"/v5/items", "/v2/items", "/latest/items"},
+      value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -184,7 +194,7 @@ public class ItemController {
 
   @Operation(summary = "update an item")
   @PutMapping(
-      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
+      value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {

@@ -13,11 +13,6 @@
   <artifactId>dc-cudami-server-business</artifactId>
   <packaging>jar</packaging>
 
-  <properties>
-    <version.dc-commons-web>1.0.1</version.dc-commons-web>
-    <version.jscience>4.3.1</version.jscience>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>com.github.spotbugs</groupId>
@@ -26,7 +21,7 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-web</artifactId>
-      <version>${version.dc-commons-web}</version>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
@@ -47,7 +42,7 @@
     <dependency>
       <groupId>org.jscience</groupId>
       <artifactId>jscience</artifactId>
-      <version>${version.jscience}</version>
+      <version>4.3.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

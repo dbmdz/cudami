@@ -4,8 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.legal.LicenseRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,19 +76,23 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
 
   @Override
   public PageResponse<License> find(PageRequest pageRequest) {
-    return find(pageRequest, null, new HashMap<>());
+    return find(pageRequest, null, null);
   }
 
   protected PageResponse<License> find(
       PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
+    if (argumentMappings == null) {
+      argumentMappings = new HashMap<>(0);
+    }
     if (commonSql == null) {
       commonSql = " FROM " + tableName + " AS " + tableAlias;
     }
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT *" + commonSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSqlBuilder);
     addPageRequestParams(pageRequest, innerQuery);
-
     String orderBy = getOrderBy(pageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
       orderBy = " ORDER BY " + orderBy;
@@ -96,11 +100,10 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
     List<License> result =
         retrieveList(SQL_REDUCED_FIELDS_LI, innerQuery, argumentMappings, orderBy);
 
-    StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSql);
-    addFiltering(pageRequest, sqlCount, argumentMappings);
+    StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(sqlCount, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
@@ -133,7 +136,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

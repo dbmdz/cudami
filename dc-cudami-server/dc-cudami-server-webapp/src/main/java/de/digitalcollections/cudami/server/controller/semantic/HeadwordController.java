@@ -3,14 +3,14 @@ package de.digitalcollections.cudami.server.controller.semantic;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,7 +44,7 @@ public class HeadwordController {
 
   @Operation(summary = "Get count of headwords")
   @GetMapping(
-      value = {"/v5/headwords/count"},
+      value = {"/v6/headwords/count", "/v5/headwords/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return headwordService.count();
@@ -52,7 +52,7 @@ public class HeadwordController {
 
   @Operation(summary = "Delete an headword with all its relations")
   @DeleteMapping(
-      value = {"/v5/headwords/{uuid}"},
+      value = {"/v6/headwords/{uuid}", "/v5/headwords/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -67,7 +67,7 @@ public class HeadwordController {
 
   @Operation(summary = "Get all headwords as (filtered, sorted, paged) list")
   @GetMapping(
-      value = {"/v5/headwords"},
+      value = {"/v6/headwords", "/v5/headwords"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Headword> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -102,7 +102,7 @@ public class HeadwordController {
 
   @Operation(summary = "Find limited amount of random headwords")
   @GetMapping(
-      value = {"/v5/headwords/random"},
+      value = {"/v6/headwords/random", "/v5/headwords/random"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Headword> getRandom(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
@@ -112,6 +112,7 @@ public class HeadwordController {
   @Operation(summary = "Get an headword by uuid")
   @GetMapping(
       value = {
+        "/v6/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,7 +122,7 @@ public class HeadwordController {
 
   @Operation(summary = "Get related entities of an headword")
   @GetMapping(
-      value = {"/v5/headwords/{uuid}/related/entities"},
+      value = {"/v6/headwords/{uuid}/related/entities", "/v5/headwords/{uuid}/related/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> findRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -134,7 +135,10 @@ public class HeadwordController {
 
   @Operation(summary = "Get related file resources of an headword")
   @GetMapping(
-      value = {"/v5/headwords/{uuid}/related/fileresources"},
+      value = {
+        "/v6/headwords/{uuid}/related/fileresources",
+        "/v5/headwords/{uuid}/related/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findRelatedFileResources(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -147,7 +151,7 @@ public class HeadwordController {
 
   @Operation(summary = "Save a newly created headword")
   @PostMapping(
-      value = {"/v5/headwords"},
+      value = {"/v6/headwords", "/v5/headwords"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword save(@RequestBody Headword headword, BindingResult errors)
       throws IdentifiableServiceException, ServiceException {
@@ -156,7 +160,7 @@ public class HeadwordController {
 
   @Operation(summary = "Save list of related entities for a given headword")
   @PostMapping(
-      value = {"/v5/headwords/{uuid}/entities"},
+      value = {"/v6/headwords/{uuid}/entities", "/v5/headwords/{uuid}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> setRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -167,7 +171,7 @@ public class HeadwordController {
 
   @Operation(summary = "Save list of related fileresources for a given headword")
   @PostMapping(
-      value = {"/v5/headwords/{uuid}/fileresources"},
+      value = {"/v6/headwords/{uuid}/fileresources", "/v5/headwords/{uuid}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setRelatedFileResources(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -178,7 +182,7 @@ public class HeadwordController {
 
   @Operation(summary = "Update an headword")
   @PutMapping(
-      value = {"/v5/headwords/{uuid}"},
+      value = {"/v6/headwords/{uuid}", "/v5/headwords/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword update(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")

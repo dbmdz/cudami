@@ -8,12 +8,12 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -67,10 +67,18 @@ class DigitalObjectControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v5/digitalobjects?pageNumber=0&pageSize=10000&parent.uuid=eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
+        "/v6/digitalobjects?pageNumber=0&pageSize=10000&parent.uuid=eq:1c419226-8d61-4efa-923a-7fbaf961eb9d"
       })
   public void filterByParentUUID(String path) throws Exception {
     UUID parentUuid = UUID.fromString("1c419226-8d61-4efa-923a-7fbaf961eb9d");
+
+    PageRequest expectedPageRequest = new PageRequest();
+    expectedPageRequest.setPageSize(10000);
+    expectedPageRequest.setPageNumber(0);
+    FilterCriterion filterCriterion =
+        new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid);
+    Filtering filtering = new Filtering(List.of(filterCriterion));
+    expectedPageRequest.setFiltering(filtering);
 
     PageResponse<DigitalObject> expected = new PageResponse<>();
     expected.setContent(
@@ -88,21 +96,14 @@ class DigitalObjectControllerTest extends BaseControllerTest {
                 .refId(72)
                 .parent(DigitalObject.builder().uuid(parentUuid).build())
                 .build()));
+    expected.setPageRequest(expectedPageRequest);
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
 
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
         ArgumentCaptor.forClass(PageRequest.class);
 
-    PageRequest expectedPageRequest = new PageRequest();
-    expectedPageRequest.setPageSize(10000);
-    expectedPageRequest.setPageNumber(0);
-    FilterCriterion filterCriterion =
-        new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parentUuid);
-    Filtering filtering = new Filtering(List.of(filterCriterion));
-    expectedPageRequest.setFiltering(filtering);
-
-    testJson(path, "/v5/digitalobjects/filtered_by_parent.json");
+    testJson(path, "/v6/digitalobjects/filtered_by_parent.json");
 
     verify(digitalObjectService, times(1)).find(pageRequestArgumentCaptor.capture());
     assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);

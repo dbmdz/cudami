@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic;
 
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.UUID;

@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -12,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,12 +96,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Article article = super.getByUuidAndFiltering(uuid, filtering);
+  public Article getByIdentifier(Identifier identifier) {
+    Article article = super.getByIdentifier(identifier);
 
     if (article != null) {
-      List<Agent> creators = getCreators(uuid);
-      article.setCreators(creators);
+      article.setCreators(getCreators(article.getUuid()));
     }
     return article;
   }
@@ -117,11 +116,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByIdentifier(Identifier identifier) {
-    Article article = super.getByIdentifier(identifier);
+  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Article article = super.getByUuidAndFiltering(uuid, filtering);
 
     if (article != null) {
-      article.setCreators(getCreators(article.getUuid()));
+      List<Agent> creators = getCreators(uuid);
+      article.setCreators(creators);
     }
     return article;
   }

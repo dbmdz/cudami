@@ -198,7 +198,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }

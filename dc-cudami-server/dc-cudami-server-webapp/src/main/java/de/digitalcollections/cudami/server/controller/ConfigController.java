@@ -21,7 +21,7 @@ public class ConfigController {
 
   @Operation(summary = "Get cudami configuration")
   @GetMapping(
-      value = {"/v5/config"},
+      value = {"/v6/config", "/v5/config"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CudamiConfig getCudamiConfig() {
     return cudamiConfig;

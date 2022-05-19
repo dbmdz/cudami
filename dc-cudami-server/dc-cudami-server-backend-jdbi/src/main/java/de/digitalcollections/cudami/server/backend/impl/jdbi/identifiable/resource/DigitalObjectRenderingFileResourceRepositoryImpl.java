@@ -42,13 +42,36 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
 
+  private FileResource fillResourceType(FileResource untypedFileResource) {
+    switch (untypedFileResource.getMimeType().getPrimaryType()) {
+      case "application":
+        untypedFileResource.setFileResourceType(FileResourceType.APPLICATION);
+        break;
+      case "audio":
+        untypedFileResource.setFileResourceType(FileResourceType.AUDIO);
+        break;
+      case "image":
+        untypedFileResource.setFileResourceType(FileResourceType.IMAGE);
+        break;
+      case "text":
+        untypedFileResource.setFileResourceType(FileResourceType.TEXT);
+        break;
+      case "video":
+        untypedFileResource.setFileResourceType(FileResourceType.VIDEO);
+        break;
+      default:
+        // nop
+    }
+    return untypedFileResource;
+  }
+
   @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(Arrays.asList("digitalobject_uuid", "fileresource_uuid", "sortIndex"));
   }
 
   @Override
-  protected String getColumnName(String modelProperty) {
+  public String getColumnName(String modelProperty) {
     return null;
   }
 
@@ -75,7 +98,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
                 + " ORDER by "
                 + getTableAlias()
                 + ".sortindex ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
+    Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", digitalObjectUuid);
 
     List<FileResource> fileResources =
@@ -124,28 +147,5 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
           }
           preparedBatch.execute();
         });
-  }
-
-  private FileResource fillResourceType(FileResource untypedFileResource) {
-    switch (untypedFileResource.getMimeType().getPrimaryType()) {
-      case "application":
-        untypedFileResource.setFileResourceType(FileResourceType.APPLICATION);
-        break;
-      case "audio":
-        untypedFileResource.setFileResourceType(FileResourceType.AUDIO);
-        break;
-      case "image":
-        untypedFileResource.setFileResourceType(FileResourceType.IMAGE);
-        break;
-      case "text":
-        untypedFileResource.setFileResourceType(FileResourceType.TEXT);
-        break;
-      case "video":
-        untypedFileResource.setFileResourceType(FileResourceType.VIDEO);
-        break;
-      default:
-        // nop
-    }
-    return untypedFileResource;
   }
 }

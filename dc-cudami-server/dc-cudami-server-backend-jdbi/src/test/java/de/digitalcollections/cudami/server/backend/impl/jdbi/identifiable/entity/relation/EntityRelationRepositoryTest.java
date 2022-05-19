@@ -8,8 +8,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.relation.PredicateRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
 import java.util.ArrayList;
 import java.util.List;

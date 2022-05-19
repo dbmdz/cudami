@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.client.identifiable.entity.BaseCudamiEntitiesClientTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,14 +34,14 @@ class CudamiCorporateBodiesClientTest
   }
 
   @Test
-  @DisplayName("can execute the find method with a SearchPageRequest")
+  @DisplayName("can execute the find method with a PageRequest")
   @Override
-  public void testFindWithSearchPageRequest() throws Exception {
+  public void testFindWithPageRequest() throws Exception {
     String bodyJson = "{}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    SearchPageResponse<CorporateBody> response = client.find(searchPageRequest);
+    PageRequest pageRequest = new PageRequest();
+    PageResponse<CorporateBody> response = client.find(pageRequest);
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");

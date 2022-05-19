@@ -3,15 +3,13 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +48,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Get a paged list of all linkedDataFileResources")
   @GetMapping(
-      value = {"/v5/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -80,16 +78,16 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Find a limited and filtered amount of LinkedDataFileResources")
   @GetMapping(
-      value = {"/v5/linkeddatafileresources/search"},
+      value = {"/v6/linkeddatafileresources/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<LinkedDataFileResource> find(
+  public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "uri", required = false)
           FilterCriterion<String> encodedUriFilterCriterion) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -110,7 +108,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")
   @GetMapping(
-      value = {"/v5/linkeddatafileresources/{uuid}"},
+      value = {"/v6/linkeddatafileresources/{uuid}", "/v5/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LinkedDataFileResource> getByUuid(
       @Parameter(
@@ -137,7 +135,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Save a newly created linkedDataFileResource")
   @PostMapping(
-      value = {"/v5/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources", "/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource save(@RequestBody LinkedDataFileResource linkedDataFileResource)
       throws IdentifiableServiceException, ValidationException {
@@ -146,7 +144,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Update a linkedDataFileResource")
   @PutMapping(
-      value = {"/v5/linkeddatafileresources/{uuid}"},
+      value = {"/v5/linkeddatafileresources/{uuid}", "/v6/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource update(
       @PathVariable UUID uuid,

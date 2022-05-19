@@ -5,10 +5,8 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -18,13 +16,7 @@ import java.util.UUID;
 public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
 
   public CudamiTopicsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Topic.class, mapper, "/v5/topics");
-  }
-
-  @Override
-  public SearchPageResponse<Topic> find(SearchPageRequest pageRequest) throws TechnicalException {
-    // FIXME /search or not. make everywhere the same endpoint syntax please!
-    return this.doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
+    super(http, serverUrl, Topic.class, mapper, API_VERSION_PREFIX + "/topics");
   }
 
   public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
@@ -45,16 +37,14 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
         String.format("%s/%s/fileresources", baseEndpoint, uuid), pageRequest, FileResource.class);
   }
 
-  public PageResponse<Topic> findSubtopics(UUID uuid, SearchPageRequest searchPageRequest)
+  public PageResponse<Topic> findSubtopics(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/%s/subtopics", baseEndpoint, uuid), searchPageRequest);
+    return doGetRequestForPagedObjectList(
+        String.format("%s/%s/subtopics", baseEndpoint, uuid), pageRequest);
   }
 
-  public SearchPageResponse<Topic> findTopTopics(SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format("%s/top", baseEndpoint), searchPageRequest);
+  public PageResponse<Topic> findTopTopics(PageRequest pageRequest) throws TechnicalException {
+    return doGetRequestForPagedObjectList(String.format("%s/top", baseEndpoint), pageRequest);
   }
 
   public List<Entity> getAllEntities(UUID uuid) throws TechnicalException {

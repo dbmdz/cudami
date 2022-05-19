@@ -2,15 +2,15 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
 /** Service for Website. */
 public interface WebsiteService extends EntityService<Website> {
 
-  SearchPageResponse<Webpage> findRootWebpages(UUID uuid, SearchPageRequest searchPageRequest);
+  PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest);
 
   default List<Webpage> getRootWebpages(Website website) {
     if (website == null) {

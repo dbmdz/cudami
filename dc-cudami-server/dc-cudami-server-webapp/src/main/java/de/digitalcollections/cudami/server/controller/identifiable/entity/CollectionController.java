@@ -4,17 +4,15 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,6 +53,7 @@ public class CollectionController {
   @Operation(summary = "Add an existing digital object to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -83,6 +82,7 @@ public class CollectionController {
   @Operation(summary = "Add existing digital objects to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects",
         "/v5/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects",
         "/latest/collections/{uuid}/digitalobjects"
@@ -107,6 +107,7 @@ public class CollectionController {
   @Operation(summary = "Add an existing collection to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
@@ -135,6 +136,7 @@ public class CollectionController {
   @Operation(summary = "Add existing collections to an existing collection")
   @PostMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections",
         "/v5/collections/{uuid}/subcollections",
         "/v3/collections/{uuid}/subcollections",
         "/latest/collections/{uuid}/subcollections"
@@ -158,62 +160,32 @@ public class CollectionController {
 
   @Operation(summary = "Get count of collections")
   @GetMapping(
-      value = {"/v5/collections/count", "/v2/collections/count", "/latest/collections/count"},
+      value = {
+        "/v6/collections/count",
+        "/v5/collections/count",
+        "/v2/collections/count",
+        "/latest/collections/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return collectionService.count();
-  }
-
-  @Operation(summary = "Get all collections")
-  @GetMapping(
-      value = {"/v5/collections"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (active != null) {
-      return collectionService.findActive(pageRequest);
-    }
-    return collectionService.find(pageRequest);
-  }
-
-  @Operation(summary = "Get all top collections")
-  @GetMapping(
-      value = {"/v5/collections/top", "/v2/collections/top", "/latest/collections/top"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findTopCollections(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return collectionService.findRootNodes(searchPageRequest);
   }
 
   @Operation(
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v5/collections/search"},
+      value = {"/v6/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<Collection> find(
+  // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
+  // if unknown)
+  public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "active", required = false) String active) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -224,9 +196,85 @@ public class CollectionController {
     return collectionService.find(pageRequest);
   }
 
+  @Operation(summary = "Get paged digital objects of a collection")
+  @GetMapping(
+      value = {"/v6/collections/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<DigitalObject> findDigitalObjects(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+
+    Collection collection = new Collection();
+    collection.setUuid(collectionUuid);
+    return collectionService.findDigitalObjects(collection, searchPageRequest);
+  }
+
+  @Operation(
+      summary = "Get all related - by the given predicate - corporate bodies of a collection")
+  @GetMapping(
+      value = {
+        "/v6/collections/{uuid}/related/corporatebodies",
+        "/v5/collections/{uuid}/related/corporatebodies",
+        "/v3/collections/{uuid}/related/corporatebodies",
+        "/latest/collections/{uuid}/related/corporatebodies"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<CorporateBody> findRelatedCorporateBodies(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
+    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
+    return collectionService.findRelatedCorporateBodies(uuid, filtering);
+  }
+
+  @Operation(summary = "Get (active or all) paged subcollections of a collection")
+  @GetMapping(
+      value = {"/v6/collections/{uuid}/subcollections"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Collection> findSubcollections(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID collectionUuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "active", required = false) String active,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
+    if (active != null) {
+      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+    }
+    return collectionService.findChildren(collectionUuid, searchPageRequest);
+  }
+
+  @Operation(summary = "Get all top collections")
+  @GetMapping(
+      value = {"/v6/collections/top"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Collection> findTopCollections(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return collectionService.findRootNodes(pageRequest);
+  }
+
   @Operation(summary = "Get the breadcrumb for a collection")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/breadcrumb",
         "/v5/collections/{uuid}/breadcrumb",
         "/v3/collections/{uuid}/breadcrumb",
         "/latest/collections/{uuid}/breadcrumb"
@@ -266,6 +314,8 @@ public class CollectionController {
   @Operation(summary = "Get a collection by namespace and id")
   @GetMapping(
       value = {
+        "/v6/collections/identifier/{namespace}:{id}",
+        "/v6/collections/identifier/{namespace}:{id}.json",
         "/v5/collections/identifier/{namespace}:{id}",
         "/v5/collections/identifier/{namespace}:{id}.json",
         "/v2/collections/identifier/{namespace}:{id}",
@@ -281,7 +331,11 @@ public class CollectionController {
 
   @Operation(summary = "Get a collection by refId")
   @GetMapping(
-      value = {"/v5/collections/{refId:[0-9]+}", "/latest/collections/{refId:[0-9]+}"},
+      value = {
+        "/v6/collections/{refId:[0-9]+}",
+        "/v5/collections/{refId:[0-9]+}",
+        "/latest/collections/{refId:[0-9]+}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Collection> getByRefId(
       @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
@@ -295,6 +349,7 @@ public class CollectionController {
   @Operation(summary = "Get a collection by uuid")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -334,26 +389,10 @@ public class CollectionController {
     return new ResponseEntity<>(collection, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get paged digital objects of a collection")
-  @GetMapping(
-      value = {"/v5/collections/{uuid}/digitalobjects"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-
-    Collection collection = new Collection();
-    collection.setUuid(collectionUuid);
-    return collectionService.findDigitalObjects(collection, searchPageRequest);
-  }
-
   @Operation(summary = "Get the first created parent of a collection")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/parent",
         "/v5/collections/{uuid}/parent",
         "/v3/collections/{uuid}/parent",
         "/latest/collections/{uuid}/parent"
@@ -366,6 +405,7 @@ public class CollectionController {
   @Operation(summary = "Get parent collections")
   @GetMapping(
       value = {
+        "/v6/collections/{uuid}/parents",
         "/v5/collections/{uuid}/parents",
         "/v3/collections/{uuid}/parents",
         "/latest/collections/{uuid}/parents"
@@ -377,49 +417,10 @@ public class CollectionController {
     return collectionService.getParents(collectionUuid);
   }
 
-  @Operation(
-      summary = "Get all related - by the given predicate - corporate bodies of a collection")
-  @GetMapping(
-      value = {
-        "/v5/collections/{uuid}/related/corporatebodies",
-        "/v3/collections/{uuid}/related/corporatebodies",
-        "/latest/collections/{uuid}/related/corporatebodies"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<CorporateBody> findRelatedCorporateBodies(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "predicate", required = true) FilterCriterion<String> predicate) {
-    Filtering filtering = Filtering.builder().add("predicate", predicate).build();
-    return collectionService.findRelatedCorporateBodies(uuid, filtering);
-  }
-
-  @Operation(summary = "Get (active or all) paged subcollections of a collection")
-  @GetMapping(
-      value = {"/v5/collections/{uuid}/subcollections"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Collection> findSubcollections(
-      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
-          UUID collectionUuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (active != null) {
-      return collectionService.findActiveChildren(collectionUuid, searchPageRequest);
-    }
-    return collectionService.findChildren(collectionUuid, searchPageRequest);
-  }
-
   @Operation(summary = "Get languages of all top collections")
   @GetMapping(
       value = {
+        "/v6/collections/top/languages",
         "/v5/collections/top/languages",
         "/v2/collections/top/languages",
         "/latest/collections/top/languages"
@@ -432,6 +433,7 @@ public class CollectionController {
   @Operation(summary = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
         "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
@@ -460,6 +462,7 @@ public class CollectionController {
   @Operation(summary = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
+        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
         "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
@@ -487,7 +490,7 @@ public class CollectionController {
 
   @Operation(summary = "Save a newly created collection")
   @PostMapping(
-      value = {"/v5/collections", "/v2/collections", "/latest/collections"},
+      value = {"/v6/collections", "/v5/collections", "/v2/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -497,6 +500,7 @@ public class CollectionController {
   @Operation(summary = "Save existing digital objects into an existing collection")
   @PutMapping(
       value = {
+        "/v6/collections/{uuid}/digitalobjects",
         "/v5/collections/{uuid}/digitalobjects",
         "/v3/collections/{uuid}/digitalobjects",
         "/latest/collections/{uuid}/digitalobjects"
@@ -521,6 +525,7 @@ public class CollectionController {
   @Operation(summary = "Save a newly created collection with parent collection")
   @PostMapping(
       value = {
+        "/v6/collections/{parentUuid}/collection",
         "/v5/collections/{parentUuid}/collection",
         "/v2/collections/{parentUuid}/collection",
         "/latest/collections/{parentUuid}/collection"
@@ -537,7 +542,12 @@ public class CollectionController {
 
   @Operation(summary = "Update a collection")
   @PutMapping(
-      value = {"/v5/collections/{uuid}", "/v2/collections/{uuid}", "/latest/collections/{uuid}"},
+      value = {
+        "/v6/collections/{uuid}",
+        "/v5/collections/{uuid}",
+        "/v2/collections/{uuid}",
+        "/latest/collections/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)

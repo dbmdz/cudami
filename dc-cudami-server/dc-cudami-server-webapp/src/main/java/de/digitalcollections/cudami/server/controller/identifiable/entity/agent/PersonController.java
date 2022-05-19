@@ -3,16 +3,15 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "Person controller")
 public class PersonController {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
   private final PersonService personService;
@@ -50,7 +50,12 @@ public class PersonController {
 
   @Operation(summary = "count all persons")
   @GetMapping(
-      value = {"/v5/persons/count", "/v2/persons/count", "/latest/persons/count"},
+      value = {
+        "/v6/persons/count",
+        "/v5/persons/count",
+        "/v2/persons/count",
+        "/latest/persons/count"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return personService.count();
@@ -58,7 +63,7 @@ public class PersonController {
 
   @Operation(summary = "get all persons")
   @GetMapping(
-      value = {"/v5/persons", "/v2/persons", "/latest/persons"},
+      value = {"/v6/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -69,7 +74,7 @@ public class PersonController {
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -85,42 +90,9 @@ public class PersonController {
     return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
   }
 
-  @Operation(summary = "Get a person by namespace and id")
-  @GetMapping(
-      value = {
-        "/v5/persons/identifier/{namespace}:{id}", "/v5/persons/identifier/{namespace}:{id}.json",
-        "/v2/persons/identifier/{namespace}:{id}", "/v2/persons/identifier/{namespace}:{id}.json",
-        "/latest/persons/identifier/{namespace}:{id}",
-            "/latest/persons/identifier/{namespace}:{id}.json"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    Person result = personService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get a person by namespace and id")
-  @GetMapping(
-      value = {"/v5/persons/identifier", "/v2/persons/identifier", "/latest/persons/identifier"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> getByIdentifier(
-      @RequestParam(name = "namespace", required = true) String namespace,
-      @RequestParam(name = "id", required = true) String id,
-      HttpServletRequest request)
-      throws IdentifiableServiceException {
-    URI newLocation =
-        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
-    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
-  }
-
   @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
-      value = {
-        "/v5/persons/placeofbirth/{uuid}",
-        "/v2/persons/placeofbirth/{uuid}",
-        "/latest/persons/placeofbirth/{uuid}"
-      },
+      value = {"/v6/persons/placeofbirth/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfBirth(
       @Parameter(
@@ -142,11 +114,7 @@ public class PersonController {
 
   @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
-      value = {
-        "/v5/persons/placeofdeath/{uuid}",
-        "/v2/persons/placeofdeath/{uuid}",
-        "/latest/persons/placeofdeath/{uuid}"
-      },
+      value = {"/v6/persons/placeofdeath/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfDeath(
       @Parameter(
@@ -166,9 +134,48 @@ public class PersonController {
     return personService.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {
+        "/v6/persons/identifier/{namespace}:{id}",
+        "/v6/persons/identifier/{namespace}:{id}.json",
+        "/v5/persons/identifier/{namespace}:{id}",
+        "/v5/persons/identifier/{namespace}:{id}.json",
+        "/v2/persons/identifier/{namespace}:{id}",
+        "/v2/persons/identifier/{namespace}:{id}.json",
+        "/latest/persons/identifier/{namespace}:{id}",
+        "/latest/persons/identifier/{namespace}:{id}.json"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Person> getByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+    Person result = personService.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get a person by namespace and id")
+  @GetMapping(
+      value = {
+        "/v6/persons/identifier",
+        "/v5/persons/identifier",
+        "/v2/persons/identifier",
+        "/latest/persons/identifier"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Void> getByIdentifier(
+      @RequestParam(name = "namespace", required = true) String namespace,
+      @RequestParam(name = "id", required = true) String id,
+      HttpServletRequest request)
+      throws IdentifiableServiceException {
+    URI newLocation =
+        URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
+  }
+
   @Operation(summary = "Get a person by uuid")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/persons/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -201,6 +208,7 @@ public class PersonController {
   @Operation(summary = "Get a person's digital objects")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid}/digitalobjects",
         "/v5/persons/{uuid}/digitalobjects",
         "/v2/persons/{uuid}/digitalobjects",
         "/latest/persons/{uuid}/digitalobjects"
@@ -213,7 +221,12 @@ public class PersonController {
 
   @Operation(summary = "Get languages of all persons")
   @GetMapping(
-      value = {"/v5/persons/languages", "/v3/persons/languages", "/latest/persons/languages"},
+      value = {
+        "/v6/persons/languages",
+        "/v5/persons/languages",
+        "/v3/persons/languages",
+        "/latest/persons/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return personService.getLanguages();
@@ -222,6 +235,7 @@ public class PersonController {
   @Operation(summary = "Get a person's works")
   @GetMapping(
       value = {
+        "/v6/persons/{uuid}/works",
         "/v5/persons/{uuid}/works",
         "/v2/persons/{uuid}/works",
         "/latest/persons/{uuid}/works"
@@ -233,7 +247,7 @@ public class PersonController {
 
   @Operation(summary = "save a newly created person")
   @PostMapping(
-      value = {"/v5/persons", "/v2/persons", "/latest/persons"},
+      value = {"/v6/persons", "/v5/persons", "/v2/persons", "/latest/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -242,7 +256,12 @@ public class PersonController {
 
   @Operation(summary = "update a person")
   @PutMapping(
-      value = {"/v5/persons/{uuid}", "/v2/persons/{uuid}", "/latest/persons/{uuid}"},
+      value = {
+        "/v5/persons/{uuid}",
+        "/v6/persons/{uuid}",
+        "/v2/persons/{uuid}",
+        "/latest/persons/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)

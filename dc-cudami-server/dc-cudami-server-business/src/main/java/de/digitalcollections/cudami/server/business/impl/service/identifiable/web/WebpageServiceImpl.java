@@ -10,15 +10,13 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
@@ -52,26 +50,25 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public SearchPageResponse<Webpage> findActiveChildren(
-      UUID uuid, SearchPageRequest searchPageRequest) {
+  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
-    searchPageRequest.add(filtering);
-    return findChildren(uuid, searchPageRequest);
+    pageRequest.add(filtering);
+    return findChildren(uuid, pageRequest);
   }
 
   @Override
-  public SearchPageResponse<Webpage> findChildren(UUID uuid, SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Webpage>) repository).findChildren(uuid, searchPageRequest);
+  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
+    return ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootNodes(SearchPageRequest searchPageRequest) {
-    return ((NodeRepository<Webpage>) repository).findRootNodes(searchPageRequest);
+  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
+    return ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
   }
 
   @Override
-  public SearchPageResponse<Webpage> findRootWebpagesForWebsite(
-      UUID websiteUuid, SearchPageRequest pageRequest) {
+  public PageResponse<Webpage> findRootWebpagesForWebsite(
+      UUID websiteUuid, PageRequest pageRequest) {
     return ((WebpageRepository) repository).findRootWebpagesForWebsite(websiteUuid, pageRequest);
   }
 
@@ -117,13 +114,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
-    Filtering filtering = filteringForActive();
-    pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest);
-  }
-
-  @Override
   public List<Webpage> getActiveChildrenTree(UUID uuid) {
     List<Webpage> webpages = getActiveChildren(uuid);
     return webpages.stream()
@@ -147,11 +137,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
-  }
-
-  @Override
   public List<Webpage> getChildrenTree(UUID uuid) {
     List<Webpage> webpages = getChildren(uuid);
     return webpages.stream()
@@ -167,11 +152,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public List<Webpage> getParents(UUID uuid) {
     return ((NodeRepository<Webpage>) repository).getParents(uuid);
-  }
-
-  @Override
-  public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
   }
 
   @Override
@@ -226,7 +206,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       }
       return ((WebpageRepository) repository)
           .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
-    } catch (Exception e) {
+    } catch (IdentifiableServiceException | ValidationException e) {
       LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
     }

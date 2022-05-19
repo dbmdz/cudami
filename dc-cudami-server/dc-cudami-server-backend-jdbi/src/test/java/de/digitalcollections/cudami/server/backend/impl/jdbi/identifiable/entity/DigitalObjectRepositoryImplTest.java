@@ -13,9 +13,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.file.MimeType;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.FilterOperation;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -25,13 +22,14 @@ import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.paging.Direction;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
@@ -219,17 +217,17 @@ class DigitalObjectRepositoryImplTest {
             });
 
     String query = "test";
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    searchPageRequest.setPageSize(10);
-    searchPageRequest.setPageNumber(0);
-    searchPageRequest.setQuery(query);
-    searchPageRequest.setSorting(
+    PageRequest pageRequest = new PageRequest();
+    pageRequest.setPageSize(10);
+    pageRequest.setPageNumber(0);
+    pageRequest.setSearchTerm(query);
+    pageRequest.setSorting(
         Sorting.builder()
             .order(Order.builder().property("refId").direction(Direction.ASC).build())
             .build());
 
-    SearchPageResponse response = repo.find(searchPageRequest);
-    assertThat(((SearchPageRequest) response.getPageRequest()).getQuery()).isEqualTo(query);
+    PageResponse response = repo.find(pageRequest);
+    assertThat(response.getExecutedSearchTerm()).isEqualTo(query);
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);
@@ -250,11 +248,11 @@ class DigitalObjectRepositoryImplTest {
     repo.save(ado);
 
     // Retrieve the ADO by filtering the parent uuid
-    SearchPageRequest searchPageRequest = new SearchPageRequest();
-    searchPageRequest.setFiltering(
+    PageRequest pageRequest = new PageRequest();
+    pageRequest.setFiltering(
         new Filtering(
             List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
-    SearchPageResponse response = repo.find(searchPageRequest);
+    PageResponse response = repo.find(pageRequest);
 
     List<DigitalObject> actuals = response.getContent();
     assertThat(actuals).hasSize(1);
@@ -262,7 +260,8 @@ class DigitalObjectRepositoryImplTest {
     DigitalObject actual = actuals.get(0);
     assertThat(actual.getUuid()).isNotEqualTo(parent.getUuid()); // Because actual is the ADO
     assertThat(actual.getParent().getUuid())
-        .isEqualTo(parent.getUuid()); // Only the UUID of the parent is filled in a search result
+        .isEqualTo(
+            parent.getUuid()); // Only the UUID of the parent is filled in a searchTerm result
   }
 
   @Test

@@ -6,10 +6,8 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -18,12 +16,7 @@ import java.util.UUID;
 public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
 
   public CudamiPersonsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Person.class, mapper, "/v5/persons");
-  }
-
-  @Override
-  public SearchPageResponse<Person> find(SearchPageRequest pageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint, pageRequest);
+    super(http, serverUrl, Person.class, mapper, API_VERSION_PREFIX + "/persons");
   }
 
   public PageResponse<Person> findByGeoLocationOfBirth(

@@ -25,7 +25,12 @@ public class VersionController {
 
   @Operation(summary = "Get version by uuid")
   @GetMapping(
-      value = {"/v5/versions/{uuid}", "/v2/versions/{uuid}", "/latest/versions/{uuid}"},
+      value = {
+        "/v6/versions/{uuid}",
+        "/v5/versions/{uuid}",
+        "/v2/versions/{uuid}",
+        "/latest/versions/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Version getByUuid(@PathVariable UUID uuid) {
     return versionService.getByUuid(uuid);
@@ -33,7 +38,12 @@ public class VersionController {
 
   @Operation(summary = "Update the version status")
   @PutMapping(
-      value = {"/v5/versions/{uuid}", "/v2/versions/{uuid}", "/latest/versions/{uuid}"},
+      value = {
+        "/v6/versions/{uuid}",
+        "/v5/versions/{uuid}",
+        "/v2/versions/{uuid}",
+        "/latest/versions/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
       throws Exception {

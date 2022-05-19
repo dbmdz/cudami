@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,9 +25,9 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v2/corporatebodies?pageSize=1"})
   void testFindAll(String path) throws Exception {
-    SearchPageResponse<CorporateBody> expected =
-        (SearchPageResponse<CorporateBody>)
-            SearchPageResponse.builder()
+    PageResponse<CorporateBody> expected =
+        (PageResponse<CorporateBody>)
+            PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .withTotalElements(75)
@@ -49,7 +49,7 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
                         .build())
                 .build();
 
-    when(corporateBodyService.find(any(SearchPageRequest.class))).thenReturn(expected);
+    when(corporateBodyService.find(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v2/corporatebodies/corporatebodies.json");
   }

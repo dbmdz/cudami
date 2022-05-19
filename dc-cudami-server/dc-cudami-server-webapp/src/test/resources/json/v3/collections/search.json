@@ -49,14 +49,14 @@
       "orders": [
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": "de"
         },
         {
           "direction": "ASC",
-          "ignoreCase": false,
+          "ignoreCase": true,
           "nullHandling": "NATIVE",
           "property": "label",
           "subProperty": ""

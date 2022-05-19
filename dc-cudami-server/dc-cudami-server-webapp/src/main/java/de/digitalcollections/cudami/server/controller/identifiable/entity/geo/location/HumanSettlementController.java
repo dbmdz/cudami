@@ -4,10 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,7 +45,7 @@ public class HumanSettlementController {
 
   @Operation(summary = "get all human settlements")
   @GetMapping(
-      value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
+      value = {"/v6/humansettlements"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<HumanSettlement> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,

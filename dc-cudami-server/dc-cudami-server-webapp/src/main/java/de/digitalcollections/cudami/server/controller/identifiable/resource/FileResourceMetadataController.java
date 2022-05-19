@@ -3,14 +3,13 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
-import de.digitalcollections.model.filter.FilterCriterion;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.paging.Order;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
-import de.digitalcollections.model.paging.Sorting;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,7 +51,7 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Get all fileresources")
   @GetMapping(
-      value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
+      value = {"/v6/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -61,7 +60,7 @@ public class FileResourceMetadataController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "uri", required = false)
           FilterCriterion<String> encodedUriFilterCriterion) {
-    SearchPageRequest searchPageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
@@ -84,13 +83,9 @@ public class FileResourceMetadataController {
       summary =
           "Find limited amount of fileresources of given type containing searchTerm in label or description")
   @GetMapping(
-      value = {
-        "/v5/fileresources/type/{type}",
-        "/v2/fileresources/type/{type}",
-        "/latest/fileresources/type/{type}"
-      },
+      value = {"/v6/fileresources/type/{type}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public SearchPageResponse<FileResource> findByType(
+  public PageResponse<FileResource> findByType(
       @Parameter(example = "", description = "Type of the fileresource, e.g. <tt>image</tt>")
           @PathVariable("type")
           String type,
@@ -98,7 +93,7 @@ public class FileResourceMetadataController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    SearchPageRequest pageRequest = new SearchPageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
@@ -141,6 +136,8 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get a fileresource by namespace and id")
   @GetMapping(
       value = {
+        "/v6/fileresources/identifier/{namespace}:{id}",
+        "/v6/fileresources/identifier/{namespace}:{id}.json",
         "/v5/fileresources/identifier/{namespace}:{id}",
         "/v5/fileresources/identifier/{namespace}:{id}.json",
         "/v2/fileresources/identifier/{namespace}:{id}",
@@ -159,6 +156,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get a fileresource by uuid")
   @GetMapping(
       value = {
+        "/v6/fileresources/{uuid}",
         "/v5/fileresources/{uuid}",
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"
@@ -190,6 +188,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Get languages of all websites")
   @GetMapping(
       value = {
+        "/v6/fileresources/languages",
         "/v5/fileresources/languages",
         "/v2/fileresources/languages",
         "/latest/fileresources/languages"
@@ -201,7 +200,12 @@ public class FileResourceMetadataController {
 
   @Operation(summary = "Save a newly created fileresource")
   @PostMapping(
-      value = {"/v5/fileresources", "/v2/fileresources", "/latest/fileresources"},
+      value = {
+        "/v6/fileresources",
+        "/v5/fileresources",
+        "/v2/fileresources",
+        "/latest/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
       throws IdentifiableServiceException, ValidationException {
@@ -211,6 +215,7 @@ public class FileResourceMetadataController {
   @Operation(summary = "Update a fileresource")
   @PutMapping(
       value = {
+        "/v6/fileresources/{uuid}",
         "/v5/fileresources/{uuid}",
         "/v2/fileresources/{uuid}",
         "/latest/fileresources/{uuid}"

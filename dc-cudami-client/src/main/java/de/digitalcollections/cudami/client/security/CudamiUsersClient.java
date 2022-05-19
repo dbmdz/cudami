@@ -10,7 +10,7 @@ import java.util.List;
 public class CudamiUsersClient extends CudamiRestClient<User> {
 
   public CudamiUsersClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, User.class, mapper, "/v5/users");
+    super(http, serverUrl, User.class, mapper, API_VERSION_PREFIX + "/users");
   }
 
   public List<User> getActiveAdminUsers() throws TechnicalException {
@@ -19,7 +19,7 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
 
   @Override
   public List<User> getAll() throws TechnicalException {
-    return doGetRequestForObjectList("/v5/users");
+    return doGetRequestForObjectList(API_VERSION_PREFIX + "/users");
   }
 
   public User getByEmail(String email) throws TechnicalException {

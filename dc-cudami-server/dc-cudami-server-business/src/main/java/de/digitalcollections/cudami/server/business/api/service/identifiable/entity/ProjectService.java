@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -26,16 +26,14 @@ public interface ProjectService extends EntityService<Project> {
 
   boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 
-  default SearchPageResponse<DigitalObject> findDigitalObjects(
-      Project project, SearchPageRequest searchPageRequest) {
+  default PageResponse<DigitalObject> findDigitalObjects(Project project, PageRequest pageRequest) {
     if (project == null) {
       return null;
     }
-    return findDigitalObjects(project.getUuid(), searchPageRequest);
+    return findDigitalObjects(project.getUuid(), pageRequest);
   }
 
-  SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID projectUuid, SearchPageRequest searchPageRequest);
+  PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest);
 
   default boolean removeDigitalObject(Project project, DigitalObject digitalObject) {
     if (project == null || digitalObject == null) {

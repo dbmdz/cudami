@@ -2,14 +2,12 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.filter.Filtering;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.paging.PageRequest;
-import de.digitalcollections.model.paging.PageResponse;
-import de.digitalcollections.model.paging.SearchPageRequest;
-import de.digitalcollections.model.paging.SearchPageResponse;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -19,7 +17,7 @@ import java.util.UUID;
 public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
 
   public CudamiCollectionsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
-    super(http, serverUrl, Collection.class, mapper, "/v5/collections");
+    super(http, serverUrl, Collection.class, mapper, API_VERSION_PREFIX + "/collections");
   }
 
   public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
@@ -57,17 +55,6 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         String.format(baseEndpoint + "?active=true"), pageRequest);
   }
 
-  public SearchPageResponse<Collection> findActive(SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/search?active", searchPageRequest);
-  }
-
-  public PageResponse<Collection> findActiveSubcollections(
-      UUID uuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format(baseEndpoint + "/%s/subcollections?active=true", uuid), searchPageRequest);
-  }
-
   public PageResponse<Collection> findActiveSubcollections(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -76,11 +63,11 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         Collection.class);
   }
 
-  public SearchPageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, SearchPageRequest searchPageRequest) throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
+  public PageResponse<DigitalObject> findDigitalObjects(
+      UUID collectionUuid, PageRequest pageRequest) throws TechnicalException {
+    return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
-        searchPageRequest,
+        pageRequest,
         DigitalObject.class);
   }
 
@@ -95,12 +82,6 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         filtering);
   }
 
-  public PageResponse<Collection> findSubcollections(UUID uuid, SearchPageRequest searchPageRequest)
-      throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(
-        String.format(baseEndpoint + "/%s/subcollections", uuid), searchPageRequest);
-  }
-
   public PageResponse<Collection> findSubcollections(UUID collectionUuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
@@ -109,9 +90,9 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
         Collection.class);
   }
 
-  public SearchPageResponse<Collection> findTopCollections(SearchPageRequest searchPageRequest)
+  public PageResponse<Collection> findTopCollections(PageRequest pageRequest)
       throws TechnicalException {
-    return doGetSearchRequestForPagedObjectList(baseEndpoint + "/top", searchPageRequest);
+    return doGetRequestForPagedObjectList(baseEndpoint + "/top", pageRequest);
   }
 
   public Collection getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
