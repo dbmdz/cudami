@@ -20,10 +20,10 @@ public class SpringConfigSecurity extends WebSecurityConfigurerAdapter {
     // https://stackoverflow.com/questions/38108357/how-to-enable-post-put-and-delete-methods-in-spring-security
     // https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-security.html#boot-features-security-csrf
     // https://docs.spring.io/spring-security/site/docs/5.0.4.RELEASE/reference/htmlsingle/#csrf
-    http.csrf().ignoringAntMatchers("/latest/**", "/v1/**", "/v2/**", "/v3/**", "/v5/**");
+    http.csrf().ignoringAntMatchers("/latest/**", "/v1/**", "/v2/**", "/v3/**", "/v5/**", "/v6/**");
 
     http.authorizeRequests()
-        .antMatchers("/latest/**", "/v1/**", "/v2/**", "/v3/**", "/v5/**")
+        .antMatchers("/latest/**", "/v1/**", "/v2/**", "/v3/**", "/v5/**", "/v6/**")
         .permitAll()
         .requestMatchers(EndpointRequest.to(HealthEndpoint.class, InfoEndpoint.class))
         .permitAll()
