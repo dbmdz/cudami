@@ -62,23 +62,6 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  protected void addOrderBy(
-      PageRequest pageRequest, StringBuilder sqlQuery, String defaultOrderBy) {
-    if (pageRequest != null) {
-      // Sorting
-      Sorting sorting = pageRequest.getSorting();
-      String orderBy = getOrderBy(sorting);
-      if (StringUtils.hasText(orderBy)) {
-        if (!sqlQuery.toString().matches("(?i).* order by .*")) {
-          sqlQuery.append(" ORDER BY ");
-        } else {
-          sqlQuery.append(", ");
-        }
-        sqlQuery.append(orderBy);
-      }
-    }
-  }
-
   public void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       if (pageRequest.getOffset() < offsetForAlternativePaging) {
@@ -88,27 +71,6 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
       } else {
         buildPageRequestSql(pageRequest, sqlQuery);
       }
-    }
-  }
-
-  protected void addPageRequestParams(
-      PageRequest pageRequest,
-      StringBuilder sqlQuery,
-      String defaultOrderBy,
-      StringBuilder addedOrderBy) {
-    if (pageRequest != null) {
-      if (pageRequest.getOffset() < offsetForAlternativePaging) {
-        addOrderBy(pageRequest, sqlQuery);
-        addLimit(pageRequest, sqlQuery);
-        addOffset(pageRequest, sqlQuery);
-      } else {
-        buildPageRequestSql(pageRequest, sqlQuery);
-      }
-    }
-
-    if (defaultOrderBy == null) {
-      addPageRequestParams(pageRequest, sqlQuery);
-      return;
     }
   }
 
