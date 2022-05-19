@@ -292,8 +292,6 @@ public abstract class BaseRestClient<T extends Object> {
         return null;
       }
       PageResponse<T> result = mapper.readerFor(PageResponse.class).readValue(body);
-      // TODO no longer needed, as this should be done by server?
-      // result.setQuery(searchTerm);
       return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
