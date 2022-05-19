@@ -37,7 +37,12 @@ public class IdentifiableController {
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
   @GetMapping(
-      value = {"/v5/identifiables", "/v2/identifiables", "/latest/identifiables"},
+      value = {
+        "/v6/identifiables",
+        "/v5/identifiables",
+        "/v2/identifiables",
+        "/latest/identifiables"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
@@ -48,7 +53,10 @@ public class IdentifiableController {
 
   @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
   @GetMapping(
-      value = {"/v5/identifiables/{uuid}/localizedUrlAliases"},
+      value = {
+        "/v6/identifiables/{uuid}/localizedUrlAliases",
+        "/v5/identifiables/{uuid}/localizedUrlAliases"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
       @Parameter(
@@ -76,6 +84,8 @@ public class IdentifiableController {
   @Operation(summary = "Get an identifiable by namespace and id")
   @GetMapping(
       value = {
+        "/v6/identifiables/identifier/{namespace}:{id}",
+        "/v6/identifiables/identifier/{namespace}:{id}.json",
         "/v5/identifiables/identifier/{namespace}:{id}",
         "/v5/identifiables/identifier/{namespace}:{id}.json",
         "/v2/identifiables/identifier/{namespace}:{id}",
@@ -97,6 +107,7 @@ public class IdentifiableController {
   @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
       value = {
+        "/v6/identifiables/{uuid}",
         "/v5/identifiables/{uuid}",
         "/v2/identifiables/{uuid}",
         "/latest/identifiables/{uuid}"

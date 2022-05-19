@@ -50,6 +50,7 @@ public class WebpageController {
   @Operation(summary = "Add file resource related to webpage")
   @PostMapping(
       value = {
+        "/v6/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
         "/v5/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
         "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
         "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
@@ -116,6 +117,7 @@ public class WebpageController {
   @Operation(summary = "Get the breadcrumb for a webpage")
   @GetMapping(
       value = {
+        "/v6/webpages/{uuid}/breadcrumb",
         "/v5/webpages/{uuid}/breadcrumb",
         "/v3/webpages/{uuid}/breadcrumb",
         "/latest/webpages/{uuid}/breadcrumb"
@@ -153,7 +155,7 @@ public class WebpageController {
 
   @Operation(summary = "Get a webpage by uuid")
   @GetMapping(
-      value = {"/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
+      value = {"/v6/webpages/{uuid}", "/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Webpage> getByUuid(
       @Parameter(
@@ -191,7 +193,11 @@ public class WebpageController {
 
   @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")
   @GetMapping(
-      value = {"/v5/webpages/{uuid}/childrentree", "/latest/webpages/{uuid}/childrentree"},
+      value = {
+        "/v6/webpages/{uuid}/childrentree",
+        "/v5/webpages/{uuid}/childrentree",
+        "/latest/webpages/{uuid}/childrentree"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Webpage> getChildrenTree(
       @Parameter(
@@ -212,6 +218,7 @@ public class WebpageController {
   @Operation(summary = "Get parent of a webpage as JSON")
   @GetMapping(
       value = {
+        "/v6/webpages/{uuid}/parent",
         "/v5/webpages/{uuid}/parent",
         "/v3/webpages/{uuid}/parent",
         "/latest/webpages/{uuid}/parent"
@@ -231,6 +238,7 @@ public class WebpageController {
   @Operation(summary = "Get file resources related to webpage")
   @GetMapping(
       value = {
+        "/v6/webpages/{uuid}/related/fileresources",
         "/v5/webpages/{uuid}/related/fileresources",
         "/v2/webpages/{uuid}/related/fileresources",
         "/latest/webpages/{uuid}/related/fileresources"
@@ -243,6 +251,7 @@ public class WebpageController {
   @Operation(summary = "Get website of a webpage as JSON")
   @GetMapping(
       value = {
+        "/v6/webpages/{uuid}/website",
         "/v5/webpages/{uuid}/website",
         "/v3/webpages/{uuid}/website",
         "/latest/webpages/{uuid}/website"
@@ -262,6 +271,7 @@ public class WebpageController {
   @Operation(summary = "Save a newly created webpage")
   @PostMapping(
       value = {
+        "/v6/webpages/{parentWebpageUuid}/webpage",
         "/v5/webpages/{parentWebpageUuid}/webpage",
         "/v2/webpages/{parentWebpageUuid}/webpage",
         "/latest/webpages/{parentWebpageUuid}/webpage"
@@ -276,6 +286,7 @@ public class WebpageController {
   @Operation(summary = "Save a newly created top-level webpage")
   @PostMapping(
       value = {
+        "/v6/websites/{parentWebsiteUuid}/webpage",
         "/v5/websites/{parentWebsiteUuid}/webpage",
         "/v2/websites/{parentWebsiteUuid}/webpage",
         "/latest/websites/{parentWebsiteUuid}/webpage",
@@ -289,7 +300,12 @@ public class WebpageController {
 
   @Operation(summary = "Update a webpage")
   @PutMapping(
-      value = {"/v5/webpages/{uuid}", "/v2/webpages/{uuid}", "/latest/webpages/{uuid}"},
+      value = {
+        "/v6/webpages/{uuid}",
+        "/v5/webpages/{uuid}",
+        "/v2/webpages/{uuid}",
+        "/latest/webpages/{uuid}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -300,6 +316,7 @@ public class WebpageController {
   @Operation(summary = "Update the order of a webpage's children")
   @PutMapping(
       value = {
+        "/v6/webpages/{uuid}/children",
         "/v5/webpages/{uuid}/children",
         "/v3/webpages/{uuid}/children",
         "/latest/webpages/{uuid}/children"

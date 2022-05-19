@@ -50,6 +50,7 @@ public class IdentifierTypeController {
   @Operation(summary = "get identifier type by uuid")
   @GetMapping(
       value = {
+        "/v6/identifiertypes/{uuid}",
         "/v5/identifiertypes/{uuid}",
         "/v2/identifiertypes/{uuid}",
         "/latest/identifiertypes/{uuid}"
@@ -61,7 +62,12 @@ public class IdentifierTypeController {
 
   @Operation(summary = "save a newly created identifier type")
   @PostMapping(
-      value = {"/v5/identifiertypes", "/v2/identifiertypes", "/latest/identifiertypes"},
+      value = {
+        "/v6/identifiertypes",
+        "/v5/identifiertypes",
+        "/v2/identifiertypes",
+        "/latest/identifiertypes"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
     return identifierTypeService.save(identifierType);
@@ -70,6 +76,7 @@ public class IdentifierTypeController {
   @Operation(summary = "update an identifier type")
   @PutMapping(
       value = {
+        "/v6/identifiertypes/{uuid}",
         "/v5/identifiertypes/{uuid}",
         "/v2/identifiertypes/{uuid}",
         "/latest/identifiertypes/{uuid}"

@@ -67,8 +67,11 @@ public class HumanSettlementController {
   @Operation(summary = "Get a human settlement by namespace and id")
   @GetMapping(
       value = {
+        "/v6/humansettlements/identifier/{namespace}:{id}",
+        "/v6/humansettlements/identifier/{namespace}:{id}.json",
         "/v5/humansettlements/identifier/{namespace}:{id}",
         "/v5/humansettlements/identifier/{namespace}:{id}.json",
+        "/v2/humansettlements/identifier/{namespace}:{id}",
         "/v2/humansettlements/identifier/{namespace}:{id}",
         "/v2/humansettlements/identifier/{namespace}:{id}.json",
         "/latest/humansettlements/identifier/{namespace}:{id}",
@@ -84,6 +87,7 @@ public class HumanSettlementController {
   @Operation(summary = "Get a human settlement by namespace and id")
   @GetMapping(
       value = {
+        "/v6/humansettlements/identifier",
         "/v5/humansettlements/identifier",
         "/v2/humansettlements/identifier",
         "/latest/humansettlements/identifier"
@@ -102,6 +106,7 @@ public class HumanSettlementController {
   @Operation(summary = "Get a human settlement by uuid")
   @GetMapping(
       value = {
+        "/v6/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v5/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/v2/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
         "/latest/humansettlements/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
@@ -133,7 +138,12 @@ public class HumanSettlementController {
 
   @Operation(summary = "save a newly created human settlement")
   @PostMapping(
-      value = {"/v5/humansettlements", "/v2/humansettlements", "/latest/humansettlements"},
+      value = {
+        "/v6/humansettlements",
+        "/v5/humansettlements",
+        "/v2/humansettlements",
+        "/latest/humansettlements"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws IdentifiableServiceException, ValidationException {
@@ -143,6 +153,7 @@ public class HumanSettlementController {
   @Operation(summary = "update a human settlement")
   @PutMapping(
       value = {
+        "/v6/humansettlements/{uuid}",
         "/v5/humansettlements/{uuid}",
         "/v2/humansettlements/{uuid}",
         "/latest/humansettlements/{uuid}"
