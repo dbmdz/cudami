@@ -63,8 +63,22 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   }
 
   public void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
+    addPageRequestParams(pageRequest, sqlQuery, false);
+  }
+
+  /**
+   * This method should never be accessible from outside. It is just necessary to avoid unwanted
+   * recursions if falling back to limit-offset.
+   *
+   * @param pageRequest
+   * @param sqlQuery
+   * @param forceLimitOffset if {@code true} a sql with limit and offset is build regardless of
+   *     {@code offsetForAlternativePaging}
+   */
+  private void addPageRequestParams(
+      PageRequest pageRequest, StringBuilder sqlQuery, boolean forceLimitOffset) {
     if (pageRequest != null) {
-      if (pageRequest.getOffset() < offsetForAlternativePaging) {
+      if (forceLimitOffset || pageRequest.getOffset() < offsetForAlternativePaging) {
         addOrderBy(pageRequest, sqlQuery);
         addLimit(pageRequest, sqlQuery);
         addOffset(pageRequest, sqlQuery);
@@ -97,7 +111,8 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     Matcher selectStmtMatcher = SELECT_STMT_SPLITTER.matcher(innerSql.toString());
     if (!selectStmtMatcher.find()) {
       LOGGER.warn("Regex 'selectStmtSplitter' did not match on << {} >>", innerSql.toString());
-      addPageRequestParams(pageRequest, innerSql);
+      // fallback to limit-offset
+      addPageRequestParams(pageRequest, innerSql, true);
       return;
     }
     String fields = selectStmtMatcher.group("fields");
