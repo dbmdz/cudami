@@ -144,7 +144,7 @@ public class LinkedDataFileResourceController {
 
   @Operation(summary = "Update a linkedDataFileResource")
   @PutMapping(
-      value = {"/v5/linkeddatafileresources/{uuid}", "/v6/linkeddatafileresources/{uuid}"},
+      value = {"/v6/linkeddatafileresources/{uuid}", "/v5/linkeddatafileresources/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource update(
       @PathVariable UUID uuid,

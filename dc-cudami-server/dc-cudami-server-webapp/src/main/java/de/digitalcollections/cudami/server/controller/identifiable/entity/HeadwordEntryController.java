@@ -39,7 +39,7 @@ public class HeadwordEntryController {
 
   @Operation(summary = "Get count of headwordentries")
   @GetMapping(
-      value = {"/v5/headwordentries/count"},
+      value = {"/v6/headwordentries/count", "/v5/headwordentries/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return headwordEntryService.count();
