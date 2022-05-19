@@ -62,30 +62,27 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     }
   }
 
-  public void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
-    addPageRequestParams(pageRequest, sqlQuery, false);
-  }
-
-  /**
-   * This method should never be accessible from outside. It is just necessary to avoid unwanted
-   * recursions if falling back to limit-offset.
-   *
+  /*
    * @param pageRequest
    * @param sqlQuery
-   * @param forceLimitOffset if {@code true} a sql with limit and offset is build regardless of
-   *     {@code offsetForAlternativePaging}
    */
-  private void addPageRequestParams(
-      PageRequest pageRequest, StringBuilder sqlQuery, boolean forceLimitOffset) {
+  public void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
-      if (forceLimitOffset || pageRequest.getOffset() < offsetForAlternativePaging) {
-        addOrderBy(pageRequest, sqlQuery);
-        addLimit(pageRequest, sqlQuery);
-        addOffset(pageRequest, sqlQuery);
+      if (pageRequest.getOffset() < offsetForAlternativePaging) {
+        // standard handling with LIMIT and OFFSET
+        buildPageRequestSqlUsingOffsetAndLimit(pageRequest, sqlQuery);
       } else {
-        buildPageRequestSql(pageRequest, sqlQuery);
+        // special handling with window function (row_number())
+        buildPageRequestSqlUsingWindowFunction(pageRequest, sqlQuery);
       }
     }
+  }
+
+  private void buildPageRequestSqlUsingOffsetAndLimit(
+      PageRequest pageRequest, StringBuilder sqlQuery) {
+    addOrderBy(pageRequest, sqlQuery);
+    addLimit(pageRequest, sqlQuery);
+    addOffset(pageRequest, sqlQuery);
   }
 
   /**
@@ -95,7 +92,8 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
   @SuppressFBWarnings(
       value = "LI_LAZY_INIT_STATIC",
       justification = "Spotbugs complains about l. 95 - ignore it")
-  protected void buildPageRequestSql(PageRequest pageRequest, StringBuilder innerSql) {
+  private void buildPageRequestSqlUsingWindowFunction(
+      PageRequest pageRequest, StringBuilder innerSql) {
     if (pageRequest == null || innerSql == null) {
       return;
     }
@@ -112,7 +110,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
     if (!selectStmtMatcher.find()) {
       LOGGER.warn("Regex 'selectStmtSplitter' did not match on << {} >>", innerSql.toString());
       // fallback to limit-offset
-      addPageRequestParams(pageRequest, innerSql, true);
+      buildPageRequestSqlUsingOffsetAndLimit(pageRequest, innerSql);
       return;
     }
     String fields = selectStmtMatcher.group("fields");
