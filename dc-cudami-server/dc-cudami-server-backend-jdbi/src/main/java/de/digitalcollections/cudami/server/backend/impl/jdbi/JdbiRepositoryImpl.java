@@ -1,31 +1,12 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import static de.digitalcollections.model.list.filtering.FilterOperation.BETWEEN;
-import static de.digitalcollections.model.list.filtering.FilterOperation.CONTAINS;
-import static de.digitalcollections.model.list.filtering.FilterOperation.EQUALS;
-import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN;
-import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN_OR_EQUAL_TO;
-import static de.digitalcollections.model.list.filtering.FilterOperation.GREATER_THAN_OR_NOT_SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.IN;
-import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN;
-import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_AND_SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO;
-import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO_AND_SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.LESS_THAN_OR_EQUAL_TO_OR_NOT_SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_EQUALS;
-import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_IN;
-import static de.digitalcollections.model.list.filtering.FilterOperation.NOT_SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.SET;
-import static de.digitalcollections.model.list.filtering.FilterOperation.STARTS_WITH;
-
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -89,7 +70,8 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     // handle search term
     String searchTerm = pageRequest.getSearchTerm();
     String executedSearchTerm = null;
-    if (StringUtils.hasText(searchTerm)) {
+    String commonSearchSql = getCommonSearchSql(tableAlias);
+    if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
       String commonSql = innerQuery.toString();
       if (commonSql.toUpperCase().contains(" WHERE ")
           || commonSql.toUpperCase().contains(" WHERE(")) {
@@ -98,7 +80,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
         innerQuery.append(" WHERE ");
       }
       // select with search term
-      innerQuery.append(getCommonSearchSql(tableAlias));
+      innerQuery.append(commonSearchSql);
       executedSearchTerm = escapeTermForJsonpath(searchTerm);
       argumentMappings.put("searchTerm", executedSearchTerm);
     }
@@ -139,9 +121,10 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   public String getCommonSearchSql(String tblAlias) {
-    return "("
-        + getSearchTermTemplates(tblAlias).stream().collect(Collectors.joining(" OR "))
-        + ")";
+    List<String> searchTermTemplates = getSearchTermTemplates(tblAlias);
+    return searchTermTemplates.isEmpty()
+        ? ""
+        : "(" + searchTermTemplates.stream().collect(Collectors.joining(" OR ")) + ")";
   }
 
   protected String getFilterClauses(Filtering filtering, Map<String, Object> argumentMappings) {
@@ -167,10 +150,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   protected List<String> getSearchTermTemplates(String tableAlias) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
+    return Collections.EMPTY_LIST;
   }
 
   public String getTableAlias() {
