@@ -447,7 +447,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     pageRequest.setSorting(sorting);
 
-    Map<String, Object> argumentMappings = new HashMap<>(0);
+    Map<String, Object> argumentMappings = new HashMap<>(2);
     argumentMappings.put("language", language);
     argumentMappings.put("initial", initial);
 
