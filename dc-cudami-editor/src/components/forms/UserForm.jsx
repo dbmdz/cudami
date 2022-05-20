@@ -48,6 +48,13 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
     })
   }
   const {email, enabled, firstname, lastname, roles} = user
+  const requiredFields = [
+    email,
+    firstname,
+    lastname,
+    // when editing (uuid is set) the password inputs can be empty
+    ...(uuid ? [] : [passwords.pwd1, passwords.pwd2]),
+  ]
   const formId = 'user-form'
   return (
     <>
@@ -79,13 +86,7 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
           </Col>
           <Col xs="6" sm="3">
             <ActionButtons
-              disabled={[
-                email,
-                firstname,
-                lastname,
-                passwords.pwd1,
-                passwords.pwd2,
-              ].some((field) => !field)}
+              disabled={requiredFields.some((field) => !field)}
               formId={formId}
             />
           </Col>
