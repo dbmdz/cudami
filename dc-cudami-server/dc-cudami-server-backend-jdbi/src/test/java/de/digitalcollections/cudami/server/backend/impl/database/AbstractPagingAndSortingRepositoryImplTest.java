@@ -62,7 +62,7 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
     assertEquals(
-        "ORDER BY COALESCE(foo->>'bar', foo->>'') COLLATE \"ucs_basic\" ASC",
+        "ORDER BY lower(COALESCE(foo->>'bar', foo->>'')) COLLATE \"ucs_basic\" ASC",
         query.toString().trim());
 
     order = new Order(Direction.DESC, "foo");
@@ -72,11 +72,14 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
     assertEquals(
-        "ORDER BY COALESCE(foo->>'bar', foo->>'') COLLATE \"ucs_basic\" DESC",
+        "ORDER BY lower(COALESCE(foo->>'bar', foo->>'')) COLLATE \"ucs_basic\" DESC",
         query.toString().trim());
 
+    order = new Order(Direction.DESC, "foo");
+    order.setSubProperty("bar");
+    order.setIgnoreCase(false);
     Order secondOrder = new Order("foo");
-    sorting = sorting.and(new Sorting(secondOrder));
+    sorting = new Sorting(order, secondOrder);
     pr.setSorting(sorting);
     query = new StringBuilder("");
     repository.addOrderBy(pr, query);
@@ -111,6 +114,11 @@ public class AbstractPagingAndSortingRepositoryImplTest {
     @Override
     protected String getUniqueField() {
       return null;
+    }
+
+    @Override
+    protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+      return false;
     }
   }
 }

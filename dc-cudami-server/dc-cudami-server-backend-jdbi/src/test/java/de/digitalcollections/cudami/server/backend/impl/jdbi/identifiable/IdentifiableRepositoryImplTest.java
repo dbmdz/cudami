@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
@@ -101,29 +102,34 @@ class IdentifiableRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("test overridden getOrderBy")
+  @DisplayName("test getOrderBy")
   void testGetOrderBy() {
     Sorting sorting = new Sorting(new Order(Direction.DESC, "lastModified"), new Order("uuid"));
     assertThat(repo.getOrderBy(sorting)).isEqualTo("i.last_modified DESC, i.uuid ASC");
 
     sorting = new Sorting(Order.builder().property("label").subProperty("de").build());
     assertThat(repo.getOrderBy(sorting))
-        .isEqualTo("COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC");
+        .isEqualTo("lower(COALESCE(i.label->>'de', i.label->>'')) COLLATE \"ucs_basic\" ASC");
 
     sorting.getOrders().add(new Order(Direction.DESC, "lastModified"));
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo(
-            "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC, i.last_modified DESC");
+            "lower(COALESCE(i.label->>'de', i.label->>'')) COLLATE \"ucs_basic\" ASC, i.last_modified DESC");
 
     sorting =
         new Sorting(
             new Order(Direction.DESC, "created"),
             Order.builder().property("label").subProperty("de").build(),
-            Order.builder().property("label").subProperty("en").direction(Direction.DESC).build());
+            Order.builder()
+                .property("label")
+                .subProperty("en")
+                .direction(Direction.DESC)
+                .ignoreCase(false)
+                .build());
     assertThat(repo.getOrderBy(sorting))
         .isEqualTo(
             "i.created DESC, "
-                + "COALESCE(i.label->>'de', i.label->>'') COLLATE \"ucs_basic\" ASC, "
+                + "lower(COALESCE(i.label->>'de', i.label->>'')) COLLATE \"ucs_basic\" ASC, "
                 + "COALESCE(i.label->>'en', i.label->>'') COLLATE \"ucs_basic\" DESC");
   }
 
