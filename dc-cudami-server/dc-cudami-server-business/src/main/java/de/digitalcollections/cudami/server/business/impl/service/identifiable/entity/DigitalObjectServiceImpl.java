@@ -148,6 +148,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public DigitalObject getByIdentifier(String namespace, String id) {
+    Identifier identifier = new Identifier(null, namespace, id);
+    return getByIdentifier(identifier);
+  }
+
+  @Override
   public DigitalObject getByRefId(long refId) {
     return fillDigitalObject(super.getByRefId(refId));
   }

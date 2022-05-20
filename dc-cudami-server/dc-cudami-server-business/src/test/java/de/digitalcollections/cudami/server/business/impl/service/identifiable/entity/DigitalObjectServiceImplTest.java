@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -213,6 +214,37 @@ class DigitalObjectServiceImplTest {
         .thenReturn(List.of(persistedRenderingResource));
 
     DigitalObject actual = service.getByUuidAndLocale(uuid, Locale.ROOT);
+
+    assertThat(actual).isNotNull();
+    assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
+  @DisplayName(
+      "fills RenderingResources for a retrieved DigitalObject by identifier (id and namespace)")
+  void fillRenderingResourceForGetByIdentfier() throws IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    when(repo.getByIdentifier(any(Identifier.class))).thenReturn(persistedDigitalObject);
+
+    FileResource persistedRenderingResource = new TextFileResource();
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
+    persistedRenderingResource.setMimeType(MimeType.fromTypename("text/html"));
+    persistedRenderingResource.setUri(URI.create("https://bla.bla/foo.html"));
+    persistedRenderingResource.setUuid(UUID.randomUUID());
+    persistedRenderingResource.setFilename("foo.html");
+    persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Beschreibung"));
+    when(digitalObjectRenderingFileResourceService.getRenderingFileResources(eq(uuid)))
+        .thenReturn(List.of(persistedRenderingResource));
+
+    DigitalObject actual = service.getByIdentifier("foo", "bar");
 
     assertThat(actual).isNotNull();
     assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
