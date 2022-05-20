@@ -186,6 +186,17 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "firstname":
+      case "lastname":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public User update(User user) {
     user.setLastModified(LocalDateTime.now());
     User result =

@@ -431,6 +431,17 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "label":
+      case "locale":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public Headword update(Headword headword) {
     throw new UnsupportedOperationException(
         "Not supported yet."); // To change body of generated methods, choose Tools | Templates.

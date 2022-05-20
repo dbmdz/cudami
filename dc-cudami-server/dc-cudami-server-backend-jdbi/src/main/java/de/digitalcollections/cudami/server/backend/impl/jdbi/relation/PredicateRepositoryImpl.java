@@ -146,4 +146,15 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
     return getByValue(predicate.getValue());
   }
+
+  @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "label":
+      case "description":
+        return true;
+      default:
+        return false;
+    }
+  }
 }

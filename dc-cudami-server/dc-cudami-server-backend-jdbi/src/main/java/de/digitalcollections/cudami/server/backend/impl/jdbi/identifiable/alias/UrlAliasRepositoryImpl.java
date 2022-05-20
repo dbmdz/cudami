@@ -466,6 +466,11 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
+
+  @Override
   public UrlAlias update(UrlAlias urlAlias) throws UrlAliasRepositoryException {
     if (urlAlias == null) {
       return null;

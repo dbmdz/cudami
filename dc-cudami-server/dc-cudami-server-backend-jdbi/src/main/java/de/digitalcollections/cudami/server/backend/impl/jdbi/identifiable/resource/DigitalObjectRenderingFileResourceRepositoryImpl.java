@@ -148,4 +148,9 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
           preparedBatch.execute();
         });
   }
+
+  @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
 }

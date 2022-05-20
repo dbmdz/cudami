@@ -239,6 +239,11 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
+
+  @Override
   public Identifier update(Identifier identifier) {
     throw new UnsupportedOperationException(
         "An update on identifiable, namespace and identifier has no use case.");

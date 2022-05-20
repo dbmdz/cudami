@@ -186,6 +186,16 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "label":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public IdentifierType update(IdentifierType identifierType) {
     identifierType.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid

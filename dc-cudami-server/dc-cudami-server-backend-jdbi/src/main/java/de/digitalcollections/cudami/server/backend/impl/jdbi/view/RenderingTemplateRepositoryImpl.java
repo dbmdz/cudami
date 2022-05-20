@@ -128,6 +128,16 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "label":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public RenderingTemplate update(RenderingTemplate template) {
     template.setLastModified(LocalDateTime.now());
     String query =

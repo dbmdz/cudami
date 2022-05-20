@@ -892,6 +892,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "label":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public I update(I identifiable, Map<String, Object> bindings) {
     if (bindings == null) {
       bindings = new HashMap<>(0);

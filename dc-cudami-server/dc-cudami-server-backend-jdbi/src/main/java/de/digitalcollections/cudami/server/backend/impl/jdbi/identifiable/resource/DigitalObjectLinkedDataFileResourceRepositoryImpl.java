@@ -128,4 +128,9 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
     }
     return getLinkedDataFileResources(digitalObjectUuid);
   }
+
+  @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
 }
