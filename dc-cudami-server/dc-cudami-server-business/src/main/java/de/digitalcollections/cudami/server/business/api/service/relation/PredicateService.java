@@ -10,7 +10,9 @@ public interface PredicateService {
 
   void delete(String value);
 
-  /** @return list of all predicates */
+  /**
+   * @return list of all predicates
+   */
   List<Predicate> getAll();
 
   /**
