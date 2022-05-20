@@ -70,7 +70,7 @@ public class UserController {
 
   @Operation(summary = "Get user by uuid")
   @GetMapping(
-      value = {"/v6/users", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {"/v6/users/{uuid}", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User getByUuid(@PathVariable UUID uuid) {
     return userService.getByUuid(uuid);
@@ -86,7 +86,7 @@ public class UserController {
 
   @Operation(summary = "Update a user")
   @PutMapping(
-      value = {"/v6/users", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {"/v6/users/{uuid}", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());
