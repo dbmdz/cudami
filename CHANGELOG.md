@@ -40,6 +40,12 @@ Methods returning one object renamed from `find...` to `getBy...`:
 - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
 - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
 
+## [5.2.5](https://github.com/dbmdz/cudami/releases/tag/5.2.5) - 2022-05-20
+
+### Changed
+
+- Updated `dc-model` version to `9.1.1`
+
 ## [5.2.4](https://github.com/dbmdz/cudami/releases/tag/5.2.4) - 2022-04-26
 
 ### Fixed
