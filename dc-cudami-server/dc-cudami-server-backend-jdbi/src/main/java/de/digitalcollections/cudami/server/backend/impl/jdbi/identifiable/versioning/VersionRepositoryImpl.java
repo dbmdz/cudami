@@ -99,6 +99,11 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
+
+  @Override
   public Version update(Version version) {
     // digitalObject.setLastModified(LocalDateTime.now());
     final String sql =

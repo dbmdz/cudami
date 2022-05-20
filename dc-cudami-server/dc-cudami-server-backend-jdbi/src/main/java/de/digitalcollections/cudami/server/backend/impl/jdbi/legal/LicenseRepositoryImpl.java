@@ -242,6 +242,17 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "acronym":
+      case "label":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  @Override
   public License update(License license) {
     String query =
         "UPDATE "

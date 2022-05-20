@@ -198,4 +198,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
         });
     return entityRelations;
   }
+
+  @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    return false;
+  }
 }

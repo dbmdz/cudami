@@ -216,21 +216,30 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
                   String sortField = o.getProperty();
                   Optional<String> subSortField = o.getSubProperty();
                   String fullQualifiedColumnName = getColumnName(sortField);
+                  String formatString;
                   if (subSortField.isEmpty()) {
-                    return String.format("%s %s", fullQualifiedColumnName, sortDirection);
+                    if (supportsCaseSensitivityForProperty(sortField) && o.isIgnoreCase()) {
+                      formatString = "lower(%s) %s";
+                    } else {
+                      // case sensitive or not supported at all
+                      formatString = "%s %s";
+                    }
+                    return String.format(formatString, fullQualifiedColumnName, sortDirection);
+                  }
+                  // `->>` always returns varchar so we obey case sensitivity
+                  // The COALESCE function returns the first of its arguments that is not null. Null
+                  // is returned
+                  // only if all arguments are null. (from Postgres doc)
+                  if (o.isIgnoreCase()) {
+                    formatString =
+                        "lower(COALESCE(%1$s->>'%2$s', %1$s->>'')) COLLATE \"ucs_basic\" %3$s";
+                  } else {
+                    formatString = "COALESCE(%1$s->>'%2$s', %1$s->>'') COLLATE \"ucs_basic\" %3$s";
                   }
                   return String.format(
-                      "%s->>'%s' %s", fullQualifiedColumnName, subSortField.get(), sortDirection);
+                      formatString, fullQualifiedColumnName, subSortField.get(), sortDirection);
                 })
             .collect(Collectors.joining(", "));
-
-    // Does it work in general (all jsonb-columns) or do we have to restrict it to jsonb-labels?
-    // The COALESCE function returns the first of its arguments that is not null. Null is returned
-    // only if all arguments are null. (from Postgres doc)
-    orderBy =
-        orderBy.replaceAll(
-            "(?i)(?<jsonfield>(?<col>[\\w._]+)->>'.+?') +(?<sorting>asc|desc)",
-            "COALESCE(${jsonfield}, ${col}->>'') COLLATE \"ucs_basic\" ${sorting}");
     return orderBy;
   }
 
@@ -239,4 +248,13 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
    *     another unique column/field
    */
   protected abstract String getUniqueField();
+
+  /**
+   * Returns whether the passed property can be sorted case sensitive (in general). This method
+   * should be kept in sync with {@link #getAllowedOrderByFields()}.
+   *
+   * @param modelProperty the property name (similar to {@link #getColumnName})
+   * @return {@code true} only if case (in)sensitive sorting is possible
+   */
+  protected abstract boolean supportsCaseSensitivityForProperty(String modelProperty);
 }
