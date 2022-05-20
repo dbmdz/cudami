@@ -522,5 +522,10 @@ public class JdbiRepositoryImplTest {
     protected String getUniqueField() {
       return "uuid";
     }
+
+    @Override
+    protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+      return false;
+    }
   }
 }
