@@ -6,23 +6,15 @@ import java.util.Locale;
 /** Service for Locales and languages. */
 public interface LocaleService {
 
-  /**
-   * @return default language of content managed in cudami (ISO-2-code, e.g. "de", "en")
-   */
+  /** @return default language of content managed in cudami (ISO-2-code, e.g. "de", "en") */
   String getDefaultLanguage();
 
-  /**
-   * @return default locale of content managed in cudami
-   */
+  /** @return default locale of content managed in cudami */
   Locale getDefaultLocale();
 
-  /**
-   * @return list of all languages supported by cudami
-   */
+  /** @return list of all languages supported by cudami */
   List<String> getSupportedLanguages();
 
-  /**
-   * @return list of all locales supported by cudami
-   */
+  /** @return list of all locales supported by cudami */
   List<Locale> getSupportedLocales();
 }
