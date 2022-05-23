@@ -49,7 +49,7 @@ public class V5CollectionController {
       summary =
           "Find limited amount of (active or all) collections containing searchTerm in label or description")
   @GetMapping(
-      value = {"/v5/collections/search"},
+      value = {"/v5/collections/search", "/v5/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
