@@ -14,6 +14,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseReposi
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -201,6 +202,8 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualReduced.getRenderingResources()).isEmpty();
     assertThat(actualReduced.getCreationInfo()).isNull();
     assertThat(actualReduced.getLicense()).isNull();
+    assertThat(actualReduced.getIdentifiableObjectType())
+        .isEqualTo(IdentifiableObjectType.DIGITAL_OBJECT);
   }
 
   @Test

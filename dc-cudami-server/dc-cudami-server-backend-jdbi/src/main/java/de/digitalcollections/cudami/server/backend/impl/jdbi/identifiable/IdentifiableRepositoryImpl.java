@@ -59,12 +59,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static final String TABLE_NAME = "identifiables";
 
   public static String getSqlInsertFields() {
-    return " uuid, created, description, identifiable_type, label, last_modified, previewfileresource, preview_hints";
+    return " uuid, created, description, identifiable_objecttype, identifiable_type, label, last_modified, previewfileresource, preview_hints";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
-    return " :uuid, :created, :description::JSONB, :type, :label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB";
+    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, :label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -85,6 +85,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         + ".description "
         + mappingPrefix
         + "_description, "
+        + tableAlias
+        + ".identifiable_objecttype "
+        + mappingPrefix
+        + "_identifiableObjectType, "
         + tableAlias
         + ".identifiable_type "
         + mappingPrefix
@@ -466,7 +470,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "type"));
+    return new ArrayList<>(
+        Arrays.asList("created", "identifiableObjectType", "label", "lastModified", "type"));
   }
 
   @Override
@@ -530,6 +535,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         return tableAlias + ".created";
       case "description":
         return tableAlias + ".description";
+      case "identifiableObjectType":
+        return tableAlias + ".identifiable_objecttype";
       case "label":
         return tableAlias + ".label";
       case "lastModified":
