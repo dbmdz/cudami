@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -57,7 +58,8 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetType(
+                IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY, EntityType.COLLECTION)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -69,7 +71,10 @@ public class IdentifiableControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hützligrütz")
             .targetLanguage("de")
-            .targetType(IdentifiableType.ENTITY, EntityType.DIGITAL_OBJECT)
+            .targetType(
+                IdentifiableObjectType.DIGITAL_OBJECT,
+                IdentifiableType.ENTITY,
+                EntityType.DIGITAL_OBJECT)
             .targetUuid("23456789-2345-2345-2345-234567890124")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
