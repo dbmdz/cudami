@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Handling of `LinkedDataFileResources`
 - Added missing columns for unique objects
 - Added sorting of resources in `dc-cudami-admin-webapp`
+- Added Handling of `identifiableObjectType` for `Identifiable`s
 
 ### Changed
 
