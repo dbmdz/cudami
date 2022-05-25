@@ -1,30 +1,36 @@
 import './EditorMenu.css'
 
 import classNames from 'classnames'
+import {useTranslation} from 'react-i18next'
 import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 
-const Button = ({dispatch, fullWidth, item, state}) => {
-  const disabled = item.enable && !item.enable(state)
+const Button = ({
+  dispatch,
+  fullWidth,
+  item: {active, content, enable, run, title},
+  state,
+}) => {
+  const disabled = enable && !enable(state)
   return (
     <button
       className={classNames(
         'menu-button',
         fullWidth && ['full-width', 'text-left'],
         {
-          active: item.active && item.active(state),
+          active: active && active(state),
           disabled,
         },
       )}
       onClick={(evt) => {
         evt.preventDefault()
-        if (!disabled && item.run) {
-          item.run(state, dispatch)
+        if (!disabled && run) {
+          run(state, dispatch)
         }
       }}
-      title={item.title}
+      title={title}
       type="button"
     >
-      {item.content}
+      {content}
     </button>
   )
 }
