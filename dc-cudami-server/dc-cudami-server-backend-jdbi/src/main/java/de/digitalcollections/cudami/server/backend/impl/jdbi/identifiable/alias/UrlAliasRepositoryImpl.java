@@ -53,8 +53,8 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     PROPERTY_COLUMN_MAPPING.put("lastPublished", "last_published");
     PROPERTY_COLUMN_MAPPING.put("primary", "primary");
     PROPERTY_COLUMN_MAPPING.put("slug", "slug");
+    PROPERTY_COLUMN_MAPPING.put("targetIdentifiableObjectType", "target_identifiable_objecttype");
     PROPERTY_COLUMN_MAPPING.put("targetIdentifiableType", "target_identifiable_type");
-    PROPERTY_COLUMN_MAPPING.put("targetEntityType", "target_entity_type");
     PROPERTY_COLUMN_MAPPING.put("targetLanguage", "target_language");
     PROPERTY_COLUMN_MAPPING.put("targetUuid", "target_uuid");
     PROPERTY_COLUMN_MAPPING.put("uuid", "uuid");

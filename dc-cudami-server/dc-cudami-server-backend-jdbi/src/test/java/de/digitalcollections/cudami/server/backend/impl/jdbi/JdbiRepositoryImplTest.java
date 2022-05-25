@@ -484,7 +484,7 @@ public class JdbiRepositoryImplTest {
     StringBuilder innerSql =
         new StringBuilder(
             "SELECT ua.created ua_created, ua.last_published ua_lastPublished, ua.primary ua_primary, ua.slug ua_slug, ua.target_identifiable_type "
-                + "ua_targetIdentifiableType, ua.target_entity_type ua_targetEntityType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
+                + "ua_targetIdentifiableType, ua.target_identifiable_objecttype ua_targetIdentifiableObjectType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
                 + "ua.uuid ua_uuid, ua.website_uuid ua_websiteUuid, webs.uuid webs_uuid, webs.label webs_label, webs.url webs_url "
                 + "FROM url_aliases AS ua LEFT JOIN websites webs ON webs.uuid = ua.website_uuid "
                 + "WHERE (ua.slug ILIKE '%' || :filtervalue_1 || '%')");
@@ -493,7 +493,7 @@ public class JdbiRepositoryImplTest {
     assertEquals(
         "SELECT * FROM ("
             + "SELECT row_number() OVER (ORDER BY slug ASC) rn, ua.created ua_created, ua.last_published ua_lastPublished, ua.primary ua_primary, ua.slug ua_slug, ua.target_identifiable_type "
-            + "ua_targetIdentifiableType, ua.target_entity_type ua_targetEntityType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
+            + "ua_targetIdentifiableType, ua.target_identifiable_objecttype ua_targetIdentifiableObjectType, ua.target_language ua_targetLanguage, ua.target_uuid ua_targetUuid, "
             + "ua.uuid ua_uuid, ua.website_uuid ua_websiteUuid, webs.uuid webs_uuid, webs.label webs_label, webs.url webs_url "
             + "FROM url_aliases AS ua LEFT JOIN websites webs ON webs.uuid = ua.website_uuid "
             + "WHERE (ua.slug ILIKE '%' || :filtervalue_1 || '%')"

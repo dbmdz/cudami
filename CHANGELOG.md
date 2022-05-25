@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added missing columns for unique objects
 - Added sorting of resources in `dc-cudami-admin-webapp`
 - Added Handling of `identifiableObjectType` for `Identifiable`s
+- Added migration of UrlAliases column from `target_entity_type` to `target_identifiable_objecttype`
 
 ### Changed
 
@@ -30,16 +31,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Removed
 
-Methods returning one object renamed from `find...` to `getBy...`:
-
-- `findOne(UUID uuid)`-methods, use `getByUuid`-method instead
-- `findOne(UUID uuid, Locale locale)`-methods, use `getByUuidAndLocale`-method instead
-- `findOneByIdentifier(String namespace, String id)`-methods, use `getByIdentifier`-method instead
-- `findOneByRefId(long refId)`-methods, use `getByRefId`-method instead
-- `findOneByEmail(String email)`-methods, use `getByEmail`-method instead
-- `findOneByLabelAndLocale`-methods, use `getByLabelAndLocale`-method instead
-- `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
-- `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
+- Methods returning one object renamed from `find...` to `getBy...`:
+  - `findOne(UUID uuid)`-methods, use `getByUuid`-method instead
+  - `findOne(UUID uuid, Locale locale)`-methods, use `getByUuidAndLocale`-method instead
+  - `findOneByIdentifier(String namespace, String id)`-methods, use `getByIdentifier`-method instead
+  - `findOneByRefId(long refId)`-methods, use `getByRefId`-method instead
+  - `findOneByEmail(String email)`-methods, use `getByEmail`-method instead
+  - `findOneByLabelAndLocale`-methods, use `getByLabelAndLocale`-method instead
+  - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
+  - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
+- EntityType storage in database (replaced by IdentifiableObjectType)
 
 ## [5.2.5](https://github.com/dbmdz/cudami/releases/tag/5.2.5) - 2022-05-20
 

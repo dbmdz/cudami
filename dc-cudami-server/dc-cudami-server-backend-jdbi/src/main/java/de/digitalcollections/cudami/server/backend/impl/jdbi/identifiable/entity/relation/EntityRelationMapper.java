@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -44,7 +44,8 @@ public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityR
     Entity objectEntity = new Entity();
     objectEntity.setCreated(rs.getTimestamp("created").toLocalDateTime());
     objectEntity.setDescription(lscMapper.map(rs, "description", ctx));
-    objectEntity.setEntityType(EntityType.valueOf(rs.getString("entity_type")));
+    objectEntity.setIdentifiableObjectType(
+        IdentifiableObjectType.valueOf(rs.getString("identifiable_objecttype")));
     objectEntity.setLabel(ltMapper.map(rs, "label", ctx));
     objectEntity.setLastModified(rs.getTimestamp("last_modified").toLocalDateTime());
     //    objectEntity.setType(IdentifiableType.valueOf(rs.getString("identifiable_type"))); // set

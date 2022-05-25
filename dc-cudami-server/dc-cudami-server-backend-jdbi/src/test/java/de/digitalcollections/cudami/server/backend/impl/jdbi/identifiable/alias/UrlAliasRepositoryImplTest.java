@@ -11,10 +11,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Url
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -87,6 +87,7 @@ public class UrlAliasRepositoryImplTest {
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setSlug("impressum");
     urlAlias.setTargetLanguage(Locale.GERMAN);
+    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.WEBPAGE);
     urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
     Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
     webpage = webpageRepository.save(webpage);
@@ -130,8 +131,8 @@ public class UrlAliasRepositoryImplTest {
     this.urlAliasWithoutWebsite.setLastPublished(
         LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
     this.urlAliasWithoutWebsite.setPrimary(true);
+    this.urlAliasWithoutWebsite.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
     this.urlAliasWithoutWebsite.setTargetIdentifiableType(IdentifiableType.ENTITY);
-    this.urlAliasWithoutWebsite.setTargetEntityType(EntityType.COLLECTION);
     UrlAlias updated = this.repo.update(this.urlAliasWithoutWebsite);
 
     assertThat(updated).isEqualTo(this.urlAliasWithoutWebsite);

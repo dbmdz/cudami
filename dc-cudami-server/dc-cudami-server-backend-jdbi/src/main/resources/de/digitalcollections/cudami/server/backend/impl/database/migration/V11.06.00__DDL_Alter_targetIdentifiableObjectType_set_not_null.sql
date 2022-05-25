@@ -1,0 +1,1 @@
+ALTER TABLE url_aliases ALTER COLUMN target_identifiable_objecttype SET NOT NULL;
