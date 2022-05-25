@@ -32,7 +32,7 @@ const AddTableDialog = ({isOpen, toggle}) => {
   }, [])
   return (
     <Modal isOpen={isOpen} toggle={destroy}>
-      <ModalHeader toggle={destroy}>{t('insert.table')}</ModalHeader>
+      <ModalHeader toggle={destroy}>{t('editor:insert.table')}</ModalHeader>
       <ModalBody>
         <Form
           onSubmit={(evt) => {

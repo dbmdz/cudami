@@ -119,7 +119,9 @@ const AddMediaDialog = ({
   return (
     <Modal isOpen={isOpen} size="lg" toggle={destroy}>
       <ModalHeader toggle={destroy}>
-        {editing ? t(`insert.${mediaType}.edit`) : t(`insert.${mediaType}.new`)}
+        {editing
+          ? t(`editor:insert.${mediaType}.edit`)
+          : t(`editor:insert.${mediaType}.new`)}
       </ModalHeader>
       <ModalBody>
         <Form

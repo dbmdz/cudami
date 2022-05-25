@@ -46,7 +46,9 @@ const AddIframeDialog = ({isOpen, toggle}) => {
   return (
     <Modal isOpen={isOpen} toggle={destroy}>
       <ModalHeader toggle={destroy}>
-        {editing ? t('insert.iframe.edit') : t('insert.iframe.new')}
+        {editing
+          ? t('editor:insert.iframe.edit')
+          : t('editor:insert.iframe.new')}
       </ModalHeader>
       <ModalBody>
         <Form

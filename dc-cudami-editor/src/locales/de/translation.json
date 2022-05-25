@@ -7,6 +7,50 @@
     "toggleCalendar": "Kalender ein-/ausblenden",
     "year": "Jahr"
   },
+  "editor": {
+    "blocks": {
+      "blockquote": "Zitat einfügen",
+      "bulletList": "In Aufzählungsliste umwandeln",
+      "codeBlock": "In Codeblock umwandeln",
+      "heading": "In Überschrift umwandeln",
+      "headingLevel": "Ebene {{ level }}",
+      "joinUp": "Mit dem obigen Block verbinden",
+      "lift": "Aus dem umschließenden Block herausheben",
+      "orderedList": "In geordnete Liste umwandeln",
+      "paragraph": "In Paragraph umwandeln"
+    },
+    "history": {
+      "redo": "Letzte rückgängig gemachte Änderung wiederholen",
+      "undo": "Letzte Änderung rückgängig machen"
+    },
+    "insert": {
+      "footnote": "Fußnote einfügen",
+      "hr": "Horizontale Linie einfügen",
+      "iframe": {
+        "edit": "Iframe bearbeiten",
+        "new": "Iframe einfügen"
+      },
+      "image": {
+        "edit": "Bild bearbeiten",
+        "new": "Bild einfügen"
+      },
+      "table": "Tabelle einfügen",
+      "video": {
+        "edit": "Video bearbeiten",
+        "new": "Video einfügen"
+      }
+    },
+    "marks": {
+      "code": "Code-Stil",
+      "em": "Kursiv",
+      "link": "Verlinkung",
+      "strikethrough": "Durchgestrichen",
+      "strong": "Fett",
+      "subscript": "Tiefgestellt",
+      "superscript": "Hochgestellt",
+      "underline": "Unterstrichen"
+    }
+  },
   "feedback": {
     "cannotBeEmpty": "Dieses Feld darf nicht leer sein.",
     "collectionNotFound": "Sammlung wurde nicht gefunden.",
@@ -100,17 +144,6 @@
     "apply": "Übernehmen",
     "altText": "Alt-Text",
     "back": "Zurück",
-    "blocks": {
-      "blockquote": "Zitat einfügen",
-      "bulletList": "In Aufzählungsliste umwandeln",
-      "codeBlock": "In Codeblock umwandeln",
-      "heading": "In Überschrift umwandeln",
-      "headingLevel": "Ebene {{ level }}",
-      "joinUp": "Mit dem obigen Block verbinden",
-      "lift": "Aus dem umschließenden Block herausheben",
-      "orderedList": "In geordnete Liste umwandeln",
-      "paragraph": "In Paragraph umwandeln"
-    },
     "cancel": "Abbrechen",
     "caption": "Bildunterschrift",
     "changeOrder": "Reihenfolge ändern",
@@ -166,46 +199,15 @@
     "forExample": "z.B.",
     "generatedUrlAliases": "Automatisch generierte sprechende Links",
     "height": "Höhe",
-    "history": {
-      "redo": "Letzte rückgängig gemachte Änderung wiederholen",
-      "undo": "Letzte Änderung rückgängig machen"
-    },
     "homepage": "Homepage",
     "identifiers": "Identifikatoren",
     "image": "Bild",
     "imageLink": "Bild-Link",
     "inPageNavigation": "Seitennavigation",
-    "insert": {
-      "footnote": "Fußnote einfügen",
-      "hr": "Horizontale Linie einfügen",
-      "iframe": {
-        "edit": "Iframe bearbeiten",
-        "new": "Iframe einfügen"
-      },
-      "image": {
-        "edit": "Bild bearbeiten",
-        "new": "Bild einfügen"
-      },
-      "table": "Tabelle einfügen",
-      "video": {
-        "edit": "Video bearbeiten",
-        "new": "Video einfügen"
-      }
-    },
     "insertLink": "Verlinkung einfügen",
     "label": "Titel",
     "lastModified": "letzte Änderung",
     "lastname": "Nachname",
-    "marks": {
-      "code": "Code-Stil",
-      "em": "Kursiv",
-      "link": "Verlinkung",
-      "strikethrough": "Durchgestrichen",
-      "strong": "Fett",
-      "subscript": "Tiefgestellt",
-      "superscript": "Hochgestellt",
-      "underline": "Unterstrichen"
-    },
     "mimeType": "MIME-Type",
     "move": "Verschieben",
     "moveSubcollections": "Untergeordnete Sammlung verschieben nach:",

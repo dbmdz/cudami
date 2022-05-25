@@ -40,6 +40,50 @@
     "userNotActivatedSuccessfully": "An error occurred during activation of user \"{{ email }}\".",
     "userNotDeactivatedSuccessfully": "An error occurred during deactivation of user \"{{ email }}\"."
   },
+  "editor": {
+    "blocks": {
+      "blockquote": "Add block quote",
+      "bulletList": "Change to bulleted list",
+      "codeBlock": "Change to code block",
+      "heading": "Change to heading",
+      "headingLevel": "Level {{ level }}",
+      "joinUp": "Join with above block",
+      "lift": "Lift out of enclosing block",
+      "orderedList": "Change to numbered list",
+      "paragraph": "Change to paragraph"
+    },
+    "history": {
+      "redo": "Redo last undone change",
+      "undo": "Undo last change"
+    },
+    "insert": {
+      "footnote": "Insert footnote",
+      "hr": "Insert horizontal rule",
+      "iframe": {
+        "edit": "Edit iframe",
+        "new": "Insert iframe"
+      },
+      "image": {
+        "edit": "Edit image",
+        "new": "Insert image"
+      },
+      "table": "Insert table",
+      "video": {
+        "edit": "Edit video",
+        "new": "Insert video"
+      }
+    },
+    "marks": {
+      "code": "Code style",
+      "em": "Italic",
+      "link": "Hyperlink",
+      "strikethrough": "Strikethrough",
+      "strong": "Bold",
+      "subscript": "Subscript",
+      "superscript": "Superscript",
+      "underline": "Underline"
+    }
+  },
   "pagination": {
     "totalElements": {
       "article_one": "found {{ formattedCount }} article",
@@ -100,17 +144,6 @@
     "apply": "Apply",
     "altText": "Alt text",
     "back": "Back",
-    "blocks": {
-      "blockquote": "Add block quote",
-      "bulletList": "Change to bulleted list",
-      "codeBlock": "Change to code block",
-      "heading": "Change to heading",
-      "headingLevel": "Level {{ level }}",
-      "joinUp": "Join with above block",
-      "lift": "Lift out of enclosing block",
-      "orderedList": "Change to numbered list",
-      "paragraph": "Change to paragraph"
-    },
     "cancel": "Cancel",
     "caption": "Caption",
     "changeOrder": "Change the order",
@@ -166,46 +199,15 @@
     "forExample": "e.g.",
     "generatedUrlAliases": "Automatically generated pretty URLs",
     "height": "Height",
-    "history": {
-      "redo": "Redo last undone change",
-      "undo": "Undo last change"
-    },
     "homepage": "Homepage",
     "identifiers": "Identifiers",
     "image": "image",
     "imageLink": "Image link",
     "inPageNavigation": "Page navigation",
-    "insert": {
-      "footnote": "Insert footnote",
-      "hr": "Insert horizontal rule",
-      "iframe": {
-        "edit": "Edit iframe",
-        "new": "Insert iframe"
-      },
-      "image": {
-        "edit": "Edit image",
-        "new": "Insert image"
-      },
-      "table": "Insert table",
-      "video": {
-        "edit": "Edit video",
-        "new": "Insert video"
-      }
-    },
     "insertLink": "Insert hyperlink",
     "label": "Label",
     "lastModified": "last modified",
     "lastname": "Lastname",
-    "marks": {
-      "code": "Code style",
-      "em": "Italic",
-      "link": "Hyperlink",
-      "strikethrough": "Strikethrough",
-      "strong": "Bold",
-      "subscript": "Subscript",
-      "superscript": "Superscript",
-      "underline": "Underline"
-    },
     "mimeType": "MIME type",
     "move": "Move",
     "moveSubcollections": "Move sub collection to:",
