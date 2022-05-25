@@ -33,7 +33,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", custom_attrs" + ", navdate";
+    return IdentifiableRepositoryImpl.getSqlInsertFields()
+        + ", custom_attrs"
+        + ", navdate"
+        + ", notes";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
@@ -41,7 +44,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // refid is generated as serial, DO NOT SET!
     return IdentifiableRepositoryImpl.getSqlInsertValues()
         + ", :customAttributes::JSONB"
-        + ", :navDate";
+        + ", :navDate"
+        + ", :notes::JSONB";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -62,14 +66,18 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + tableAlias
         + ".refid "
         + mappingPrefix
-        + "_refId";
+        + "_refId, "
+        + tableAlias
+        + ".notes "
+        + mappingPrefix
+        + "_notes";
   }
 
   public static String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
     return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
-        + ", custom_attrs=:customAttributes::JSONB";
+        + ", custom_attrs=:customAttributes::JSONB, notes=:notes::JSONB";
   }
 
   private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -218,16 +226,15 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     if (modelProperty == null) {
       return null;
     }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
     switch (modelProperty) {
       case "navdate":
         return tableAlias + ".navdate";
       case "refId":
         return tableAlias + ".refid";
+      case "notes":
+        return tableAlias + ".notes";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
