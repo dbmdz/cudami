@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -42,9 +42,8 @@ class V5EntityControllerTest extends BaseControllerTest {
             .label(Locale.GERMAN, "Test")
             .refId(71)
             .uuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-            .entityType(EntityType.WEBSITE)
+            .identifiableObjectType(IdentifiableObjectType.WEBSITE)
             .build();
-    entity.setEntityType(EntityType.WEBSITE);
 
     PageResponse<Entity> expected =
         (PageResponse<Entity>)
@@ -78,9 +77,8 @@ class V5EntityControllerTest extends BaseControllerTest {
             .label(Locale.GERMAN, "Test")
             .refId(71)
             .uuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-            .entityType(EntityType.WEBSITE)
+            .identifiableObjectType(IdentifiableObjectType.WEBSITE)
             .build();
-    entity.setEntityType(EntityType.WEBSITE);
 
     PageResponse<Entity> expected =
         (PageResponse<Entity>)

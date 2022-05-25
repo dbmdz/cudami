@@ -33,10 +33,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields()
-        + ", custom_attrs"
-        + ", entity_type"
-        + ", navdate";
+    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", custom_attrs" + ", navdate";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
@@ -44,7 +41,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // refid is generated as serial, DO NOT SET!
     return IdentifiableRepositoryImpl.getSqlInsertValues()
         + ", :customAttributes::JSONB"
-        + ", :entityType"
         + ", :navDate";
   }
 
@@ -64,10 +60,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + mappingPrefix
         + "_navDate, "
         + tableAlias
-        + ".entity_type "
-        + mappingPrefix
-        + "_entityType, "
-        + tableAlias
         + ".refid "
         + mappingPrefix
         + "_refId";
@@ -75,7 +67,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   public static String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
+    // uuid, created, identifiable_type, identifiable_objecttype, refid
     return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
         + ", custom_attrs=:customAttributes::JSONB";
   }
@@ -230,8 +222,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       return super.getColumnName(modelProperty);
     }
     switch (modelProperty) {
-      case "entityType":
-        return tableAlias + ".entity_type";
       case "navdate":
         return tableAlias + ".navdate";
       case "refId":

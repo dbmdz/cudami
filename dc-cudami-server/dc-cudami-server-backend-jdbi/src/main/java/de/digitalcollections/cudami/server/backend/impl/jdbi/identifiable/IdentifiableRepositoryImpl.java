@@ -920,7 +920,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     identifiable.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type, entity_type, refid
+    // uuid, created, identifiable_type, identifiable_objecttype, refid
 
     final String sql = "UPDATE " + tableName + " SET" + sqlUpdateFieldValues + " WHERE uuid=:uuid";
 

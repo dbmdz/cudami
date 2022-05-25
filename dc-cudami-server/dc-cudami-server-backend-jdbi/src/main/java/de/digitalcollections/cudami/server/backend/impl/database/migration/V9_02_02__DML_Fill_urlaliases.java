@@ -18,25 +18,11 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.config.SpringUtility;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.Article;
-import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.EntityType;
-import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
-import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.Family;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
-import de.digitalcollections.model.identifiable.entity.work.Item;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,34 +55,40 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   // for all the commented lines there doesn't exist a corresponding model class
   static {
-    ENTITY_MIGRATION_TABLES.put(Agent.class.getSimpleName(), null);
-    ENTITY_MIGRATION_TABLES.put(Article.class.getSimpleName(), Pair.of("articles", ARTICLE));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.AGENT.toString(), null);
+    ENTITY_MIGRATION_TABLES.put(
+        IdentifiableObjectType.ARTICLE.toString(), Pair.of("articles", ARTICLE));
     // ENTITY_MIGRATION_TABLES.put(AUDIO, null);
     // ENTITY_MIGRATION_TABLES.put(BOOK, null);
     ENTITY_MIGRATION_TABLES.put(
-        Collection.class.getSimpleName(), Pair.of("collections", COLLECTION));
+        IdentifiableObjectType.COLLECTION.toString(), Pair.of("collections", COLLECTION));
     ENTITY_MIGRATION_TABLES.put(
-        CorporateBody.class.getSimpleName(), Pair.of("corporatebodies", CORPORATE_BODY));
+        IdentifiableObjectType.CORPORATE_BODY.toString(),
+        Pair.of("corporatebodies", CORPORATE_BODY));
     ENTITY_MIGRATION_TABLES.put(
-        DigitalObject.class.getSimpleName(), Pair.of("digitalobjects", DIGITAL_OBJECT));
-    ENTITY_MIGRATION_TABLES.put(Entity.class.getSimpleName(), null);
+        IdentifiableObjectType.DIGITAL_OBJECT.toString(),
+        Pair.of("digitalobjects", DIGITAL_OBJECT));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.ENTITY.toString(), null);
     // ENTITY_MIGRATION_TABLES.put(EVENT, null);
     // ENTITY_MIGRATION_TABLES.put(EXPRESSION, null);
-    ENTITY_MIGRATION_TABLES.put(Family.class.getSimpleName(), null);
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.FAMILY.toString(), null);
     ENTITY_MIGRATION_TABLES.put(
-        GeoLocation.class.getSimpleName(), Pair.of("geolocations", GEOLOCATION));
-    ENTITY_MIGRATION_TABLES.put(HeadwordEntry.class.getSimpleName(), null);
+        IdentifiableObjectType.GEO_LOCATION.toString(), Pair.of("geolocations", GEOLOCATION));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.HEADWORD_ENTRY.toString(), null);
     // ENTITY_MIGRATION_TABLES.put(IMAGE, null);
-    ENTITY_MIGRATION_TABLES.put(Item.class.getSimpleName(), Pair.of("items", ITEM));
-    ENTITY_MIGRATION_TABLES.put(Manifestation.class.getSimpleName(), null);
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.ITEM.toString(), Pair.of("items", ITEM));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.MANIFESTATION.toString(), null);
     // ENTITY_MIGRATION_TABLES.put(OBJECT_3D, null);
-    ENTITY_MIGRATION_TABLES.put(Person.class.getSimpleName(), Pair.of("persons", PERSON));
+    ENTITY_MIGRATION_TABLES.put(
+        IdentifiableObjectType.PERSON.toString(), Pair.of("persons", PERSON));
     // ENTITY_MIGRATION_TABLES.put(PLACE, null);
-    ENTITY_MIGRATION_TABLES.put(Project.class.getSimpleName(), Pair.of("projects", PROJECT));
-    ENTITY_MIGRATION_TABLES.put(Topic.class.getSimpleName(), Pair.of("topics", TOPIC));
+    ENTITY_MIGRATION_TABLES.put(
+        IdentifiableObjectType.PROJECT.toString(), Pair.of("projects", PROJECT));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.TOPIC.toString(), Pair.of("topics", TOPIC));
     // ENTITY_MIGRATION_TABLES.put(VIDEO, null);
-    ENTITY_MIGRATION_TABLES.put(Website.class.getSimpleName(), Pair.of("websites", WEBSITE));
-    ENTITY_MIGRATION_TABLES.put(Work.class.getSimpleName(), Pair.of("works", WORK));
+    ENTITY_MIGRATION_TABLES.put(
+        IdentifiableObjectType.WEBSITE.toString(), Pair.of("websites", WEBSITE));
+    ENTITY_MIGRATION_TABLES.put(IdentifiableObjectType.WORK.toString(), Pair.of("works", WORK));
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(V9_02_02__DML_Fill_urlaliases.class);

@@ -121,7 +121,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public List<EntityRelation> getBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
-        "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.entity_type as entity_type"
+        "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.identifiable_objecttype as identifiable_objecttype"
             + " FROM "
             + tableName
             + " AS "
