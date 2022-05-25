@@ -57,49 +57,49 @@ export default function (t) {
   return {
     marks: {
       strong: {
-        title: t('marks.strong'),
+        titleKey: 'marks.strong',
         content: icons.strong,
         active: markActive(schema.marks.strong),
         run: toggleMark(schema.marks.strong),
       },
       em: {
-        title: t('marks.em'),
+        titleKey: 'marks.em',
         content: icons.em,
         active: markActive(schema.marks.em),
         run: toggleMark(schema.marks.em),
       },
       underline: {
-        title: t('marks.underline'),
+        titleKey: 'marks.underline',
         content: icons.underline,
         active: markActive(schema.marks.underline),
         run: toggleMark(schema.marks.underline),
       },
       strikethrough: {
-        title: t('marks.strikethrough'),
+        titleKey: 'marks.strikethrough',
         content: icons.strikethrough,
         active: markActive(schema.marks.strikethrough),
         run: toggleMark(schema.marks.strikethrough),
       },
       superscript: {
-        title: t('marks.superscript'),
+        titleKey: 'marks.superscript',
         content: icons.superscript,
         active: markActive(schema.marks.superscript),
         run: toggleMark(schema.marks.superscript),
       },
       subscript: {
-        title: t('marks.subscript'),
+        titleKey: 'marks.subscript',
         content: icons.subscript,
         active: markActive(schema.marks.subscript),
         run: toggleMark(schema.marks.subscript),
       },
       code: {
-        title: t('marks.code'),
+        titleKey: 'marks.code',
         content: icons.code,
         active: markActive(schema.marks.code),
         run: toggleMark(schema.marks.code),
       },
       link: {
-        title: t('marks.link'),
+        titleKey: 'marks.link',
         content: icons.link,
         active: markActive(schema.marks.link),
         enable: (state) => !state.selection.empty,
@@ -122,60 +122,60 @@ export default function (t) {
     },
     blocks: {
       plain: {
-        title: t('blocks.paragraph'),
+        titleKey: 'blocks.paragraph',
         content: icons.paragraph,
         active: blockActive(schema.nodes.paragraph),
         enable: setBlockType(schema.nodes.paragraph),
         run: setBlockType(schema.nodes.paragraph),
       },
       code_block: {
-        title: t('blocks.codeBlock'),
+        titleKey: 'blocks.codeBlock',
         content: icons.code_block,
         active: blockActive(schema.nodes.code_block),
         enable: setBlockType(schema.nodes.code_block),
         run: setBlockType(schema.nodes.code_block),
       },
       heading: {
-        title: t('blocks.heading'),
+        titleKey: 'blocks.heading',
         content: icons.heading,
         active: headingActive(),
         enable: () => true,
         children: headingLevels.map((level) => ({
           active: blockActive(schema.nodes.heading, {level}),
-          content: t('blocks.headingLevel', {level}),
+          content: t('editor:blocks.headingLevel', {level}),
           enable: setBlockType(schema.nodes.heading, {level}),
           run: setBlockType(schema.nodes.heading, {level}),
         })),
       },
       blockquote: {
-        title: t('blocks.blockquote'),
+        titleKey: 'blocks.blockquote',
         content: icons.blockquote,
         active: blockActive(schema.nodes.blockquote),
         enable: wrapIn(schema.nodes.blockquote),
         run: wrapIn(schema.nodes.blockquote),
       },
       bullet_list: {
-        title: t('blocks.bulletList'),
+        titleKey: 'blocks.bulletList',
         content: icons.bullet_list,
         active: blockActive(schema.nodes.bullet_list),
         enable: wrapInList(schema.nodes.bullet_list),
         run: wrapInList(schema.nodes.bullet_list),
       },
       ordered_list: {
-        title: t('blocks.orderedList'),
+        titleKey: 'blocks.orderedList',
         content: icons.ordered_list,
         active: blockActive(schema.nodes.ordered_list),
         enable: wrapInList(schema.nodes.ordered_list),
         run: wrapInList(schema.nodes.ordered_list),
       },
       lift: {
-        title: t('blocks.lift'),
+        titleKey: 'blocks.lift',
         content: icons.lift,
         enable: lift,
         run: lift,
       },
       join_up: {
-        title: t('blocks.joinUp'),
+        titleKey: 'blocks.joinUp',
         content: icons.join_up,
         enable: joinUp,
         run: joinUp,
@@ -183,7 +183,7 @@ export default function (t) {
     },
     insert: {
       image: {
-        title: t('insert.image.new'),
+        titleKey: 'insert.image.new',
         content: icons.image,
         enable: canInsert(schema.nodes.image),
         run: (state, dispatch) => {
@@ -196,7 +196,7 @@ export default function (t) {
         },
       },
       video: {
-        title: t('insert.video.new'),
+        titleKey: 'insert.video.new',
         content: icons.video,
         enable: canInsert(schema.nodes.video),
         run: (state, dispatch) => {
@@ -209,7 +209,7 @@ export default function (t) {
         },
       },
       hr: {
-        title: t('insert.hr'),
+        titleKey: 'insert.hr',
         content: icons.hr,
         enable: canInsert(schema.nodes.horizontal_rule),
         run: (state, dispatch) => {
@@ -218,7 +218,7 @@ export default function (t) {
         },
       },
       iframe: {
-        title: t('insert.iframe.new'),
+        titleKey: 'insert.iframe.new',
         content: icons.iframe,
         enable: canInsert(schema.nodes.iframe),
         run: (state, dispatch) => {
@@ -231,7 +231,7 @@ export default function (t) {
         },
       },
       table: {
-        title: t('insert.table'),
+        titleKey: 'insert.table',
         content: icons.table,
         enable: canInsert(schema.nodes.table),
         run: (state, dispatch) => {
@@ -258,13 +258,13 @@ export default function (t) {
     },
     history: {
       undo: {
-        title: t('history.undo'),
+        titleKey: 'history.undo',
         content: icons.undo,
         enable: undo,
         run: undo,
       },
       redo: {
-        title: t('history.redo'),
+        titleKey: 'history.redo',
         content: icons.redo,
         enable: redo,
         run: redo,

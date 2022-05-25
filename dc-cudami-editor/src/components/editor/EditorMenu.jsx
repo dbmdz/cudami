@@ -7,9 +7,10 @@ import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 const Button = ({
   dispatch,
   fullWidth,
-  item: {active, content, enable, run, title},
+  item: {active, content, enable, run, titleKey},
   state,
 }) => {
+  const {t} = useTranslation()
   const disabled = enable && !enable(state)
   return (
     <button
@@ -27,7 +28,7 @@ const Button = ({
           run(state, dispatch)
         }
       }}
-      title={title}
+      title={t(`editor:${titleKey}`)}
       type="button"
     >
       {content}
