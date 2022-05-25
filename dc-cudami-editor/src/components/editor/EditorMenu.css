@@ -1,5 +1,6 @@
 .identifiable-editor .menu-bar {
   align-items: baseline;
+  background-color: white;
   border-bottom: 1px solid #ccc;
   display: flex;
 }
@@ -35,7 +36,7 @@
 }
 
 .identifiable-editor .menu-group {
-  margin-right: 5px;
+  border-right: 1px solid #ccc;
 }
 
 .identifiable-editor .menu-group > .dropdown {
