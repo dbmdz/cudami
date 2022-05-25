@@ -40,10 +40,11 @@ const canInsert = (type) => (state) => {
   return false
 }
 
+const headingLevels = [1, 2, 3, 4, 5, 6]
+
 const headingActive = () => (state) => {
   let active = false
-  const levels = [1, 2, 3, 4, 5, 6]
-  for (let level of levels) {
+  for (let level of headingLevels) {
     if (blockActive(schema.nodes.heading, {level})(state)) {
       active = true
       break
@@ -139,44 +140,12 @@ export default function (t) {
         content: icons.heading,
         active: headingActive(),
         enable: () => true,
-        children: [
-          {
-            active: blockActive(schema.nodes.heading, {level: 1}),
-            content: t('blocks.headingLevel', {level: 1}),
-            enable: setBlockType(schema.nodes.heading, {level: 1}),
-            run: setBlockType(schema.nodes.heading, {level: 1}),
-          },
-          {
-            active: blockActive(schema.nodes.heading, {level: 2}),
-            content: t('blocks.headingLevel', {level: 2}),
-            enable: setBlockType(schema.nodes.heading, {level: 2}),
-            run: setBlockType(schema.nodes.heading, {level: 2}),
-          },
-          {
-            active: blockActive(schema.nodes.heading, {level: 3}),
-            content: t('blocks.headingLevel', {level: 3}),
-            enable: setBlockType(schema.nodes.heading, {level: 3}),
-            run: setBlockType(schema.nodes.heading, {level: 3}),
-          },
-          {
-            active: blockActive(schema.nodes.heading, {level: 4}),
-            content: t('blocks.headingLevel', {level: 4}),
-            enable: setBlockType(schema.nodes.heading, {level: 4}),
-            run: setBlockType(schema.nodes.heading, {level: 4}),
-          },
-          {
-            active: blockActive(schema.nodes.heading, {level: 5}),
-            content: t('blocks.headingLevel', {level: 5}),
-            enable: setBlockType(schema.nodes.heading, {level: 5}),
-            run: setBlockType(schema.nodes.heading, {level: 5}),
-          },
-          {
-            active: blockActive(schema.nodes.heading, {level: 6}),
-            content: t('blocks.headingLevel', {level: 6}),
-            enable: setBlockType(schema.nodes.heading, {level: 6}),
-            run: setBlockType(schema.nodes.heading, {level: 6}),
-          },
-        ],
+        children: headingLevels.map((level) => ({
+          active: blockActive(schema.nodes.heading, {level}),
+          content: t('blocks.headingLevel', {level}),
+          enable: setBlockType(schema.nodes.heading, {level}),
+          run: setBlockType(schema.nodes.heading, {level}),
+        })),
       },
       blockquote: {
         title: t('blocks.blockquote'),
