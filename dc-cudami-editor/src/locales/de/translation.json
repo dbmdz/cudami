@@ -49,6 +49,15 @@
       "subscript": "Tiefgestellt",
       "superscript": "Hochgestellt",
       "underline": "Unterstrichen"
+    },
+    "table": {
+      "addColumnAfter": "Spalte danach einfügen",
+      "addColumnBefore": "Spalte davor einfügen",
+      "addRowAfter": "Zeile danach einfügen",
+      "addRowBefore": "Zeile davor einfügen",
+      "deleteColumn": "Spalte löschen",
+      "deleteRow": "Zeile löschen",
+      "deleteTable": "Tabelle löschen"
     }
   },
   "feedback": {

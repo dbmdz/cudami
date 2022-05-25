@@ -82,6 +82,15 @@
       "subscript": "Subscript",
       "superscript": "Superscript",
       "underline": "Underline"
+    },
+    "table": {
+      "addColumnAfter": "Add column after",
+      "addColumnBefore": "Add column before",
+      "addRowAfter": "Add row after",
+      "addRowBefore": "Add row before",
+      "deleteColumn": "Delete column",
+      "deleteRow": "Delete row",
+      "deleteTable": "Delete table"
     }
   },
   "pagination": {
