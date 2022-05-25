@@ -7,7 +7,16 @@ import {
 } from 'prosemirror-commands'
 import {redo, undo} from 'prosemirror-history'
 import {wrapInList} from 'prosemirror-schema-list'
-// import { addColumnAfter, addColumnBefore } from 'prosemirror-tables'
+import {
+  addColumnAfter,
+  addColumnBefore,
+  addRowAfter,
+  addRowBefore,
+  deleteColumn,
+  deleteRow,
+  deleteTable,
+  isInTable,
+} from 'prosemirror-tables'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 
 import icons from './icons'
@@ -270,19 +279,49 @@ export default function (t) {
         run: redo,
       },
     },
-    // table: {
-    // addColumnBefore: {
-    //   title: 'Insert column before',
-    //   content: icons.after,
-    //   active: addColumnBefore, // TOOD: active -> select
-    //   run: addColumnBefore
-    // },
-    // addColumnAfter: {
-    //   title: 'Insert column before',
-    //   content: icons.before,
-    //   active: addColumnAfter, // TOOD: active -> select
-    //   run: addColumnAfter
-    // }
-    // }
+    table: {
+      addRowBefore: {
+        titleKey: 'table.addRowBefore',
+        content: icons.addRowBefore,
+        enable: isInTable,
+        run: addRowBefore,
+      },
+      addRowAfter: {
+        titleKey: 'table.addRowAfter',
+        content: icons.addRowAfter,
+        enable: isInTable,
+        run: addRowAfter,
+      },
+      deleteRow: {
+        titleKey: 'table.deleteRow',
+        content: icons.deleteRow,
+        enable: isInTable,
+        run: deleteRow,
+      },
+      addColumnBefore: {
+        titleKey: 'table.addColumnBefore',
+        content: icons.addColumnBefore,
+        enable: isInTable,
+        run: addColumnBefore,
+      },
+      addColumnAfter: {
+        titleKey: 'table.addColumnAfter',
+        content: icons.addColumnAfter,
+        enable: isInTable,
+        run: addColumnAfter,
+      },
+      deleteColumn: {
+        titleKey: 'table.deleteColumn',
+        content: icons.deleteColumn,
+        enable: isInTable,
+        run: deleteColumn,
+      },
+      deleteTable: {
+        titleKey: 'table.deleteTable',
+        content: icons.deleteTable,
+        enable: isInTable,
+        run: deleteTable,
+      },
+    },
   }
 }
