@@ -32,7 +32,7 @@ public class V11_05_00__DDL_DML_UrlAlias_replace_targetEntityType_with_targetIde
 
     // select all needed data for migration
     String selectQuery =
-        "SELECT DISTINCT ua.target_uuid AS target_uuid, i.identifiable_objecttype AS identifiable_objecttype FROM url_aliases ua, identifiables i WHERE ua.target_uuid=i.uuid";
+        "SELECT identifiables.uuid AS target_uuid, identifiable_objecttype FROM identifiables INNER JOIN (SELECT DISTINCT target_uuid FROM url_aliases) url_aliases ON identifiables.uuid=url_aliases.target_uuid";
     List<Map<String, Object>> targetData = jdbcTemplate.queryForList(selectQuery);
 
     if (targetData.isEmpty()) {
@@ -41,19 +41,29 @@ public class V11_05_00__DDL_DML_UrlAlias_replace_targetEntityType_with_targetIde
     }
 
     LOGGER.info("Migrating urlaliasses for {} identifiables", targetData.size());
-    targetData.forEach(
-        i -> {
-          JSONObject jsonObject = new JSONObject(i.toString());
 
-          UUID targetUuid = UUID.fromString(jsonObject.getString("target_uuid"));
-          IdentifiableObjectType targetIdentifiableObjectType =
-              IdentifiableObjectType.valueOf(jsonObject.getString("identifiable_objecttype"));
+    try {
+      // Disable all triggers for faster updates
+      jdbcTemplate.execute("ALTER TABLE url_aliases DISABLE TRIGGER ALL");
 
-          jdbcTemplate.update(
-              "UPDATE url_aliases SET target_identifiable_objecttype = ? WHERE target_uuid = ?",
-              targetIdentifiableObjectType.toString(),
-              targetUuid);
-        });
-    LOGGER.info("Migration done");
+      // Do the actual migration
+      targetData.forEach(
+          i -> {
+            JSONObject jsonObject = new JSONObject(i.toString());
+
+            UUID targetUuid = UUID.fromString(jsonObject.getString("target_uuid"));
+            IdentifiableObjectType targetIdentifiableObjectType =
+                IdentifiableObjectType.valueOf(jsonObject.getString("identifiable_objecttype"));
+
+            jdbcTemplate.update(
+                "UPDATE url_aliases SET target_identifiable_objecttype = ? WHERE target_uuid = ?",
+                targetIdentifiableObjectType.toString(),
+                targetUuid);
+          });
+      LOGGER.info("Migration done");
+    } finally {
+      // Re-enable the triggers
+      jdbcTemplate.execute("ALTER TABLE url_aliases ENABLE TRIGGER ALL");
+    }
   }
 }
