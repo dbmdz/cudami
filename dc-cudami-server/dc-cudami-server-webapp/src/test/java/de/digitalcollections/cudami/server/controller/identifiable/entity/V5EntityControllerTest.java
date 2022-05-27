@@ -42,8 +42,8 @@ class V5EntityControllerTest extends BaseControllerTest {
             .label(Locale.GERMAN, "Test")
             .refId(71)
             .uuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-            .identifiableObjectType(IdentifiableObjectType.WEBSITE)
             .build();
+    entity.setIdentifiableObjectType(IdentifiableObjectType.WEBSITE);
 
     PageResponse<Entity> expected =
         (PageResponse<Entity>)
@@ -77,8 +77,8 @@ class V5EntityControllerTest extends BaseControllerTest {
             .label(Locale.GERMAN, "Test")
             .refId(71)
             .uuid("e91464a1-588b-434b-a88e-b6a1c3824c85")
-            .identifiableObjectType(IdentifiableObjectType.WEBSITE)
             .build();
+    entity.setIdentifiableObjectType(IdentifiableObjectType.WEBSITE);
 
     PageResponse<Entity> expected =
         (PageResponse<Entity>)
