@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -35,7 +36,8 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @BeforeEach
   public void setup() {
-    CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
+    CudamiConfig.UrlAlias urlAliasConfig =
+        new CudamiConfig.UrlAlias(List.of(IdentifiableObjectType.DIGITAL_OBJECT.toString()), 0);
     cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
 
     slugGeneratorService = mock(IdentifiableUrlAliasAlignHelper.SlugGeneratorService.class);
@@ -85,7 +87,8 @@ public class IdentifiableUrlAliasAlignHelperTest {
     assertThat(actual.getCreated()).isNull(); // is set by the repository
     assertThat(actual.getTargetUuid()).isEqualTo(expectedTargetUuid);
     assertThat(actual.getTargetIdentifiableType()).isEqualTo(entity.getType());
-    assertThat(actual.getTargetEntityType()).isEqualTo(entity.getEntityType());
+    assertThat(actual.getTargetIdentifiableObjectType())
+        .isEqualTo(entity.getIdentifiableObjectType());
     assertThat(actual.getWebsite()).isNull(); // no default website given
     assertThat(actual.getSlug()).isEqualTo("hallo-welt");
     assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
