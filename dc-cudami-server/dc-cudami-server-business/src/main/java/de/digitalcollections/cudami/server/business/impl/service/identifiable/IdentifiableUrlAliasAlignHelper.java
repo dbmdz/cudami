@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Cudam
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import java.util.ArrayList;
@@ -147,9 +146,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         newAlias.setTargetIdentifiableType(actualIdentifiable.getType());
         newAlias.setTargetLanguage(langFromDb);
         newAlias.setTargetUuid(actualIdentifiable.getUuid());
-        if (actualIdentifiable instanceof Entity) {
-          newAlias.setTargetEntityType(((Entity) actualIdentifiable).getEntityType());
-        }
+        newAlias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
+
         if (websiteUuid != null) {
           Website ws = new Website();
           ws.setUuid(websiteUuid);
@@ -171,7 +169,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     return cudamiConfig
             .getUrlAlias()
             .getGenerationExcludes()
-            .contains(actualIdentifiable.getClass().getSimpleName())
+            .contains(actualIdentifiable.getIdentifiableObjectType().toString())
         || actualIdentifiable.getLabel() == null;
   }
 
@@ -206,9 +204,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
         defaultAlias.setTargetLanguage(lang);
         defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
-        if (actualIdentifiable instanceof Entity) {
-          defaultAlias.setTargetEntityType(((Entity) actualIdentifiable).getEntityType());
-        }
+        defaultAlias.setTargetIdentifiableObjectType(
+            actualIdentifiable.getIdentifiableObjectType());
         defaultAlias.setPrimary(!urlAliases.containsKey(lang));
         try {
           defaultAlias.setSlug(

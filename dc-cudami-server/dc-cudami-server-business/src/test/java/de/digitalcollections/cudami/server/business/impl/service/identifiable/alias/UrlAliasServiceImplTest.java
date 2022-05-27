@@ -16,10 +16,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.a
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -206,7 +206,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setTargetUuid(targetUuid);
     urlAlias.setSlug(slug);
     urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
-    urlAlias.setTargetEntityType(EntityType.COLLECTION);
+    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
     urlAlias.setLastPublished(LocalDateTime.now());
     urlAlias.setCreated(LocalDateTime.now());
     urlAlias.setTargetLanguage(Locale.forLanguageTag(language));
@@ -236,7 +236,7 @@ class UrlAliasServiceImplTest {
     copy.setLastPublished(urlAlias.getLastPublished());
     copy.setSlug(urlAlias.getSlug());
     copy.setTargetIdentifiableType(urlAlias.getTargetIdentifiableType());
-    copy.setTargetEntityType(urlAlias.getTargetEntityType());
+    copy.setTargetIdentifiableObjectType(urlAlias.getTargetIdentifiableObjectType());
     copy.setTargetUuid(urlAlias.getTargetUuid());
     return copy;
   }
