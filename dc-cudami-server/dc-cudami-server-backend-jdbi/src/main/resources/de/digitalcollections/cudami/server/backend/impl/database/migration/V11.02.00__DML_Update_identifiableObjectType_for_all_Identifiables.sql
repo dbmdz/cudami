@@ -1,5 +1,10 @@
+ALTER TABLE identifiables DISABLE TRIGGER ALL;
 UPDATE identifiables SET identifiable_objecttype = 'IDENTIFIABLE';
+ALTER TABLE identifiables ENABLE TRIGGER ALL;
+
+ALTER TABLE entities DISABLE TRIGGER ALL;
 UPDATE entities SET identifiable_objecttype = 'ENTITY';
+ALTER TABLE entities ENABLE TRIGGER ALL;
 
 UPDATE articles SET identifiable_objecttype = 'ARTICLE';
 UPDATE collections SET identifiable_objecttype = 'COLLECTION';
@@ -31,7 +36,10 @@ UPDATE geolocations SET identifiable_objecttype = 'VALLEY' WHERE geolocation_typ
 
 UPDATE humansettlements SET identifiable_objecttype = 'HUMAN_SETTLEMENT';
 
+ALTER TABLE fileresources DISABLE TRIGGER ALL;
 UPDATE fileresources SET identifiable_objecttype = 'FILE_RESOURCE';
+ALTER TABLE fileresources ENABLE TRIGGER ALL;
+
 UPDATE fileresources_application SET identifiable_objecttype = 'APPLICATION_FILE_RESOURCE';
 UPDATE fileresources_audio SET identifiable_objecttype = 'AUDIO_FILE_RESOURCE';
 UPDATE fileresources_image SET identifiable_objecttype = 'IMAGE_FILE_RESOURCE';
@@ -46,3 +54,5 @@ UPDATE webpages SET identifiable_objecttype = 'WEBPAGE';
 --  EXPRESSION(Expression.class),
 --  FAMILY(Family.class),
 --  MANIFESTATION(Manifestation.class),
+
+
