@@ -29,7 +29,7 @@
     "@aeaton/react-prosemirror": "^0.22.1",
     "@babel/runtime": "^7.18.0",
     "classnames": "^2.3.1",
-    "filesize": "^8.0.7",
+    "filesize": "^9.0.0",
     "i18next": "^21.8.5",
     "lodash": "^4.17.21",
     "object.fromentries": "^2.0.5",
