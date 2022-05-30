@@ -44,7 +44,7 @@ public class V11_05_00__DDL_DML_UrlAlias_replace_targetEntityType_with_targetIde
 
     try {
       // Disable all triggers for faster updates
-      jdbcTemplate.execute("ALTER TABLE url_aliases DISABLE TRIGGER ALL");
+      jdbcTemplate.execute("ALTER TABLE url_aliases DISABLE TRIGGER tr_url_aliases_target_uuid");
 
       // Do the actual migration
       targetData.forEach(
@@ -63,7 +63,7 @@ public class V11_05_00__DDL_DML_UrlAlias_replace_targetEntityType_with_targetIde
       LOGGER.info("Migration done");
     } finally {
       // Re-enable the triggers
-      jdbcTemplate.execute("ALTER TABLE url_aliases ENABLE TRIGGER ALL");
+      jdbcTemplate.execute("ALTER TABLE url_aliases ENABLE TRIGGER tr_url_aliases_target_uuid");
     }
   }
 }

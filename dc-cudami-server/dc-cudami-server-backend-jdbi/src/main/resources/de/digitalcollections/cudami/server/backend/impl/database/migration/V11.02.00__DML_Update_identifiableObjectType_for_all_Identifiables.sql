@@ -54,5 +54,3 @@ UPDATE webpages SET identifiable_objecttype = 'WEBPAGE';
 --  EXPRESSION(Expression.class),
 --  FAMILY(Family.class),
 --  MANIFESTATION(Manifestation.class),
-
-
