@@ -49,7 +49,7 @@ export default {
   deleteTable: (
     <>
       <FaTable />
-      <FaTrashAlt size="0.6em" style={{verticalAlign: 'bottom'}} />
+      <FaTrashAlt className="align-bottom" size="0.6em" />
     </>
   ),
   edit: <FaEdit />,
