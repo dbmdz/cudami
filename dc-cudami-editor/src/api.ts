@@ -8,16 +8,13 @@ interface Sorting {
 }
 
 interface ListRequest {
+  searchTerm?: string
   sorting?: Sorting
 }
 
 interface PageRequest extends ListRequest {
   pageNumber: number
   pageSize: number
-}
-
-interface SearchPageRequest extends PageRequest {
-  searchTerm?: string
 }
 
 const convertOrdersToString = (orders: Order[]): string =>
@@ -165,7 +162,7 @@ export async function loadAttachedIdentifiables(
   parentType: string,
   parentUuid: string,
   type: string,
-  {pageNumber, pageSize, searchTerm}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm}: PageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -229,7 +226,7 @@ export async function loadIdentifiable(
 export async function loadRootIdentifiables(
   contextPath: string,
   type: string,
-  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
@@ -368,7 +365,7 @@ export async function saveOrUpdateUser(
 export async function searchIdentifiables(
   contextPath: string,
   type: string,
-  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   if (sorting?.orders) {
@@ -393,7 +390,7 @@ export async function searchIdentifiables(
 export async function searchMedia(
   contextPath: string,
   mediaType: string,
-  {pageNumber, pageSize, searchTerm, sorting}: SearchPageRequest,
+  {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
   if (sorting?.orders) {
