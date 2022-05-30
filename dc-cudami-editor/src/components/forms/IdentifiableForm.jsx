@@ -241,7 +241,7 @@ class IdentifiableForm extends Component {
 
   getGeneratedUrlAliasForLanguageAndWebsite = async (language, website) => {
     const {apiContextPath, uuid} = this.props
-    const {entityType, label, type} = this.state.identifiable
+    const {identifiableObjectType, label, type} = this.state.identifiable
     const slug = await generateSlug(
       apiContextPath,
       language,
@@ -251,11 +251,22 @@ class IdentifiableForm extends Component {
     return {
       primary: true,
       slug,
-      targetEntityType: entityType,
+      // TODO: remove when the field does not exist anymore
+      targetEntityType: identifiableObjectType,
+      targetIdentifiableObjectType: identifiableObjectType,
       targetIdentifiableType: type,
       targetLanguage: language,
       targetUuid: uuid,
-      website: website && pick(website, ['entityType', 'type', 'url', 'uuid']),
+      website:
+        website &&
+        pick(website, [
+          // TODO: remove when the field does not exist anymore
+          'entityType',
+          'identifiableObjectType',
+          'type',
+          'url',
+          'uuid',
+        ]),
     }
   }
 
@@ -559,7 +570,9 @@ class IdentifiableForm extends Component {
             onSubmit={this.addUrlAlias}
             parentWebsite={parentWebsite}
             target={{
-              targetEntityType: identifiable.entityType,
+              // TODO: remove when the field does not exist anymore
+              targetEntityType: identifiable.identifiableObjectType,
+              targetIdentifiableObjectType: identifiable.identifiableObjectType,
               targetIdentifiableType: identifiable.type,
               targetUuid: uuid,
             }}

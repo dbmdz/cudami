@@ -49,7 +49,14 @@ const AddUrlAliasesDialog = ({
     targetLanguage: activeLanguage,
     website:
       parentWebsite &&
-      pick(parentWebsite, ['entityType', 'type', 'url', 'uuid']),
+      pick(parentWebsite, [
+        // TODO: remove when the field does not exist anymore
+        'entityType',
+        'identifiableObjectType',
+        'type',
+        'url',
+        'uuid',
+      ]),
     ...target,
   }
   const {apiContextPath, dispatch} = useContext(Context)
@@ -145,7 +152,14 @@ const AddUrlAliasesDialog = ({
               onSelect={(website) => {
                 setNewUrlAlias({
                   ...newUrlAlias,
-                  website: pick(website, ['entityType', 'type', 'url', 'uuid']),
+                  website: pick(website, [
+                    // TODO: remove when the field does not exist anymore
+                    'entityType',
+                    'identifiableObjectType',
+                    'type',
+                    'url',
+                    'uuid',
+                  ]),
                 })
                 setActiveStep(activeStep + 1)
               }}
