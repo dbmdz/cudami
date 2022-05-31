@@ -94,7 +94,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   public long count(String commonSql, Map<String, Object> argumentMappings) {
-    final String sql = "SELECT count(" + tableAlias + ".uuid) " + commonSql;
+    final String sql = "SELECT count(*) " + commonSql;
     return dbi.withHandle(
         h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
   }
