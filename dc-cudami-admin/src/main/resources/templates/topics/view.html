@@ -106,7 +106,6 @@
     <script th:inline="javascript">
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
-        enableSearch: true,
         existingLanguages: /*[[${existingSubtopicLanguages}]]*/ [],
         id: "subtopic-list",
         parentType: "topic",
@@ -116,9 +115,9 @@
         type: "subtopic",
         uiLocale: /*[[${#locale.language}]]*/ ''
       });
-      
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: false,
         existingLanguages: /*[[${existingEntityLanguages}]]*/ [],
         id: "entities-list",
         parentType: "topic",
@@ -126,9 +125,9 @@
         type: "entity",
         uiLocale: /*[[${#locale.language}]]*/ ''
       });
-      
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
+        enableSearch: false,
         existingLanguages: /*[[${existingFileResourceLanguages}]]*/ [],
         id: "files-list",
         parentType: "topic",

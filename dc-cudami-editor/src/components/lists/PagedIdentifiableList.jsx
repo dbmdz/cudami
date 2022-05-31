@@ -549,7 +549,7 @@ PagedIdentifiableList.defaultProps = {
   enableChangeOfOrder: false,
   enableMove: false,
   enableRemove: false,
-  enableSearch: false,
+  enableSearch: true,
   showEdit: false,
   showNew: false,
 }
