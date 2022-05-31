@@ -8,12 +8,13 @@ const usePagination = (apiContextPath, type, orders = []) => {
   const [numberOfPages, setNumberOfPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(0)
   const [pageSize, setPageSize] = useState(20)
+  const [searchTerm, setSearchTerm] = useState('')
   const [totalElements, setTotalElements] = useState(0)
-  const loadData = async (context, pageNumber, pageSize) => {
+  const loadData = async () => {
     const {content, totalElements} = await loadRootIdentifiables(
-      context,
+      apiContextPath,
       type,
-      {pageNumber, pageSize, sorting: {orders}},
+      {pageNumber, pageSize, searchTerm, sorting: {orders}},
     )
     return {
       numberOfPages: Math.ceil(totalElements / pageSize),
@@ -23,7 +24,7 @@ const usePagination = (apiContextPath, type, orders = []) => {
   }
   useEffect(() => {
     setIsLoading(true)
-    loadData(apiContextPath, pageNumber, pageSize)
+    loadData()
       .then(({content, numberOfPages, totalElements}) => {
         setContent(content)
         setNumberOfPages(numberOfPages)
@@ -32,17 +33,19 @@ const usePagination = (apiContextPath, type, orders = []) => {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [pageNumber])
+  }, [pageNumber, searchTerm])
   return {
     content,
     isLoading,
     numberOfPages,
     pageNumber,
     pageSize,
+    searchTerm,
     totalElements,
     setContent,
     setPageNumber,
     setPageSize,
+    setSearchTerm,
   }
 }
 

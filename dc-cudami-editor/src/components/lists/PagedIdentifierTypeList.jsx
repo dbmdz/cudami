@@ -4,6 +4,7 @@ import {Button, Card, CardBody, Col, Row, Table} from 'reactstrap'
 
 import {typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
+import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import ActionButtons from './ActionButtons'
 
@@ -16,10 +17,12 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
     pageSize,
     totalElements,
     setPageNumber,
+    setSearchTerm: executeSearch,
   } = usePagination(apiContextPath, type, [
     {property: 'namespace'},
     {property: 'uuid'},
   ])
+  const [searchTerm, setSearchTerm] = useState('')
   const {t} = useTranslation()
   return (
     <>
@@ -40,13 +43,23 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
       <hr />
       <Card className="border-top-0">
         <CardBody>
-          <Pagination
-            changePage={({selected}) => setPageNumber(selected)}
-            numberOfPages={numberOfPages}
-            pageNumber={pageNumber}
-            totalElements={totalElements}
-            type={type}
-          />
+          <div className="d-flex justify-content-between">
+            <Pagination
+              changePage={({selected}) => setPageNumber(selected)}
+              numberOfPages={numberOfPages}
+              pageNumber={pageNumber}
+              totalElements={totalElements}
+              type={type}
+            />
+            {totalElements > 0 && (
+              <ListSearch
+                isHighlighted={totalElements === 0 && searchTerm}
+                onChange={(value) => setSearchTerm(value)}
+                onSubmit={() => executeSearch(searchTerm)}
+                value={searchTerm}
+              />
+            )}
+          </div>
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
               <tr>
