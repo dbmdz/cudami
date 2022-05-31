@@ -6,6 +6,7 @@ import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {loadDefaultLanguage, typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import LanguageTab from '../LanguageTab'
+import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import ActionButtons from './ActionButtons'
 
@@ -18,11 +19,13 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
     pageSize,
     totalElements,
     setPageNumber,
+    setSearchTerm: executeSearch,
   } = usePagination(apiContextPath, type, [
     {property: 'name'},
     {property: 'uuid'},
   ])
   const [defaultLanguage, setDefaultLanguage] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
   useEffect(() => {
     loadDefaultLanguage(apiContextPath).then((defaultLanguage) =>
       setDefaultLanguage(defaultLanguage),
@@ -55,13 +58,23 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
       </Nav>
       <Card className="border-top-0">
         <CardBody>
-          <Pagination
-            changePage={({selected}) => setPageNumber(selected)}
-            numberOfPages={numberOfPages}
-            pageNumber={pageNumber}
-            totalElements={totalElements}
-            type={type}
-          />
+          <div className="d-flex justify-content-between">
+            <Pagination
+              changePage={({selected}) => setPageNumber(selected)}
+              numberOfPages={numberOfPages}
+              pageNumber={pageNumber}
+              totalElements={totalElements}
+              type={type}
+            />
+            {totalElements > 0 && (
+              <ListSearch
+                isHighlighted={totalElements === 0 && searchTerm}
+                onChange={(value) => setSearchTerm(value)}
+                onSubmit={() => executeSearch(searchTerm)}
+                value={searchTerm}
+              />
+            )}
+          </div>
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
               <tr>

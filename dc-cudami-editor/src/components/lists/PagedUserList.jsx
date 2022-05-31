@@ -8,6 +8,7 @@ import {changeUserStatus, typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import DeactiveUserDialog from '../dialogs/DeactiveUserDialog'
 import FeedbackMessage from '../FeedbackMessage'
+import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import ActionButtons from './ActionButtons'
 
@@ -21,9 +22,11 @@ const PagedUserList = ({apiContextPath = '/'}) => {
     totalElements,
     setContent,
     setPageNumber,
+    setSearchTerm: executeSearch,
   } = usePagination(apiContextPath, type, [{property: 'email'}])
   const [dialogOpen, setDialogOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState()
+  const [searchTerm, setSearchTerm] = useState('')
   const [userIndex, setUserIndex] = useState()
   const {t} = useTranslation()
   const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
@@ -79,13 +82,23 @@ const PagedUserList = ({apiContextPath = '/'}) => {
       )}
       <Card className="border-top-0">
         <CardBody>
-          <Pagination
-            changePage={({selected}) => setPageNumber(selected)}
-            numberOfPages={numberOfPages}
-            pageNumber={pageNumber}
-            totalElements={totalElements}
-            type={type}
-          />
+          <div className="d-flex justify-content-between">
+            <Pagination
+              changePage={({selected}) => setPageNumber(selected)}
+              numberOfPages={numberOfPages}
+              pageNumber={pageNumber}
+              totalElements={totalElements}
+              type={type}
+            />
+            {totalElements > 0 && (
+              <ListSearch
+                isHighlighted={totalElements === 0 && searchTerm}
+                onChange={(value) => setSearchTerm(value)}
+                onSubmit={() => executeSearch(searchTerm)}
+                value={searchTerm}
+              />
+            )}
+          </div>
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
               <tr>
