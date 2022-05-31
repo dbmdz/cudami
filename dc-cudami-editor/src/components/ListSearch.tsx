@@ -1,11 +1,18 @@
-import './IdentifiableSearch.css'
+import './ListSearch.css'
 
 import classNames from 'classnames'
 import {useTranslation} from 'react-i18next'
 import {FaSearch} from 'react-icons/fa'
 import {Button, Form, Input, InputGroup, InputGroupAddon} from 'reactstrap'
 
-const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
+interface Props {
+  isHighlighted: boolean
+  onChange(value: string): void
+  onSubmit(): void
+  value: string
+}
+
+const ListSearch = ({isHighlighted, onChange, onSubmit, value}: Props) => {
   const {t} = useTranslation()
   return (
     <Form
@@ -55,4 +62,4 @@ const IdentifiableSearch = ({isHighlighted, onChange, onSubmit, value}) => {
   )
 }
 
-export default IdentifiableSearch
+export default ListSearch
