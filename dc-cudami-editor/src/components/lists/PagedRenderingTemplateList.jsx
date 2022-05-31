@@ -66,14 +66,12 @@ const PagedRenderingTemplateList = ({apiContextPath = '/'}) => {
               totalElements={totalElements}
               type={type}
             />
-            {totalElements > 0 && (
-              <ListSearch
-                isHighlighted={totalElements === 0 && searchTerm}
-                onChange={(value) => setSearchTerm(value)}
-                onSubmit={() => executeSearch(searchTerm)}
-                value={searchTerm}
-              />
-            )}
+            <ListSearch
+              isHighlighted={totalElements === 0 && searchTerm}
+              onChange={(value) => setSearchTerm(value)}
+              onSubmit={() => executeSearch(searchTerm)}
+              value={searchTerm}
+            />
           </div>
           <Table bordered className="mb-0" hover responsive size="sm" striped>
             <thead>
