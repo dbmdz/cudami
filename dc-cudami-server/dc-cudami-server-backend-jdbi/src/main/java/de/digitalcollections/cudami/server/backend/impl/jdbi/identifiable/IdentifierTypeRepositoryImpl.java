@@ -52,37 +52,24 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
+    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
+
     Map<String, Object> argumentMappings = new HashMap<>(0);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+
     // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
-    addPageRequestParams(pageRequest, innerQuery);
-
-    final String sql = innerQuery.toString();
-
+    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_IDT + commonSql);
+    addPageRequestParams(pageRequest, query);
     List<IdentifierType> result =
         dbi.withHandle(
             h ->
-                h.createQuery(sql)
+                h.createQuery(query.toString())
                     .bindMap(argumentMappings)
                     .mapToBean(IdentifierType.class)
                     .list());
 
-    StringBuilder sqlCount =
-        new StringBuilder("SELECT count(*) FROM " + tableName + " " + tableAlias);
-    addFiltering(pageRequest, sqlCount, argumentMappings);
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-
-    return new PageResponse<>(result, pageRequest, total);
+    long total = count(commonSql.toString(), argumentMappings);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
@@ -150,6 +137,14 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
       default:
         return null;
     }
+  }
+
+  @Override
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return new ArrayList<>(
+        Arrays.asList(
+            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "label"),
+            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "namespace")));
   }
 
   @Override

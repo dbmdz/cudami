@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.security.UserRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -10,7 +11,9 @@ import de.digitalcollections.model.security.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +49,24 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   public PageResponse<User> find(PageRequest pageRequest) {
-    // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder query =
-        new StringBuilder(
-            "SELECT " + SQL_REDUCED_FIELDS_US + " FROM " + tableName + " AS " + tableAlias);
+    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
 
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+
+    // Actually "*" should be used in select, but here we don't need it as there is no outer select
+    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + commonSql);
     addPageRequestParams(pageRequest, query);
     List<User> result =
-        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(User.class).list());
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .bindMap(argumentMappings)
+                    .mapToBean(User.class)
+                    .list());
 
-    long total = count();
-
-    PageResponse<User> pageResponse = new PageResponse<>(result, pageRequest, total);
-    return pageResponse;
+    long total = count(commonSql.toString(), argumentMappings);
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
@@ -149,6 +157,15 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
       default:
         return null;
     }
+  }
+
+  @Override
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return new ArrayList<>(
+        Arrays.asList(
+            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "email"),
+            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "firstname"),
+            SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "lastname")));
   }
 
   @Override

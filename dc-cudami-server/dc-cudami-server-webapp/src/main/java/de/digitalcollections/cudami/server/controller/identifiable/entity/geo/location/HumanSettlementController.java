@@ -52,8 +52,9 @@ public class HumanSettlementController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "language", required = false, defaultValue = "de") String language,
-      @RequestParam(name = "initial", required = false) String initial) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
+      @RequestParam(name = "initial", required = false) String initial,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);

@@ -93,6 +93,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return count;
   }
 
+  public long count(String commonSql, Map<String, Object> argumentMappings) {
+    final String sql = "SELECT count(" + tableAlias + ".uuid) " + commonSql;
+    return dbi.withHandle(
+        h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
+  }
+
   /**
    * Escape characters that must not appear in jsonpath inner strings.
    *

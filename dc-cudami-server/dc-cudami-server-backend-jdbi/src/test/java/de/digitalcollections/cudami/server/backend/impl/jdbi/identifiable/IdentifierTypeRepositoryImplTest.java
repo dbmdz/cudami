@@ -5,9 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.FilterOperation;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -183,13 +180,7 @@ class IdentifierTypeRepositoryImplTest {
     type2 = repo.save(type2);
 
     PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber(0)
-            .pageSize(99)
-            .filtering(
-                new Filtering(
-                    List.of(new FilterCriterion("namespace", FilterOperation.EQUALS, namespace1))))
-            .build();
+        PageRequest.builder().pageNumber(0).pageSize(99).searchTerm(namespace1).build();
     PageResponse<IdentifierType> pageResponse = repo.find(pageRequest);
     List<IdentifierType> actualContent = pageResponse.getContent();
     assertThat(actualContent).hasSize(1);
