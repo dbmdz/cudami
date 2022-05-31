@@ -19,8 +19,8 @@ import AppContext from '../AppContext'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
 import RemoveAttachedIdentifiableDialog from '../dialogs/RemoveAttachedIdentifiableDialog'
 import FeedbackMessage from '../FeedbackMessage'
-import IdentifiableSearch from '../IdentifiableSearch'
 import LanguageTab from '../LanguageTab'
+import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import {getLabelValue} from '../utils'
 import ArticleList from './ArticleList'
@@ -486,7 +486,7 @@ class PagedIdentifiableList extends Component {
                 type={type}
               />
               {enableSearch && showSearch && (
-                <IdentifiableSearch
+                <ListSearch
                   isHighlighted={totalElements === 0 && searchTerm}
                   onChange={(value) => this.setState({searchTerm: value})}
                   onSubmit={this.executeSearch}
