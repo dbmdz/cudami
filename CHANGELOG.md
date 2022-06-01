@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Added sorting of resources in `dc-cudami-admin-webapp`
 - Added handling of `identifiableObjectType` for `Identifiable`s
 - Added migration of UrlAliases column from `target_entity_type` to `target_identifiable_objecttype`
+- Added functionality to modify and delete tables in the editor
+- Added possibility to search for human settlements, identifier types, rendering templates and users.
 
 ### Changed
 
