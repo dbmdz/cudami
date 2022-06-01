@@ -1,3 +1,5 @@
+import {getAttributes} from '../utils'
+
 export default {
   attrs: {
     height: {default: '150px'},
@@ -8,6 +10,12 @@ export default {
   draggable: true,
   group: 'block',
   inline: false,
-  parseDOM: [{tag: 'prosemirror-iframe'}],
-  toDOM: () => ['prosemirror-iframe'],
+  parseDOM: [
+    {
+      tag: 'prosemirror-iframe',
+      getAttrs: (dom) =>
+        getAttributes(['height', 'src', 'title', 'width'], dom),
+    },
+  ],
+  toDOM: (node) => ['prosemirror-iframe', node.attrs],
 }

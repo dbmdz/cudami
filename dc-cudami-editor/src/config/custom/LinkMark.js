@@ -1,3 +1,5 @@
+import {getAttributes} from '../utils'
+
 export default {
   attrs: {
     href: {default: null},
@@ -7,16 +9,8 @@ export default {
   parseDOM: [
     {
       tag: 'a[href]',
-      getAttrs(dom) {
-        return {
-          href: dom.getAttribute('href'),
-          title: dom.getAttribute('title'),
-        }
-      },
+      getAttrs: (dom) => getAttributes(['href', 'title'], dom),
     },
   ],
-  toDOM(node) {
-    let {href, title} = node.attrs
-    return ['a', {href, title}, 0]
-  },
+  toDOM: (node) => ['a', node.attrs],
 }

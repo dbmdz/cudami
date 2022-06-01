@@ -1,3 +1,5 @@
+import {getAttributes} from '../utils'
+
 export default {
   attrs: {
     alignment: {default: null},
@@ -12,6 +14,24 @@ export default {
   draggable: true,
   group: 'block',
   inline: false,
-  parseDOM: [{tag: 'prosemirror-video'}],
-  toDOM: () => ['prosemirror-video'],
+  parseDOM: [
+    {
+      tag: 'prosemirror-video',
+      getAttrs: (dom) =>
+        getAttributes(
+          [
+            'alignment',
+            'caption',
+            'previewUrl',
+            'previewResourceId',
+            'resourceId',
+            'title',
+            'url',
+            'width',
+          ],
+          dom,
+        ),
+    },
+  ],
+  toDOM: (node) => ['prosemirror-video', node.attrs],
 }

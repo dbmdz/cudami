@@ -1,3 +1,5 @@
+import {getAttributes} from '../utils'
+
 export default {
   attrs: {
     alignment: {default: null},
@@ -13,6 +15,25 @@ export default {
   draggable: true,
   group: 'block',
   inline: false,
-  parseDOM: [{tag: 'prosemirror-image'}],
-  toDOM: () => ['prosemirror-image'],
+  parseDOM: [
+    {
+      tag: 'prosemirror-image',
+      getAttrs: (dom) =>
+        getAttributes(
+          [
+            'alignment',
+            'altText',
+            'caption',
+            'linkNewTab',
+            'linkUrl',
+            'resourceId',
+            'title',
+            'url',
+            'width',
+          ],
+          dom,
+        ),
+    },
+  ],
+  toDOM: (node) => ['prosemirror-image', node.attrs],
 }
