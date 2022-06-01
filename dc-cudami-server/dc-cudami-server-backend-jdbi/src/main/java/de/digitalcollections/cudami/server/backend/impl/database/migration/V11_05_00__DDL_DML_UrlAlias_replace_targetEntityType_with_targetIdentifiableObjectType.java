@@ -40,7 +40,7 @@ public class V11_05_00__DDL_DML_UrlAlias_replace_targetEntityType_with_targetIde
       return;
     }
 
-    LOGGER.info("Migrating urlaliasses for {} identifiables", targetData.size());
+    LOGGER.info("Migrating UrlAliases for {} identifiables", targetData.size());
 
     try {
       // Disable all triggers for faster updates
