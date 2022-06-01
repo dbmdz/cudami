@@ -392,8 +392,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             argumentMappings,
             getOrderBy(pageRequest.getSorting()));
 
-    StringBuilder countQuery =
-        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSqlBuilder);
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total, executedSearchTerm);

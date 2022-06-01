@@ -24,6 +24,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsC
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
+import de.digitalcollections.cudami.client.identifiable.resource.CudamiImageFileResourcesClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiLinkedDataFileResourcesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
@@ -56,6 +57,7 @@ public class CudamiClient {
   private final CudamiHumanSettlementsClient cudamiHumanSettlementsClient;
   private final CudamiIdentifiablesClient<Identifiable> cudamiIdentifiablesClient;
   private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
+  private final CudamiImageFileResourcesClient cudamiImageFileResourcesClient;
   private final CudamiItemsClient cudamiItemsClient;
   private final CudamiLicensesClient cudamiLicensesClient;
   private final CudamiLinkedDataFileResourcesClient cudamiLinkedDataFileResourcesClient;
@@ -109,6 +111,8 @@ public class CudamiClient {
     this.cudamiIdentifiablesClient = new CudamiIdentifiablesClient<>(http, cudamiServerUrl, mapper);
     this.cudamiIdentifierTypesClient =
         new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
+    this.cudamiImageFileResourcesClient =
+        new CudamiImageFileResourcesClient(http, cudamiServerUrl, mapper);
     this.cudamiItemsClient = new CudamiItemsClient(http, cudamiServerUrl, mapper);
     this.cudamiLicensesClient = new CudamiLicensesClient(http, cudamiServerUrl, mapper);
     this.cudamiLinkedDataFileResourcesClient =
@@ -193,6 +197,10 @@ public class CudamiClient {
 
   public CudamiIdentifierTypesClient forIdentifierTypes() {
     return cudamiIdentifierTypesClient;
+  }
+
+  public CudamiImageFileResourcesClient forImageFileResources() {
+    return cudamiImageFileResourcesClient;
   }
 
   public CudamiItemsClient forItems() {
