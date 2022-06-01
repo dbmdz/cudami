@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Updated multiple dependencies
 - Normalize method names: `getBy` for returning one object, `findBy` for returning a list of objects, "set" for saving a list after deleting previous list
 - Set default case sensitivity for sorting to `ignoreCase`
+- Fixed copy&paste of `iframe`, `image` and `video` blocks in the editor
 
 ### Removed
 
