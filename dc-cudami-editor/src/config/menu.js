@@ -69,49 +69,57 @@ export default function (t) {
         titleKey: 'marks.strong',
         content: icons.strong,
         active: markActive(schema.marks.strong),
+        enable: toggleMark(schema.marks.strong),
         run: toggleMark(schema.marks.strong),
       },
       em: {
         titleKey: 'marks.em',
         content: icons.em,
         active: markActive(schema.marks.em),
+        enable: toggleMark(schema.marks.em),
         run: toggleMark(schema.marks.em),
       },
       underline: {
         titleKey: 'marks.underline',
         content: icons.underline,
         active: markActive(schema.marks.underline),
+        enable: toggleMark(schema.marks.underline),
         run: toggleMark(schema.marks.underline),
       },
       strikethrough: {
         titleKey: 'marks.strikethrough',
         content: icons.strikethrough,
         active: markActive(schema.marks.strikethrough),
+        enable: toggleMark(schema.marks.strikethrough),
         run: toggleMark(schema.marks.strikethrough),
       },
       superscript: {
         titleKey: 'marks.superscript',
         content: icons.superscript,
         active: markActive(schema.marks.superscript),
+        enable: toggleMark(schema.marks.superscript),
         run: toggleMark(schema.marks.superscript),
       },
       subscript: {
         titleKey: 'marks.subscript',
         content: icons.subscript,
         active: markActive(schema.marks.subscript),
+        enable: toggleMark(schema.marks.subscript),
         run: toggleMark(schema.marks.subscript),
       },
       code: {
         titleKey: 'marks.code',
         content: icons.code,
         active: markActive(schema.marks.code),
+        enable: toggleMark(schema.marks.code),
         run: toggleMark(schema.marks.code),
       },
       link: {
         titleKey: 'marks.link',
         content: icons.link,
         active: markActive(schema.marks.link),
-        enable: (state) => !state.selection.empty,
+        enable: (state) =>
+          !state.selection.empty && toggleMark(schema.marks.link)(state),
         run(state, dispatch) {
           if (markActive(schema.marks.link)(state)) {
             toggleMark(schema.marks.link)(state, dispatch)
@@ -148,7 +156,7 @@ export default function (t) {
         titleKey: 'blocks.heading',
         content: icons.heading,
         active: headingActive(),
-        enable: () => true,
+        enable: setBlockType(schema.nodes.heading),
         children: headingLevels.map((level) => ({
           active: blockActive(schema.nodes.heading, {level}),
           content: t('editor:blocks.headingLevel', {level}),
