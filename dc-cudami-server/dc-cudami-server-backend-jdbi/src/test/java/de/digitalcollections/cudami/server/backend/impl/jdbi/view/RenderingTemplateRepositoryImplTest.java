@@ -1,0 +1,65 @@
+package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.view.RenderingTemplate;
+import java.util.List;
+import org.jdbi.v3.core.Jdbi;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = RenderingTemplateRepositoryImpl.class)
+@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@DisplayName("The RenderingTemplate Repository")
+public class RenderingTemplateRepositoryImplTest {
+
+  RenderingTemplateRepositoryImpl repo;
+
+  @Autowired PostgreSQLContainer postgreSQLContainer;
+
+  @Autowired Jdbi jdbi;
+
+  @Autowired CudamiConfig cudamiConfig;
+
+  @BeforeEach
+  public void beforeEach() {
+    repo = new RenderingTemplateRepositoryImpl(jdbi, cudamiConfig);
+  }
+
+  @Test
+  @DisplayName("can find rendering templates")
+  void find() {
+    String name1 = "my-first-template";
+    String name2 = "my-second-template";
+
+    RenderingTemplate template1 = new RenderingTemplate();
+    template1.setName(name1);
+    template1 = repo.save(template1);
+
+    RenderingTemplate template2 = new RenderingTemplate();
+    template2.setName(name2);
+    repo.save(template2);
+
+    PageRequest pageRequest =
+        PageRequest.builder().pageNumber(0).pageSize(99).searchTerm(name1).build();
+    PageResponse<RenderingTemplate> pageResponse = repo.find(pageRequest);
+    List<RenderingTemplate> actualContent = pageResponse.getContent();
+    assertThat(actualContent).hasSize(1);
+    RenderingTemplate actual = actualContent.get(0);
+    assertThat(actual.getName()).isEqualTo(template1.getName());
+  }
+}
