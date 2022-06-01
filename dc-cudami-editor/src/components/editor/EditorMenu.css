@@ -7,9 +7,10 @@
 
 .identifiable-editor .menu-button {
   background: white;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 0;
   color: #777;
+  margin: 1px;
   padding: 5px 10px;
 }
 
@@ -26,7 +27,11 @@
   color: black;
 }
 
-.identifiable-editor .active.menu-button,
+.identifiable-editor .active.menu-button {
+  background: #eee;
+  border-color: #ccc;
+}
+
 .identifiable-editor .disabled.menu-button {
   color: #ccc;
 }
