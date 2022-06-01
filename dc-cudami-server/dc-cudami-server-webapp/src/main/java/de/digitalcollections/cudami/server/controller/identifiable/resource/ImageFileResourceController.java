@@ -41,20 +41,6 @@ public class ImageFileResourceController {
     this.service = service;
   }
 
-  @Operation(summary = "Get an ImageFileResource by namespace and id")
-  @GetMapping(
-      value = {
-        "/v6/imagefileresources/identifier/{namespace}:{id}",
-        "/v6/imagefileresources/identifier/{namespace}:{id}.json"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FileResource> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-
-    ImageFileResource imageFileResource = service.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(imageFileResource, HttpStatus.OK);
-  }
-
   @Operation(summary = "Get a paged and filtered list of ImageFileResources")
   @GetMapping(
       value = {"/v6/imagefileresources", "/v6/imagefileresources/search"},
@@ -83,6 +69,20 @@ public class ImageFileResourceController {
     }
 
     return service.find(pageRequest);
+  }
+
+  @Operation(summary = "Get an ImageFileResource by namespace and id")
+  @GetMapping(
+      value = {
+        "/v6/imagefileresources/identifier/{namespace}:{id}",
+        "/v6/imagefileresources/identifier/{namespace}:{id}.json"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<FileResource> getByIdentifier(
+      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
+
+    ImageFileResource imageFileResource = service.getByIdentifier(namespace, id);
+    return new ResponseEntity<>(imageFileResource, HttpStatus.OK);
   }
 
   @Operation(summary = "Get an ImageFileResource by uuid")
