@@ -42,26 +42,25 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
       })
   void testFind(String path) throws Exception {
     PageResponse<DigitalObject> expected =
-        (PageResponse<DigitalObject>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(1365676)
-                .forAscendingOrderedField("label", "de")
-                .forAscendingOrderedField("label")
-                .forDescendingOrderedField("uuid")
-                .withContent(
-                    List.of(
-                        DigitalObject.builder()
-                            .created("2020-10-14T00:00:00")
-                            .lastModified("2020-10-14T00:00:00")
-                            .uuid("e2e75cd3-87c3-4b70-b29a-58086ce5ad4d")
-                            .label(Locale.GERMAN, "Testdigitalisat")
-                            .identifier(
-                                "mdz-obj", "bsb12345678", "4bbe38a4-96e9-4200-9360-740da00f104f")
-                            .refId(37423)
-                            .build()))
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(1365676)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
+            .forDescendingOrderedField("uuid")
+            .withContent(
+                List.of(
+                    DigitalObject.builder()
+                        .created("2020-10-14T00:00:00")
+                        .lastModified("2020-10-14T00:00:00")
+                        .uuid("e2e75cd3-87c3-4b70-b29a-58086ce5ad4d")
+                        .label(Locale.GERMAN, "Testdigitalisat")
+                        .identifier(
+                            "mdz-obj", "bsb12345678", "4bbe38a4-96e9-4200-9360-740da00f104f")
+                        .refId(37423)
+                        .build()))
+            .build();
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
 
@@ -73,23 +72,22 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/digitalobjects/e2e75cd3-87c3-4b70-b29a-58086ce5ad4d/projects"})
   void testFindProjects(String path) throws Exception {
     PageResponse<Project> expected =
-        (PageResponse<Project>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(1)
-                .withContent(
-                    List.of(
-                        Project.builder()
-                            .created("2020-10-15T00:00:00")
-                            .lastModified("2020-10-15T00:00:00")
-                            .label(Locale.GERMAN, "Testprojekt")
-                            .identifier(
-                                "mdz-proj", "1245413523", "95545a10-feb2-4a4f-a88d-3124f47f6f06")
-                            .uuid("5c6b2788-94a5-482a-8471-d78513c905db")
-                            .refId(590334)
-                            .build()))
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(1)
+            .withContent(
+                List.of(
+                    Project.builder()
+                        .created("2020-10-15T00:00:00")
+                        .lastModified("2020-10-15T00:00:00")
+                        .label(Locale.GERMAN, "Testprojekt")
+                        .identifier(
+                            "mdz-proj", "1245413523", "95545a10-feb2-4a4f-a88d-3124f47f6f06")
+                        .uuid("5c6b2788-94a5-482a-8471-d78513c905db")
+                        .refId(590334)
+                        .build()))
+            .build();
 
     when(digitalObjectService.findProjects(any(DigitalObject.class), any(PageRequest.class)))
         .thenReturn(expected);
@@ -102,22 +100,21 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v5/digitalobjects/e2e75cd3-87c3-4b70-b29a-58086ce5ad4d/collections"})
   void testFindCollections(String path) throws Exception {
     PageResponse<Collection> expected =
-        (PageResponse<Collection>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(1)
-                .withContent(
-                    List.of(
-                        Collection.builder()
-                            .created("2020-03-03T00:00:00")
-                            .lastModified("2020-03-03T00:00:00")
-                            .label(Locale.GERMAN, "Testcollection")
-                            .uuid("96f02509-478f-4d80-a6ba-bd68acf9e23a")
-                            .refId(16)
-                            .publicationStart("2020-10-01")
-                            .build()))
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(1)
+            .withContent(
+                List.of(
+                    Collection.builder()
+                        .created("2020-03-03T00:00:00")
+                        .lastModified("2020-03-03T00:00:00")
+                        .label(Locale.GERMAN, "Testcollection")
+                        .uuid("96f02509-478f-4d80-a6ba-bd68acf9e23a")
+                        .refId(16)
+                        .publicationStart("2020-10-01")
+                        .build()))
+            .build();
 
     when(digitalObjectService.findCollections(any(DigitalObject.class), any(PageRequest.class)))
         .thenReturn(expected);
@@ -158,7 +155,7 @@ class V5DigitalObjectControllerTest extends BaseControllerTest {
                 .refId(72)
                 .parent(DigitalObject.builder().uuid(parentUuid).build())
                 .build()));
-    expected.setPageRequest(expectedPageRequest);
+    expected.setRequest(expectedPageRequest);
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
 

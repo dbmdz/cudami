@@ -36,7 +36,7 @@ public abstract class BaseControllerTest {
     pageResponse.setContent(content);
     pageResponse.setTotalElements(content.size());
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
     return pageResponse;
   }
 

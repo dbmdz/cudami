@@ -96,7 +96,7 @@ class DigitalObjectControllerTest extends BaseControllerTest {
                 .refId(72)
                 .parent(DigitalObject.builder().uuid(parentUuid).build())
                 .build()));
-    expected.setPageRequest(expectedPageRequest);
+    expected.setRequest(expectedPageRequest);
 
     when(digitalObjectService.find(any(PageRequest.class))).thenReturn(expected);
 
