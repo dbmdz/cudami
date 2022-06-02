@@ -48,7 +48,7 @@ class V5MigrationHelperTest {
   public void renamesExecutedSearchTerm() throws JsonProcessingException {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     PageRequest pageRequest = PageRequest.builder().pageSize(1).pageNumber(0).build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
     pageResponse.setExecutedSearchTerm("hugo");
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -62,7 +62,7 @@ class V5MigrationHelperTest {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     PageRequest pageRequest =
         PageRequest.builder().searchTerm("blubb").pageSize(1).pageNumber(0).build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("query\":\"blubb");
@@ -75,7 +75,7 @@ class V5MigrationHelperTest {
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
     PageRequest pageRequest =
         PageRequest.builder().searchTerm("blubb").pageSize(1).pageNumber(0).build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
     pageResponse.setExecutedSearchTerm("hugo");
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
@@ -96,7 +96,7 @@ class V5MigrationHelperTest {
                 Sorting.builder().order(Order.builder().direction(Direction.ASC).build()).build())
             .build();
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("ascending\":true");
@@ -117,7 +117,7 @@ class V5MigrationHelperTest {
                     .build())
             .build();
     PageResponse pageResponse = PageResponse.builder().withoutContent().build();
-    pageResponse.setPageRequest(pageRequest);
+    pageResponse.setRequest(pageRequest);
 
     String actual = V5MigrationHelper.migrate(pageResponse, objectMapper);
     assertThat(actual).contains("ascending\":true");
