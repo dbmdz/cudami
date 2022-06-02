@@ -156,7 +156,6 @@ export default function (t) {
         titleKey: 'blocks.heading',
         content: icons.heading,
         active: headingActive(),
-        enable: setBlockType(schema.nodes.heading),
         children: headingLevels.map((level) => ({
           active: blockActive(schema.nodes.heading, {level}),
           content: t('editor:blocks.headingLevel', {level}),
