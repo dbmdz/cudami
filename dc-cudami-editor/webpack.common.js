@@ -23,14 +23,14 @@ module.exports = {
       },
       {
         exclude: /node_modules/,
-        test: /\.tsx?$/,
+        test: /\.(j|t)sx?$/,
         use: 'ts-loader',
       },
-      {
-        exclude: /(node_modules)/,
-        test: /\.jsx?$/,
-        use: ['babel-loader'],
-      },
+     // {
+     //   exclude: /(node_modules)/,
+     //   test: /\.jsx?$/,
+     //   use: ['babel-loader'],
+     // },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
         use: {

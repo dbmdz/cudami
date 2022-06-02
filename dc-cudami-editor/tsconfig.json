@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "checkJs": false,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -10,10 +11,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "module": "commonjs",
+    "module": "es6",
     "moduleResolution": "node",
+    "noImplicitAny": false,
     "removeComments": true,
     "skipLibCheck": true,
+    "sourceMap": true,
     "strict": true,
     "target": "es5"
   },
