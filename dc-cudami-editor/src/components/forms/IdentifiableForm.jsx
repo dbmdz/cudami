@@ -251,8 +251,6 @@ class IdentifiableForm extends Component {
     return {
       primary: true,
       slug,
-      // TODO: remove when the field does not exist anymore
-      targetEntityType: identifiableObjectType,
       targetIdentifiableObjectType: identifiableObjectType,
       targetIdentifiableType: type,
       targetLanguage: language,
@@ -260,8 +258,6 @@ class IdentifiableForm extends Component {
       website:
         website &&
         pick(website, [
-          // TODO: remove when the field does not exist anymore
-          'entityType',
           'identifiableObjectType',
           'type',
           'url',
@@ -570,8 +566,6 @@ class IdentifiableForm extends Component {
             onSubmit={this.addUrlAlias}
             parentWebsite={parentWebsite}
             target={{
-              // TODO: remove when the field does not exist anymore
-              targetEntityType: identifiable.identifiableObjectType,
               targetIdentifiableObjectType: identifiable.identifiableObjectType,
               targetIdentifiableType: identifiable.type,
               targetUuid: uuid,
