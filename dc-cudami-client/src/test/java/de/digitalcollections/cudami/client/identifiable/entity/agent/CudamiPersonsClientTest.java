@@ -59,7 +59,8 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @Test
   @DisplayName("can return all works of a person")
   public void testGetWorks() throws Exception {
-    String bodyJson = "[{\"entityType\":\"WORK\",\"identifiableType\":\"ENTITY\"}]";
+    String bodyJson =
+        "[{\"entityType\":\"WORK\",\"identifiableType\":\"ENTITY\",\"identifiableObjectType\":\"WORK\"}]";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     UUID personUuid = UUID.randomUUID();

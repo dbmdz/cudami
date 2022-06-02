@@ -50,8 +50,6 @@ const AddUrlAliasesDialog = ({
     website:
       parentWebsite &&
       pick(parentWebsite, [
-        // TODO: remove when the field does not exist anymore
-        'entityType',
         'identifiableObjectType',
         'type',
         'url',
@@ -153,8 +151,6 @@ const AddUrlAliasesDialog = ({
                 setNewUrlAlias({
                   ...newUrlAlias,
                   website: pick(website, [
-                    // TODO: remove when the field does not exist anymore
-                    'entityType',
                     'identifiableObjectType',
                     'type',
                     'url',
