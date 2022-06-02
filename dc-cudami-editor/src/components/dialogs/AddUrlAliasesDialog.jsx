@@ -49,12 +49,7 @@ const AddUrlAliasesDialog = ({
     targetLanguage: activeLanguage,
     website:
       parentWebsite &&
-      pick(parentWebsite, [
-        'identifiableObjectType',
-        'type',
-        'url',
-        'uuid',
-      ]),
+      pick(parentWebsite, ['identifiableObjectType', 'type', 'url', 'uuid']),
     ...target,
   }
   const {apiContextPath, dispatch} = useContext(Context)
