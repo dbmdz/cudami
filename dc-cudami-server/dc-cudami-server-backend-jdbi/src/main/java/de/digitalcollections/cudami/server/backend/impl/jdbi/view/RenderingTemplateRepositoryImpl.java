@@ -30,9 +30,9 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_ALIAS = "rt";
   public static final String SQL_REDUCED_FIELDS_RT =
       String.format(
-          " %1$s.uuid, %1$s.created, %1$s.label, %1$s.name, %1$s.last_modified", TABLE_ALIAS);
-  public static final String SQL_FULL_FIELDS_RT =
-      SQL_REDUCED_FIELDS_RT + String.format(", %s.description", TABLE_ALIAS);
+          " %1$s.uuid, %1$s.created, %1$s.label, %1$s.name, %1$s.last_modified, %1$s.description",
+          TABLE_ALIAS);
+  public static final String SQL_FULL_FIELDS_RT = SQL_REDUCED_FIELDS_RT;
   public static final String TABLE_NAME = "rendering_templates";
 
   public RenderingTemplateRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
