@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     try {
       return client.create();
     } catch (TechnicalException e) {
-      throw new ServiceException("Cannot create an user: " + e, e);
+      throw new ServiceException("Cannot create a user: " + e, e);
     }
   }
 
