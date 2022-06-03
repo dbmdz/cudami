@@ -71,8 +71,12 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public User create() {
-    return client.create();
+  public User create() throws ServiceException {
+    try {
+      return client.create();
+    } catch (TechnicalException e) {
+      throw new ServiceException("Cannot create an user: " + e, e);
+    }
   }
 
   @Override
@@ -86,7 +90,7 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public User createAdminUser() {
+  public User createAdminUser() throws ServiceException {
     User user = create();
     List<Role> roles = new ArrayList<>();
     roles.add(Role.ADMIN);

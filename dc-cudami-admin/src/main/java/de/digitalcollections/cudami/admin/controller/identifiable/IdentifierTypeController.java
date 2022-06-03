@@ -50,7 +50,7 @@ public class IdentifierTypeController extends AbstractController {
 
   @GetMapping("/api/identifiertypes/new")
   @ResponseBody
-  public IdentifierType createModel() {
+  public IdentifierType createModel() throws TechnicalException {
     return service.create();
   }
 

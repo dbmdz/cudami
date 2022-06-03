@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
@@ -17,9 +18,9 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.identifiable.resource.VideoFileResource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -111,18 +112,18 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws CudamiServiceException {
 
     // Remove the old rendering resources, if present
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObjectUuid);
-    existingRenderingResources.forEach(
-        r -> {
-          try {
-            deleteRenderingResource(r);
-          } catch (IdentifiableServiceException e) {
-            throw new RuntimeException("Cannot save rendering resource=" + r + ": " + e, e);
-          }
-        });
+    for (FileResource existingRenderingResource : existingRenderingResources) {
+      try {
+        deleteRenderingResource(existingRenderingResource);
+      } catch (IdentifiableServiceException e) {
+        throw new CudamiServiceException(
+            "Cannot remove existing rendering resource=" + existingRenderingResource + ": " + e, e);
+      }
+    }
 
     // Remove the old relations
     digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObjectUuid);
@@ -130,22 +131,21 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     // Persist the new rendering resources
     if (renderingResources != null) {
       // first save rendering resources
-      renderingResources =
-          renderingResources.stream()
-              .map(
-                  r -> {
-                    try {
-                      return saveRenderingFileResource(r);
-                    } catch (Exception e) {
-                      throw new RuntimeException(
-                          "Cannot save rendering resource=" + r + ": " + e, e);
-                    }
-                  })
-              .collect(Collectors.toList());
+      List<FileResource> savedRenderingResources = new ArrayList<>();
+      for (FileResource renderingResource : renderingResources) {
+        FileResource savedRenderingResource = null;
+        try {
+          savedRenderingResource = saveRenderingFileResource(renderingResource);
+        } catch (ValidationException | IdentifiableServiceException e) {
+          throw new CudamiServiceException(
+              "Cannot save RenderingResource" + renderingResource + ": " + e, e);
+        }
+        savedRenderingResources.add(savedRenderingResource);
+      }
 
       // Persist the new relations
       digitalObjectRenderingFileResourceRepository.saveRenderingFileResources(
-          digitalObjectUuid, renderingResources);
+          digitalObjectUuid, savedRenderingResources);
     }
 
     return renderingResources;

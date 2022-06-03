@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.model.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +62,9 @@ public class CudamiConfig {
     private List<String> generationExcludes;
     private int maxLength = -1;
 
+    @SuppressFBWarnings(
+        value = "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION",
+        justification = "Application must not start with an invalid configuration")
     @JsonCreator(mode = Mode.PROPERTIES)
     public UrlAlias(
         @JsonProperty(value = "generationExcludes") List<String> generationExcludes,

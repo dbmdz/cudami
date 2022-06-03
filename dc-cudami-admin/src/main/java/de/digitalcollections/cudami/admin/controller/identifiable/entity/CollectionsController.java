@@ -99,7 +99,7 @@ public class CollectionsController extends AbstractController {
 
   @GetMapping("/api/collections/new")
   @ResponseBody
-  public Collection create() {
+  public Collection create() throws TechnicalException {
     return service.create();
   }
 

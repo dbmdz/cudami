@@ -1,9 +1,5 @@
 package de.digitalcollections.client;
 
-import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.MIN_MAX_VALUES;
-import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.MULTIVALUE;
-import static de.digitalcollections.model.list.filtering.FilterOperation.OperandCount.SINGLEVALUE;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -58,14 +54,14 @@ public abstract class BaseRestClient<T extends Object> {
     this.targetType = targetType;
   }
 
-  public T create() {
+  public T create() throws TechnicalException {
     try {
       return targetType.getDeclaredConstructor().newInstance();
     } catch (InstantiationException
         | IllegalAccessException
         | InvocationTargetException
         | NoSuchMethodException e) {
-      throw new RuntimeException(
+      throw new TechnicalException(
           "Cannot create new instance of " + targetType.getName() + ": " + e, e);
     }
   }

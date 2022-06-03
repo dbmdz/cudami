@@ -48,7 +48,7 @@ public class RenderingTemplatesController extends AbstractController {
 
   @GetMapping("/api/renderingtemplates/new")
   @ResponseBody
-  public RenderingTemplate createModel() {
+  public RenderingTemplate createModel() throws TechnicalException {
     return service.create();
   }
 

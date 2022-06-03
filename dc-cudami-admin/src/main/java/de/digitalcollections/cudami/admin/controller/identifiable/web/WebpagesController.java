@@ -74,7 +74,7 @@ public class WebpagesController extends AbstractController {
 
   @GetMapping("/api/webpages/new")
   @ResponseBody
-  public Webpage create() {
+  public Webpage create() throws TechnicalException {
     return service.create();
   }
 

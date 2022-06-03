@@ -68,7 +68,7 @@ public class ProjectsController extends AbstractController {
 
   @GetMapping("/api/projects/new")
   @ResponseBody
-  public Project create() {
+  public Project create() throws TechnicalException {
     return service.create();
   }
 

@@ -253,7 +253,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources) {
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources)
+      throws CudamiServiceException {
     return digitalObjectRenderingFileResourceService.setRenderingFileResources(
         digitalObjectUuid, renderingFileResources);
   }

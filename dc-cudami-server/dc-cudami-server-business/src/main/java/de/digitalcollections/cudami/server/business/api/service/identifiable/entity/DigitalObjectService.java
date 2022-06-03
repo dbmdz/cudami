@@ -104,5 +104,6 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources);
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources)
+      throws CudamiServiceException;
 }
