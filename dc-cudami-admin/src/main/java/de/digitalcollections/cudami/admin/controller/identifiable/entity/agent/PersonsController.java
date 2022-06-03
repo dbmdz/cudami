@@ -56,7 +56,7 @@ public class PersonsController extends AbstractController {
 
   @GetMapping("/api/persons/new")
   @ResponseBody
-  public Person create() {
+  public Person create() throws TechnicalException {
     return service.create();
   }
 

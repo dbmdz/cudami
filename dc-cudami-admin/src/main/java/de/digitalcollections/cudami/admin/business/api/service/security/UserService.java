@@ -18,11 +18,11 @@ public interface UserService<U extends User> extends UserDetailsService {
 
   long count() throws ServiceException;
 
-  U create();
+  U create() throws ServiceException;
 
   U create(U user, String password1, String password2, Errors results) throws ServiceException;
 
-  U createAdminUser();
+  U createAdminUser() throws ServiceException;
 
   boolean doesActiveAdminUserExist() throws ServiceException;
 

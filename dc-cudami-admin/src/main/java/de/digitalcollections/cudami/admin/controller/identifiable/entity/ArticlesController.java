@@ -56,7 +56,7 @@ public class ArticlesController extends AbstractController {
 
   @GetMapping("/api/articles/new")
   @ResponseBody
-  public Article create() {
+  public Article create() throws TechnicalException {
     return service.create();
   }
 

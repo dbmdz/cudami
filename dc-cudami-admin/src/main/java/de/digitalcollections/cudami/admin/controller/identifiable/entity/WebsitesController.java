@@ -57,7 +57,7 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/api/websites/new")
   @ResponseBody
-  public Website create() {
+  public Website create() throws TechnicalException {
     return service.create();
   }
 

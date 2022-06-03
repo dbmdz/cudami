@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.client.BaseRestClientTest;
 import de.digitalcollections.model.UniqueObject;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
@@ -62,7 +63,7 @@ public abstract class BaseCudamiRestClientTest<
 
   @Test
   @DisplayName("can create an instance of the data type")
-  public void testCreate() {
+  public void testCreate() throws TechnicalException {
     T object = client.create();
     assertThat(object).isNotNull();
     assertThat(object).isInstanceOf(objectType);

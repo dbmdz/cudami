@@ -58,7 +58,8 @@ public class UserController extends AbstractController {
   @GetMapping("/api/users/new")
   @ResponseBody
   public User create(
-      @RequestParam(name = "admin", required = false, defaultValue = "false") boolean admin) {
+      @RequestParam(name = "admin", required = false, defaultValue = "false") boolean admin)
+      throws ServiceException {
     if (admin) {
       return service.createAdminUser();
     }

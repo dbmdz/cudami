@@ -57,7 +57,7 @@ public class FileResourcesMetadataController extends AbstractController {
 
   @GetMapping("/api/fileresources/new")
   @ResponseBody
-  public FileResource create() {
+  public FileResource create() throws TechnicalException {
     return service.create();
   }
 

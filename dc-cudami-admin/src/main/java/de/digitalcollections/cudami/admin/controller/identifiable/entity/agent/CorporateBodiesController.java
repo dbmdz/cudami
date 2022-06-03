@@ -56,7 +56,7 @@ public class CorporateBodiesController extends AbstractController {
 
   @GetMapping("/api/corporatebodies/new")
   @ResponseBody
-  public CorporateBody create() {
+  public CorporateBody create() throws TechnicalException {
     return service.create();
   }
 

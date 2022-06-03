@@ -21,7 +21,7 @@ public interface DigitalObjectRenderingFileResourceService {
   }
 
   List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources);
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws CudamiServiceException;
 
   default List<FileResource> getRenderingFileResources(DigitalObject digitalObject)
       throws CudamiServiceException {

@@ -66,7 +66,7 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/api/topics/new")
   @ResponseBody
-  public Topic create() {
+  public Topic create() throws TechnicalException {
     return service.create();
   }
 

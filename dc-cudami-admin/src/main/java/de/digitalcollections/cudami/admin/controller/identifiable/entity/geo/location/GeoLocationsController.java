@@ -38,7 +38,7 @@ public class GeoLocationsController extends AbstractController {
 
   @GetMapping("/api/geolocations/new")
   @ResponseBody
-  public GeoLocation create() {
+  public GeoLocation create() throws TechnicalException {
     return service.create();
   }
 
