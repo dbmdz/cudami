@@ -34,7 +34,10 @@ const EditorWithLabel = ({
               <EditorMenu
                 menu={
                   restrictedMenu
-                    ? {marks: translatedMenu.marks}
+                    ? {
+                        history: translatedMenu.history,
+                        marks: translatedMenu.marks,
+                      }
                     : translatedMenu
                 }
                 view={view}
