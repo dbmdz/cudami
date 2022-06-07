@@ -60,18 +60,13 @@ public class WorkController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "language", required = false, defaultValue = "de") String language,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "initial", required = false) String initial) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    if (initial == null) {
-      return workService.find(pageRequest);
-    }
-    return workService.findByLanguageAndInitial(pageRequest, language, initial);
+    return workService.find(pageRequest);
   }
 
   @Operation(summary = "Get a work by namespace and id")

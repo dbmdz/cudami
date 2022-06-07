@@ -69,11 +69,9 @@ public class PersonController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "language", required = false, defaultValue = "de") String language,
-      @RequestParam(name = "initial", required = false) String initial,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "previewImage", required = false)
-          FilterCriterion<UUID> previewImageFilter,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+          FilterCriterion<UUID> previewImageFilter) {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -84,10 +82,7 @@ public class PersonController {
       Filtering filtering = Filtering.builder().add("previewImage", previewImageFilter).build();
       searchPageRequest.setFiltering(filtering);
     }
-    if (initial == null) {
-      return personService.find(searchPageRequest);
-    }
-    return personService.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return personService.find(searchPageRequest);
   }
 
   @Operation(summary = "get all persons born at given geo location")

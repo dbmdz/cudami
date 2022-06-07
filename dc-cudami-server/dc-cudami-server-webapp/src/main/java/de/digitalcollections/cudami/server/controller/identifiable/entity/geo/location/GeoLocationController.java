@@ -64,18 +64,13 @@ public class GeoLocationController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "language", required = false) String language,
-      @RequestParam(name = "initial", required = false) String initial,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    if (language == null && initial == null) {
-      return geoLocationService.find(searchPageRequest);
-    }
-    return geoLocationService.findByLanguageAndInitial(searchPageRequest, language, initial);
+    return geoLocationService.find(searchPageRequest);
   }
 
   @Operation(summary = "Get a geolocation by namespace and id")
