@@ -64,6 +64,20 @@ const headingActive = () => (state) => {
 
 export default function (t) {
   return {
+    history: {
+      undo: {
+        titleKey: 'history.undo',
+        content: icons.undo,
+        enable: undo,
+        run: undo,
+      },
+      redo: {
+        titleKey: 'history.redo',
+        content: icons.redo,
+        enable: redo,
+        run: redo,
+      },
+    },
     marks: {
       strong: {
         titleKey: 'marks.strong',
@@ -270,20 +284,6 @@ export default function (t) {
           })
           publish('editor.show-table-dialog')
         },
-      },
-    },
-    history: {
-      undo: {
-        titleKey: 'history.undo',
-        content: icons.undo,
-        enable: undo,
-        run: undo,
-      },
-      redo: {
-        titleKey: 'history.redo',
-        content: icons.redo,
-        enable: redo,
-        run: redo,
       },
     },
     table: {
