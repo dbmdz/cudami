@@ -8,6 +8,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.We
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
@@ -65,6 +68,28 @@ class WebsiteRepositoryImplTest {
     Website actual = repo.save(website);
 
     assertThat(actual.getEntityType()).isEqualTo(EntityType.WEBSITE);
+    assertThat(actual.getUuid()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("save a website with notes")
+  void saveWebsiteWithNotes() {
+    var noteContent = new StructuredContent();
+    noteContent.addContentBlock(new Text("eine Bemerkung"));
+    var note = new LocalizedStructuredContent();
+    note.put(Locale.GERMAN, noteContent);
+    Website website =
+        Website.builder()
+            .label(Locale.GERMAN, "Digitale Sammlungen")
+            .url("https://www.digitale-sammlungen.de")
+            .registrationDate("2022-05-04")
+            .rootPages(List.of(Webpage.builder().build()))
+            .note(note)
+            .build();
+
+    Website actual = repo.save(website);
+
+    assertThat(actual.getNotes()).isEqualTo(website.getNotes());
     assertThat(actual.getUuid()).isNotNull();
   }
 }
