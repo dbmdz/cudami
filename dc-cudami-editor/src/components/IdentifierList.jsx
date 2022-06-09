@@ -1,13 +1,15 @@
+import {List, ListInlineItem} from 'reactstrap'
+
 const IdentifierList = ({identifiers, identifierTypes}) => (
-  <ul className="list-inline mb-0">
+  <List className="mb-0" type="inline">
     {identifiers.map(({id, namespace}) => (
-      <li className="list-inline-item" key={`${namespace}:${id}`}>{`${
+      <ListInlineItem key={`${namespace}:${id}`}>{`${
         identifierTypes.find(
           (identifierType) => identifierType.namespace === namespace,
         )?.label ?? namespace
-      }: ${id}`}</li>
+      }: ${id}`}</ListInlineItem>
     ))}
-  </ul>
+  </List>
 )
 
 export default IdentifierList
