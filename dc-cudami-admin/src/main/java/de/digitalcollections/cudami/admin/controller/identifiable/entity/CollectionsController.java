@@ -63,7 +63,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PostMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
+  @PostMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws TechnicalException {
@@ -74,7 +74,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @PostMapping("/api/collections/{collectionUuid}/subcollections")
+  @PostMapping("/api/collections/{collectionUuid}/collections")
   public ResponseEntity addSubcollections(
       @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
       throws TechnicalException {
@@ -85,7 +85,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @GetMapping({"/collections/new", "/subcollections/new"})
+  @GetMapping("/collections/new")
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
@@ -103,7 +103,7 @@ public class CollectionsController extends AbstractController {
     return service.create();
   }
 
-  @GetMapping({"/collections/{uuid}/edit", "/subcollections/{uuid}/edit"})
+  @GetMapping("/collections/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -125,7 +125,7 @@ public class CollectionsController extends AbstractController {
     return "collections/edit";
   }
 
-  @GetMapping({"/api/collections/search", "/api/subcollections/search"})
+  @GetMapping("/api/collections/search")
   @ResponseBody
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -153,7 +153,7 @@ public class CollectionsController extends AbstractController {
     return service.findDigitalObjects(uuid, pageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}/subcollections")
+  @GetMapping("/api/collections/{uuid}/collections")
   @ResponseBody
   public PageResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
@@ -181,26 +181,21 @@ public class CollectionsController extends AbstractController {
     return service.findTopCollections(pageRequest);
   }
 
-  @GetMapping({
-    "/api/collections/identifier/{namespace}:{id}",
-    "/api/subcollections/identifier/{namespace}:{id}"
-  })
+  @GetMapping("/api/collections/identifier/{namespace}:{id}")
   @ResponseBody
   public Collection getByIdentifier(@PathVariable String namespace, @PathVariable String id)
       throws TechnicalException {
     return service.getByIdentifier(namespace, id);
   }
 
-  @GetMapping({"/api/collections/{refId:[0-9]+}", "/api/subcollections/{refId:[0-9]+}"})
+  @GetMapping("/api/collections/{refId:[0-9]+}")
   @ResponseBody
   public Collection getByRefId(@PathVariable long refId) throws TechnicalException {
     return service.getByRefId(refId);
   }
 
-  @GetMapping({
-    "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-    "/api/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-  })
+  @GetMapping(
+      "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
   @ResponseBody
   public Collection getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -232,7 +227,7 @@ public class CollectionsController extends AbstractController {
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
-  @DeleteMapping("/api/collections/{collectionUuid}/subcollections/{subcollectionUuid}")
+  @DeleteMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws TechnicalException {
@@ -273,10 +268,8 @@ public class CollectionsController extends AbstractController {
     }
   }
 
-  @GetMapping({
-    "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-    "/subcollections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-  })
+  @GetMapping(
+      "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -307,7 +300,7 @@ public class CollectionsController extends AbstractController {
     return "collections/view";
   }
 
-  @GetMapping({"/collections/{refId:[0-9]+}", "/subcollections/{refId:[0-9]+}"})
+  @GetMapping("/collections/{refId:[0-9]+}")
   public String viewByRefId(@PathVariable long refId, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Collection collection = service.getByRefId(refId);
