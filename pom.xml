@@ -11,7 +11,7 @@
 
   <groupId>de.digitalcollections.cudami</groupId>
   <artifactId>dc-cudami</artifactId>
-  <version>6.0.0-RC1</version>
+  <version>6.0.0-RC2</version>
   <packaging>pom</packaging>
 
   <name>DigitalCollections: cudami</name>
