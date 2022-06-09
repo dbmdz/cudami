@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -13,12 +14,16 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -95,16 +100,25 @@ public class ItemController {
     return itemService.find(pageRequest);
   }
 
-  @Operation(summary = "Get an item by namespace and id")
+  @Operation(
+      summary = "Get an item by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {
-        "/v6/items/identifier/{namespace}:{id}",
-        "/v6/items/identifier/{namespace}:{id}.json"
-      },
+      value = {"/v6/items/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Item> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    Item result = itemService.getByIdentifier(namespace, id);
+  public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, UnsupportedEncodingException {
+    Pair<String, String> namespaceAndId =
+        ParameterHelper.extractPairOfStringsFromUri(
+            URLDecoder.decode(request.getRequestURI(), "LATIN1"), "^.*?/identifier/");
+    if (namespaceAndId.getLeft().isBlank()
+        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
+      throw new InvalidParameterException(
+          "No namespace and/or id were provided in a colon separated manner");
+    }
+
+    Item result = itemService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
