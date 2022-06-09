@@ -99,19 +99,13 @@ public class ItemController {
   @GetMapping(
       value = {
         "/v6/items/identifier/{namespace}:{id}",
-        "/v6/items/identifier/{namespace}:{id}.json",
-        "/v5/items/identifier/{namespace}:{id}",
-        "/v5/items/identifier/{namespace}:{id}.json",
-        "/v2/items/identifier/{namespace}:{id}",
-        "/v2/items/identifier/{namespace}:{id}.json",
-        "/latest/items/identifier/{namespace}:{id}",
-        "/latest/items/identifier/{namespace}:{id}.json"
+        "/v6/items/identifier/{namespace}:{id}.json"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(
       @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
     Item result = itemService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get an item by namespace and id")
@@ -135,7 +129,7 @@ public class ItemController {
 
   @Operation(summary = "Get an item by uuid")
   @GetMapping(
-      value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
+      value = {"/v6/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByUuid(
       @Parameter(
@@ -157,7 +151,7 @@ public class ItemController {
     } else {
       result = itemService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get digital objects of this item")
