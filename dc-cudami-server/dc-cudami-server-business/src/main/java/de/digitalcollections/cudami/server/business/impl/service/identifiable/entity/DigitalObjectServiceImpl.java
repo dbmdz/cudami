@@ -159,6 +159,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public DigitalObject getByUuid(UUID uuid) {
+    return fillDigitalObject(super.getByUuid(uuid));
+  }
+
+  @Override
   public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale)
       throws IdentifiableServiceException {
     return fillDigitalObject(super.getByUuidAndLocale(uuid, locale));
