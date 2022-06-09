@@ -7,38 +7,6 @@
     "toggleCalendar": "Toggle calendar",
     "year": "Year"
   },
-  "feedback": {
-    "cannotBeEmpty": "This field cannot be empty.",
-    "collectionAddedSuccessfully_one": "The selected collection has been added successfully as a subcollection.",
-    "collectionAddedSuccessfully_other": "The selected collections have been added successfully as subcollections.",
-    "collectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
-    "collectionNotFound": "Collection was not found.",
-    "collectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
-    "digitalObjectAddedSuccessfully_one": "The selected digital object has been added successfully.",
-    "digitalObjectAddedSuccessfully_other": "The selected digital objects have been added successfully.",
-    "digitalObjectNotFound": "Digital object was not found.",
-    "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
-    "duplicateInformation": {
-      "attachedIdentifiables": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
-      "urlAliases_one": "The displayed pretty URL may have been supplemented with a numeric suffix. Please check whether there is a duplicate.",
-      "urlAliases_other": "The displayed pretty URLs may have been supplemented with a numeric suffix. Please check whether there are duplicates."
-    },
-    "labelNotFilled": "The field \"$t(label)\" must be filled out in all languages.",
-    "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
-    "noDuplicateSlugsForObject": "This URL slug already exists for this object.",
-    "noElementsFound": "No results were found.",
-    "noWebsiteNeeded": "Choosing a website is optional.",
-    "orderChangedSuccessfully": "Order has been changed successfully.",
-    "orderNotChangedSuccessfully": "Order could not be changed.",
-    "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
-    "submitOfFormFailed": "An error occurred during saving.",
-    "uploadFailed": "An error occurred during upload: {{ error }}",
-    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
-    "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
-    "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",
-    "userNotActivatedSuccessfully": "An error occurred during activation of user \"{{ email }}\".",
-    "userNotDeactivatedSuccessfully": "An error occurred during deactivation of user \"{{ email }}\"."
-  },
   "editor": {
     "blocks": {
       "blockquote": "Add block quote",
@@ -91,6 +59,38 @@
       "deleteRow": "Delete row",
       "deleteTable": "Delete table"
     }
+  },
+  "feedback": {
+    "cannotBeEmpty": "This field cannot be empty.",
+    "collectionAddedSuccessfully_one": "The selected collection has been added successfully as a subcollection.",
+    "collectionAddedSuccessfully_other": "The selected collections have been added successfully as subcollections.",
+    "collectionMovedSuccessfully": "{{ name }} has been moved successfully to <0>{{ targetName }}</0>.",
+    "collectionNotFound": "Collection was not found.",
+    "collectionRemovedSuccessfully": "{{ name }} has been removed successfully.",
+    "digitalObjectAddedSuccessfully_one": "The selected digital object has been added successfully.",
+    "digitalObjectAddedSuccessfully_other": "The selected digital objects have been added successfully.",
+    "digitalObjectNotFound": "Digital object was not found.",
+    "digitalObjectRemovedSuccessfully": "{{ name }} has been removed successfully.",
+    "duplicateInformation": {
+      "attachedIdentifiables": "If entries are selected multiple times, the duplicates are automatically removed when you click on \"$t(add)\".",
+      "urlAliases_one": "The displayed pretty URL may have been supplemented with a numeric suffix. Please check whether there is a duplicate.",
+      "urlAliases_other": "The displayed pretty URLs may have been supplemented with a numeric suffix. Please check whether there are duplicates."
+    },
+    "labelNotFilled": "The field \"$t(label)\" must be filled out in all languages.",
+    "moreElementsFound": "{{ maxElements }} out of {{ totalElements }} results, please refine your search.",
+    "noDuplicateSlugsForObject": "This URL slug already exists for this object.",
+    "noElementsFound": "No results were found.",
+    "noWebsiteNeeded": "Choosing a website is optional.",
+    "orderChangedSuccessfully": "Order has been changed successfully.",
+    "orderNotChangedSuccessfully": "Order could not be changed.",
+    "removePreviewImageAfterSaveNotification": "Click \"$t(save)\" to confirm the deletion.",
+    "submitOfFormFailed": "An error occurred during saving.",
+    "uploadFailed": "An error occurred during upload: {{ error }}",
+    "uploadSuccessful": "$t({{ mediaType }}, capitalize) uploaded successfully.",
+    "userActivatedSuccessfully": "User \"{{ email }}\" was successfully activated.",
+    "userDeactivatedSuccessfully": "User \"{{ email }}\" was successfully deactivated.",
+    "userNotActivatedSuccessfully": "An error occurred during activation of user \"{{ email }}\".",
+    "userNotDeactivatedSuccessfully": "An error occurred during deactivation of user \"{{ email }}\"."
   },
   "pagination": {
     "totalElements": {
@@ -145,8 +145,8 @@
     "alignment": "Alignment",
     "alignmentLeft": "left (with text wrapping)",
     "alignmentRight": "right (with text wrapping)",
-    "apply": "Apply",
     "altText": "Alt text",
+    "apply": "Apply",
     "back": "Back",
     "cancel": "Cancel",
     "caption": "Caption",
@@ -157,13 +157,13 @@
     "chooseRenderingTemplate": "Choose a design template",
     "confirm": "Confirm",
     "confirmLanguageRemoval": "Are you sure, that you want to remove the content of \"{{ language }}\"?",
-    "confirmUrlAliasRemoval": "Are you sure, that you want to remove the pretty URL \"{{ url }}/{{ slug }}\" for the language \"{{ language }}\"?",
     "confirmPassword": "Confirm password",
     "confirmRemove": {
       "collectionFromCollection": "Are you sure that you want to remove this sub collection from the collection?",
       "digitalObjectFromCollection": "Are you sure that you want to remove this digital object from the collection?",
       "digitalObjectFromProject": "Are you sure that you want to remove this digital object from the project?"
     },
+    "confirmUrlAliasRemoval": "Are you sure, that you want to remove the pretty URL \"{{ url }}/{{ slug }}\" for the language \"{{ language }}\"?",
     "confirmUserDeactivation": "Are you sure, that you want to deactivate user \"{{ email }}\"?",
     "createArticle": "Create a new article",
     "createCollection": "Create a new collection",
@@ -221,9 +221,9 @@
     "new": "New",
     "next": "Next",
     "no": "No",
-    "notSpecified": "not specified",
     "noAlignment": "without text wrapping",
     "noPreviewImage": "no preview image",
+    "notSpecified": "not specified",
     "numberOfColumns": "Number of columns",
     "numberOfRows": "Number of rows",
     "openLinkNewTab": "open in a new tab",
@@ -232,7 +232,7 @@
     "passwordChangeInfo": "If you want to change the user's password then fill both of the following fields, please.",
     "pattern": "Pattern",
     "previewImage": "Preview image",
-    "primaryAlias":"Primary URL",
+    "primaryAlias": "Primary URL",
     "ready": "Ready",
     "refId": "Reference ID",
     "removeFrom": {
