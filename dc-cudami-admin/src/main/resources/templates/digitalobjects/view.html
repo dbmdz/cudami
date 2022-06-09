@@ -45,11 +45,7 @@
               </div>
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
-                <div class="col-md-9">
-                  <ul class="list-inline">
-                    <li class="list-inline-item" th:each="identifier: *{identifiers}" th:text="|${identifier.namespace}:${identifier.id}|">Namespace:ID</li>
-                  </ul>
-                </div>
+                <div class="col-md-9" id="identifiers-list"></div>
               </div>
             </div>
           </div>
@@ -85,7 +81,13 @@
       addLanguageChangeHandler()
     </script>
     <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:src="@{/js/identifier-list.bundle.js}"></script>
     <script th:inline="javascript">
+      IdentifierList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        id: "identifiers-list",
+        identifiers: /*[[${digitalObject.identifiers}]]*/ []
+      });
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
         existingLanguages: /*[[${existingCollectionLanguages}]]*/ [],
