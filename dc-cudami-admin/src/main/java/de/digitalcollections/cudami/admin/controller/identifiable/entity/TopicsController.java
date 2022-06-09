@@ -52,7 +52,7 @@ public class TopicsController extends AbstractController {
     this.service = client.forTopics();
   }
 
-  @GetMapping({"/subtopics/new", "/topics/new"})
+  @GetMapping("/topics/new")
   public String create(
       Model model,
       @RequestParam(name = "parentType", required = false) String parentType,
@@ -70,7 +70,7 @@ public class TopicsController extends AbstractController {
     return service.create();
   }
 
-  @GetMapping({"/subtopics/{uuid}/edit", "/topics/{uuid}/edit"})
+  @GetMapping("/topics/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -108,7 +108,7 @@ public class TopicsController extends AbstractController {
     return this.service.findTopTopics(pageRequest);
   }
 
-  @GetMapping("/api/topics/{uuid}/subtopics")
+  @GetMapping("/api/topics/{uuid}/topics")
   @ResponseBody
   public PageResponse<Topic> findSubtopic(
       @PathVariable UUID uuid,
@@ -189,10 +189,8 @@ public class TopicsController extends AbstractController {
     }
   }
 
-  @GetMapping({
-    "/subtopics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-    "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-  })
+  @GetMapping(
+      "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -229,7 +227,7 @@ public class TopicsController extends AbstractController {
     return "topics/view";
   }
 
-  @GetMapping({"/subtopics/{refId:[0-9]+}", "/topics/{refId:[0-9]+}"})
+  @GetMapping("/topics/{refId:[0-9]+}")
   public String viewByRefId(@PathVariable long refId, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Topic topic = service.getByRefId(refId);

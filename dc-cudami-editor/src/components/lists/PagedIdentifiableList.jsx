@@ -145,8 +145,6 @@ class PagedIdentifiableList extends Component {
       geoLocation: GeoLocationList,
       person: PersonList,
       project: ProjectList,
-      subcollection: CollectionList,
-      subtopic: TopicList,
       topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,
