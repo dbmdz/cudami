@@ -5,6 +5,7 @@ module.exports = {
   entry: {
     IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
     IdentifiableList: './src/lib/IdentifiableList.jsx',
+    IdentifierList: './src/lib/IdentifierList.jsx',
     IdentifierTypeEditor: './src/lib/IdentifierTypeEditor.jsx',
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
