@@ -576,13 +576,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   public List<Locale> getLanguages() {
     String query =
-        "SELECT DISTINCT languages FROM "
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) as languages FROM "
             + tableName
             + " AS "
-            + tableAlias
-            + ", jsonb_object_keys("
-            + tableAlias
-            + ".label) AS languages";
+            + tableAlias;
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
   }

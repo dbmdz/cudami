@@ -450,14 +450,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
-        "SELECT DISTINCT languages"
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages"
             + " FROM "
             + tableName
             + " AS "
             + tableAlias
-            + ", jsonb_object_keys("
-            + tableAlias
-            + ".label) AS languages"
             + " WHERE NOT EXISTS (SELECT FROM collection_collections WHERE child_collection_uuid = "
             + tableAlias
             + ".uuid)";

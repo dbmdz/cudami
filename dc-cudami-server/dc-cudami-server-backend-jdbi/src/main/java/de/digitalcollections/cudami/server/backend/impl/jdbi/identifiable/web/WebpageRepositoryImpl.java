@@ -364,14 +364,13 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
-        "SELECT DISTINCT languages"
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages"
             + " FROM "
             + tableName
             + " AS "
             + tableAlias
-            + ", jsonb_object_keys("
-            + tableAlias
-            + ".label) AS languages"
             + " WHERE NOT EXISTS (SELECT FROM webpage_webpages WHERE child_webpage_uuid = "
             + tableAlias
             + ".uuid)";
