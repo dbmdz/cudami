@@ -465,14 +465,13 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   @Override
   public List<Locale> getRootNodesLanguages() {
     String query =
-        "SELECT DISTINCT languages"
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) AS languages"
             + " FROM "
             + tableName
             + " AS "
             + tableAlias
-            + ", jsonb_object_keys("
-            + tableAlias
-            + ".label) AS languages"
             + " WHERE NOT EXISTS (SELECT FROM topic_topics WHERE child_topic_uuid = "
             + tableAlias
             + ".uuid)";
