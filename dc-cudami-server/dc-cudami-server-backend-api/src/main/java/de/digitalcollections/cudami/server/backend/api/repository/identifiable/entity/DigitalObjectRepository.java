@@ -47,6 +47,8 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   List<Locale> getLanguagesOfCollections(UUID uuid);
 
+  List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid);
+
   List<Locale> getLanguagesOfProjects(UUID uuid);
 
   default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
