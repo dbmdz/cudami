@@ -182,7 +182,12 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + tableAlias
         + ".parent_uuid "
         + mappingPrefix
-        + "_parent_uuid";
+        + "_parent_uuid"
+        + ", "
+        + tableAlias
+        + ".item_uuid "
+        + mappingPrefix
+        + "_item_uuid";
   }
 
   public static String getSqlUpdateFieldValues() {
