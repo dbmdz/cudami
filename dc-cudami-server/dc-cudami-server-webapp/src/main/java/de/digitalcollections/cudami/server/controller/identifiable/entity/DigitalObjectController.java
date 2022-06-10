@@ -253,7 +253,13 @@ public class DigitalObjectController {
         "/latest/digitalobjects/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages(
+      @RequestParam(name = "parent.uuid", required = false)
+          FilterCriterion<UUID> parentUuidFilterCriterion) {
+    if (parentUuidFilterCriterion != null) {
+      return digitalObjectService.getLanguagesOfContainedDigitalObjects(
+          (UUID) parentUuidFilterCriterion.getValue());
+    }
     return digitalObjectService.getLanguages();
   }
 

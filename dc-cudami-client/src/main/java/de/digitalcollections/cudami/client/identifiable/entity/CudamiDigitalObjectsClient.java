@@ -49,19 +49,20 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
       throw new TechnicalException("Empty parent");
     }
 
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber(0)
-            .pageSize(10000)
-            .filtering(
-                Filtering.builder()
-                    .add(
-                        FilterCriterion.builder()
-                            .withExpression("parent.uuid")
-                            .isEquals(parent.getUuid())
-                            .build())
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(10000).build();
+    return getAllForParent(parent, pageRequest);
+  }
+
+  public PageResponse<DigitalObject> getAllForParent(DigitalObject parent, PageRequest pageRequest)
+      throws TechnicalException {
+    pageRequest.add(
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("parent.uuid")
+                    .isEquals(parent.getUuid())
                     .build())
-            .build();
+            .build());
     return find(pageRequest);
   }
 
@@ -91,6 +92,14 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
   public List<Locale> getLanguagesOfCollections(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
+  }
+
+  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) throws TechnicalException {
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("parent.uuid").isEquals(uuid).build())
+            .build();
+    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class, filtering);
   }
 
   public List<Locale> getLanguagesOfProjects(UUID uuid) throws TechnicalException {

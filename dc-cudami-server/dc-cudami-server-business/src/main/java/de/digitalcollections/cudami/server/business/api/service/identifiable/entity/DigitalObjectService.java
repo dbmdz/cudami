@@ -58,6 +58,8 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   List<Locale> getLanguagesOfCollections(UUID uuid);
 
+  List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid);
+
   List<Locale> getLanguagesOfProjects(UUID uuid);
 
   default List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject) {

@@ -190,6 +190,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) {
+    return ((DigitalObjectRepository) repository).getLanguagesOfContainedDigitalObjects(uuid);
+  }
+
+  @Override
   public List<Locale> getLanguagesOfProjects(UUID uuid) {
     return ((DigitalObjectRepository) repository).getLanguagesOfProjects(uuid);
   }

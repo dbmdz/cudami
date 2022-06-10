@@ -557,6 +557,22 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) {
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys(d1.label)"
+            + " FROM "
+            + tableName
+            + " AS d1"
+            + " INNER JOIN "
+            + tableName
+            + " AS d2"
+            + " ON d1.parent_uuid = d2.uuid"
+            + " WHERE d1.parent_uuid = :uuid;";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
+
+  @Override
   public List<Locale> getLanguagesOfProjects(UUID uuid) {
     String projectTable = this.projectRepositoryImpl.getTableName();
     String projectAlias = this.projectRepositoryImpl.getTableAlias();
