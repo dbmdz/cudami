@@ -158,10 +158,15 @@ public class DigitalObjectsController extends AbstractController {
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfCollections(uuid));
     List<Locale> existingProjectLanguages =
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfProjects(uuid));
+    List<Locale> existingContainedDigitalObjectLanguages =
+        languageSortingHelper.sortLanguages(
+            displayLocale, service.getLanguagesOfContainedDigitalObjects(uuid));
 
     model
         .addAttribute("digitalObject", digitalObject)
         .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
+        .addAttribute(
+            "existingContainedDigitalObjectLanguages", existingContainedDigitalObjectLanguages)
         .addAttribute("existingProjectLanguages", existingProjectLanguages);
     return "digitalobjects/view";
   }

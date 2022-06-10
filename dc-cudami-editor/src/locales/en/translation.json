@@ -285,6 +285,8 @@
     "collection_other": "Collections",
     "corporateBody_one": "Corporate body",
     "corporateBody_other": "Corporate bodies",
+    "digitalObject_digitalObject_one": "Contained digital object",
+    "digitalObject_digitalObject_other": "Contained digital objects",
     "digitalObject_one": "Digital object",
     "digitalObject_other": "Digital objects",
     "entity_one": "Entity",

@@ -285,6 +285,8 @@
     "collection_other": "Sammlungen",
     "corporateBody_one": "Institution",
     "corporateBody_other": "Institutionen",
+    "digitalObject_digitalObject_one": "Enthaltenes Digitalisat (digitales Objekt)",
+    "digitalObject_digitalObject_other": "Enthaltene Digitalisate (digitale Objekte)",
     "digitalObject_one": "Digitalisat (digitales Objekt)",
     "digitalObject_other": "Digitalisate (digitale Objekte)",
     "entity_one": "Objekt",

@@ -63,6 +63,12 @@
 
         <div class="mt-3 row">
           <div class="col-sm-12">
+            <div id="digitalobjects-list"></div>
+          </div>
+        </div>
+
+        <div class="mt-3 row">
+          <div class="col-sm-12">
             <div id="collections-list"></div>
           </div>
         </div>
@@ -87,6 +93,15 @@
         apiContextPath: /*[[@{/}]]*/ '',
         id: "identifiers-list",
         identifiers: /*[[${digitalObject.identifiers}]]*/ []
+      });
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        existingLanguages: /*[[${existingContainedDigitalObjectLanguages}]]*/ [],
+        id: "digitalobjects-list",
+        parentType: "digitalObject",
+        parentUuid: /*[[${digitalObject.uuid}]]*/ '',
+        type: "digitalObject",
+        uiLocale: /*[[${#locale.language}]]*/ ''
       });
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
