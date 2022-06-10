@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - `findOne(UUID uuid, Filtering filtering)`-methods, use `getByUuidAndFiltering`-method instead
   - `findOneByNamespace(String namespace)`-methods, use `getByNamespace`-method instead
 - EntityType storage in database (replaced by IdentifiableObjectType)
+- Removed deprecated initial param ([#1776](https://github.com/dbmdz/cudami/pull/1776))
 
 ## [5.2.5](https://github.com/dbmdz/cudami/releases/tag/5.2.5) - 2022-05-20
 
