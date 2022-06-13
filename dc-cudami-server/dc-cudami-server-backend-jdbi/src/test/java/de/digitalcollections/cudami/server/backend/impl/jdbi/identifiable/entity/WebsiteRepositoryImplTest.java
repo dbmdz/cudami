@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -30,6 +31,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     webEnvironment = WebEnvironment.MOCK,
     classes = {WebsiteRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Website Repository")
 class WebsiteRepositoryImplTest {
 
@@ -85,8 +87,8 @@ class WebsiteRepositoryImplTest {
     note2.put(Locale.GERMAN, noteContent2);
     Website website =
         Website.builder()
-            .label(Locale.GERMAN, "Digitale Sammlungen")
-            .url("https://www.digitale-sammlungen.de")
+            .label(Locale.GERMAN, "digiPress")
+            .url("https://digipress.digitale-sammlungen.de")
             .registrationDate("2022-05-04")
             .rootPages(List.of(Webpage.builder().build()))
             .note(note1)
