@@ -29,7 +29,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
@@ -45,7 +44,10 @@ import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,6 +62,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     classes = {DigitalObjectRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @DisplayName("The DigitalObject Repository")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DigitalObjectRepositoryImplTest {
 
   DigitalObjectRepositoryImpl repo;
@@ -226,7 +229,11 @@ class DigitalObjectRepositoryImplTest {
     pageRequest.setSearchTerm(query);
     pageRequest.setSorting(
         Sorting.builder()
-            .order(Order.builder().property("refId").direction(Direction.ASC).build())
+            .order(
+                de.digitalcollections.model.list.sorting.Order.builder()
+                    .property("refId")
+                    .direction(Direction.ASC)
+                    .build())
             .build());
 
     PageResponse response = repo.find(pageRequest);
@@ -314,6 +321,23 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
         .isEqualTo("Körperschaft");
     assertThat(actual.getParent()).isNotNull();
+  }
+
+  @Test
+  @Order(Integer.MAX_VALUE)
+  @DisplayName("")
+  void returnLanguages() {
+    List<Locale> allLanguages = repo.getLanguages();
+    assertThat(allLanguages).containsAll(List.of(Locale.GERMAN, Locale.ENGLISH));
+
+    DigitalObject digitalObject = buildDigitalObject();
+    LocalizedText label = digitalObject.getLabel();
+    label.put(Locale.KOREAN, "테스트");
+    digitalObject = repo.save(digitalObject);
+    List<Locale> languagesOfContainedDigitalObjects =
+        repo.getLanguagesOfContainedDigitalObjects(digitalObject.getParent().getUuid());
+    assertThat(languagesOfContainedDigitalObjects)
+        .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
   // -----------------------------------------------------------------
