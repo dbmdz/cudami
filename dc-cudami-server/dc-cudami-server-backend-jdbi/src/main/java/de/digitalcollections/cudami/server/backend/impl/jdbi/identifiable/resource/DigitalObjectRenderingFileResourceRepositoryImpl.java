@@ -163,4 +163,15 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
                 .execute());
     return true;
   }
+
+  @Override
+  public int countDigitalObjectsForResource(UUID uuid) {
+    return dbi.withHandle(
+        h ->
+            h.createQuery("SELECT count(*) FROM " + tableName + " WHERE fileresource_uuid = :uuid")
+                .bind("uuid", uuid)
+                .mapTo(Integer.class)
+                .findOne()
+                .get());
+  }
 }

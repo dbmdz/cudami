@@ -52,8 +52,10 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
         // Delete the relation
         repository.delete(linkedDataFileResource.getUuid());
 
-        // Delete the resource
-        linkedDataFileResourceService.delete(linkedDataFileResource.getUuid());
+        // Delete the resource, when no references exist to it
+        if (repository.countDigitalObjectsForResource(linkedDataFileResource.getUuid()) == 0) {
+          linkedDataFileResourceService.delete(linkedDataFileResource.getUuid());
+        }
       } catch (Exception e) {
         throw new CudamiServiceException(
             "Cannot delete LinkedDataFileResource="

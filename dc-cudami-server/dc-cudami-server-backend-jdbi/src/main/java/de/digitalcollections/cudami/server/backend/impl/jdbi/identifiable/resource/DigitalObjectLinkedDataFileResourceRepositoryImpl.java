@@ -144,4 +144,18 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
                 .execute());
     return true;
   }
+
+  @Override
+  public int countDigitalObjectsForResource(UUID uuid) {
+    return dbi.withHandle(
+        h ->
+            h.createQuery(
+                    "SELECT count(*) FROM "
+                        + tableName
+                        + " WHERE linkeddata_fileresource_uuid = :uuid")
+                .bind("uuid", uuid)
+                .mapTo(Integer.class)
+                .findOne()
+                .get());
+  }
 }

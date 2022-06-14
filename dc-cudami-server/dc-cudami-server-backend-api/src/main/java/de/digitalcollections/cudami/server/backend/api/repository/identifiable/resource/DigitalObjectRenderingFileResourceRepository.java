@@ -24,4 +24,6 @@ public interface DigitalObjectRenderingFileResourceRepository {
   }
 
   boolean delete(List<UUID> uuids);
+
+  int countDigitalObjectsForResource(UUID uuid);
 }

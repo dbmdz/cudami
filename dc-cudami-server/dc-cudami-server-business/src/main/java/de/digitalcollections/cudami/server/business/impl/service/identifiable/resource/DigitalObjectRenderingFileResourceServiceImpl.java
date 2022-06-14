@@ -159,8 +159,12 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         // Delete the relation
         digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
 
-        // Delete the resource
-        deleteRenderingResource(renderingFileResource);
+        // Delete the resource, when no references exist to it
+        if (digitalObjectRenderingFileResourceRepository.countDigitalObjectsForResource(
+                renderingFileResource.getUuid())
+            == 0) {
+          deleteRenderingResource(renderingFileResource);
+        }
       } catch (IdentifiableServiceException e) {
         throw new CudamiServiceException(
             "Cannot delete RenderingFileResource="

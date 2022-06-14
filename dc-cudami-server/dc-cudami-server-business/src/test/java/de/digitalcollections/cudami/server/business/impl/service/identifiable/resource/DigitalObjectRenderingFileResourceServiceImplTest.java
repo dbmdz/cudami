@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,7 +58,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
             repo);
   }
 
-  @DisplayName("can delete resource and relation")
+  @DisplayName("can delete resource and relation, when the resource is not referenced elsewhere")
   @Test
   public void deleteResourceAndRelation()
       throws CudamiServiceException, IdentifiableServiceException {
@@ -69,10 +70,30 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
     when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(0);
 
     service.deleteRenderingFileResources(uuid);
 
     verify(repo, times(1)).delete(renderingFileResource.getUuid());
     verify(textFileResourceService, times(1)).delete(renderingFileResource.getUuid());
+  }
+
+  @DisplayName("can delete relation only, when the resource is referenced elsewhere")
+  @Test
+  public void deleteOnlyRelation() throws CudamiServiceException, IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
+    TextFileResource renderingFileResource =
+        TextFileResource.builder().mimeType(MimeType.fromTypename("text/html")).build();
+
+    digitalObject.setRenderingResources(List.of(renderingFileResource));
+
+    when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(1);
+
+    service.deleteRenderingFileResources(uuid);
+
+    verify(repo, times(1)).delete(renderingFileResource.getUuid());
+    verify(textFileResourceService, never()).delete(renderingFileResource.getUuid());
   }
 }
