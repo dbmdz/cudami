@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,21 +36,42 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
         new DigitalObjectLinkedDataFileResourceServiceImpl(repo, linkedDataFileResourceService);
   }
 
-  @DisplayName("can delete resource and relation")
+  @DisplayName("can delete resource and relation, when the resource is not referenced elsewhere")
   @Test
   public void deleteResourceAndRelation()
       throws CudamiServiceException, IdentifiableServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
-    LinkedDataFileResource linkedDataFileResource = LinkedDataFileResource.builder().build();
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder().uuid(UUID.randomUUID()).build();
 
     digitalObject.setLinkedDataResources(List.of(linkedDataFileResource));
 
     when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
+    when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(0);
 
     service.deleteLinkedDataFileResources(uuid);
 
     verify(repo, times(1)).delete(linkedDataFileResource.getUuid());
     verify(linkedDataFileResourceService, times(1)).delete(linkedDataFileResource.getUuid());
+  }
+
+  @DisplayName("can delete relation only, when the resource is referenced elsewhere")
+  @Test
+  public void deleteRelationOnly() throws CudamiServiceException, IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder().uuid(UUID.randomUUID()).build();
+
+    digitalObject.setLinkedDataResources(List.of(linkedDataFileResource));
+
+    when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
+    when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(1);
+
+    service.deleteLinkedDataFileResources(uuid);
+
+    verify(repo, times(1)).delete(linkedDataFileResource.getUuid());
+    verify(linkedDataFileResourceService, never()).delete(linkedDataFileResource.getUuid());
   }
 }

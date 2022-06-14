@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,5 +86,41 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
     List<FileResource> actual = repo.getRenderingFileResources(digitalObject.getUuid());
     assertThat(actual).isEmpty();
+  }
+
+  @DisplayName(
+      "can count the number of entries for a provided LinkedDataFileResource uuid when no entries exist")
+  @Test
+  void countZero() {
+    assertThat(repo.countDigitalObjectsForResource(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName(
+      "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
+  @Test
+  void countMoreThanZero() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the RenderingFileResource
+    TextFileResource renderingFileResource =
+        TextFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    TextFileResource persistedRenderingResource =
+        textFileResourceMetadataRepository.save(renderingFileResource);
+
+    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(persistedRenderingResource));
+
+    assertThat(repo.countDigitalObjectsForResource(renderingFileResource.getUuid())).isEqualTo(1);
   }
 }
