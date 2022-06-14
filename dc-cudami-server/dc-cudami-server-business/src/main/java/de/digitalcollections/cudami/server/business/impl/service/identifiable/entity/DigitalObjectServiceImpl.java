@@ -70,10 +70,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     this.projectService = projectService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
+    System.out.println(
+        "digitalObjectLinkedDataFileResourceService=" + digitalObjectLinkedDataFileResourceService);
   }
 
   @Override
-  public boolean delete(UUID uuid) {
+  public boolean delete(UUID uuid) throws IdentifiableServiceException {
     // Check for existance. If not given, return false.
     DigitalObject existingDigitalObject = getByUuid(uuid);
     if (existingDigitalObject == null) {
@@ -89,6 +91,30 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     // Remove preview images
     deleteFileResources(existingDigitalObject.getUuid());
 
+    // Remove LinkedDataFileResources (relation, and, if possible, resource)
+    try {
+      deleteLinkedDatafileResources(existingDigitalObject.getUuid());
+    } catch (CudamiServiceException e) {
+      throw new IdentifiableServiceException(
+          "Cannot remove LinkedDataFileResource from digitalObject with uuid="
+              + existingDigitalObject.getUuid()
+              + ": "
+              + e,
+          e);
+    }
+
+    // Remove RenderingResources (relation, and, if possible, resource)
+    try {
+      deleteRenderingResource(existingDigitalObject.getUuid());
+    } catch (CudamiServiceException e) {
+      throw new IdentifiableServiceException(
+          "Cannot remove RenderingFileResource from digitalObject with uuid="
+              + existingDigitalObject.getUuid()
+              + ": "
+              + e,
+          e);
+    }
+
     // Remove identifiers
     deleteIdentifiers(existingDigitalObject.getUuid());
 
@@ -96,6 +122,14 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     repository.delete(uuid);
 
     return true;
+  }
+
+  private void deleteRenderingResource(UUID digitalObjectUuid) throws CudamiServiceException {
+    digitalObjectRenderingFileResourceService.deleteRenderingFileResources(digitalObjectUuid);
+  }
+
+  private void deleteLinkedDatafileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+    digitalObjectLinkedDataFileResourceService.deleteLinkedDataFileResources(digitalObjectUuid);
   }
 
   @Override

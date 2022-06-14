@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
@@ -23,6 +26,7 @@ import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.resource.FileResourceType;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.text.LocalizedText;
@@ -40,28 +44,33 @@ class DigitalObjectServiceImplTest {
   private CollectionService collectionService;
   private CudamiConfig cudamiConfig;
   private DigitalObjectServiceImpl service;
+  private DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService;
   private DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private DigitalObjectRepository repo;
   protected HookProperties hookProperties;
   private IdentifierRepository identifierRepository;
-  private DigitalObjectLinkedDataFileResourceService linkedDataFileResourceService;
   private LocaleService localeService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
+  private DigitalObjectLinkedDataFileResourceRepository
+      digitalObjectLinkedDataFileResourceRepository;
 
   @BeforeEach
   public void beforeEach() throws CudamiServiceException {
     repo = mock(DigitalObjectRepository.class);
     collectionService = mock(CollectionService.class);
+    digitalObjectLinkedDataFileResourceService =
+        mock(DigitalObjectLinkedDataFileResourceService.class);
     digitalObjectRenderingFileResourceService =
         mock(DigitalObjectRenderingFileResourceService.class);
     hookProperties = mock(HookProperties.class);
     identifierRepository = mock(IdentifierRepository.class);
-    linkedDataFileResourceService = mock(DigitalObjectLinkedDataFileResourceService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
     projectService = mock(ProjectService.class);
     urlAliasService = mock(UrlAliasService.class);
+    digitalObjectLinkedDataFileResourceRepository =
+        mock(DigitalObjectLinkedDataFileResourceRepository.class);
 
     cudamiConfig = mock(CudamiConfig.class);
     CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
@@ -75,7 +84,7 @@ class DigitalObjectServiceImplTest {
             projectService,
             identifierRepository,
             urlAliasService,
-            linkedDataFileResourceService,
+            digitalObjectLinkedDataFileResourceService,
             digitalObjectRenderingFileResourceService,
             hookProperties,
             localeService,
@@ -147,7 +156,7 @@ class DigitalObjectServiceImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    when(linkedDataFileResourceService.getLinkedDataFileResources(eq(uuid)))
+    when(digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(eq(uuid)))
         .thenReturn(List.of(persistedLinkedDataFileResource));
 
     DigitalObject actual = service.getByUuidAndLocale(uuid, Locale.ROOT);
@@ -314,6 +323,35 @@ class DigitalObjectServiceImplTest {
 
     assertThat(actual).isNotNull();
     assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
+  }
+
+  @Test
+  @DisplayName(
+      "deletes RenderingResources and LinkedDataFileResources of a DigitalObject, when the DigitalObject is delete")
+  void deleteRenderingAndLinkedDataFileResources()
+      throws CudamiServiceException, IdentifiableServiceException {
+    UUID uuid = UUID.randomUUID();
+    DigitalObject persistedDigitalObject =
+        DigitalObject.builder()
+            .uuid(uuid)
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .renderingResources(
+                List.of(FileResource.builder().type(FileResourceType.APPLICATION).build()))
+            .linkedDataResources(List.of(LinkedDataFileResource.builder().build()))
+            .refId(42)
+            .build();
+    when(repo.getByUuid(any(UUID.class))).thenReturn(persistedDigitalObject);
+
+    assertThat(service.delete(uuid)).isTrue();
+
+    verify(repo, times(1)).delete(eq(uuid));
+    verify(digitalObjectLinkedDataFileResourceService, times(1))
+        .deleteLinkedDataFileResources(eq(uuid));
+    verify(digitalObjectRenderingFileResourceService, times(1))
+        .deleteRenderingFileResources(eq(uuid));
   }
 
   /*

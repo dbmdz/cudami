@@ -18,4 +18,10 @@ public interface DigitalObjectRenderingFileResourceRepository {
 
   public void saveRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources);
+
+  default void delete(UUID uuid) {
+    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
+
+  boolean delete(List<UUID> uuids);
 }
