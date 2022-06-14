@@ -133,4 +133,15 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     return false;
   }
+
+  @Override
+  public boolean delete(List<UUID> uuids) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM " + tableName + " WHERE linkeddata_fileresource_uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
+    return true;
+  }
 }

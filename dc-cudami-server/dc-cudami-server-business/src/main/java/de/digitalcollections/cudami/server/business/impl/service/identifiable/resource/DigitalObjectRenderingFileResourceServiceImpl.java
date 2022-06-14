@@ -146,4 +146,31 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
     return renderingResources;
   }
+
+  @Override
+  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+    List<FileResource> renderingFileResources = getRenderingFileResources(digitalObjectUuid);
+    if (renderingFileResources == null || renderingFileResources.isEmpty()) {
+      return;
+    }
+
+    for (FileResource renderingFileResource : renderingFileResources) {
+      try {
+        // Delete the relation
+        digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
+
+        // Delete the resource
+        deleteRenderingResource(renderingFileResource);
+      } catch (IdentifiableServiceException e) {
+        throw new CudamiServiceException(
+            "Cannot delete RenderingFileResource="
+                + renderingFileResource
+                + " for DigitalObject with uuid="
+                + digitalObjectUuid
+                + ": "
+                + e,
+            e);
+      }
+    }
+  }
 }

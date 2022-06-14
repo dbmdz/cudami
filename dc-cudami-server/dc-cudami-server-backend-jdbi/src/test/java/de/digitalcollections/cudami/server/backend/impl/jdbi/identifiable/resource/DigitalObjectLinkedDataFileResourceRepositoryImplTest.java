@@ -10,6 +10,7 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -109,5 +110,37 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
     assertThat(actual).isNotEmpty();
     assertThat(actual).isEqualTo(persisted);
+  }
+
+  @DisplayName("can delete a list of LinkedDataFileResources by their uuids")
+  @Test
+  void delete() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    List<LinkedDataFileResource> persisted =
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+
+    repo.delete(
+        persisted.stream().map(LinkedDataFileResource::getUuid).collect(Collectors.toList()));
+
+    List<LinkedDataFileResource> actual = repo.getLinkedDataFileResources(digitalObject.getUuid());
+    assertThat(actual).isEmpty();
   }
 }
