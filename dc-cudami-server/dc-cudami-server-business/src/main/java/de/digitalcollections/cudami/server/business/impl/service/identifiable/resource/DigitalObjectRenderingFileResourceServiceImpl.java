@@ -90,24 +90,20 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
   private FileResource saveRenderingFileResource(FileResource renderingResource)
       throws ValidationException, IdentifiableServiceException {
-    if (renderingResource.getUuid() == null) {
-      switch (renderingResource.getMimeType().getPrimaryType()) {
-        case "application":
-          return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
-        case "audio":
-          return audioFileResourceService.save((AudioFileResource) renderingResource);
-        case "image":
-          return imageFileResourceService.save((ImageFileResource) renderingResource);
-        case "text":
-          return textFileResourceService.save((TextFileResource) renderingResource);
-        case "video":
-          return videoFileResourceService.save((VideoFileResource) renderingResource);
-        default:
-          return fileResourceMetadataService.save(renderingResource);
-      }
+    switch (renderingResource.getMimeType().getPrimaryType()) {
+      case "application":
+        return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
+      case "audio":
+        return audioFileResourceService.save((AudioFileResource) renderingResource);
+      case "image":
+        return imageFileResourceService.save((ImageFileResource) renderingResource);
+      case "text":
+        return textFileResourceService.save((TextFileResource) renderingResource);
+      case "video":
+        return videoFileResourceService.save((VideoFileResource) renderingResource);
+      default:
+        return fileResourceMetadataService.save(renderingResource);
     }
-
-    return renderingResource;
   }
 
   @Override
