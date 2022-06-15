@@ -180,4 +180,38 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
     assertThat(repo.countDigitalObjectsForResource(linkedDataFileResource.getUuid())).isEqualTo(1);
   }
+
+  @DisplayName("returns zero, when nothing was deleted")
+  @Test
+  void noDeletionReturnsZero() {
+    assertThat(repo.delete(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName("returns the number of deleted items")
+  @Test
+  void deletionReturnsNumberOfDeletedItems() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    List<LinkedDataFileResource> persisted =
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+
+    assertThat(repo.delete(linkedDataFileResource.getUuid())).isEqualTo(1);
+  }
 }

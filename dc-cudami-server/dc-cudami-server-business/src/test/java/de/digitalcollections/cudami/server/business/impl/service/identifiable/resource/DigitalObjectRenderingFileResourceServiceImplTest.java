@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -65,12 +66,16 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =
-        TextFileResource.builder().mimeType(MimeType.fromTypename("text/html")).build();
+        TextFileResource.builder()
+            .uuid(UUID.randomUUID())
+            .mimeType(MimeType.fromTypename("text/html"))
+            .build();
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
     when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(0);
+    when(repo.delete(any(UUID.class))).thenReturn(1);
 
     service.deleteRenderingFileResources(uuid);
 
@@ -84,12 +89,16 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =
-        TextFileResource.builder().mimeType(MimeType.fromTypename("text/html")).build();
+        TextFileResource.builder()
+            .uuid(UUID.randomUUID())
+            .mimeType(MimeType.fromTypename("text/html"))
+            .build();
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
     when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(1);
+    when(repo.delete(any(UUID.class))).thenReturn(1);
 
     service.deleteRenderingFileResources(uuid);
 

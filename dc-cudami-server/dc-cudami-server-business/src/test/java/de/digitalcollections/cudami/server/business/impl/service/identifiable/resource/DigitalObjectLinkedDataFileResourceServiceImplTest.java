@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -49,6 +50,7 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
 
     when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
     when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(0);
+    when(repo.delete(any(UUID.class))).thenReturn(1);
 
     service.deleteLinkedDataFileResources(uuid);
 
@@ -68,6 +70,7 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
 
     when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
     when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(1);
+    when(repo.delete(any(UUID.class))).thenReturn(1);
 
     service.deleteLinkedDataFileResources(uuid);
 

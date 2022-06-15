@@ -117,8 +117,8 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public void removeByDigitalObject(UUID digitalObjectUuid) {
-    dbi.withHandle(
+  public int removeByDigitalObject(UUID digitalObjectUuid) {
+    return dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + getTableName() + " WHERE digitalobject_uuid = :uuid")
                 .bind("uuid", digitalObjectUuid)
@@ -155,13 +155,12 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) {
-    dbi.withHandle(
+  public int delete(List<UUID> uuids) {
+    return dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE fileresource_uuid in (<uuids>)")
                 .bindList("uuids", uuids)
                 .execute());
-    return true;
   }
 
   @Override
