@@ -123,4 +123,44 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
     assertThat(repo.countDigitalObjectsForResource(renderingFileResource.getUuid())).isEqualTo(1);
   }
+
+  @DisplayName("returns zero, when nothing was deleted")
+  @Test
+  void noDeletionReturnsZero() {
+    assertThat(repo.delete(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName("returns zero, when no relation for a DigitalObject was deleted")
+  @Test
+  void noDeletionByDigitalObjectReturnsZero() {
+    assertThat(repo.removeByDigitalObject(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName("returns the number of deleted items")
+  @Test
+  void deletionReturnsNumberOfDeletedItems() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the RenderingFileResource
+    TextFileResource renderingFileResource =
+        TextFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    TextFileResource persistedRenderingResource =
+        textFileResourceMetadataRepository.save(renderingFileResource);
+
+    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(persistedRenderingResource));
+
+    assertThat(repo.delete(renderingFileResource.getUuid())).isEqualTo(1);
+  }
 }
