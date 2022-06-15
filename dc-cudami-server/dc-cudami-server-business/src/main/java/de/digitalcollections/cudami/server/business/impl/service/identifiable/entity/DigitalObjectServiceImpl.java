@@ -70,8 +70,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     this.projectService = projectService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
-    System.out.println(
-        "digitalObjectLinkedDataFileResourceService=" + digitalObjectLinkedDataFileResourceService);
   }
 
   @Override
