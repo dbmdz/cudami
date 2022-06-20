@@ -29,13 +29,10 @@ class AgentRepositoryImplTest {
 
   AgentRepositoryImpl repo;
 
-  @Autowired
-  CudamiConfig cudamiConfig;
+  @Autowired CudamiConfig cudamiConfig;
 
-  @Autowired
-  PostgreSQLContainer postgreSQLContainer;
-  @Autowired
-  Jdbi jdbi;
+  @Autowired PostgreSQLContainer postgreSQLContainer;
+  @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
@@ -62,5 +59,4 @@ class AgentRepositoryImplTest {
 
     assertThat(actual).isEqualTo(agent);
   }
-
 }
