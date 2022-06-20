@@ -21,8 +21,8 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "ag";
-  public static final String TABLE_ALIAS = "e";
-  public static final String TABLE_NAME = "entities";
+  public static final String TABLE_ALIAS = "ag";
+  public static final String TABLE_NAME = "agents";
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields();
