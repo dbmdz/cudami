@@ -52,6 +52,7 @@ public class ItemRepositoryImplTest {
   }
 
   @Test
+  @DisplayName("Save one holder")
   void saveAndRetrieveOneHolder() {
     List<Agent> holders = new ArrayList<>();
     holders.add(
@@ -60,7 +61,8 @@ public class ItemRepositoryImplTest {
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
-    corporateBodyRepository.save((CorporateBody) holders.get(0));
+    Agent holder0 = corporateBodyRepository.save((CorporateBody) holders.get(0));
+    assertThat(holders.get(0).getUuid()).isNotNull();
 
     Item item =
         Item.builder()
@@ -74,9 +76,12 @@ public class ItemRepositoryImplTest {
     Item storedItem = repo.save(item);
     Item retrievedItem = repo.getByUuid(storedItem.getUuid());
     assertThat(storedItem).isEqualTo(retrievedItem);
+    assertThat(retrievedItem.getHolders().size()).isEqualTo(1);
+    assertThat(retrievedItem.getHolders().get(0)).isEqualTo(holder0);
   }
 
   @Test
+  @DisplayName("Save two holders")
   void saveAndRetrieveTwoHolders() {
     List<Agent> holders = new ArrayList<>();
     holders.add(
@@ -90,8 +95,10 @@ public class ItemRepositoryImplTest {
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
-    corporateBodyRepository.save((CorporateBody) holders.get(0));
-    corporateBodyRepository.save((CorporateBody) holders.get(1));
+    List<Agent> holdersInDb =
+        List.of(
+            corporateBodyRepository.save((CorporateBody) holders.get(0)),
+            corporateBodyRepository.save((CorporateBody) holders.get(1)));
 
     Item item =
         Item.builder()
@@ -105,6 +112,8 @@ public class ItemRepositoryImplTest {
     Item storedItem = repo.save(item);
     Item retrievedItem = repo.getByUuid(storedItem.getUuid());
     assertThat(storedItem).isEqualTo(retrievedItem);
+    assertThat(retrievedItem.getHolders().size()).isEqualTo(2);
+    assertThat(retrievedItem.getHolders()).containsAll(holdersInDb);
   }
 
   @Test
@@ -142,10 +151,57 @@ public class ItemRepositoryImplTest {
     assertThat(itemPersistedAgent2.getLabel()).isNotNull();
     assertThat(itemPersistedAgent2.getIdentifiers()).isEmpty();
 
-    CorporateBody agent1 = (CorporateBody) agentRepository.getByUuid(itemPersistedAgent1.getUuid());
+    Agent agent1 = agentRepository.getByUuid(itemPersistedAgent1.getUuid());
     assertThat(agent1).isEqualTo(holder1);
 
-    Person agent2 = (Person) agentRepository.getByUuid(itemPersistedAgent2.getUuid());
+    Agent agent2 = agentRepository.getByUuid(itemPersistedAgent2.getUuid());
     assertThat(agent2).isEqualTo(holder2);
+  }
+
+  @Test
+  @DisplayName("Update one of two holders")
+  void updateHolders() {
+    List<Agent> holders = new ArrayList<>();
+    holders.add(
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "A Company")
+            .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
+            .build());
+    holders.add(
+        CorporateBody.builder()
+            .label(Locale.GERMAN, "Some Amazing Company")
+            .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
+            .build());
+
+    Person person =
+        Person.builder()
+            .label("Karl Ranseier")
+            .gender(Gender.MALE)
+            .description(Locale.GERMAN, "Der erfolgloseste Entwickler aller Zeiten")
+            .build();
+    List<Agent> holdersInDb =
+        List.of(
+            corporateBodyRepository.save((CorporateBody) holders.get(0)),
+            corporateBodyRepository.save((CorporateBody) holders.get(1)),
+            personRepository.save(person));
+
+    Item item =
+        Item.builder()
+            .label(Locale.GERMAN, "Ein Buch")
+            .exemplifiesManifestation(false)
+            .identifier("mdz-sig", "Signatur")
+            .title(Locale.GERMAN, "Ein Buchtitel")
+            .holders(holders)
+            .build();
+
+    Item storedItem = repo.save(item);
+    Item retrievedItem = repo.getByUuid(storedItem.getUuid());
+
+    retrievedItem.setHolders(List.of(holdersInDb.get(0), holdersInDb.get(2)));
+    repo.update(retrievedItem);
+    Item updatedItem = repo.getByUuid(retrievedItem.getUuid());
+
+    assertThat(updatedItem.getHolders().size()).isEqualTo(2);
+    assertThat(updatedItem.getHolders()).contains(holdersInDb.get(0), holdersInDb.get(2));
   }
 }
