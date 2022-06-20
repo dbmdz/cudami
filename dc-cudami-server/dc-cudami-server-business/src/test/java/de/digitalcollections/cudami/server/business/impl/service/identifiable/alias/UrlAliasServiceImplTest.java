@@ -460,8 +460,9 @@ class UrlAliasServiceImplTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug))).thenReturn(new LocalizedUrlAliases());
-    when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug))).thenReturn(expected);
+    when(repo.findPrimaryLinksForWebsite(eq(uuid), eq(slug), eq(false)))
+        .thenReturn(new LocalizedUrlAliases());
+    when(repo.findPrimaryLinksForWebsite(eq(null), eq(slug), eq(false))).thenReturn(expected);
 
     assertThat(service.getPrimaryUrlAliases(uuid, slug, null)).isEqualTo(expected);
   }
@@ -815,10 +816,24 @@ class UrlAliasServiceImplTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class))).thenReturn(expected);
+    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class), eq(false)))
+        .thenReturn(expected);
 
     assertThat(service.getPrimaryUrlAliases(UUID.randomUUID(), "hützligrütz", null))
         .isEqualTo(expected);
+  }
+
+  @DisplayName("can return generic primary links")
+  @Test
+  public void returnPrimaryLinksWithoutWebsite()
+      throws CudamiServiceException, UrlAliasRepositoryException {
+    LocalizedUrlAliases expected = new LocalizedUrlAliases();
+    expected.add(
+        createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
+    when(repo.findPrimaryLinksForWebsite(eq(null), any(String.class), eq(false)))
+        .thenReturn(expected);
+
+    assertThat(service.getPrimaryUrlAliases(null, "hützligrütz", null)).isEqualTo(expected);
   }
 
   @DisplayName("can return a SearchPageResult")
