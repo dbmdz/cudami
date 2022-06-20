@@ -32,4 +32,6 @@ public interface DigitalObjectRenderingFileResourceService {
   }
 
   List<FileResource> getRenderingFileResources(UUID digitalObjectUuid);
+
+  void deleteRenderingFileResources(UUID digitalObjectUuid) throws CudamiServiceException;
 }

@@ -10,6 +10,8 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -109,5 +111,107 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
     assertThat(actual).isNotEmpty();
     assertThat(actual).isEqualTo(persisted);
+  }
+
+  @DisplayName("can delete a list of LinkedDataFileResources by their uuids")
+  @Test
+  void delete() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    List<LinkedDataFileResource> persisted =
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+
+    repo.delete(
+        persisted.stream().map(LinkedDataFileResource::getUuid).collect(Collectors.toList()));
+
+    List<LinkedDataFileResource> actual = repo.getLinkedDataFileResources(digitalObject.getUuid());
+    assertThat(actual).isEmpty();
+  }
+
+  @DisplayName(
+      "can count the number of entries for a provided LinkedDataFileResource uuid when no entries exist")
+  @Test
+  void countZero() {
+    assertThat(repo.countDigitalObjectsForResource(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName(
+      "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
+  @Test
+  void countMoreThanZero() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    List<LinkedDataFileResource> persisted =
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+
+    assertThat(repo.countDigitalObjectsForResource(linkedDataFileResource.getUuid())).isEqualTo(1);
+  }
+
+  @DisplayName("returns zero, when nothing was deleted")
+  @Test
+  void noDeletionReturnsZero() {
+    assertThat(repo.delete(UUID.randomUUID())).isEqualTo(0);
+  }
+
+  @DisplayName("returns the number of deleted items")
+  @Test
+  void deletionReturnsNumberOfDeletedItems() {
+    // Persist the DigitalObject
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .build();
+    digitalObject = digitalObjectRepository.save(digitalObject);
+
+    // Persist the LinkedDataFileResource
+    LinkedDataFileResource linkedDataFileResource =
+        LinkedDataFileResource.builder()
+            .label(Locale.GERMAN, "Linked Data")
+            .context("https://foo.bar/blubb.xml")
+            .objectType("XML")
+            .filename("blubb.xml") // required!!
+            .mimeType(MimeType.MIME_APPLICATION_XML)
+            .build();
+    List<LinkedDataFileResource> persisted =
+        repo.setLinkedDataFileResources(digitalObject.getUuid(), List.of(linkedDataFileResource));
+
+    assertThat(repo.delete(linkedDataFileResource.getUuid())).isEqualTo(1);
   }
 }

@@ -90,24 +90,20 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
   private FileResource saveRenderingFileResource(FileResource renderingResource)
       throws ValidationException, IdentifiableServiceException {
-    if (renderingResource.getUuid() == null) {
-      switch (renderingResource.getMimeType().getPrimaryType()) {
-        case "application":
-          return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
-        case "audio":
-          return audioFileResourceService.save((AudioFileResource) renderingResource);
-        case "image":
-          return imageFileResourceService.save((ImageFileResource) renderingResource);
-        case "text":
-          return textFileResourceService.save((TextFileResource) renderingResource);
-        case "video":
-          return videoFileResourceService.save((VideoFileResource) renderingResource);
-        default:
-          return fileResourceMetadataService.save(renderingResource);
-      }
+    switch (renderingResource.getMimeType().getPrimaryType()) {
+      case "application":
+        return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
+      case "audio":
+        return audioFileResourceService.save((AudioFileResource) renderingResource);
+      case "image":
+        return imageFileResourceService.save((ImageFileResource) renderingResource);
+      case "text":
+        return textFileResourceService.save((TextFileResource) renderingResource);
+      case "video":
+        return videoFileResourceService.save((VideoFileResource) renderingResource);
+      default:
+        return fileResourceMetadataService.save(renderingResource);
     }
-
-    return renderingResource;
   }
 
   @Override
@@ -149,5 +145,44 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     }
 
     return renderingResources;
+  }
+
+  @Override
+  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+    List<FileResource> renderingFileResources = getRenderingFileResources(digitalObjectUuid);
+    if (renderingFileResources == null || renderingFileResources.isEmpty()) {
+      return;
+    }
+
+    for (FileResource renderingFileResource : renderingFileResources) {
+      try {
+        // Delete the relation
+        int amountDeletedRelations =
+            digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
+        if (amountDeletedRelations != 1) {
+          throw new CudamiServiceException(
+              "Could not delete relation for RenderingFileResource="
+                  + renderingFileResource
+                  + " for DigitalObject with uuid="
+                  + digitalObjectUuid);
+        }
+
+        // Delete the resource, when no references exist to it
+        if (digitalObjectRenderingFileResourceRepository.countDigitalObjectsForResource(
+                renderingFileResource.getUuid())
+            == 0) {
+          deleteRenderingResource(renderingFileResource);
+        }
+      } catch (IdentifiableServiceException e) {
+        throw new CudamiServiceException(
+            "Cannot delete RenderingFileResource="
+                + renderingFileResource
+                + " for DigitalObject with uuid="
+                + digitalObjectUuid
+                + ": "
+                + e,
+            e);
+      }
+    }
   }
 }

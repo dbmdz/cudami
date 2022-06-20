@@ -24,4 +24,12 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
    */
   List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
+
+  default int delete(UUID uuid) {
+    return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  }
+
+  int delete(List<UUID> uuids);
+
+  int countDigitalObjectsForResource(UUID uuid);
 }
