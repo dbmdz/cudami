@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, release/* ]
   push:
-    branches: [ main ]
+    branches: [ main, release/* ]
   release:
     types: [ published ]
   workflow_dispatch:
@@ -63,7 +63,7 @@ jobs:
       - name: Publish code coverage reports
         uses: codecov/codecov-action@v1
   publish:
-    if: (github.event_name == 'push' && contains(github.ref, 'main')) || github.event_name == 'release'
+    if: (github.event_name == 'push' && (contains(github.ref, 'main') || startsWith(github.ref, 'release/'))) || github.event_name == 'release'
     needs: build
     outputs:
       PROJECT_VERSION: ${{ steps.projectversion.outputs.PROJECT_VERSION }}
