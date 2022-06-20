@@ -118,29 +118,6 @@ public class ItemController {
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
-  /*
-  @Operation(summary = "Get an item by namespace and id",
-      description = "Separate namespace and id with a colon, d.h. foo:bar")
-  @GetMapping(
-      value = {
-          "/v6/items"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Item> getByIdentifierAsParameter(
-      @RequestParam(name = "identifier", required = true) String identifier) throws ValidationException {
-    Pair<String, String> namespaceAndId =
-        ParameterHelper.extractPairOfStrings(identifier);
-    if (namespaceAndId.getLeft().isBlank()
-        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
-      throw new ValidationException(
-          "No namespace and/or id were provided in a colon separated manner");
-    }
-
-    Item result = itemService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-  }
-   */
-
   @Operation(summary = "Get an item by namespace and id")
   @GetMapping(
       value = {

@@ -108,27 +108,4 @@ class ItemControllerTest extends BaseControllerTest {
 
     testHttpGetWithExpectedStatus(path, HttpStatus.SC_UNPROCESSABLE_ENTITY);
   }
-
-  /*
-  @DisplayName("can retrieve an item by identifier as parameter without any special characters")
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
-          "/v6/items?identifier=foo:bar"
-      })
-  public void getByIdentifierByParameterWithoutSpecialCharacters(String path) throws Exception {
-    when(itemService.getByIdentifier(any(String.class),any(String.class))).thenReturn(Item.builder().build());
-
-    ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
-
-    testHttpGet(path);
-
-    verify(itemService, times(1))
-        .getByIdentifier(namespaceCaptor.capture(), identifierCaptor.capture());
-
-    assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
-    assertThat(identifierCaptor.getValue()).isEqualTo("bar");
-  }
-   */
 }
