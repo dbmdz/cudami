@@ -3,12 +3,16 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Gender;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +39,8 @@ public class ItemRepositoryImplTest {
   private ItemRepositoryImpl repo;
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
+  @Autowired AgentRepository agentRepository;
+  @Autowired PersonRepository personRepository;
 
   @BeforeEach
   void setup(
@@ -46,7 +52,7 @@ public class ItemRepositoryImplTest {
   }
 
   @Test
-  void safeAndRetrieveOneHolder() {
+  void saveAndRetrieveOneHolder() {
     List<Agent> holders = new ArrayList<>();
     holders.add(
         CorporateBody.builder()
@@ -71,7 +77,7 @@ public class ItemRepositoryImplTest {
   }
 
   @Test
-  void safeAndRetrieveTwoHolders() {
+  void saveAndRetrieveTwoHolders() {
     List<Agent> holders = new ArrayList<>();
     holders.add(
         CorporateBody.builder()
@@ -99,5 +105,47 @@ public class ItemRepositoryImplTest {
     Item storedItem = repo.save(item);
     Item retrievedItem = repo.getByUuid(storedItem.getUuid());
     assertThat(storedItem).isEqualTo(retrievedItem);
+  }
+
+  @Test
+  @DisplayName("returns holder(s) as agents only with UUID and label and no other fields")
+  void returnHoldersAsAgents() {
+    CorporateBody holder1 =
+        corporateBodyRepository.save(
+            CorporateBody.builder()
+                .label("ACME Inc.")
+                .identifier("foobar", "42")
+                .homepageUrl("https://www.digitale-sammlungen.de/")
+                .build());
+    Person holder2 =
+        personRepository.save(
+            Person.builder()
+                .label("Karl Ranseier")
+                .identifier("gnd", "-1")
+                .gender(Gender.MALE)
+                .description(Locale.GERMAN, "Der erfolgloseste Entwickler aller Zeiten")
+                .build());
+
+    Item item = Item.builder().label("Test-Item").holders(List.of(holder1, holder2)).build();
+
+    Item persisted = repo.getByUuid(repo.save(item).getUuid());
+
+    assertThat(persisted.getHolders()).hasSize(2);
+
+    Agent itemPersistedAgent1 = persisted.getHolders().get(0);
+    assertThat(itemPersistedAgent1.getUuid()).isNotNull();
+    assertThat(itemPersistedAgent1.getLabel()).isNotNull();
+    assertThat(itemPersistedAgent1.getIdentifiers()).isEmpty();
+
+    Agent itemPersistedAgent2 = persisted.getHolders().get(1);
+    assertThat(itemPersistedAgent2.getUuid()).isNotNull();
+    assertThat(itemPersistedAgent2.getLabel()).isNotNull();
+    assertThat(itemPersistedAgent2.getIdentifiers()).isEmpty();
+
+    CorporateBody agent1 = (CorporateBody) agentRepository.getByUuid(itemPersistedAgent1.getUuid());
+    assertThat(agent1).isEqualTo(holder1);
+
+    Person agent2 = (Person) agentRepository.getByUuid(itemPersistedAgent2.getUuid());
+    assertThat(agent2).isEqualTo(holder2);
   }
 }
