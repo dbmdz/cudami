@@ -406,18 +406,46 @@ class UrlAliasServiceImplTest {
     assertThat(service.generateSlug(Locale.GERMAN, "label", websiteUuid)).isEqualTo(expected);
   }
 
-  @DisplayName("returns the generic primary link, when no website uuid is provided")
+  @DisplayName(
+      "returns the generic primary link in all languages, when no website uuid is provided")
   @Test
   public void genericPrimaryLinkForNoWebsite()
       throws CudamiServiceException, UrlAliasRepositoryException {
     LocalizedUrlAliases expectedLocalizedUrlAliases = new LocalizedUrlAliases();
     expectedLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(eq(null), eq("hurz")))
+    expectedLocalizedUrlAliases.add(
+        createUrlAlias("hurz", true, "en", false, UUID.randomUUID(), UUID.randomUUID()));
+    when(repo.findPrimaryLinksForWebsite(eq(null), eq("hurz"), eq(false)))
         .thenReturn(expectedLocalizedUrlAliases);
 
     LocalizedUrlAliases actual = service.getPrimaryUrlAliases(null, "hurz", null);
 
+    assertThat(actual).isEqualTo(expectedLocalizedUrlAliases);
+  }
+
+  @DisplayName(
+      "returns the generic primary link in demanded language, when no website uuid is provided")
+  @Test
+  public void genericPrimaryLinkForNoWebsiteRestrictedtoLanguage()
+      throws CudamiServiceException, UrlAliasRepositoryException {
+
+    UrlAlias germanUrlAlias =
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
+    UrlAlias englishUrlAlias =
+        createUrlAlias("hurz", true, "en", false, UUID.randomUUID(), UUID.randomUUID());
+
+    LocalizedUrlAliases localizedUrlAliasesToPersist = new LocalizedUrlAliases();
+    localizedUrlAliasesToPersist.add(germanUrlAlias);
+    localizedUrlAliasesToPersist.add(englishUrlAlias);
+    when(repo.findPrimaryLinksForWebsite(eq(null), eq("hurz"), eq(true)))
+        .thenReturn(localizedUrlAliasesToPersist);
+
+    LocalizedUrlAliases actual =
+        service.getPrimaryUrlAliases(null, "hurz", Locale.forLanguageTag("de"));
+
+    LocalizedUrlAliases expectedLocalizedUrlAliases = new LocalizedUrlAliases();
+    expectedLocalizedUrlAliases.add(germanUrlAlias);
     assertThat(actual).isEqualTo(expectedLocalizedUrlAliases);
   }
 
