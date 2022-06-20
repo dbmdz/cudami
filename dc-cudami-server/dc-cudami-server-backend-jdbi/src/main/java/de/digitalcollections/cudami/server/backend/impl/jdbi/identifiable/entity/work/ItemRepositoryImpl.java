@@ -82,15 +82,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + ".part_of_item "
         + mappingPrefix
         + "_part_of_item, "
-        + EntityRepositoryImpl.getSqlSelectReducedFields(
-            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX); // TODO: Use AgentRepo
+        + AgentRepositoryImpl.getSqlSelectReducedFields(
+            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
   }
 
-  // TODO: Use AgentRepo instead of EntityRepo
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
       String.format(
           " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids) ",
-          EntityRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
+          AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
