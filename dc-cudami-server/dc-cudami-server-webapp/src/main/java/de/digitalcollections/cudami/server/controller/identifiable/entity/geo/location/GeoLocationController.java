@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -33,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Geo location controller")
-public class GeoLocationController {
+public class GeoLocationController extends AbstractIdentifiableController<GeoLocation> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
@@ -41,6 +43,11 @@ public class GeoLocationController {
 
   public GeoLocationController(GeoLocationService geoLocationservice) {
     this.geoLocationService = geoLocationservice;
+  }
+
+  @Override
+  protected IdentifiableService<GeoLocation> getService() {
+    return geoLocationService;
   }
 
   @Operation(summary = "count all geolocations")
@@ -73,23 +80,21 @@ public class GeoLocationController {
     return geoLocationService.find(searchPageRequest);
   }
 
-  @Operation(summary = "Get a geolocation by namespace and id")
+  @Operation(
+      summary = "Get a geolocation by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/geolocations/identifier/{namespace}:{id}",
-        "/v6/geolocations/identifier/{namespace}:{id}.json",
-        "/v5/geolocations/identifier/{namespace}:{id}",
-        "/v5/geolocations/identifier/{namespace}:{id}.json",
-        "/v2/geolocations/identifier/{namespace}:{id}",
-        "/v2/geolocations/identifier/{namespace}:{id}.json",
-        "/latest/geolocations/identifier/{namespace}:{id}",
-        "/latest/geolocations/identifier/{namespace}:{id}.json"
+        "/v6/geolocations/identifier/**",
+        "/v5/geolocations/identifier/**",
+        "/v2/geolocations/identifier/**",
+        "/latest/geolocations/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GeoLocation> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    GeoLocation result = geoLocationService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<GeoLocation> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a geolocation by namespace and id")

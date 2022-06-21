@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,5 +108,34 @@ class ItemControllerTest extends BaseControllerTest {
         .thenReturn(Item.builder().build());
 
     testHttpGetWithExpectedStatus(path, HttpStatus.SC_UNPROCESSABLE_ENTITY);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/items/identifier/foo:bar", "/v6/items/identifier/foo:bar.json"})
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    Item expected = Item.builder().build();
+
+    when(itemService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(itemService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/items/identifier/"})
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    Item expected = Item.builder().build();
+
+    when(itemService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + java.util.Base64.getEncoder()
+                .encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(itemService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

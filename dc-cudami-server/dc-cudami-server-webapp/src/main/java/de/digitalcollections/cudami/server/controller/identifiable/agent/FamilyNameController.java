@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -31,12 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Family name controller")
-public class FamilyNameController {
+public class FamilyNameController extends AbstractIdentifiableController<FamilyName> {
 
   private final FamilyNameService familyNameService;
 
   public FamilyNameController(FamilyNameService familyNameservice) {
     this.familyNameService = familyNameservice;
+  }
+
+  @Override
+  protected IdentifiableService<FamilyName> getService() {
+    return familyNameService;
   }
 
   @Operation(summary = "get all family names")
@@ -56,19 +63,16 @@ public class FamilyNameController {
     return familyNameService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a familyname by namespace and id")
+  @Operation(
+      summary = "Get a family name by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {
-        "/v6/familynames/identifier/{namespace}:{id}",
-        "/v6/familynames/identifier/{namespace}:{id}.json",
-        "/v5/familynames/identifier/{namespace}:{id}",
-        "/v5/familynames/identifier/{namespace}:{id}.json"
-      },
+      value = {"/v6/familynames/identifier/**", "/v5/familynames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FamilyName> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    FamilyName result = familyNameService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<FamilyName> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a familyname by namespace and id")

@@ -1,26 +1,37 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
-import de.digitalcollections.cudami.server.config.SpringConfigBackendForTest;
-import de.digitalcollections.cudami.server.config.SpringConfigBusinessForTest;
+import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-@DisplayName("The corporate body controller")
-@ActiveProfiles("TEST")
-@SpringBootTest(classes = {SpringConfigBusinessForTest.class, SpringConfigBackendForTest.class})
-class CorporateBodyControllerTest {
+@WebMvcTest(CorporateBodyController.class)
+@DisplayName("The CorporateBodyController")
+class CorporateBodyControllerTest extends BaseControllerTest {
+
+  @MockBean private CorporateBodyService corporateBodyService;
 
   private CorporateBodyController corporateBodyController;
-  private CorporateBodyService corporateBodyService;
+
+  @BeforeEach
+  public void beforeEach() {
+    corporateBodyController = new CorporateBodyController(corporateBodyService);
+  }
 
   @ParameterizedTest(
       name =
@@ -43,9 +54,47 @@ class CorporateBodyControllerTest {
     }
   }
 
-  @BeforeEach
-  void setUp() {
-    corporateBodyService = mock(CorporateBodyService.class);
-    corporateBodyController = new CorporateBodyController(corporateBodyService);
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/corporatebodies/identifier/foo:bar",
+        "/v5/corporatebodies/identifier/foo:bar",
+        "/v3/corporatebodies/identifier/foo:bar",
+        "/latest/corporatebodies/identifier/foo:bar",
+        "/v6/corporatebodies/identifier/foo:bar.json",
+        "/v5/corporatebodies/identifier/foo:bar.json",
+        "/v3/corporatebodies/identifier/foo:bar.json",
+        "/latest/corporatebodies/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    CorporateBody expected = CorporateBody.builder().build();
+
+    when(corporateBodyService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(corporateBodyService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/corporatebodies/identifier/",
+        "/v5/corporatebodies/identifier/",
+        "/v3/corporatebodies/identifier/",
+        "/latest/corporatebodies/identifier/"
+      })
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    CorporateBody expected = CorporateBody.builder().build();
+
+    when(corporateBodyService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(corporateBodyService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

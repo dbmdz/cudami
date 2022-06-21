@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Identifiable controller")
-public class IdentifiableController {
+public class IdentifiableController extends AbstractIdentifiableController<Identifiable> {
 
   private final IdentifiableService identifiableService;
   private final UrlAliasService urlAliasService;
@@ -33,6 +35,11 @@ public class IdentifiableController {
       UrlAliasService urlAliasService) {
     this.identifiableService = identifiableService;
     this.urlAliasService = urlAliasService;
+  }
+
+  @Override
+  protected IdentifiableService<Identifiable> getService() {
+    return identifiableService;
   }
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
@@ -81,27 +88,21 @@ public class IdentifiableController {
     }
   }
 
-  @Operation(summary = "Get an identifiable by namespace and id")
+  @Operation(
+      summary = "Get an identifiable by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/identifiables/identifier/{namespace}:{id}",
-        "/v6/identifiables/identifier/{namespace}:{id}.json",
-        "/v5/identifiables/identifier/{namespace}:{id}",
-        "/v5/identifiables/identifier/{namespace}:{id}.json",
-        "/v2/identifiables/identifier/{namespace}:{id}",
-        "/v2/identifiables/identifier/{namespace}:{id}.json",
-        "/latest/identifiables/identifier/{namespace}:{id}",
-        "/latest/identifiables/identifier/{namespace}:{id}.json"
+        "/v6/identifiables/identifier/**",
+        "/v5/identifiables/identifier/**",
+        "/v2/identifiables/identifier/**",
+        "/latest/identifiables/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Identifiable> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-
-    Identifiable result = identifiableService.getByIdentifier(namespace, id);
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<Identifiable> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get identifiable by uuid")

@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
@@ -11,6 +13,8 @@ import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Project;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,5 +78,41 @@ class EntityControllerTest extends BaseControllerTest {
             .refId(1300518)
             .build();
     when(entityService.getByIdentifier(eq("mdz-proj"), eq("1328176523"))).thenReturn(expected);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/entities/identifier/foo:bar",
+        "/v5/entities/identifier/foo:bar",
+        "/latest/entities/identifier/foo:bar",
+        "/v6/entities/identifier/foo:bar.json",
+        "/v5/entities/identifier/foo:bar.json",
+        "/latest/entities/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    Entity expected = Entity.builder().build();
+
+    when(entityService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(entityService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/entities/identifier/", "/v5/entities/identifier/"})
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    Entity expected = Entity.builder().build();
+
+    when(entityService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(entityService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

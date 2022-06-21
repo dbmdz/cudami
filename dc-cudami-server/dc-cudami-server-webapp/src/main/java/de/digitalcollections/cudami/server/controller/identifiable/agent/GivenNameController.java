@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.GivenNameService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -31,12 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Given name controller")
-public class GivenNameController {
+public class GivenNameController extends AbstractIdentifiableController<GivenName> {
 
   private final GivenNameService givenNameService;
 
   public GivenNameController(GivenNameService givenNameService) {
     this.givenNameService = givenNameService;
+  }
+
+  @Override
+  protected IdentifiableService<GivenName> getService() {
+    return givenNameService;
   }
 
   @Operation(summary = "get all given names")
@@ -56,19 +63,16 @@ public class GivenNameController {
     return givenNameService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a givenname by namespace and id")
+  @Operation(
+      summary = "Get a given name by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {
-        "/v6/givennames/identifier/{namespace}:{id}",
-        "/v6/givennames/identifier/{namespace}:{id}.json",
-        "/v5/givennames/identifier/{namespace}:{id}",
-        "/v5/givennames/identifier/{namespace}:{id}.json"
-      },
+      value = {"/v6/givennames/identifier/**", "/v5/givennames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<GivenName> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    GivenName result = givenNameService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<GivenName> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a givenname by namespace and id")

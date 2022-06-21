@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,8 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -107,5 +110,43 @@ class DigitalObjectControllerTest extends BaseControllerTest {
 
     verify(digitalObjectService, times(1)).find(pageRequestArgumentCaptor.capture());
     assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/digitalobjects/identifier/foo:bar",
+        "/v5/digitalobjects/identifier/foo:bar",
+        "/v2/digitalobjects/identifier/foo:bar",
+        "/latest/digitalobjects/identifier/foo:bar",
+        "/v6/digitalobjects/identifier/foo:bar.json",
+        "/v5/digitalobjects/identifier/foo:bar.json",
+        "/v2/digitalobjects/identifier/foo:bar.json",
+        "/latest/digitalobjects/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    DigitalObject expected = DigitalObject.builder().build();
+
+    when(digitalObjectService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(digitalObjectService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/digitalobjects/identifier/", "/v5/digitalobjects/identifier/"})
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    DigitalObject expected = DigitalObject.builder().build();
+
+    when(digitalObjectService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(digitalObjectService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }
