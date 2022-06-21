@@ -1,7 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -13,6 +16,8 @@ import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,5 +93,49 @@ public class IdentifiableControllerTest extends BaseControllerTest {
     when(identifiableService.getByUuid(any(UUID.class))).thenReturn(null);
 
     testNotFound(path);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/identifiables/identifier/foo:bar",
+        "/v5/identifiables/identifier/foo:bar",
+        "/v2/identifiables/identifier/foo:bar",
+        "/latest/identifiables/identifier/foo:bar",
+        "/v6/identifiables/identifier/foo:bar.json",
+        "/v5/identifiables/identifier/foo:bar.json",
+        "/v2/identifiables/identifier/foo:bar.json",
+        "/latest/identifiables/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    Identifiable expected = Identifiable.builder().build();
+
+    when(identifiableService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(identifiableService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/identifiables/identifier/",
+        "/v5/identifiables/identifier/",
+        "/v2/identifiables/identifier/",
+        "/latest/identifiables/identifier/"
+      })
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    Identifiable expected = Identifiable.builder().build();
+
+    when(identifiableService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(identifiableService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

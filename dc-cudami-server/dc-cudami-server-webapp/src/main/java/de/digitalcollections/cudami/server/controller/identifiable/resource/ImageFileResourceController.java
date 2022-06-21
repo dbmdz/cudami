@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +86,29 @@ public class ImageFileResourceController {
 
     ImageFileResource imageFileResource = service.getByIdentifier(namespace, id);
     return new ResponseEntity<>(imageFileResource, HttpStatus.OK);
+  }
+
+  @Operation(
+      summary = "Get an ImageFileResource by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
+  @GetMapping(
+      value = {"/v6/imagefileresources/identifier/**"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<ImageFileResource> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    Pair<String, String> namespaceAndId =
+        ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
+    if (namespaceAndId.getLeft().isBlank()
+        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
+      throw new ValidationException(
+          "No namespace and/or id were provided in a colon separated manner");
+    }
+
+    ImageFileResource imageFileResource =
+        service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    return new ResponseEntity<>(
+        imageFileResource, imageFileResource != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get an ImageFileResource by uuid")

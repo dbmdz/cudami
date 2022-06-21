@@ -1,14 +1,20 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.Filtering;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -58,5 +64,43 @@ class CollectionControllerTest extends BaseControllerTest {
 
     testJson(
         path, "/v3/collections/09baa24e-0918-4b96-8ab1-f496b02af73a_related_corporatebodies.json");
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/collections/identifier/foo:bar",
+        "/v5/collections/identifier/foo:bar",
+        "/v2/collections/identifier/foo:bar",
+        "/latest/collections/identifier/foo:bar",
+        "/v6/collections/identifier/foo:bar.json",
+        "/v5/collections/identifier/foo:bar.json",
+        "/v2/collections/identifier/foo:bar.json",
+        "/latest/collections/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    Collection expected = Collection.builder().build();
+
+    when(collectionService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(collectionService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/collections/identifier/", "/v5/collections/identifier/"})
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    Collection expected = Collection.builder().build();
+
+    when(collectionService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(collectionService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

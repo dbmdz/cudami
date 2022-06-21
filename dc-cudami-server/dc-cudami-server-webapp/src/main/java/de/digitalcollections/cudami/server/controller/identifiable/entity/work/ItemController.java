@@ -2,8 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -20,7 +21,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Item controller")
-public class ItemController {
+public class ItemController extends AbstractIdentifiableController<Item> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
 
@@ -45,6 +45,11 @@ public class ItemController {
 
   public ItemController(ItemService itemService) {
     this.itemService = itemService;
+  }
+
+  @Override
+  protected IdentifiableService<Item> getService() {
+    return itemService;
   }
 
   @Operation(summary = "Add digital object to an item")
@@ -106,16 +111,7 @@ public class ItemController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
-    Pair<String, String> namespaceAndId =
-        ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
-    if (namespaceAndId.getLeft().isBlank()
-        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
-      throw new ValidationException(
-          "No namespace and/or id were provided in a colon separated manner");
-    }
-
-    Item result = itemService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get an item by namespace and id")

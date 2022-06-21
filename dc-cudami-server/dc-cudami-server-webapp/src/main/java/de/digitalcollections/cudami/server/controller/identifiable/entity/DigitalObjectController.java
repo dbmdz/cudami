@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +40,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Digital object controller")
-public class DigitalObjectController {
+public class DigitalObjectController extends AbstractIdentifiableController<DigitalObject> {
 
   private final DigitalObjectService digitalObjectService;
 
   public DigitalObjectController(DigitalObjectService digitalObjectService) {
     this.digitalObjectService = digitalObjectService;
+  }
+
+  @Override
+  protected IdentifiableService<DigitalObject> getService() {
+    return digitalObjectService;
   }
 
   @Operation(summary = "Get count of digital objects")
@@ -140,27 +148,21 @@ public class DigitalObjectController {
     return digitalObjectService.getAllReduced();
   }
 
-  @Operation(summary = "Get digital object by namespace and id")
+  @Operation(
+      summary = "Get a digital object by namespace and id",
+      description =
+          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/identifier/{namespace}:{id}",
-        "/v6/digitalobjects/identifier/{namespace}:{id}.json",
-        "/v5/digitalobjects/identifier/{namespace}:{id}",
-        "/v5/digitalobjects/identifier/{namespace}:{id}.json",
-        "/v2/digitalobjects/identifier/{namespace}:{id}",
-        "/v2/digitalobjects/identifier/{namespace}:{id}.json",
-        "/latest/digitalobjects/identifier/{namespace}:{id}",
-        "/latest/digitalobjects/identifier/{namespace}:{id}.json"
+        "/v6/digitalobjects/identifier/**",
+        "/v5/digitalobjects/identifier/**",
+        "/v2/digitalobjects/identifier/**",
+        "/latest/digitalobjects/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject getByIdentifier(
-      @Parameter(example = "", description = "Namespace of the identifier")
-          @PathVariable("namespace")
-          String namespace,
-      @Parameter(example = "", description = "value of the identifier") @PathVariable("id")
-          String id)
-      throws IdentifiableServiceException {
-    return digitalObjectService.getByIdentifier(namespace, id);
+  public ResponseEntity<DigitalObject> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a digital object by refId")
