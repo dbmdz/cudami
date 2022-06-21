@@ -307,7 +307,6 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
     urlAlias.setPrimary(true);
     urlAlias.setTargetUuid(uuid);
     urlAlias.setTargetIdentifiableType(identifiableType);
-    urlAlias.setTargetEntityType(entityType);
     urlAlias.setSlug(slug);
     if (websiteUuid != null) {
       Website website = new Website();
@@ -320,14 +319,13 @@ public class V9_02_02__DML_Fill_urlaliases extends BaseJavaMigration {
 
   private void saveUrlAlias(JdbcTemplate jdbcTemplate, UrlAlias urlAlias) throws SQLException {
     String updateQuery =
-        "INSERT INTO url_aliases (uuid,created,last_published,\"primary\",slug,target_entity_type,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
+        "INSERT INTO url_aliases (uuid,created,last_published,\"primary\",slug,target_identifiable_type,target_language,target_uuid,website_uuid) VALUES(?::uuid,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,?,?,?::uuid,?::uuid);";
     try {
       jdbcTemplate.update(
           updateQuery,
           urlAlias.getUuid().toString(),
           urlAlias.isPrimary(),
           urlAlias.getSlug(),
-          urlAlias.getTargetEntityType() != null ? urlAlias.getTargetEntityType().toString() : null,
           urlAlias.getTargetIdentifiableType().toString(),
           urlAlias.getTargetLanguage().toString(),
           urlAlias.getTargetUuid().toString(),

@@ -11,7 +11,6 @@ import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -51,8 +50,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(
-                IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -112,8 +110,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(
-                IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -148,8 +145,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(
-                IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY, EntityType.COLLECTION)
+            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -233,9 +229,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                 .slug("hurz")
                                 .targetLanguage("de")
                                 .targetType(
-                                    IdentifiableObjectType.COLLECTION,
-                                    IdentifiableType.ENTITY,
-                                    EntityType.COLLECTION)
+                                    IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
                                 .targetUuid("23456789-2345-2345-2345-234567890123")
                                 .uuid("12345678-1234-1234-1234-123456789012")
                                 .website(
@@ -285,7 +279,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("en")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE, null)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -310,7 +304,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("de")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE, null)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
@@ -335,7 +329,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("en")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE, null)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
             .targetUuid("23456789-2345-2345-2345-234567890123")
             .uuid("12345678-1234-1234-1234-123456789012")
             .build());
