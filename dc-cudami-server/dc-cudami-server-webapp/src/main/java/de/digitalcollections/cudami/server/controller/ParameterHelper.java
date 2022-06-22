@@ -29,7 +29,7 @@ public class ParameterHelper {
     String paramString =
         requestUri.replaceFirst(trailingPathRegex, "").replaceFirst("\\.json$", "");
 
-    if (Base64.isBase64(paramString)) {
+    if (!paramString.contains(":")) {
       paramString = new String(Base64.decodeBase64(paramString), StandardCharsets.UTF_8);
     }
 

@@ -105,9 +105,14 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @Operation(
       summary = "Get an item by namespace and id",
       description =
-          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {"/v6/items/identifier/**"},
+      value = {
+        "/v6/items/identifier/**",
+        "/v5/items/identifier/**",
+        "/v2/items/identifier/**",
+        "/latest/items/identifier/**"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {

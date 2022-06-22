@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,8 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -181,5 +184,37 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             + "}";
 
     testPutJson(path, body, "/v6/imagefileresources/12345678-abcd-1234-abcd-123456789012.json");
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/imagefileresources/identifier/foo:bar",
+        "/v6/imagefileresources/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    ImageFileResource expected = ImageFileResource.builder().build();
+
+    when(imageFileResourceService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(imageFileResourceService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/imagefileresources/identifier/"})
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    ImageFileResource expected = ImageFileResource.builder().build();
+
+    when(imageFileResourceService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(imageFileResourceService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

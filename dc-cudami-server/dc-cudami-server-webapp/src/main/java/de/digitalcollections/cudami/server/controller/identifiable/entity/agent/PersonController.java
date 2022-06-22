@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -38,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Person controller")
-public class PersonController {
+public class PersonController extends AbstractIdentifiableController<Person> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
@@ -46,6 +48,11 @@ public class PersonController {
 
   public PersonController(PersonService personService) {
     this.personService = personService;
+  }
+
+  @Override
+  protected IdentifiableService<Person> getService() {
+    return personService;
   }
 
   @Operation(summary = "count all persons")
@@ -129,23 +136,21 @@ public class PersonController {
     return personService.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
-  @Operation(summary = "Get a person by namespace and id")
+  @Operation(
+      summary = "Get a person by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/persons/identifier/{namespace}:{id}",
-        "/v6/persons/identifier/{namespace}:{id}.json",
-        "/v5/persons/identifier/{namespace}:{id}",
-        "/v5/persons/identifier/{namespace}:{id}.json",
-        "/v2/persons/identifier/{namespace}:{id}",
-        "/v2/persons/identifier/{namespace}:{id}.json",
-        "/latest/persons/identifier/{namespace}:{id}",
-        "/latest/persons/identifier/{namespace}:{id}.json"
+        "/v6/persons/identifier/**",
+        "/v5/persons/identifier/**",
+        "/v2/persons/identifier/**",
+        "/latest/persons/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Person> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    Person result = personService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<Person> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a person by namespace and id")

@@ -66,7 +66,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
   @Operation(
       summary = "Get a given name by namespace and id",
       description =
-          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {"/v6/givennames/identifier/**", "/v5/givennames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)

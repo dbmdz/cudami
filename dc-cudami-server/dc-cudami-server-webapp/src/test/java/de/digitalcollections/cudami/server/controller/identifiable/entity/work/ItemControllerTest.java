@@ -12,7 +12,6 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -91,28 +90,19 @@ class ItemControllerTest extends BaseControllerTest {
     assertThat(identifierCaptor.getValue()).isEqualTo("bar/baz");
   }
 
-  @DisplayName(
-      "throws an error, when the base64 encoded identifier is invalid and thus is treated as an unencoded identifier")
+  @DisplayName("can retrieve by identifier with plaintext id")
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v6/items/identifier/",
+        "/v6/items/identifier/foo:bar",
+        "/v6/items/identifier/foo:bar.json",
+        "/v5/items/identifier/foo:bar",
+        "/v5/items/identifier/foo:bar.json",
+        "/v2/items/identifier/foo:bar",
+        "/v2/items/identifier/foo:bar.json",
+        "/latest/items/identifier/foo:bar",
+        "/latest/items/identifier/foo:bar.json"
       })
-  public void getByIdentifierWithInvalidEncodedSlashesAsIdentifier() throws Exception {
-    String path =
-        "/v6/items/identifier/"
-            + Base64.encodeBase64String("foo:bar/baz".getBytes(StandardCharsets.UTF_8))
-            + "möööp";
-
-    when(itemService.getByIdentifier(any(String.class), any(String.class)))
-        .thenReturn(Item.builder().build());
-
-    testHttpGetWithExpectedStatus(path, HttpStatus.SC_UNPROCESSABLE_ENTITY);
-  }
-
-  @DisplayName("can retrieve by identifier with plaintext id")
-  @ParameterizedTest
-  @ValueSource(strings = {"/v6/items/identifier/foo:bar", "/v6/items/identifier/foo:bar.json"})
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Item expected = Item.builder().build();
 
@@ -125,7 +115,13 @@ class ItemControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/items/identifier/"})
+  @ValueSource(
+      strings = {
+        "/v6/items/identifier/",
+        "/v5/items/identifier/",
+        "/v2/items/identifier/",
+        "/latest/items/identifier/"
+      })
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Item expected = Item.builder().build();
 
