@@ -2,9 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +35,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Image Fileresource controller")
-public class ImageFileResourceController {
+public class ImageFileResourceController extends AbstractIdentifiableController<ImageFileResource> {
 
   private final ImageFileResourceService service;
 
   public ImageFileResourceController(ImageFileResourceService service) {
     this.service = service;
+  }
+
+  @Override
+  protected IdentifiableService<ImageFileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Get a paged and filtered list of ImageFileResources")
@@ -74,41 +78,16 @@ public class ImageFileResourceController {
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get an ImageFileResource by namespace and id")
-  @GetMapping(
-      value = {
-        "/v6/imagefileresources/identifier/{namespace}:{id}",
-        "/v6/imagefileresources/identifier/{namespace}:{id}.json"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FileResource> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-
-    ImageFileResource imageFileResource = service.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(imageFileResource, HttpStatus.OK);
-  }
-
   @Operation(
       summary = "Get an ImageFileResource by namespace and id",
       description =
-          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {"/v6/imagefileresources/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ImageFileResource> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
-    Pair<String, String> namespaceAndId =
-        ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
-    if (namespaceAndId.getLeft().isBlank()
-        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
-      throw new ValidationException(
-          "No namespace and/or id were provided in a colon separated manner");
-    }
-
-    ImageFileResource imageFileResource =
-        service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-    return new ResponseEntity<>(
-        imageFileResource, imageFileResource != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get an ImageFileResource by uuid")

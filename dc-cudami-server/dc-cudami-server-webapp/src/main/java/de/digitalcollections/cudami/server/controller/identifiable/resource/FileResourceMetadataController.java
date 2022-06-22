@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Fileresource controller")
-public class FileResourceMetadataController {
+public class FileResourceMetadataController extends AbstractIdentifiableController<FileResource> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
@@ -47,6 +50,11 @@ public class FileResourceMetadataController {
       @Qualifier("fileResourceMetadataService")
           FileResourceMetadataService<FileResource> metadataService) {
     this.metadataService = metadataService;
+  }
+
+  @Override
+  protected IdentifiableService<FileResource> getService() {
+    return metadataService;
   }
 
   @Operation(summary = "Get all fileresources")
@@ -133,24 +141,21 @@ public class FileResourceMetadataController {
     return metadataService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a fileresource by namespace and id")
+  @Operation(
+      summary = "Get a fileresource by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/fileresources/identifier/{namespace}:{id}",
-        "/v6/fileresources/identifier/{namespace}:{id}.json",
-        "/v5/fileresources/identifier/{namespace}:{id}",
-        "/v5/fileresources/identifier/{namespace}:{id}.json",
-        "/v2/fileresources/identifier/{namespace}:{id}",
-        "/v2/fileresources/identifier/{namespace}:{id}.json",
-        "/latest/fileresources/identifier/{namespace}:{id}",
-        "/latest/fileresources/identifier/{namespace}:{id}.json"
+        "/v6/fileresources/identifier/**",
+        "/v5/fileresources/identifier/**",
+        "/v2/fileresources/identifier/**",
+        "/latest/fileresources/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<FileResource> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-
-    FileResource fileResource = metadataService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(fileResource, HttpStatus.OK);
+  public ResponseEntity<FileResource> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a fileresource by uuid")

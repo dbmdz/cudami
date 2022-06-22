@@ -70,7 +70,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
   @Operation(
       summary = "Get a geolocation by namespace and id",
       description =
-          "Separate namespace and id with a colon, d.h. foo:bar. It is also possible, to a .json suffix, which will be ignored then")
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
         "/v6/humansettlements/identifier/**",
