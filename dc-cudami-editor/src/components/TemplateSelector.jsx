@@ -15,7 +15,7 @@ const TemplateSelector = ({onClick, onRemove, templateName}) => {
   return (
     <FormGroup>
       <Label className="d-block font-weight-bold">
-        {t('types:renderingTemplate_one')}
+        {t('types:renderingTemplate', {count: 1})}
       </Label>
       {templateName ? (
         <InputGroup id={id}>
