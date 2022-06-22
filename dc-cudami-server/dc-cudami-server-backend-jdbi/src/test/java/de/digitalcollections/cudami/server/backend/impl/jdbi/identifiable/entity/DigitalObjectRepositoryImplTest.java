@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
@@ -20,6 +22,7 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
@@ -91,6 +94,7 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
   @Autowired private PersonRepositoryImpl personRepositoryImpl;
+  @Autowired private ItemRepository itemRepository;
 
   private static final License EXISTING_LICENSE =
       License.builder()
@@ -321,6 +325,28 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
         .isEqualTo("Körperschaft");
     assertThat(actual.getParent()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("save item UUID with digital object and retrieve it properly")
+  void saveAndRetrieveItemUuid() {
+    DigitalObject digitalObject = buildDigitalObject();
+    Item item =
+        Item.builder()
+            .label(Locale.GERMAN, "Ein Buch")
+            .exemplifiesManifestation(false)
+            .identifier("mdz-sig", "Signatur")
+            .title(Locale.GERMAN, "Ein Buchtitel")
+            .build();
+    Item savedItem = itemRepository.save(item);
+    assertThat(savedItem.getUuid()).isNotNull();
+
+    digitalObject.setItem(savedItem);
+    DigitalObject savedDigitalObject = repo.save(digitalObject);
+    assertThat(savedDigitalObject.getUuid()).isNotNull();
+    assertThat(savedDigitalObject.getItem().getUuid()).isEqualTo(savedItem.getUuid());
+    DigitalObject retrieved = repo.getByUuid(savedDigitalObject.getUuid());
+    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(savedItem.getUuid()).build());
   }
 
   @Test
