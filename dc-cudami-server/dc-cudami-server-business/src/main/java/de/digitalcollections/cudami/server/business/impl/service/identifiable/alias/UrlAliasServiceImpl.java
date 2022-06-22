@@ -213,7 +213,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       if (websiteUuid == null) {
         // We only want the unspecified primary links
         LocalizedUrlAliases unspecificLocalizedUrlAliases =
-            repository.findPrimaryLinksForWebsite(null, slug);
+            repository.findPrimaryLinksForWebsite(null, slug, pLocale != null);
         unspecificLocalizedUrlAliases =
             filterForLocaleWithFallback(pLocale, unspecificLocalizedUrlAliases);
         return unspecificLocalizedUrlAliases;
@@ -221,10 +221,10 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
       // Try to retrieve the specific localizedUrlAliases for a website
       LocalizedUrlAliases localizedUrlAliases =
-          repository.findPrimaryLinksForWebsite(websiteUuid, slug);
+          repository.findPrimaryLinksForWebsite(websiteUuid, slug, pLocale != null);
       if (localizedUrlAliases.isEmpty()) {
         // Fallback to generic localizedUrlAliases
-        localizedUrlAliases = repository.findPrimaryLinksForWebsite(null, slug);
+        localizedUrlAliases = repository.findPrimaryLinksForWebsite(null, slug, pLocale != null);
       }
 
       localizedUrlAliases = filterForLocaleWithFallback(pLocale, localizedUrlAliases);
