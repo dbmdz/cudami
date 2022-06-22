@@ -66,7 +66,13 @@ const AddUrlAliasesDialog = ({
   const steps = [
     ...(parentWebsite
       ? []
-      : [{Icon: FaGlobe, label: t('types:website_one'), name: 'website'}]),
+      : [
+          {
+            Icon: FaGlobe,
+            label: t('types:website', {count: 1}),
+            name: 'website',
+          },
+        ]),
     {Icon: FaLink, label: t('slug'), name: 'slug'},
     {Icon: FaCheck, name: 'confirm'},
   ]
@@ -218,7 +224,8 @@ const AddUrlAliasesDialog = ({
                 className="mb-2"
                 message={{
                   color: 'warning',
-                  key: 'duplicateInformation.urlAliases_one',
+                  key: 'duplicateInformation.urlAliases',
+                  values: {count: 1},
                 }}
               />
             )}
