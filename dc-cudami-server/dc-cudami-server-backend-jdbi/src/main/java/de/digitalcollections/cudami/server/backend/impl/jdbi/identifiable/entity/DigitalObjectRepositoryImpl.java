@@ -63,51 +63,59 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + ".uuid";
   public static final String TABLE_NAME = "digitalobjects";
 
-  private static BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
-      createAdditionalReduceRowsBiFunction() {
-    return (map, rowView) -> {
-      DigitalObject digitalObject =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  private static final BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
+      ADDITIONAL_REDUCE_ROWS_BIFUNCTION =
+          (map, rowView) -> {
+            DigitalObject digitalObject =
+                map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      // Try to fill license subresource with uuid, url and label
-      License license = rowView.getRow(License.class);
-      if (license.getUuid() != null) {
-        digitalObject.setLicense(license);
-      }
+            // Try to fill license subresource with uuid, url and label
+            License license = rowView.getRow(License.class);
+            if (license.getUuid() != null) {
+              digitalObject.setLicense(license);
+            }
 
-      // Try to fill UUID of geolocation of creator
-      UUID creationCreatorUuid =
-          rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
-      LocalDate creationDate =
-          rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
-      UUID creationGeolocationUuid =
-          rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
+            // Try to fill UUID of geolocation of creator
+            UUID creationCreatorUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
+            LocalDate creationDate =
+                rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
+            UUID creationGeolocationUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
 
-      // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
-      // We must build the CreationInfo object
-      if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
-        CreationInfo creationInfo = new CreationInfo();
-        if (creationCreatorUuid != null) {
-          creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
-        }
-        if (creationDate != null) {
-          creationInfo.setDate(creationDate);
-        }
-        if (creationGeolocationUuid != null) {
-          creationInfo.setGeoLocation(GeoLocation.builder().uuid(creationGeolocationUuid).build());
-        }
-        digitalObject.setCreationInfo(creationInfo);
-      }
+            // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
+            // We must build the CreationInfo object
+            if (creationCreatorUuid != null
+                || creationDate != null
+                || creationGeolocationUuid != null) {
+              CreationInfo creationInfo = new CreationInfo();
+              if (creationCreatorUuid != null) {
+                creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
+              }
+              if (creationDate != null) {
+                creationInfo.setDate(creationDate);
+              }
+              if (creationGeolocationUuid != null) {
+                creationInfo.setGeoLocation(
+                    GeoLocation.builder().uuid(creationGeolocationUuid).build());
+              }
+              digitalObject.setCreationInfo(creationInfo);
+            }
 
-      // Fill further attributes
-      Integer numberOfBinaryResources =
-          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
-      digitalObject.setNumberOfBinaryResources(
-          numberOfBinaryResources != null ? numberOfBinaryResources : 0);
+            // Fill further attributes
+            Integer numberOfBinaryResources =
+                rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
+            digitalObject.setNumberOfBinaryResources(
+                numberOfBinaryResources != null ? numberOfBinaryResources : 0);
 
-      return map;
-    };
-  }
+            // set item UUID only
+            UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
+            if (itemUuid != null) {
+              digitalObject.setItem(Item.builder().uuid(itemUuid).build());
+            }
+
+            return map;
+          };
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
@@ -238,7 +246,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         getSqlInsertValues(),
         getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction(),
+        ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
