@@ -16,18 +16,17 @@ public class ParameterHelper {
    * <p>If the request string ends with .json, that string is cut off.
    *
    * @param requestUri the URI whose path is evaluated
-   * @param trailingPathRegex the regex, at whose end the evaulation will start
+   * @param leadingPathRegex the regex, at whose end the evaulation will start
    * @return a pair of strings, separated by the first colon. The second string can contain multiple
    *     colons
    */
   public static Pair<String, String> extractPairOfStringsFromUri(
-      String requestUri, String trailingPathRegex) {
+      String requestUri, String leadingPathRegex) {
     if (requestUri == null) {
       return Pair.of(null, null);
     }
 
-    String paramString =
-        requestUri.replaceFirst(trailingPathRegex, "").replaceFirst("\\.json$", "");
+    String paramString = requestUri.replaceFirst(leadingPathRegex, "").replaceFirst("\\.json$", "");
 
     if (!paramString.contains(":")) {
       paramString = new String(Base64.decodeBase64(paramString), StandardCharsets.UTF_8);
