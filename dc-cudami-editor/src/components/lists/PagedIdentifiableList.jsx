@@ -6,14 +6,14 @@ import {withTranslation} from 'react-i18next'
 import {Button, Card, CardBody, Col, Nav, Row} from 'reactstrap'
 
 import {
-  addAttachedIdentifiable,
-  addAttachedIdentifiables,
-  loadAttachedIdentifiables,
-  loadDefaultLanguage,
-  loadRootIdentifiables,
-  removeAttachedIdentifiable,
+  addAttachedObject,
+  addAttachedObjects,
+  findAttachedObjects,
+  findRootObjects,
+  getDefaultLanguage,
+  removeAttachedObject,
   typeToEndpointMapping,
-  updateAttachedIdentifiablesOrder,
+  updateAttachedObjectsOrder,
 } from '../../api'
 import AppContext from '../AppContext'
 import AddAttachedIdentifiablesDialog from '../dialogs/AddAttachedIdentifiablesDialog'
@@ -62,7 +62,7 @@ class PagedIdentifiableList extends Component {
   }
 
   async componentDidMount() {
-    const {content: identifierTypes} = await loadRootIdentifiables(
+    const {content: identifierTypes} = await findRootObjects(
       this.props.apiContextPath,
       'identifierType',
       {
@@ -73,7 +73,7 @@ class PagedIdentifiableList extends Component {
         },
       },
     )
-    const defaultLanguage = await loadDefaultLanguage(this.props.apiContextPath)
+    const defaultLanguage = await getDefaultLanguage(this.props.apiContextPath)
     const {content, pageSize, totalElements} = await this.loadIdentifiables(0, {
       defaultLanguage,
     })
@@ -102,7 +102,7 @@ class PagedIdentifiableList extends Component {
 
   addIdentifiable = async (parentUuid, uuid) => {
     const {apiContextPath, parentType, type} = this.props
-    const successful = await addAttachedIdentifiable(
+    const successful = await addAttachedObject(
       apiContextPath,
       parentType,
       parentUuid,
@@ -114,7 +114,7 @@ class PagedIdentifiableList extends Component {
 
   addIdentifiables = async (identifiables) => {
     const {apiContextPath, parentType, parentUuid, type} = this.props
-    const successful = await addAttachedIdentifiables(
+    const successful = await addAttachedObjects(
       apiContextPath,
       identifiables,
       parentType,
@@ -288,7 +288,7 @@ class PagedIdentifiableList extends Component {
     const {apiContextPath, parentType, parentUuid, type} = this.props
     const {searchTerm} = this.state
     if (parentType && parentUuid) {
-      return await loadAttachedIdentifiables(
+      return await findAttachedObjects(
         apiContextPath,
         parentType,
         parentUuid,
@@ -296,7 +296,7 @@ class PagedIdentifiableList extends Component {
         {pageNumber, pageSize, searchTerm},
       )
     }
-    return await loadRootIdentifiables(apiContextPath, type, {
+    return await findRootObjects(apiContextPath, type, {
       pageNumber,
       pageSize,
       searchTerm,
@@ -308,7 +308,7 @@ class PagedIdentifiableList extends Component {
 
   removeIdentifiable = async (parentUuid, uuid) => {
     const {apiContextPath, parentType, type} = this.props
-    const successful = await removeAttachedIdentifiable(
+    const successful = await removeAttachedObject(
       apiContextPath,
       parentType,
       parentUuid,
@@ -320,7 +320,7 @@ class PagedIdentifiableList extends Component {
 
   saveChangeOfOrder = async () => {
     const {apiContextPath, parentType, parentUuid, type} = this.props
-    const successful = await updateAttachedIdentifiablesOrder(
+    const successful = await updateAttachedObjectsOrder(
       apiContextPath,
       this.state.identifiables,
       parentType,

@@ -4,27 +4,22 @@ import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Col, Form, Row} from 'reactstrap'
 
-import {
-  loadIdentifiable,
-  saveIdentifiable,
-  typeToEndpointMapping,
-  updateIdentifiable,
-} from '../../api'
+import {getByUuid, save, typeToEndpointMapping, update} from '../../api'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
 
 const submitData = async (context, data, type, uuid) => {
   const {error = false} = await (uuid
-    ? updateIdentifiable(context, data, type)
-    : saveIdentifiable(context, data, type))
+    ? update(context, data, type)
+    : save(context, data, type))
   return error
 }
 
 const IdentifierTypeForm = ({apiContextPath = '/', uuid}) => {
   const type = 'identifierType'
   useEffect(() => {
-    loadIdentifiable(apiContextPath, type, uuid).then((identifierType) => {
+    getByUuid(apiContextPath, type, uuid).then((identifierType) => {
       setIdentifierType(identifierType)
     })
   }, [])

@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Alert, Col, Form, FormGroup, Label, Row} from 'reactstrap'
 
-import {loadUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
+import {getUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
 import CheckboxWithLabel from '../CheckboxWithLabel'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
@@ -31,7 +31,7 @@ const submitData = async (context, user, passwords) => {
 
 const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
   useEffect(() => {
-    loadUser(apiContextPath, {uuid}).then((user) => {
+    getUser(apiContextPath, {uuid}).then((user) => {
       setUser(user)
     })
   }, [])

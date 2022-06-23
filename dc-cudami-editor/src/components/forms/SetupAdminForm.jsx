@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {Col, Form, Row} from 'reactstrap'
 
-import {loadUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
+import {getUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
@@ -30,7 +30,7 @@ const submitData = async (context, user, passwords) => {
 
 const UserForm = ({apiContextPath = '/'}) => {
   useEffect(() => {
-    loadUser(apiContextPath, {admin: true}).then((user) => {
+    getUser(apiContextPath, {admin: true}).then((user) => {
       setUser(user)
     })
   }, [])

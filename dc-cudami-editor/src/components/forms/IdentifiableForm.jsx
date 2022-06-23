@@ -11,12 +11,12 @@ import {withTranslation} from 'react-i18next'
 
 import {
   generateSlug,
+  getAvailableLanguages,
+  getByUuid,
   getConfig,
-  loadAvailableLanguages,
-  loadIdentifiable,
-  saveIdentifiable,
+  save,
   typeToEndpointMapping,
-  updateIdentifiable,
+  update,
 } from '../../api'
 import AppContext from '../AppContext'
 import AddIframeDialog from '../dialogs/AddIframeDialog'
@@ -95,12 +95,12 @@ class IdentifiableForm extends Component {
 
   async componentDidMount() {
     const {apiContextPath, t, type, uuid} = this.props
-    const availableLanguages = await loadAvailableLanguages(apiContextPath)
+    const availableLanguages = await getAvailableLanguages(apiContextPath)
     const {
       defaults: {language: defaultLanguage},
       urlAlias: {generationExcludes},
     } = await getConfig(apiContextPath)
-    const identifiable = await loadIdentifiable(apiContextPath, type, uuid)
+    const identifiable = await getByUuid(apiContextPath, type, uuid)
     const initialIdentifiable = {
       description: {},
       label: {
@@ -117,10 +117,7 @@ class IdentifiableForm extends Component {
       text: this.identifiablesWithLongText.includes(type) ? {} : undefined,
       ...identifiable,
     }
-    const initialFileResource = await loadIdentifiable(
-      apiContextPath,
-      'fileResource',
-    )
+    const initialFileResource = await getByUuid(apiContextPath, 'fileResource')
     this.setState({
       availableLanguages: availableLanguages
         .filter((language) => !(language in initialIdentifiable.label))
@@ -416,8 +413,8 @@ class IdentifiableForm extends Component {
       identifiable.text = this.cleanContent(identifiable.text)
     }
     const {error = false, uuid} = await (identifiable.uuid
-      ? updateIdentifiable(apiContextPath, identifiable, type)
-      : saveIdentifiable(apiContextPath, identifiable, type, {
+      ? update(apiContextPath, identifiable, type)
+      : save(apiContextPath, identifiable, type, {
           parentType,
           parentUuid,
         }))

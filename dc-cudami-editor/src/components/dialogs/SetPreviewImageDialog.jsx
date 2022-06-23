@@ -13,7 +13,7 @@ import {
   ModalHeader,
 } from 'reactstrap'
 
-import {saveFileResource, updateFileResource} from '../../api'
+import {save, update} from '../../api'
 import AppContext from '../AppContext'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaRenderingHintsForm from './mediaAdder/MediaRenderingHintsForm'
@@ -21,9 +21,9 @@ import MediaSelector from './mediaAdder/MediaSelector'
 
 const submitFileResource = async (apiContextPath, fileResource, isUpdate) => {
   if (!fileResource.uuid) {
-    fileResource = await saveFileResource(apiContextPath, fileResource)
+    fileResource = await save(apiContextPath, fileResource, 'fileResource')
   } else if (isUpdate) {
-    fileResource = updateFileResource(apiContextPath, fileResource)
+    fileResource = update(apiContextPath, fileResource, 'fileResource')
   }
   return fileResource
 }
