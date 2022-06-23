@@ -50,7 +50,7 @@ class AgentRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can update an ageint")
+  @DisplayName("can update an agent")
   void testUpdate() {
     Agent agent = repo.save(Agent.builder().label("Test").build());
     agent.setLabel("changed test");
