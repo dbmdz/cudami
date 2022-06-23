@@ -6,7 +6,10 @@ import initI18n from '../i18n'
 export default function ({apiContextPath, id, uiLocale}) {
   initI18n(uiLocale)
   ReactDOM.render(
-    <PagedIdentifierTypeList apiContextPath={apiContextPath} />,
+    <PagedIdentifierTypeList
+      apiContextPath={apiContextPath}
+      uiLocale={uiLocale}
+    />,
     document.getElementById(id),
   )
 }
