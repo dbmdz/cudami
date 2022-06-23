@@ -79,7 +79,7 @@ const CorporateBodyList = ({
                 />
               </td>
               <td className="text-center">
-                {formatDate(new Date(lastModified), uiLocale)}
+                {formatDate(lastModified, uiLocale)}
               </td>
               <td className="text-center">
                 <ActionButtons

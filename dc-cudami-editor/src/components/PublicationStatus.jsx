@@ -3,21 +3,27 @@ import {FaCircle} from 'react-icons/fa'
 
 const PublicationStatus = ({publicationEnd, publicationStart}) => {
   const {t} = useTranslation()
-  let color = ''
+  const publicationStartDate =
+    publicationStart instanceof Date
+      ? publicationStart
+      : new Date(publicationStart)
+  const publicationEndDate =
+    publicationEnd instanceof Date ? publicationEnd : new Date(publicationEnd)
   const now = Date.now()
+  let color = ''
   let publicationStatus = ''
-  if (!publicationStart || publicationStart.getTime() > now) {
+  if (!publicationStartDate || publicationStartDate.getTime() > now) {
     color = 'warning'
     publicationStatus = 'notYetPublished'
   } else if (
-    publicationStart.getTime() <= now &&
-    (!publicationEnd || publicationEnd.getTime() > now)
+    publicationStartDate.getTime() <= now &&
+    (!publicationEndDate || publicationEndDate.getTime() > now)
   ) {
     color = 'success'
     publicationStatus = 'currentlyPublished'
   } else if (
-    publicationStart.getTime() <= now &&
-    publicationEnd.getTime() <= now
+    publicationStartDate.getTime() <= now &&
+    publicationEndDate.getTime() <= now
   ) {
     color = 'danger'
     publicationStatus = 'noLongerPublished'
