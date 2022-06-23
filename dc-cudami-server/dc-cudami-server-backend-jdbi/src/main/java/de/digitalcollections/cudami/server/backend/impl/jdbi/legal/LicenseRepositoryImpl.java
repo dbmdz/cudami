@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.legal;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.legal.LicenseRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -156,6 +157,12 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
       default:
         return null;
     }
+  }
+
+  @Override
+  protected List<String> getSearchTermTemplates(String tableAlias) {
+    return new ArrayList<>(
+        Arrays.asList(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "url")));
   }
 
   @Override
