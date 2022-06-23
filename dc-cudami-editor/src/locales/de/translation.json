@@ -110,6 +110,8 @@
       "geoLocation_other": "{{ formattedCount }} Orte gefunden",
       "identifierType_one": "{{ formattedCount }} Identifikatortyp gefunden",
       "identifierType_other": "{{ formattedCount }} Identifikatortypen gefunden",
+      "license_one": "{{ formattedCount }} Lizenz gefunden",
+      "license_other": "{{ formattedCount }} Lizenzen gefunden",
       "person_one": "{{ formattedCount }} Person gefunden",
       "person_other": "{{ formattedCount }} Personen gefunden",
       "project_one": "{{ formattedCount }} Projekt gefunden",
@@ -135,6 +137,7 @@
     "startDate": "Publikationsstart"
   },
   "translation": {
+    "acronym": "Akronym",
     "actions": "Aktionen",
     "activated": "aktiviert",
     "add": "Hinzufügen",
@@ -297,6 +300,8 @@
     "geoLocation_other": "Orte",
     "identifierType_one": "Identifikatortyp",
     "identifierType_other": "Identifikatortypen",
+    "license_one": "Lizenz",
+    "license_other": "Lizenzen",
     "person_one": "Person",
     "person_other": "Personen",
     "project_one": "Projekt",
