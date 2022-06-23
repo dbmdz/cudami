@@ -1,4 +1,5 @@
 export function formatDate(date, locale, onlyDate = false) {
+  const dateToFormat = date instanceof Date ? date : new Date(date)
   const options = {
     day: '2-digit',
     hour12: false,
@@ -6,9 +7,9 @@ export function formatDate(date, locale, onlyDate = false) {
     year: 'numeric',
   }
   if (onlyDate) {
-    return date?.toLocaleDateString(locale, options)
+    return dateToFormat.toLocaleDateString(locale, options)
   }
-  return date?.toLocaleString(locale, {
+  return dateToFormat.toLocaleString(locale, {
     ...options,
     hour: '2-digit',
     minute: '2-digit',

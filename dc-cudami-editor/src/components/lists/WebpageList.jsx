@@ -50,8 +50,6 @@ const WebpageItem = forwardRef(
     } = identifiable
     const {apiContextPath, uiLocale} = useContext(AppContext)
     const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
-    const publicationEndDate = publicationEnd && new Date(publicationEnd)
-    const publicationStartDate = publicationStart && new Date(publicationStart)
     const [
       indexCol,
       publicationStatusCol,
@@ -77,8 +75,8 @@ const WebpageItem = forwardRef(
         </td>
         <td className="text-center" style={{width: publicationStatusCol}}>
           <PublicationStatus
-            publicationEnd={publicationEndDate}
-            publicationStart={publicationStartDate}
+            publicationEnd={publicationEnd}
+            publicationStart={publicationStart}
           />
         </td>
         <td className="text-center">
@@ -101,13 +99,13 @@ const WebpageItem = forwardRef(
           )}
         </td>
         <td style={{width: publicationStartCol}}>
-          {formatDate(publicationStartDate, uiLocale, true)}
+          {formatDate(publicationStart, uiLocale, true)}
         </td>
         <td style={{width: publicationEndCol}}>
-          {formatDate(publicationEndDate, uiLocale, true)}
+          {formatDate(publicationEnd, uiLocale, true)}
         </td>
         <td className="text-center" style={{width: lastModifiedCol}}>
-          {formatDate(new Date(lastModified), uiLocale)}
+          {formatDate(lastModified, uiLocale)}
         </td>
         <td className="text-center" style={{width: actionsCol}}>
           <ActionButtons
