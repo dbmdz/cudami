@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [6.0.0](https://github.com/dbmdz/cudami/releases/tag/6.0.0) - 2022-06-23
+
 ### Added
 
 - Handling of `LinkedDataFileResources`
@@ -18,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- **Breaking** Using `digitalcollections-model` in version `10.0.0` (affects the client)
+- **Breaking** Using `digitalcollections-model` in version `10` (affects the client)
 - Database update for the updated `DigitalObject`
 - Fill new fields of `DigitalObject`, when a single `DigitalObject` is returned
 - Improved `Identifier` handling by avoiding useless deletions and re-insertions
@@ -31,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Normalize method names: `getBy` for returning one object, `findBy` for returning a list of objects, "set" for saving a list after deleting previous list
 - Set default case sensitivity for sorting to `ignoreCase`
 - Fixed copy&paste of `iframe`, `image` and `video` blocks in the editor
+- Fixed delivery of multilingual UrlAliases
 
 ### Removed
 
