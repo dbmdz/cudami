@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
         + ", :language, :publicationDate, :publicationPlace, :publisher, :version, "
-        + ":exemplifiesManifestation, :manifestation, :holder_uuids::UUID[], :partOfItem";
+        + ":exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -77,11 +78,11 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + tableAlias
         + ".manifestation "
         + mappingPrefix
-        + "_manifestation, "
+        + "_manifestation_uuid, "
         + tableAlias
         + ".part_of_item "
         + mappingPrefix
-        + "_part_of_item, "
+        + "_part_of_item_uuid, "
         + AgentRepositoryImpl.getSqlSelectReducedFields(
             "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
   }
@@ -98,7 +99,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public static String getSqlUpdateFieldValues() {
     return EntityRepositoryImpl.getSqlUpdateFieldValues()
         + ", language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version, "
-        + "exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation, holder_uuids=:holder_uuids, part_of_item=:partOfItem";
+        + "exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
@@ -110,12 +111,26 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class);
             Item item = map.get(itemUuid);
             Agent holder = rowView.getRow(Agent.class);
+            UUID partOfItemUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
+            UUID manifestationUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_manifestation_uuid", UUID.class);
+            // holders
             if (item.getHolders() == null) {
               item.setHolders(new ArrayList<Agent>());
             }
             if (holder != null && !item.getHolders().contains(holder)) {
               item.getHolders().add(holder);
             }
+            // partOfItem
+            if (partOfItemUuid != null && item.getPartOfItem() == null) {
+              item.setPartOfItem(Item.builder().uuid(partOfItemUuid).build());
+            }
+            // manifestation
+            if (manifestationUuid != null && item.getManifestation() == null) {
+              item.setManifestation(Manifestation.builder().uuid(manifestationUuid).build());
+            }
+
             return map;
           };
 

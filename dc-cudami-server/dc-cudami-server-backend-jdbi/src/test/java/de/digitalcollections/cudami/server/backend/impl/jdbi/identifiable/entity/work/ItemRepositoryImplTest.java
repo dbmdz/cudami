@@ -64,6 +64,15 @@ public class ItemRepositoryImplTest {
     Agent holder0 = corporateBodyRepository.save((CorporateBody) holders.get(0));
     assertThat(holders.get(0).getUuid()).isNotNull();
 
+    Item enclosingItem =
+        Item.builder()
+            .label(Locale.GERMAN, "Gesamt-Buch")
+            .exemplifiesManifestation(false)
+            .identifier("mdz-sig", "Sig")
+            .title(Locale.GERMAN, "Ein Gesamt-Buchtitel")
+            .build();
+    Item savedEnclosingItem = repo.save(enclosingItem);
+
     Item item =
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
@@ -71,6 +80,7 @@ public class ItemRepositoryImplTest {
             .identifier("mdz-sig", "Signatur")
             .title(Locale.GERMAN, "Ein Buchtitel")
             .holders(holders)
+            .partOfItem(savedEnclosingItem)
             .build();
 
     Item storedItem = repo.save(item);
@@ -78,6 +88,8 @@ public class ItemRepositoryImplTest {
     assertThat(storedItem).isEqualTo(retrievedItem);
     assertThat(retrievedItem.getHolders().size()).isEqualTo(1);
     assertThat(retrievedItem.getHolders().get(0)).isEqualTo(holder0);
+    assertThat(retrievedItem.getPartOfItem()).isNotNull();
+    assertThat(retrievedItem.getPartOfItem().getUuid()).isEqualTo(savedEnclosingItem.getUuid());
   }
 
   @Test
