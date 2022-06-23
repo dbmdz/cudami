@@ -14,11 +14,11 @@ import {
 } from 'reactstrap'
 
 import {
-  loadDefaultLanguage,
-  loadIdentifiable,
-  saveIdentifiable,
+  getByUuid,
+  getDefaultLanguage,
+  save,
   typeToEndpointMapping,
-  updateIdentifiable,
+  update,
 } from '../../api'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
@@ -26,8 +26,8 @@ import LanguageTab from '../LanguageTab'
 import ActionButtons from './ActionButtons'
 
 const loadData = async (context, type, uuid) => {
-  const defaultLanguage = await loadDefaultLanguage(context)
-  const template = await loadIdentifiable(context, type, uuid)
+  const defaultLanguage = await getDefaultLanguage(context)
+  const template = await getByUuid(context, type, uuid)
   return {
     defaultLanguage,
     template,
@@ -36,8 +36,8 @@ const loadData = async (context, type, uuid) => {
 
 const submitData = async (context, data, type, uuid) => {
   const {error = false} = await (uuid
-    ? updateIdentifiable(context, data, type)
-    : saveIdentifiable(context, data, type))
+    ? update(context, data, type)
+    : save(context, data, type))
   return error
 }
 

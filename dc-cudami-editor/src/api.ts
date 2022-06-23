@@ -46,7 +46,7 @@ export const typeToEndpointMapping: Record<string, string> = {
   website: 'websites',
 }
 
-export async function addAttachedIdentifiable(
+export async function addAttachedObject(
   contextPath: string,
   parentType: string,
   parentUuid: string,
@@ -64,9 +64,9 @@ export async function addAttachedIdentifiable(
   }
 }
 
-export async function addAttachedIdentifiables(
+export async function addAttachedObjects(
   contextPath: string,
-  identifiables: any[],
+  objects: any[],
   parentType: string,
   parentUuid: string,
   type: string,
@@ -74,7 +74,7 @@ export async function addAttachedIdentifiables(
   const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
   try {
     const response = await fetch(url, {
-      body: JSON.stringify(identifiables),
+      body: JSON.stringify(objects),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -106,56 +106,7 @@ export async function changeUserStatus(
   }
 }
 
-export async function findByIdentifier(
-  contextPath: string,
-  id: string,
-  namespace: string,
-  type: string,
-) {
-  const url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
-  try {
-    const response = await fetch(url)
-    if (!response.ok) {
-      return {}
-    }
-    return await response.json()
-  } catch (err) {
-    return {}
-  }
-}
-
-export async function generateSlug(
-  contextPath: string,
-  language: string,
-  slug: string,
-  websiteUuid: string,
-) {
-  let url = `${contextPath}api/${
-    typeToEndpointMapping.urlAlias
-  }/slug/${language}/${encodeURIComponent(slug)}`
-  if (websiteUuid) {
-    url += `/${websiteUuid}`
-  }
-  try {
-    const response = await fetch(url)
-    return await response.json()
-  } catch (err) {
-    return slug
-  }
-}
-
-export async function getConfig(contextPath: string) {
-  const url = `${contextPath}api/${typeToEndpointMapping.config}`
-  try {
-    const response = await fetch(url)
-    const json = await response.json()
-    return json
-  } catch (err) {
-    return {}
-  }
-}
-
-export async function loadAttachedIdentifiables(
+export async function findAttachedObjects(
   contextPath: string,
   parentType: string,
   parentUuid: string,
@@ -184,44 +135,7 @@ export async function loadAttachedIdentifiables(
   }
 }
 
-export async function loadAvailableLanguages(contextPath: string) {
-  const url = `${contextPath}api/${typeToEndpointMapping.language}`
-  try {
-    const response = await fetch(url)
-    return await response.json()
-  } catch (err) {
-    return []
-  }
-}
-
-export async function loadDefaultLanguage(contextPath: string) {
-  const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
-  try {
-    const response = await fetch(url)
-    return await response.json()
-  } catch (err) {
-    return 'en'
-  }
-}
-
-export async function loadIdentifiable(
-  contextPath: string,
-  type: string,
-  uuid = 'new',
-) {
-  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
-  try {
-    const response = await fetch(url)
-    if (!response.ok) {
-      return {}
-    }
-    return await response.json()
-  } catch (err) {
-    return {}
-  }
-}
-
-export async function loadRootIdentifiables(
+export async function findRootObjects(
   contextPath: string,
   type: string,
   {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
@@ -251,7 +165,93 @@ export async function loadRootIdentifiables(
   }
 }
 
-export async function loadUser(
+export async function generateSlug(
+  contextPath: string,
+  language: string,
+  slug: string,
+  websiteUuid: string,
+) {
+  let url = `${contextPath}api/${
+    typeToEndpointMapping.urlAlias
+  }/slug/${language}/${encodeURIComponent(slug)}`
+  if (websiteUuid) {
+    url += `/${websiteUuid}`
+  }
+  try {
+    const response = await fetch(url)
+    return await response.json()
+  } catch (err) {
+    return slug
+  }
+}
+
+export async function getAvailableLanguages(contextPath: string) {
+  const url = `${contextPath}api/${typeToEndpointMapping.language}`
+  try {
+    const response = await fetch(url)
+    return await response.json()
+  } catch (err) {
+    return []
+  }
+}
+
+export async function getByIdentifier(
+  contextPath: string,
+  id: string,
+  namespace: string,
+  type: string,
+) {
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/identifier/${namespace}:${id}`
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return {}
+    }
+    return await response.json()
+  } catch (err) {
+    return {}
+  }
+}
+
+export async function getByUuid(
+  contextPath: string,
+  type: string,
+  uuid = 'new',
+) {
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${uuid}`
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      return {}
+    }
+    return await response.json()
+  } catch (err) {
+    return {}
+  }
+}
+
+export async function getConfig(contextPath: string) {
+  const url = `${contextPath}api/${typeToEndpointMapping.config}`
+  try {
+    const response = await fetch(url)
+    const json = await response.json()
+    return json
+  } catch (err) {
+    return {}
+  }
+}
+
+export async function getDefaultLanguage(contextPath: string) {
+  const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
+  try {
+    const response = await fetch(url)
+    return await response.json()
+  } catch (err) {
+    return 'en'
+  }
+}
+
+export async function getUser(
   contextPath: string,
   {admin = false, uuid = 'new'},
 ) {
@@ -267,7 +267,7 @@ export async function loadUser(
   }
 }
 
-export async function removeAttachedIdentifiable(
+export async function removeAttachedObject(
   contextPath: string,
   parentType: string,
   parentUuid: string,
@@ -285,13 +285,9 @@ export async function removeAttachedIdentifiable(
   }
 }
 
-export async function saveFileResource(contextPath: string, fileResource: any) {
-  return await saveIdentifiable(contextPath, fileResource, 'fileResource')
-}
-
-export async function saveIdentifiable(
+export async function save(
   contextPath: string,
-  identifiable: any,
+  object: any,
   type: string,
   {parentType, parentUuid}: Record<string, string> = {},
 ) {
@@ -301,7 +297,7 @@ export async function saveIdentifiable(
   }
   try {
     const response = await fetch(url, {
-      body: JSON.stringify(identifiable),
+      body: JSON.stringify(object),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -360,7 +356,7 @@ export async function saveOrUpdateUser(
   }
 }
 
-export async function searchIdentifiables(
+export async function search(
   contextPath: string,
   type: string,
   {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
@@ -410,44 +406,11 @@ export async function searchMedia(
   }
 }
 
-export async function updateAttachedIdentifiablesOrder(
-  contextPath: string,
-  identifiables: any[],
-  parentType: string,
-  parentUuid: string,
-  type: string,
-) {
-  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
+export async function update(contextPath: string, object: any, type: string) {
+  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${object.uuid}`
   try {
     const response = await fetch(url, {
-      body: JSON.stringify(identifiables),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'PUT',
-    })
-    return response.ok
-  } catch (err) {
-    return false
-  }
-}
-
-export async function updateFileResource(
-  contextPath: string,
-  fileResource: any,
-) {
-  return await updateIdentifiable(contextPath, fileResource, 'fileResource')
-}
-
-export async function updateIdentifiable(
-  contextPath: string,
-  identifiable: any,
-  type: string,
-) {
-  const url = `${contextPath}api/${typeToEndpointMapping[type]}/${identifiable.uuid}`
-  try {
-    const response = await fetch(url, {
-      body: JSON.stringify(identifiable),
+      body: JSON.stringify(object),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -459,6 +422,28 @@ export async function updateIdentifiable(
     return await response.json()
   } catch (err) {
     return {error: err}
+  }
+}
+
+export async function updateAttachedObjectsOrder(
+  contextPath: string,
+  objects: any[],
+  parentType: string,
+  parentUuid: string,
+  type: string,
+) {
+  const url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}`
+  try {
+    const response = await fetch(url, {
+      body: JSON.stringify(objects),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'PUT',
+    })
+    return response.ok
+  } catch (err) {
+    return false
   }
 }
 

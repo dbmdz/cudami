@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 
-import {loadRootIdentifiables} from '../api'
+import {findRootObjects} from '../api'
 
 const usePagination = (apiContextPath, type, orders = []) => {
   const [content, setContent] = useState([])
@@ -11,7 +11,7 @@ const usePagination = (apiContextPath, type, orders = []) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [totalElements, setTotalElements] = useState(0)
   const loadData = async () => {
-    const {content, totalElements} = await loadRootIdentifiables(
+    const {content, totalElements} = await findRootObjects(
       apiContextPath,
       type,
       {pageNumber, pageSize, searchTerm, sorting: {orders}},

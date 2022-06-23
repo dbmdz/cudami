@@ -24,7 +24,7 @@ import {
 } from 'reactstrap'
 import {useContext} from 'use-context-selector'
 
-import {generateSlug, loadRootIdentifiables} from '../../api'
+import {findRootObjects, generateSlug} from '../../api'
 import {toggleAllUrlAliases} from '../../state/actions'
 import {Context} from '../../state/Store'
 import AppContext from '../AppContext'
@@ -139,7 +139,7 @@ const AddUrlAliasesDialog = ({
               activeLanguage={activeLanguage}
               maxElements={5}
               onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                loadRootIdentifiables(contextPath, 'website', {
+                findRootObjects(contextPath, 'website', {
                   pageNumber,
                   pageSize,
                   searchTerm,

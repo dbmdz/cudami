@@ -13,7 +13,7 @@ import {
   ModalHeader,
 } from 'reactstrap'
 
-import {saveFileResource, updateFileResource} from '../../api'
+import {save, update} from '../../api'
 import AppContext from '../AppContext'
 import MediaMetadataForm from './mediaAdder/MediaMetadataForm'
 import MediaPreviewImage from './mediaAdder/MediaPreviewImage'
@@ -32,10 +32,10 @@ const addToEditor = (attributes, mediaType, resourceId, uri) => {
 const submitFileResource = async (apiContextPath, fileResource, isUpdate) => {
   let resourceId = fileResource.uuid
   if (!resourceId) {
-    const {uuid} = await saveFileResource(apiContextPath, fileResource)
+    const {uuid} = await save(apiContextPath, fileResource, 'fileResource')
     resourceId = uuid
   } else if (isUpdate) {
-    updateFileResource(apiContextPath, fileResource)
+    update(apiContextPath, fileResource, 'fileResource')
   }
   return resourceId
 }

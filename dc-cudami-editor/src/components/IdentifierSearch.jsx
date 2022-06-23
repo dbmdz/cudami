@@ -10,7 +10,7 @@ import {
   Row,
 } from 'reactstrap'
 
-import {findByIdentifier, loadIdentifiable} from '../api'
+import {getByIdentifier, getByUuid} from '../api'
 import AppContext from './AppContext'
 import FeedbackMessage from './FeedbackMessage'
 import InputWithSpinner from './InputWithSpinner'
@@ -26,8 +26,8 @@ const search = async (
     (i) => i.namespace === namespace,
   )
   const suggestion = await (isFixedIdentifier
-    ? loadIdentifiable(apiContextPath, type, id)
-    : findByIdentifier(apiContextPath, id, namespace, type))
+    ? getByUuid(apiContextPath, type, id)
+    : getByIdentifier(apiContextPath, id, namespace, type))
   return suggestion
 }
 
