@@ -110,6 +110,8 @@
       "geoLocation_other": "found {{ formattedCount }} geolocations",
       "identifierType_one": "found {{ formattedCount }} identifier type",
       "identifierType_other": "found {{ formattedCount }} identifier types",
+      "license_one": "found {{ formattedCount }} license",
+      "license_other": "found {{ formattedCount }} licenses",
       "person_one": "found {{ formattedCount }} person",
       "person_other": "found {{ formattedCount }} persons",
       "project_one": "found {{ formattedCount }} project",
@@ -135,6 +137,7 @@
     "startDate": "Start of publication"
   },
   "translation": {
+    "acronym": "Acronym",
     "actions": "Actions",
     "activated": "activated",
     "add": "Add",
@@ -297,6 +300,8 @@
     "geoLocation_other": "Geolocations",
     "identifierType_one": "Identifier type",
     "identifierType_other": "Identifier types",
+    "license_one": "License",
+    "license_other": "Licenses",
     "person_one": "Person",
     "person_other": "Persons",
     "project_one": "Project",

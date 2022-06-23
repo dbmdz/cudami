@@ -36,6 +36,7 @@ export const typeToEndpointMapping: Record<string, string> = {
   geoLocation: 'geolocations',
   identifierType: 'identifiertypes',
   language: 'languages',
+  license: 'licenses',
   person: 'persons',
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
