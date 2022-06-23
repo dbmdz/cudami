@@ -10,9 +10,10 @@ import DeactiveUserDialog from '../dialogs/DeactiveUserDialog'
 import FeedbackMessage from '../FeedbackMessage'
 import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
+import {formatDate} from '../utils'
 import ActionButtons from './ActionButtons'
 
-const PagedUserList = ({apiContextPath = '/'}) => {
+const PagedUserList = ({apiContextPath = '/', uiLocale}) => {
   const type = 'user'
   const {
     content: users,
@@ -110,12 +111,24 @@ const PagedUserList = ({apiContextPath = '/'}) => {
                 )}`}</th>
                 <th className="text-center">{t('roles')}</th>
                 <th className="text-center">{t('status')}</th>
+                <th className="text-center">{t('lastModified')}</th>
                 <th className="text-center">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
               {users.map(
-                ({email, enabled, firstname, lastname, roles, uuid}, index) => (
+                (
+                  {
+                    email,
+                    enabled,
+                    firstname,
+                    lastModified,
+                    lastname,
+                    roles,
+                    uuid,
+                  },
+                  index,
+                ) => (
                   <tr key={uuid}>
                     <td className="text-right">
                       {index + 1 + pageNumber * pageSize}
@@ -134,6 +147,9 @@ const PagedUserList = ({apiContextPath = '/'}) => {
                         })}
                         title={enabled ? t('activated') : t('deactivated')}
                       />
+                    </td>
+                    <td className="text-center">
+                      {formatDate(lastModified, uiLocale)}
                     </td>
                     <td className="text-center">
                       <ActionButtons
