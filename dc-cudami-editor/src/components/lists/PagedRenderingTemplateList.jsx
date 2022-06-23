@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 
-import {loadDefaultLanguage, typeToEndpointMapping} from '../../api'
+import {getDefaultLanguage, typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import LanguageTab from '../LanguageTab'
 import ListSearch from '../ListSearch'
@@ -28,7 +28,7 @@ const PagedRenderingTemplateList = ({apiContextPath = '/', uiLocale}) => {
   const [defaultLanguage, setDefaultLanguage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   useEffect(() => {
-    loadDefaultLanguage(apiContextPath).then((defaultLanguage) =>
+    getDefaultLanguage(apiContextPath).then((defaultLanguage) =>
       setDefaultLanguage(defaultLanguage),
     )
   }, [])

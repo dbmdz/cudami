@@ -17,7 +17,7 @@ import {
   Row,
 } from 'reactstrap'
 
-import {searchIdentifiables} from '../../api'
+import {search} from '../../api'
 import AppContext from '../AppContext'
 import Autocomplete from '../Autocomplete'
 import FeedbackMessage from '../FeedbackMessage'
@@ -109,7 +109,7 @@ const AddAttachedIdentifiablesDialog = ({
                   <Autocomplete
                     activeLanguage={activeLanguage}
                     onSearch={(contextPath, searchTerm, pageNumber, pageSize) =>
-                      searchIdentifiables(contextPath, type, {
+                      search(contextPath, type, {
                         pageNumber,
                         pageSize,
                         searchTerm,

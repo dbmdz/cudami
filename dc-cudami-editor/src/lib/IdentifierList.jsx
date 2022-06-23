@@ -1,11 +1,11 @@
 import ReactDOM from 'react-dom'
 
-import {loadRootIdentifiables} from '../api'
+import {findRootObjects} from '../api'
 import IdentifierList from '../components/IdentifierList'
 
 export default async function ({apiContextPath, id, identifiers}) {
   const pageSize = 20
-  const {content: identifierTypes} = await loadRootIdentifiables(
+  const {content: identifierTypes} = await findRootObjects(
     apiContextPath,
     'identifierType',
     {
