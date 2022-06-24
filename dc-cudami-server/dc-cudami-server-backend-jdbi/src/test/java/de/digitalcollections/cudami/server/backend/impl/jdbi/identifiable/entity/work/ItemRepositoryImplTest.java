@@ -14,6 +14,10 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Gender;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -215,5 +219,31 @@ public class ItemRepositoryImplTest {
 
     assertThat(updatedItem.getHolders().size()).isEqualTo(2);
     assertThat(updatedItem.getHolders()).contains(holdersInDb.get(0), holdersInDb.get(2));
+  }
+
+  @Test
+  @DisplayName("can filter by the is_part_of uuid")
+  void testIsPartOfFiltering() {
+    Item parentItem = repo.save(Item.builder().label("parent").build());
+    Item expectedItem = repo.save(Item.builder().partOfItem(parentItem).label("expected").build());
+
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber(0)
+            .pageSize(100)
+            .filtering(
+                Filtering.builder()
+                    .add(
+                        FilterCriterion.builder()
+                            .withExpression("part_of_item.uuid")
+                            .isEquals(parentItem.getUuid())
+                            .build())
+                    .build())
+            .build();
+    PageResponse<Item> actualPageResponse = repo.find(pageRequest);
+
+    Item actualItem = actualPageResponse.getContent().get(0);
+
+    assertThat(actualItem).isEqualTo(expectedItem);
   }
 }

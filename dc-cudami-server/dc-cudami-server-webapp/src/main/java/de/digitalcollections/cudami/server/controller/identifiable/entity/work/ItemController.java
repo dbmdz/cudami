@@ -105,7 +105,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       pageRequest.setSorting(sorting);
     }
     if (partOfItemUuidFilterCriterion != null) {
-      partOfItemUuidFilterCriterion.setExpression("part_of_item");
+      partOfItemUuidFilterCriterion.setExpression("part_of_item.uuid");
       pageRequest.setFiltering(new Filtering(List.of(partOfItemUuidFilterCriterion)));
     }
     return itemService.find(pageRequest);

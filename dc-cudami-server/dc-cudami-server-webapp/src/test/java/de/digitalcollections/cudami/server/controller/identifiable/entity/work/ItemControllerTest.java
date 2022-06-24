@@ -10,9 +10,14 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -133,5 +138,26 @@ class ItemControllerTest extends BaseControllerTest {
                 .encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
     verify(itemService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+  }
+
+  @DisplayName("can filter items by the uuid of their \"parent\" item")
+  @Test
+  public void filterByPartOfItemUuid() throws Exception {
+    UUID uuid = UUID.randomUUID();
+    testHttpGet("/v6/items?pageNumber=0&pageSize=100&part_of_item.uuid=eq:" + uuid);
+    PageRequest expectedPageRequest =
+        PageRequest.builder()
+            .pageNumber(0)
+            .pageSize(100)
+            .filtering(
+                Filtering.builder()
+                    .add(
+                        FilterCriterion.builder()
+                            .withExpression("part_of_item.uuid")
+                            .isEquals(uuid)
+                            .build())
+                    .build())
+            .build();
+    verify(itemService, times(1)).find(eq(expectedPageRequest));
   }
 }

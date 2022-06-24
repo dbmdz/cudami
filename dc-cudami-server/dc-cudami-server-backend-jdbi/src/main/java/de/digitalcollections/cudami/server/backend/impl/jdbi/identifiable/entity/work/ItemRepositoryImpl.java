@@ -223,7 +223,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       return super.getColumnName(modelProperty);
     }
     switch (modelProperty) {
-      case "part_of_item":
+      case "part_of_item.uuid":
         return tableAlias + ".part_of_item";
       default:
         return null;
