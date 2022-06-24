@@ -6,6 +6,10 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.UUID;
@@ -36,5 +40,27 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
 
   public List getWorks(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(String.format("%s/%s/works", baseEndpoint, uuid), Work.class);
+  }
+
+  public PageResponse<Item> getAllForParent(Item parent) throws TechnicalException {
+    if (parent == null) {
+      throw new TechnicalException("Empty parent");
+    }
+
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(10000).build();
+    return getAllForParent(parent, pageRequest);
+  }
+
+  public PageResponse<Item> getAllForParent(Item parent, PageRequest pageRequest)
+      throws TechnicalException {
+    pageRequest.add(
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("part_of_item.uuid")
+                    .isEquals(parent.getUuid())
+                    .build())
+            .build());
+    return find(pageRequest);
   }
 }

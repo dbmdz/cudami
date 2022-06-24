@@ -8,6 +8,8 @@ import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdent
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -27,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,11 +96,17 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "part_of_item.uuid", required = false)
+          FilterCriterion<UUID> partOfItemUuidFilterCriterion) {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
+    }
+    if (partOfItemUuidFilterCriterion != null) {
+      partOfItemUuidFilterCriterion.setExpression("part_of_item");
+      pageRequest.setFiltering(new Filtering(List.of(partOfItemUuidFilterCriterion)));
     }
     return itemService.find(pageRequest);
   }
@@ -203,5 +212,23 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     }
 
     return itemService.update(item);
+  }
+
+  @Operation(summary = "Delete an item")
+  @DeleteMapping(
+      value = {"/v6/items/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid) {
+    boolean successful;
+    try {
+      successful = itemService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }
