@@ -110,7 +110,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
           (map, rowView) -> {
             UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class);
             Item item = map.get(itemUuid);
-            Agent holder = rowView.getRow(Agent.class);
+
+            Agent holder = null;
+            if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+                != null) {
+              holder = rowView.getRow(Agent.class);
+            }
+
             UUID partOfItemUuid =
                 rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
             UUID manifestationUuid =
