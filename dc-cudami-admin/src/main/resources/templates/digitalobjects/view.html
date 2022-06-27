@@ -45,11 +45,7 @@
               </div>
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
-                <div class="col-md-9">
-                  <ul class="list-inline">
-                    <li class="list-inline-item" th:each="identifier: *{identifiers}" th:text="|${identifier.namespace}:${identifier.id}|">Namespace:ID</li>
-                  </ul>
-                </div>
+                <div class="col-md-9" id="identifiers-list"></div>
               </div>
             </div>
           </div>
@@ -62,6 +58,12 @@
                 <div th:replace="fragments/identifiable::renderTeaser(${digitalObject}, ${language})"></div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="mt-3 row">
+          <div class="col-sm-12">
+            <div id="digitalobjects-list"></div>
           </div>
         </div>
 
@@ -85,7 +87,22 @@
       addLanguageChangeHandler()
     </script>
     <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:src="@{/js/identifier-list.bundle.js}"></script>
     <script th:inline="javascript">
+      IdentifierList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        id: "identifiers-list",
+        identifiers: /*[[${digitalObject.identifiers}]]*/ []
+      });
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        existingLanguages: /*[[${existingContainedDigitalObjectLanguages}]]*/ [],
+        id: "digitalobjects-list",
+        parentType: "digitalObject",
+        parentUuid: /*[[${digitalObject.uuid}]]*/ '',
+        type: "digitalObject",
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
         existingLanguages: /*[[${existingCollectionLanguages}]]*/ [],

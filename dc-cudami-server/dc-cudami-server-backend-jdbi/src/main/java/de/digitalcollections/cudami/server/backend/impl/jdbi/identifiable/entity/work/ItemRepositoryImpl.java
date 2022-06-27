@@ -4,17 +4,22 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
+import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +37,15 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
-        + ", language, publication_date, publication_place, publisher, version";
+        + ", language, publication_date, publication_place, publisher, version, "
+        + "exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :language, :publicationDate, :publicationPlace, :publisher, :version";
+        + ", :language, :publicationDate, :publicationPlace, :publisher, :version, "
+        + ":exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -63,8 +70,27 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + tableAlias
         + ".version "
         + mappingPrefix
-        + "_version";
+        + "_version, "
+        + tableAlias
+        + ".exemplifies_manifestation "
+        + mappingPrefix
+        + "_exemplifies_manifestation, "
+        + tableAlias
+        + ".manifestation "
+        + mappingPrefix
+        + "_manifestation_uuid, "
+        + tableAlias
+        + ".part_of_item "
+        + mappingPrefix
+        + "_part_of_item_uuid, "
+        + AgentRepositoryImpl.getSqlSelectReducedFields(
+            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
   }
+
+  public static final String SQL_SELECT_ALL_FIELDS_JOINS =
+      String.format(
+          " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids) ",
+          AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
@@ -72,11 +98,41 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   public static String getSqlUpdateFieldValues() {
     return EntityRepositoryImpl.getSqlUpdateFieldValues()
-        + ", language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version";
+        + ", language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version, "
+        + "exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
+
+  private static final BiFunction<Map<UUID, Item>, RowView, Map<UUID, Item>>
+      ADDITIONAL_REDUCE_ROWS_BIFUNCTION =
+          (map, rowView) -> {
+            UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class);
+            Item item = map.get(itemUuid);
+            Agent holder = rowView.getRow(Agent.class);
+            UUID partOfItemUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
+            UUID manifestationUuid =
+                rowView.getColumn(MAPPING_PREFIX + "_manifestation_uuid", UUID.class);
+            // holders
+            if (item.getHolders() == null) {
+              item.setHolders(new ArrayList<Agent>());
+            }
+            if (holder != null && !item.getHolders().contains(holder)) {
+              item.getHolders().add(holder);
+            }
+            // partOfItem
+            if (partOfItemUuid != null && item.getPartOfItem() == null) {
+              item.setPartOfItem(Item.builder().uuid(partOfItemUuid).build());
+            }
+            // manifestation
+            if (manifestationUuid != null && item.getManifestation() == null) {
+              item.setManifestation(Manifestation.builder().uuid(manifestationUuid).build());
+            }
+
+            return map;
+          };
 
   @Autowired
   public ItemRepositoryImpl(
@@ -95,6 +151,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         getSqlInsertFields(),
         getSqlInsertValues(),
         getSqlUpdateFieldValues(),
+        SQL_SELECT_ALL_FIELDS_JOINS,
+        ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
@@ -144,6 +202,18 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return true;
   }
 
+  private UUID[] extractHolderUuids(Item item) {
+    if (item == null || item.getHolders() == null || item.getHolders().isEmpty()) {
+      return null;
+    }
+    return item.getHolders().stream()
+        .collect(
+            ArrayList<UUID>::new,
+            (result, holder) -> result.add(holder.getUuid()),
+            ArrayList::addAll)
+        .toArray(new UUID[1]);
+  }
+
   @Override
   public Set<DigitalObject> getDigitalObjects(UUID itemUuid) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
@@ -159,7 +229,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + doTableAlias
                 + ".uuid = ido.digitalobject_uuid"
                 + " WHERE ido.item_uuid = :uuid"
-                + " ORDER BY idx ASC");
+                + " ORDER BY ido.sortindex ASC");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", itemUuid);
     List<DigitalObject> result =
@@ -213,7 +283,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + wTableAlias
                 + ".uuid = iw.work_uuid"
                 + " WHERE iw.item_uuid = :uuid"
-                + " ORDER BY idx ASC");
+                + " ORDER BY iw.sortindex ASC");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", itemUuid);
     List<Work> result =
@@ -234,14 +304,18 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   @Override
   public Item save(Item item) {
-    super.save(item);
+    HashMap<String, Object> bindings = new HashMap<>();
+    bindings.put("holder_uuids", extractHolderUuids(item));
+    super.save(item, bindings);
     Item result = getByUuid(item.getUuid());
     return result;
   }
 
   @Override
   public Item update(Item item) {
-    super.update(item);
+    HashMap<String, Object> bindings = new HashMap<>();
+    bindings.put("holder_uuids", extractHolderUuids(item));
+    super.update(item, bindings);
     Item result = getByUuid(item.getUuid());
     return result;
   }

@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -16,6 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Corporate body controller")
-public class CorporateBodyController {
+public class CorporateBodyController extends AbstractIdentifiableController<CorporateBody> {
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
@@ -38,6 +41,11 @@ public class CorporateBodyController {
 
   public CorporateBodyController(CorporateBodyService corporateBodyservice) {
     this.corporateBodyService = corporateBodyservice;
+  }
+
+  @Override
+  protected IdentifiableService<CorporateBody> getService() {
+    return corporateBodyService;
   }
 
   @Operation(summary = "Fetch a corporate body by GND-ID from external system and save it")
@@ -78,25 +86,21 @@ public class CorporateBodyController {
     return corporateBodyService.find(searchPageRequest);
   }
 
-  @Operation(summary = "Get corporate body by namespace and id")
+  @Operation(
+      summary = "Get a corporate body by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/corporatebodies/identifier/{namespace}:{id}",
-        "/v6/corporatebodies/identifier/{namespace}:{id}.json",
-        "/v5/corporatebodies/identifier/{namespace}:{id}",
-        "/v5/corporatebodies/identifier/{namespace}:{id}.json",
-        "/v3/corporatebodies/identifier/{namespace}:{id}",
-        "/v3/corporatebodies/identifier/{namespace}:{id}.json",
-        "/latest/corporatebodies/identifier/{namespace}:{id}",
-        "/latest/corporatebodies/identifier/{namespace}:{id}.json"
+        "/v6/corporatebodies/identifier/**",
+        "/v5/corporatebodies/identifier/**",
+        "/v3/corporatebodies/identifier/**",
+        "/latest/corporatebodies/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public CorporateBody getByIdentifier(
-      @Parameter(example = "", description = "namespace of identifier") @PathVariable("namespace")
-          String namespace,
-      @Parameter(example = "", description = "id of identifier") @PathVariable("id") String id)
-      throws IdentifiableServiceException {
-    return corporateBodyService.getByIdentifier(namespace, id);
+  public ResponseEntity<CorporateBody> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get corporate body by refId")

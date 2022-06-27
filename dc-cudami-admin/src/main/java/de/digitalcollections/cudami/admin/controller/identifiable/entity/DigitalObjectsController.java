@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -31,11 +32,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DigitalObjectsController extends AbstractController {
 
   private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
   private final CudamiDigitalObjectsClient service;
 
   public DigitalObjectsController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
     this.service = client.forDigitalObjects();
   }
 
@@ -103,6 +106,31 @@ public class DigitalObjectsController extends AbstractController {
     return service.getByUuid(uuid);
   }
 
+  @GetMapping("/api/digitalobjects/{uuid}/digitalobjects")
+  @ResponseBody
+  public PageResponse<DigitalObject> getContainedDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      throws TechnicalException {
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber(pageNumber)
+            .pageSize(pageSize)
+            .searchTerm(searchTerm)
+            .sorting(
+                Sorting.builder()
+                    .order(
+                        Order.builder()
+                            .property("label")
+                            .subProperty(localeService.getDefaultLanguage().getLanguage())
+                            .build())
+                    .build())
+            .build();
+    return service.getAllForParent(DigitalObject.builder().uuid(uuid).build(), pageRequest);
+  }
+
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -124,12 +152,21 @@ public class DigitalObjectsController extends AbstractController {
     if (digitalObject == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingCollectionLanguages = this.service.getLanguagesOfCollections(uuid),
-        existingProjectLanguages = this.service.getLanguagesOfProjects(uuid);
+
+    Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingCollectionLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfCollections(uuid));
+    List<Locale> existingProjectLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfProjects(uuid));
+    List<Locale> existingContainedDigitalObjectLanguages =
+        languageSortingHelper.sortLanguages(
+            displayLocale, service.getLanguagesOfContainedDigitalObjects(uuid));
 
     model
         .addAttribute("digitalObject", digitalObject)
         .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
+        .addAttribute(
+            "existingContainedDigitalObjectLanguages", existingContainedDigitalObjectLanguages)
         .addAttribute("existingProjectLanguages", existingProjectLanguages);
     return "digitalobjects/view";
   }

@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -16,8 +18,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -73,21 +79,30 @@ public class EntityController<E extends Entity> {
     return entityService.find(pageRequest);
   }
 
-  @Operation(summary = "Get entity by namespace and id")
+  @Operation(
+      summary = "Get an entity by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/entities/identifier/{namespace}:{id}",
-        "/v6/entities/identifier/{namespace}:{id}.json",
-        "/v5/entities/identifier/{namespace}:{id}",
-        "/v5/entities/identifier/{namespace}:{id}.json",
-        "/latest/entities/identifier/{namespace}:{id}",
-        "/latest/entities/identifier/{namespace}:{id}.json"
+        "/v6/entities/identifier/**",
+        "/v5/entities/identifier/**",
+        "/latest/entities/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity getByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws IdentifiableServiceException {
-    Entity entity = entityService.getByIdentifier(namespace, id);
-    return entity;
+  public ResponseEntity<Entity> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    Pair<String, String> namespaceAndId =
+        ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
+    if (namespaceAndId.getLeft().isBlank()
+        || (namespaceAndId.getRight() == null || namespaceAndId.getRight().isBlank())) {
+      throw new ValidationException(
+          "No namespace and/or id were provided in a colon separated manner");
+    }
+
+    Entity entity =
+        entityService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get entity by reference id")

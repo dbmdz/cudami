@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,8 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
@@ -70,5 +73,50 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
 
     verify(fileResourceMetadataService, times(1)).find(pageRequestArgumentCaptor.capture());
     assertThat(pageRequestArgumentCaptor.getValue()).isEqualTo(expectedPageRequest);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/fileresources/identifier/foo:bar",
+        "/v5/fileresources/identifier/foo:bar",
+        "/v2/fileresources/identifier/foo:bar",
+        "/latest/fileresources/identifier/foo:bar",
+        "/v6/fileresources/identifier/foo:bar.json",
+        "/v5/fileresources/identifier/foo:bar.json",
+        "/v2/fileresources/identifier/foo:bar.json",
+        "/latest/fileresources/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    FileResource expected = FileResource.builder().build();
+
+    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/fileresources/identifier/",
+        "/v5/fileresources/identifier/",
+        "/v2/fileresources/identifier/",
+        "/latest/fileresources/identifier/"
+      })
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    FileResource expected = FileResource.builder().build();
+
+    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar/bla")))
+        .thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }

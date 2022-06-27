@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -34,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Work controller")
-public class WorkController {
+public class WorkController extends AbstractIdentifiableController<Work> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
@@ -42,6 +44,11 @@ public class WorkController {
 
   public WorkController(WorkService workService) {
     this.workService = workService;
+  }
+
+  @Override
+  protected IdentifiableService<Work> getService() {
+    return workService;
   }
 
   @Operation(summary = "count all works")
@@ -69,23 +76,21 @@ public class WorkController {
     return workService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a work by namespace and id")
+  @Operation(
+      summary = "Get a work by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/works/identifier/{namespace}:{id}",
-        "/v6/works/identifier/{namespace}:{id}.json",
-        "/v5/works/identifier/{namespace}:{id}",
-        "/v5/works/identifier/{namespace}:{id}.json",
-        "/v2/works/identifier/{namespace}:{id}",
-        "/v2/works/identifier/{namespace}:{id}.json",
-        "/latest/works/identifier/{namespace}:{id}",
-        "/latest/works/identifier/{namespace}:{id}.json"
+        "/v6/works/identifier/**",
+        "/v5/works/identifier/**",
+        "/v2/works/identifier/**",
+        "/latest/works/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Work> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    Work result = workService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<Work> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a work by namespace and id")

@@ -39,8 +39,6 @@ export const typeToEndpointMapping: Record<string, string> = {
   person: 'persons',
   project: 'projects',
   renderingTemplate: 'renderingtemplates',
-  subcollection: 'subcollections',
-  subtopic: 'subtopics',
   topic: 'topics',
   urlAlias: 'urlaliases',
   user: 'users',

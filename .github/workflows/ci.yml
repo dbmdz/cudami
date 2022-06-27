@@ -2,9 +2,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [ main, release/* ]
+    branches: [ main, release/*, wip-item ]
   push:
-    branches: [ main, release/* ]
+    branches: [ main, release/*, wip-item ]
   release:
     types: [ published ]
   workflow_dispatch:

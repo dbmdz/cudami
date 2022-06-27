@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -33,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Human settlement controller")
-public class HumanSettlementController {
+public class HumanSettlementController extends AbstractIdentifiableController<HumanSettlement> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementController.class);
 
@@ -41,6 +43,11 @@ public class HumanSettlementController {
 
   public HumanSettlementController(HumanSettlementService humanSettlementService) {
     this.humanSettlementService = humanSettlementService;
+  }
+
+  @Override
+  protected IdentifiableService<HumanSettlement> getService() {
+    return humanSettlementService;
   }
 
   @Operation(summary = "get all human settlements")
@@ -60,24 +67,21 @@ public class HumanSettlementController {
     return humanSettlementService.find(pageRequest);
   }
 
-  @Operation(summary = "Get a human settlement by namespace and id")
+  @Operation(
+      summary = "Get a geolocation by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/humansettlements/identifier/{namespace}:{id}",
-        "/v6/humansettlements/identifier/{namespace}:{id}.json",
-        "/v5/humansettlements/identifier/{namespace}:{id}",
-        "/v5/humansettlements/identifier/{namespace}:{id}.json",
-        "/v2/humansettlements/identifier/{namespace}:{id}",
-        "/v2/humansettlements/identifier/{namespace}:{id}",
-        "/v2/humansettlements/identifier/{namespace}:{id}.json",
-        "/latest/humansettlements/identifier/{namespace}:{id}",
-        "/latest/humansettlements/identifier/{namespace}:{id}.json"
+        "/v6/humansettlements/identifier/**",
+        "/v5/humansettlements/identifier/**",
+        "/v2/humansettlements/identifier/**",
+        "/latest/humansettlements/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<HumanSettlement> getByIdentifier(
-      @PathVariable String namespace, @PathVariable String id) throws IdentifiableServiceException {
-    HumanSettlement result = humanSettlementService.getByIdentifier(namespace, id);
-    return new ResponseEntity<>(result, HttpStatus.OK);
+  public ResponseEntity<HumanSettlement> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a human settlement by namespace and id")

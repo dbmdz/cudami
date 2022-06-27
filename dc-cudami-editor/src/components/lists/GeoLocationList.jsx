@@ -5,10 +5,10 @@ import {Table} from 'reactstrap'
 
 import {typeToEndpointMapping} from '../../api'
 import AppContext from '../AppContext'
+import IdentifierList from '../IdentifierList'
 import PreviewImage from '../PreviewImage'
 import {formatDate} from '../utils'
 import ActionButtons from './ActionButtons'
-import IdentifierList from './IdentifierList'
 
 const GeoLocationList = ({
   enableMove,
@@ -79,7 +79,7 @@ const GeoLocationList = ({
                 />
               </td>
               <td className="text-center">
-                {formatDate(new Date(lastModified), uiLocale)}
+                {formatDate(lastModified, uiLocale)}
               </td>
               <td className="text-center">
                 <ActionButtons

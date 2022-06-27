@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +32,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "HeadwordEntry controller")
-public class HeadwordEntryController {
+public class HeadwordEntryController extends AbstractIdentifiableController<HeadwordEntry> {
 
   private final HeadwordEntryService headwordEntryService;
 
   public HeadwordEntryController(HeadwordEntryService headwordEntryService) {
     this.headwordEntryService = headwordEntryService;
+  }
+
+  @Override
+  protected IdentifiableService<HeadwordEntry> getService() {
+    return headwordEntryService;
   }
 
   @Operation(summary = "Get count of headwordentries")
@@ -80,23 +88,16 @@ public class HeadwordEntryController {
     return headwordEntryService.getByHeadword(uuid);
   }
 
-  @Operation(summary = "Get an headwordentry by namespace and id")
+  @Operation(
+      summary = "Get a headword entry by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
-      value = {
-        "/v6/headwordentries/identifier/{namespace}:{id}",
-        "/v6/headwordentries/identifier/{namespace}:{id}.json",
-        "/v5/headwordentries/identifier/{namespace}:{id}",
-        "/v5/headwordentries/identifier/{namespace}:{id}.json"
-      },
+      value = {"/v6/headwordentries/identifier/**", "/v5/headwordentries/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public HeadwordEntry getByIdentifier(
-      @Parameter(example = "", description = "Namespace of the identifier")
-          @PathVariable("namespace")
-          String namespace,
-      @Parameter(example = "", description = "value of the identifier") @PathVariable("id")
-          String id)
-      throws IdentifiableServiceException {
-    return headwordEntryService.getByIdentifier(namespace, id);
+  public ResponseEntity<HeadwordEntry> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get an headwordentry")

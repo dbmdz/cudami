@@ -7,9 +7,10 @@ import {typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
+import {formatDate} from '../utils'
 import ActionButtons from './ActionButtons'
 
-const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
+const PagedIdentifierTypeList = ({apiContextPath = '/', uiLocale}) => {
   const type = 'identifierType'
   const {
     content: identifierTypes,
@@ -29,8 +30,8 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
     <>
       <Row>
         <Col>
-          {/* We want to force the usage of the plural form here */}
-          <h1>{t(`types:${type}_other`)}</h1>
+          {/* We want to force the usage of the plural form here (0 as count activates it) */}
+          <h1>{t(`types:${type}`, {count: 0})}</h1>
         </Col>
         <Col className="text-right">
           <Button
@@ -68,12 +69,13 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
                 <th className="text-center">{t('label')}</th>
                 <th className="text-center">{t('namespace')}</th>
                 <th className="text-center">{t('pattern')}</th>
+                <th className="text-center">{t('lastModified')}</th>
                 <th className="text-center">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
               {identifierTypes.map(
-                ({label, namespace, pattern, uuid}, index) => (
+                ({label, lastModified, namespace, pattern, uuid}, index) => (
                   <tr key={uuid}>
                     <td className="text-right">
                       {index + 1 + pageNumber * pageSize}
@@ -81,6 +83,9 @@ const PagedIdentifierTypeList = ({apiContextPath = '/'}) => {
                     <td>{label}</td>
                     <td>{namespace}</td>
                     <td>{pattern}</td>
+                    <td className="text-center">
+                      {formatDate(lastModified, uiLocale)}
+                    </td>
                     <td className="text-center">
                       <ActionButtons
                         editUrl={`${apiContextPath}${typeToEndpointMapping[type]}/${uuid}/edit`}

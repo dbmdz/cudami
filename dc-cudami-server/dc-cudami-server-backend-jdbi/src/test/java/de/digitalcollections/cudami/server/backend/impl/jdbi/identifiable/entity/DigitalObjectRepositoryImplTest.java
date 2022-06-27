@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
@@ -20,6 +22,7 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.legal.License;
@@ -29,7 +32,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
 import de.digitalcollections.model.text.LocalizedText;
@@ -45,7 +47,10 @@ import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,6 +65,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     classes = {DigitalObjectRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @DisplayName("The DigitalObject Repository")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DigitalObjectRepositoryImplTest {
 
   DigitalObjectRepositoryImpl repo;
@@ -88,6 +94,7 @@ class DigitalObjectRepositoryImplTest {
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
   @Autowired private PersonRepositoryImpl personRepositoryImpl;
+  @Autowired private ItemRepository itemRepository;
 
   private static final License EXISTING_LICENSE =
       License.builder()
@@ -226,7 +233,11 @@ class DigitalObjectRepositoryImplTest {
     pageRequest.setSearchTerm(query);
     pageRequest.setSorting(
         Sorting.builder()
-            .order(Order.builder().property("refId").direction(Direction.ASC).build())
+            .order(
+                de.digitalcollections.model.list.sorting.Order.builder()
+                    .property("refId")
+                    .direction(Direction.ASC)
+                    .build())
             .build());
 
     PageResponse response = repo.find(pageRequest);
@@ -314,6 +325,45 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actualCreationInfo.getCreator().getLabel().getText(Locale.GERMAN))
         .isEqualTo("Körperschaft");
     assertThat(actual.getParent()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("save item UUID with digital object and retrieve it properly")
+  void saveAndRetrieveItemUuid() {
+    DigitalObject digitalObject = buildDigitalObject();
+    Item item =
+        Item.builder()
+            .label(Locale.GERMAN, "Ein Buch")
+            .exemplifiesManifestation(false)
+            .identifier("mdz-sig", "Signatur")
+            .title(Locale.GERMAN, "Ein Buchtitel")
+            .build();
+    Item savedItem = itemRepository.save(item);
+    assertThat(savedItem.getUuid()).isNotNull();
+
+    digitalObject.setItem(savedItem);
+    DigitalObject savedDigitalObject = repo.save(digitalObject);
+    assertThat(savedDigitalObject.getUuid()).isNotNull();
+    assertThat(savedDigitalObject.getItem().getUuid()).isEqualTo(savedItem.getUuid());
+    DigitalObject retrieved = repo.getByUuid(savedDigitalObject.getUuid());
+    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(savedItem.getUuid()).build());
+  }
+
+  @Test
+  @Order(Integer.MAX_VALUE)
+  @DisplayName("")
+  void returnLanguages() {
+    List<Locale> allLanguages = repo.getLanguages();
+    assertThat(allLanguages).containsAll(List.of(Locale.GERMAN, Locale.ENGLISH));
+
+    DigitalObject digitalObject = buildDigitalObject();
+    LocalizedText label = digitalObject.getLabel();
+    label.put(Locale.KOREAN, "테스트");
+    digitalObject = repo.save(digitalObject);
+    List<Locale> languagesOfContainedDigitalObjects =
+        repo.getLanguagesOfContainedDigitalObjects(digitalObject.getParent().getUuid());
+    assertThat(languagesOfContainedDigitalObjects)
+        .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
   // -----------------------------------------------------------------

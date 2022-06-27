@@ -57,53 +57,47 @@ const CollectionList = ({
               uuid,
             },
             index,
-          ) => {
-            const publicationEndDate =
-              publicationEnd && new Date(publicationEnd)
-            const publicationStartDate =
-              publicationStart && new Date(publicationStart)
-            return (
-              <tr key={uuid}>
-                <td className="text-right">
-                  {index + 1 + pageNumber * pageSize}
-                </td>
-                <td className="text-center">
-                  <PublicationStatus
-                    publicationEnd={publicationEndDate}
-                    publicationStart={publicationStartDate}
-                  />
-                </td>
-                <td className="text-center">
-                  <PreviewImage
-                    image={previewImage}
-                    renderingHints={previewImageRenderingHints}
-                    width={30}
-                  />
-                </td>
-                <td>
-                  {label[language] && (
-                    <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
-                  )}
-                </td>
-                <td>{formatDate(publicationStartDate, uiLocale, true)}</td>
-                <td>{formatDate(publicationEndDate, uiLocale, true)}</td>
-                <td className="text-center">
-                  {formatDate(new Date(lastModified), uiLocale)}
-                </td>
-                <td className="text-center">
-                  <ActionButtons
-                    enableMove={enableMove}
-                    enableRemove={enableRemove}
-                    onMove={() => onMove(index)}
-                    onRemove={() => onRemove(index)}
-                    parentType={parentType}
-                    showEdit={showEdit}
-                    viewUrl={`${viewBaseUrl}/${uuid}`}
-                  />
-                </td>
-              </tr>
-            )
-          },
+          ) => (
+            <tr key={uuid}>
+              <td className="text-right">
+                {index + 1 + pageNumber * pageSize}
+              </td>
+              <td className="text-center">
+                <PublicationStatus
+                  publicationEnd={publicationEnd}
+                  publicationStart={publicationStart}
+                />
+              </td>
+              <td className="text-center">
+                <PreviewImage
+                  image={previewImage}
+                  renderingHints={previewImageRenderingHints}
+                  width={30}
+                />
+              </td>
+              <td>
+                {label[language] && (
+                  <a href={`${viewBaseUrl}/${uuid}`}>{label[language]}</a>
+                )}
+              </td>
+              <td>{formatDate(publicationStart, uiLocale, true)}</td>
+              <td>{formatDate(publicationEnd, uiLocale, true)}</td>
+              <td className="text-center">
+                {formatDate(lastModified, uiLocale)}
+              </td>
+              <td className="text-center">
+                <ActionButtons
+                  enableMove={enableMove}
+                  enableRemove={enableRemove}
+                  onMove={() => onMove(index)}
+                  onRemove={() => onRemove(index)}
+                  parentType={parentType}
+                  showEdit={showEdit}
+                  viewUrl={`${viewBaseUrl}/${uuid}`}
+                />
+              </td>
+            </tr>
+          ),
         )}
       </tbody>
     </Table>

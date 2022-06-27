@@ -8,6 +8,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.We
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -27,6 +31,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     webEnvironment = WebEnvironment.MOCK,
     classes = {WebsiteRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Website Repository")
 class WebsiteRepositoryImplTest {
 
@@ -65,6 +70,34 @@ class WebsiteRepositoryImplTest {
     Website actual = repo.save(website);
 
     assertThat(actual.getEntityType()).isEqualTo(EntityType.WEBSITE);
+    assertThat(actual.getUuid()).isNotNull();
+  }
+
+  @Test
+  @DisplayName("save a website with notes")
+  void saveWebsiteWithNotes() {
+    var noteContent1 = new StructuredContent();
+    noteContent1.addContentBlock(new Text("eine Bemerkung"));
+    var note1 = new LocalizedStructuredContent();
+    note1.put(Locale.GERMAN, noteContent1);
+
+    var noteContent2 = new StructuredContent();
+    noteContent2.addContentBlock(new Text("zweite Bemerkung"));
+    var note2 = new LocalizedStructuredContent();
+    note2.put(Locale.GERMAN, noteContent2);
+    Website website =
+        Website.builder()
+            .label(Locale.GERMAN, "digiPress")
+            .url("https://digipress.digitale-sammlungen.de")
+            .registrationDate("2022-05-04")
+            .rootPages(List.of(Webpage.builder().build()))
+            .note(note1)
+            .note(note2)
+            .build();
+
+    Website actual = repo.save(website);
+
+    assertThat(actual.getNotes()).isEqualTo(website.getNotes());
     assertThat(actual.getUuid()).isNotNull();
   }
 }

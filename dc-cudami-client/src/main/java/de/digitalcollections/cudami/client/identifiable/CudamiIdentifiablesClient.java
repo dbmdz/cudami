@@ -12,9 +12,11 @@ import de.digitalcollections.model.list.sorting.NullHandling;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.apache.commons.codec.binary.Base64;
 
 public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRestClient<I> {
 
@@ -65,9 +67,22 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
     return findByLanguageAndInitial(pageRequest, language, initial);
   }
 
+  /**
+   * Retrieves an Identifiable by its namespace and id
+   *
+   * @param namespace the namespace. Must be plain text, not encoded in any way
+   * @param id the id. Must be in plain text, not encoded in any way
+   * @return the Identifiable or null
+   * @throws TechnicalException in case of an error
+   */
   public I getByIdentifier(String namespace, String id) throws TechnicalException {
+    String namespaceAndId = namespace + ":" + id;
+
+    String encodedNamespaceAndId =
+        Base64.encodeBase64URLSafeString(namespaceAndId.getBytes(StandardCharsets.UTF_8));
+
     return doGetRequestForObject(
-        String.format(baseEndpoint + "/identifier/%s:%s.json", namespace, id));
+        String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
   }
 
   public I getByUuidAndLocale(UUID uuid, Locale locale) throws TechnicalException {

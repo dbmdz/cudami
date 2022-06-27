@@ -36,6 +36,10 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
                 <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
               </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
+                <div class="col-md-9" id="identifiers-list"></div>
+              </div>
               <div class="row" th:if="*{homepageUrl}">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{homepage}">Homepage</label></div>
                 <div class="col-md-9"><a th:href="*{homepageUrl}" th:text="*{homepageUrl}" target="_blank">http://www.example.de/</a></div>
@@ -74,6 +78,14 @@
     <script>
       addLanguageChangeHandler()
       moveEditButtonToNavbar()
+    </script>
+    <script th:src="@{/js/identifier-list.bundle.js}"></script>
+    <script th:inline="javascript">
+      IdentifierList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        id: "identifiers-list",
+        identifiers: /*[[${corporateBody.identifiers}]]*/ []
+      });
     </script>
   </section>
 </body>

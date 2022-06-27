@@ -70,18 +70,6 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   }
 
   @Test
-  @DisplayName("can get by identifier")
-  public void testGetByIdentifier() throws Exception {
-    String identifierNamespace = "gnd";
-    String identifierValue = "1234567-8";
-
-    client.getByIdentifier(identifierNamespace, identifierValue);
-
-    verifyHttpRequestByMethodAndRelativeURL(
-        "get", "/identifier/" + identifierNamespace + ":" + identifierValue + ".json");
-  }
-
-  @Test
   @DisplayName("can get by UUID and locale")
   public void testGetByUuidAndLocale() throws Exception {
     UUID uuid = UUID.randomUUID();
@@ -99,5 +87,12 @@ public abstract class BaseCudamiIdentifiablesClientTest<
     client.getByUuidAndLocale(uuid, locale);
 
     verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid + "?locale=" + locale);
+  }
+
+  @Test
+  @DisplayName("calls getByIdentifier with Base64 URL safe encoded data")
+  public void testGetByIdentifierBase64Encoded() throws Exception {
+    client.getByIdentifier("foo", "bar/baz");
+    verifyHttpRequestByMethodAndRelativeURL("get", "/identifier/Zm9vOmJhci9iYXo");
   }
 }

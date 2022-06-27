@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +34,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Project controller")
-public class ProjectController {
+public class ProjectController extends AbstractIdentifiableController<Project> {
 
   private final ProjectService projectService;
 
   public ProjectController(ProjectService projectService) {
     this.projectService = projectService;
+  }
+
+  @Override
+  protected IdentifiableService<Project> getService() {
+    return projectService;
   }
 
   @Operation(summary = "Add an existing digital object to an existing project")
@@ -150,22 +158,21 @@ public class ProjectController {
     return projectService.findDigitalObjects(project, searchPageRequest);
   }
 
-  @Operation(summary = "Get project by namespace and id")
+  @Operation(
+      summary = "Get a project by namespace and id",
+      description =
+          "Separate namespace and id with a colon, e.g. foo:bar. It is also possible, to add a .json suffix, which will be ignored then")
   @GetMapping(
       value = {
-        "/v6/projects/identifier/{namespace}:{id}",
-        "/v6/projects/identifier/{namespace}:{id}.json",
-        "/v5/projects/identifier/{namespace}:{id}",
-        "/v5/projects/identifier/{namespace}:{id}.json",
-        "/v3/projects/identifier/{namespace}:{id}",
-        "/v3/projects/identifier/{namespace}:{id}.json",
-        "/latest/projects/identifier/{namespace}:{id}",
-        "/latest/projects/identifier/{namespace}:{id}.json"
+        "/v6/projects/identifier/**",
+        "/v5/projects/identifier/**",
+        "/v3/projects/identifier/**",
+        "/latest/projects/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Project getByIdentifier(@PathVariable String namespace, @PathVariable String id)
-      throws IdentifiableServiceException {
-    return projectService.getByIdentifier(namespace, id);
+  public ResponseEntity<Project> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException {
+    return super.getByIdentifier(request);
   }
 
   @Operation(summary = "Get a project by uuid")

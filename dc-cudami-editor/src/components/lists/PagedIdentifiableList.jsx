@@ -145,8 +145,6 @@ class PagedIdentifiableList extends Component {
       geoLocation: GeoLocationList,
       person: PersonList,
       project: ProjectList,
-      subcollection: CollectionList,
-      subtopic: TopicList,
       topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,
@@ -413,12 +411,12 @@ class PagedIdentifiableList extends Component {
           <Col>
             {/*
               We want to force the usage of the plural form here
-              (0 as count also activates it)
+              (0 as count activates it)
             */}
             {parentType ? (
               <h2>{t(`types:${type}`, {context: parentType, count: 0})}</h2>
             ) : (
-              <h1>{t(`types:${type}_other`)}</h1>
+              <h1>{t(`types:${type}`, {count: 0})}</h1>
             )}
           </Col>
           <Col className="text-right">

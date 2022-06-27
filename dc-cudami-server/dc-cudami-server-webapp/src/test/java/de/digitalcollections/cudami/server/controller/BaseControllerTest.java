@@ -203,6 +203,27 @@ public abstract class BaseControllerTest {
   }
 
   /**
+   * Checks, if an HTTP GET request to a path is successful and returns status 200
+   *
+   * @param path the path of the HTTP GET request
+   * @throws Exception in case of an error
+   */
+  protected void testHttpGet(String path) throws Exception {
+    mockMvc.perform(get(path)).andExpect(status().isOk());
+  }
+
+  /**
+   * Checks, if an HTTP GET request to a path returns the expected status code
+   *
+   * @param path the path of the HTTP GET request
+   * @param expectedStatus the expected Status
+   * @throws Exception in case of an error
+   */
+  protected void testHttpGetWithExpectedStatus(String path, int expectedStatus) throws Exception {
+    mockMvc.perform(get(path)).andExpect(status().is(expectedStatus));
+  }
+
+  /**
    * Check, if the HTML result from a GET request to the given path matches the contents of a HTML
    * file, which lies in src/test/resources under the identically constructed path ( and a .html
    * suffix of the file name)

@@ -1,11 +1,15 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.Project;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,5 +40,49 @@ class ProjectControllerTest extends BaseControllerTest {
     when(projectService.getByUuid(eq(expected.getUuid()))).thenReturn(expected);
 
     testJson(path);
+  }
+
+  @DisplayName("can retrieve by identifier with plaintext id")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/projects/identifier/foo:bar",
+        "/v5/projects/identifier/foo:bar",
+        "/v3/projects/identifier/foo:bar",
+        "/latest/projects/identifier/foo:bar",
+        "/v6/projects/identifier/foo:bar.json",
+        "/v5/projects/identifier/foo:bar.json",
+        "/v3/projects/identifier/foo:bar.json",
+        "/latest/projects/identifier/foo:bar.json"
+      })
+  void testGetByIdentifierWithPlaintextId(String path) throws Exception {
+    Project expected = Project.builder().build();
+
+    when(projectService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+
+    testHttpGet(path);
+
+    verify(projectService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+  }
+
+  @DisplayName("can retrieve by identifier with base 64 encoded data")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/projects/identifier/",
+        "/v5/projects/identifier/",
+        "/v3/projects/identifier/",
+        "/latest/projects/identifier/"
+      })
+  void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
+    Project expected = Project.builder().build();
+
+    when(projectService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+
+    testHttpGet(
+        basePath
+            + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
+
+    verify(projectService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
 }
