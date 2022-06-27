@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
-import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -261,17 +260,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
+  protected void extendReducedIdentifiable(DigitalObject identifiable, RowView rowView) {
     super.extendReducedIdentifiable(identifiable, rowView);
-
-    if (!(identifiable instanceof DigitalObject)) {
-      return;
-    }
 
     // Fill the parent (empty, only with uuid), if present.
     UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
     if (parentUuid != null) {
-      ((DigitalObject) identifiable).setParent(DigitalObject.builder().uuid(parentUuid).build());
+      identifiable.setParent(DigitalObject.builder().uuid(parentUuid).build());
     }
   }
 

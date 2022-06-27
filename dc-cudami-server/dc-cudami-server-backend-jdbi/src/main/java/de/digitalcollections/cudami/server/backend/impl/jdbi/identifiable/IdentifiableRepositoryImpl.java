@@ -365,7 +365,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
    * @param identifiable the reduced Identifiable
    * @param rowView the rowView
    */
-  protected void extendReducedIdentifiable(Identifiable identifiable, RowView rowView) {
+  protected void extendReducedIdentifiable(I identifiable, RowView rowView) {
     // do nothing by default
   }
 
