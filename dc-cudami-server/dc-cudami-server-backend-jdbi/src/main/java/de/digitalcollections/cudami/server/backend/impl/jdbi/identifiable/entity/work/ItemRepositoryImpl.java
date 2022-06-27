@@ -225,14 +225,11 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     if (modelProperty == null) {
       return null;
     }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
     switch (modelProperty) {
       case "part_of_item.uuid":
         return tableAlias + ".part_of_item";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
