@@ -235,16 +235,22 @@ public class ItemRepositoryImplTest {
         repo.save(
             Item.builder()
                 .partOfItem(parentItem)
-                .label("expected")
+                .label("testSetHolderAndPartofItemUuidInSearchResult")
                 .holders(List.of(holder))
                 .build());
 
-    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(100).build();
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber(0)
+            .pageSize(100)
+            .searchTerm("testSetHolderAndPartofItemUuidInSearchResult")
+            .build();
 
     PageResponse<Item> actualPageResponse = repo.find(pageRequest);
 
+    assertThat(actualPageResponse.getTotalElements()).isEqualTo(1);
     Item actualItem = actualPageResponse.getContent().get(0);
-
+    expectedItem.setPartOfItem(Item.builder().uuid(expectedItem.getPartOfItem().getUuid()).build());
     assertThat(actualItem).isEqualTo(expectedItem);
   }
 

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -74,11 +73,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + tableAlias
         + ".exemplifies_manifestation "
         + mappingPrefix
-        + "_exemplifies_manifestation, "
-        + tableAlias
-        + ".manifestation "
-        + mappingPrefix
-        + "_manifestation_uuid ";
+        + "_exemplifies_manifestation";
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
@@ -110,41 +105,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
 
-  private static final BiFunction<Map<UUID, Item>, RowView, Map<UUID, Item>>
-      ADDITIONAL_REDUCE_ROWS_BIFUNCTION =
-          (map, rowView) -> {
-            UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class);
-            Item item = map.get(itemUuid);
-
-            Agent holder = null;
-            if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-                != null) {
-              holder = rowView.getRow(Agent.class);
-            }
-
-            UUID partOfItemUuid =
-                rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
-            UUID manifestationUuid =
-                rowView.getColumn(MAPPING_PREFIX + "_manifestation_uuid", UUID.class);
-            // holders
-            if (item.getHolders() == null) {
-              item.setHolders(new ArrayList<Agent>());
-            }
-            if (holder != null && !item.getHolders().contains(holder)) {
-              item.getHolders().add(holder);
-            }
-            // partOfItem
-            if (partOfItemUuid != null && item.getPartOfItem() == null) {
-              item.setPartOfItem(Item.builder().uuid(partOfItemUuid).build());
-            }
-            // manifestation
-            if (manifestationUuid != null && item.getManifestation() == null) {
-              item.setManifestation(Manifestation.builder().uuid(manifestationUuid).build());
-            }
-
-            return map;
-          };
-
   @Autowired
   public ItemRepositoryImpl(
       Jdbi dbi,
@@ -163,7 +123,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         getSqlInsertValues(),
         getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
-        ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
@@ -211,6 +170,34 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 .bind("nextSortIndex", nextSortIndex)
                 .execute());
     return true;
+  }
+
+  @Override
+  protected void extendReducedIdentifiable(Item identifiable, RowView rowView) {
+    super.extendReducedIdentifiable(identifiable, rowView);
+
+    Agent holder = null;
+    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      holder = rowView.getRow(Agent.class);
+    }
+
+    UUID partOfItemUuid = rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
+    UUID manifestationUuid = rowView.getColumn(MAPPING_PREFIX + "_manifestation_uuid", UUID.class);
+    // holders
+    if (identifiable.getHolders() == null) {
+      identifiable.setHolders(new ArrayList<Agent>());
+    }
+    if (holder != null && !identifiable.getHolders().contains(holder)) {
+      identifiable.getHolders().add(holder);
+    }
+    // partOfItem
+    if (partOfItemUuid != null && identifiable.getPartOfItem() == null) {
+      identifiable.setPartOfItem(Item.builder().uuid(partOfItemUuid).build());
+    }
+    // manifestation
+    if (manifestationUuid != null && identifiable.getManifestation() == null) {
+      identifiable.setManifestation(Manifestation.builder().uuid(manifestationUuid).build());
+    }
   }
 
   private UUID[] extractHolderUuids(Item item) {
