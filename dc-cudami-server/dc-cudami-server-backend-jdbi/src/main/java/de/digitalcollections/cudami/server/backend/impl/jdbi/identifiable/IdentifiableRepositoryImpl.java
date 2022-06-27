@@ -718,7 +718,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                   .reduceRows(
                       (Map<UUID, I> map, RowView rowView) -> {
                         basicReduceRowsBiFunction.apply(map, rowView);
-                        additionalReduceRowsBiFunction.apply(map, rowView);
                       })
                   .collect(Collectors.toList());
             });
