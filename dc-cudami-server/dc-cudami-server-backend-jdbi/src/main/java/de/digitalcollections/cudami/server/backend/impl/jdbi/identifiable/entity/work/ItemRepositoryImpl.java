@@ -78,13 +78,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + tableAlias
         + ".manifestation "
         + mappingPrefix
-        + "_manifestation_uuid, "
-        + tableAlias
-        + ".part_of_item "
-        + mappingPrefix
-        + "_part_of_item_uuid, "
-        + AgentRepositoryImpl.getSqlSelectReducedFields(
-            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
+        + "_manifestation_uuid ";
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
@@ -93,7 +87,18 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
           AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
 
   public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".part_of_item "
+        + mappingPrefix
+        + "_part_of_item_uuid, "
+        + tableAlias
+        + ".manifestation "
+        + mappingPrefix
+        + "_manifestation_uuid, "
+        + AgentRepositoryImpl.getSqlSelectReducedFields(
+            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
   }
 
   public static String getSqlUpdateFieldValues() {
