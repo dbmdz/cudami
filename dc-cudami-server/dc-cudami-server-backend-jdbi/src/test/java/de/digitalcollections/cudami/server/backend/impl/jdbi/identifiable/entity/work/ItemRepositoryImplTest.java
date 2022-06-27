@@ -222,6 +222,33 @@ public class ItemRepositoryImplTest {
   }
 
   @Test
+  @DisplayName("return holder and part_of_item uuids in the search result")
+  void testSetHolderAndPartofItemUuidInSearchResult() {
+    CorporateBody holder =
+        corporateBodyRepository.save(
+            CorporateBody.builder()
+                .label(Locale.GERMAN, "A Company")
+                .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
+                .build());
+    Item parentItem = repo.save(Item.builder().label("parent").build());
+    Item expectedItem =
+        repo.save(
+            Item.builder()
+                .partOfItem(parentItem)
+                .label("expected")
+                .holders(List.of(holder))
+                .build());
+
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(100).build();
+
+    PageResponse<Item> actualPageResponse = repo.find(pageRequest);
+
+    Item actualItem = actualPageResponse.getContent().get(0);
+
+    assertThat(actualItem).isEqualTo(expectedItem);
+  }
+
+  @Test
   @DisplayName("can filter by the is_part_of uuid")
   void testIsPartOfFiltering() {
     Item parentItem = repo.save(Item.builder().label("parent").build());
