@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -31,14 +31,14 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
 
   public TopicServiceImpl(
       TopicRepository repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,

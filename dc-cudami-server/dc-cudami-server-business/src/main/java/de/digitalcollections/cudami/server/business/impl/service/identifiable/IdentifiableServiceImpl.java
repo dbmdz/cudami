@@ -2,12 +2,12 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -21,10 +21,8 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,23 +37,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class IdentifiableServiceImpl<I extends Identifiable> implements IdentifiableService<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
+
   private CudamiConfig cudamiConfig;
-  protected IdentifierRepository identifierRepository;
-
+  protected IdentifierService identifierService;
   private LocaleService localeService;
-
   protected IdentifiableRepository<I> repository;
-
   private UrlAliasService urlAliasService;
 
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") IdentifiableRepository<I> repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     this.repository = repository;
-    this.identifierRepository = identifierRepository;
+    this.identifierService = identifierService;
     this.urlAliasService = urlAliasService;
     this.localeService = localeService;
     this.cudamiConfig = cudamiConfig;
@@ -81,27 +77,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     for (UUID uuid : uuids) {
       try {
         urlAliasService.deleteAllForTarget(uuid, true);
-        deleteIdentifiers(uuid);
+        identifierService.deleteByIdentifiable(uuid);
       } catch (CudamiServiceException e) {
         throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
       }
     }
     return repository.delete(uuids);
-  }
-
-  @Override
-  public boolean deleteIdentifiers(UUID identifiableUuid) {
-    I identifiable = repository.getByUuid(identifiableUuid);
-    if (identifiable == null || identifiable.getIdentifiers() == null) {
-      return false;
-    }
-
-    identifierRepository.delete(
-        identifiable.getIdentifiers().stream()
-            .map(Identifier::getUuid)
-            .collect(Collectors.toList()));
-
-    return true;
   }
 
   @Override
@@ -207,7 +188,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
       I savedIdentifiable = repository.save(identifiable);
-      saveIdentifiers(identifiable.getIdentifiers(), savedIdentifiable);
+      savedIdentifiable.setIdentifiers(
+          identifierService.saveForIdentifiable(
+              savedIdentifiable.getUuid(), identifiable.getIdentifiers()));
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
           savedIdentifiable, cudamiConfig, urlAliasService::generateSlug);
@@ -240,23 +223,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
   }
 
-  public void saveIdentifiers(Set<Identifier> identifiers, Identifiable identifiable) {
-    // we assume that identifiers (unique to object) are new (existing ones were deleted before
-    // (e.g. see update))
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        identifier.setIdentifiable(identifiable.getUuid());
-        Identifier savedIdentifier;
-        if (identifier.getUuid() == null) {
-          savedIdentifier = identifierRepository.save(identifier);
-        } else {
-          savedIdentifier = identifierRepository.getByUuid(identifier.getUuid());
-        }
-        identifiable.addIdentifier(savedIdentifier);
-      }
-    }
-  }
-
   protected void setDefaultSorting(PageRequest pageRequest) {
     // business logic: default sorting if no other sorting given: lastModified descending, uuid
     // ascending
@@ -284,38 +250,23 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       identifiableInDb = repository.getByUuid(identifiable.getUuid());
       repository.update(identifiable);
 
-      // Retrieve all identifiers from the database and put them into a map
-      Map<String, Identifier> existingIdentifierMap =
-          identifierRepository.findByIdentifiable(identifiable.getUuid()).stream()
-              .collect(Collectors.toMap(i -> i.getNamespace() + ":" + i.getId(), i -> i));
-      Set<String> existingIdentifiersByNamespaceAndId = existingIdentifierMap.keySet();
-
-      // Build a map of all provided identifiers
-      Map<String, Identifier> providedIdentifierMap =
-          identifiable.getIdentifiers().stream()
-              .collect(
-                  Collectors.toMap(
-                      i -> i.getNamespace() + ":" + i.getId(),
-                      i -> {
-                        i.setIdentifiable(identifiable.getUuid());
-                        return i;
-                      }));
-      Set<String> providedIdentifiersByNamespaceAndId = providedIdentifierMap.keySet();
-
-      // Difference calculations
-      Set<String> obsoleteIdentifiers = new HashSet<>(existingIdentifiersByNamespaceAndId);
-      obsoleteIdentifiers.removeAll(providedIdentifiersByNamespaceAndId);
-
-      Set<String> missingIdentifiers = new HashSet<>(providedIdentifiersByNamespaceAndId);
-      missingIdentifiers.removeAll(existingIdentifiersByNamespaceAndId);
-
-      if (!missingIdentifiers.isEmpty()) {
-        missingIdentifiers.forEach(i -> identifierRepository.save(providedIdentifierMap.get(i)));
-      }
+      Set<Identifier> existingIdentifiers = identifiableInDb.getIdentifiers();
+      Set<Identifier> providedIdentifiers = identifiable.getIdentifiers();
+      Set<Identifier> obsoleteIdentifiers =
+          existingIdentifiers.stream()
+              .filter(i -> !providedIdentifiers.contains(i))
+              .collect(Collectors.toSet());
+      Set<Identifier> missingIdentifiers =
+          providedIdentifiers.stream()
+              .filter(i -> !existingIdentifiers.contains(i))
+              .collect(Collectors.toSet());
 
       if (!obsoleteIdentifiers.isEmpty()) {
-        obsoleteIdentifiers.forEach(
-            i -> identifierRepository.delete(existingIdentifierMap.get(i).getUuid()));
+        identifierService.delete(obsoleteIdentifiers);
+      }
+
+      if (!missingIdentifiers.isEmpty()) {
+        identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
       }
     } catch (Exception e) {
       LOGGER.error("Cannot update identifiable " + identifiable + ": ", e);

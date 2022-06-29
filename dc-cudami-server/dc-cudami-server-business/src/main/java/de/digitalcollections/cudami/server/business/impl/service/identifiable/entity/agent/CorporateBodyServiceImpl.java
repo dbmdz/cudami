@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
@@ -32,14 +32,14 @@ public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
       CorporateBodyRepository repository,
       ExternalCorporateBodyRepository externalRepository,
       ImageFileResourceService imageFileResourceService,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,

@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
@@ -25,14 +25,14 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
 
   public WorkServiceImpl(
       WorkRepository repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,

@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
@@ -28,13 +28,13 @@ public class LinkedDataFileResourceServiceImpl
   @Autowired
   public LinkedDataFileResourceServiceImpl(
       LinkedDataFileResourceRepository linkedDataFileResourceRepository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         linkedDataFileResourceRepository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         localeService,
         cudamiConfig);

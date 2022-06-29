@@ -17,11 +17,11 @@ public interface IdentifierRepository {
 
   void delete(List<UUID> uuids);
 
-  default void deleteByIdentifiable(Identifiable identifiable) {
-    deleteByIdentifiable(identifiable.getUuid());
+  default int deleteByIdentifiable(Identifiable identifiable) {
+    return deleteByIdentifiable(identifiable.getUuid());
   }
 
-  void deleteByIdentifiable(UUID identifiableUuid);
+  int deleteByIdentifiable(UUID identifiableUuid);
 
   PageResponse<Identifier> find(PageRequest pageRequest);
 

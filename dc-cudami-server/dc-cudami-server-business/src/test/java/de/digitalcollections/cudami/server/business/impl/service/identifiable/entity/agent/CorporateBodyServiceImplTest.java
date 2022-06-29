@@ -9,12 +9,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -33,7 +33,7 @@ class CorporateBodyServiceImplTest {
   private CorporateBodyRepository corporateBodyRepository;
   private ExternalCorporateBodyRepository externalCorporateBodyRepository;
   private ImageFileResourceService imageFileResourceService;
-  private IdentifierRepository identifierRepository;
+  private IdentifierService identifierService;
   private UrlAliasService urlAliasService;
   private CudamiConfig cudamiConfig;
 
@@ -47,7 +47,7 @@ class CorporateBodyServiceImplTest {
     imageFileResourceService = mock(ImageFileResourceService.class);
     when(imageFileResourceService.save(eq(null))).thenThrow(new NullPointerException());
 
-    identifierRepository = mock(IdentifierRepository.class);
+    identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
 
     cudamiConfig = mock(CudamiConfig.class);
@@ -61,7 +61,7 @@ class CorporateBodyServiceImplTest {
             corporateBodyRepository,
             externalCorporateBodyRepository,
             imageFileResourceService,
-            identifierRepository,
+            identifierService,
             urlAliasService,
             hookProperties,
             localeService,

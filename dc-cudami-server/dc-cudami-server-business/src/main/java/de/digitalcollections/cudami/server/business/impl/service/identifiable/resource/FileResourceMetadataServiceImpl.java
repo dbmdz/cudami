@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
@@ -55,10 +55,10 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
       TextFileResourceService textFileResourceService,
       VideoFileResourceService videoFileResourceService,
       LocaleService localeService,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       CudamiConfig cudamiConfig) {
-    super(metadataRepository, identifierRepository, urlAliasService, localeService, cudamiConfig);
+    super(metadataRepository, identifierService, urlAliasService, localeService, cudamiConfig);
     this.applicationFileResourceService = applicationFileResourceService;
     this.audioFileResourceService = audioFileResourceService;
     this.imageFileResourceService = imageFileResourceService;
