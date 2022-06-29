@@ -187,6 +187,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
+      try {
+        identifierService.validate(identifiable.getIdentifiers());
+      } catch (ValidationException e) {
+        throw new ValidationException("Validation error: " + e, e);
+      }
       I savedIdentifiable = repository.save(identifiable);
       savedIdentifiable.setIdentifiers(
           identifierService.saveForIdentifiable(
@@ -245,7 +250,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
-    I updatedIdentifiable, identifiableInDb;
+    try {
+      identifierService.validate(identifiable.getIdentifiers());
+    } catch (ValidationException e) {
+      throw new ValidationException("Validation error: " + e, e);
+    }
+    I identifiableInDb;
     try {
       identifiableInDb = repository.getByUuid(identifiable.getUuid());
       repository.update(identifiable);

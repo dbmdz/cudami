@@ -18,6 +18,8 @@ public interface IdentifierTypeRepository {
 
   PageResponse<IdentifierType> find(PageRequest pageRequest);
 
+  List<IdentifierType> findAll();
+
   IdentifierType getByUuid(UUID uuid);
 
   IdentifierType getByNamespace(String namespace);
