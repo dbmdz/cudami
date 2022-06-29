@@ -1,10 +1,13 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.model.identifiable.Identifier;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -58,5 +61,32 @@ public class IdentifierServiceImpl implements IdentifierService {
       }
     }
     return savedIdentifiers;
+  }
+
+  @Override
+  public void validate(Set<Identifier> identifiers) throws ValidationException {
+    Map<String, String> identifierTypes = identifierTypeService.getIdentifierTypeCache();
+    List<String> namespacesNotFound = new ArrayList<>(0);
+    List<String> idsNotMatchingPattern = new ArrayList<>(0);
+    for (Identifier identifier : identifiers) {
+      String namespace = identifier.getNamespace();
+      String pattern = identifierTypes.get(identifier.getNamespace());
+      if (pattern == null) {
+        namespacesNotFound.add(namespace);
+        continue;
+      }
+      String id = identifier.getId();
+      if (!id.matches(pattern)) {
+        idsNotMatchingPattern.add(id);
+      }
+    }
+    if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
+      return;
+    }
+    throw new ValidationException(
+        "Validation of identifiers failed: namespacesNotFound="
+            + namespacesNotFound
+            + ", idsNotMatchingPattern="
+            + idsNotMatchingPattern);
   }
 }

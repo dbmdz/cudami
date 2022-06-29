@@ -73,6 +73,12 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
+  public List<IdentifierType> findAll() {
+    String query = "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias;
+    return dbi.withHandle(h -> h.createQuery(query).mapToBean(IdentifierType.class).list());
+  }
+
+  @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(Arrays.asList("label", "namespace", "pattern"));
   }

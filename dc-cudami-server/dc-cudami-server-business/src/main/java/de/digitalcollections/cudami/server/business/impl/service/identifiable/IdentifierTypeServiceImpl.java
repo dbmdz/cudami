@@ -8,7 +8,9 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,14 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
 
   protected IdentifierTypeRepository repository;
+  private final Map<String, String> identifierTypeCache;
 
   @Autowired
   public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) {
     this.repository = repository;
+    this.identifierTypeCache =
+        repository.findAll().stream()
+            .collect(Collectors.toMap(IdentifierType::getNamespace, IdentifierType::getPattern));
   }
 
   @Override
@@ -54,9 +60,17 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
     return repository.getByUuid(uuid);
   }
 
+  public Map<String, String> getIdentifierTypeCache() {
+    return identifierTypeCache;
+  }
+
   @Override
   public IdentifierType save(IdentifierType identifierType) {
-    return repository.save(identifierType);
+    IdentifierType saved = repository.save(identifierType);
+    if (saved != null) {
+      identifierTypeCache.put(saved.getNamespace(), saved.getPattern());
+    }
+    return saved;
   }
 
   private void setDefaultSorting(PageRequest pageRequest) {
@@ -67,7 +81,11 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType update(IdentifierType identifiable) {
-    return repository.update(identifiable);
+  public IdentifierType update(IdentifierType identifierType) {
+    IdentifierType updated = repository.update(identifierType);
+    if (updated != null) {
+      identifierTypeCache.put(updated.getNamespace(), updated.getPattern());
+    }
+    return updated;
   }
 }

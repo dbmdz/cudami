@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.List;
 import java.util.Set;
@@ -15,4 +16,6 @@ public interface IdentifierService {
   public Identifier save(Identifier identifier);
 
   public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers);
+
+  public void validate(Set<Identifier> identifiers) throws ValidationException;
 }
