@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
@@ -29,14 +29,14 @@ public class PersonServiceImpl extends EntityServiceImpl<Person> implements Pers
 
   public PersonServiceImpl(
       PersonRepository repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,

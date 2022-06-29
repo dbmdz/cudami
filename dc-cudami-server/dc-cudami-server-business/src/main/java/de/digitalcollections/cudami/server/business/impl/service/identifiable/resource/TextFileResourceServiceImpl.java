@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.TextFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.TextFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
@@ -26,13 +26,13 @@ public class TextFileResourceServiceImpl extends IdentifiableServiceImpl<TextFil
   @Autowired
   public TextFileResourceServiceImpl(
       TextFileResourceRepository textFileResourceRepository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         textFileResourceRepository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         localeService,
         cudamiConfig);

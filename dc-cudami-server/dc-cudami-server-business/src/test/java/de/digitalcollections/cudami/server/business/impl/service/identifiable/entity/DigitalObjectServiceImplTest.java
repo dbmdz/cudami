@@ -9,13 +9,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
@@ -48,7 +48,7 @@ class DigitalObjectServiceImplTest {
   private DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private DigitalObjectRepository repo;
   protected HookProperties hookProperties;
-  private IdentifierRepository identifierRepository;
+  private IdentifierService identifierService;
   private LocaleService localeService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
@@ -64,7 +64,7 @@ class DigitalObjectServiceImplTest {
     digitalObjectRenderingFileResourceService =
         mock(DigitalObjectRenderingFileResourceService.class);
     hookProperties = mock(HookProperties.class);
-    identifierRepository = mock(IdentifierRepository.class);
+    identifierService = mock(IdentifierService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
     projectService = mock(ProjectService.class);
@@ -82,7 +82,7 @@ class DigitalObjectServiceImplTest {
             repo,
             collectionService,
             projectService,
-            identifierRepository,
+            identifierService,
             urlAliasService,
             digitalObjectLinkedDataFileResourceService,
             digitalObjectRenderingFileResourceService,
@@ -117,7 +117,7 @@ class DigitalObjectServiceImplTest {
     DigitalObject savedDigitalObject = digitalObject;
     savedDigitalObject.setUuid(UUID.randomUUID());
     when(repo.save(eq(digitalObject))).thenReturn(savedDigitalObject);
-    when(identifierRepository.save(eq(identifier))).thenReturn(identifier);
+    when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
     DigitalObject persisted = service.save(digitalObject);
 
@@ -190,7 +190,7 @@ class DigitalObjectServiceImplTest {
     DigitalObject savedDigitalObject = digitalObject;
     savedDigitalObject.setUuid(UUID.randomUUID());
     when(repo.save(eq(digitalObject))).thenReturn(savedDigitalObject);
-    when(identifierRepository.save(eq(identifier))).thenReturn(identifier);
+    when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
     DigitalObject persisted = service.save(digitalObject);
 

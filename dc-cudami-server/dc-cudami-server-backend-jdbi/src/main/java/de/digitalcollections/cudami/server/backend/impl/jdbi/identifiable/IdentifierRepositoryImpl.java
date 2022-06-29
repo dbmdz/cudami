@@ -60,8 +60,8 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public void deleteByIdentifiable(UUID identifiableUuid) {
-    dbi.withHandle(
+  public int deleteByIdentifiable(UUID identifiableUuid) {
+    return dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
                 .bind("uuid", identifiableUuid)

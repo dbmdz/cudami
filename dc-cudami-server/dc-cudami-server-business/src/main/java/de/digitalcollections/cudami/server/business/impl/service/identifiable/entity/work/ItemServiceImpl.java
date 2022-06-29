@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
@@ -27,14 +27,14 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   @Autowired
   public ItemServiceImpl(
       ItemRepository repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,

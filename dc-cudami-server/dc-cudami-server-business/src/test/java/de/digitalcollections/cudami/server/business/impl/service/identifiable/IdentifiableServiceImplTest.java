@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -13,11 +14,11 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -42,14 +43,14 @@ class IdentifiableServiceImplTest {
   private IdentifiableServiceImpl service;
   private IdentifiableRepository repo;
   private UrlAliasService urlAliasService;
-  private IdentifierRepository identifierRepository;
+  private IdentifierService identifierService;
 
   @BeforeEach
   public void beforeEach() throws CudamiServiceException {
     repo = mock(IdentifiableRepository.class);
     urlAliasService = mock(UrlAliasService.class);
     when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
-    identifierRepository = mock(IdentifierRepository.class);
+    identifierService = mock(IdentifierService.class);
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
     CudamiConfig cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
 
@@ -57,7 +58,7 @@ class IdentifiableServiceImplTest {
 
     service =
         new IdentifiableServiceImpl(
-            repo, identifierRepository, urlAliasService, localeService, cudamiConfig);
+            repo, identifierService, urlAliasService, localeService, cudamiConfig);
   }
 
   @DisplayName("can add related entities by delegating it to the repository")
@@ -688,7 +689,7 @@ class IdentifiableServiceImplTest {
     when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
         .thenReturn(existingIdentifiable)
         .thenReturn(existingIdentifiableWithUpdatedIdentifiers);
-    when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
+    when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(List.of(identifierToDelete));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
@@ -701,8 +702,9 @@ class IdentifiableServiceImplTest {
     assertThat(actualIdentifier.getNamespace()).isEqualTo("namespace");
     assertThat(actualIdentifier.getId()).isEqualTo("value");
 
-    verify(identifierRepository, times(1)).save(any(Identifier.class));
-    verify(identifierRepository, times(1)).delete(eq(identifierToDelete.getUuid()));
+    verify(identifierService, times(1))
+        .saveForIdentifiable(any(UUID.class), argThat(set -> set.size() == 1));
+    verify(identifierService, times(1)).delete(eq(Set.of(identifierToDelete)));
   }
 
   @DisplayName(
@@ -738,7 +740,7 @@ class IdentifiableServiceImplTest {
     when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
         .thenReturn(existingIdentifiable)
         .thenReturn(existingIdentifiableWithUpdateUuids);
-    when(identifierRepository.findByIdentifiable(eq(existingIdentifiable.getUuid())))
+    when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
     when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
@@ -759,8 +761,9 @@ class IdentifiableServiceImplTest {
     assertThat(actualIdentifiers.get(1).getId()).isEqualTo("1");
 
     // Only one identifier was saved - the identifier, was was provided, but did not already exist
-    verify(identifierRepository, times(1)).save(any(Identifier.class));
+    verify(identifierService, times(1))
+        .saveForIdentifiable(any(UUID.class), argThat(set -> set.size() == 1));
     // No identifier was deleted at all
-    verify(identifierRepository, never()).delete(any(UUID.class));
+    verify(identifierService, never()).delete(any(Set.class));
   }
 }

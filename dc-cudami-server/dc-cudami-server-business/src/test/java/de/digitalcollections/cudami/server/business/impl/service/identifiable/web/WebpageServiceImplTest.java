@@ -10,12 +10,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -39,7 +39,7 @@ class WebpageServiceImplTest {
 
   WebpageRepository repo;
 
-  IdentifierRepository identifierRepository;
+  IdentifierService identifierService;
   UrlAliasService urlAliasService;
   CudamiConfig cudamiConfig;
 
@@ -48,7 +48,7 @@ class WebpageServiceImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = mock(WebpageRepository.class);
-    identifierRepository = mock(IdentifierRepository.class);
+    identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
     cudamiConfig = mock(CudamiConfig.class);
     CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
@@ -59,7 +59,7 @@ class WebpageServiceImplTest {
 
     service =
         new WebpageServiceImpl(
-            repo, identifierRepository, urlAliasService, localeService, cudamiConfig);
+            repo, identifierService, urlAliasService, localeService, cudamiConfig);
   }
 
   @Test

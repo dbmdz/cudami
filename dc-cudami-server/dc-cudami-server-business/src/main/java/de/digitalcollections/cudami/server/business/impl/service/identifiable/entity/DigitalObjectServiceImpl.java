@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
@@ -52,7 +52,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       DigitalObjectRepository repository,
       CollectionService collectionService,
       ProjectService projectService,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
@@ -61,7 +61,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,
@@ -114,7 +114,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     }
 
     // Remove identifiers
-    deleteIdentifiers(existingDigitalObject.getUuid());
+    identifierService.deleteByIdentifiable(existingDigitalObject.getUuid());
 
     // Remove the digitalObject itself
     repository.delete(uuid);

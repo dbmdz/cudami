@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -28,14 +28,14 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
 
   public ProjectServiceImpl(
       ProjectRepository repository,
-      IdentifierRepository identifierRepository,
+      IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
-        identifierRepository,
+        identifierService,
         urlAliasService,
         hookProperties,
         localeService,
@@ -63,9 +63,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     ((ProjectRepository) repository).delete(uuid);
 
     // Step 3: Delete all identifiers of the project
-    for (Identifier identifier : identifiers) {
-      identifierRepository.delete(identifier.getUuid());
-    }
+    identifierService.delete(identifiers);
     return true;
   }
 

@@ -75,8 +75,6 @@ public interface IdentifiableService<I extends Identifiable> {
 
   boolean delete(List<UUID> uuids) throws IdentifiableServiceException;
 
-  boolean deleteIdentifiers(UUID identifiableUuid);
-
   PageResponse<I> find(PageRequest pageRequest);
 
   List<I> find(String searchTerm, int maxResults);
