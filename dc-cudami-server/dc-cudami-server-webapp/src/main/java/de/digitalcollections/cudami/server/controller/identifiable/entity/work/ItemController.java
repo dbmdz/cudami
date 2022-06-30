@@ -123,6 +123,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         "/latest/items/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
