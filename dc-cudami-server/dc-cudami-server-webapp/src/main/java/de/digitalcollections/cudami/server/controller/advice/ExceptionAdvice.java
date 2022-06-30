@@ -15,23 +15,23 @@ public class ExceptionAdvice {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionAdvice.class);
 
-  @ResponseStatus(HttpStatus.NOT_FOUND)
-  @ExceptionHandler(UsernameNotFoundException.class)
-  public void handleNotFound() {}
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(Exception.class)
+  public void handleAllOther(Exception exception) {
+    LOGGER.error("exception stack trace", exception);
+  }
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
   public void handleHttpMediaTypeNotAcceptableException() {}
 
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  @ExceptionHandler(UsernameNotFoundException.class)
+  public void handleNotFound() {}
+
   @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @ExceptionHandler(ValidationException.class)
-  public void handleValidationException(Exception exception) {
-    LOGGER.error("Cannot process request: ", exception);
-  }
-
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  @ExceptionHandler(Exception.class)
-  public void handleAllOther(Exception exception) {
-    LOGGER.error("exception stack trace", exception);
+  public void handleValidationException(ValidationException exception) {
+    LOGGER.error("Validation error: ", exception);
   }
 }
