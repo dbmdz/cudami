@@ -76,8 +76,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
     for (UUID uuid : uuids) {
       try {
-        urlAliasService.deleteAllForTarget(uuid, true);
         identifierService.deleteByIdentifiable(uuid);
+        urlAliasService.deleteAllForTarget(uuid, true);
       } catch (CudamiServiceException e) {
         throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
       }
