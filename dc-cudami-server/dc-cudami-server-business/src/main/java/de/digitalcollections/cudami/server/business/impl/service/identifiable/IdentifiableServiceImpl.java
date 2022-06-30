@@ -186,12 +186,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
+    identifierService.validate(identifiable.getIdentifiers());
+    urlAliasService.validate(identifiable.getLocalizedUrlAliases());
     try {
-      try {
-        identifierService.validate(identifiable.getIdentifiers());
-      } catch (ValidationException e) {
-        throw new ValidationException("Validation error: " + e, e);
-      }
       I savedIdentifiable = repository.save(identifiable);
       savedIdentifiable.setIdentifiers(
           identifierService.saveForIdentifiable(
@@ -199,12 +196,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
           savedIdentifiable, cudamiConfig, urlAliasService::generateSlug);
-
-      try {
-        urlAliasService.validate(identifiable.getLocalizedUrlAliases());
-      } catch (Exception e) {
-        throw new ValidationException("Validation error: " + e, e);
-      }
 
       if (savedIdentifiable.getLocalizedUrlAliases() != null
           && !savedIdentifiable.getLocalizedUrlAliases().isEmpty()) {
@@ -221,9 +212,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       return savedIdentifiable;
     } catch (CudamiServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
-      throw new IdentifiableServiceException(e.getMessage());
-    } catch (Exception e) {
-      LOGGER.error("Cannot save identifiable " + identifiable + ": " + e, e);
       throw new IdentifiableServiceException(e.getMessage());
     }
   }
