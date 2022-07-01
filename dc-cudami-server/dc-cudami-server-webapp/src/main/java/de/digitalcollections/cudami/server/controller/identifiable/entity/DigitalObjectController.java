@@ -104,7 +104,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
+          FilterCriterion<UUID> parentUuidFilterCriterion,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -114,6 +116,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       parentUuidFilterCriterion.setExpression("parent.uuid");
       pageRequest.setFiltering(new Filtering(List.of(parentUuidFilterCriterion)));
     }
+    addLabelFilter(pageRequest, labelTerm, labelLanguage);
 
     return digitalObjectService.find(pageRequest);
   }
@@ -150,6 +153,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     return digitalObjectService.getAllReduced();
   }
 
+  @Override
   @Operation(
       summary = "Get a digital object by namespace and id",
       description =
