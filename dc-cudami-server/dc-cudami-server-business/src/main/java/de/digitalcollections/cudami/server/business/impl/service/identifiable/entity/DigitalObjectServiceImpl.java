@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -73,7 +74,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public boolean delete(UUID uuid) throws IdentifiableServiceException {
+  public boolean delete(UUID uuid) throws IdentifiableServiceException, ConflictException {
     // Check for existance. If not given, return false.
     DigitalObject existingDigitalObject = getByUuid(uuid);
     if (existingDigitalObject == null) {
@@ -113,13 +114,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
           e);
     }
 
-    // Remove identifiers
-    identifierService.deleteByIdentifiable(existingDigitalObject.getUuid());
-
-    // Remove the digitalObject itself
-    repository.delete(uuid);
-
-    return true;
+    return super.delete(uuid);
   }
 
   private void deleteRenderingResource(UUID digitalObjectUuid) throws CudamiServiceException {

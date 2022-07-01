@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.advice;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,10 @@ public class ExceptionAdvice {
   public void handleAllOther(Exception exception) {
     LOGGER.error("exception stack trace", exception);
   }
+
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ExceptionHandler(ConflictException.class)
+  public void handleConflict(ConflictException exception) {}
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)

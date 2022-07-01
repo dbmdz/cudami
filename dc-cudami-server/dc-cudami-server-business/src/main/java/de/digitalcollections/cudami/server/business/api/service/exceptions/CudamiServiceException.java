@@ -6,6 +6,10 @@ public class CudamiServiceException extends Exception {
     super(message);
   }
 
+  public CudamiServiceException(Throwable cause) {
+    super("An unexpected error occured!", cause);
+  }
+
   public CudamiServiceException(String message, Throwable cause) {
     super(message, cause);
   }

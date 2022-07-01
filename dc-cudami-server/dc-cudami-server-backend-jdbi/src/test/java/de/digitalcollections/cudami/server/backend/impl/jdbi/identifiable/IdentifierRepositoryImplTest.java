@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -51,7 +52,7 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can save and return the saved object")
-  void checkSave() {
+  void checkSave() throws RepositoryException {
     UUID identifiableUuid = UUID.randomUUID();
     saveIdentifiable(identifiableUuid);
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
@@ -65,13 +66,13 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can return an empty list when no identifiers were found for an identifiable")
-  void retrieveNoIdentifiersForIdentifiable() {
+  void retrieveNoIdentifiersForIdentifiable() throws RepositoryException {
     assertThat(repo.findByIdentifiable(UUID.randomUUID())).isEmpty();
   }
 
   @Test
   @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
-  void identifiersForIdentifiable() {
+  void identifiersForIdentifiable() throws RepositoryException {
     UUID identifiableUuid = UUID.randomUUID();
     saveIdentifiable(identifiableUuid);
     Identifier identifier1 = repo.save(new Identifier(identifiableUuid, "namespace", "1"));
@@ -84,7 +85,7 @@ class IdentifierRepositoryImplTest {
 
   @Test
   @DisplayName("can return an identifier by its uuid")
-  void getByUuid() {
+  void getByUuid() throws RepositoryException {
     // Persist an identifier
     UUID identifiableUuid = UUID.randomUUID();
     saveIdentifiable(identifiableUuid);

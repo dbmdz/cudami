@@ -3,18 +3,17 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,23 +47,15 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public boolean delete(UUID uuid) {
-    // Step 1: Retrieve all identifiers for the project
-    Set<Identifier> identifiers;
-
-    Project existingProject = getByUuid(uuid);
-    if (existingProject != null) {
-      identifiers = existingProject.getIdentifiers();
-    } else {
-      identifiers = Collections.emptySet();
+  public boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+    List<DigitalObject> digitalObjects =
+        findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
+            .getContent();
+    if (!digitalObjects.isEmpty()) {
+      throw new ConflictException(
+          "Project cannot be deleted, because it has corresponding digital objects!");
     }
-
-    // Step 2: Delete the project from the repository
-    ((ProjectRepository) repository).delete(uuid);
-
-    // Step 3: Delete all identifiers of the project
-    identifierService.delete(identifiers);
-    return true;
+    return super.delete(uuid);
   }
 
   @Override

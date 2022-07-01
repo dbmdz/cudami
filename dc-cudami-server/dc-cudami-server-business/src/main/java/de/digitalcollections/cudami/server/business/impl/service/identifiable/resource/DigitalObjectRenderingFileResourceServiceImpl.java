@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -65,7 +66,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   private boolean deleteRenderingResource(FileResource renderingResource)
-      throws IdentifiableServiceException {
+      throws IdentifiableServiceException, ConflictException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
         return applicationFileResourceService.delete(renderingResource.getUuid());
@@ -115,7 +116,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
         deleteRenderingResource(existingRenderingResource);
-      } catch (IdentifiableServiceException e) {
+      } catch (ConflictException | IdentifiableServiceException e) {
         throw new CudamiServiceException(
             "Cannot remove existing rendering resource=" + existingRenderingResource + ": " + e, e);
       }
@@ -173,7 +174,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
             == 0) {
           deleteRenderingResource(renderingFileResource);
         }
-      } catch (IdentifiableServiceException e) {
+      } catch (ConflictException | IdentifiableServiceException e) {
         throw new CudamiServiceException(
             "Cannot delete RenderingFileResource="
                 + renderingFileResource
