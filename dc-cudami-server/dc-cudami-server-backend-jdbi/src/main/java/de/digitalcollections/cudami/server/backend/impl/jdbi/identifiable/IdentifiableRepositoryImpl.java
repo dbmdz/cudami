@@ -36,6 +36,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -644,6 +646,34 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   protected String getUniqueField() {
     return "uuid";
+  }
+
+  @Override
+  protected String getWhereClause(
+      FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
+      throws IllegalArgumentException, UnsupportedOperationException {
+    if (fc.getExpression().startsWith("label")) {
+      if (!(fc.getValue() instanceof String)) {
+        throw new IllegalArgumentException("Value of label must be a string!");
+      }
+      String value = (String) fc.getValue();
+      switch (fc.getOperation()) {
+        case CONTAINS:
+          String key = String.format("split_label_%d", criterionCount);
+          argumentMappings.put(key, IdentifiableRepository.splitToArray(value));
+          return String.format("%s.split_label @> :%s::TEXT[]", tableAlias, key);
+        case EQUALS:
+          Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(fc.getExpression());
+          String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
+          argumentMappings.put("searchTerm", escapeTermForJsonpath(value));
+          return SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", language);
+        default:
+          throw new UnsupportedOperationException(
+              "Filtering by label only supports CONTAINS (to be preferred) or EQUALS operator!");
+      }
+    }
+
+    return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {

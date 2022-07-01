@@ -5,6 +5,11 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -29,4 +34,21 @@ public abstract class AbstractIdentifiableController<T extends Identifiable> {
   }
 
   protected abstract IdentifiableService<T> getService();
+
+  protected void addLabelFilter(PageRequest pageRequest, String labelTerm, Locale labelLanguage) {
+    if (pageRequest == null || labelTerm == null) {
+      return;
+    }
+    labelTerm = labelTerm.trim();
+    String expression = "label";
+    if (labelLanguage != null) {
+      expression += "." + labelLanguage.getLanguage();
+    }
+    FilterOperation operation = FilterOperation.CONTAINS;
+    if (labelTerm.matches("\".+\"")) {
+      operation = FilterOperation.EQUALS;
+    }
+    pageRequest.add(
+        Filtering.builder().add(new FilterCriterion<>(expression, operation, labelTerm)).build());
+  }
 }

@@ -15,16 +15,21 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,10 +94,72 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     return repository.delete(uuids);
   }
 
+  /**
+   * Special logic to filter by label, optionally paying attention to the language. The passed
+   * {@code PageResponse} could be modified.
+   *
+   * @param pageResponse the response from the repo, must always contain the request too (if
+   *     everything goes right)
+   */
+  protected void filterByLabel(PageResponse<I> pageResponse, FilterCriterion<String> labelFilter) {
+    if (!pageResponse.hasContent()) {
+      return;
+    }
+    // we must differentiate several cases
+    if (labelFilter.getOperation() == FilterOperation.EQUALS) {
+      // everything has been done by repo already
+      return;
+    }
+
+    // for CONTAINS the language, if any, has not been taken into account yet
+    Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(labelFilter.getExpression());
+    if (matchLanguage.find()) {
+      // there is a language...
+      Locale language = Locale.forLanguageTag(matchLanguage.group(1));
+      List<String> searchTerms =
+          Arrays.asList(IdentifiableRepository.splitToArray((String) labelFilter.getValue()));
+      List<I> filteredContent =
+          pageResponse.getContent().parallelStream()
+              .filter(
+                  identifiable -> {
+                    String label = identifiable.getLabel().get(language);
+                    if (label == null) {
+                      return false;
+                    }
+                    List<String> splitLabel =
+                        Arrays.asList(IdentifiableRepository.splitToArray(label));
+                    return splitLabel.containsAll(searchTerms);
+                  })
+              .collect(Collectors.toList());
+      // fix total elements count roughly
+      pageResponse.setTotalElements(
+          pageResponse.getTotalElements()
+              - (pageResponse.getContent().size() - filteredContent.size()));
+      pageResponse.setContent(filteredContent);
+    }
+  }
+
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
-    return repository.find(pageRequest);
+    // filter by label is quite special due to optimization
+    FilterCriterion<String> labelFilter = null;
+    if (pageRequest.hasFiltering()) {
+      labelFilter =
+          pageRequest.getFiltering().getFilterCriteria().stream()
+              .filter(fc -> fc.getExpression().startsWith("label"))
+              .findAny()
+              .orElse(null);
+    }
+    PageResponse<I> response = repository.find(pageRequest);
+    if (labelFilter == null) {
+      // nothing special here, go on
+      return response;
+    }
+    // filter by label specials go here
+    filterByLabel(response, labelFilter);
+    // TODO: what happens if all entries have been removed by the filter?
+    return response;
   }
 
   @Override

@@ -111,7 +111,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
    * @param term can be null
    * @return term with forbidden characters removed or escaped
    */
-  private String escapeTermForJsonpath(String term) {
+  protected final String escapeTermForJsonpath(String term) {
     if (term == null) {
       return null;
     }
