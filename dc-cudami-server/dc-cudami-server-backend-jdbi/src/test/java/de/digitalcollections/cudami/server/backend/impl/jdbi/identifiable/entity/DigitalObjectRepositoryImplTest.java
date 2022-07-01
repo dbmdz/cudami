@@ -4,6 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
@@ -280,7 +281,7 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @DisplayName("returns all identifiers for a DigitalObject")
-  void returnIdentifiers() {
+  void returnIdentifiers() throws RepositoryException {
     // Step1: Create the DigitalObject
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
     DigitalObject persisted = repo.save(digitalObject);
@@ -313,7 +314,7 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
-  void returnGetByIdentifier() {
+  void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
     digitalObject = repo.save(digitalObject);
     identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));

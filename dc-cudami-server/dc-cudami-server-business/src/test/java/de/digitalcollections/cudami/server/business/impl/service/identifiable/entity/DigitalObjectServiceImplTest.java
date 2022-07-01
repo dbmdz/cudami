@@ -12,6 +12,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -93,7 +94,8 @@ class DigitalObjectServiceImplTest {
 
   @Test
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
-  void saveLinkedDataFileResources() throws ValidationException, IdentifiableServiceException {
+  void saveLinkedDataFileResources()
+      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
             .label(Locale.GERMAN, "Linked Data")
@@ -167,7 +169,8 @@ class DigitalObjectServiceImplTest {
 
   @Test
   @DisplayName("can save RenderingResources for a DigitalObject")
-  void saveRenderingResources() throws ValidationException, IdentifiableServiceException {
+  void saveRenderingResources()
+      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
     FileResource renderingResource = new TextFileResource();
     renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
     renderingResource.setMimeType(MimeType.fromTypename("text/html"));
@@ -329,7 +332,7 @@ class DigitalObjectServiceImplTest {
   @DisplayName(
       "deletes RenderingResources and LinkedDataFileResources of a DigitalObject, when the DigitalObject is delete")
   void deleteRenderingAndLinkedDataFileResources()
-      throws CudamiServiceException, IdentifiableServiceException {
+      throws CudamiServiceException, IdentifiableServiceException, ConflictException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()

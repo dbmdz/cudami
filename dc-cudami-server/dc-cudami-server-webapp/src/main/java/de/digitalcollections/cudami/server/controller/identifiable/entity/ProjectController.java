@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -112,8 +113,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
-      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
-          UUID uuid) {
+      @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid") UUID uuid)
+      throws ConflictException {
 
     try {
       projectService.delete(uuid);

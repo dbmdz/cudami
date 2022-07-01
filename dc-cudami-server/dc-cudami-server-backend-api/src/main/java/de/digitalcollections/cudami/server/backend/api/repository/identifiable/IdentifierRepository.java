@@ -1,9 +1,8 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,33 +10,21 @@ public interface IdentifierRepository {
 
   long count();
 
-  default void delete(UUID uuid) {
+  default void delete(UUID uuid) throws RepositoryException {
     delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  void delete(List<UUID> uuids);
+  void delete(List<UUID> uuids) throws RepositoryException;
 
-  default int deleteByIdentifiable(Identifiable identifiable) {
+  default int deleteByIdentifiable(Identifiable identifiable) throws RepositoryException {
     return deleteByIdentifiable(identifiable.getUuid());
   }
 
-  int deleteByIdentifiable(UUID identifiableUuid);
+  int deleteByIdentifiable(UUID identifiableUuid) throws RepositoryException;
 
-  PageResponse<Identifier> find(PageRequest pageRequest);
+  List<Identifier> findByIdentifiable(UUID identifiableUuid) throws RepositoryException;
 
-  default List<Identifier> find(String searchTerm, int maxResults) {
-    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
-    PageResponse<Identifier> response = find(request);
-    return response.getContent();
-  }
+  Identifier getByUuid(UUID identifierUuid) throws RepositoryException;
 
-  List<Identifier> findByIdentifiable(UUID identifiableUuid);
-
-  Identifier getByNamespaceAndId(String namespace, String id);
-
-  Identifier save(Identifier identifier);
-
-  Identifier getByUuid(UUID identifierUuid);
-
-  Identifier update(Identifier identifier);
+  Identifier save(Identifier identifier) throws RepositoryException;
 }

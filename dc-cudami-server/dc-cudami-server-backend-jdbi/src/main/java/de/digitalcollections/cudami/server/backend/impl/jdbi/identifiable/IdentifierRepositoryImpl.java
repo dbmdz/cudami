@@ -1,24 +1,22 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.jdbi.v3.core.statement.StatementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements IdentifierRepository {
@@ -48,73 +46,44 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public void delete(List<UUID> uuids) {
+  public void delete(List<UUID> uuids) throws RepositoryException {
     if (uuids == null || uuids.isEmpty()) {
       return;
     }
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-  }
-
-  @Override
-  public int deleteByIdentifiable(UUID identifiableUuid) {
-    return dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
-                .bind("uuid", identifiableUuid)
-                .execute());
-  }
-
-  @Override
-  public PageResponse<Identifier> find(PageRequest pageRequest) {
-    String selectSql =
-        "SELECT " + SQL_REDUCED_FIELDS_ID + " FROM " + tableName + " AS " + tableAlias;
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-
-    // handle search term
-    String searchTerm = pageRequest.getSearchTerm();
-    final boolean hasSearchTerm = StringUtils.hasText(searchTerm);
-    String executedSearchTerm = null;
-    if (hasSearchTerm) {
-      // select with search term
-      selectSql += " WHERE namespace ILIKE '%' || :searchTerm || '%'";
-      executedSearchTerm = searchTerm;
-      argumentMappings.put("searchTerm", executedSearchTerm);
+    try {
+      dbi.withHandle(
+          h ->
+              h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                  .bindList("uuids", uuids)
+                  .execute());
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
     }
-
-    StringBuilder innerQuery = new StringBuilder(selectSql);
-    addFiltering(pageRequest, innerQuery, argumentMappings);
-    addPageRequestParams(pageRequest, innerQuery);
-
-    final String sql = innerQuery.toString();
-    List<Identifier> result =
-        dbi.withHandle(
-            h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Identifier.class).list());
-
-    String countSql = "SELECT count(*) FROM " + tableName;
-    if (hasSearchTerm) {
-      // select with search term
-      countSql += " WHERE namespace ILIKE '%' || :searchTerm || '%'";
-    }
-    StringBuilder sqlCount = new StringBuilder(countSql);
-    addFiltering(pageRequest, sqlCount, argumentMappings);
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-
-    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
-  public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) {
+  public int deleteByIdentifiable(UUID identifiableUuid) throws RepositoryException {
+    try {
+      return dbi.withHandle(
+          h ->
+              h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
+                  .bind("uuid", identifiableUuid)
+                  .execute());
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
+  }
+
+  @Override
+  public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws RepositoryException {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_ID
@@ -124,12 +93,20 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + tableAlias
             + " WHERE identifiable = :uuid";
 
-    return dbi.withHandle(
-        h ->
-            h.createQuery(sql)
-                .bind("uuid", uuidIdentifiable)
-                .mapTo(Identifier.class)
-                .collect(Collectors.toList()));
+    try {
+      return dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bind("uuid", uuidIdentifiable)
+                  .mapTo(Identifier.class)
+                  .collect(Collectors.toList()));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override
@@ -138,30 +115,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public Identifier getByNamespaceAndId(String namespace, String id) {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_ID
-            + " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " WHERE namespace = :namespace, identifier = :identifier";
-
-    Identifier identifier =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("namespace", namespace)
-                    .bind("identifier", id)
-                    .mapTo(Identifier.class)
-                    .findOne()
-                    .orElse(null));
-    return identifier;
-  }
-
-  @Override
-  public Identifier getByUuid(UUID identifierUuid) {
+  public Identifier getByUuid(UUID identifierUuid) throws RepositoryException {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_ID
@@ -171,15 +125,21 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + tableAlias
             + " WHERE uuid = :uuid";
 
-    Identifier result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("uuid", identifierUuid)
-                    .mapTo(Identifier.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+    try {
+      return dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bind("uuid", identifierUuid)
+                  .mapTo(Identifier.class)
+                  .findOne()
+                  .orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override
@@ -211,7 +171,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public Identifier save(Identifier identifier) {
+  public Identifier save(Identifier identifier) throws RepositoryException {
     identifier.setUuid(UUID.randomUUID());
     identifier.setCreated(LocalDateTime.now());
     identifier.setLastModified(LocalDateTime.now());
@@ -227,25 +187,25 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " )"
             + " RETURNING *, identifier id";
 
-    Identifier result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(identifier)
-                    .mapToBean(Identifier.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+    try {
+      return dbi.withHandle(
+          h ->
+              h.createQuery(sql)
+                  .bindBean(identifier)
+                  .mapToBean(Identifier.class)
+                  .findOne()
+                  .orElse(null));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     return false;
-  }
-
-  @Override
-  public Identifier update(Identifier identifier) {
-    throw new UnsupportedOperationException(
-        "An update on identifiable, namespace and identifier has no use case.");
   }
 }

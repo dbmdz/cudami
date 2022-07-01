@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -69,11 +70,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   long count();
 
-  default boolean delete(UUID uuid) throws IdentifiableServiceException {
+  default boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  boolean delete(List<UUID> uuids) throws IdentifiableServiceException;
+  boolean delete(List<UUID> uuids) throws ConflictException, IdentifiableServiceException;
 
   PageResponse<I> find(PageRequest pageRequest);
 
