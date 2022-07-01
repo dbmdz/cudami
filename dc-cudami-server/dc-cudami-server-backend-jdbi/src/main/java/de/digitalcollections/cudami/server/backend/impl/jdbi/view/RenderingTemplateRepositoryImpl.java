@@ -113,7 +113,7 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
     return new ArrayList<>(
         Arrays.asList(
             SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "name"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label")));
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**")));
   }
 
   @Override

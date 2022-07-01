@@ -626,8 +626,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   protected List<String> getSearchTermTemplates(String tableAlias) {
     return new ArrayList<>(
         Arrays.asList(
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**"),
+            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**")));
   }
 
   public String getSqlSelectAllFields() {
