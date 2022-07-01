@@ -7,12 +7,33 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public interface IdentifiableRepository<I extends Identifiable> {
+
+  static String[] splitToArray(String term) {
+    term = term.trim().toLowerCase();
+    term = term.replaceAll("[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
+    Matcher hyphenWords = Pattern.compile("\\b\\w+(-\\w+)+\\b").matcher(term);
+    List<String> result =
+        hyphenWords
+            .results()
+            .collect(
+                ArrayList<String>::new,
+                (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
+                ArrayList::addAll);
+    for (String s : term.split("\\s+")) {
+      result.add(s);
+    }
+    return result.toArray(new String[result.size()]);
+  }
 
   default void addRelatedEntity(I identifiable, Entity entity) {
     if (identifiable == null || entity == null) {

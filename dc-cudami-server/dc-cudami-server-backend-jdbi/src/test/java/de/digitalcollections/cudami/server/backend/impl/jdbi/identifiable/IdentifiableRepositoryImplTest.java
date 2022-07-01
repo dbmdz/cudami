@@ -4,6 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -19,10 +20,12 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import org.assertj.core.api.Condition;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -170,5 +173,63 @@ class IdentifiableRepositoryImplTest {
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);
+  }
+
+  @Test
+  @DisplayName("test string splitting method")
+  void testSplitter() {
+    var in =
+        "A funny text with comma, a hyphen-separated word (unusual in English though) and some other stuff...";
+    final var expected =
+        new String[] {
+          "hyphen",
+          "separated",
+          "a",
+          "funny",
+          "text",
+          "with",
+          "comma",
+          "a",
+          "hyphen-separated",
+          "word",
+          "unusual",
+          "in",
+          "english",
+          "though",
+          "and",
+          "some",
+          "other",
+          "stuff"
+        };
+    String[] out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected), "out == expected"));
+
+    in = "\"Here we have quotes and a word-with-two hyphens!\"";
+    final var expected1 =
+        new String[] {
+          "word",
+          "with",
+          "two",
+          "here",
+          "we",
+          "have",
+          "quotes",
+          "and",
+          "a",
+          "word-with-two",
+          "hyphens"
+        };
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected1), "out == expected"));
+
+    in = "something easy";
+    final var expected2 = new String[] {"something", "easy"};
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected2), "out == expected"));
+
+    in = "one";
+    final var expected3 = new String[] {"one"};
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected3), "out == expected"));
   }
 }

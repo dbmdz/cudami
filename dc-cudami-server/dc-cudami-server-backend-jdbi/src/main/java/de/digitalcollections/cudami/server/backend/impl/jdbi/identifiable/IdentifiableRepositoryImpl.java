@@ -59,12 +59,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static final String TABLE_NAME = "identifiables";
 
   public static String getSqlInsertFields() {
-    return " uuid, created, description, identifiable_objecttype, identifiable_type, label, last_modified, previewfileresource, preview_hints";
+    return " uuid, created, description, identifiable_objecttype, identifiable_type, "
+        + "label, last_modified, previewfileresource, preview_hints, split_label";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
-    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, :label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB";
+    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
+        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[]";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -110,7 +112,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
-    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB";
+    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
+        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]";
   }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
@@ -812,8 +815,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     final UUID previewImageUuid =
         identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
     bindings.put("previewFileResource", previewImageUuid);
+    // split label
+    bindings.put("split_label", splitToArray(identifiable.getLabel()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
-
     if (identifiable.getUuid() == null) {
       // in case of fileresource the uuid is created on binary upload (before metadata save)
       // to make saving on storage using uuid is possible
@@ -896,6 +900,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return getRelatedFileResources(identifiableUuid);
   }
 
+  protected String[] splitToArray(LocalizedText localizedText) {
+    List<String> splitLabels =
+        localizedText.values().stream()
+            .map(text -> IdentifiableRepository.splitToArray(text))
+            .flatMap(Arrays::stream)
+            .collect(Collectors.toList());
+    return splitLabels.toArray(new String[splitLabels.size()]);
+  }
+
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
@@ -914,6 +927,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     final UUID previewImageUuid =
         identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
     bindings.put("previewFileResource", previewImageUuid);
+    // split label
+    bindings.put("split_label", splitToArray(identifiable.getLabel()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
 
     identifiable.setLastModified(LocalDateTime.now());
