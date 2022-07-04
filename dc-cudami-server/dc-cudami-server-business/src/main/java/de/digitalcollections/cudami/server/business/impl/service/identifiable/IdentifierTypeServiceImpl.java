@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -24,14 +26,13 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
 
   protected IdentifierTypeRepository repository;
-  private final Map<String, String> identifierTypeCache;
+  private Map<String, String> identifierTypeCache;
 
   @Autowired
-  public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) {
+  public IdentifierTypeServiceImpl(IdentifierTypeRepository repository)
+      throws CudamiServiceException {
     this.repository = repository;
-    this.identifierTypeCache =
-        repository.findAll().stream()
-            .collect(Collectors.toMap(IdentifierType::getNamespace, IdentifierType::getPattern));
+    updateIdentifierTypeCache();
   }
 
   @Override
@@ -87,5 +88,18 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
       identifierTypeCache.put(updated.getNamespace(), updated.getPattern());
     }
     return updated;
+  }
+
+  public final Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException {
+    try {
+      identifierTypeCache =
+          repository.findAll().stream()
+              .collect(
+                  Collectors.toConcurrentMap(
+                      IdentifierType::getNamespace, IdentifierType::getPattern));
+    } catch (RepositoryException e) {
+      throw new CudamiServiceException(e);
+    }
+    return identifierTypeCache;
   }
 }

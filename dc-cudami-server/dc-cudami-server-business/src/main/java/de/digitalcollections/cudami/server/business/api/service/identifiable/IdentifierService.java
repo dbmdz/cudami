@@ -19,5 +19,6 @@ public interface IdentifierService {
   public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers)
       throws CudamiServiceException;
 
-  public void validate(Set<Identifier> identifiers) throws ValidationException;
+  public void validate(Set<Identifier> identifiers)
+      throws CudamiServiceException, ValidationException;
 }
