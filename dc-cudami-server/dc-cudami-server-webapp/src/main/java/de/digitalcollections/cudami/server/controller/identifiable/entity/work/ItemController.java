@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -220,7 +221,8 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
-      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid) {
+      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid)
+      throws ConflictException {
     boolean successful;
     try {
       successful = itemService.delete(uuid);
