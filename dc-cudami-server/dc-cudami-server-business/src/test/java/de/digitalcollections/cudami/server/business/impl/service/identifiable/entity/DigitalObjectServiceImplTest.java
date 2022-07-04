@@ -347,10 +347,13 @@ class DigitalObjectServiceImplTest {
             .refId(42)
             .build();
     when(repo.getByUuid(any(UUID.class))).thenReturn(persistedDigitalObject);
+    when(repo.delete(any(List.class))).thenReturn(true);
 
     assertThat(service.delete(uuid)).isTrue();
 
-    verify(repo, times(1)).delete(eq(uuid));
+    verify(repo, times(1)).getByUuid(eq(uuid));
+    verify(repo, times(1)).deleteFileResources(eq(uuid));
+    verify(repo, times(1)).delete(eq(List.of(uuid)));
     verify(digitalObjectLinkedDataFileResourceService, times(1))
         .deleteLinkedDataFileResources(eq(uuid));
     verify(digitalObjectRenderingFileResourceService, times(1))
