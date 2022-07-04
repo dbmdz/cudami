@@ -188,7 +188,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     identifierService.validate(identifiable.getIdentifiers());
 
-    I savedIdentifiable = repository.save(identifiable);
+    I savedIdentifiable;
+    try {
+      savedIdentifiable = repository.save(identifiable);
+    } catch (Exception e) {
+      throw new IdentifiableServiceException(
+          "Cannot save identifiable " + identifiable + ": " + e, e);
+    }
 
     try {
       savedIdentifiable.setIdentifiers(
@@ -252,7 +258,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       throw new ValidationException("Validation error: " + e, e);
     }
     I identifiableInDb = repository.getByUuid(identifiable.getUuid());
-    repository.update(identifiable);
+
+    try {
+      repository.update(identifiable);
+    } catch (Exception e) {
+      throw new IdentifiableServiceException(
+          "Cannot update identifiable " + identifiable + ": " + e, e);
+    }
+
     try {
       Set<Identifier> existingIdentifiers = identifiableInDb.getIdentifiers();
       Set<Identifier> providedIdentifiers = identifiable.getIdentifiers();
