@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.JdbiException;
+import org.jdbi.v3.core.statement.StatementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -73,9 +76,17 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<IdentifierType> findAll() {
+  public List<IdentifierType> findAll() throws RepositoryException {
     String query = "SELECT " + SQL_REDUCED_FIELDS_IDT + " FROM " + tableName + " AS " + tableAlias;
-    return dbi.withHandle(h -> h.createQuery(query).mapToBean(IdentifierType.class).list());
+    try {
+      return dbi.withHandle(h -> h.createQuery(query).mapToBean(IdentifierType.class).list());
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override

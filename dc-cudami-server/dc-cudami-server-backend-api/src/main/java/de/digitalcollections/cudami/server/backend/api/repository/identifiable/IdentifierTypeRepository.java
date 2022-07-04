@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -18,7 +19,7 @@ public interface IdentifierTypeRepository {
 
   PageResponse<IdentifierType> find(PageRequest pageRequest);
 
-  List<IdentifierType> findAll();
+  List<IdentifierType> findAll() throws RepositoryException;
 
   IdentifierType getByUuid(UUID uuid);
 

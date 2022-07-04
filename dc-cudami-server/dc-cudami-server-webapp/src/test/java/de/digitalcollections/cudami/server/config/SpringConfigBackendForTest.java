@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,7 +25,7 @@ public class SpringConfigBackendForTest {
 
   @Bean
   @Primary
-  public IdentifierTypeRepository identifierTypeRepository() {
+  public IdentifierTypeRepository identifierTypeRepository() throws RepositoryException {
     IdentifierTypeRepository identifierTypeRepository =
         Mockito.mock(IdentifierTypeRepository.class);
     Mockito.when(identifierTypeRepository.findAll()).thenReturn(new ArrayList<>());
