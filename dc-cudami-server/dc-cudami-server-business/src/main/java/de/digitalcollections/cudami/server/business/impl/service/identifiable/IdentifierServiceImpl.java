@@ -89,13 +89,19 @@ public class IdentifierServiceImpl implements IdentifierService {
   }
 
   @Override
-  public void validate(Set<Identifier> identifiers) throws ValidationException {
+  public void validate(Set<Identifier> identifiers)
+      throws ValidationException, CudamiServiceException {
     Map<String, String> identifierTypes = identifierTypeService.getIdentifierTypeCache();
     List<String> namespacesNotFound = new ArrayList<>(0);
     List<String> idsNotMatchingPattern = new ArrayList<>(0);
+    boolean cacheUpdated = false;
     for (Identifier identifier : identifiers) {
       String namespace = identifier.getNamespace();
       String pattern = identifierTypes.get(identifier.getNamespace());
+      if (pattern == null && !cacheUpdated) {
+        identifierTypes = identifierTypeService.updateIdentifierTypeCache();
+        pattern = identifierTypes.get(identifier.getNamespace());
+      }
       if (pattern == null) {
         namespacesNotFound.add(namespace);
         continue;
