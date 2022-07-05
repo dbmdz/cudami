@@ -77,15 +77,19 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
+    addLabelFilter(searchPageRequest, labelTerm, labelLanguage);
     return corporateBodyService.find(searchPageRequest);
   }
 
+  @Override
   @Operation(
       summary = "Get a corporate body by namespace and id",
       description =
