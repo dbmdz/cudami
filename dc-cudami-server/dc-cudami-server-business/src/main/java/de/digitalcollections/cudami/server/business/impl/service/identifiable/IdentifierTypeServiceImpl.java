@@ -61,6 +61,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
     return repository.getByUuid(uuid);
   }
 
+  @Override
   public Map<String, String> getIdentifierTypeCache() {
     return identifierTypeCache;
   }
@@ -90,6 +91,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
     return updated;
   }
 
+  @Override
   public final Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException {
     try {
       identifierTypeCache =
