@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
@@ -231,5 +230,29 @@ class IdentifiableRepositoryImplTest {
     final var expected3 = new String[] {"one"};
     out = IdentifiableRepository.splitToArray(in);
     assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected3), "out == expected"));
+  }
+
+  @Test
+  @DisplayName("can split umlauts")
+  void testSplitterWithUmlauts() {
+    String[] expected = {"münchen", "bayerische", "staatsbibliothek"};
+    String[] actual = IdentifiableRepository.splitToArray("München, Bayerische Staatsbibliothek");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("can split text with numbers, too")
+  void testSplitterWithNumbers() {
+    String[] expected = {"80333", "münchen", "ludwigstr", "16"};
+    String[] actual = IdentifiableRepository.splitToArray("80333 München, Ludwigstr. 16");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("can split in foreign scripts")
+  void testSplitterWithForeignScripts() {
+    String[] expected = {"古學二千文", "名山勝槩圖", "本草求真", "8"};
+    String[] actual = IdentifiableRepository.splitToArray("古學二千文 名山勝槩圖, 本草求真. 8");
+    assertThat(actual).containsExactly(expected);
   }
 }

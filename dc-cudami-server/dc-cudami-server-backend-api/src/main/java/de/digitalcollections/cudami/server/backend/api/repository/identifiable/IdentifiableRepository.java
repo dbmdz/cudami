@@ -20,8 +20,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   static String[] splitToArray(String term) {
     term = term.trim().toLowerCase();
-    term = term.replaceAll("[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
-    Matcher hyphenWords = Pattern.compile("\\b\\w+(-\\w+)+\\b").matcher(term);
+    term = term.replaceAll("[^\\s\\p{L}_-]|(?<=\\s)-(?=\\s)", "");
+    Matcher hyphenWords = Pattern.compile("\\b\\p{L}+(-\\p{L}+)+\\b").matcher(term);
     List<String> result =
         hyphenWords
             .results()
