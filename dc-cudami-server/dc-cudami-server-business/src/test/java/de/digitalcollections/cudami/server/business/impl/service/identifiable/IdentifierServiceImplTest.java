@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.Map;
 import java.util.Set;
@@ -19,12 +20,12 @@ public class IdentifierServiceImplTest {
 
   private IdentifierService service;
   private IdentifierRepository repo;
-  private IdentifierTypeServiceImpl identifierTypeService;
+  private IdentifierTypeService identifierTypeService;
 
   @BeforeEach
   public void beforeEach() throws CudamiServiceException {
     repo = mock(IdentifierRepository.class);
-    identifierTypeService = mock(IdentifierTypeServiceImpl.class);
+    identifierTypeService = mock(IdentifierTypeService.class);
     service = new IdentifierServiceImpl(repo, identifierTypeService);
   }
 
