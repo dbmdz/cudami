@@ -100,6 +100,7 @@ public class IdentifierServiceImpl implements IdentifierService {
       String pattern = identifierTypes.get(identifier.getNamespace());
       if (pattern == null && !cacheUpdated) {
         identifierTypes = identifierTypeService.updateIdentifierTypeCache();
+        cacheUpdated = true;
         pattern = identifierTypes.get(identifier.getNamespace());
       }
       if (pattern == null) {
