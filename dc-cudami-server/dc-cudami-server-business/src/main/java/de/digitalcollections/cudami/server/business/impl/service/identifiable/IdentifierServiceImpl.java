@@ -98,11 +98,11 @@ public class IdentifierServiceImpl implements IdentifierService {
     boolean cacheUpdated = false;
     for (Identifier identifier : identifiers) {
       String namespace = identifier.getNamespace();
-      String pattern = identifierTypes.get(identifier.getNamespace());
+      String pattern = identifierTypes.get(namespace);
       if (pattern == null && !cacheUpdated) {
         identifierTypes = identifierTypeService.updateIdentifierTypeCache();
         cacheUpdated = true;
-        pattern = identifierTypes.get(identifier.getNamespace());
+        pattern = identifierTypes.get(namespace);
       }
       if (pattern == null) {
         namespacesNotFound.add(namespace);
