@@ -3,13 +3,14 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -36,12 +38,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Website controller")
-public class WebsiteController {
+public class WebsiteController extends AbstractIdentifiableController<Website> {
 
   private final WebsiteService websiteService;
 
   public WebsiteController(WebsiteService websiteService) {
     this.websiteService = websiteService;
+  }
+
+  @Override
+  protected IdentifiableService<Website> getService() {
+    return websiteService;
   }
 
   @Operation(
@@ -112,13 +119,11 @@ public class WebsiteController {
               example = "Test",
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return websiteService.find(searchPageRequest);
+          String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
+    return super.find(
+        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, Collections.emptyMap());
   }
 
   @Operation(

@@ -3,7 +3,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -37,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Webpage controller")
-public class WebpageController {
+public class WebpageController extends AbstractIdentifiableController<Webpage> {
 
   private final LocaleService localeService;
   private final WebpageService webpageService;
@@ -45,6 +47,11 @@ public class WebpageController {
   public WebpageController(LocaleService localeService, WebpageService webpageService) {
     this.localeService = localeService;
     this.webpageService = webpageService;
+  }
+
+  @Override
+  protected IdentifiableService<Webpage> getService() {
+    return webpageService;
   }
 
   @Operation(summary = "Add file resource related to webpage")
@@ -68,6 +75,8 @@ public class WebpageController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "publicationStart", required = false)
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
@@ -83,6 +92,7 @@ public class WebpageController {
             .add("publicationEnd", publicationEnd)
             .build();
     pageRequest.setFiltering(filtering);
+    addLabelFilter(pageRequest, labelTerm, labelLanguage);
     return webpageService.find(pageRequest);
   }
 

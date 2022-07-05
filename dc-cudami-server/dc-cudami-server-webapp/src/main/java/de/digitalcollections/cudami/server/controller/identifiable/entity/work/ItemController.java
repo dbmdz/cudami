@@ -10,17 +10,15 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -98,18 +96,18 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "part_of_item.uuid", required = false)
           FilterCriterion<UUID> partOfItemUuidFilterCriterion) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (partOfItemUuidFilterCriterion != null) {
-      partOfItemUuidFilterCriterion.setExpression("part_of_item.uuid");
-      pageRequest.setFiltering(new Filtering(List.of(partOfItemUuidFilterCriterion)));
-    }
-    return itemService.find(pageRequest);
+    return super.find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        searchTerm,
+        labelTerm,
+        labelLanguage,
+        Map.of("part_of_item.uuid", partOfItemUuidFilterCriterion));
   }
 
   @Operation(

@@ -6,13 +6,12 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -80,13 +79,8 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    addLabelFilter(searchPageRequest, labelTerm, labelLanguage);
-    return corporateBodyService.find(searchPageRequest);
+    return super.find(
+        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, Collections.emptyMap());
   }
 
   @Override

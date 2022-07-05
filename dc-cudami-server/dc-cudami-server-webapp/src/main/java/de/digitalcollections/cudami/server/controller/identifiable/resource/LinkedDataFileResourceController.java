@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -35,7 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "LinkedData Fileresource controller")
-public class LinkedDataFileResourceController {
+public class LinkedDataFileResourceController
+    extends AbstractIdentifiableController<LinkedDataFileResource> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(LinkedDataFileResourceController.class);
@@ -46,6 +49,11 @@ public class LinkedDataFileResourceController {
     this.service = service;
   }
 
+  @Override
+  protected IdentifiableService<LinkedDataFileResource> getService() {
+    return service;
+  }
+
   @Operation(summary = "Get a paged list of all linkedDataFileResources")
   @GetMapping(
       value = {"/v6/linkeddatafileresources"},
@@ -54,6 +62,8 @@ public class LinkedDataFileResourceController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "uri", required = false)
           FilterCriterion<String> encodedUriFilterCriterion) {
 
@@ -72,7 +82,7 @@ public class LinkedDataFileResourceController {
       Filtering filtering = Filtering.builder().add("uri", uri).build();
       pageRequest.setFiltering(filtering);
     }
-
+    addLabelFilter(pageRequest, labelTerm, labelLanguage);
     return service.find(pageRequest);
   }
 

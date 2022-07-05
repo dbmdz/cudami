@@ -9,7 +9,12 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -31,6 +36,34 @@ public abstract class AbstractIdentifiableController<T extends Identifiable> {
         getService().getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  protected PageResponse<T> find(
+      int pageNumber,
+      int pageSize,
+      List<Order> sortBy,
+      String searchTerm,
+      String labelTerm,
+      Locale labelLanguage,
+      Map<String, FilterCriterion<?>> filterCriteria) {
+    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+
+    if (filterCriteria != null && !filterCriteria.isEmpty()) {
+      for (Map.Entry<String, FilterCriterion<?>> filterCriterionEntry : filterCriteria.entrySet()) {
+        FilterCriterion<?> filterCriterion = filterCriterionEntry.getValue();
+        if (filterCriterion != null) {
+          filterCriterion.setExpression(filterCriterionEntry.getKey());
+          pageRequest.add(new Filtering(List.of(filterCriterion)));
+        }
+      }
+    }
+
+    addLabelFilter(pageRequest, labelTerm, labelLanguage);
+    return getService().find(pageRequest);
   }
 
   protected abstract IdentifiableService<T> getService();

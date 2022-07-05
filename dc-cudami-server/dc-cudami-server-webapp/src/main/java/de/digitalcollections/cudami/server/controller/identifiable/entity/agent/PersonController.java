@@ -9,7 +9,6 @@ import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -20,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -77,19 +77,18 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-
-    if (previewImageFilter != null) {
-      Filtering filtering = Filtering.builder().add("previewImage", previewImageFilter).build();
-      searchPageRequest.setFiltering(filtering);
-    }
-    return personService.find(searchPageRequest);
+    return super.find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        searchTerm,
+        labelTerm,
+        labelLanguage,
+        Map.of("previewImage", previewImageFilter));
   }
 
   @Operation(summary = "get all persons born at given geo location")
