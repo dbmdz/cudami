@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,10 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Exception.class})
 public class IdentifierServiceImpl implements IdentifierService {
   private final IdentifierRepository identifierRepository;
-  private final IdentifierTypeServiceImpl identifierTypeService;
+  private final IdentifierTypeService identifierTypeService;
 
   public IdentifierServiceImpl(
-      IdentifierRepository identifierRepository, IdentifierTypeServiceImpl identifierTypeService) {
+      IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
     this.identifierRepository = identifierRepository;
     this.identifierTypeService = identifierTypeService;
   }
