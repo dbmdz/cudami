@@ -19,12 +19,10 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.IntStream;
-import org.assertj.core.api.Condition;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -97,9 +95,14 @@ class IdentifiableRepositoryImplTest {
   @Test
   @DisplayName("returns expected sql string")
   void testGetCommonSearchSql() {
-    String actual = repo.getCommonSearchSql("test");
+    String actual = repo.getCommonSearchSql("test", "\"phrase term\"");
     String expected =
         "(jsonb_path_exists(test.label, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath) OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    assertThat(actual).isEqualTo(expected);
+
+    actual = repo.getCommonSearchSql("test", "search term");
+    expected =
+        "(test.split_label @> :searchTermArray::TEXT[] OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     assertThat(actual).isEqualTo(expected);
   }
 
@@ -201,7 +204,7 @@ class IdentifiableRepositoryImplTest {
           "stuff"
         };
     String[] out = IdentifiableRepository.splitToArray(in);
-    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected), "out == expected"));
+    assertThat(out).containsExactly(expected);
 
     in = "\"Here we have quotes and a word-with-two hyphens!\"";
     final var expected1 =
@@ -219,17 +222,17 @@ class IdentifiableRepositoryImplTest {
           "hyphens"
         };
     out = IdentifiableRepository.splitToArray(in);
-    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected1), "out == expected"));
+    assertThat(out).containsExactly(expected1);
 
     in = "something easy";
     final var expected2 = new String[] {"something", "easy"};
     out = IdentifiableRepository.splitToArray(in);
-    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected2), "out == expected"));
+    assertThat(out).containsExactly(expected2);
 
     in = "one";
     final var expected3 = new String[] {"one"};
     out = IdentifiableRepository.splitToArray(in);
-    assertThat(out).has(new Condition<>(a -> Arrays.equals(a, expected3), "out == expected"));
+    assertThat(out).containsExactly(expected3);
   }
 
   @Test
@@ -253,6 +256,18 @@ class IdentifiableRepositoryImplTest {
   void testSplitterWithForeignScripts() {
     String[] expected = {"古學二千文", "名山勝槩圖", "本草求真", "8"};
     String[] actual = IdentifiableRepository.splitToArray("古學二千文 名山勝槩圖, 本草求真. 8");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("split a label into an array")
+  void testSplitLocalizedText() {
+    String[] expected = {
+      "bayerische", "staatsbibliothek", "münchen", "bavarian", "state", "library", "munich"
+    };
+    var label = new LocalizedText(Locale.GERMAN, "Bayerische Staatsbibliothek, München");
+    label.put(Locale.ENGLISH, "Bavarian State Library, Munich");
+    var actual = repo.splitToArray(label);
     assertThat(actual).containsExactly(expected);
   }
 }

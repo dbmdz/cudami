@@ -109,7 +109,7 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias) {
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
     return new ArrayList<>(
         Arrays.asList(
             SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "name"),

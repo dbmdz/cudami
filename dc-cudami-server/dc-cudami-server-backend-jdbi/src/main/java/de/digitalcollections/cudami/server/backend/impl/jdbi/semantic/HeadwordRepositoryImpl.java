@@ -330,7 +330,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias) {
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
     return List.of(SearchTermTemplates.ILIKE_STARTS_WITH.renderTemplate(tableAlias, "label"));
   }
 

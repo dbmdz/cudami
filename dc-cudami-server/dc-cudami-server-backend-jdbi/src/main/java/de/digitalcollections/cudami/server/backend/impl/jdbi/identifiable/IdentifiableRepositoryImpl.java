@@ -30,6 +30,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -295,6 +296,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 .bind("fileresourceUuid", fileResourceUuid)
                 .bind("sortindex", sortIndex)
                 .execute());
+  }
+
+  @Override
+  protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
+    argumentMappings.put(
+        SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+        IdentifiableRepository.splitToArray(searchTerm));
+    return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 
   private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
@@ -628,11 +637,18 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**")));
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
+    if (originalSearchTerm == null) {
+      return Collections.EMPTY_LIST;
+    }
+    List<String> templates = new ArrayList<>(2);
+    if (originalSearchTerm.matches("\".+\"")) {
+      templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**"));
+    } else {
+      templates.add(SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label"));
+    }
+    templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**"));
+    return templates;
   }
 
   public String getSqlSelectAllFields() {
