@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public interface IdentifiableRepository<I extends Identifiable> {
 
   static String[] splitToArray(String term) {
-    term = term.trim().toLowerCase();
+    term = term.toLowerCase();
     term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
     Matcher hyphenWords = Pattern.compile("(?iU)\\b\\w+(-\\w+)+\\b").matcher(term);
     List<String> result =
@@ -29,7 +29,7 @@ public interface IdentifiableRepository<I extends Identifiable> {
                 ArrayList<String>::new,
                 (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
                 ArrayList::addAll);
-    for (String s : term.split("\\s+")) {
+    for (String s : term.trim().split("\\s+")) {
       result.add(s);
     }
     return result.toArray(new String[result.size()]);
