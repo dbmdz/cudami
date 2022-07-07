@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -73,10 +72,10 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(
-        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, Collections.emptyMap());
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
+  @Override
   @Operation(
       summary = "Get a geolocation by namespace and id",
       description =

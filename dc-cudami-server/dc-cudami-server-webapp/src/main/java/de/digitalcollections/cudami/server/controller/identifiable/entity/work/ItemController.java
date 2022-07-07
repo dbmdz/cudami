@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -107,9 +106,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         searchTerm,
         labelTerm,
         labelLanguage,
-        Map.of("part_of_item.uuid", partOfItemUuidFilterCriterion));
+        "part_of_item.uuid",
+        partOfItemUuidFilterCriterion);
   }
 
+  @Override
   @Operation(
       summary = "Get an item by namespace and id",
       description =

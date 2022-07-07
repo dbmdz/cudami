@@ -11,7 +11,6 @@ import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -79,8 +78,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(
-        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, Collections.emptyMap());
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
   @Override

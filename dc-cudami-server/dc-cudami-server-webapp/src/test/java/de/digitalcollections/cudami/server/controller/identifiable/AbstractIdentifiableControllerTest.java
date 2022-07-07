@@ -12,7 +12,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import java.util.Locale;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ class AbstractIdentifiableControllerTest {
   public void filterLabelOnly() {
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
         ArgumentCaptor.forClass(PageRequest.class);
-    testAbstractIdentifiableController.find(0, 1, null, null, "Label", null, null);
+    testAbstractIdentifiableController.find(0, 1, null, null, "Label", null);
     verify(personService, times(1)).find(pageRequestArgumentCaptor.capture());
 
     PageRequest actual = pageRequestArgumentCaptor.getValue();
@@ -56,7 +55,7 @@ class AbstractIdentifiableControllerTest {
   public void filterLabelOnlyPhraseSearch() {
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
         ArgumentCaptor.forClass(PageRequest.class);
-    testAbstractIdentifiableController.find(0, 1, null, null, "\"Label Label\"", null, null);
+    testAbstractIdentifiableController.find(0, 1, null, null, "\"Label Label\"", null);
     verify(personService, times(1)).find(pageRequestArgumentCaptor.capture());
 
     PageRequest actual = pageRequestArgumentCaptor.getValue();
@@ -76,7 +75,7 @@ class AbstractIdentifiableControllerTest {
   public void filterLabelAndLabelLanguage() {
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
         ArgumentCaptor.forClass(PageRequest.class);
-    testAbstractIdentifiableController.find(0, 1, null, null, "Label", Locale.GERMAN, null);
+    testAbstractIdentifiableController.find(0, 1, null, null, "Label", Locale.GERMAN);
     verify(personService, times(1)).find(pageRequestArgumentCaptor.capture());
 
     PageRequest actual = pageRequestArgumentCaptor.getValue();
@@ -99,7 +98,7 @@ class AbstractIdentifiableControllerTest {
     FilterCriterion<?> filterCriterionFoo = FilterCriterion.builder().isEquals("foovalue").build();
     FilterCriterion<?> filterCriterionBar = FilterCriterion.builder().contains("barvalue").build();
     testAbstractIdentifiableController.find(
-        0, 1, null, null, null, null, Map.of("foo", filterCriterionFoo, "bar", filterCriterionBar));
+        0, 1, null, null, null, null, "foo", filterCriterionFoo, "bar", filterCriterionBar);
     verify(personService, times(1)).find(pageRequestArgumentCaptor.capture());
 
     PageRequest actual = pageRequestArgumentCaptor.getValue();

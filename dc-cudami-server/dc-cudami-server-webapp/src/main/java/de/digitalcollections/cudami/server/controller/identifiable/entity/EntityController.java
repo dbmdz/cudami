@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -82,9 +81,11 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         searchTerm,
         labelTerm,
         labelLanguage,
-        Map.of("entityType", entityTypeCriterion));
+        "entityType",
+        entityTypeCriterion);
   }
 
+  @Override
   @Operation(
       summary = "Get an entity by namespace and id",
       description =

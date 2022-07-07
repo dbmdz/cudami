@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +112,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         searchTerm,
         labelTerm,
         labelLanguage,
-        Map.of("parent.uuid", parentUuidFilterCriterion));
+        "parent.uuid",
+        parentUuidFilterCriterion);
   }
 
   @Operation(summary = "Get paged projects of a digital objects")

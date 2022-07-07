@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -122,8 +121,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(
-        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, Collections.emptyMap());
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
   @Operation(

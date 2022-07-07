@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -88,7 +87,8 @@ public class PersonController extends AbstractIdentifiableController<Person> {
         searchTerm,
         labelTerm,
         labelLanguage,
-        Map.of("previewImage", previewImageFilter));
+        "previewImage",
+        previewImageFilter);
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -135,6 +135,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
     return personService.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
+  @Override
   @Operation(
       summary = "Get a person by namespace and id",
       description =
