@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- WEMI part: Item
+- `notes` property to `Entity`
+- DB: `split_label` column to `identifiables`
+- search by label, optionally limited to the language
+  - looks for the existence of the single words in arbitrary order by default (optimized and thus to be preferred)
+  - to search for the phrase surroung the term with double quotes (can be much slower)
+
+### Changed
+
+- find by `searchTerm` looks for the existence of the single words;
+  to look for the words as phrase, surroung them with double quotes (but it will be much slower)
+
 ## [6.0.0](https://github.com/dbmdz/cudami/releases/tag/6.0.0) - 2022-06-23
 
 ### Added
