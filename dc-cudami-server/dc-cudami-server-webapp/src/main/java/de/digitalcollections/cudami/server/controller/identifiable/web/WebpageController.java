@@ -10,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -81,19 +80,17 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    Filtering filtering =
-        Filtering.builder()
-            .add("publicationStart", publicationStart)
-            .add("publicationEnd", publicationEnd)
-            .build();
-    pageRequest.setFiltering(filtering);
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
-    return webpageService.find(pageRequest);
+    return super.find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        null,
+        labelTerm,
+        labelLanguage,
+        "publicationStart",
+        publicationStart,
+        "publicationEnd",
+        publicationEnd);
   }
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")

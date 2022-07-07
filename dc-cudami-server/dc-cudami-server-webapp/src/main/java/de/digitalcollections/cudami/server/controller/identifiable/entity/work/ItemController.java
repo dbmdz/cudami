@@ -110,7 +110,6 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         partOfItemUuidFilterCriterion);
   }
 
-  @Override
   @Operation(
       summary = "Get an item by namespace and id",
       description =
