@@ -270,4 +270,65 @@ class IdentifiableRepositoryImplTest {
     var actual = repo.splitToArray(label);
     assertThat(actual).containsExactly(expected);
   }
+
+  @Test
+  @DisplayName("save and update `split_label`")
+  void testSaveUpdateOfSplitLabel() {
+    // test save method
+    DigitalObject digitalObject = new DigitalObject();
+    digitalObject.setLabel(
+        new LocalizedText(Locale.ENGLISH, "1 not so short Label to check the Label-Splitting"));
+
+    DigitalObject savedDigitalObject = (DigitalObject) repo.save(digitalObject);
+    assertThat(savedDigitalObject.getUuid()).isNotNull();
+
+    String[] splitLabelDb =
+        jdbi.withHandle(
+            h ->
+                h.select(
+                        "select split_label from identifiables where uuid = ?;",
+                        savedDigitalObject.getUuid())
+                    .mapTo(String[].class)
+                    .findOne()
+                    .orElse(null));
+    assertThat(splitLabelDb).isNotNull().isNotEmpty();
+    assertThat(splitLabelDb)
+        .containsExactly(
+            new String[] {
+              "label",
+              "splitting",
+              "1",
+              "not",
+              "so",
+              "short",
+              "label",
+              "to",
+              "check",
+              "the",
+              "label-splitting"
+            });
+
+    // test update method
+    var label = new LocalizedText();
+    label.setText(Locale.ENGLISH, "An English label, no. 1");
+    label.setText(Locale.GERMAN, "Ein deutsches Label, nr. 2");
+    savedDigitalObject.setLabel(label);
+    repo.update(savedDigitalObject);
+
+    String[] splitLabelUpdated =
+        jdbi.withHandle(
+            h ->
+                h.select(
+                        "select split_label from identifiables where uuid = ?;",
+                        savedDigitalObject.getUuid())
+                    .mapTo(String[].class)
+                    .findOne()
+                    .orElse(null));
+    assertThat(splitLabelUpdated).isNotNull().isNotEmpty();
+    assertThat(splitLabelUpdated)
+        .containsExactlyInAnyOrder(
+            new String[] {
+              "an", "english", "label", "no", "1", "ein", "deutsches", "label", "nr", "2"
+            });
+  }
 }
