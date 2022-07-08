@@ -675,13 +675,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String value = (String) fc.getValue();
       switch (fc.getOperation()) {
         case CONTAINS:
-          String key = String.format("split_label_%d", criterionCount);
-          argumentMappings.put(key, IdentifiableRepository.splitToArray(value));
-          return String.format("%s.split_label @> :%s::TEXT[]", tableAlias, key);
+          argumentMappings.put(
+              SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+              IdentifiableRepository.splitToArray(value));
+          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label");
         case EQUALS:
           Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(fc.getExpression());
           String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
-          argumentMappings.put("searchTerm", escapeTermForJsonpath(value));
+          argumentMappings.put(
+              SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
           return SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", language);
         default:
           throw new UnsupportedOperationException(
