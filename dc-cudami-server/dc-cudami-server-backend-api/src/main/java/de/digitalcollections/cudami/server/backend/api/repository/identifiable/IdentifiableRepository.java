@@ -20,7 +20,17 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   static String[] splitToArray(String term) {
     term = term.toLowerCase();
+    /*
+     * Remove all characters that are NOT:
+     * - space
+     * - letter or digit
+     * - underscore
+     * - hyphen
+     * and remove all standalone hyphens (space hyphen space)
+     * (flag `U` stands for Unicode)
+     */
     term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
+    // Look for words with hyphens to split them too
     Matcher hyphenWords = Pattern.compile("(?iU)\\b\\w+(-\\w+)+\\b").matcher(term);
     List<String> result =
         hyphenWords
@@ -29,8 +39,8 @@ public interface IdentifiableRepository<I extends Identifiable> {
                 ArrayList<String>::new,
                 (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
                 ArrayList::addAll);
-    for (String s : term.trim().split("\\s+")) {
-      result.add(s);
+    for (String word : term.trim().split("\\s+")) {
+      result.add(word);
     }
     return result.toArray(new String[result.size()]);
   }
