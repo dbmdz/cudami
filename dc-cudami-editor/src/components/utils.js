@@ -1,4 +1,7 @@
 export function formatDate(date, locale, onlyDate = false) {
+  if (!date) {
+    return null
+  }
   const dateToFormat = date instanceof Date ? date : new Date(date)
   const options = {
     day: '2-digit',

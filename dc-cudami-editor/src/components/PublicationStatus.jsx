@@ -4,11 +4,13 @@ import {FaCircle} from 'react-icons/fa'
 const PublicationStatus = ({publicationEnd, publicationStart}) => {
   const {t} = useTranslation()
   const publicationStartDate =
-    publicationStart instanceof Date
+    !publicationStart || publicationStart instanceof Date
       ? publicationStart
       : new Date(publicationStart)
   const publicationEndDate =
-    publicationEnd instanceof Date ? publicationEnd : new Date(publicationEnd)
+    !publicationEnd || publicationEnd instanceof Date
+      ? publicationEnd
+      : new Date(publicationEnd)
   const now = Date.now()
   let color = ''
   let publicationStatus = ''
