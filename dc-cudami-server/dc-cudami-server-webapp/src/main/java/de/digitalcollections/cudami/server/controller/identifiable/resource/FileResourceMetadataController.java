@@ -66,6 +66,8 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "uri", required = false)
           FilterCriterion<String> encodedUriFilterCriterion) {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
@@ -83,7 +85,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       Filtering filtering = Filtering.builder().add("uri", uri).build();
       searchPageRequest.setFiltering(filtering);
     }
-
+    addLabelFilter(searchPageRequest, labelTerm, labelLanguage);
     return metadataService.find(searchPageRequest);
   }
 

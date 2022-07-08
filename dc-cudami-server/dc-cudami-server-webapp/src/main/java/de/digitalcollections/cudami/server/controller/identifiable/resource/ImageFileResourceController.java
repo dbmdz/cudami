@@ -56,6 +56,8 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "filename", required = false)
           FilterCriterion<String> filenameFilterCriterion) {
 
@@ -74,6 +76,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       Filtering filtering = Filtering.builder().add("filename", filename).build();
       pageRequest.setFiltering(filtering);
     }
+    addLabelFilter(pageRequest, labelTerm, labelLanguage);
 
     return service.find(pageRequest);
   }

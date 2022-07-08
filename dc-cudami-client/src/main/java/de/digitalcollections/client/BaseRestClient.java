@@ -561,7 +561,7 @@ public abstract class BaseRestClient<T extends Object> {
     }
   }
 
-  private String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
+  protected String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
     if (filterCriterion.getOperation() == null) {
       return "";
     }

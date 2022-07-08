@@ -160,7 +160,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias) {
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
     return new ArrayList<>(
         Arrays.asList(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tableAlias, "url")));
   }

@@ -3,7 +3,9 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Topic controller")
-public class TopicController {
+public class TopicController extends AbstractIdentifiableController<Topic> {
 
   private final LocaleService localeService;
   private final TopicService topicService;
@@ -44,6 +46,11 @@ public class TopicController {
   public TopicController(LocaleService localeService, TopicService topicService) {
     this.localeService = localeService;
     this.topicService = topicService;
+  }
+
+  @Override
+  protected IdentifiableService<Topic> getService() {
+    return topicService;
   }
 
   @Operation(summary = "Add an existing topic to an existing parent topic")
@@ -86,13 +93,10 @@ public class TopicController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return topicService.find(pageRequest);
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
   @Operation(summary = "Get paged entities of a topic")

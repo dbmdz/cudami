@@ -5,6 +5,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +71,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     // handle search term
     String searchTerm = pageRequest.getSearchTerm();
     String executedSearchTerm = null;
-    String commonSearchSql = getCommonSearchSql(tableAlias);
+    String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
     if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
       String commonSql = innerQuery.toString();
       if (commonSql.toUpperCase().contains(" WHERE ")
@@ -81,9 +82,24 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       }
       // select with search term
       innerQuery.append(commonSearchSql);
-      executedSearchTerm = escapeTermForJsonpath(searchTerm);
-      argumentMappings.put("searchTerm", executedSearchTerm);
+      executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
     }
+    return executedSearchTerm;
+  }
+
+  /**
+   * Add the search term to the argument map. By overriding this method custom modifications can be
+   * made. Belongs to {@link #getSearchTermTemplates(String, String)} and {@link
+   * #addSearchTerm(PageRequest, StringBuilder, Map)}.
+   *
+   * @param searchTerm original term from the {@code PageRequest}
+   * @param argumentMappings
+   * @return the search term that should be used for the {@link
+   *     PageResponse#setExecutedSearchTerm(String)}
+   */
+  protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
+    String executedSearchTerm = escapeTermForJsonpath(searchTerm);
+    argumentMappings.put("searchTerm", executedSearchTerm);
     return executedSearchTerm;
   }
 
@@ -111,7 +127,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
    * @param term can be null
    * @return term with forbidden characters removed or escaped
    */
-  private String escapeTermForJsonpath(String term) {
+  protected final String escapeTermForJsonpath(String term) {
     if (term == null) {
       return null;
     }
@@ -126,8 +142,8 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return term;
   }
 
-  public String getCommonSearchSql(String tblAlias) {
-    List<String> searchTermTemplates = getSearchTermTemplates(tblAlias);
+  public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
+    List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
     return searchTermTemplates.isEmpty()
         ? ""
         : "(" + searchTermTemplates.stream().collect(Collectors.joining(" OR ")) + ")";
@@ -155,7 +171,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return mappingPrefix;
   }
 
-  protected List<String> getSearchTermTemplates(String tableAlias) {
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
     return Collections.EMPTY_LIST;
   }
 

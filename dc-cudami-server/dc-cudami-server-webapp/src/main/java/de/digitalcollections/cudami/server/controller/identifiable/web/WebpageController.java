@@ -3,12 +3,13 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Webpage controller")
-public class WebpageController {
+public class WebpageController extends AbstractIdentifiableController<Webpage> {
 
   private final LocaleService localeService;
   private final WebpageService webpageService;
@@ -45,6 +46,11 @@ public class WebpageController {
   public WebpageController(LocaleService localeService, WebpageService webpageService) {
     this.localeService = localeService;
     this.webpageService = webpageService;
+  }
+
+  @Override
+  protected IdentifiableService<Webpage> getService() {
+    return webpageService;
   }
 
   @Operation(summary = "Add file resource related to webpage")
@@ -68,22 +74,23 @@ public class WebpageController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "publicationStart", required = false)
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    Filtering filtering =
-        Filtering.builder()
-            .add("publicationStart", publicationStart)
-            .add("publicationEnd", publicationEnd)
-            .build();
-    pageRequest.setFiltering(filtering);
-    return webpageService.find(pageRequest);
+    return super.find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        null,
+        labelTerm,
+        labelLanguage,
+        "publicationStart",
+        publicationStart,
+        "publicationEnd",
+        publicationEnd);
   }
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")

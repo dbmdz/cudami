@@ -176,8 +176,8 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tblAlias) {
-    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias);
+  protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
+    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
     searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "filename"));
     return searchTermTemplates;
   }

@@ -30,12 +30,15 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -59,12 +62,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static final String TABLE_NAME = "identifiables";
 
   public static String getSqlInsertFields() {
-    return " uuid, created, description, identifiable_objecttype, identifiable_type, label, last_modified, previewfileresource, preview_hints";
+    return " uuid, created, description, identifiable_objecttype, identifiable_type, "
+        + "label, last_modified, previewfileresource, preview_hints, split_label";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
-    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, :label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB";
+    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
+        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[]";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
@@ -110,7 +115,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
-    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, preview_hints=:previewImageRenderingHints::JSONB";
+    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
+        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]";
   }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
@@ -290,6 +296,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 .bind("fileresourceUuid", fileResourceUuid)
                 .bind("sortindex", sortIndex)
                 .execute());
+  }
+
+  @Override
+  protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
+    argumentMappings.put(
+        SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+        IdentifiableRepository.splitToArray(searchTerm));
+    return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 
   private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
@@ -623,11 +637,18 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  protected List<String> getSearchTermTemplates(String tableAlias) {
-    return new ArrayList<>(
-        Arrays.asList(
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label"),
-            SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description")));
+  protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
+    if (originalSearchTerm == null) {
+      return Collections.EMPTY_LIST;
+    }
+    List<String> templates = new ArrayList<>(2);
+    if (originalSearchTerm.matches("\".+\"")) {
+      templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", "**"));
+    } else {
+      templates.add(SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label"));
+    }
+    templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**"));
+    return templates;
   }
 
   public String getSqlSelectAllFields() {
@@ -641,6 +662,36 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   @Override
   protected String getUniqueField() {
     return "uuid";
+  }
+
+  @Override
+  protected String getWhereClause(
+      FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
+      throws IllegalArgumentException, UnsupportedOperationException {
+    if (fc.getExpression().startsWith("label")) {
+      if (!(fc.getValue() instanceof String)) {
+        throw new IllegalArgumentException("Value of label must be a string!");
+      }
+      String value = (String) fc.getValue();
+      switch (fc.getOperation()) {
+        case CONTAINS:
+          argumentMappings.put(
+              SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+              IdentifiableRepository.splitToArray(value));
+          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label");
+        case EQUALS:
+          Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(fc.getExpression());
+          String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
+          argumentMappings.put(
+              SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
+          return SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", language);
+        default:
+          throw new UnsupportedOperationException(
+              "Filtering by label only supports CONTAINS (to be preferred) or EQUALS operator!");
+      }
+    }
+
+    return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
@@ -812,8 +863,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     final UUID previewImageUuid =
         identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
     bindings.put("previewFileResource", previewImageUuid);
+    // split label
+    bindings.put("split_label", splitToArray(identifiable.getLabel()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
-
     if (identifiable.getUuid() == null) {
       // in case of fileresource the uuid is created on binary upload (before metadata save)
       // to make saving on storage using uuid is possible
@@ -896,6 +948,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return getRelatedFileResources(identifiableUuid);
   }
 
+  protected String[] splitToArray(LocalizedText localizedText) {
+    List<String> splitLabels =
+        localizedText.values().stream()
+            .map(text -> IdentifiableRepository.splitToArray(text))
+            .flatMap(Arrays::stream)
+            .collect(Collectors.toList());
+    return splitLabels.toArray(new String[splitLabels.size()]);
+  }
+
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
@@ -914,6 +975,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     final UUID previewImageUuid =
         identifiable.getPreviewImage() == null ? null : identifiable.getPreviewImage().getUuid();
     bindings.put("previewFileResource", previewImageUuid);
+    // split label
+    bindings.put("split_label", splitToArray(identifiable.getLabel()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
 
     identifiable.setLastModified(LocalDateTime.now());

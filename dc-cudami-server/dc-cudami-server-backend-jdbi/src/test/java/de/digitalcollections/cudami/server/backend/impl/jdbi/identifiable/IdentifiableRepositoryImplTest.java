@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -95,9 +95,14 @@ class IdentifiableRepositoryImplTest {
   @Test
   @DisplayName("returns expected sql string")
   void testGetCommonSearchSql() {
-    String actual = repo.getCommonSearchSql("test");
+    String actual = repo.getCommonSearchSql("test", "\"phrase term\"");
     String expected =
         "(jsonb_path_exists(test.label, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath) OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+    assertThat(actual).isEqualTo(expected);
+
+    actual = repo.getCommonSearchSql("test", "search term");
+    expected =
+        "(test.split_label @> :searchTermArray::TEXT[] OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     assertThat(actual).isEqualTo(expected);
   }
 
@@ -170,5 +175,160 @@ class IdentifiableRepositoryImplTest {
 
     List<Identifiable> content = response.getContent();
     assertThat(content).hasSize(10);
+  }
+
+  @Test
+  @DisplayName("test string splitting method")
+  void testSplitter() {
+    var in =
+        "A funny text with comma, a hyphen-separated word (unusual in English though) and some other stuff...";
+    final var expected =
+        new String[] {
+          "hyphen",
+          "separated",
+          "a",
+          "funny",
+          "text",
+          "with",
+          "comma",
+          "a",
+          "hyphen-separated",
+          "word",
+          "unusual",
+          "in",
+          "english",
+          "though",
+          "and",
+          "some",
+          "other",
+          "stuff"
+        };
+    String[] out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).containsExactly(expected);
+
+    in = "\"Here we have quotes and a word-with-two hyphens!\"";
+    final var expected1 =
+        new String[] {
+          "word",
+          "with",
+          "two",
+          "here",
+          "we",
+          "have",
+          "quotes",
+          "and",
+          "a",
+          "word-with-two",
+          "hyphens"
+        };
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).containsExactly(expected1);
+
+    in = "something easy";
+    final var expected2 = new String[] {"something", "easy"};
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).containsExactly(expected2);
+
+    in = "one";
+    final var expected3 = new String[] {"one"};
+    out = IdentifiableRepository.splitToArray(in);
+    assertThat(out).containsExactly(expected3);
+  }
+
+  @Test
+  @DisplayName("can split umlauts")
+  void testSplitterWithUmlauts() {
+    String[] expected = {"münchen", "bayerische", "staatsbibliothek"};
+    String[] actual = IdentifiableRepository.splitToArray("München, Bayerische Staatsbibliothek");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("can split text with numbers, too")
+  void testSplitterWithNumbers() {
+    String[] expected = {"80333", "münchen", "ludwigstr", "16"};
+    String[] actual = IdentifiableRepository.splitToArray("80333 München, Ludwigstr. 16");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("can split in foreign scripts")
+  void testSplitterWithForeignScripts() {
+    String[] expected = {"古學二千文", "名山勝槩圖", "本草求真", "8"};
+    String[] actual = IdentifiableRepository.splitToArray("古學二千文 名山勝槩圖, 本草求真. 8");
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("split a label into an array")
+  void testSplitLocalizedText() {
+    String[] expected = {
+      "bayerische", "staatsbibliothek", "münchen", "bavarian", "state", "library", "munich"
+    };
+    var label = new LocalizedText(Locale.GERMAN, "Bayerische Staatsbibliothek, München");
+    label.put(Locale.ENGLISH, "Bavarian State Library, Munich");
+    var actual = repo.splitToArray(label);
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
+  @DisplayName("save and update `split_label`")
+  void testSaveUpdateOfSplitLabel() {
+    // test save method
+    DigitalObject digitalObject = new DigitalObject();
+    digitalObject.setLabel(
+        new LocalizedText(Locale.ENGLISH, "1 not so short Label to check the Label-Splitting"));
+
+    DigitalObject savedDigitalObject = (DigitalObject) repo.save(digitalObject);
+    assertThat(savedDigitalObject.getUuid()).isNotNull();
+
+    String[] splitLabelDb =
+        jdbi.withHandle(
+            h ->
+                h.select(
+                        "select split_label from identifiables where uuid = ?;",
+                        savedDigitalObject.getUuid())
+                    .mapTo(String[].class)
+                    .findOne()
+                    .orElse(null));
+    assertThat(splitLabelDb).isNotNull().isNotEmpty();
+    assertThat(splitLabelDb)
+        .containsExactly(
+            new String[] {
+              "label",
+              "splitting",
+              "1",
+              "not",
+              "so",
+              "short",
+              "label",
+              "to",
+              "check",
+              "the",
+              "label-splitting"
+            });
+
+    // test update method
+    var label = new LocalizedText();
+    label.setText(Locale.ENGLISH, "An English label, no. 1");
+    label.setText(Locale.GERMAN, "Ein deutsches Label, nr. 2");
+    savedDigitalObject.setLabel(label);
+    repo.update(savedDigitalObject);
+
+    String[] splitLabelUpdated =
+        jdbi.withHandle(
+            h ->
+                h.select(
+                        "select split_label from identifiables where uuid = ?;",
+                        savedDigitalObject.getUuid())
+                    .mapTo(String[].class)
+                    .findOne()
+                    .orElse(null));
+    assertThat(splitLabelUpdated).isNotNull().isNotEmpty();
+    assertThat(splitLabelUpdated)
+        .containsExactlyInAnyOrder(
+            new String[] {
+              "an", "english", "label", "no", "1", "ein", "deutsches", "label", "nr", "2"
+            });
   }
 }

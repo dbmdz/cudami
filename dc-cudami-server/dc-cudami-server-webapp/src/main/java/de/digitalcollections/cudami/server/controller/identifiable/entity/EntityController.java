@@ -2,21 +2,21 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Entity controller")
-public class EntityController<E extends Entity> {
+public class EntityController<E extends Entity> extends AbstractIdentifiableController<Entity> {
 
   private final EntityRelationService entityRelationService;
   private final EntityService<Entity> entityService;
@@ -41,6 +41,11 @@ public class EntityController<E extends Entity> {
       @Qualifier("entityService") EntityService<Entity> entityService) {
     this.entityRelationService = entityRelationService;
     this.entityService = entityService;
+  }
+
+  @Override
+  protected IdentifiableService<Entity> getService() {
+    return entityService;
   }
 
   @Operation(summary = "Get count of entities")
@@ -65,20 +70,22 @@ public class EntityController<E extends Entity> {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
       @RequestParam(name = "entityType", required = false)
           FilterCriterion<String> entityTypeCriterion) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (entityTypeCriterion != null) {
-      Filtering filtering = Filtering.builder().add("entityType", entityTypeCriterion).build();
-      pageRequest.setFiltering(filtering);
-    }
-    return entityService.find(pageRequest);
+    return super.find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        searchTerm,
+        labelTerm,
+        labelLanguage,
+        "entityType",
+        entityTypeCriterion);
   }
 
+  @Override
   @Operation(
       summary = "Get an entity by namespace and id",
       description =
