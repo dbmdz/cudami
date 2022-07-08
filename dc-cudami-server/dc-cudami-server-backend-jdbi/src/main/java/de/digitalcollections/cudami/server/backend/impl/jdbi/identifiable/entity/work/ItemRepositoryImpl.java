@@ -232,7 +232,9 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT ido.sortindex AS idx, * FROM "
+            "SELECT ido.sortindex AS idx, "
+                + doTableAlias
+                + ".* FROM "
                 + doTableName
                 + " AS "
                 + doTableAlias
