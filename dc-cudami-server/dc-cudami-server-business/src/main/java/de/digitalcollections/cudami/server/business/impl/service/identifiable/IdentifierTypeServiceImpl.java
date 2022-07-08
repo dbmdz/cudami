@@ -13,19 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service("identifierTypeService")
 @Transactional(rollbackFor = {Exception.class})
 public class IdentifierTypeServiceImpl implements IdentifierTypeService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
-
-  protected IdentifierTypeRepository repository;
+  private final IdentifierTypeRepository repository;
   private Map<String, String> identifierTypeCache;
 
   @Autowired
@@ -92,7 +88,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public final Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException {
+  public Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException {
     try {
       identifierTypeCache =
           repository.findAll().stream()
