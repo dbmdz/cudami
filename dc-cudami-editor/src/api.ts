@@ -116,7 +116,7 @@ export async function findAttachedObjects(
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[parentType]}/${parentUuid}/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
-    url = `${url}&searchTerm=${searchTerm}`
+    url = `${url}&searchTerm=${encodeURIComponent(searchTerm)}`
   }
   try {
     const response = await fetch(url)
@@ -143,7 +143,7 @@ export async function findRootObjects(
 ) {
   let url = `${contextPath}api/${typeToEndpointMapping[type]}?pageNumber=${pageNumber}&pageSize=${pageSize}`
   if (searchTerm) {
-    url = `${url}&searchTerm=${searchTerm}`
+    url = `${url}&searchTerm=${encodeURIComponent(searchTerm)}`
   }
   if (sorting?.orders) {
     url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
@@ -362,7 +362,11 @@ export async function search(
   type: string,
   {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
 ) {
-  let url = `${contextPath}api/${typeToEndpointMapping[type]}/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/${
+    typeToEndpointMapping[type]
+  }/search?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${encodeURIComponent(
+    searchTerm ?? '',
+  )}`
   if (sorting?.orders) {
     url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
   }
@@ -387,7 +391,11 @@ export async function searchMedia(
   mediaType: string,
   {pageNumber, pageSize, searchTerm, sorting}: PageRequest,
 ) {
-  let url = `${contextPath}api/${typeToEndpointMapping.fileResource}/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${searchTerm}`
+  let url = `${contextPath}api/${
+    typeToEndpointMapping.fileResource
+  }/type/${mediaType}?pageNumber=${pageNumber}&pageSize=${pageSize}&searchTerm=${encodeURIComponent(
+    searchTerm ?? '',
+  )}`
   if (sorting?.orders) {
     url = `${url}&sortBy=${convertOrdersToString(sorting.orders)}`
   }
