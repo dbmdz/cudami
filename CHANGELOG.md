@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - find by `searchTerm` looks for the existence of the single words;
   to look for the words as phrase, embed them in double quotes (but it will be much slower)
 
+### Removed
+
+- removed unused fields `language`, `publicationDate`, `publicationPlace`, `publisher` and `version` from items
+
 ## [6.0.0](https://github.com/dbmdz/cudami/releases/tag/6.0.0) - 2022-06-23
 
 ### Added
