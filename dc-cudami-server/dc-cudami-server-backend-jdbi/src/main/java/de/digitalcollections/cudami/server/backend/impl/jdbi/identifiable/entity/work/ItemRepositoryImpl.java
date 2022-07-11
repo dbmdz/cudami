@@ -36,40 +36,18 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   public static String getSqlInsertFields() {
     return EntityRepositoryImpl.getSqlInsertFields()
-        + ", language, publication_date, publication_place, publisher, version, "
-        + "exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
+        + ", exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public static String getSqlInsertValues() {
     return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :language, :publicationDate, :publicationPlace, :publisher, :version, "
-        + ":exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
+        + ", :exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
   }
 
   public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
-        + tableAlias
-        + ".language "
-        + mappingPrefix
-        + "_language, "
-        + tableAlias
-        + ".publication_date "
-        + mappingPrefix
-        + "_publicationDate, "
-        + tableAlias
-        + ".publication_place "
-        + mappingPrefix
-        + "_publicationPlace, "
-        + tableAlias
-        + ".publisher "
-        + mappingPrefix
-        + "_publisher, "
-        + tableAlias
-        + ".version "
-        + mappingPrefix
-        + "_version, "
         + tableAlias
         + ".exemplifies_manifestation "
         + mappingPrefix
@@ -98,8 +76,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   public static String getSqlUpdateFieldValues() {
     return EntityRepositoryImpl.getSqlUpdateFieldValues()
-        + ", language=:language, publication_date=:publicationDate, publication_place=:publicationPlace, publisher=:publisher, version=:version, "
-        + "exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
+        + ", exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
