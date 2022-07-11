@@ -176,7 +176,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "Get digital objects of this item")
   @GetMapping(
-      value = {"/latest/items/{uuid}/digitalobjects", "/v2/items/{uuid}/digitalobjects"},
+      value = {
+        "/v6/items/{uuid}/digitalobjects",
+        "/v2/items/{uuid}/digitalobjects",
+        "/latest/items/{uuid}/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
@@ -185,7 +189,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "Get works embodied in an item")
   @GetMapping(
-      value = {"/latest/items/{uuid}/works", "/v2/items/{uuid}/works"},
+      value = {"/v6/items/{uuid}/works", "/v2/items/{uuid}/works", "/latest/items/{uuid}/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
