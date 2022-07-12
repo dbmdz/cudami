@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +48,26 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
   @Override
   protected IdentifiableService<HumanSettlement> getService() {
     return humanSettlementService;
+  }
+
+  @Operation(summary = "Delete a human settlement")
+  @DeleteMapping(
+      value = {"/v6/humansettlements/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the human settlement") @PathVariable("uuid")
+          UUID uuid)
+      throws ConflictException {
+    boolean successful;
+    try {
+      successful = humanSettlementService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get all human settlements")
