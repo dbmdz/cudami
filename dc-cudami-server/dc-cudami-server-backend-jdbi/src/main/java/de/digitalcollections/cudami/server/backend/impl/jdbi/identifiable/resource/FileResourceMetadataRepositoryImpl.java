@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Identi
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -177,6 +178,9 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
 
   @Override
   protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
+    if (originalSearchTerm == null) {
+      return Collections.EMPTY_LIST;
+    }
     List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
     searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "filename"));
     return searchTermTemplates;
