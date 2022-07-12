@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -35,15 +34,6 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   }
 
   List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
-
-  default Item getItem(DigitalObject digitalObject) {
-    if (digitalObject == null) {
-      return null;
-    }
-    return getItem(digitalObject.getUuid());
-  }
-
-  Item getItem(UUID digitalObjectUuid);
 
   List<Locale> getLanguagesOfCollections(UUID uuid);
 

@@ -20,7 +20,6 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -515,27 +514,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
 
     return fileResources;
-  }
-
-  @Override
-  public Item getItem(UUID digitalObjectUuid) {
-    final String itTableAlias = itemRepositoryImpl.getTableAlias();
-    String sqlAdditionalJoins =
-        " LEFT JOIN item_digitalobjects AS ido ON " + itTableAlias + ".uuid = ido.item_uuid";
-
-    Filtering filtering =
-        Filtering.builder()
-            .add(
-                FilterCriterion.nativeBuilder()
-                    .withExpression("ido.digitalobject_uuid")
-                    .isEquals(digitalObjectUuid)
-                    .build())
-            .build();
-
-    Item result =
-        itemRepositoryImpl.retrieveOne(
-            itemRepositoryImpl.getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
-    return result;
   }
 
   @Override

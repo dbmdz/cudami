@@ -3,12 +3,14 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Gender;
@@ -21,6 +23,8 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,12 +50,15 @@ public class ItemRepositoryImplTest {
   @Autowired AgentRepository agentRepository;
   @Autowired PersonRepository personRepository;
 
+  private DigitalObjectRepository digitalObjectRepository;
+
   @BeforeEach
   void setup(
       @Autowired Jdbi jdbi,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
       @Autowired WorkRepositoryImpl workRepository,
       @Autowired CudamiConfig config) {
+    this.digitalObjectRepository = digitalObjectRepository;
     repo = new ItemRepositoryImpl(jdbi, digitalObjectRepository, workRepository, config);
   }
 
@@ -278,5 +285,48 @@ public class ItemRepositoryImplTest {
     Item actualItem = actualPageResponse.getContent().get(0);
 
     assertThat(actualItem).isEqualTo(expectedItem);
+  }
+
+  @Test
+  @DisplayName("can return an empty set of connected digital objects for an null item")
+  void digitalObjectsForNullItem() {
+    assertThat(repo.getDigitalObjects(null)).isEmpty();
+  }
+
+  @Test
+  @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
+  void digitalObjectsForNonexistingItem() {
+    assertThat(repo.getDigitalObjects(UUID.randomUUID())).isEmpty();
+  }
+
+  @Test
+  @DisplayName(
+      "can return an empty set of connected digital objects for an item which has no digital objects connected to it")
+  void digitalObjectsForItemWithoutDigitalObjects() {
+    Item item = repo.save(Item.builder().label("item without digital objects").build());
+    DigitalObject digitalObject =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object without item").build());
+
+    assertThat(repo.getDigitalObjects(item.getUuid())).isEmpty();
+  }
+
+  @Test
+  @DisplayName("can return digital objects connected to an item")
+  void digitalObjectsForItem() {
+    Item item1 = repo.save(Item.builder().label("item1 with two digitalObject2").build());
+    Item item2 = repo.save(Item.builder().label("item2 with one digitalObject").build());
+    DigitalObject digitalObject1 =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object 1 for item1").item(item1).build());
+    DigitalObject digitalObject2 =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object 2 for item1").item(item1).build());
+    DigitalObject digitalObject3 =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object 1 for item2").item(item2).build());
+
+    Set<DigitalObject> actual = repo.getDigitalObjects(item1.getUuid());
+    assertThat(actual).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
   }
 }
