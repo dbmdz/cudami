@@ -5,8 +5,6 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesCli
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import java.net.http.HttpClient;
-import java.util.List;
-import java.util.Locale;
 
 public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateBody> {
 
@@ -16,9 +14,5 @@ public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateB
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws TechnicalException {
     return doPostRequestForObject(String.format("%s/gnd/%s", baseEndpoint, gndId));
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 }

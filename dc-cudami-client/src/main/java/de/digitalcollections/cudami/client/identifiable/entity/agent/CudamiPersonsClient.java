@@ -10,7 +10,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
@@ -34,10 +33,6 @@ public class CudamiPersonsClient extends CudamiEntitiesClient<Person> {
   public List<DigitalObject> getDigitalObjects(UUID uuidPerson) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/digitalobjects", baseEndpoint, uuidPerson), DigitalObject.class);
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
   public List getWorks(UUID uuidPerson) throws TechnicalException {

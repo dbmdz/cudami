@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import java.net.http.HttpClient;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -20,9 +19,5 @@ public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
     } else {
       return doGetRequestForObject(String.format(baseEndpoint + "/%s", uuid));
     }
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

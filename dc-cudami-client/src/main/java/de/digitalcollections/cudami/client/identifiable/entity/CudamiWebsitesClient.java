@@ -8,7 +8,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
@@ -21,10 +20,6 @@ public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/rootpages", baseEndpoint, uuid), pageRequest, Webpage.class);
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/languages", baseEndpoint), Locale.class);
   }
 
   public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootpages)
