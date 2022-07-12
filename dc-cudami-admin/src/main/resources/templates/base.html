@@ -232,12 +232,6 @@
                         <i class="far fa-comment-dots nav-icon"></i>
                         <p th:text="#{expressions}">Expressions</p>
                       </a>
-                    </li>
-                    <li class="nav-item">
-                      <a th:href="@{/works}" th:title="#{works}" class="nav-link">
-                        <i class="far fa-lightbulb nav-icon"></i>
-                        <p th:text="#{works}">Works</p>
-                      </a>
                     </li>-->
                     <li class="nav-item">
                       <a class="nav-link"
@@ -267,6 +261,16 @@
                       >
                         <i class="fas fa-map-marker-alt nav-icon"></i>
                         <p th:text="#{geolocations}">Geolocations</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'works'} ? active"
+                         th:href="@{/works}"
+                         th:title="#{works}"
+                      >
+                        <i class="fas fa-lightbulb nav-icon"></i>
+                        <p th:text="#{works}">Works</p>
                       </a>
                     </li>
                     <li class="nav-item">

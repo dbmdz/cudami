@@ -46,6 +46,7 @@ export const typeToEndpointMapping: Record<string, string> = {
   user: 'users',
   webpage: 'webpages',
   website: 'websites',
+  work: 'works',
 }
 
 export async function addAttachedObject(

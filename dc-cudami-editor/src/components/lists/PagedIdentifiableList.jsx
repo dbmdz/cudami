@@ -36,6 +36,7 @@ import ProjectList from './ProjectList'
 import TopicList from './TopicList'
 import WebpageList from './WebpageList'
 import WebsiteList from './WebsiteList'
+import WorkList from './WorkList'
 
 class PagedIdentifiableList extends Component {
   pageSize = 20
@@ -150,6 +151,7 @@ class PagedIdentifiableList extends Component {
       topic: TopicList,
       webpage: WebpageList,
       website: WebsiteList,
+      work: WorkList,
     }
     const {enableMove, enableRemove, parentType, showEdit, type} = this.props
     const {
