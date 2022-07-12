@@ -72,12 +72,12 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
         String.format("%s/%s/fileresources/languages", baseEndpoint, topicUuid), Locale.class);
   }
 
-  public Topic getParent(UUID uuid) throws TechnicalException {
-    return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
+  public List<Locale> getLanguagesOfTopTopics() throws TechnicalException {
+    return doGetRequestForObjectList(String.format("%s/top/languages", baseEndpoint), Locale.class);
   }
 
-  public List<Locale> getTopTopicsLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/top/languages", baseEndpoint), Locale.class);
+  public Topic getParent(UUID uuid) throws TechnicalException {
+    return doGetRequestForObject(String.format("%s/%s/parent", baseEndpoint, uuid));
   }
 
   public List<Topic> getTopicsOfEntity(UUID uuid) throws TechnicalException {
