@@ -69,7 +69,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.findCollections(uuid, pageRequest);
+    return service.findCollections(uuid, pageRequest);
   }
 
   @GetMapping(
@@ -83,7 +83,7 @@ public class DigitalObjectsController extends AbstractController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
       throws TechnicalException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return this.service.findProjects(uuid, pageRequest);
+    return service.findProjects(uuid, pageRequest);
   }
 
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
