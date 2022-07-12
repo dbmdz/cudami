@@ -351,7 +351,7 @@ class DigitalObjectServiceImplTest {
 
     assertThat(service.delete(uuid)).isTrue();
 
-    verify(repo, times(1)).getByUuid(eq(uuid));
+    verify(repo, times(2)).getByUuid(eq(uuid));
     verify(repo, times(1)).deleteFileResources(eq(uuid));
     verify(repo, times(1)).delete(eq(List.of(uuid)));
     verify(digitalObjectLinkedDataFileResourceService, times(1))
