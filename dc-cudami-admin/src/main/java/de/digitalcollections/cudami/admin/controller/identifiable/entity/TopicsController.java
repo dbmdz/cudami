@@ -151,7 +151,7 @@ public class TopicsController extends AbstractController {
     final Locale displayLocale = LocaleContextHolder.getLocale();
     model.addAttribute(
         "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getTopTopicsLanguages()));
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfTopTopics()));
     return "topics/list";
   }
 
