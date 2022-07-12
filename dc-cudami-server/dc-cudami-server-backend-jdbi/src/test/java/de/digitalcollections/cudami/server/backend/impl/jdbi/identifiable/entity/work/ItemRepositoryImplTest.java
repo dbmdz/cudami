@@ -23,7 +23,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -290,30 +289,34 @@ public class ItemRepositoryImplTest {
   @Test
   @DisplayName("can return an empty set of connected digital objects for an null item")
   void digitalObjectsForNullItem() {
-    assertThat(repo.getDigitalObjects(null)).isEmpty();
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    assertThat(repo.findDigitalObjects(null, pageRequest)).isEmpty();
   }
 
   @Test
   @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
   void digitalObjectsForNonexistingItem() {
-    assertThat(repo.getDigitalObjects(UUID.randomUUID())).isEmpty();
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    assertThat(repo.findDigitalObjects(UUID.randomUUID(), pageRequest)).isEmpty();
   }
 
   @Test
   @DisplayName(
       "can return an empty set of connected digital objects for an item which has no digital objects connected to it")
   void digitalObjectsForItemWithoutDigitalObjects() {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     Item item = repo.save(Item.builder().label("item without digital objects").build());
     DigitalObject digitalObject =
         digitalObjectRepository.save(
             DigitalObject.builder().label("digital object without item").build());
 
-    assertThat(repo.getDigitalObjects(item.getUuid())).isEmpty();
+    assertThat(repo.findDigitalObjects(item.getUuid(), pageRequest)).isEmpty();
   }
 
   @Test
   @DisplayName("can return digital objects connected to an item")
   void digitalObjectsForItem() {
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     Item item1 = repo.save(Item.builder().label("item1 with two digitalObject2").build());
     Item item2 = repo.save(Item.builder().label("item2 with one digitalObject").build());
     DigitalObject digitalObject1 =
@@ -326,7 +329,23 @@ public class ItemRepositoryImplTest {
         digitalObjectRepository.save(
             DigitalObject.builder().label("digital object 1 for item2").item(item2).build());
 
-    Set<DigitalObject> actual = repo.getDigitalObjects(item1.getUuid());
-    assertThat(actual).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
+    PageResponse<DigitalObject> actual = repo.findDigitalObjects(item1.getUuid(), pageRequest);
+    assertThat(actual.getContent()).containsExactlyInAnyOrder(digitalObject1, digitalObject2);
+  }
+
+  @Test
+  @DisplayName("can use paging on retrieval of digital objects connected to an item")
+  void pagedDigitalObjectsForItem() {
+    PageRequest pageRequest = PageRequest.builder().pageSize(1).pageNumber(0).build();
+    Item item = repo.save(Item.builder().label("item1 with two digitalObject2").build());
+    DigitalObject digitalObject1 =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object 1 for item1").item(item).build());
+    DigitalObject digitalObject2 =
+        digitalObjectRepository.save(
+            DigitalObject.builder().label("digital object 2 for item1").item(item).build());
+
+    PageResponse<DigitalObject> actual = repo.findDigitalObjects(item.getUuid(), pageRequest);
+    assertThat(actual.getContent()).hasSize(1);
   }
 }

@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
@@ -221,8 +220,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
 
-  @Lazy @Autowired private ItemRepositoryImpl itemRepositoryImpl;
-
   @Lazy @Autowired
   private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
 
@@ -290,7 +287,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         // Can be either a CorporateBody or a Person
         Agent creatorEntity = agentEntityRepositoryImpl.getByUuid(creatorUuid);
         if (creatorEntity != null) {
-          switch (creatorEntity.getEntityType()) {
+          switch (creatorEntity.getIdentifiableObjectType()) {
             case CORPORATE_BODY:
               creationInfo.setCreator(corporateBodyRepositoryImpl.getByUuid(creatorUuid));
               break;
@@ -309,7 +306,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         // Can be a GeoLocation or a HumanSettlement at the moment
         GeoLocation geolocationEntity = geolocationEntityRepositoryImpl.getByUuid(geolocationUuid);
         if (geolocationEntity != null) {
-          switch (geolocationEntity.getEntityType()) {
+          switch (geolocationEntity.getIdentifiableObjectType()) {
               // FIXME: Why no HUMAN_SETTLEMENT here?
             default:
               creationInfo.setGeoLocation(geoLocationRepositoryImpl.getByUuid(geolocationUuid));

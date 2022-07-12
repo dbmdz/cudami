@@ -64,8 +64,7 @@ class ItemServiceImplTest {
   @DisplayName("returns false when connecting an existing item to a nonexisting digital object")
   public void connectExistingItemToNonexistingDigitalObject()
       throws ValidationException, ConflictException, IdentifiableServiceException {
-    when(itemRepository.getByUuidAndFiltering(any(UUID.class), eq(null)))
-        .thenReturn(Item.builder().build());
+    when(itemRepository.getByUuid(any(UUID.class))).thenReturn(Item.builder().build());
 
     assertThat(itemService.addDigitalObject(UUID.randomUUID(), UUID.randomUUID())).isFalse();
   }
@@ -74,7 +73,7 @@ class ItemServiceImplTest {
   @DisplayName("returns false when connecting a nonexisting item to an xisting digital object")
   public void connectNoneistingItemToExistingDigitalObject()
       throws ValidationException, ConflictException, IdentifiableServiceException {
-    when(itemRepository.getByUuidAndFiltering(any(UUID.class), eq(null))).thenReturn(null);
+    when(itemRepository.getByUuid(any(UUID.class))).thenReturn(null);
     when(digitalObjectService.getByUuid(any(UUID.class)))
         .thenReturn(DigitalObject.builder().build());
 
@@ -88,7 +87,7 @@ class ItemServiceImplTest {
       throws ValidationException, ConflictException, IdentifiableServiceException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject = DigitalObject.builder().uuid(UUID.randomUUID()).build();
-    when(itemRepository.getByUuidAndFiltering(eq(item.getUuid()), eq(null))).thenReturn(item);
+    when(itemRepository.getByUuid(eq(item.getUuid()))).thenReturn(item);
     when(digitalObjectService.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
     boolean actual = itemService.addDigitalObject(item.getUuid(), digitalObject.getUuid());
@@ -109,7 +108,7 @@ class ItemServiceImplTest {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =
         DigitalObject.builder().uuid(UUID.randomUUID()).item(item).build();
-    when(itemRepository.getByUuidAndFiltering(eq(item.getUuid()), eq(null))).thenReturn(item);
+    when(itemRepository.getByUuid(eq(item.getUuid()))).thenReturn(item);
     when(digitalObjectService.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
     boolean actual = itemService.addDigitalObject(item.getUuid(), digitalObject.getUuid());
@@ -127,7 +126,7 @@ class ItemServiceImplTest {
             .uuid(UUID.randomUUID())
             .item(Item.builder().uuid(UUID.randomUUID()).build())
             .build();
-    when(itemRepository.getByUuidAndFiltering(eq(item.getUuid()), eq(null))).thenReturn(item);
+    when(itemRepository.getByUuid(eq(item.getUuid()))).thenReturn(item);
     when(digitalObjectService.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
     assertThrows(

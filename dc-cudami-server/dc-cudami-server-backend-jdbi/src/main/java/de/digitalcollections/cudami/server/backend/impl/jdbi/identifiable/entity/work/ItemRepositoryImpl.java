@@ -10,6 +10,9 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -181,15 +184,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public Set<DigitalObject> getDigitalObjects(UUID itemUuid) {
+  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
 
-    StringBuilder innerQuery =
+    StringBuilder commonSql =
         new StringBuilder(
-            "SELECT "
-                + doTableAlias
-                + ".* FROM "
+            " FROM "
                 + doTableName
                 + " AS "
                 + doTableAlias
@@ -198,13 +199,27 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
                 + ".item_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", itemUuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (digitalobject) than this repository (item)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
-            null);
-    return result.stream().collect(Collectors.toSet());
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
