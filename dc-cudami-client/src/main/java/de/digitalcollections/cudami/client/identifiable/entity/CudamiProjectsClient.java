@@ -8,7 +8,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
@@ -38,10 +37,6 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
         String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid),
         pageRequest,
         DigitalObject.class);
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(API_VERSION_PREFIX + "/projects/languages", Locale.class);
   }
 
   public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)

@@ -7,8 +7,6 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * TODO: implement clients for all different fileresource types (application, audio, image, ....)
@@ -23,9 +21,5 @@ public class CudamiFileResourcesMetadataClient extends CudamiIdentifiablesClient
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/type/%s", baseEndpoint, type), pageRequest);
-  }
-
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

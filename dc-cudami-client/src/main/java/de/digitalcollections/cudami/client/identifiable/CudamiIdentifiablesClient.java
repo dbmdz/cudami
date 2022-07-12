@@ -128,6 +128,10 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
     return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
   }
 
+  public List<Locale> getLanguages() throws TechnicalException {
+    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
+  }
+
   public LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws TechnicalException {
     return (LocalizedUrlAliases)
         doGetRequestForObject(

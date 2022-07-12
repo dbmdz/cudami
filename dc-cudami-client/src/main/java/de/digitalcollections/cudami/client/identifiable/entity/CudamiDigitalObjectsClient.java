@@ -85,10 +85,6 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         doGetRequestForObject(String.format("%s/%s/item", baseEndpoint, uuid), Item.class);
   }
 
-  public List<Locale> getLanguages() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
-  }
-
   public List<Locale> getLanguagesOfCollections(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/collections/languages", baseEndpoint, uuid), Locale.class);
