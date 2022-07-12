@@ -31,7 +31,6 @@ delete from humansettlements;
 delete from identifiables;
 delete from identifiers;
 delete from identifiertypes;
-delete from item_digitalobjects;
 delete from item_works;
 delete from items;
 delete from licenses;
