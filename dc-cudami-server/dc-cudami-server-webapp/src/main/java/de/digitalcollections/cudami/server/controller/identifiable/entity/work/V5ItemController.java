@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -14,8 +15,10 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -95,5 +98,18 @@ public class V5ItemController {
       result = itemService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get digital objects of this item")
+  @GetMapping(
+      value = {"/v2/items/{uuid}/digitalobjects", "/latest/items/{uuid}/digitalobjects"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Set<DigitalObject> getDigitalObjects(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
+    return new HashSet<>(
+        itemService
+            .findDigitalObjects(
+                uuid, PageRequest.builder().pageNumber(0).pageSize(Integer.MAX_VALUE).build())
+            .getContent());
   }
 }

@@ -9,11 +9,14 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.DisplayName;
@@ -159,5 +162,31 @@ class ItemControllerTest extends BaseControllerTest {
                     .build())
             .build();
     verify(itemService, times(1)).find(eq(expectedPageRequest));
+  }
+
+  @DisplayName("can return a paged list of DigitalObjects for an item, even it the item")
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "/v6/items/1c72ae9a-94e1-45b1-848f-da1303000924/digitalobjects?pageSize=25&pageNumber=0"
+      })
+  public void pageListOfDigitalObjectsForItem(String path) throws Exception {
+    DigitalObject expectedDigitalObject =
+        DigitalObject.builder()
+            .uuid(UUID.fromString("604ed5f3-d245-4829-b8ad-297cc947af7e"))
+            .label("Hello")
+            .build();
+    UUID itemUuid = UUID.fromString("1c72ae9a-94e1-45b1-848f-da1303000924");
+    PageResponse<DigitalObject> expectedPageResponse =
+        PageResponse.builder()
+            .forPageSize(25)
+            .forRequestPage(0)
+            .withTotalElements(1)
+            .withContent(List.of(expectedDigitalObject))
+            .build();
+    when(itemService.findDigitalObjects(eq(itemUuid), any(PageRequest.class)))
+        .thenReturn(expectedPageResponse);
+
+    testJson(path, "/v6/items/1c72ae9a-94e1-45b1-848f-da1303000924_digitalobjects.json");
   }
 }

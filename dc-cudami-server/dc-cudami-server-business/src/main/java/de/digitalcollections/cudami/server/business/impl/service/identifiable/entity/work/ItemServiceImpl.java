@@ -15,6 +15,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -53,7 +55,7 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   public boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid)
       throws ConflictException, ValidationException, IdentifiableServiceException {
     // Retrieve the Item. If it does not exist, return false
-    Item item = repository.getByUuidAndFiltering(itemUuid, null);
+    Item item = repository.getByUuid(itemUuid);
     if (item == null) {
       return false;
     }
@@ -96,8 +98,8 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   }
 
   @Override
-  public Set<DigitalObject> getDigitalObjects(UUID itemUuid) {
-    return ((ItemRepository) repository).getDigitalObjects(itemUuid);
+  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
+    return ((ItemRepository) repository).findDigitalObjects(itemUuid, pageRequest);
   }
 
   @Override

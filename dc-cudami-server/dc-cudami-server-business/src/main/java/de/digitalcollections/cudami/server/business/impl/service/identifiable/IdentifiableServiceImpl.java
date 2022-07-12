@@ -80,7 +80,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
     for (UUID uuid : uuids) {
-
       try {
         deleteIdentifiers(uuid);
       } catch (CudamiServiceException e) {
