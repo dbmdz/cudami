@@ -106,28 +106,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) {
-    Integer nextSortIndex =
-        retrieveNextSortIndexForParentChildren(dbi, "item_digitalobjects", "item_uuid", itemUuid);
-
-    String query =
-        "INSERT INTO item_digitalobjects ("
-            + "item_uuid, digitalobject_uuid, sortindex"
-            + ") VALUES ("
-            + ":itemUuid, :digitalObjectUuid, :nextSortIndex"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("itemUuid", itemUuid)
-                .bind("digitalObjectUuid", digitalObjectUuid)
-                .bind("nextSortIndex", nextSortIndex)
-                .execute());
-    return true;
-  }
-
-  @Override
   public boolean addWork(UUID itemUuid, UUID workUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(dbi, "item_works", "item_uuid", itemUuid);
@@ -209,17 +187,15 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
     StringBuilder innerQuery =
         new StringBuilder(
-            "SELECT ido.sortindex AS idx, "
+            "SELECT "
                 + doTableAlias
                 + ".* FROM "
                 + doTableName
                 + " AS "
                 + doTableAlias
-                + " LEFT JOIN item_digitalobjects AS ido ON "
+                + " WHERE "
                 + doTableAlias
-                + ".uuid = ido.digitalobject_uuid"
-                + " WHERE ido.item_uuid = :uuid"
-                + " ORDER BY ido.sortindex ASC");
+                + ".item_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", itemUuid);
     List<DigitalObject> result =
@@ -227,7 +203,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
-            "ORDER BY idx ASC");
+            null);
     return result.stream().collect(Collectors.toSet());
   }
 

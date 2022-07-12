@@ -56,15 +56,17 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @Operation(summary = "Add digital object to an item")
   @PostMapping(
       value = {
-        "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/items/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}",
+        "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public boolean addDigitalObject(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
           @PathVariable
-          UUID digitalObjectUuid) {
+          UUID digitalObjectUuid)
+      throws ValidationException, ConflictException, IdentifiableServiceException {
     return itemService.addDigitalObject(uuid, digitalObjectUuid);
   }
 

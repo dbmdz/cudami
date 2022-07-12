@@ -208,7 +208,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public Item getItem(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getItem(digitalObjectUuid);
+    DigitalObject digitalObject = repository.getByUuid(digitalObjectUuid);
+    if (digitalObject == null) {
+      return null;
+    }
+
+    return digitalObject.getItem();
   }
 
   @Override

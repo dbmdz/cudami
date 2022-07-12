@@ -10,8 +10,6 @@ import java.util.UUID;
 /** Repository for Item persistence handling. */
 public interface ItemRepository extends EntityRepository<Item> {
 
-  boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid);
-
   boolean addWork(UUID itemUuid, UUID workUuid);
 
   Set<DigitalObject> getDigitalObjects(UUID itemUuid);

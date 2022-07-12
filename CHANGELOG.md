@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Removed
 
 - removed unused fields `language`, `publicationDate`, `publicationPlace`, `publisher` and `version` from items
+- removed redundant table `item_digitalobjects`
 
 ## [6.0.0](https://github.com/dbmdz/cudami/releases/tag/6.0.0) - 2022-06-23
 
