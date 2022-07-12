@@ -81,7 +81,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
     for (UUID uuid : uuids) {
       try {
-        identifierService.deleteByIdentifiable(uuid);
+        deleteIdentifiers(uuid);
       } catch (CudamiServiceException e) {
         throw new IdentifiableServiceException("Error while removing Identifiers. Rollback.", e);
       }
@@ -92,6 +92,17 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       }
     }
     return repository.delete(uuids);
+  }
+
+  private boolean deleteIdentifiers(UUID identifiableUuid) throws CudamiServiceException {
+    I identifiable = getByUuid(identifiableUuid);
+    if (identifiable == null || identifiable.getIdentifiers() == null) {
+      return false;
+    }
+
+    identifierService.delete(identifiable.getIdentifiers());
+
+    return true;
   }
 
   /**
