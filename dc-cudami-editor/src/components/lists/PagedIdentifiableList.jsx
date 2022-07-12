@@ -30,6 +30,7 @@ import DigitalObjectList from './DigitalObjectList'
 import EntityList from './EntityList'
 import FileResourceList from './FileResourceList'
 import GeoLocationList from './GeoLocationList'
+import ItemList from './ItemList'
 import PersonList from './PersonList'
 import ProjectList from './ProjectList'
 import TopicList from './TopicList'
@@ -143,6 +144,7 @@ class PagedIdentifiableList extends Component {
       entity: EntityList,
       fileResource: FileResourceList,
       geoLocation: GeoLocationList,
+      item: ItemList,
       person: PersonList,
       project: ProjectList,
       topic: TopicList,
