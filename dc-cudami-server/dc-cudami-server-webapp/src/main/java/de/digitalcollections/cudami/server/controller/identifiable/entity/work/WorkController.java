@@ -12,6 +12,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -164,6 +165,17 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Item> getItems(@PathVariable UUID uuid) {
     return workService.getItems(uuid);
+  }
+
+  @Operation(
+      summary = "Get languages of all works",
+      description = "Get languages of all works",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/works/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return workService.getLanguages();
   }
 
   @Operation(summary = "save a newly created work")

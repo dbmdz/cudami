@@ -127,7 +127,9 @@
       "webpage_one": "{{ formattedCount }} Webseite gefunden",
       "webpage_other": "{{ formattedCount }} Webseiten gefunden",
       "website_one": "{{ formattedCount }} Website gefunden",
-      "website_other": "{{ formattedCount }} Websites gefunden"
+      "website_other": "{{ formattedCount }} Websites gefunden",
+      "work_one": "{{ formattedCount }} Werk gefunden",
+      "work_other": "{{ formattedCount }} Werke gefunden"
     }
   },
   "publicationStatus": {
@@ -323,6 +325,8 @@
     "webpage_website_one": "Webseite",
     "webpage_website_other": "Webseiten",
     "website_one": "Website",
-    "website_other": "Websites"
+    "website_other": "Websites",
+    "work_one": "Werk",
+    "work_other": "Werke"
   }
 }
