@@ -35,6 +35,7 @@ export const typeToEndpointMapping: Record<string, string> = {
   fileResource: 'fileresources',
   geoLocation: 'geolocations',
   identifierType: 'identifiertypes',
+  item: 'items',
   language: 'languages',
   license: 'licenses',
   person: 'persons',

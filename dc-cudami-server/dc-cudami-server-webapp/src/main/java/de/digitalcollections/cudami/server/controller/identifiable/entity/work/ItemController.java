@@ -16,6 +16,7 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -48,11 +49,6 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   public ItemController(ItemService itemService) {
     this.itemService = itemService;
-  }
-
-  @Override
-  protected IdentifiableService<Item> getService() {
-    return itemService;
   }
 
   @Operation(summary = "Add digital object to an item")
@@ -88,6 +84,25 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return itemService.count();
+  }
+
+  @Operation(summary = "Delete an item")
+  @DeleteMapping(
+      value = {"/v6/items/{uuid}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid)
+      throws ConflictException {
+    boolean successful;
+    try {
+      successful = itemService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get all items")
@@ -197,6 +212,22 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     return itemService.findDigitalObjects(uuid, pageRequest);
   }
 
+  @Operation(
+      summary = "Get languages of all items",
+      description = "Get languages of all items",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/items/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return itemService.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Item> getService() {
+    return itemService;
+  }
+
   @Operation(summary = "Get works embodied in an item")
   @GetMapping(
       value = {"/v6/items/{uuid}/works", "/v2/items/{uuid}/works", "/latest/items/{uuid}/works"},
@@ -226,24 +257,5 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     }
 
     return itemService.update(item);
-  }
-
-  @Operation(summary = "Delete an item")
-  @DeleteMapping(
-      value = {"/v6/items/{uuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity delete(
-      @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid)
-      throws ConflictException {
-    boolean successful;
-    try {
-      successful = itemService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 }
