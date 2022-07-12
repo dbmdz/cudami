@@ -33,15 +33,6 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
             String.format("%s/%s/works/%s", baseEndpoint, itemUuid, workUuid), Boolean.class);
   }
 
-  public List getDigitalObjects(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(
-        String.format("%s/%s/digitalobjects", baseEndpoint, uuid), DigitalObject.class);
-  }
-
-  public List getWorks(UUID uuid) throws TechnicalException {
-    return doGetRequestForObjectList(String.format("%s/%s/works", baseEndpoint, uuid), Work.class);
-  }
-
   public PageResponse<Item> getAllForParent(Item parent) throws TechnicalException {
     if (parent == null) {
       throw new TechnicalException("Empty parent");
@@ -62,5 +53,14 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
                     .build())
             .build());
     return find(pageRequest);
+  }
+
+  public List getDigitalObjects(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/digitalobjects", baseEndpoint, uuid), DigitalObject.class);
+  }
+
+  public List getWorks(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(String.format("%s/%s/works", baseEndpoint, uuid), Work.class);
   }
 }
