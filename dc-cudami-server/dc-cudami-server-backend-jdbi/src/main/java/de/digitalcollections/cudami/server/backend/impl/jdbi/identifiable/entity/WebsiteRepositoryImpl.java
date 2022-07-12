@@ -9,6 +9,7 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +153,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
+    if (originalSearchTerm == null) {
+      return Collections.EMPTY_LIST;
+    }
     List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
     searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "url"));
     return searchTermTemplates;
