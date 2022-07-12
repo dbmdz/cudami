@@ -115,13 +115,16 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid") UUID uuid)
       throws ConflictException {
 
+    boolean successful;
     try {
-      projectService.delete(uuid);
+      successful = projectService.delete(uuid);
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return new ResponseEntity<>(HttpStatus.OK);
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all projects as (sorted, paged) list")
