@@ -287,7 +287,8 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
           identifierService.saveForIdentifiable(
               savedIdentifiable.getUuid(), identifiable.getIdentifiers()));
     } catch (CudamiServiceException e) {
-      LOGGER.error(String.format("Cannot save Identifiers for: %s", identifiable), e);
+      LOGGER.error(
+          String.format("Cannot save Identifiers for: %s: %s", identifiable, e.getMessage()), e);
       throw new IdentifiableServiceException(e.getMessage());
     }
 
@@ -372,7 +373,14 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
       }
     } catch (CudamiServiceException e) {
-      LOGGER.error("Error while updating Identifiers for " + identifiable, e);
+      LOGGER.error(
+          "Error while updating Identifiers "
+              + identifiable.getIdentifiers()
+              + ": "
+              + e
+              + ", for "
+              + identifiable,
+          e);
       throw new IdentifiableServiceException(e.getMessage());
     }
     try {
