@@ -82,7 +82,7 @@ public class IdentifierServiceImpl implements IdentifierService {
           }
           savedIdentifiers.add(savedIdentifier);
         } catch (RepositoryException e) {
-          throw new CudamiServiceException(e);
+          throw new CudamiServiceException("Cannot save identifier " + identifier + ": " + e, e);
         }
       }
     }
