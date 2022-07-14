@@ -17,6 +17,8 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -100,6 +102,11 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   @Override
   public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
     return ((ItemRepository) repository).findDigitalObjects(itemUuid, pageRequest);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) {
+    return ((ItemRepository) repository).getLanguagesOfDigitalObjects(uuid);
   }
 
   @Override

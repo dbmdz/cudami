@@ -6,6 +6,8 @@ import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,6 +17,8 @@ public interface ItemRepository extends EntityRepository<Item> {
   boolean addWork(UUID itemUuid, UUID workUuid);
 
   PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
+
+  List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
 
   Set<Work> getWorks(UUID itemUuid);
 }
