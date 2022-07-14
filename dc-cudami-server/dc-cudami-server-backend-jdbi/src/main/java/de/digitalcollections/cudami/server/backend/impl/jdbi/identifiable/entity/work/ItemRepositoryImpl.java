@@ -171,19 +171,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "part_of_item.uuid":
-        return tableAlias + ".part_of_item";
-      default:
-        return super.getColumnName(modelProperty);
-    }
-  }
-
-  @Override
   public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
@@ -220,6 +207,19 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "part_of_item.uuid":
+        return tableAlias + ".part_of_item";
+      default:
+        return super.getColumnName(modelProperty);
+    }
   }
 
   @Override
