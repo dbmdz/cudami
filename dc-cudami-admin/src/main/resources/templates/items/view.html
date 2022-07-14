@@ -1,0 +1,97 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{items}: #{item}|">...</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content" th:object="${item}">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <ol class="breadcrumb hidden-xs-down">
+              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+              <li class="breadcrumb-item"><a th:href="@{/items}" th:text="#{items}">...</a></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 th:text="|#{item}|">...</h1>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <hr/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="container-fluid rows-striped">
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
+                <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+              </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
+                <div class="col-md-9" id="identifiers-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row main-content">
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="card-body bg-light">
+                <div th:replace="fragments/identifiable::renderTeaser(${item}, ${language})"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-3 row">
+          <div class="col-sm-12">
+            <div id="digitalobjects-list"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+  <section layout:fragment="beforeBodyEnds">
+    <script>
+      addLanguageChangeHandler()
+    </script>
+    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:src="@{/js/identifier-list.bundle.js}"></script>
+    <script th:inline="javascript">
+      IdentifierList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        id: "identifiers-list",
+        identifiers: /*[[${item.identifiers}]]*/ []
+      });
+      IdentifiableList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        existingLanguages: /*[[${existingDigitalObjectLanguages}]]*/ [],
+        id: "digitalobjects-list",
+        parentType: "item",
+        parentUuid: /*[[${item.uuid}]]*/ '',
+        type: "digitalObject",
+        uiLocale: /*[[${#locale.language}]]*/ ''
+      });
+    </script>
+  </section>
+</body>
+</html>
