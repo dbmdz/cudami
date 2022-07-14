@@ -12,6 +12,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
@@ -61,6 +62,11 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
                     .build())
             .build());
     return find(pageRequest);
+  }
+
+  public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/digitalobjects/languages", baseEndpoint, uuid), Locale.class);
   }
 
   public List getWorks(UUID uuid) throws TechnicalException {

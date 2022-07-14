@@ -16,6 +16,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -220,6 +221,23 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       default:
         return super.getColumnName(modelProperty);
     }
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) {
+    String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
+    String doTableName = digitalObjectRepositoryImpl.getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + doTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + doTableName
+            + " AS "
+            + doTableAlias
+            + String.format(" WHERE %s.item_uuid = :uuid;", doTableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
   }
 
   @Override

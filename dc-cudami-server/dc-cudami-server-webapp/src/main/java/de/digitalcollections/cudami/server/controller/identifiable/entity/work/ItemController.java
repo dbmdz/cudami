@@ -223,6 +223,18 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     return itemService.getLanguages();
   }
 
+  @Operation(
+      summary = "Get languages of all items",
+      description = "Get languages of all items",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/items/{uuid}/digitalobjects/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguagesOfDigitalObjects(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
+    return itemService.getLanguagesOfDigitalObjects(uuid);
+  }
+
   @Override
   protected IdentifiableService<Item> getService() {
     return itemService;
