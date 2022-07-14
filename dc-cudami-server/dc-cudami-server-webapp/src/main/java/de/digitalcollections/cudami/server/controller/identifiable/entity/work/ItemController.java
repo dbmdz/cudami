@@ -129,6 +129,25 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         partOfItemUuidFilterCriterion);
   }
 
+  @Operation(summary = "Get paged list of digital objects of this item")
+  @GetMapping(
+      value = {
+        "/v6/items/{uuid}/digitalobjects",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<DigitalObject> findDigitalObjects(
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return itemService.findDigitalObjects(uuid, pageRequest);
+  }
+
   @Operation(
       summary = "Get an item by namespace and id",
       description =
@@ -191,25 +210,6 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       result = itemService.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-  }
-
-  @Operation(summary = "Get paged list of digital objects of this item")
-  @GetMapping(
-      value = {
-        "/v6/items/{uuid}/digitalobjects",
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<DigitalObject> getDigitalObjects(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return itemService.findDigitalObjects(uuid, pageRequest);
   }
 
   @Operation(
