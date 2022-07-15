@@ -110,7 +110,7 @@ public class IdentifierServiceImpl implements IdentifierService {
       }
       String id = identifier.getId();
       if (!id.matches(pattern)) {
-        idsNotMatchingPattern.add(id);
+        idsNotMatchingPattern.add(namespace + "=" + id);
       }
     }
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
