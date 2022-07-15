@@ -110,11 +110,11 @@ public class IdentifierServiceImpl implements IdentifierService {
       }
       String id = identifier.getId();
       if (id == null) {
-        throw new ValidationException(
-            "Validation of identifiers failed: " + namespace + " is null");
-      }
-      if (!id.matches(pattern)) {
         idsNotMatchingPattern.add(namespace + ":" + id);
+      } else {
+        if (!id.matches(pattern)) {
+          idsNotMatchingPattern.add(namespace + ":" + id);
+        }
       }
     }
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
