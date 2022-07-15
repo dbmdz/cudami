@@ -76,6 +76,19 @@ public class IdentifierServiceImplTest {
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))
-        .withMessageContaining("idsNotMatchingPattern=[id2]");
+        .withMessageContaining("idsNotMatchingPattern=[namespace:id2]");
+  }
+
+  @DisplayName("Validation fails, if the id is null")
+  @Test
+  public void validationFailureNullId() throws CudamiServiceException {
+    when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
+    when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
+
+    Set<Identifier> identifiers = Set.of(new Identifier(null, "namespace"));
+
+    assertThatExceptionOfType(ValidationException.class)
+        .isThrownBy(() -> service.validate(identifiers))
+        .withMessageContaining("idsNotMatchingPattern=[namespace:null]");
   }
 }
