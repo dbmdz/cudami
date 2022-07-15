@@ -114,7 +114,7 @@ public class IdentifierServiceImpl implements IdentifierService {
             "Validation of identifiers failed: " + namespace + " is null");
       }
       if (!id.matches(pattern)) {
-        idsNotMatchingPattern.add(namespace + "=" + id);
+        idsNotMatchingPattern.add(namespace + ":" + id);
       }
     }
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
