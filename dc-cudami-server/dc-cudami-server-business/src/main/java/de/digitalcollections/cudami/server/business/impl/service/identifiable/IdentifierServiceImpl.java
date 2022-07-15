@@ -109,12 +109,8 @@ public class IdentifierServiceImpl implements IdentifierService {
         continue;
       }
       String id = identifier.getId();
-      if (id == null) {
+      if (id == null || !id.matches(pattern)) {
         idsNotMatchingPattern.add(namespace + ":" + id);
-      } else {
-        if (!id.matches(pattern)) {
-          idsNotMatchingPattern.add(namespace + ":" + id);
-        }
       }
     }
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
