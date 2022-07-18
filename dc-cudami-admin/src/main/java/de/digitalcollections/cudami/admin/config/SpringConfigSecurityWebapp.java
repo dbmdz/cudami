@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 
 @Configuration
 @Order(2)
@@ -50,10 +49,6 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .csrf()
         .disable();
 
-    // FIXME: replace with serverside token repository?
-    final InMemoryTokenRepositoryImpl inMemoryTokenRepositoryImpl =
-        new InMemoryTokenRepositoryImpl();
-
     http.authorizeRequests()
         .antMatchers("/users/updatePassword")
         .hasAnyAuthority(Role.ADMIN.getAuthority(), Role.CONTENT_MANAGER.getAuthority())
@@ -72,7 +67,9 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .permitAll()
         .and()
         .rememberMe()
-        .tokenRepository(inMemoryTokenRepositoryImpl)
+        .rememberMeParameter("remember-me")
+        .key("ajksh34h534h34v5gjh")
+        //        .tokenRepository(inMemoryTokenRepositoryImpl)
         .tokenValiditySeconds(14 * 24 * 3600);
   }
 

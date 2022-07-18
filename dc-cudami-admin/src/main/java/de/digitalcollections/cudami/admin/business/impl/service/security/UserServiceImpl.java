@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.admin.business.impl.validator.UniqueUsername
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.Role;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -142,30 +139,6 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
     } catch (TechnicalException ex) {
       throw new ServiceException(ex.getMessage(), ex);
     }
-  }
-
-  /*
-   * see: http://stackoverflow.com/questions/19302196/transaction-marked-as-rollback-only-how-do-i-find-the-cause
-   * When you mark your method as @Transactional, occurrence of any exception inside your method will mark the surrounding TX as roll-back only (even if you catch them).
-   * You can use other attributes of @Transactional annotation to prevent it of rolling back like:
-   *
-   * @Transactional(rollbackFor=MyException.class, noRollbackFor=MyException2.class)
-   */
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user;
-    try {
-      user = client.getByEmail(username);
-    } catch (ResourceNotFoundException | TechnicalException ex) {
-      throw new UsernameNotFoundException(
-          String.format("User \"%s\" was not found.", username), ex);
-    }
-    if (user == null || !user.isEnabled()) {
-      throw new UsernameNotFoundException(String.format("User \"%s\" was not found.", username));
-    }
-    List<? extends GrantedAuthority> authorities = user.getRoles();
-
-    return buildUserForAuthentication(user, authorities);
   }
 
   // TODO: Simplify user management

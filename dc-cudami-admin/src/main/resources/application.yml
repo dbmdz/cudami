@@ -49,9 +49,12 @@ spring:
   profiles:
     active: local
   security:
+    rememberme:
+      secret-key: 'ajksh34h534h34v5gjh'
     user:
       name: admin
       password: secret
+      roles: ACTUATOR
   servlet:
     multipart:
       # disable resolving request to MultiPartRequest to get direct access to HttpServletRequest

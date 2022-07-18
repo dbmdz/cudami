@@ -6,7 +6,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.validation.Errors;
 
 /**
@@ -14,7 +13,7 @@ import org.springframework.validation.Errors;
  *
  * @param <U> domain object
  */
-public interface UserService<U extends User> extends UserDetailsService {
+public interface UserService<U extends User> {
 
   long count() throws ServiceException;
 

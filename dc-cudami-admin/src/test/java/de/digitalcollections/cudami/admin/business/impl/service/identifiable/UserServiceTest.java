@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.business.impl.service.identifiable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.business.impl.service.security.UserServiceImpl;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
@@ -13,18 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserServiceTest {
 
-  CudamiClient cudamiClient = Mockito.mock(CudamiClient.class);
-  MessageSource messageSource = Mockito.mock(MessageSource.class);
-
-  UserService service;
+  private final CudamiClient cudamiClient = Mockito.mock(CudamiClient.class);
+  private final MessageSource messageSource = Mockito.mock(MessageSource.class);
+  private UserServiceImpl service;
   private User user;
-  CudamiUsersClient userRepository = Mockito.mock(CudamiUsersClient.class);
+  private final CudamiUsersClient userRepository = Mockito.mock(CudamiUsersClient.class);
 
   @BeforeEach
   public void setup() throws Exception {
@@ -44,15 +41,15 @@ public class UserServiceTest {
   }
 
   @Test
-  public void testGetPasswordHash() throws Exception {
-    PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
-    assertThat(pwEncoder.matches("foobar", user.getPasswordHash())).isTrue();
+  public void testGetByEmail() throws Exception {
+    User retrieved = service.getByEmail("foo@spar.org");
+    assertThat(retrieved.getEmail()).isEqualTo(user.getEmail());
+    Mockito.verify(userRepository, VerificationModeFactory.times(1)).getByEmail("foo@spar.org");
   }
 
   @Test
-  public void testLoadUserByUsername() throws Exception {
-    UserDetails retrieved = service.loadUserByUsername("foo@spar.org");
-    assertThat(retrieved.getUsername()).isEqualTo(user.getEmail());
-    Mockito.verify(userRepository, VerificationModeFactory.times(1)).getByEmail("foo@spar.org");
+  public void testGetPasswordHash() throws Exception {
+    PasswordEncoder pwEncoder = new BCryptPasswordEncoder();
+    assertThat(pwEncoder.matches("foobar", user.getPasswordHash())).isTrue();
   }
 }
