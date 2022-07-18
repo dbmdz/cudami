@@ -99,12 +99,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
               digitalObject.setCreationInfo(creationInfo);
             }
 
-            // Fill further attributes
-            Integer numberOfBinaryResources =
-                rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
-            digitalObject.setNumberOfBinaryResources(
-                numberOfBinaryResources != null ? numberOfBinaryResources : 0);
-
             // set item UUID only
             UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
             if (itemUuid != null) {

@@ -35,7 +35,6 @@
       "refId": 72,
       "fileResources": [],
       "linkedDataResources": [],
-      "numberOfBinaryResources": 0,
       "parent": {
         "uuid": "1c419226-8d61-4efa-923a-7fbaf961eb9d",
         "identifiers": [],
@@ -44,7 +43,6 @@
         "refId": 0,
         "fileResources": [],
         "linkedDataResources": [],
-        "numberOfBinaryResources": 0,
         "renderingResources": []
       },
       "renderingResources": []
