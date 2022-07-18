@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.config;
 import de.digitalcollections.model.security.Role;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 
 @Configuration
 @Order(2)
@@ -29,6 +29,9 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
  * and https://docs.spring.io/spring-security/site/docs/5.1.2.RELEASE/reference/htmlsingle/#multiple-httpsecurity
  */
 public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
+
+  @Value("${spring.security.rememberme.secret-key}")
+  private String rememberMeSecretKey;
 
   @Autowired(required = true)
   private UserDetailsService userDetailsService; // provided by component scan
@@ -50,10 +53,6 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .csrf()
         .disable();
 
-    // FIXME: replace with serverside token repository?
-    final InMemoryTokenRepositoryImpl inMemoryTokenRepositoryImpl =
-        new InMemoryTokenRepositoryImpl();
-
     http.authorizeRequests()
         .antMatchers("/users/updatePassword")
         .hasAnyAuthority(Role.ADMIN.getAuthority(), Role.CONTENT_MANAGER.getAuthority())
@@ -72,7 +71,9 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .permitAll()
         .and()
         .rememberMe()
-        .tokenRepository(inMemoryTokenRepositoryImpl)
+        .rememberMeParameter("remember-me")
+        .key(rememberMeSecretKey)
+        .userDetailsService(userDetailsService)
         .tokenValiditySeconds(14 * 24 * 3600);
   }
 

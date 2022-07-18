@@ -1,14 +1,21 @@
 package de.digitalcollections.cudami.admin.test.config;
 
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.business.impl.service.security.UserDetailsServiceImpl;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /** Services context. */
 @Configuration
 public class SpringConfigBusinessForTest {
+
+  @Bean
+  public UserDetailsService userDetailsService(UserService userService) {
+    return new UserDetailsServiceImpl(userService);
+  }
 
   @Primary
   @Bean
