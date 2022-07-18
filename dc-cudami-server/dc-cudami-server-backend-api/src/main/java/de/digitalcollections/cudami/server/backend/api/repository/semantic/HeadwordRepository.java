@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.backend.api.repository.semantic;
 
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -34,6 +36,8 @@ public interface HeadwordRepository {
   void deleteRelatedEntities(UUID headwordUuid);
 
   void deleteRelatedFileresources(UUID headwordUuid);
+
+  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
 
   /**
    * Return paged list of headwords
@@ -77,7 +81,7 @@ public interface HeadwordRepository {
    * @param locale locale of label, e.g. "de"
    * @return Headword or null
    */
-  Headword findByLabelAndLocale(String label, Locale locale);
+  Headword getByLabelAndLocale(String label, Locale locale);
 
   default Headword getByUuid(UUID uuid) {
     return findByUuidAndFiltering(uuid, null);

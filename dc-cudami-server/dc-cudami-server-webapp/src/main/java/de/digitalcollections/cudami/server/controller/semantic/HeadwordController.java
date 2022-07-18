@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -98,6 +100,19 @@ public class HeadwordController {
       pageRequest.setFiltering(filtering);
     }
     return headwordService.find(pageRequest);
+  }
+
+  @Operation(summary = "Get lower and upper headword borders as equal sized buckets in a list")
+  @GetMapping(
+      value = {"/v6/headwords/buckets"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public BucketsResponse<Headword> find(
+      @RequestParam(name = "numberOfBuckets", required = false, defaultValue = "25")
+          int numberOfBuckets) {
+    // TODO: until now only size is parametrizable:
+    BucketsRequest<Headword> bucketsRequest =
+        new BucketsRequest<>(numberOfBuckets, null, null, null);
+    return headwordService.find(bucketsRequest);
   }
 
   @Operation(summary = "Find limited amount of random headwords")

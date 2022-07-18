@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
@@ -57,6 +59,11 @@ public class HeadwordServiceImpl implements HeadwordService {
   @Override
   public List<Headword> find(String searchTerm, int maxResults) {
     return repository.find(searchTerm, maxResults);
+  }
+
+  @Override
+  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) {
+    return repository.find(bucketsRequest);
   }
 
   @Override

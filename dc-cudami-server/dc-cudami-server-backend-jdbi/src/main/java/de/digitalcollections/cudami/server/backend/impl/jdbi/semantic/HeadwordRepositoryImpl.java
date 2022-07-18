@@ -6,6 +6,9 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.Bucket;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -182,6 +185,59 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   }
 
   @Override
+  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    int numberOfBuckets = bucketsRequest.getNumberOfBuckets();
+    argumentMappings.put("numberOfBuckets", numberOfBuckets);
+
+    /*
+
+    eine alphabetisch sortierte Liste (A-Z) bekommen,
+    die in z.B. 100 (numberOfBuckets) gleichgroße “Portionen” (buckets) aufgeteilt wird.
+    Pro “Portion” will ich die uuid und das label des ersten Records und des letzten Records (paarweise) bekommen. (Beispiel: Aal - Ada, Ada - Ado, …)
+
+    */
+    // basic query
+    StringBuilder sqlQuery =
+        new StringBuilder(
+            "WITH"
+                + " tmp AS (SELECT ROW_NUMBER () OVER (ORDER BY label) AS num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) FROM headwords),"
+                + " tmp2 AS (SELECT min(num) AS minNum, max(num) AS maxNum, ntile FROM tmp GROUP BY ntile ORDER BY ntile)"
+                + " SELECT num, uuid, label, ntile FROM tmp WHERE num IN ((SELECT minNum FROM tmp2) UNION (SELECT maxNum FROM tmp2));");
+    List<Map<String, Object>> rows =
+        dbi.withHandle(
+            (Handle handle) -> {
+              return handle
+                  .createQuery(sqlQuery.toString())
+                  .bindMap(argumentMappings)
+                  .mapToMap()
+                  .list();
+            });
+
+    List<Bucket<Headword>> content = new ArrayList<>(0);
+
+    for (int i = 0; i < rows.size(); i += 2) {
+      Map<String, Object> lowerBorder = rows.get(i);
+      Map<String, Object> upperBorder = rows.get(i + 1);
+
+      Headword lowerHeadword = new Headword();
+      lowerHeadword.setUuid((UUID) lowerBorder.get("uuid"));
+      lowerHeadword.setLabel((String) lowerBorder.get("label"));
+
+      Headword upperHeadword = new Headword();
+      upperHeadword.setUuid((UUID) upperBorder.get("uuid"));
+      upperHeadword.setLabel((String) upperBorder.get("label"));
+
+      Bucket<Headword> bucket = new Bucket<>(lowerHeadword, upperHeadword);
+      content.add(bucket);
+    }
+
+    BucketsResponse<Headword> bucketsResponse = new BucketsResponse<>(bucketsRequest, content);
+    return bucketsResponse;
+  }
+
+  @Override
   public List<Headword> findByLabel(String label) {
     Filtering filtering =
         Filtering.builder()
@@ -196,34 +252,6 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             filtering);
     PageResponse<Headword> response = find(request);
     return response.getContent();
-  }
-
-  @Override
-  public Headword findByLabelAndLocale(String label, Locale locale) {
-    // basic query
-    StringBuilder sqlQuery =
-        new StringBuilder(
-            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
-
-    // add filtering
-    Filtering filtering =
-        Filtering.builder()
-            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
-            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
-            .build();
-    Map<String, Object> argumentMappings = new HashMap<>();
-    addFiltering(filtering, sqlQuery, argumentMappings);
-
-    // get it
-    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
-    Optional<Headword> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlQuery.toString())
-                    .bindMap(bindMap)
-                    .mapToBean(Headword.class)
-                    .findFirst());
-    return result.orElse(null);
   }
 
   @Override
@@ -281,6 +309,34 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
   @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(Arrays.asList("created", "label", "lastModified"));
+  }
+
+  @Override
+  public Headword getByLabelAndLocale(String label, Locale locale) {
+    // basic query
+    StringBuilder sqlQuery =
+        new StringBuilder(
+            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
+
+    // add filtering
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
+            .build();
+    Map<String, Object> argumentMappings = new HashMap<>();
+    addFiltering(filtering, sqlQuery, argumentMappings);
+
+    // get it
+    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
+    Optional<Headword> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlQuery.toString())
+                    .bindMap(bindMap)
+                    .mapToBean(Headword.class)
+                    .findFirst());
+    return result.orElse(null);
   }
 
   @Override

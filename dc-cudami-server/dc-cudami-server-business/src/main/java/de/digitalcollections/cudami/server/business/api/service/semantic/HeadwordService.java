@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.business.api.service.semantic;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
@@ -38,6 +40,8 @@ public interface HeadwordService {
   }
 
   boolean delete(List<UUID> uuids);
+
+  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
 
   PageResponse<Headword> find(PageRequest pageRequest);
 
