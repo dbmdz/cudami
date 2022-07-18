@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.config;
 import de.digitalcollections.model.security.Role;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * and https://docs.spring.io/spring-security/site/docs/5.1.2.RELEASE/reference/htmlsingle/#multiple-httpsecurity
  */
 public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
+
+  @Value("${spring.security.rememberme.secret-key}")
+  private String rememberMeSecretKey;
 
   @Autowired(required = true)
   private UserDetailsService userDetailsService; // provided by component scan
@@ -68,9 +72,8 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .and()
         .rememberMe()
         .rememberMeParameter("remember-me")
-        .key("ajksh34h534h34v5gjh")
+        .key(rememberMeSecretKey)
         .userDetailsService(userDetailsService)
-        //        .tokenRepository(inMemoryTokenRepositoryImpl)
         .tokenValiditySeconds(14 * 24 * 3600);
   }
 
