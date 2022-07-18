@@ -39,24 +39,6 @@ import TopicForm from './TopicForm'
 import WebpageForm from './WebpageForm'
 import WebsiteForm from './WebsiteForm'
 
-const typeToClassNamesMapping = {
-  article: [{className: 'Article'}],
-  collection: [{className: 'Collection'}],
-  corporateBody: [{className: 'CorporateBody'}],
-  fileResource: [
-    {className: 'ApplicationFileResource', mimeType: 'application/'},
-    {className: 'AudioFileResource', mimeType: 'audio/'},
-    {className: 'ImageFileResource', mimeType: 'image/'},
-    {className: 'LinkedDataFileResource', mimeType: 'application/'},
-    {className: 'TextFileResource', mimeType: 'text/'},
-    {className: 'VideoFileResource', mimeType: 'video/'},
-  ],
-  project: [{className: 'Project'}],
-  topic: [{className: 'Topic'}],
-  webpage: [{className: 'Webpage'}],
-  website: [{className: 'Website'}],
-}
-
 class IdentifiableForm extends Component {
   identifiablesWithLongText = [
     'article',
@@ -263,16 +245,10 @@ class IdentifiableForm extends Component {
     const {
       existingLanguages,
       generationExcludes,
-      identifiable: {label, localizedUrlAliases, mimeType: mime},
+      identifiable: {identifiableObjectType, label, localizedUrlAliases},
       initialLabel,
     } = this.state
-    if (
-      typeToClassNamesMapping[type].some(
-        ({className, mimeType}) =>
-          (mimeType ? mime?.startsWith(mimeType) : true) &&
-          generationExcludes.includes(className),
-      )
-    ) {
+    if (generationExcludes.includes(identifiableObjectType)) {
       return {}
     }
     const languagesWithoutGeneratedUrlAliases = existingLanguages.filter(
