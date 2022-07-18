@@ -41,7 +41,7 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-springmvc</artifactId>
-      <version>5.0.1</version>
+      <version>6.0.0</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
