@@ -69,6 +69,7 @@ public class SpringConfigSecurityWebapp extends WebSecurityConfigurerAdapter {
         .rememberMe()
         .rememberMeParameter("remember-me")
         .key("ajksh34h534h34v5gjh")
+        .userDetailsService(userDetailsService)
         //        .tokenRepository(inMemoryTokenRepositoryImpl)
         .tokenValiditySeconds(14 * 24 * 3600);
   }
