@@ -503,7 +503,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
-            + (orderBy != null ? " " + orderBy : "");
+            + (orderBy != null ? " ORDER BY " + orderBy : "");
 
     List<Headword> result =
         dbi.withHandle(
