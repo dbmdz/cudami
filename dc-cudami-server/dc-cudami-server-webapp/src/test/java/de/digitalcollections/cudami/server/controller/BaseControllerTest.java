@@ -316,4 +316,14 @@ public abstract class BaseControllerTest {
   protected void testDeleteSuccessful(String path) throws Exception {
     mockMvc.perform(delete(path)).andExpect(status().is(HttpStatus.NO_CONTENT.value())); // 204
   }
+
+  /**
+   * Verifies, that an HTTP DELETE request was successful and returns the OK state (code 200)
+   *
+   * @param path the path of the HTTP DELETE request
+   * @thries Exception in case of an error
+   */
+  protected void testDeleteSuccessfulOK(String path) throws Exception {
+    mockMvc.perform(delete(path)).andExpect(status().is(HttpStatus.OK.value())); // 204
+  }
 }

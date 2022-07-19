@@ -103,4 +103,16 @@ class CollectionControllerTest extends BaseControllerTest {
 
     verify(collectionService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
   }
+
+  @DisplayName("can delete a collection")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/collections/09baa24e-0918-4b96-8ab1-f496b02af73a"})
+  void deleteCollection(String path) throws Exception {
+    UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
+    when(collectionService.delete(eq(uuid))).thenReturn(true);
+
+    testDeleteSuccessfulOK(path);
+
+    verify(collectionService, times(1)).delete(eq(uuid));
+  }
 }
