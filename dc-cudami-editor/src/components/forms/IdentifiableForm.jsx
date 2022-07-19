@@ -241,7 +241,7 @@ class IdentifiableForm extends Component {
   }
 
   getGeneratedUrlAliases = async () => {
-    const {parentWebsite, type} = this.props
+    const {parentWebsite} = this.props
     const {
       existingLanguages,
       generationExcludes,
