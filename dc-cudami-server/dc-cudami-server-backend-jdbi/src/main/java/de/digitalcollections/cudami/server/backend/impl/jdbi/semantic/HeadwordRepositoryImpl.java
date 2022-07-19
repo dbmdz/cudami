@@ -7,6 +7,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Search
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.buckets.Bucket;
+import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
+import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
 import de.digitalcollections.model.list.buckets.BucketsRequest;
 import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -192,19 +194,37 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     argumentMappings.put("numberOfBuckets", numberOfBuckets);
 
     /*
+    - get an alphabetically sorted (ASC: A-Z) and numbered list,
+    - divide it in e.g. 100 (numberOfBuckets) same sized sublists (buckets),
+    - get first and last result of each bucket (lower and upper border)
+     */
+    StringBuilder sqlQuery = new StringBuilder(0);
+    Bucket<Headword> parentBucket = bucketsRequest.getParentBucket();
+    if (parentBucket != null) {
+      UUID startUuid = parentBucket.getStartObject().getUuid();
+      UUID endUuid = parentBucket.getEndObject().getUuid();
+      argumentMappings.put("startUuid", startUuid);
+      argumentMappings.put("endUuid", endUuid);
 
-    eine alphabetisch sortierte Liste (A-Z) bekommen,
-    die in z.B. 100 (numberOfBuckets) gleichgroße “Portionen” (buckets) aufgeteilt wird.
-    Pro “Portion” will ich die uuid und das label des ersten Records und des letzten Records (paarweise) bekommen. (Beispiel: Aal - Ada, Ada - Ado, …)
+      sqlQuery.append(
+          "WITH"
+              + " headwords_list AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+              + tableName
+              + "),"
+              + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid)),");
+    } else {
+      sqlQuery.append(
+          "WITH"
+              + " hws AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+              + tableName
+              + "),");
+    }
+    sqlQuery.append(
+        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) FROM hws),"
+            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, ntile FROM buckets GROUP BY ntile ORDER BY ntile)"
+            + " SELECT num, uuid, label, ntile FROM buckets"
+            + " WHERE num IN ((SELECT minNum FROM buckets_borders_nums) UNION (SELECT maxNum FROM buckets_borders_nums))");
 
-    */
-    // basic query
-    StringBuilder sqlQuery =
-        new StringBuilder(
-            "WITH"
-                + " tmp AS (SELECT ROW_NUMBER () OVER (ORDER BY label) AS num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) FROM headwords),"
-                + " tmp2 AS (SELECT min(num) AS minNum, max(num) AS maxNum, ntile FROM tmp GROUP BY ntile ORDER BY ntile)"
-                + " SELECT num, uuid, label, ntile FROM tmp WHERE num IN ((SELECT minNum FROM tmp2) UNION (SELECT maxNum FROM tmp2));");
     List<Map<String, Object>> rows =
         dbi.withHandle(
             (Handle handle) -> {
@@ -215,8 +235,9 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
                   .list();
             });
 
+    // analyze the pairs with same ntile id and create lower and upper border using their values
+    // create a bucket java instance for each pair of this lower and upper borders
     List<Bucket<Headword>> content = new ArrayList<>(0);
-
     for (int i = 0; i < rows.size(); i += 2) {
       Map<String, Object> lowerBorder = rows.get(i);
       Map<String, Object> upperBorder = rows.get(i + 1);
@@ -235,6 +256,51 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
     BucketsResponse<Headword> bucketsResponse = new BucketsResponse<>(bucketsRequest, content);
     return bucketsResponse;
+  }
+
+  @Override
+  public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest) {
+    StringBuilder sqlQuery = new StringBuilder(0);
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    // bucket
+    Bucket<Headword> bucket = bucketObjectsRequest.getBucket();
+    UUID startUuid = bucket.getStartObject().getUuid();
+    UUID endUuid = bucket.getEndObject().getUuid();
+    argumentMappings.put("startUuid", startUuid);
+    argumentMappings.put("endUuid", endUuid);
+
+    sqlQuery.append(
+        "WITH"
+            + " headwords_list AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+            + tableName
+            + "),"
+            + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid))"
+            + " SELECT uuid, label FROM hws");
+
+    // paging
+    int pageSize = bucketObjectsRequest.getPageSize();
+    if (pageSize > 0) {
+      sqlQuery.append(" ").append("LIMIT").append(" ").append(pageSize);
+    }
+    int offset = bucketObjectsRequest.getOffset();
+    if (offset >= 0) {
+      sqlQuery.append(" ").append("OFFSET").append(" ").append(offset);
+    }
+
+    List<Headword> content =
+        dbi.withHandle(
+            (Handle handle) -> {
+              return handle
+                  .createQuery(sqlQuery.toString())
+                  .bindMap(argumentMappings)
+                  .mapToBean(Headword.class)
+                  .list();
+            });
+
+    BucketObjectsResponse<Headword> bucketObjectsResponse =
+        new BucketObjectsResponse<>(bucketObjectsRequest, content);
+    return bucketObjectsResponse;
   }
 
   @Override
