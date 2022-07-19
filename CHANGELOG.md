@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - search by label, optionally limited to the language
   - looks for the existence of the single words in arbitrary order by default (optimized and thus to be preferred)
   - to search for a phrase embed the term in double quotes (can be much slower)
-- Add endpoints to delete geolocations and humansettlements
+- Add endpoints to delete collections, geolocations and humansettlements
 
 ### Changed
 

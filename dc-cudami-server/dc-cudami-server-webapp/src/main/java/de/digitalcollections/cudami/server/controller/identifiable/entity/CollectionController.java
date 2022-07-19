@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -177,6 +178,29 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
     return collectionService.count();
+  }
+
+  @Operation(summary = "Delete an existing collection")
+  @DeleteMapping(
+      value = {
+        "/v6/collections/{uuid}",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity delete(
+      @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
+          UUID uuid)
+      throws ConflictException {
+
+    boolean successful;
+    try {
+      successful = collectionService.delete(uuid);
+    } catch (IdentifiableServiceException e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    if (successful) {
+      return new ResponseEntity<>(successful, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
   @Operation(
