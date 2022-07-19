@@ -22,6 +22,10 @@ public class CudamiIdentifierTypesClient extends CudamiRestClient<IdentifierType
     return response.getContent();
   }
 
+  public IdentifierType getByNamespace(String namespace) throws TechnicalException {
+    return doGetRequestForObject(String.format(baseEndpoint + "/namespace/%s", namespace));
+  }
+
   public IdentifierType getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
     return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
   }

@@ -48,6 +48,14 @@ public class IdentifierTypeController {
     return identifierTypeService.find(pageRequest);
   }
 
+  @Operation(summary = "get identifier type by namespace (which is unique)")
+  @GetMapping(
+      value = {"/v6/identifiertypes/namespace/{namespace}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public IdentifierType getByNamespace(@PathVariable String namespace) {
+    return identifierTypeService.getByNamespace(namespace);
+  }
+
   @Operation(summary = "get identifier type by uuid")
   @GetMapping(
       value = {
