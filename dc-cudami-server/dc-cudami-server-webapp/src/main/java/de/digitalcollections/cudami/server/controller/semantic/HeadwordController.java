@@ -105,7 +105,8 @@ public class HeadwordController {
     return headwordService.find(pageRequest);
   }
 
-  @Operation(summary = "Get lower and upper headword borders as equal sized buckets in a list")
+  @Operation(
+      summary = "Get paged list of headwords in a bucket (defined by lower and upper border UUIDs)")
   @GetMapping(
       value = {"/v6/headwords/bucketobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
