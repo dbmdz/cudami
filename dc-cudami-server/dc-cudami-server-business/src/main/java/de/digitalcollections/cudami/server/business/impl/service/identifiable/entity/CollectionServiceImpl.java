@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -54,6 +55,18 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
     return ((CollectionRepository) repository).addDigitalObjects(collectionUuid, digitalObjects);
+  }
+
+  @Override
+  public boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+    long amountDigitalObjects =
+        findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
+            .getTotalElements();
+    if (amountDigitalObjects > 0) {
+      throw new ConflictException(
+          "Collection cannot be deleted, because it has corresponding digital objects!");
+    }
+    return super.delete(uuid);
   }
 
   @Override
