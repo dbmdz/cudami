@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   to look for the words as phrase, embed them in double quotes (but it will be much slower)
 - retrieval of DigitalObjects for an Item now works with paging
 
+### Fixed
+
+- Fixed "remember me" functionality for login (token is valid for 14 days)
+
 ### Removed
 
 - removed unused fields `language`, `publicationDate`, `publicationPlace`, `publisher` and `version` from items
