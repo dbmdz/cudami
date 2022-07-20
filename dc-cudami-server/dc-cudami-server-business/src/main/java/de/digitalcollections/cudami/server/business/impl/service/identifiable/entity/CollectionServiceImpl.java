@@ -59,6 +59,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+    long amountChildrenCollections =
+        findChildren(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
+            .getTotalElements();
+    if (amountChildrenCollections > 0) {
+      throw new ConflictException(
+          "Collection cannot be deleted, because it has children collections!");
+    }
+
     long amountDigitalObjects =
         findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
             .getTotalElements();
@@ -190,5 +198,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
     return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
+  }
+
+  /**
+   * Only for testing purposes
+   *
+   * @param nodeRepository The NodeRepository
+   */
+  protected void setNodeRepository(NodeRepository<Collection> nodeRepository) {
+    repository = nodeRepository;
   }
 }
