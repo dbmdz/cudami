@@ -240,7 +240,12 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     List<Bucket<Headword>> content = new ArrayList<>(0);
     for (int i = 0; i < rows.size(); i += 2) {
       Map<String, Object> lowerBorder = rows.get(i);
-      Map<String, Object> upperBorder = rows.get(i + 1);
+      Map<String, Object> upperBorder;
+      if ((i + 1) < rows.size()) {
+        upperBorder = rows.get(i + 1);
+      } else {
+        upperBorder = lowerBorder;
+      }
 
       Headword lowerHeadword = new Headword();
       lowerHeadword.setUuid((UUID) lowerBorder.get("uuid"));
