@@ -59,20 +59,7 @@
 
         <div class="row main-content">
           <div class="col-sm-12">
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item" th:each="language,iter : ${existingLanguages}">
-                <a class="language-switcher nav-link" th:classappend="${iter.index} == 0 ? active" th:href="${'#' + language}" data-toggle="tab" th:text="${language.getDisplayName(#locale)}" role="tab">language</a>
-              </li>
-            </ul>
-            <div class="tab-content">
-              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-                <div class="card">
-                  <div class="card-body bg-light">
-                    <div th:replace="fragments/identifiable::renderTeaser(${topic}, ${language})"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${topic}, ${existingLanguages}, false)"></th:block>
           </div>
         </div>
 

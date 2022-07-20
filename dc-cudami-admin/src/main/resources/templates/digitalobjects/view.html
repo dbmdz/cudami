@@ -65,11 +65,7 @@
 
         <div class="row main-content">
           <div class="col-sm-12">
-            <div class="card">
-              <div class="card-body bg-light">
-                <div th:replace="fragments/identifiable::renderTeaser(${digitalObject}, ${language})"></div>
-              </div>
-            </div>
+            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${digitalObject}, ${existingLanguages}, false)"></th:block>
           </div>
         </div>
 

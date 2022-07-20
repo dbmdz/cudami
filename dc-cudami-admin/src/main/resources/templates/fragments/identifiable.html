@@ -3,6 +3,38 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
+  <th:block th:fragment="renderLocalizedTeaser(identifiable, languages, hasLongText)">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" th:each="language,iter : ${languages}">
+        <a
+          class="language-switcher nav-link"
+          data-toggle="tab"
+          role="tab"
+          th:classappend="${iter.index} == 0 ? active"
+          th:href="${'#' + language}"
+          th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+          th:with="languageToDisplay=${language.getDisplayName(#locale)}"
+        >
+          language
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div th:each="language,iter : ${languages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+        <div class="card">
+          <div class="card-body bg-light">
+            <th:block th:insert="::renderTeaser(${identifiable}, ${language})"></th:block>
+          </div>
+          <th:block th:if="${hasLongText} and ${identifiable.text?.containsKey(language)}">
+            <div class="card-body long-text">
+              <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.text}, ${language})"></th:block>
+            </div>
+          </th:block>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
   <th:block th:fragment="renderTeaser(identifiable, language)">
     <div class="row">
       <div class="col-sm-2">
@@ -12,7 +44,7 @@
         <label class="font-weight-bold">
           <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})"></th:block>
         </label>
-        <th:block th:if="${identifiable.description} and ${identifiable.description.containsKey(language)}">
+        <th:block th:if="${identifiable.description?.containsKey(language)}">
           <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description}, ${language})"></div>
         </th:block>
       </div>
@@ -33,5 +65,5 @@
 
   </th:block>
 
-</body>
+  </body>
 </html>
