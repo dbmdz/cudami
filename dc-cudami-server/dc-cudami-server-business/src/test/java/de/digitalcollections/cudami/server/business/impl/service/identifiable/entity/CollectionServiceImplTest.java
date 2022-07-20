@@ -6,12 +6,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -47,6 +49,19 @@ class CollectionServiceImplTest {
             hookProperties,
             localeService,
             cudamiConfig);
+  }
+
+  @DisplayName("throws an exception, when a collection with children shall be deleted")
+  @Test
+  public void execeptionOnDeletionOfCollectionWithChildren() {
+    PageResponse<Collection> pageResponse = mock(PageResponse.class);
+    when(pageResponse.getTotalElements()).thenReturn(1l);
+    NodeRepository<Collection> nodeRepository = mock(NodeRepository.class);
+    when(nodeRepository.findChildren(any(UUID.class), any(PageRequest.class)))
+        .thenReturn(pageResponse);
+    collectionService.setNodeRepository(nodeRepository);
+
+    assertThrows(ConflictException.class, () -> collectionService.delete(UUID.randomUUID()));
   }
 
   @DisplayName(
