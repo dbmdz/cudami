@@ -154,6 +154,8 @@ public class DigitalObjectsController extends AbstractController {
     }
 
     Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, digitalObject.getLabel().getLocales());
     List<Locale> existingCollectionLanguages =
         languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfCollections(uuid));
     List<Locale> existingProjectLanguages =
@@ -164,6 +166,7 @@ public class DigitalObjectsController extends AbstractController {
 
     model
         .addAttribute("digitalObject", digitalObject)
+        .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
         .addAttribute(
             "existingContainedDigitalObjectLanguages", existingContainedDigitalObjectLanguages)

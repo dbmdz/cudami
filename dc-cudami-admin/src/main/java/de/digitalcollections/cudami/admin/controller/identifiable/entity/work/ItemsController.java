@@ -85,11 +85,14 @@ public class ItemsController {
     }
 
     Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, item.getLabel().getLocales());
     List<Locale> existingDigitalObjectLanguages =
         languageSortingHelper.sortLanguages(
             displayLocale, service.getLanguagesOfDigitalObjects(uuid));
     model
         .addAttribute("item", item)
+        .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages);
     return "items/view";
   }
