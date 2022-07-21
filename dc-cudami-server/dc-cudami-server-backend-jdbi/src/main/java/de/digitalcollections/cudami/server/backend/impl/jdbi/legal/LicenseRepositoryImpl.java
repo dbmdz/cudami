@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -157,6 +158,18 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements License
       default:
         return null;
     }
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    String query =
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label) as languages FROM "
+            + tableName
+            + " AS "
+            + tableAlias;
+    return dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
   }
 
   @Override

@@ -7,6 +7,8 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.RenderingTemplate;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,11 @@ public class RenderingTemplateServiceImpl implements RenderingTemplateService {
   @Override
   public RenderingTemplate getByUuid(UUID uuid) {
     return repository.getByUuid(uuid);
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    return repository.getLanguages();
   }
 
   @Override

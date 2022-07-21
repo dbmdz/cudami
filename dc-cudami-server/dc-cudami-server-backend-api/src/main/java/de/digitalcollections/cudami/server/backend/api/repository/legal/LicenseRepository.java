@@ -5,6 +5,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for licences persistence handling. */
@@ -68,6 +69,13 @@ public interface LicenseRepository {
    * @return The found license
    */
   License getByUuid(UUID uuid);
+
+  /**
+   * Return list of languages of all licenses
+   *
+   * @return list of languages
+   */
+  List<Locale> getLanguages();
 
   /**
    * Save a license.

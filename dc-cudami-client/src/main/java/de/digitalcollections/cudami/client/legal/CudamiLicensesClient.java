@@ -10,6 +10,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
 
 public class CudamiLicensesClient extends CudamiRestClient<License> {
 
@@ -43,5 +45,9 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
 
   public License getByUrl(URL url) throws TechnicalException {
     return getByUrl(url.toString());
+  }
+
+  public List<Locale> getLanguages() throws TechnicalException {
+    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }
