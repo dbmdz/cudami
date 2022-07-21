@@ -16,14 +16,14 @@
               <script th:src="@{/js/identifiable-editor.bundle.js}"></script>
               <script th:inline="javascript">
                 IdentifiableEditor({
-                  activeLanguage: /*[[${activeLanguage}]]*/,
+                  activeLanguage: /*[[${activeLanguage}]]*/ '',
                   apiContextPath: /*[[@{/}]]*/ '',
                   id: "editor",
-                  parentType: /*[[${parentType}]]*/,
-                  parentUuid: /*[[${parentUuid}]]*/,
-                  parentWebsite: /*[[${parentWebsite}]]*/,
+                  parentType: /*[[${parentType}]]*/ '',
+                  parentUuid: /*[[${parentUuid}]]*/ '',
+                  parentWebsite: /*[[${parentWebsite}]]*/ '',
                   type: "webpage",
-                  uiLocale: /*[[${#locale.language}]]*/
+                  uiLocale: /*[[${#locale.language}]]*/ ''
                 });
               </script>
             </div> 
