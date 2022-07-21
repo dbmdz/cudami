@@ -9,6 +9,7 @@ import de.digitalcollections.model.view.RenderingTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.MediaType;
@@ -59,6 +60,14 @@ public class RenderingTemplateController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate getByUuid(@PathVariable UUID uuid) {
     return renderingTemplateService.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Get languages of all rendering templates")
+  @GetMapping(
+      value = {"/v6/renderingtemplates/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return this.renderingTemplateService.getLanguages();
   }
 
   @Operation(summary = "Save a newly created rendering template")

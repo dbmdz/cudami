@@ -158,6 +158,14 @@ public class LicenseController {
     return service.getByUuid(uuid);
   }
 
+  @Operation(summary = "Get languages of all licenses")
+  @GetMapping(
+      value = {"/v6/licenses/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return this.service.getLanguages();
+  }
+
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(URL.class, new UrlEditor());

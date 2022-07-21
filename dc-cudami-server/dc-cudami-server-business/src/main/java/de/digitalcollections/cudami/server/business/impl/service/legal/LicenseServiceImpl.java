@@ -9,6 +9,7 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,11 @@ public class LicenseServiceImpl implements LicenseService {
   @Override
   public License getByUuid(UUID uuid) {
     return repository.getByUuid(uuid);
+  }
+
+  @Override
+  public List<Locale> getLanguages() {
+    return repository.getLanguages();
   }
 
   @Override
