@@ -18,10 +18,10 @@
               <script th:inline="javascript">
                 IdentifiableList({
                   apiContextPath: /*[[@{/}]]*/ '',
-                  existingLanguages: /*[[${existingLanguages}]]*/,
+                  existingLanguages: /*[[${existingLanguages}]]*/ [],
                   id: "list",
                   type: "digitalObject",
-                  uiLocale: /*[[${#locale.language}]]*/
+                  uiLocale: /*[[${#locale.language}]]*/ ''
                 });
               </script>
             </div>
