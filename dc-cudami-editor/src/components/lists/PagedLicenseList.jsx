@@ -3,12 +3,13 @@ import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
 import {Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 
-import {getDefaultLanguage} from '../../api'
+import {getDefaultLanguage, typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import LanguageTab from '../LanguageTab'
 import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import {formatDate} from '../utils'
+import ActionButtons from './ActionButtons'
 
 const PagedLicenseList = ({apiContextPath = '/', uiLocale}) => {
   const type = 'license'
@@ -72,6 +73,7 @@ const PagedLicenseList = ({apiContextPath = '/', uiLocale}) => {
                 <th className="text-center">{t('acronym')}</th>
                 <th className="text-center">URL</th>
                 <th className="text-center">{t('lastModified')}</th>
+                <th className="text-center">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -90,6 +92,9 @@ const PagedLicenseList = ({apiContextPath = '/', uiLocale}) => {
                     </td>
                     <td className="text-center">
                       {formatDate(lastModified, uiLocale)}
+                    </td>
+                    <td className="text-center">
+                      <ActionButtons viewUrl={`${viewBaseUrl}/${uuid}`} />
                     </td>
                   </tr>
                 ),
