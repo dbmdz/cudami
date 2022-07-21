@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -11,9 +11,11 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,11 +35,12 @@ public class RenderingTemplatesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
-  private final CudamiLocalesClient localeService;
+  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiRenderingTemplatesClient service;
 
-  public RenderingTemplatesController(CudamiClient client) {
-    this.localeService = client.forLocales();
+  public RenderingTemplatesController(
+      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+    this.languageSortingHelper = languageSortingHelper;
     this.service = client.forRenderingTemplates();
   }
 
@@ -83,7 +86,11 @@ public class RenderingTemplatesController extends AbstractController {
   }
 
   @GetMapping("/renderingtemplates")
-  public String list() {
+  public String list(Model model) throws TechnicalException {
+    Locale locale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages",
+        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
     return "renderingtemplates/list";
   }
 

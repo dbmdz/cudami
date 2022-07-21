@@ -1,18 +1,25 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
 import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
+import {useContext} from 'use-context-selector'
 
-import {getDefaultLanguage, typeToEndpointMapping} from '../../api'
+import {typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
+import {setActiveLanguage} from '../../state/actions'
+import {getActiveLanguage} from '../../state/selectors'
+import {Context} from '../../state/Store'
 import LanguageTab from '../LanguageTab'
 import ListSearch from '../ListSearch'
 import Pagination from '../Pagination'
 import {formatDate} from '../utils'
 import ActionButtons from './ActionButtons'
 
-const PagedRenderingTemplateList = ({apiContextPath = '/', uiLocale}) => {
+const PagedRenderingTemplateList = () => {
   const type = 'renderingTemplate'
+  const activeLanguage = getActiveLanguage()
+  const {apiContextPath, dispatch, existingLanguages, uiLocale} =
+    useContext(Context)
   const {
     content: templates,
     numberOfPages,
@@ -25,13 +32,7 @@ const PagedRenderingTemplateList = ({apiContextPath = '/', uiLocale}) => {
     {property: 'name'},
     {property: 'uuid'},
   ])
-  const [defaultLanguage, setDefaultLanguage] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  useEffect(() => {
-    getDefaultLanguage(apiContextPath).then((defaultLanguage) =>
-      setDefaultLanguage(defaultLanguage),
-    )
-  }, [])
   const {t} = useTranslation()
   return (
     <>
@@ -51,11 +52,17 @@ const PagedRenderingTemplateList = ({apiContextPath = '/', uiLocale}) => {
       </Row>
       <hr />
       <Nav tabs>
-        <LanguageTab
-          activeLanguage={defaultLanguage}
-          language={defaultLanguage}
-          toggle={() => {}}
-        />
+        {existingLanguages.length > 1 &&
+          existingLanguages.map((language) => (
+            <LanguageTab
+              activeLanguage={activeLanguage}
+              key={language}
+              language={language}
+              toggle={(activeLanguage) =>
+                dispatch(setActiveLanguage(activeLanguage))
+              }
+            />
+          ))}
       </Nav>
       <Card className="border-top-0">
         <CardBody>
@@ -94,8 +101,8 @@ const PagedRenderingTemplateList = ({apiContextPath = '/', uiLocale}) => {
                     <td className="text-right">
                       {index + 1 + pageNumber * pageSize}
                     </td>
-                    <td>{label?.[defaultLanguage]}</td>
-                    <td>{description?.[defaultLanguage]}</td>
+                    <td>{label?.[activeLanguage]}</td>
+                    <td>{description?.[activeLanguage]}</td>
                     <td>{name}</td>
                     <td className="text-center">
                       {formatDate(lastModified, uiLocale)}

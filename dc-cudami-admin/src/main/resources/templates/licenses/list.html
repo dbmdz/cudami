@@ -18,6 +18,7 @@
               <script th:inline="javascript">
                 LicenseList({
                   apiContextPath: /*[[@{/}]]*/ '',
+                  existingLanguages: /*[[${existingLanguages}]]*/ [],
                   id: "list",
                   uiLocale: /*[[${#locale.language}]]*/ ''
                 });
