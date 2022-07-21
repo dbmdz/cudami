@@ -59,6 +59,15 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{number_of_binary_resources}">...</label></div>
                 <div class="col-md-9"><span th:text="*{numberOfBinaryResources}">0</span></div>
               </div>
+              <div class="row" th:if="*{license?.url} and *{license?.uuid}">
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{license}">...</label>
+                </div>
+                <div class="col-md-9">
+                  <a class="mr-1" th:href="*{license.url}" th:if="*{license.url}" th:text="*{license.url}">...</a>
+                  (<a th:href="@{/licenses/{uuid}(uuid=*{license.uuid})}" th:text="#{details}">...</a>)
+                </div>
+              </div>
             </div>
           </div>
         </div>
