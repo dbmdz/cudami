@@ -51,7 +51,10 @@ public class LicensesController {
   }
 
   @GetMapping("/licenses")
-  public String list() {
+  public String list(Model model) throws TechnicalException {
+    Locale locale = LocaleContextHolder.getLocale();
+    model.addAttribute(
+        "existingLanguages", languageSortingHelper.sortLanguages(locale, service.getLanguages()));
     return "licenses/list";
   }
 
