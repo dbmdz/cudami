@@ -265,7 +265,6 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
   @Override
   public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest) {
-    StringBuilder sqlQuery = new StringBuilder(0);
     Map<String, Object> argumentMappings = new HashMap<>(0);
 
     // bucket
@@ -275,36 +274,49 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     argumentMappings.put("startUuid", startUuid);
     argumentMappings.put("endUuid", endUuid);
 
-    sqlQuery.append(
+    String baseQuery =
         "WITH"
             + " headwords_list AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
             + tableName
             + "),"
-            + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid))"
-            + " SELECT uuid, label FROM hws");
+            + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid))";
 
+    // query data
+    StringBuilder dataQuery = new StringBuilder(baseQuery);
+    dataQuery.append(" SELECT uuid, label FROM hws");
     // paging
     int pageSize = bucketObjectsRequest.getPageSize();
     if (pageSize > 0) {
-      sqlQuery.append(" ").append("LIMIT").append(" ").append(pageSize);
+      dataQuery.append(" ").append("LIMIT").append(" ").append(pageSize);
     }
     int offset = bucketObjectsRequest.getOffset();
     if (offset >= 0) {
-      sqlQuery.append(" ").append("OFFSET").append(" ").append(offset);
+      dataQuery.append(" ").append("OFFSET").append(" ").append(offset);
     }
-
     List<Headword> content =
         dbi.withHandle(
             (Handle handle) -> {
               return handle
-                  .createQuery(sqlQuery.toString())
+                  .createQuery(dataQuery.toString())
                   .bindMap(argumentMappings)
                   .mapToBean(Headword.class)
                   .list();
             });
 
+    // query total count
+    StringBuilder countQuery = new StringBuilder(baseQuery);
+    countQuery.append(" SELECT count(*) FROM hws");
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(countQuery.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+
     BucketObjectsResponse<Headword> bucketObjectsResponse =
-        new BucketObjectsResponse<>(bucketObjectsRequest, content);
+        new BucketObjectsResponse<>(bucketObjectsRequest, content, total);
     return bucketObjectsResponse;
   }
 
