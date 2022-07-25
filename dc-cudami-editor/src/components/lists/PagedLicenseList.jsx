@@ -13,6 +13,7 @@ import ActionButtons from './ActionButtons'
 
 const PagedLicenseList = ({apiContextPath = '/', uiLocale}) => {
   const type = 'license'
+  const viewBaseUrl = `${apiContextPath}${typeToEndpointMapping[type]}`
   const {
     content: licenses,
     numberOfPages,
