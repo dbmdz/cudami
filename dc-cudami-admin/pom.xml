@@ -32,7 +32,7 @@
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
       <artifactId>dc-commons-server</artifactId>
-      <version>4.1.1</version>
+      <version>4.1.2</version>
     </dependency>
     <dependency>
       <groupId>de.digitalcollections.commons</groupId>
