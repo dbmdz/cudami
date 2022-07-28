@@ -43,7 +43,11 @@
     "marks": {
       "code": "Code-Stil",
       "em": "Kursiv",
-      "link": "Verlinkung",
+      "link": {
+        "edit": "Verlinkung bearbeiten",
+        "insert": "Verlinkung einfügen",
+        "remove": "Verlinkung entfernen"
+      },
       "strikethrough": "Durchgestrichen",
       "strong": "Fett",
       "subscript": "Tiefgestellt",
@@ -192,7 +196,6 @@
     "editCorporateBody": "Institution bearbeiten",
     "editFileResource": "Datei \"{{ name }}\" bearbeiten",
     "editIdentifierType": "Identifikatortyp \"{{ label }}\" bearbeiten",
-    "editLink": "Verlinkung bearbeiten",
     "editPreviewImage": "Vorschaubild bearbeiten",
     "editProject": "Projekt bearbeiten",
     "editRenderingTemplate": "Gestaltungsvorlage \"{{ name }}\" bearbeiten",
@@ -213,7 +216,6 @@
     "image": "Bild",
     "imageLink": "Bild-Link",
     "inPageNavigation": "Seitennavigation",
-    "insertLink": "Verlinkung einfügen",
     "label": "Titel",
     "lastModified": "letzte Änderung",
     "lastname": "Nachname",
