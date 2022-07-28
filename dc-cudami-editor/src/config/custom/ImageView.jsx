@@ -61,7 +61,10 @@ class ImageView {
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
     menu.style.zIndex = 1
-    render(<EditButton onClick={this.editImage} />, menu)
+    render(
+      <EditButton onClick={this.editImage} titleKey="insert.image.edit" />,
+      menu,
+    )
     this.dom.appendChild(menu)
   }
 }

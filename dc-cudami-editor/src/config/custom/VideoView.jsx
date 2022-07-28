@@ -62,7 +62,10 @@ class VideoView {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
-    render(<EditButton onClick={this.editVideo} />, menu)
+    render(
+      <EditButton onClick={this.editVideo} titleKey="insert.video.edit" />,
+      menu,
+    )
     this.dom.appendChild(menu)
   }
 }

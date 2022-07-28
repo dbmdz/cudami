@@ -48,7 +48,10 @@ class IframeView {
     this.dom.classList.add('ProseMirror-selectednode')
     const menu = document.createElement('span')
     menu.classList.add('contentblock-menu')
-    render(<EditButton onClick={this.editIframe} />, menu)
+    render(
+      <EditButton onClick={this.editIframe} titleKey="insert.iframe.edit" />,
+      menu,
+    )
     this.dom.appendChild(menu)
   }
 }

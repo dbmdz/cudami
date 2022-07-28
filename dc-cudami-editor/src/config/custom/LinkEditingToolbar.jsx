@@ -9,7 +9,10 @@ class LinkEditingToolbar {
     this.view = editorView
     const toolbar = document.createElement('div')
     toolbar.classList.add('d-none', 'link-editing-toolbar', 'position-absolute')
-    render(<EditButton onClick={this.editLink} />, toolbar)
+    render(
+      <EditButton onClick={this.editLink} titleKey="marks.link.edit" />,
+      toolbar,
+    )
     this.toolbar = toolbar
   }
 
