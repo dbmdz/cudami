@@ -7,18 +7,45 @@ import {DropdownItem, DropdownMenu, UncontrolledDropdown} from 'reactstrap'
 const Button = ({
   dispatch,
   fullWidth,
-  item: {active, content, enable, run, titleKey},
+  item: {
+    active,
+    content,
+    contentActive,
+    contentInactive,
+    enable,
+    run,
+    titleKey,
+    titleKeyActive,
+    titleKeyInactive,
+  },
   state,
 }) => {
   const {t} = useTranslation()
+  const isActive = active && active(state)
   const disabled = enable && !enable(state)
+  // Check if there are different contents for active and inactive state
+  if (contentActive && contentInactive) {
+    if (isActive) {
+      content = contentActive
+    } else {
+      content = contentInactive
+    }
+  }
+  // Check if there are different titles for active and inactive state
+  if (titleKeyActive && titleKeyInactive) {
+    if (isActive) {
+      titleKey = titleKeyActive
+    } else {
+      titleKey = titleKeyInactive
+    }
+  }
   return (
     <button
       className={classNames(
         'menu-button',
         fullWidth && ['full-width', 'text-left'],
         {
-          active: active && active(state),
+          active: isActive,
           disabled,
         },
       )}

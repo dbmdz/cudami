@@ -23,6 +23,7 @@ import {
   FaTrashAlt,
   FaUnderline,
   FaUndo,
+  FaUnlink,
   FaWindowMaximize,
 } from 'react-icons/fa'
 import {
@@ -73,5 +74,6 @@ export default {
   table: <FaTable />,
   underline: <FaUnderline />,
   undo: <FaUndo />,
+  unlink: <FaUnlink />,
   video: <FaFilm />,
 }

@@ -129,8 +129,10 @@ export default function (t) {
         run: toggleMark(schema.marks.code),
       },
       link: {
-        titleKey: 'marks.link',
-        content: icons.link,
+        titleKeyActive: 'marks.link.remove',
+        titleKeyInactive: 'marks.link.insert',
+        contentActive: icons.unlink,
+        contentInactive: icons.link,
         active: markActive(schema.marks.link),
         enable: (state) =>
           !state.selection.empty && toggleMark(schema.marks.link)(state),
