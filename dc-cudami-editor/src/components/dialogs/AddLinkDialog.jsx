@@ -43,7 +43,7 @@ const AddLinkDialog = ({isOpen, toggle}) => {
   return (
     <Modal isOpen={isOpen} toggle={destroy}>
       <ModalHeader toggle={destroy}>
-        {editing ? t('editLink') : t('insertLink')}
+        {t(`editor:marks.link.${editing ? 'edit' : 'insert'}`)}
       </ModalHeader>
       <ModalBody>
         <Form
