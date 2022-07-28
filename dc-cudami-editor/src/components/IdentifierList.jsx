@@ -6,7 +6,7 @@ const IdentifierList = ({identifiers = [], identifierTypes = []}) =>
     <List className="mb-0" type="inline">
       {sortBy(identifiers, ['namespace']).map(({id, namespace}) => (
         <ListInlineItem key={`${namespace}:${id}`}>
-          <Badge className="pb-1 pt-1" color="primary" pill>{`${
+          <Badge className="border border-dark p-2" color="light" pill>{`${
             identifierTypes.find(
               (identifierType) => identifierType.namespace === namespace,
             )?.label ?? namespace
