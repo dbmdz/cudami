@@ -14,17 +14,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - search by label, optionally limited to the language
   - looks for the existence of the single words in arbitrary order by default (optimized and thus to be preferred)
   - to search for a phrase embed the term in double quotes (can be much slower)
-- Add endpoints to delete collections, geolocations and humansettlements
+- Added endpoints to delete collections, corporate bodies, geolocations, humansettlements and persons
+- Added rendering of contained digital objects
+- Added missing `lastModified` column to the list of `IdentifierType`, `RenderingTemplate` and `User`
+- Added rendering of the list of `License` and `Work` and of a single `License`
+- Added validation of the given identifiers on `save` and `update` against the available identifier types
 
 ### Changed
 
 - find by `searchTerm` looks for the existence of the single words;
   to look for the words as phrase, embed them in double quotes (but it will be much slower)
 - retrieval of DigitalObjects for an Item now works with paging
+- **Breaking**: Bumped `dc-model` dependency to version `11.0.0`
 
 ### Fixed
 
 - Fixed "remember me" functionality for login (token is valid for 14 days)
+- Fixed retrieval by identifier with slashes
 
 ### Removed
 
