@@ -78,6 +78,12 @@
           </div>
         </div>
 
+        <div class="mt-3 row" th:if="*{notes}">
+          <div class="col-sm-12">
+            <th:block th:insert="fragments/entity::renderNotes(*{notes})"></th:block>
+          </div>
+        </div>
+
         <div class="mt-3 row">
           <div class="col-sm-12">
             <div id="digitalobjects-list"></div>
