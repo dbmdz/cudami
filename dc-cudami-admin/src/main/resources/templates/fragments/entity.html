@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="renderNotes(notes)">
+    <h2 th:text="#{notes}">Notes</h2>
+    <th:block
+      th:each="localizedNote,iter : ${notes}"
+      th:insert="::renderLocalizedNote(localizedNote, idx)"
+      th:with="idx=${iter.index}"
+    ></th:block>
+  </th:block>
+
+  <th:block th:fragment="renderLocalizedNote(localizedNote, idx)">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item" th:each="note,iter : ${localizedNote}">
+        <a
+          class="nav-link"
+          data-toggle="tab"
+          role="tab"
+          th:classappend="${iter.index} == 0 ? active"
+          th:href="${'#note-' + idx + '-' + note.key}"
+          th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+          th:with="languageToDisplay=${note.key.getDisplayName(#locale)}"
+        >
+          language
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div th:each="note,iter : ${localizedNote}" th:id="${'note-' + idx + '-' + note.key}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+        <div class="card">
+          <div class="card-body">
+            <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${localizedNote}, ${note.key})"></th:block>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  </body>
+</html>
