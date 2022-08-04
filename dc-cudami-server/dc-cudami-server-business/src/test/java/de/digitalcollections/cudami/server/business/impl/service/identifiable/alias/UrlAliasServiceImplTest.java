@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
+import static de.digitalcollections.model.time.TimestampHelper.truncatedToMicros;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,7 +112,9 @@ class UrlAliasServiceImplTest {
 
     when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
     service.checkPublication(urlAlias);
-    assertThat(urlAlias.getLastPublished()).isEqualTo(publicationDate);
+
+    LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
+    assertThat(urlAlias.getLastPublished()).isEqualTo(expectedPublicationDate);
   }
 
   @DisplayName("checkPublication does not set lastPublished primary is set to false")
@@ -128,10 +131,11 @@ class UrlAliasServiceImplTest {
     UrlAlias changedUrlAlias = deepCopy(urlAlias);
     changedUrlAlias.setPrimary(false);
 
-    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
+    LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(expectedPublicationDate);
     service.checkPublication(changedUrlAlias);
-    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
-    assertThat(changedUrlAlias.getLastPublished().compareTo(publicationDate))
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(expectedPublicationDate);
+    assertThat(changedUrlAlias.getLastPublished().compareTo(expectedPublicationDate))
         .isEqualTo(0); // =equal
     assertThat(changedUrlAlias.isPrimary()).isFalse();
   }
@@ -150,10 +154,11 @@ class UrlAliasServiceImplTest {
     UrlAlias changedUrlAlias = deepCopy(urlAlias);
     changedUrlAlias.setPrimary(true);
 
-    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(publicationDate);
+    LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
+    assertThat(changedUrlAlias.getLastPublished()).isEqualTo(expectedPublicationDate);
     service.checkPublication(changedUrlAlias);
-    assertThat(changedUrlAlias.getLastPublished()).isNotEqualTo(publicationDate);
-    assertThat(changedUrlAlias.getLastPublished().compareTo(publicationDate))
+    assertThat(changedUrlAlias.getLastPublished()).isNotEqualTo(expectedPublicationDate);
+    assertThat(changedUrlAlias.getLastPublished().compareTo(expectedPublicationDate))
         .isEqualTo(1); // =later than publicationDate
     assertThat(changedUrlAlias.isPrimary()).isTrue();
   }
