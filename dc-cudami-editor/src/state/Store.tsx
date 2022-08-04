@@ -35,6 +35,8 @@ interface State {
   defaultLanguage?: string
   /** the open state of the dialogs */
   dialogsOpen: Record<string, boolean>
+  /** a list of already existing languages for multilanguage fields */
+  existingLanguages?: string[]
   /** a feedback message with all the needed information */
   feedbackMessage?: Message
   /** all the state that is only relevant for form components */
@@ -65,13 +67,12 @@ const Store = ({
   const [state, dispatch] = useReducer(Reducer, {
     ...initialState,
     activeLanguage: existingLanguages[0] ?? '',
+    existingLanguages,
     ...(type === 'form' && {forms: initialFormState}),
     ...(type === 'list' && {lists: initialListState}),
   })
   return (
-    <Context.Provider
-      value={{apiContextPath, dispatch, existingLanguages, state, uiLocale}}
-    >
+    <Context.Provider value={{apiContextPath, dispatch, state, uiLocale}}>
       {children}
     </Context.Provider>
   )

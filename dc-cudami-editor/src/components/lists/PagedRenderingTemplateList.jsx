@@ -7,7 +7,7 @@ import {useContext} from 'use-context-selector'
 import {typeToEndpointMapping} from '../../api'
 import usePagination from '../../hooks/usePagination'
 import {setActiveLanguage} from '../../state/actions'
-import {getActiveLanguage} from '../../state/selectors'
+import {getActiveLanguage, getExistingLanguages} from '../../state/selectors'
 import {Context} from '../../state/Store'
 import LanguageTab from '../LanguageTab'
 import ListSearch from '../ListSearch'
@@ -18,8 +18,8 @@ import ActionButtons from './ActionButtons'
 const PagedRenderingTemplateList = () => {
   const type = 'renderingTemplate'
   const activeLanguage = getActiveLanguage()
-  const {apiContextPath, dispatch, existingLanguages, uiLocale} =
-    useContext(Context)
+  const existingLanguages = getExistingLanguages()
+  const {apiContextPath, dispatch, uiLocale} = useContext(Context)
   const {
     content: templates,
     numberOfPages,
