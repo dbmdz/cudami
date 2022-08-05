@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -13,12 +14,18 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -26,12 +33,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class LicensesController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
+
   private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
   public LicensesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
     this.service = client.forLicenses();
+  }
+
+  @GetMapping("/licenses/new")
+  public String create(Model model) throws TechnicalException {
+    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    return "licenses/create";
+  }
+
+  @GetMapping("/api/licenses/new")
+  @ResponseBody
+  public License createModel() throws TechnicalException {
+    return service.create();
   }
 
   @GetMapping("/api/licenses")
@@ -61,6 +84,17 @@ public class LicensesController {
   @ModelAttribute("menu")
   protected String module() {
     return "licenses";
+  }
+
+  @PostMapping("/api/licenses")
+  public ResponseEntity save(@RequestBody License license) {
+    try {
+      License licenseDb = service.save(license);
+      return ResponseEntity.status(HttpStatus.CREATED).body(licenseDb);
+    } catch (TechnicalException e) {
+      LOGGER.error("Cannot save license: ", e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
   }
 
   @GetMapping("/licenses/{uuid}")

@@ -18,7 +18,7 @@ export const setDefaultLanguage = (language: string): Action => ({
 })
 
 /** Sets a feedback message */
-export const setFeedbackMessage = (message: Message): Action => ({
+export const setFeedbackMessage = (message: Message | undefined): Action => ({
   payload: {
     message,
   },
