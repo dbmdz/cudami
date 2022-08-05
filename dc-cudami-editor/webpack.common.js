@@ -9,6 +9,7 @@ module.exports = {
     IdentifierList: './src/lib/IdentifierList.jsx',
     IdentifierTypeEditor: './src/lib/IdentifierTypeEditor.jsx',
     IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
+    LicenseEditor: './src/lib/LicenseEditor.jsx',
     LicenseList: './src/lib/LicenseList.jsx',
     RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
     RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',

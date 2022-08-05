@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'
-import {Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
+import {Button, Card, CardBody, Col, Nav, Row, Table} from 'reactstrap'
 import {useContext} from 'use-context-selector'
 
 import {typeToEndpointMapping} from '../../api'
@@ -38,6 +38,14 @@ const PagedLicenseList = () => {
         <Col>
           {/* We want to force the usage of the plural form here (0 as count activates it) */}
           <h1>{t(`types:${type}`, {count: 0})}</h1>
+        </Col>
+        <Col className="text-right">
+          <Button
+            color="primary"
+            href={`${apiContextPath}${typeToEndpointMapping[type]}/new`}
+          >
+            {t('new')}
+          </Button>
         </Col>
       </Row>
       <hr />

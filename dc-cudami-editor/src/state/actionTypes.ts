@@ -18,7 +18,7 @@ interface BooleanAction {
 type MessageTypes = ActionTypes.SET_FEEDBACK_MESSAGE
 
 interface MessageAction {
-  payload: Record<string, Message>
+  payload: Record<string, Message | undefined>
   type: MessageTypes
 }
 
