@@ -42,7 +42,7 @@
     "prosemirror-model": "^1.18.1",
     "prosemirror-schema-basic": "^1.2.0",
     "prosemirror-schema-list": "^1.2.1",
-    "prosemirror-tables": "^1.2.4",
+    "prosemirror-tables": "^1.2.5",
     "pubsub-js": "^1.9.4",
     "react": "^17.0.2",
     "react-autosuggest": "^10.1.0",
