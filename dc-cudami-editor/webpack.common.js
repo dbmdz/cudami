@@ -1,5 +1,6 @@
 const path = require('path')
 const _ = require('lodash')
+const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   entry: {
@@ -45,6 +46,10 @@ module.exports = {
         use: ['file-loader'],
       },
     ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({extractComments: false})],
   },
   output: {
     filename: (pathData) => {
