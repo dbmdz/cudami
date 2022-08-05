@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.client.semantic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.exception.http.HttpErrorDecoder;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.list.buckets.Bucket;
 import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
@@ -11,10 +10,7 @@ import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
 import de.digitalcollections.model.list.buckets.BucketsRequest;
 import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.semantic.Headword;
-import java.io.IOException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,25 +38,9 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
       url = url + "&pageSize=" + pageSize;
     }
 
-    HttpRequest req = createGetRequest(url);
-    // TODO add creation of a request id if needed
-    //            .header("X-Request-Id", request.getRequestId())
-    try {
-      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.statusCode();
-      if (statusCode >= 400) {
-        throw HttpErrorDecoder.decode("GET " + url, statusCode, response);
-      }
-      // This is the most performant approach for Jackson
-      final byte[] body = response.body();
-      if (body == null || body.length == 0) {
-        return null;
-      }
-      BucketObjectsResponse result = mapper.readerFor(BucketObjectsResponse.class).readValue(body);
-      return result;
-    } catch (IOException | InterruptedException e) {
-      throw new TechnicalException("Failed to retrieve response due to connection error", e);
-    }
+    BucketObjectsResponse<Headword> result =
+        (BucketObjectsResponse<Headword>) doGetRequestForObject(url, BucketObjectsResponse.class);
+    return result;
   }
 
   public BucketsResponse<Headword> findBuckets(BucketsRequest<Headword> bucketsRequest)
@@ -76,23 +56,9 @@ public class CudamiHeadwordsClient extends CudamiRestClient<Headword> {
       url = url + "&endId=" + endObject.getUuid();
     }
 
-    HttpRequest req = createGetRequest(url);
-    try {
-      HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
-      Integer statusCode = response.statusCode();
-      if (statusCode >= 400) {
-        throw HttpErrorDecoder.decode("GET " + url, statusCode, response);
-      }
-      // This is the most performant approach for Jackson
-      final byte[] body = response.body();
-      if (body == null || body.length == 0) {
-        return null;
-      }
-      BucketsResponse result = mapper.readerFor(BucketsResponse.class).readValue(body);
-      return result;
-    } catch (IOException | InterruptedException e) {
-      throw new TechnicalException("Failed to retrieve response due to connection error", e);
-    }
+    BucketsResponse<Headword> result =
+        (BucketsResponse<Headword>) doGetRequestForObject(url, BucketsResponse.class);
+    return result;
   }
 
   public List getRandomHeadwords(int count) throws TechnicalException {
