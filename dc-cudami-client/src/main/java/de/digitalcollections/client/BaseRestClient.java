@@ -66,7 +66,7 @@ public abstract class BaseRestClient<T extends Object> {
     }
   }
 
-  protected HttpRequest createDeleteRequest(String requestUrl) {
+  private HttpRequest createDeleteRequest(String requestUrl) {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("DELETE " + url);
     HttpRequest req =
@@ -84,7 +84,7 @@ public abstract class BaseRestClient<T extends Object> {
     return serverUri.resolve(serverUri.getPath() + requestUrl);
   }
 
-  protected HttpRequest createGetRequest(String requestUrl) {
+  private HttpRequest createGetRequest(String requestUrl) {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("GET " + url);
     HttpRequest req =
@@ -98,7 +98,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected HttpRequest createPatchRequest(String requestUrl) {
+  private HttpRequest createPatchRequest(String requestUrl) {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("PATCH " + url);
     HttpRequest req =
@@ -112,7 +112,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected HttpRequest createPatchRequest(String requestUrl, Object bodyObject)
+  private HttpRequest createPatchRequest(String requestUrl, Object bodyObject)
       throws JsonProcessingException {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("PATCH " + url + " with body");
@@ -129,7 +129,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected HttpRequest createPostRequest(String requestUrl) throws JsonProcessingException {
+  private HttpRequest createPostRequest(String requestUrl) throws JsonProcessingException {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("POST " + url);
     HttpRequest req =
@@ -144,7 +144,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected HttpRequest createPostRequest(String requestUrl, Object bodyObject)
+  private HttpRequest createPostRequest(String requestUrl, Object bodyObject)
       throws JsonProcessingException {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("POST " + url + " with body");
@@ -160,7 +160,7 @@ public abstract class BaseRestClient<T extends Object> {
     return req;
   }
 
-  protected HttpRequest createPutRequest(String requestUrl, Object bodyObject)
+  private HttpRequest createPutRequest(String requestUrl, Object bodyObject)
       throws JsonProcessingException {
     final URI url = createFullUri(requestUrl);
     LOGGER.debug("PUT " + url + " with body");
