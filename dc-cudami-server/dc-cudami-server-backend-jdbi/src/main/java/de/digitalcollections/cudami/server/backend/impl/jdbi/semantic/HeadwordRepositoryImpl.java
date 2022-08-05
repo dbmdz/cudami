@@ -208,7 +208,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
       sqlQuery.append(
           "WITH"
-              + " headwords_list AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+              + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
               + tableName
               + "),"
               + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid)),");
