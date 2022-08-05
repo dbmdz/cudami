@@ -215,7 +215,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
     } else {
       sqlQuery.append(
           "WITH"
-              + " hws AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+              + " hws AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
               + tableName
               + "),");
     }
@@ -276,7 +276,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
 
     String baseQuery =
         "WITH"
-            + " headwords_list AS (SELECT ROW_NUMBER() OVER (ORDER BY label) as num, uuid, label FROM "
+            + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) as num, uuid, label FROM "
             + tableName
             + "),"
             + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid))";
