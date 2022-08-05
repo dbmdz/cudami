@@ -10,18 +10,19 @@ import Reducer from './Reducer'
 interface Context {
   apiContextPath?: string
   dispatch?: Dispatch<Action>
-  existingLanguages?: string[]
   state: State
   uiLocale?: string
 }
 
 interface Props {
+  /** the active language for multilanguage fields on start */
+  activeLanguage?: string
   /** the context path of the surrounding java application */
   apiContextPath: string
   /** the children who use the store */
   children: ReactNode
   /** a list of existing languages for multilanguage fields */
-  existingLanguages: string[]
+  existingLanguages?: string[]
   /** the type of the store */
   type: 'form' | 'list'
   /** the defined ui locale */
@@ -58,18 +59,25 @@ const Context = createContext<Context>({
 })
 
 const Store = ({
+  activeLanguage,
   apiContextPath = '/',
   children,
-  existingLanguages = [],
+  existingLanguages,
   type,
   uiLocale = 'en',
 }: Props) => {
   const [state, dispatch] = useReducer(Reducer, {
     ...initialState,
-    activeLanguage: existingLanguages[0] ?? '',
+    activeLanguage,
     existingLanguages,
-    ...(type === 'form' && {forms: initialFormState}),
-    ...(type === 'list' && {lists: initialListState}),
+    ...(type === 'form' && {
+      existingLanguages: existingLanguages ?? [activeLanguage ?? ''],
+      forms: initialFormState,
+    }),
+    ...(type === 'list' && {
+      activeLanguage: existingLanguages?.[0] ?? '',
+      lists: initialListState,
+    }),
   })
   return (
     <Context.Provider value={{apiContextPath, dispatch, state, uiLocale}}>
