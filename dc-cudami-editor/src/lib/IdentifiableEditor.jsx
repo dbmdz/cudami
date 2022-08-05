@@ -19,6 +19,7 @@ export default function ({
   initI18n(uiLocale)
   ReactDOM.render(
     <Store
+      activeLanguage={activeLanguage}
       apiContextPath={apiContextPath}
       existingLanguages={existingLanguages}
       type="form"
