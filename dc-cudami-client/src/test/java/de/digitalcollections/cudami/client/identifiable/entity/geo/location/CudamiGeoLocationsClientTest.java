@@ -20,7 +20,9 @@ class CudamiGeoLocationsClientTest
   @Override
   public void testFindWithPageRequest() throws Exception {
     String bodyJson =
-        "{\"content\":[{\"objectType\":\"GEO_LOCATION\", \"geoLocation\":{\"entityType\":\"GEO_LOCATION\",\"identifiableType\":\"ENTITY\"}}]}";
+        "{"
+            + "\"listResponseType\":\"PAGE_RESPONSE\","
+            + "\"content\":[{\"objectType\":\"GEO_LOCATION\", \"geoLocation\":{\"entityType\":\"GEO_LOCATION\",\"identifiableType\":\"ENTITY\"}}]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();
@@ -35,7 +37,7 @@ class CudamiGeoLocationsClientTest
   @DisplayName("can execute the find method with a search term and max results")
   @Override
   public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{\"content\":[]}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"," + "\"content\":[]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     assertThat(client.find("foo", 100)).isNotNull();

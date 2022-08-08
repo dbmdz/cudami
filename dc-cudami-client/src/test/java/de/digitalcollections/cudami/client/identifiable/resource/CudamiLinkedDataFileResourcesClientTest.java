@@ -23,7 +23,7 @@ class CudamiLinkedDataFileResourcesClientTest
   @Test
   @DisplayName("can execute the find method with a PageRequest and Filtering")
   public void testFindWithPageRequestAndFiltering() throws Exception {
-    String bodyJson = "{}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"" + "}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();

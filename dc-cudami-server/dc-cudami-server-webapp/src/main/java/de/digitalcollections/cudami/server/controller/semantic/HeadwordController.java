@@ -5,6 +5,11 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.list.buckets.Bucket;
+import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
+import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
+import de.digitalcollections.model.list.buckets.BucketsRequest;
+import de.digitalcollections.model.list.buckets.BucketsResponse;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -100,24 +105,48 @@ public class HeadwordController {
     return headwordService.find(pageRequest);
   }
 
-  @Operation(summary = "Find limited amount of random headwords")
+  @Operation(
+      summary = "Get paged list of headwords in a bucket (defined by lower and upper border UUIDs)")
   @GetMapping(
-      value = {"/v6/headwords/random", "/v5/headwords/random"},
+      value = {"/v6/headwords/bucketobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Headword> getRandom(
-      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return headwordService.getRandom(count);
+  public BucketObjectsResponse<Headword> findBucketObjects(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "startId", required = true) UUID startId,
+      @RequestParam(name = "endId", required = true) UUID endId) {
+    Headword startHeadword = new Headword();
+    startHeadword.setUuid(startId);
+    Headword endHeadword = new Headword();
+    endHeadword.setUuid(endId);
+    Bucket<Headword> bucket = new Bucket<>(startHeadword, endHeadword);
+    // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
+    BucketObjectsRequest<Headword> bucketObjectsRequest =
+        new BucketObjectsRequest<>(bucket, pageNumber, pageSize, null, null);
+    return headwordService.find(bucketObjectsRequest);
   }
 
-  @Operation(summary = "Get an headword by uuid")
+  @Operation(summary = "Get lower and upper headword borders as equal sized buckets in a list")
   @GetMapping(
-      value = {
-        "/v6/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
-      },
+      value = {"/v6/headwords/buckets"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Headword getByUuid(@PathVariable UUID uuid) {
-    return headwordService.getByUuid(uuid);
+  public BucketsResponse<Headword> findBuckets(
+      @RequestParam(name = "numberOfBuckets", required = false, defaultValue = "25")
+          int numberOfBuckets,
+      @RequestParam(name = "startId", required = false) UUID startId,
+      @RequestParam(name = "endId", required = false) UUID endId) {
+    Bucket<Headword> parentBucket = null;
+    if (startId != null && endId != null) {
+      Headword startHeadword = new Headword();
+      startHeadword.setUuid(startId);
+      Headword endHeadword = new Headword();
+      endHeadword.setUuid(endId);
+      parentBucket = new Bucket<>(startHeadword, endHeadword);
+    }
+    // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
+    BucketsRequest<Headword> bucketsRequest =
+        new BucketsRequest<>(numberOfBuckets, parentBucket, null, null);
+    return headwordService.find(bucketsRequest);
   }
 
   @Operation(summary = "Get related entities of an headword")
@@ -147,6 +176,26 @@ public class HeadwordController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     return headwordService.findRelatedFileResources(uuid, pageRequest);
+  }
+
+  @Operation(summary = "Get an headword by uuid")
+  @GetMapping(
+      value = {
+        "/v6/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/headwords/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Headword getByUuid(@PathVariable UUID uuid) {
+    return headwordService.getByUuid(uuid);
+  }
+
+  @Operation(summary = "Find limited amount of random headwords")
+  @GetMapping(
+      value = {"/v6/headwords/random", "/v5/headwords/random"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Headword> getRandom(
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+    return headwordService.getRandom(count);
   }
 
   @Operation(summary = "Save a newly created headword")

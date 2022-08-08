@@ -74,7 +74,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @DisplayName("can execute the find method with a PageRequest")
   @Override
   public void testFindWithPageRequest() throws Exception {
-    String bodyJson = "{}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"" + "}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();
@@ -88,7 +88,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
   @DisplayName("can execute the find method with a search term and max results")
   @Override
   public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{\"content\":[]}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"," + "\"content\":[]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     assertThat(client.find("foo", 100)).isNotNull();

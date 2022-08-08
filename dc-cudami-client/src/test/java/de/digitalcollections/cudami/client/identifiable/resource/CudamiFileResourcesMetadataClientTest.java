@@ -27,7 +27,15 @@ class CudamiFileResourcesMetadataClientTest
   @Override
   public void testFindWithPageRequest() throws Exception {
     String bodyJson =
-        "{\"content\":[{\"objectType\":\"FILE_RESOURCE\", \"fileResource\":{\"entityType\":\"FILE_RESOURCE\",\"identifiableType\":\"ENTITY\"}}]}";
+        "{"
+            + "\"listResponseType\":\"PAGE_RESPONSE\","
+            + "\"content\":["
+            + "{"
+            + "\"objectType\":\"FILE_RESOURCE\","
+            + "\"fileResource\":{\"entityType\":\"FILE_RESOURCE\",\"identifiableType\":\"ENTITY\"}"
+            + "}"
+            + "]"
+            + "}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();
@@ -42,7 +50,7 @@ class CudamiFileResourcesMetadataClientTest
   @DisplayName("can execute the find method with a search term and max results")
   @Override
   public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{\"content\":[]}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"," + "\"content\":[]" + "}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     assertThat(client.find("foo", 100)).isNotNull();

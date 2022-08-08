@@ -48,7 +48,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   @Test
   @DisplayName("can execute the find method with a PageRequest")
   public void testFindWithPageRequest() throws Exception {
-    String bodyJson = "{}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"" + "}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();
@@ -61,7 +61,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
   @Test
   @DisplayName("can execute the find method with a search term and max results")
   public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{\"content\":[]}";
+    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\", " + "\"content\":[]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     assertThat(client.find("foo", 100)).isNotNull();
