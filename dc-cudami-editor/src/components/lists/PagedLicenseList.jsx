@@ -110,7 +110,10 @@ const PagedLicenseList = () => {
                       {formatDate(lastModified, uiLocale)}
                     </td>
                     <td className="text-center">
-                      <ActionButtons viewUrl={`${viewBaseUrl}/${uuid}`} />
+                      <ActionButtons
+                        showEdit={true}
+                        viewUrl={`${viewBaseUrl}/${uuid}`}
+                      />
                     </td>
                   </tr>
                 ),
