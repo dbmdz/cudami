@@ -211,7 +211,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
               + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
               + tableName
               + "),"
-              + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid)),");
+              + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]')),");
     } else {
       sqlQuery.append(
           "WITH"
@@ -220,10 +220,10 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
               + "),");
     }
     sqlQuery.append(
-        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) FROM hws),"
-            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, ntile FROM buckets GROUP BY ntile ORDER BY ntile)"
-            + " SELECT num, uuid, label, ntile FROM buckets"
-            + " WHERE num IN ((SELECT minNum FROM buckets_borders_nums) UNION (SELECT maxNum FROM buckets_borders_nums))");
+        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) AS tile_number FROM hws),"
+            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, tile_number FROM buckets GROUP BY tile_number ORDER BY tile_number)"
+            + " SELECT num, uuid, label, tile_number FROM buckets"
+            + " WHERE num IN (SELECT minNum FROM buckets_borders_nums UNION SELECT maxNum FROM buckets_borders_nums)");
 
     List<Map<String, Object>> rows =
         dbi.withHandle(
@@ -279,7 +279,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements Headwo
             + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) as num, uuid, label FROM "
             + tableName
             + "),"
-            + " hws AS (SELECT * FROM headwords_list WHERE num between (select num from headwords_list where uuid = :startUuid) AND (select num from headwords_list where uuid = :endUuid))";
+            + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]'))";
 
     // query data
     StringBuilder dataQuery = new StringBuilder(baseQuery);
