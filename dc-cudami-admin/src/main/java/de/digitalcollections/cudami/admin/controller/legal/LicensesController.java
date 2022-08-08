@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -57,6 +58,29 @@ public class LicensesController {
     return service.create();
   }
 
+  @GetMapping("/licenses/{uuid}/edit")
+  public String edit(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
+      Model model)
+      throws TechnicalException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    License license = service.getByUuid(uuid);
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+
+    if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
+      model.addAttribute("activeLanguage", activeLanguage);
+    } else {
+      model.addAttribute("activeLanguage", existingLanguages.get(0));
+    }
+    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("url", license.getUrl());
+    model.addAttribute("uuid", license.getUuid());
+
+    return "licenses/edit";
+  }
+
   @GetMapping("/api/licenses")
   @ResponseBody
   public PageResponse<License> find(
@@ -71,6 +95,12 @@ public class LicensesController {
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
+  }
+
+  @GetMapping("/api/licenses/{uuid}")
+  @ResponseBody
+  public License getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
   }
 
   @GetMapping("/licenses")
@@ -97,6 +127,17 @@ public class LicensesController {
     }
   }
 
+  @PutMapping("/api/licenses/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody License license) {
+    try {
+      License licenseDb = service.update(uuid, license);
+      return ResponseEntity.ok(licenseDb);
+    } catch (TechnicalException e) {
+      LOGGER.error("Cannot save license with uuid={}", uuid, e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
+  }
+
   @GetMapping("/licenses/{uuid}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
@@ -107,7 +148,10 @@ public class LicensesController {
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
-    model.addAttribute("license", license).addAttribute("existingLanguages", existingLanguages);
+    model
+        .addAttribute("license", license)
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("url", license.getUrl());
     return "licenses/view";
   }
 }
