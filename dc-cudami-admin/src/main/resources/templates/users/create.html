@@ -7,26 +7,26 @@
     <title th:text="|#{users}: #{user_create}|">Users: Create a new user</title>
   </head>
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-12">
-            <div id="editor"></div>
-            <script th:src="@{/js/user-editor.bundle.js}"></script>
-            <script th:inline="javascript">
-              UserEditor({
-                allRoles: /*[[${allRoles}]]*/ [],
-                apiContextPath: /*[[@{/}]]*/ '',
-                id: "editor",
-                setupAdmin: /*[[${setupAdmin}]]*/ false,
-                uiLocale: /*[[${#locale.language}]]*/ ''
-              })
-            </script>
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+              <div id="editor"></div>
+              <script th:src="@{/js/user-editor.bundle.js}"></script>
+              <script th:inline="javascript">
+                UserEditor({
+                  allRoles: /*[[${allRoles}]]*/ [],
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  id: "editor",
+                  setupAdmin: /*[[${setupAdmin}]]*/ false,
+                  uiLocale: /*[[${#locale.language}]]*/ ''
+                })
+              </script>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </th:block>
-</body>
+    </th:block>
+  </body>
 </html>
