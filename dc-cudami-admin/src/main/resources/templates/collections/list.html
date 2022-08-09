@@ -8,28 +8,28 @@
     <title th:text="#{collections}">Collections</title>
   </head>
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-12">
-            <div id="list"></div>
-            <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-            <script th:inline="javascript">
-              IdentifiableList({
-                apiContextPath: /*[[@{/}]]*/ '',
-                existingLanguages: /*[[${existingLanguages}]]*/ [],
-                id: "list",
-                showEdit: true,
-                showNew: true,
-                type: "collection",
-                uiLocale: /*[[${#locale.language}]]*/ ''
-              });
-            </script>
-          </div> 
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+              <div id="list"></div>
+              <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+              <script th:inline="javascript">
+                IdentifiableList({
+                  apiContextPath: /*[[@{/}]]*/ '',
+                  existingLanguages: /*[[${existingLanguages}]]*/ [],
+                  id: "list",
+                  showEdit: true,
+                  showNew: true,
+                  type: "collection",
+                  uiLocale: /*[[${#locale.language}]]*/ ''
+                });
+              </script>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </th:block>
-</body>
+    </th:block>
+  </body>
 </html>

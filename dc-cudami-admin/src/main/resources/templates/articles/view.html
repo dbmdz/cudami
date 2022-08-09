@@ -12,7 +12,7 @@
   <th:block layout:fragment="content" th:object="${article}">
     <div class="content-header">
       <div class="container-fluid">
-        <div class="row mb-2">
+        <div class="row">
           <div class="col-sm-6">
             <h1 th:text="#{article}">Article</h1>
           </div>
@@ -40,7 +40,7 @@
           </div>
         </div>
 
-        <div class="row main-content">
+        <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${article}, ${existingLanguages}, true)"></th:block>
           </div>
