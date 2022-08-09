@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{users}: #{user} ${user.email}|">Users: user admin@unknown.org</title>
+    <title th:text="|#{users}: #{user} &quot;${user.email}&quot;|">Users: user admin@unknown.org</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${user}">
@@ -12,7 +12,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-8">
-            <h1 th:text="|#{username}: *{email}|">Username / Email: email@email.de</h1>
+            <h1 th:text="|#{user} &quot;*{email}&quot;|">Username / Email: email@email.de</h1>
           </div>
           <div class="col-sm-4">
             <div class="float-right">
