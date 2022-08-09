@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{fileresources}: #{file} '${fileresource.filename}'|">Files: File 'image001.jpg'</title>
+    <title th:text="|#{fileresources}: #{file} &quot;${fileresource.filename}&quot;|">Files: File "image001.jpg"</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${fileresource}">
@@ -12,7 +12,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="|#{file} '*{filename}'|">File 'image001.jpg'</h1>
+            <h1 th:text="|#{file} &quot;*{filename}&quot;|">File "image001.jpg"</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
