@@ -8,6 +8,16 @@ const Reducer = (state: State, action: Action<any>): State => {
         ...state,
         activeLanguage: action.payload.language,
       }
+    case ActionTypes.SET_AVAILABLE_LANGUAGES:
+      return {
+        ...state,
+        ...(state.forms && {
+          forms: {
+            ...state.forms,
+            availableLanguages: action.payload.languages,
+          },
+        }),
+      }
     case ActionTypes.SET_DEFAULT_LANGUAGE:
       return {
         ...state,

@@ -1,7 +1,10 @@
-import {Dispatch, ReactNode, useReducer} from 'react'
+import {Dispatch, ReactNode, useEffect, useReducer} from 'react'
+import {useTranslation} from 'react-i18next'
 import {createContext} from 'use-context-selector'
 
+import {getAvailableLanguages, getDefaultLanguage} from '../api'
 import {Message} from '../components/FeedbackMessage'
+import {setAvailableLanguages, setDefaultLanguage} from './actions'
 import {Action, PayloadTypes} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
@@ -46,6 +49,31 @@ interface State {
   lists?: ListState
 }
 
+const loadinitialState = async (
+  context: string,
+  type: string,
+  t: (key: string) => string,
+  existingLanguages: string[] = [],
+) => {
+  const defaultLanguage = await getDefaultLanguage(context)
+  if (type === 'list') {
+    return {
+      defaultLanguage,
+    }
+  }
+  const availableLanguages = await getAvailableLanguages(context)
+  return {
+    defaultLanguage,
+    availableLanguages: availableLanguages
+      .filter((language) => !existingLanguages.includes(language))
+      .map((language) => ({
+        displayName: t(`languageNames:${language}`),
+        name: language,
+      }))
+      .sort((a, b) => (a.displayName > b.displayName ? 1 : -1)),
+  }
+}
+
 const initialState: State = {
   dialogsOpen: {
     addAttachedIdentifiables: false,
@@ -79,6 +107,17 @@ const Store = ({
       lists: initialListState,
     }),
   })
+  const {t} = useTranslation()
+  useEffect(() => {
+    loadinitialState(apiContextPath, type, t, state.existingLanguages).then(
+      ({availableLanguages, defaultLanguage}) => {
+        dispatch(setDefaultLanguage(defaultLanguage))
+        if (availableLanguages) {
+          dispatch(setAvailableLanguages(availableLanguages))
+        }
+      },
+    )
+  }, [])
   return (
     <Context.Provider value={{apiContextPath, dispatch, state, uiLocale}}>
       {children}
