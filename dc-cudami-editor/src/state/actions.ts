@@ -2,7 +2,7 @@ import {Message} from '../components/FeedbackMessage'
 import {Action, ActionTypes} from './actionTypes'
 
 /** Sets the active language */
-export const setActiveLanguage = (language: string): Action => ({
+export const setActiveLanguage = (language: string): Action<string> => ({
   payload: {
     language,
   },
@@ -10,7 +10,7 @@ export const setActiveLanguage = (language: string): Action => ({
 })
 
 /** Sets the default language */
-export const setDefaultLanguage = (language: string): Action => ({
+export const setDefaultLanguage = (language: string): Action<string> => ({
   payload: {
     language,
   },
@@ -18,7 +18,9 @@ export const setDefaultLanguage = (language: string): Action => ({
 })
 
 /** Sets a feedback message */
-export const setFeedbackMessage = (message: Message | undefined): Action => ({
+export const setFeedbackMessage = (
+  message: Message | undefined,
+): Action<Message | undefined> => ({
   payload: {
     message,
   },
@@ -26,7 +28,7 @@ export const setFeedbackMessage = (message: Message | undefined): Action => ({
 })
 
 /** Toggles all url aliases */
-export const toggleAllUrlAliases = (value: boolean): Action => ({
+export const toggleAllUrlAliases = (value: boolean): Action<boolean> => ({
   payload: {
     value,
   },
@@ -34,7 +36,7 @@ export const toggleAllUrlAliases = (value: boolean): Action => ({
 })
 
 /** Toggles a dialog with the given name */
-export const toggleDialog = (name: string): Action => ({
+export const toggleDialog = (name: string): Action<string> => ({
   payload: {
     name,
   },

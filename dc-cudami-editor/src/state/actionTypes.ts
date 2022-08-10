@@ -8,28 +8,9 @@ export enum ActionTypes {
   TOGGLE_DIALOG = 'cudami-editor/TOGGLE_DIALOG',
 }
 
-type BooleanTypes = ActionTypes.TOGGLE_ALL_URL_ALIASES
+export type PayloadTypes = boolean | string | Message | undefined
 
-interface BooleanAction {
-  payload: Record<string, boolean>
-  type: BooleanTypes
+export interface Action<P extends PayloadTypes> {
+  payload: Record<string, P>
+  type: ActionTypes
 }
-
-type MessageTypes = ActionTypes.SET_FEEDBACK_MESSAGE
-
-interface MessageAction {
-  payload: Record<string, Message | undefined>
-  type: MessageTypes
-}
-
-type StringTypes =
-  | ActionTypes.SET_ACTIVE_LANGUAGE
-  | ActionTypes.SET_DEFAULT_LANGUAGE
-  | ActionTypes.TOGGLE_DIALOG
-
-interface StringAction {
-  payload: Record<string, string>
-  type: StringTypes
-}
-
-export type Action = BooleanAction | MessageAction | StringAction
