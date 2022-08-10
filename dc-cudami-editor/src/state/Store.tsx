@@ -2,14 +2,14 @@ import {Dispatch, ReactNode, useReducer} from 'react'
 import {createContext} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
-import {Action} from './actionTypes'
+import {Action, PayloadTypes} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
 
 interface Context {
   apiContextPath?: string
-  dispatch?: Dispatch<Action>
+  dispatch?: Dispatch<Action<PayloadTypes>>
   state: State
   uiLocale?: string
 }

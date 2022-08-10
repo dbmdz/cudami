@@ -1,7 +1,7 @@
 import {Action, ActionTypes} from './actionTypes'
 import {State} from './Store'
 
-const Reducer = (state: State, action: Action): State => {
+const Reducer = (state: State, action: Action<any>): State => {
   switch (action.type) {
     case ActionTypes.SET_ACTIVE_LANGUAGE:
       return {
