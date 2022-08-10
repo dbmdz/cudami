@@ -188,7 +188,9 @@ export async function generateSlug(
   }
 }
 
-export async function getAvailableLanguages(contextPath: string) {
+export async function getAvailableLanguages(
+  contextPath: string,
+): Promise<string[]> {
   const url = `${contextPath}api/${typeToEndpointMapping.language}`
   try {
     const response = await fetch(url)
@@ -244,7 +246,7 @@ export async function getConfig(contextPath: string) {
   }
 }
 
-export async function getDefaultLanguage(contextPath: string) {
+export async function getDefaultLanguage(contextPath: string): Promise<string> {
   const url = `${contextPath}api/${typeToEndpointMapping.language}/default`
   try {
     const response = await fetch(url)
