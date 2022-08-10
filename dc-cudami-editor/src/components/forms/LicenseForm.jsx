@@ -37,7 +37,7 @@ const LicenseForm = ({uuid}) => {
   const activeLanguage = getActiveLanguage()
   const existingLanguages = getExistingLanguages()
   const feedbackMessage = getFeedbackMessage()
-  const {apiContextPath, dispatch, uiLocale} = useContext(Context)
+  const {apiContextPath, dispatch} = useContext(Context)
   const [license, setLicense] = useState()
   const {t} = useTranslation()
   useEffect(() => {
