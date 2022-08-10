@@ -1,5 +1,6 @@
 import {Message} from '../components/FeedbackMessage'
 import {Action, ActionTypes} from './actionTypes'
+import {Language} from './FormState'
 
 /** Sets the active language */
 export const setActiveLanguage = (language: string): Action<string> => ({
@@ -7,6 +8,16 @@ export const setActiveLanguage = (language: string): Action<string> => ({
     language,
   },
   type: ActionTypes.SET_ACTIVE_LANGUAGE,
+})
+
+/** Sets the available languages */
+export const setAvailableLanguages = (
+  languages: Language[],
+): Action<Language[]> => ({
+  payload: {
+    languages,
+  },
+  type: ActionTypes.SET_AVAILABLE_LANGUAGES,
 })
 
 /** Sets the default language */

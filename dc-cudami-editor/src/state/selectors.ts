@@ -1,11 +1,18 @@
 import {useContextSelector} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
+import {Language} from './FormState'
 import {Context} from './Store'
 
 /** Gets the active language */
 export const getActiveLanguage = (): string =>
   useContextSelector(Context, ({state}) => state.activeLanguage ?? '')
+
+export const getAvailableLanguages = (): Language[] =>
+  useContextSelector(
+    Context,
+    ({state}) => state.forms?.availableLanguages ?? [],
+  )
 
 /** Gets the default language */
 export const getDefaultLanguage = (): string =>
