@@ -181,6 +181,23 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
+  public DigitalObject getByIdentifierWithWEMI(String namespace, String id) {
+    DigitalObject digitalObject = getByIdentifierWithWEMI(namespace, id);
+    if (digitalObject.getItem() != null) {
+      Item item = getItem(digitalObject);
+
+      // for later:
+      if (item.getManifestation() != null) {
+        // TODO: fetch manifestation and fill item
+      }
+
+      digitalObject.setItem(item);
+    }
+
+    return digitalObject;
+  }
+
+  @Override
   public DigitalObject getByRefId(long refId) {
     return fillDigitalObject(super.getByRefId(refId));
   }
