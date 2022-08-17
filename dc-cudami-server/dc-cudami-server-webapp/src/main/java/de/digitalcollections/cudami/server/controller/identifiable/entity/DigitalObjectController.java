@@ -148,7 +148,6 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     return digitalObjectService.getAllReduced();
   }
 
-  @Override
   @Operation(
       summary = "Get a digital object by namespace and id",
       description =
@@ -161,9 +160,21 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<DigitalObject> getByIdentifier(HttpServletRequest request)
+  public ResponseEntity<DigitalObject> getByIdentifier(
+      HttpServletRequest request,
+      @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
       throws IdentifiableServiceException, ValidationException {
-    return super.getByIdentifier(request);
+
+    Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
+
+    DigitalObject digitalObject =
+        fillWemi
+            ? digitalObjectService.getByIdentifierWithWEMI(
+                namespaceAndId.getLeft(), namespaceAndId.getRight())
+            : digitalObjectService.getByIdentifier(
+                namespaceAndId.getLeft(), namespaceAndId.getRight());
+    return new ResponseEntity<>(
+        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a digital object by refId")

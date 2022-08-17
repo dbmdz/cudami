@@ -35,6 +35,8 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
+  DigitalObject getByIdentifierWithWEMI(String namespace, String id);
+
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
   }
