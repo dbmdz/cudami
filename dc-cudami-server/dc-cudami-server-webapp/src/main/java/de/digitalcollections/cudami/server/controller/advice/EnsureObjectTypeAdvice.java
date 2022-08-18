@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -76,7 +77,7 @@ public class EnsureObjectTypeAdvice extends RequestBodyAdviceAdapter {
       Type targetType,
       Class<? extends HttpMessageConverter<?>> converterType)
       throws IOException {
-    String body = new String(inputMessage.getBody().readAllBytes());
+    String body = new String(inputMessage.getBody().readAllBytes(), StandardCharsets.UTF_8);
     HttpInputMessage fixedInputMessage = inputMessage;
 
     if (body.length() >= 2) {
@@ -186,7 +187,7 @@ public class EnsureObjectTypeAdvice extends RequestBodyAdviceAdapter {
     }
   }
 
-  private class FixedHttpInputMessage implements HttpInputMessage {
+  private static class FixedHttpInputMessage implements HttpInputMessage {
 
     private final HttpHeaders httpHeaders;
     private final String body;
@@ -198,7 +199,7 @@ public class EnsureObjectTypeAdvice extends RequestBodyAdviceAdapter {
 
     @Override
     public InputStream getBody() throws IOException {
-      return new ByteArrayInputStream(body.getBytes());
+      return new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
