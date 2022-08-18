@@ -11,6 +11,8 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,10 +67,15 @@ public class LicensesController {
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
       throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     License license = service.getByUuid(uuid);
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+
+    List<Locale> existingLanguages = List.of(localeService.getDefaultLanguage());
+    LocalizedText label = license.getLabel();
+    if (!CollectionUtils.isEmpty(label)) {
+      Locale displayLocale = LocaleContextHolder.getLocale();
+      existingLanguages =
+          languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+    }
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -145,9 +153,15 @@ public class LicensesController {
     if (license == null) {
       throw new ResourceNotFoundException();
     }
-    Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+
+    List<Locale> existingLanguages = Collections.emptyList();
+    LocalizedText label = license.getLabel();
+    if (!CollectionUtils.isEmpty(label)) {
+      Locale displayLocale = LocaleContextHolder.getLocale();
+      existingLanguages =
+          languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+    }
+
     model
         .addAttribute("license", license)
         .addAttribute("existingLanguages", existingLanguages)
