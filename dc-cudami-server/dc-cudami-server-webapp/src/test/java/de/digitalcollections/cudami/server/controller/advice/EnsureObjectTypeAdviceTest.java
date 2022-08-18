@@ -4,14 +4,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.IdentifierType;
+import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import de.digitalcollections.model.legal.License;
+import de.digitalcollections.model.relation.Predicate;
+import de.digitalcollections.model.security.User;
+import de.digitalcollections.model.semantic.Headword;
+import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,20 +130,14 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can work with an empty POST body")
   @Test
   public void emptyPostBody() throws IOException {
-    HttpInputMessage httpInputMessage = buildHttpInputMessage("");
-    HttpInputMessage fixedHttpInputMessage =
-        advice.beforeBodyRead(httpInputMessage, methodParameter, targetType, converterType);
-    String actual = new String(fixedHttpInputMessage.getBody().readAllBytes());
+    String actual = getActualJsonFromAdvice("");
     assertThat(actual).isEqualTo("");
   }
 
   @DisplayName("can work with an empty JSON POST body")
   @Test
   public void emptyJSONPostBody() throws IOException {
-    HttpInputMessage httpInputMessage = buildHttpInputMessage("{}");
-    HttpInputMessage fixedHttpInputMessage =
-        advice.beforeBodyRead(httpInputMessage, methodParameter, targetType, converterType);
-    String actual = new String(fixedHttpInputMessage.getBody().readAllBytes());
+    String actual = getActualJsonFromAdvice("{}");
     assertThat(actual).isEqualTo("{}");
   }
 
@@ -137,18 +145,11 @@ class EnsureObjectTypeAdviceTest {
   @Test
   public void missingObjectTypeInIdentifier() throws IOException, JSONException {
     Identifier identifier = new Identifier("Foo", "Bar");
-
-    // Build the JSON without the objectType attribute
-    String missingObjectTypeJSON = objectMapper.writeValueAsString(identifier);
-    missingObjectTypeJSON = missingObjectTypeJSON.replaceAll("\"objectType\":\"IDENTIFIER\",", "");
-    assertThat(missingObjectTypeJSON).doesNotContain("IDENTIFIER");
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(identifier);
 
     String expectedJSON = objectMapper.writeValueAsString(identifier);
 
-    HttpInputMessage httpInputMessage = buildHttpInputMessage(missingObjectTypeJSON);
-    HttpInputMessage fixedHttpInputMessage =
-        advice.beforeBodyRead(httpInputMessage, methodParameter, targetType, converterType);
-    String actual = new String(fixedHttpInputMessage.getBody().readAllBytes());
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
     JSONAssert.assertEquals(expectedJSON, actual, false);
   }
 
@@ -156,18 +157,126 @@ class EnsureObjectTypeAdviceTest {
   @Test
   public void missingObjectTypeInLicense() throws IOException, JSONException {
     License license = License.builder().acronym("acr").url("http://foo.bar").build();
-
-    // Build the JSON without the objectType attribute
-    String missingObjectTypeJSON = objectMapper.writeValueAsString(license);
-    missingObjectTypeJSON = missingObjectTypeJSON.replaceAll("\"objectType\":\"LICENSE\",", "");
-    assertThat(missingObjectTypeJSON).doesNotContain("LICENSE");
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(license);
 
     String expectedJSON = objectMapper.writeValueAsString(license);
 
-    HttpInputMessage httpInputMessage = buildHttpInputMessage(missingObjectTypeJSON);
-    HttpInputMessage fixedHttpInputMessage =
-        advice.beforeBodyRead(httpInputMessage, methodParameter, targetType, converterType);
-    String actual = new String(fixedHttpInputMessage.getBody().readAllBytes());
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in Identifiable, when missing")
+  @Test
+  public void missingObjectTypeInIdentifiable() throws IOException, JSONException {
+    Identifiable identifiable =
+        Identifiable.builder()
+            .label("Hallo")
+            .identifiableObjectType(IdentifiableObjectType.IDENTIFIABLE)
+            .build();
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(identifiable);
+
+    String expectedJSON = objectMapper.writeValueAsString(identifiable);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in IdentifierType, when missing")
+  @Test
+  public void missingObjectTypeInIdentifierType() throws IOException, JSONException {
+    IdentifierType identifierType =
+        IdentifierType.builder().label("foo").pattern(".*+").namespace("bar").build();
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(identifierType);
+
+    String expectedJSON = objectMapper.writeValueAsString(identifierType);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in Predicate, when missing")
+  @Test
+  public void missingObjectTypeInPredicate() throws IOException, JSONException {
+    Predicate predicate = new Predicate();
+    predicate.setLabel(new LocalizedText(Locale.GERMAN, "Test"));
+    predicate.setDescription(new LocalizedText(Locale.GERMAN, "Das ist ein Test"));
+    predicate.setValue("foo");
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(predicate);
+
+    String expectedJSON = objectMapper.writeValueAsString(predicate);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in RenderingTemplate, when missing")
+  @Test
+  public void missingObjectTypeInRenderingTemplate() throws IOException, JSONException {
+    RenderingTemplate renderingTemplate =
+        RenderingTemplate.builder()
+            .label(Locale.GERMAN, "Foo")
+            .description(Locale.GERMAN, "Bar")
+            .name("bar")
+            .build();
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(renderingTemplate);
+
+    String expectedJSON = objectMapper.writeValueAsString(renderingTemplate);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in User, when missing")
+  @Test
+  public void missingObjectTypeInUser() throws IOException, JSONException {
+    User user = new User();
+    user.setEmail("foo@bar.bla");
+    user.setEnabled(false);
+    user.setPasswordHash("bar");
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(user);
+
+    String expectedJSON = objectMapper.writeValueAsString(user);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can fix the objectType in Headword, when missing")
+  @Test
+  public void missingObjectTypeInHeadword() throws IOException, JSONException {
+    Headword headword = new Headword();
+    headword.setLabel("Foo");
+    headword.setLocale(Locale.GERMAN);
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(headword);
+
+    String expectedJSON = objectMapper.writeValueAsString(headword);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("can insert the objectType in objects of arrays")
+  @Test
+  public void testArrays() throws IOException, JSONException {
+    Item item =
+        Item.builder().holders(List.of(Person.builder().identifier("Foo", "Bar").build())).build();
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(item);
+
+    String expectedJSON = objectMapper.writeValueAsString(item);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
+  @DisplayName("does not insert a second objectType, when one is already present")
+  @Test
+  public void noDoubleObjectType() throws IOException, JSONException {
+    DigitalObject digitalObject = DigitalObject.builder().label("Test").build();
+    String filledObjectTypeJSON = objectMapper.writeValueAsString(digitalObject);
+
+    String expectedJSON = objectMapper.writeValueAsString(digitalObject);
+
+    String actual = getActualJsonFromAdvice(filledObjectTypeJSON);
     JSONAssert.assertEquals(expectedJSON, actual, false);
   }
 
@@ -185,5 +294,20 @@ class EnsureObjectTypeAdviceTest {
     when(httpInputMessage.getBody())
         .thenReturn(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
     return httpInputMessage;
+  }
+
+  private String getActualJsonFromAdvice(String missingObjectTypeJSON) throws IOException {
+    HttpInputMessage httpInputMessage = buildHttpInputMessage(missingObjectTypeJSON);
+    HttpInputMessage fixedHttpInputMessage =
+        advice.beforeBodyRead(httpInputMessage, methodParameter, targetType, converterType);
+    String actual = new String(fixedHttpInputMessage.getBody().readAllBytes());
+    return actual;
+  }
+
+  private String getMissingObjectTypeJSON(Object object) throws JsonProcessingException {
+    String missingObjectTypeJSON = objectMapper.writeValueAsString(object);
+    missingObjectTypeJSON = missingObjectTypeJSON.replaceAll("\"objectType\":\".*?\",", "");
+    assertThat(missingObjectTypeJSON).doesNotContain("objectType");
+    return missingObjectTypeJSON;
   }
 }
