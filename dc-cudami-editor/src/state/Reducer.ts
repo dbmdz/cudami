@@ -1,5 +1,5 @@
 import {Action, ActionTypes} from './actionTypes'
-import {State} from './Store'
+import {DialogName, State} from './Store'
 
 const Reducer = (state: State, action: Action<any>): State => {
   switch (action.type) {
@@ -44,7 +44,8 @@ const Reducer = (state: State, action: Action<any>): State => {
         ...state,
         dialogsOpen: {
           ...state.dialogsOpen,
-          [action.payload.name]: !state.dialogsOpen[action.payload.name],
+          [action.payload.type]:
+            !state.dialogsOpen[action.payload.type as DialogName],
         },
       }
     default:

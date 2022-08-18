@@ -1,6 +1,7 @@
 import {Message} from '../components/FeedbackMessage'
 import {Action, ActionTypes} from './actionTypes'
 import {Language} from './FormState'
+import {DialogName} from './Store'
 
 /** Sets the active language */
 export const setActiveLanguage = (language: string): Action<string> => ({
@@ -47,9 +48,9 @@ export const toggleAllUrlAliases = (value: boolean): Action<boolean> => ({
 })
 
 /** Toggles a dialog with the given name */
-export const toggleDialog = (name: string): Action<string> => ({
+export const toggleDialog = (type: DialogName): Action<DialogName> => ({
   payload: {
-    name,
+    type,
   },
   type: ActionTypes.TOGGLE_DIALOG,
 })

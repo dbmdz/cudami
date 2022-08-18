@@ -10,6 +10,11 @@ import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
 
+export enum DialogName {
+  ADD_LANGUAGE = 'addLanguage',
+  REMOVE_LANGUAGE = 'removeLanguage',
+}
+
 interface Context {
   apiContextPath?: string
   dispatch?: Dispatch<Action<PayloadTypes>>
@@ -38,7 +43,7 @@ interface State {
   /** the defined default language for multilanguage fields, will be fetched from the api */
   defaultLanguage?: string
   /** the open state of the dialogs */
-  dialogsOpen: Record<string, boolean>
+  dialogsOpen: Record<DialogName, boolean>
   /** a list of already existing languages for multilanguage fields */
   existingLanguages?: string[]
   /** a feedback message with all the needed information */
@@ -76,9 +81,8 @@ const loadinitialState = async (
 
 const initialState: State = {
   dialogsOpen: {
-    addAttachedIdentifiables: false,
-    moveAttachedIdentifiable: false,
-    removeAttachedIdentifiable: false,
+    addLanguage: false,
+    removeLanguage: false,
   },
 }
 
