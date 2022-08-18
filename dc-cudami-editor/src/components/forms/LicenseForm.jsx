@@ -1,3 +1,4 @@
+import omit from 'lodash/omit'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -13,16 +14,28 @@ import {
 import {useContext} from 'use-context-selector'
 
 import {getByUuid, save, typeToEndpointMapping, update} from '../../api'
-import {setActiveLanguage, setFeedbackMessage} from '../../state/actions'
+import {
+  addLanguage,
+  removeLanguage,
+  setActiveLanguage,
+  setFeedbackMessage,
+  toggleDialog,
+} from '../../state/actions'
 import {
   getActiveLanguage,
+  getAvailableLanguages,
+  getDialogsOpen,
   getExistingLanguages,
   getFeedbackMessage,
 } from '../../state/selectors'
-import {Context} from '../../state/Store'
+import {Context, DialogName} from '../../state/Store'
+import AddLanguageDialog from '../dialogs/AddLanguageDialog'
+import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
+import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
+import {cleanLocalizedText} from '../utils'
 import ActionButtons from './ActionButtons'
 
 const submitData = async (context, data, type, uuid) => {
@@ -35,6 +48,8 @@ const submitData = async (context, data, type, uuid) => {
 const LicenseForm = ({uuid}) => {
   const type = 'license'
   const activeLanguage = getActiveLanguage()
+  const availableLanguages = getAvailableLanguages()
+  const dialogsOpen = getDialogsOpen()
   const existingLanguages = getExistingLanguages()
   const feedbackMessage = getFeedbackMessage()
   const {apiContextPath, dispatch} = useContext(Context)
@@ -111,12 +126,19 @@ const LicenseForm = ({uuid}) => {
               {existingLanguages.map((language) => (
                 <LanguageTab
                   activeLanguage={activeLanguage}
-                  enableRemove={existingLanguages.length > 1}
+                  enableRemove={true}
                   key={language}
                   language={language}
                   toggle={(language) => dispatch(setActiveLanguage(language))}
                 />
               ))}
+              {availableLanguages.length > 0 && (
+                <LanguageAdder
+                  onClick={() =>
+                    dispatch(toggleDialog(DialogName.ADD_LANGUAGE))
+                  }
+                />
+              )}
             </Nav>
             <TabContent activeTab={activeLanguage}>
               {existingLanguages.map((language) => (
@@ -142,6 +164,25 @@ const LicenseForm = ({uuid}) => {
           </Col>
         </Row>
       </Form>
+      <AddLanguageDialog
+        addLanguage={(language) => {
+          dispatch(addLanguage(language.name))
+        }}
+        availableLanguages={availableLanguages}
+        isOpen={dialogsOpen.addLanguage}
+        toggle={() => dispatch(toggleDialog(DialogName.ADD_LANGUAGE))}
+      />
+      <RemoveLanguageDialog
+        isOpen={dialogsOpen.removeLanguage}
+        onConfirm={(language) => {
+          dispatch(removeLanguage(language))
+          setLicense({
+            ...license,
+            label: omit(license.label, [language]),
+          })
+        }}
+        toggle={() => dispatch(toggleDialog(DialogName.REMOVE_LANGUAGE))}
+      />
     </>
   )
 }

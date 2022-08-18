@@ -1,3 +1,11 @@
+export function cleanLocalizedText(localizedText = {}) {
+  const cleanedText = Object.entries(localizedText).filter(([, text]) => text)
+  if (!cleanedText.length) {
+    return
+  }
+  return Object.fromEntries(cleanedText)
+}
+
 export function formatDate(date, locale, onlyDate = false) {
   if (!date) {
     return null
