@@ -39,10 +39,10 @@ import {cleanLocalizedText} from '../utils'
 import ActionButtons from './ActionButtons'
 
 const submitData = async (context, data, type, uuid) => {
-  const {error = false} = await (uuid
+  const response = await (uuid
     ? update(context, data, type)
     : save(context, data, type))
-  return error
+  return response
 }
 
 const LicenseForm = ({uuid}) => {
@@ -78,7 +78,12 @@ const LicenseForm = ({uuid}) => {
         id={formId}
         onSubmit={async (evt) => {
           evt.preventDefault()
-          const error = await submitData(apiContextPath, license, type, uuid)
+          const {error = false, uuid: uuidFromApi} = await submitData(
+            apiContextPath,
+            {...license, label: cleanLocalizedText(license.label)},
+            type,
+            uuid,
+          )
           if (error) {
             return dispatch(
               setFeedbackMessage({
@@ -87,7 +92,7 @@ const LicenseForm = ({uuid}) => {
               }),
             )
           }
-          window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}`
+          window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuidFromApi}`
         }}
       >
         <Row>
