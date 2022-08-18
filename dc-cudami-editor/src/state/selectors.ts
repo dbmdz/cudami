@@ -2,7 +2,7 @@ import {useContextSelector} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
 import {Language} from './FormState'
-import {Context} from './Store'
+import {Context, DialogName} from './Store'
 
 /** Gets the active language */
 export const getActiveLanguage = (): string =>
@@ -18,6 +18,10 @@ export const getAvailableLanguages = (): Language[] =>
 export const getDefaultLanguage = (): string =>
   useContextSelector(Context, ({state}) => state.defaultLanguage ?? '')
 
+/** Gets the open state of the dialogs */
+export const getDialogsOpen = (): Record<DialogName, boolean> =>
+  useContextSelector(Context, ({state}) => state.dialogsOpen)
+
 /** Gets the existing languagea */
 export const getExistingLanguages = (): string[] =>
   useContextSelector(Context, ({state}) => state.existingLanguages ?? [])
@@ -26,10 +30,7 @@ export const getExistingLanguages = (): string[] =>
 export const getFeedbackMessage = (): Message | undefined =>
   useContextSelector(Context, ({state}) => state.feedbackMessage)
 
-/** Checks if a dialog is open */
-export const isDialogOpen = (name: string): boolean =>
-  useContextSelector(Context, ({state}) => state.dialogsOpen[name])
-
+/** Checks if all url aliases should be shown */
 export const getShowAllUrlAliases = (): boolean =>
   useContextSelector(
     Context,
