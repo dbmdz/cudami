@@ -3,6 +3,22 @@ import {Action, ActionTypes} from './actionTypes'
 import {Language} from './FormState'
 import {DialogName} from './Store'
 
+/** Adds a language */
+export const addLanguage = (language: string): Action<string> => ({
+  payload: {
+    language,
+  },
+  type: ActionTypes.ADD_LANGUAGE,
+})
+
+/** Adds a language */
+export const removeLanguage = (language: Language): Action<Language> => ({
+  payload: {
+    language,
+  },
+  type: ActionTypes.REMOVE_LANGUAGE,
+})
+
 /** Sets the active language */
 export const setActiveLanguage = (language: string): Action<string> => ({
   payload: {

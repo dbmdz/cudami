@@ -551,7 +551,7 @@ class IdentifiableForm extends Component {
           />
           <RemoveLanguageDialog
             isOpen={dialogsOpen.removeLanguage}
-            onConfirm={this.removeLanguage}
+            onConfirm={(language) => this.removeLanguage(language.name)}
             toggle={() => this.toggleDialog('removeLanguage')}
           />
           <RemoveUrlAliasDialog

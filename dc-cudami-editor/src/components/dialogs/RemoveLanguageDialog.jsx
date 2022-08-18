@@ -11,24 +11,27 @@ import {
 } from 'reactstrap'
 
 const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
-  const [language, setLanguage] = useState('')
+  const [language, setLanguage] = useState()
+  const {t} = useTranslation()
   useEffect(() => {
     const token = subscribe(
       'editor.show-remove-language-dialog',
-      (_msg, language) => {
-        setLanguage(language)
+      (_msg, lang) => {
+        setLanguage({
+          displayName: t(`languageNames:${lang}`),
+          name: lang,
+        })
         toggle()
       },
     )
     return () => unsubscribe(token)
   }, [])
-  const {t} = useTranslation()
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>{t('warning')}</ModalHeader>
       <ModalBody>
         {t('confirmLanguageRemoval', {
-          language: t(`languageNames:${language}`),
+          language: language?.displayName,
         })}
       </ModalBody>
       <ModalFooter>

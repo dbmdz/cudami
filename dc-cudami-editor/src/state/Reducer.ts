@@ -1,8 +1,47 @@
+import sortBy from 'lodash-es/sortBy'
+
 import {Action, ActionTypes} from './actionTypes'
 import {DialogName, State} from './Store'
 
 const Reducer = (state: State, action: Action<any>): State => {
   switch (action.type) {
+    case ActionTypes.ADD_LANGUAGE:
+      const {language: newLanguage} = action.payload
+      return {
+        ...state,
+        activeLanguage: newLanguage,
+        existingLanguages: [...(state.existingLanguages ?? []), newLanguage],
+        ...(state.forms && {
+          forms: {
+            ...state.forms,
+            availableLanguages:
+              state.forms?.availableLanguages?.filter(
+                (lang) => lang.name !== newLanguage,
+              ) ?? [],
+          },
+        }),
+      }
+    case ActionTypes.REMOVE_LANGUAGE:
+      const {language: languageToRemove} = action.payload
+      return {
+        ...state,
+        activeLanguage:
+          state.activeLanguage === languageToRemove.name
+            ? state.existingLanguages?.[0] ?? ''
+            : state.activeLanguage,
+        existingLanguages: state.existingLanguages?.filter(
+          (lang) => lang != languageToRemove.name,
+        ),
+        ...(state.forms && {
+          forms: {
+            ...state.forms,
+            availableLanguages: sortBy(
+              [...(state.forms.availableLanguages ?? []), languageToRemove],
+              'displayName',
+            ),
+          },
+        }),
+      }
     case ActionTypes.SET_ACTIVE_LANGUAGE:
       return {
         ...state,
