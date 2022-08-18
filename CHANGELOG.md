@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Changed
+
+- POST/PUT/PATCH-Requests require the attribute `objectType` in the JSON body. If it is missing, it is heuristically set
+
 ## [6.1.0](https://github.com/dbmdz/cudami/releases/tag/6.1.0) - 2022-07-29
 
 ### Added
