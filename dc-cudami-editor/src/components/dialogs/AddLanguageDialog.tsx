@@ -11,13 +11,22 @@ import {
   ModalHeader,
 } from 'reactstrap'
 
+import {Language} from '../../state/FormState'
+
+interface Props {
+  addLanguage(language?: Language): void
+  availableLanguages: Language[]
+  isOpen: boolean
+  toggle(): void
+}
+
 const AddLanguageDialog = ({
   addLanguage,
   availableLanguages,
   isOpen,
   toggle,
-}) => {
-  const [selectedLanguage, setSelectedLanguage] = useState()
+}: Props) => {
+  const [selectedLanguage, setSelectedLanguage] = useState('')
   const {t} = useTranslation()
   return (
     <Modal

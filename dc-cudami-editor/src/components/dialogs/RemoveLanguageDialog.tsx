@@ -10,13 +10,24 @@ import {
   ModalHeader,
 } from 'reactstrap'
 
-const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
-  const [language, setLanguage] = useState()
+import {Language} from '../../state/FormState'
+
+interface Props {
+  isOpen: boolean
+  onConfirm(language: Language): void
+  toggle(): void
+}
+
+const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}: Props) => {
+  const [language, setLanguage] = useState<Language>({
+    displayName: '',
+    name: '',
+  })
   const {t} = useTranslation()
   useEffect(() => {
     const token = subscribe(
       'editor.show-remove-language-dialog',
-      (_msg, lang) => {
+      (_msg: string, lang: string) => {
         setLanguage({
           displayName: t(`languageNames:${lang}`),
           name: lang,
@@ -24,7 +35,9 @@ const RemoveLanguageDialog = ({isOpen, onConfirm, toggle}) => {
         toggle()
       },
     )
-    return () => unsubscribe(token)
+    return () => {
+      unsubscribe(token)
+    }
   }, [])
   return (
     <Modal isOpen={isOpen} toggle={toggle}>

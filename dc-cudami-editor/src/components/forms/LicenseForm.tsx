@@ -1,4 +1,4 @@
-import omit from 'lodash/omit'
+import omit from 'lodash-es/omit'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {
@@ -21,6 +21,7 @@ import {
   setFeedbackMessage,
   toggleDialog,
 } from '../../state/actions'
+import {Language} from '../../state/FormState'
 import {
   getActiveLanguage,
   getAvailableLanguages,
@@ -28,7 +29,8 @@ import {
   getExistingLanguages,
   getFeedbackMessage,
 } from '../../state/selectors'
-import {Context, DialogNames} from '../../state/Store'
+import {Context} from '../../state/Store'
+import {DialogNames, License} from '../../types'
 import AddLanguageDialog from '../dialogs/AddLanguageDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import FeedbackMessage from '../FeedbackMessage'
@@ -38,14 +40,23 @@ import LanguageTab from '../LanguageTab'
 import {cleanLocalizedText} from '../utils'
 import ActionButtons from './ActionButtons'
 
-const submitData = async (context, data, type, uuid) => {
+interface Props {
+  uuid: string
+}
+
+const submitData = async (
+  context: string,
+  data: License,
+  type: string,
+  uuid: string,
+) => {
   const response = await (uuid
     ? update(context, data, type)
     : save(context, data, type))
   return response
 }
 
-const LicenseForm = ({uuid}) => {
+const LicenseForm = ({uuid}: Props) => {
   const type = 'license'
   const activeLanguage = getActiveLanguage()
   const availableLanguages = getAvailableLanguages()
@@ -53,7 +64,7 @@ const LicenseForm = ({uuid}) => {
   const existingLanguages = getExistingLanguages()
   const feedbackMessage = getFeedbackMessage()
   const {apiContextPath, dispatch} = useContext(Context)
-  const [license, setLicense] = useState()
+  const [license, setLicense] = useState<License>()
   const {t} = useTranslation()
   useEffect(() => {
     getByUuid(apiContextPath, type, uuid).then((license) => {
@@ -85,12 +96,13 @@ const LicenseForm = ({uuid}) => {
             uuid,
           )
           if (error) {
-            return dispatch(
+            dispatch(
               setFeedbackMessage({
                 color: 'danger',
                 key: 'submitOfFormFailed',
               }),
             )
+            return
           }
           window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuidFromApi}`
         }}
@@ -134,7 +146,9 @@ const LicenseForm = ({uuid}) => {
                   enableRemove={true}
                   key={language}
                   language={language}
-                  toggle={(language) => dispatch(setActiveLanguage(language))}
+                  toggle={(language: string) =>
+                    dispatch(setActiveLanguage(language))
+                  }
                 />
               ))}
               {availableLanguages.length > 0 && (
@@ -171,7 +185,7 @@ const LicenseForm = ({uuid}) => {
       </Form>
       <AddLanguageDialog
         addLanguage={(language) => {
-          dispatch(addLanguage(language.name))
+          dispatch(addLanguage(language?.name ?? ''))
         }}
         availableLanguages={availableLanguages}
         isOpen={dialogsOpen.addLanguage}
@@ -183,7 +197,7 @@ const LicenseForm = ({uuid}) => {
           dispatch(removeLanguage(language))
           setLicense({
             ...license,
-            label: omit(license.label, [language]),
+            label: omit(license.label, [language?.name ?? '']),
           })
         }}
         toggle={() => dispatch(toggleDialog(DialogNames.REMOVE_LANGUAGE))}
