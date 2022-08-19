@@ -5,7 +5,7 @@ import {createContext} from 'use-context-selector'
 import {getAvailableLanguages, getDefaultLanguage} from '../api'
 import {Message} from '../components/FeedbackMessage'
 import {setAvailableLanguages, setDefaultLanguage} from './actions'
-import {Action, PayloadTypes} from './actionTypes'
+import {Action} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
@@ -17,7 +17,7 @@ enum DialogNames {
 
 interface Context {
   apiContextPath?: string
-  dispatch?: Dispatch<Action<PayloadTypes>>
+  dispatch?: Dispatch<Action>
   state: State
   uiLocale?: string
 }
