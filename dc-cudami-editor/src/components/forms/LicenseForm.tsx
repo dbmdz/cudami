@@ -21,7 +21,6 @@ import {
   setFeedbackMessage,
   toggleDialog,
 } from '../../state/actions'
-import {Language} from '../../state/FormState'
 import {
   getActiveLanguage,
   getAvailableLanguages,
