@@ -5,11 +5,11 @@ import {FaExclamationCircle, FaTrashAlt} from 'react-icons/fa'
 import {Button, NavItem, NavLink} from 'reactstrap'
 
 interface Props {
-  activeLanguage: string,
-  enableRemove: boolean,
-  invalid?: boolean,
-  language: string,
-  toggle(language: string): void,
+  activeLanguage: string
+  enableRemove: boolean
+  invalid?: boolean
+  language: string
+  toggle(language: string): void
 }
 
 const LanguageTab = ({
