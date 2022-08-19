@@ -28,7 +28,7 @@ import {
   getExistingLanguages,
   getFeedbackMessage,
 } from '../../state/selectors'
-import {Context, DialogName} from '../../state/Store'
+import {Context, DialogNames} from '../../state/Store'
 import AddLanguageDialog from '../dialogs/AddLanguageDialog'
 import RemoveLanguageDialog from '../dialogs/RemoveLanguageDialog'
 import FeedbackMessage from '../FeedbackMessage'
@@ -140,7 +140,7 @@ const LicenseForm = ({uuid}) => {
               {availableLanguages.length > 0 && (
                 <LanguageAdder
                   onClick={() =>
-                    dispatch(toggleDialog(DialogName.ADD_LANGUAGE))
+                    dispatch(toggleDialog(DialogNames.ADD_LANGUAGE))
                   }
                 />
               )}
@@ -175,7 +175,7 @@ const LicenseForm = ({uuid}) => {
         }}
         availableLanguages={availableLanguages}
         isOpen={dialogsOpen.addLanguage}
-        toggle={() => dispatch(toggleDialog(DialogName.ADD_LANGUAGE))}
+        toggle={() => dispatch(toggleDialog(DialogNames.ADD_LANGUAGE))}
       />
       <RemoveLanguageDialog
         isOpen={dialogsOpen.removeLanguage}
@@ -186,7 +186,7 @@ const LicenseForm = ({uuid}) => {
             label: omit(license.label, [language]),
           })
         }}
-        toggle={() => dispatch(toggleDialog(DialogName.REMOVE_LANGUAGE))}
+        toggle={() => dispatch(toggleDialog(DialogNames.REMOVE_LANGUAGE))}
       />
     </>
   )

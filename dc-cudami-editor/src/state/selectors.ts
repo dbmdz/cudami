@@ -2,7 +2,7 @@ import {useContextSelector} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
 import {Language} from './FormState'
-import {Context, DialogName} from './Store'
+import {Context, DialogNames} from './Store'
 
 /** Gets the active language */
 export const getActiveLanguage = (): string =>
@@ -19,7 +19,7 @@ export const getDefaultLanguage = (): string =>
   useContextSelector(Context, ({state}) => state.defaultLanguage ?? '')
 
 /** Gets the open state of the dialogs */
-export const getDialogsOpen = (): Record<DialogName, boolean> =>
+export const getDialogsOpen = (): Record<DialogNames, boolean> =>
   useContextSelector(Context, ({state}) => state.dialogsOpen)
 
 /** Gets the existing languagea */

@@ -1,5 +1,5 @@
 import {Dispatch, ReactNode, useEffect, useReducer} from 'react'
-import {useTranslation} from 'react-i18next'
+import {TFunction, useTranslation} from 'react-i18next'
 import {createContext} from 'use-context-selector'
 
 import {getAvailableLanguages, getDefaultLanguage} from '../api'
@@ -10,7 +10,7 @@ import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
 
-export enum DialogName {
+enum DialogNames {
   ADD_LANGUAGE = 'addLanguage',
   REMOVE_LANGUAGE = 'removeLanguage',
 }
@@ -43,7 +43,7 @@ interface State {
   /** the defined default language for multilanguage fields, will be fetched from the api */
   defaultLanguage?: string
   /** the open state of the dialogs */
-  dialogsOpen: Record<DialogName, boolean>
+  dialogsOpen: Record<DialogNames, boolean>
   /** a list of already existing languages for multilanguage fields */
   existingLanguages?: string[]
   /** a feedback message with all the needed information */
@@ -57,7 +57,7 @@ interface State {
 const loadinitialState = async (
   context: string,
   type: string,
-  t: (key: string) => string,
+  t: TFunction,
   existingLanguages: string[] = [],
 ) => {
   const defaultLanguage = await getDefaultLanguage(context)
@@ -130,5 +130,5 @@ const Store = ({
 }
 
 export {Context}
-export type {State}
+export type {DialogNames, State}
 export default Store

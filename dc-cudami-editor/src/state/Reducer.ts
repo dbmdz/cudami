@@ -1,7 +1,7 @@
 import sortBy from 'lodash-es/sortBy'
 
 import {Action, ActionTypes} from './actionTypes'
-import {DialogName, State} from './Store'
+import {DialogNames, State} from './Store'
 
 const Reducer = (state: State, action: Action<any>): State => {
   switch (action.type) {
@@ -83,8 +83,8 @@ const Reducer = (state: State, action: Action<any>): State => {
         ...state,
         dialogsOpen: {
           ...state.dialogsOpen,
-          [action.payload.type]:
-            !state.dialogsOpen[action.payload.type as DialogName],
+          [action.payload.name]:
+            !state.dialogsOpen[action.payload.name as DialogNames],
         },
       }
     default:

@@ -1,7 +1,7 @@
 import {Message} from '../components/FeedbackMessage'
 import {Action, ActionTypes} from './actionTypes'
 import {Language} from './FormState'
-import {DialogName} from './Store'
+import {DialogNames} from './Store'
 
 /** Adds a language */
 export const addLanguage = (language: string): Action<string> => ({
@@ -47,7 +47,7 @@ export const setDefaultLanguage = (language: string): Action<string> => ({
 
 /** Sets a feedback message */
 export const setFeedbackMessage = (
-  message: Message | undefined,
+  message?: Message,
 ): Action<Message | undefined> => ({
   payload: {
     message,
@@ -64,9 +64,9 @@ export const toggleAllUrlAliases = (value: boolean): Action<boolean> => ({
 })
 
 /** Toggles a dialog with the given name */
-export const toggleDialog = (type: DialogName): Action<DialogName> => ({
+export const toggleDialog = (name: DialogNames): Action<DialogNames> => ({
   payload: {
-    type,
+    name,
   },
   type: ActionTypes.TOGGLE_DIALOG,
 })
