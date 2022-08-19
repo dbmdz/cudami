@@ -141,7 +141,7 @@ public class LicensesController {
       License licenseDb = service.update(uuid, license);
       return ResponseEntity.ok(licenseDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save license with uuid={}", uuid, e);
+      LOGGER.error("Cannot update license with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
