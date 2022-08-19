@@ -1,7 +1,5 @@
-import {Message} from '../components/FeedbackMessage'
-import {DialogNames} from '../types'
+import {DialogNames, FeedbackMessage, Language} from '../types'
 import {Action, ActionTypes} from './actionTypes'
-import {Language} from './FormState'
 
 /** Adds a language */
 export const addLanguage = (language: string): Action => ({
@@ -44,7 +42,7 @@ export const setDefaultLanguage = (language: string): Action => ({
 })
 
 /** Sets a feedback message */
-export const setFeedbackMessage = (message?: Message): Action => ({
+export const setFeedbackMessage = (message?: FeedbackMessage): Action => ({
   payload: {
     message,
   },

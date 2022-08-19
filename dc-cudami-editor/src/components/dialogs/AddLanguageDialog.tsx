@@ -11,7 +11,7 @@ import {
   ModalHeader,
 } from 'reactstrap'
 
-import {Language} from '../../state/FormState'
+import {Language} from '../../types'
 
 interface Props {
   addLanguage(language?: Language): void

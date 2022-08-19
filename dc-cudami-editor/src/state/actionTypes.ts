@@ -1,6 +1,4 @@
-import {Message} from '../components/FeedbackMessage'
-import {DialogNames} from '../types'
-import {Language} from './FormState'
+import {DialogNames, FeedbackMessage, Language} from '../types'
 
 export enum ActionTypes {
   ADD_LANGUAGE = 'cudami-editor/ADD_LANGUAGE',
@@ -35,7 +33,7 @@ export type Action =
       type: ActionTypes.SET_DEFAULT_LANGUAGE
     }
   | {
-      payload: Record<string, Message | undefined>
+      payload: Record<string, FeedbackMessage | undefined>
       type: ActionTypes.SET_FEEDBACK_MESSAGE
     }
   | {

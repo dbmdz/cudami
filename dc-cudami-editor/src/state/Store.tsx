@@ -3,8 +3,7 @@ import {TFunction, useTranslation} from 'react-i18next'
 import {createContext} from 'use-context-selector'
 
 import {getAvailableLanguages, getDefaultLanguage} from '../api'
-import {Message} from '../components/FeedbackMessage'
-import {DialogNames} from '../types'
+import {DialogNames, FeedbackMessage} from '../types'
 import {setAvailableLanguages, setDefaultLanguage} from './actions'
 import {Action} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
@@ -43,7 +42,7 @@ interface State {
   /** a list of already existing languages for multilanguage fields */
   existingLanguages?: string[]
   /** a feedback message with all the needed information */
-  feedbackMessage?: Message
+  feedbackMessage?: FeedbackMessage
   /** all the state that is only relevant for form components */
   forms?: FormState
   /** all the state that is only relevant for list components */

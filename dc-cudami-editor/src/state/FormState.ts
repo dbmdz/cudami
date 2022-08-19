@@ -1,7 +1,4 @@
-export interface Language {
-  displayName: string
-  name: string
-}
+import {Language} from '../types'
 
 export interface FormState {
   availableLanguages?: Language[]
