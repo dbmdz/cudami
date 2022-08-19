@@ -12,8 +12,8 @@ import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
 
 interface Context {
-  apiContextPath?: string
-  dispatch?: Dispatch<Action>
+  apiContextPath: string
+  dispatch: Dispatch<Action>
   state: State
   uiLocale?: string
 }
@@ -83,6 +83,8 @@ const initialState: State = {
 }
 
 const Context = createContext<Context>({
+  apiContextPath: '/',
+  dispatch: (_) => {},
   state: initialState,
 })
 
