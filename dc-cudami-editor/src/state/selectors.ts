@@ -1,8 +1,6 @@
 import {useContextSelector} from 'use-context-selector'
 
-import {Message} from '../components/FeedbackMessage'
-import {DialogNames} from '../types'
-import {Language} from './FormState'
+import {DialogNames, FeedbackMessage, Language} from '../types'
 import {Context} from './Store'
 
 /** Gets the active language */
@@ -28,7 +26,7 @@ export const getExistingLanguages = (): string[] =>
   useContextSelector(Context, ({state}) => state.existingLanguages ?? [])
 
 /** Gets a feedback message */
-export const getFeedbackMessage = (): Message | undefined =>
+export const getFeedbackMessage = (): FeedbackMessage | undefined =>
   useContextSelector(Context, ({state}) => state.feedbackMessage)
 
 /** Checks if all url aliases should be shown */
