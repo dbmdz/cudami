@@ -1,6 +1,6 @@
 import './AddMediaDialog.css'
 
-import transform from 'lodash/transform'
+import transform from 'lodash-es/transform'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useContext, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'

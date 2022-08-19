@@ -1,4 +1,4 @@
-import isEmpty from 'lodash/isEmpty'
+import isEmpty from 'lodash-es/isEmpty'
 import {useContext, useEffect, useState} from 'react'
 import {FaSearch} from 'react-icons/fa'
 import {

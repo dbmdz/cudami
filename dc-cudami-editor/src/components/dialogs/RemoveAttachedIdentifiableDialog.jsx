@@ -1,4 +1,4 @@
-import startCase from 'lodash/startCase'
+import startCase from 'lodash-es/startCase'
 import {useTranslation} from 'react-i18next'
 import {
   Button,

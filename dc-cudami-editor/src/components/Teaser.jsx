@@ -1,4 +1,4 @@
-import groupBy from 'lodash/groupBy'
+import groupBy from 'lodash-es/groupBy'
 import {publish} from 'pubsub-js'
 import {useTranslation} from 'react-i18next'
 import {FaPlus} from 'react-icons/fa'
