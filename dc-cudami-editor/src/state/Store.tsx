@@ -4,16 +4,12 @@ import {createContext} from 'use-context-selector'
 
 import {getAvailableLanguages, getDefaultLanguage} from '../api'
 import {Message} from '../components/FeedbackMessage'
+import {DialogNames} from '../types'
 import {setAvailableLanguages, setDefaultLanguage} from './actions'
 import {Action} from './actionTypes'
 import {FormState, initialFormState} from './FormState'
 import {ListState, initialListState} from './ListState'
 import Reducer from './Reducer'
-
-enum DialogNames {
-  ADD_LANGUAGE = 'addLanguage',
-  REMOVE_LANGUAGE = 'removeLanguage',
-}
 
 interface Context {
   apiContextPath?: string

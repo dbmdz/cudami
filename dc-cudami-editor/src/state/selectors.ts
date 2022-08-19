@@ -1,8 +1,9 @@
 import {useContextSelector} from 'use-context-selector'
 
 import {Message} from '../components/FeedbackMessage'
+import {DialogNames} from '../types'
 import {Language} from './FormState'
-import {Context, DialogNames} from './Store'
+import {Context} from './Store'
 
 /** Gets the active language */
 export const getActiveLanguage = (): string =>

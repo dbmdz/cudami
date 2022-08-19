@@ -1,6 +1,6 @@
 import {Message} from '../components/FeedbackMessage'
+import {DialogNames} from '../types'
 import {Language} from './FormState'
-import {DialogNames} from './Store'
 
 export enum ActionTypes {
   ADD_LANGUAGE = 'cudami-editor/ADD_LANGUAGE',
