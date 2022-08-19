@@ -48,7 +48,6 @@ class EnsureObjectTypeAdviceTest {
 
   @BeforeEach
   public void beforeEach() throws IOException {
-    advice = new EnsureObjectTypeAdvice();
     methodParameter = mock(MethodParameter.class);
     targetType = mock(Type.class);
     converterType = MappingJackson2HttpMessageConverter.class;
@@ -58,7 +57,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("ignores DELETE requests")
   @Test
   public void doesNothingForDelete() {
-    advice.setHttpServletRequest(buildRequest("DELETE", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("DELETE", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
@@ -66,7 +65,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("ignores GET requests")
   @Test
   public void doesNothingForGet() {
-    advice.setHttpServletRequest(buildRequest("GET", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("GET", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
@@ -74,7 +73,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("ignores HEAD requests")
   @Test
   public void doesNothingForHead() {
-    advice.setHttpServletRequest(buildRequest("HEAD", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("HEAD", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
@@ -82,7 +81,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("handles POST requests for versions less than 7")
   @Test
   public void handlesForVersionLessThatSeven() {
-    advice.setHttpServletRequest(buildRequest("POST", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("POST", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isTrue();
   }
@@ -90,7 +89,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("handles PUT requests for versions less than 7")
   @Test
   public void handlesPutForVersionLessThatSeven() {
-    advice.setHttpServletRequest(buildRequest("PUT", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("PUT", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isTrue();
   }
@@ -98,7 +97,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("handles PATCH requests for versions less than 7")
   @Test
   public void handlesPatchForVersionLessThatSeven() {
-    advice.setHttpServletRequest(buildRequest("PATCH", "https://foo.bar/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("PATCH", "https://foo.bar/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isTrue();
   }
@@ -106,7 +105,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("does not handle requests for version 7")
   @Test
   public void doesNotHandleForVersionSeven() {
-    advice.setHttpServletRequest(buildRequest("POST", "https://foo.bar/v7/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("POST", "https://foo.bar/v7/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
@@ -114,7 +113,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("handles requests for version 6 under different context")
   @Test
   public void canWorkForVersionSixUnderDifferentContext() {
-    advice.setHttpServletRequest(buildRequest("POST", "https://foo.bar/cudami/v6/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("POST", "https://foo.bar/cudami/v6/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isTrue();
   }
@@ -122,7 +121,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("does not handle requests for two digit versions")
   @Test
   public void canWorkForVersionTen() {
-    advice.setHttpServletRequest(buildRequest("POST", "https://foo.bar/v10/bla"));
+    advice = new EnsureObjectTypeAdvice(buildRequest("POST", "https://foo.bar/v10/bla"));
 
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
@@ -130,6 +129,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can work with an empty POST body")
   @Test
   public void emptyPostBody() throws IOException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     String actual = getActualJsonFromAdvice("");
     assertThat(actual).isEqualTo("");
   }
@@ -137,6 +137,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can work with an empty JSON POST body")
   @Test
   public void emptyJSONPostBody() throws IOException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     String actual = getActualJsonFromAdvice("{}");
     assertThat(actual).isEqualTo("{}");
   }
@@ -144,6 +145,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in Identifier, when missing")
   @Test
   public void missingObjectTypeInIdentifier() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Identifier identifier = new Identifier("Foo", "Bar");
     String missingObjectTypeJSON = getMissingObjectTypeJSON(identifier);
 
@@ -156,6 +158,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in License, when missing")
   @Test
   public void missingObjectTypeInLicense() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     License license = License.builder().acronym("acr").url("http://foo.bar").build();
     String missingObjectTypeJSON = getMissingObjectTypeJSON(license);
 
@@ -168,6 +171,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in Identifiable, when missing")
   @Test
   public void missingObjectTypeInIdentifiable() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Identifiable identifiable =
         Identifiable.builder()
             .label("Hallo")
@@ -184,6 +188,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in IdentifierType, when missing")
   @Test
   public void missingObjectTypeInIdentifierType() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     IdentifierType identifierType =
         IdentifierType.builder().label("foo").pattern(".*+").namespace("bar").build();
     String missingObjectTypeJSON = getMissingObjectTypeJSON(identifierType);
@@ -197,6 +202,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in Predicate, when missing")
   @Test
   public void missingObjectTypeInPredicate() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Predicate predicate = new Predicate();
     predicate.setLabel(new LocalizedText(Locale.GERMAN, "Test"));
     predicate.setDescription(new LocalizedText(Locale.GERMAN, "Das ist ein Test"));
@@ -212,6 +218,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in RenderingTemplate, when missing")
   @Test
   public void missingObjectTypeInRenderingTemplate() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     RenderingTemplate renderingTemplate =
         RenderingTemplate.builder()
             .label(Locale.GERMAN, "Foo")
@@ -229,6 +236,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in User, when missing")
   @Test
   public void missingObjectTypeInUser() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     User user = new User();
     user.setEmail("foo@bar.bla");
     user.setEnabled(false);
@@ -244,6 +252,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can fix the objectType in Headword, when missing")
   @Test
   public void missingObjectTypeInHeadword() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Headword headword = new Headword();
     headword.setLabel("Foo");
     headword.setLocale(Locale.GERMAN);
@@ -258,6 +267,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("can insert the objectType in objects of arrays")
   @Test
   public void testArrays() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Item item =
         Item.builder().holders(List.of(Person.builder().identifier("Foo", "Bar").build())).build();
     String missingObjectTypeJSON = getMissingObjectTypeJSON(item);
@@ -271,6 +281,7 @@ class EnsureObjectTypeAdviceTest {
   @DisplayName("does not insert a second objectType, when one is already present")
   @Test
   public void noDoubleObjectType() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     DigitalObject digitalObject = DigitalObject.builder().label("Test").build();
     String filledObjectTypeJSON = objectMapper.writeValueAsString(digitalObject);
 

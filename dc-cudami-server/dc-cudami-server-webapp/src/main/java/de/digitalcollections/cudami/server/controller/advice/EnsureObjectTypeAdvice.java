@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
@@ -28,15 +27,9 @@ public class EnsureObjectTypeAdvice extends RequestBodyAdviceAdapter {
   private static final int LATEST_VERSION_WHICH_REQUIRES_FIX = 6;
   private static final Pattern VERSION_PATTERN = Pattern.compile(".*?/(v\\d+)/.*?");
 
-  // For each request, we get a new httpServletRequest here
-  @Autowired HttpServletRequest httpServletRequest;
+  private final HttpServletRequest httpServletRequest;
 
-  /**
-   * Only for testing purposes
-   *
-   * @param httpServletRequest the HttpServletRequest of which Method and RequestURL are used
-   */
-  protected void setHttpServletRequest(HttpServletRequest httpServletRequest) {
+  public EnsureObjectTypeAdvice(HttpServletRequest httpServletRequest) {
     this.httpServletRequest = httpServletRequest;
   }
 
