@@ -1,7 +1,7 @@
 import {Message} from '../components/FeedbackMessage'
+import {DialogNames} from '../types'
 import {Action, ActionTypes} from './actionTypes'
 import {Language} from './FormState'
-import {DialogNames} from './Store'
 
 /** Adds a language */
 export const addLanguage = (language: string): Action => ({
