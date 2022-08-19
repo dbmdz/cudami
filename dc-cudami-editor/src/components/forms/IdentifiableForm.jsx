@@ -1,11 +1,11 @@
 import '../../polyfills'
 
-import groupBy from 'lodash/groupBy'
-import kebabCase from 'lodash/kebabCase'
-import mergeWith from 'lodash/mergeWith'
-import omit from 'lodash/omit'
-import pick from 'lodash/pick'
-import sortBy from 'lodash/sortBy'
+import groupBy from 'lodash-es/groupBy'
+import kebabCase from 'lodash-es/kebabCase'
+import mergeWith from 'lodash-es/mergeWith'
+import omit from 'lodash-es/omit'
+import pick from 'lodash-es/pick'
+import sortBy from 'lodash-es/sortBy'
 import {Component} from 'react'
 import {withTranslation} from 'react-i18next'
 

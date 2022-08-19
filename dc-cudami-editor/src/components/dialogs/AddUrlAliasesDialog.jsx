@@ -1,8 +1,8 @@
 import './AddUrlAliasesDialog.css'
 
 import classNames from 'classnames'
-import omit from 'lodash/omit'
-import pick from 'lodash/pick'
+import omit from 'lodash-es/omit'
+import pick from 'lodash-es/pick'
 import {subscribe, unsubscribe} from 'pubsub-js'
 import {useContext as useContextReact, useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'

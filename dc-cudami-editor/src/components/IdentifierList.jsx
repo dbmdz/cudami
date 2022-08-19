@@ -1,4 +1,4 @@
-import sortBy from 'lodash/sortBy'
+import sortBy from 'lodash-es/sortBy'
 import {Badge, List, ListInlineItem} from 'reactstrap'
 
 const IdentifierList = ({identifiers = [], identifierTypes = []}) =>

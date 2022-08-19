@@ -1,4 +1,4 @@
-import mapValues from 'lodash/mapValues'
+import mapValues from 'lodash-es/mapValues'
 import {publish, subscribe, unsubscribe} from 'pubsub-js'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
