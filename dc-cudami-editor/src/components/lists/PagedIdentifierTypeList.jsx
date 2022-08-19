@@ -1,3 +1,5 @@
+import '../../polyfills'
+
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag} from 'react-icons/fa'

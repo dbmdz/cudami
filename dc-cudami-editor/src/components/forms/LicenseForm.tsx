@@ -1,3 +1,5 @@
+import '../../polyfills'
+
 import omit from 'lodash-es/omit'
 import {useEffect, useState} from 'react'
 import {useTranslation} from 'react-i18next'
