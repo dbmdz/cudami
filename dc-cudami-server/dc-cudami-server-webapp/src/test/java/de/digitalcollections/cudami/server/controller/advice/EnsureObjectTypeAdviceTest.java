@@ -111,7 +111,7 @@ class EnsureObjectTypeAdviceTest {
     assertThat(advice.supports(methodParameter, targetType, converterType)).isFalse();
   }
 
-  @DisplayName("handes requests for version 6 under different context")
+  @DisplayName("handles requests for version 6 under different context")
   @Test
   public void canWorkForVersionSixUnderDifferentContext() {
     advice.setHttpServletRequest(buildRequest("POST", "https://foo.bar/cudami/v6/bla"));
