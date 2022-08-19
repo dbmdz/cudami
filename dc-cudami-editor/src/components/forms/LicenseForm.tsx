@@ -146,7 +146,7 @@ const LicenseForm = ({uuid}: Props) => {
                   enableRemove={true}
                   key={language}
                   language={language}
-                  toggle={(language: string) =>
+                  toggle={(language) =>
                     dispatch(setActiveLanguage(language))
                   }
                 />

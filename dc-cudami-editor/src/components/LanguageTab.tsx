@@ -4,13 +4,21 @@ import {useTranslation} from 'react-i18next'
 import {FaExclamationCircle, FaTrashAlt} from 'react-icons/fa'
 import {Button, NavItem, NavLink} from 'reactstrap'
 
+interface Props {
+  activeLanguage: string,
+  enableRemove: boolean,
+  invalid?: boolean,
+  language: string,
+  toggle(language: string): void,
+}
+
 const LanguageTab = ({
   activeLanguage,
   enableRemove,
   invalid = false,
   language,
   toggle,
-}) => {
+}: Props) => {
   const {t} = useTranslation()
   return (
     <NavItem>
