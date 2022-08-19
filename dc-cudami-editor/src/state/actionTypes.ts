@@ -1,5 +1,6 @@
 import {Message} from '../components/FeedbackMessage'
 import {Language} from './FormState'
+import {DialogNames} from './Store'
 
 export enum ActionTypes {
   ADD_LANGUAGE = 'cudami-editor/ADD_LANGUAGE',
@@ -12,15 +13,36 @@ export enum ActionTypes {
   TOGGLE_DIALOG = 'cudami-editor/TOGGLE_DIALOG',
 }
 
-export type PayloadTypes =
-  | boolean
-  | string
-  | Language
-  | Language[]
-  | Message
-  | undefined
-
-export interface Action<P extends PayloadTypes> {
-  payload: Record<string, P>
-  type: ActionTypes
-}
+export type Action =
+  | {
+      payload: Record<string, string>
+      type: ActionTypes.ADD_LANGUAGE
+    }
+  | {
+      payload: Record<string, Language>
+      type: ActionTypes.REMOVE_LANGUAGE
+    }
+  | {
+      payload: Record<string, string>
+      type: ActionTypes.SET_ACTIVE_LANGUAGE
+    }
+  | {
+      payload: Record<string, Language[]>
+      type: ActionTypes.SET_AVAILABLE_LANGUAGES
+    }
+  | {
+      payload: Record<string, string>
+      type: ActionTypes.SET_DEFAULT_LANGUAGE
+    }
+  | {
+      payload: Record<string, Message | undefined>
+      type: ActionTypes.SET_FEEDBACK_MESSAGE
+    }
+  | {
+      payload: Record<string, boolean>
+      type: ActionTypes.TOGGLE_ALL_URL_ALIASES
+    }
+  | {
+      payload: Record<string, DialogNames>
+      type: ActionTypes.TOGGLE_DIALOG
+    }

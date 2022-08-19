@@ -4,7 +4,7 @@ import {Language} from './FormState'
 import {DialogNames} from './Store'
 
 /** Adds a language */
-export const addLanguage = (language: string): Action<string> => ({
+export const addLanguage = (language: string): Action => ({
   payload: {
     language,
   },
@@ -12,7 +12,7 @@ export const addLanguage = (language: string): Action<string> => ({
 })
 
 /** Adds a language */
-export const removeLanguage = (language: Language): Action<Language> => ({
+export const removeLanguage = (language: Language): Action => ({
   payload: {
     language,
   },
@@ -20,7 +20,7 @@ export const removeLanguage = (language: Language): Action<Language> => ({
 })
 
 /** Sets the active language */
-export const setActiveLanguage = (language: string): Action<string> => ({
+export const setActiveLanguage = (language: string): Action => ({
   payload: {
     language,
   },
@@ -28,9 +28,7 @@ export const setActiveLanguage = (language: string): Action<string> => ({
 })
 
 /** Sets the available languages */
-export const setAvailableLanguages = (
-  languages: Language[],
-): Action<Language[]> => ({
+export const setAvailableLanguages = (languages: Language[]): Action => ({
   payload: {
     languages,
   },
@@ -38,7 +36,7 @@ export const setAvailableLanguages = (
 })
 
 /** Sets the default language */
-export const setDefaultLanguage = (language: string): Action<string> => ({
+export const setDefaultLanguage = (language: string): Action => ({
   payload: {
     language,
   },
@@ -46,9 +44,7 @@ export const setDefaultLanguage = (language: string): Action<string> => ({
 })
 
 /** Sets a feedback message */
-export const setFeedbackMessage = (
-  message?: Message,
-): Action<Message | undefined> => ({
+export const setFeedbackMessage = (message?: Message): Action => ({
   payload: {
     message,
   },
@@ -56,7 +52,7 @@ export const setFeedbackMessage = (
 })
 
 /** Toggles all url aliases */
-export const toggleAllUrlAliases = (value: boolean): Action<boolean> => ({
+export const toggleAllUrlAliases = (value: boolean): Action => ({
   payload: {
     value,
   },
@@ -64,7 +60,7 @@ export const toggleAllUrlAliases = (value: boolean): Action<boolean> => ({
 })
 
 /** Toggles a dialog with the given name */
-export const toggleDialog = (name: DialogNames): Action<DialogNames> => ({
+export const toggleDialog = (name: DialogNames): Action => ({
   payload: {
     name,
   },

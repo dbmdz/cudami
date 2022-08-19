@@ -3,7 +3,7 @@ import sortBy from 'lodash-es/sortBy'
 import {Action, ActionTypes} from './actionTypes'
 import {DialogNames, State} from './Store'
 
-const Reducer = (state: State, action: Action<any>): State => {
+const Reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case ActionTypes.ADD_LANGUAGE:
       const {language: newLanguage} = action.payload
