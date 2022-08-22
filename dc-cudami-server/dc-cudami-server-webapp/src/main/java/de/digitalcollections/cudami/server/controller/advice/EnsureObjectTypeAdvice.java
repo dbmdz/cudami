@@ -74,11 +74,17 @@ public class EnsureObjectTypeAdvice extends RequestBodyAdviceAdapter {
     HttpInputMessage fixedInputMessage = inputMessage;
 
     if (body.length() >= 2) {
-      // everthing else cannot be valid json in parentheses
-      JSONObject jsonObject = new JSONObject(body);
-      jsonObject = fixJsonObject(jsonObject);
-      fixedInputMessage =
-          new FixedHttpInputMessage(inputMessage.getHeaders(), jsonObject.toString());
+      if (body.startsWith("[")) {
+        JSONArray jsonArray = new JSONArray(body);
+        jsonArray = fixJsonArray(jsonArray);
+        fixedInputMessage =
+            new FixedHttpInputMessage(inputMessage.getHeaders(), jsonArray.toString());
+      } else {
+        JSONObject jsonObject = new JSONObject(body);
+        jsonObject = fixJsonObject(jsonObject);
+        fixedInputMessage =
+            new FixedHttpInputMessage(inputMessage.getHeaders(), jsonObject.toString());
+      }
     }
 
     return super.beforeBodyRead(fixedInputMessage, parameter, targetType, converterType);
