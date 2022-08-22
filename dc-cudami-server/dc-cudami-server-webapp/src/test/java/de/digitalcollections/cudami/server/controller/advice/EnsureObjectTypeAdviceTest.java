@@ -155,6 +155,20 @@ class EnsureObjectTypeAdviceTest {
     JSONAssert.assertEquals(expectedJSON, actual, false);
   }
 
+  @DisplayName("can fix the objectType in a list of identifiers, when missing")
+  @Test
+  public void missingObjectTypeInIdentifierList() throws IOException, JSONException {
+    advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
+    List<Identifier> identifier =
+        List.of(new Identifier("Foo", "Bar"), new Identifier("Baz", "Blubb"));
+    String missingObjectTypeJSON = getMissingObjectTypeJSON(identifier);
+
+    String expectedJSON = objectMapper.writeValueAsString(identifier);
+
+    String actual = getActualJsonFromAdvice(missingObjectTypeJSON);
+    JSONAssert.assertEquals(expectedJSON, actual, false);
+  }
+
   @DisplayName("can fix the objectType in License, when missing")
   @Test
   public void missingObjectTypeInLicense() throws IOException, JSONException {
