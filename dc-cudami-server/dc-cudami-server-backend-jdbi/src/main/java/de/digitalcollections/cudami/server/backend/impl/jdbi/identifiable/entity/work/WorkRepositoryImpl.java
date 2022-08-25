@@ -21,7 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements WorkRepository {
+public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
+    implements WorkRepository<W> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkRepositoryImpl.class);
 
@@ -87,8 +88,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work getByIdentifier(Identifier identifier) {
-    Work work = super.getByIdentifier(identifier);
+  public W getByIdentifier(Identifier identifier) {
+    W work = super.getByIdentifier(identifier);
 
     if (work != null) {
       List<Agent> creators = getCreators(work.getUuid());
@@ -98,8 +99,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    Work work = super.getByUuidAndFiltering(uuid, filtering);
+  public W getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    W work = super.getByUuidAndFiltering(uuid, filtering);
 
     if (work != null) {
       List<Agent> creators = getCreators(uuid);
@@ -164,18 +165,18 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work save(Work work) {
+  public W save(W work) {
     super.save(work);
 
     // save creators
     List<Agent> creators = work.getCreators();
     setCreatorsList(work, creators);
 
-    Work result = getByUuid(work.getUuid());
+    W result = getByUuid(work.getUuid());
     return result;
   }
 
-  private void setCreatorsList(Work work, List<Agent> creators) {
+  private void setCreatorsList(W work, List<Agent> creators) {
     UUID workUuid = work.getUuid();
 
     // as we store the whole list new: delete old entries
@@ -205,14 +206,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work update(Work work) {
+  public W update(W work) {
     super.update(work);
 
     // save creators
     List<Agent> creators = work.getCreators();
     setCreatorsList(work, creators);
 
-    Work result = getByUuid(work.getUuid());
+    W result = getByUuid(work.getUuid());
     return result;
   }
 }

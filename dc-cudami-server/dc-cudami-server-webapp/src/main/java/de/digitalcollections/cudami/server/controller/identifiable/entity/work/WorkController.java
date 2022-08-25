@@ -39,9 +39,9 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
-  private final WorkService workService;
+  private final WorkService<Work> workService;
 
-  public WorkController(WorkService workService) {
+  public WorkController(WorkService<Work> workService) {
     this.workService = workService;
   }
 

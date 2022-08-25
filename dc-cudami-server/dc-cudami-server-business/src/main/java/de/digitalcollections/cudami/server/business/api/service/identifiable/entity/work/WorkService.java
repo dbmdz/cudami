@@ -7,7 +7,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.UUID;
 
-public interface WorkService extends EntityService<Work> {
+public interface WorkService<W extends Work> extends EntityService<W> {
 
   List<Agent> getCreators(UUID workUuid);
 
