@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 /** Repository for Work persistence handling. */
-public interface WorkRepository extends EntityRepository<Work> {
+public interface WorkRepository<W extends Work> extends EntityRepository<W> {
 
   List<Agent> getCreators(UUID workUuid);
 
