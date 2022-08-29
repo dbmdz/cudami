@@ -144,7 +144,7 @@ const LicenseForm = ({uuid}: Props) => {
               {existingLanguages.map((language) => (
                 <LanguageTab
                   activeLanguage={activeLanguage}
-                  enableRemove={true}
+                  enableRemove={existingLanguages.length > 1}
                   key={language}
                   language={language}
                   toggle={(language) => dispatch(setActiveLanguage(language))}
