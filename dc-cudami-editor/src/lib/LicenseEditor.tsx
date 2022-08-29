@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom'
+import {render} from 'react-dom'
 
 import LicenseForm from '../components/forms/LicenseForm'
 import initI18n from '../i18n'
@@ -22,7 +22,7 @@ export default function ({
   uuid,
 }: Props) {
   initI18n(uiLocale)
-  ReactDOM.render(
+  render(
     <Store
       activeLanguage={activeLanguage}
       apiContextPath={apiContextPath}
