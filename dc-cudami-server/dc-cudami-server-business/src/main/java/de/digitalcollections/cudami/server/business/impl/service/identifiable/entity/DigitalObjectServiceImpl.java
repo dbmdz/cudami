@@ -12,6 +12,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -47,6 +48,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private final DigitalObjectLinkedDataFileResourceService
       digitalObjectLinkedDataFileResourceService;
   private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
+  private final ItemService itemService;
   private final ProjectService projectService;
 
   public DigitalObjectServiceImpl(
@@ -54,6 +56,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       CollectionService collectionService,
       ProjectService projectService,
       IdentifierService identifierService,
+      ItemService itemService,
       UrlAliasService urlAliasService,
       DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
@@ -68,9 +71,50 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
         localeService,
         cudamiConfig);
     this.collectionService = collectionService;
+    this.itemService = itemService;
     this.projectService = projectService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
+  }
+
+  @Override
+  public boolean addItemToDigitalObject(Item item, UUID digitalObjectUuid)
+      throws ConflictException, ValidationException, IdentifiableServiceException {
+    // If the item does not exist, return false
+    if (item == null) {
+      return false;
+    }
+
+    // Retrieve the DigitalObject
+    DigitalObject digitalObject = getByUuid(digitalObjectUuid);
+    if (digitalObject == null) {
+      return false;
+    }
+
+    // Ensure, that the DigitalObject is either not connected with any item or already belongs to
+    // the item
+    Item digitalObjectItem = digitalObject.getItem();
+    if (digitalObjectItem != null && digitalObjectItem.getUuid().equals(item.getUuid())) {
+      return true; // nothing to do
+    }
+    if (digitalObjectItem != null && !digitalObjectItem.getUuid().equals(item.getUuid())) {
+      LOGGER.warn(
+          "Trying to connect DigitalObject "
+              + digitalObjectUuid
+              + " to item "
+              + item.getUuid()
+              + ", but it already belongs to item "
+              + digitalObjectItem.getUuid());
+      throw new ConflictException(
+          "DigitalObject "
+              + digitalObject.getUuid()
+              + " already belongs to item "
+              + digitalObject.getItem().getUuid());
+    }
+
+    digitalObject.setItem(item);
+    update(digitalObject);
+    return true;
   }
 
   @Override
@@ -182,9 +226,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public DigitalObject getByIdentifierWithWEMI(String namespace, String id) {
-    DigitalObject digitalObject = getByIdentifierWithWEMI(namespace, id);
+    DigitalObject digitalObject = getByIdentifier(namespace, id);
     if (digitalObject.getItem() != null) {
-      Item item = getItem(digitalObject);
+      Item item = itemService.getByUuid(digitalObject.getItem().getUuid());
 
       // for later:
       if (item.getManifestation() != null) {

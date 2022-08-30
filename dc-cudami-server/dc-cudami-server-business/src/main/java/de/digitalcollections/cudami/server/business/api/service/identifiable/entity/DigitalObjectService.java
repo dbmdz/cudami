@@ -1,6 +1,9 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -16,6 +19,9 @@ import java.util.UUID;
 
 /** Service for Digital Object. */
 public interface DigitalObjectService extends EntityService<DigitalObject> {
+
+  boolean addItemToDigitalObject(Item item, UUID digitalObjectUuid)
+      throws ConflictException, ValidationException, IdentifiableServiceException;
 
   void deleteFileResources(UUID digitalObjectUuid);
 

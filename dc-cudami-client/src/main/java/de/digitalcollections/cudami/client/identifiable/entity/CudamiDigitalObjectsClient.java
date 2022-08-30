@@ -15,6 +15,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObject> {
@@ -35,6 +36,11 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/collections", baseEndpoint, uuid), pageRequest, Collection.class);
+  }
+
+  public DigitalObject getByIdentifierAndFillWEMI(String namespace, String id)
+      throws TechnicalException {
+    return getByIdentifier(namespace, id, Map.of("fill-wemi", "true"));
   }
 
   public PageResponse<Project> findProjects(UUID uuid, PageRequest pageRequest)
