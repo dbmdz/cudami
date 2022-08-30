@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Confl
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -46,9 +47,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
 
+  private final DigitalObjectService digitalObjectService;
   private final ItemService itemService;
 
-  public ItemController(ItemService itemService) {
+  public ItemController(DigitalObjectService digitalObjectService, ItemService itemService) {
+    this.digitalObjectService = digitalObjectService;
     this.itemService = itemService;
   }
 
@@ -66,7 +69,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
           @PathVariable
           UUID digitalObjectUuid)
       throws ValidationException, ConflictException, IdentifiableServiceException {
-    return itemService.addDigitalObject(uuid, digitalObjectUuid);
+
+    Item item = itemService.getByUuid(uuid);
+    return digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
   }
 
   @Operation(summary = "Add work to an item")
