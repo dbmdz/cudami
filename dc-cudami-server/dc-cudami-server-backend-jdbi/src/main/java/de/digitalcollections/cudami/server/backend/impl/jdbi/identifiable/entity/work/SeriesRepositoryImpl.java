@@ -7,7 +7,7 @@ import de.digitalcollections.model.identifiable.entity.work.Series;
 import org.jdbi.v3.core.Jdbi;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("seriesRepository")
 public class SeriesRepositoryImpl extends WorkRepositoryImpl<Series> implements SeriesRepository {
 
   public SeriesRepositoryImpl(

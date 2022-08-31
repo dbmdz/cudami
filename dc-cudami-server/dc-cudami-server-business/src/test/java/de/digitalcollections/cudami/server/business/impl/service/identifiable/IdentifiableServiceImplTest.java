@@ -25,6 +25,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -765,5 +766,42 @@ class IdentifiableServiceImplTest {
         .saveForIdentifiable(any(UUID.class), argThat(set -> set.size() == 1));
     // No identifier was deleted at all
     verify(identifierService, never()).delete(any(Set.class));
+  }
+
+  @DisplayName("throws a ValidationException on save and update when the label is null")
+  @Test
+  public void nullLabelThrowsValidationException() {
+    Manifestation manifestation = Manifestation.builder().build();
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.update(manifestation);
+        });
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.save(manifestation);
+        });
+  }
+
+  @DisplayName("throws a ValidationException on save and update when the label is empty")
+  @Test
+  public void emptyLabelThrowsValidationException() {
+    Manifestation manifestation = Manifestation.builder().build();
+    manifestation.setLabel(new LocalizedText());
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.update(manifestation);
+        });
+
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.save(manifestation);
+        });
   }
 }
