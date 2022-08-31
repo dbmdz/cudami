@@ -1,8 +1,15 @@
 import './CircleButton.css'
 
+import {ReactNode} from 'react'
 import {Button} from 'reactstrap'
 
-const CircleButton = ({disabled, children, onClick}) => (
+interface Props {
+  disabled: boolean
+  children: ReactNode
+  onClick(): void
+}
+
+const CircleButton = ({disabled, children, onClick}: Props) => (
   <Button
     className="align-items-center btn-circle d-flex justify-content-center"
     color={disabled ? 'light' : 'primary'}

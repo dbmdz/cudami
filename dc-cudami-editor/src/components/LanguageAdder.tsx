@@ -2,7 +2,11 @@ import {useTranslation} from 'react-i18next'
 import {FaPlus} from 'react-icons/fa'
 import {NavItem, NavLink} from 'reactstrap'
 
-const LanguageAdder = ({onClick}) => {
+interface Props {
+  onClick(): void
+}
+
+const LanguageAdder = ({onClick}: Props) => {
   const {t} = useTranslation()
   return (
     <NavItem>

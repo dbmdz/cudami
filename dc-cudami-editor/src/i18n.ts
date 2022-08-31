@@ -6,7 +6,7 @@ import de from './locales/de/translation.json'
 import enLanguageNames from './locales/en/languages.json'
 import en from './locales/en/translation.json'
 
-export default function (locale) {
+export default function (locale: string) {
   const instance = i18n.createInstance()
   instance.use(initReactI18next).init({
     fallbackLng: 'en',
