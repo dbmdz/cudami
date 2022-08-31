@@ -4,18 +4,18 @@ const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   entry: {
-    IdentifiableEditor: './src/lib/IdentifiableEditor.jsx',
-    IdentifiableList: './src/lib/IdentifiableList.jsx',
-    IdentifierList: './src/lib/IdentifierList.jsx',
-    IdentifierTypeEditor: './src/lib/IdentifierTypeEditor.jsx',
-    IdentifierTypeList: './src/lib/IdentifierTypeList.jsx',
-    LicenseEditor: './src/lib/LicenseEditor.tsx',
-    LicenseList: './src/lib/LicenseList.jsx',
-    RenderingTemplateEditor: './src/lib/RenderingTemplateEditor.jsx',
-    RenderingTemplateList: './src/lib/RenderingTemplateList.jsx',
-    UrlAliasesList: './src/lib/UrlAliasesList.jsx',
-    UserEditor: './src/lib/UserEditor.jsx',
-    UserList: './src/lib/UserList.jsx',
+    IdentifiableEditor: './src/lib/IdentifiableEditor',
+    IdentifiableList: './src/lib/IdentifiableList',
+    IdentifierList: './src/lib/IdentifierList',
+    IdentifierTypeEditor: './src/lib/IdentifierTypeEditor',
+    IdentifierTypeList: './src/lib/IdentifierTypeList',
+    LicenseEditor: './src/lib/LicenseEditor',
+    LicenseList: './src/lib/LicenseList',
+    RenderingTemplateEditor: './src/lib/RenderingTemplateEditor',
+    RenderingTemplateList: './src/lib/RenderingTemplateList',
+    UrlAliasesList: './src/lib/UrlAliasesList',
+    UserEditor: './src/lib/UserEditor',
+    UserList: './src/lib/UserList',
   },
   module: {
     rules: [
