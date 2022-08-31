@@ -269,7 +269,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
-      identifierService.validate(identifiable.getIdentifiers());
+      validate(identifiable);
     } catch (CudamiServiceException e) {
       throw new IdentifiableServiceException(e.getMessage());
     }
@@ -343,10 +343,11 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
     try {
-      identifierService.validate(identifiable.getIdentifiers());
+      validate(identifiable);
     } catch (CudamiServiceException e) {
       throw new IdentifiableServiceException(e.getMessage());
     }
+
     I identifiableInDb = repository.getByUuid(identifiable.getUuid());
 
     try {
@@ -418,5 +419,18 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
 
     return repository.getByUuid(identifiable.getUuid());
+  }
+
+  @Override
+  public void validate(I identifiable) throws CudamiServiceException, ValidationException {
+    if (identifiable.getLabel() == null || identifiable.getLabel().isEmpty()) {
+      throw new ValidationException("Missing label");
+    }
+
+    try {
+      identifierService.validate(identifiable.getIdentifiers());
+    } catch (CudamiServiceException e) {
+      throw new ValidationException("Cannot validate: " + e, e);
+    }
   }
 }

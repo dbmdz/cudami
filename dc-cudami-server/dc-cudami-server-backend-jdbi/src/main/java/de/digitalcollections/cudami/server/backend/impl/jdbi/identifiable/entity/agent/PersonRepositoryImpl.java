@@ -28,6 +28,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -175,7 +176,7 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       FamilyNameRepositoryImpl familyNameRepositoryImpl,
       GivenNameRepositoryImpl givenNameRepositoryImpl,
-      WorkRepositoryImpl workRepositoryImpl,
+      @Qualifier("workRepository") WorkRepositoryImpl workRepositoryImpl,
       CudamiConfig cudamiConfig) {
     super(
         dbi,

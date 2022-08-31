@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -164,4 +165,6 @@ public interface IdentifiableService<I extends Identifiable> {
       UUID identifiableUuid, List<FileResource> fileResources);
 
   I update(I identifiable) throws IdentifiableServiceException, ValidationException;
+
+  void validate(I identifiable) throws CudamiServiceException, ValidationException;
 }

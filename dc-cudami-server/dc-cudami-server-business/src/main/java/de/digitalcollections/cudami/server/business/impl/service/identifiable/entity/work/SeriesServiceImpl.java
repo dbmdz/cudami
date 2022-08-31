@@ -10,7 +10,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.work.Series;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("seriesService")
 public class SeriesServiceImpl extends WorkServiceImpl<Series> implements SeriesService {
 
   public SeriesServiceImpl(
