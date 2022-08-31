@@ -21,6 +21,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.geo.location.Cuda
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiHumanSettlementsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.relation.CudamiEntityRelationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
@@ -62,6 +63,7 @@ public class CudamiClient {
   private final CudamiLicensesClient cudamiLicensesClient;
   private final CudamiLinkedDataFileResourcesClient cudamiLinkedDataFileResourcesClient;
   private final CudamiLocalesClient cudamiLocalesClient;
+  private final CudamiManifestationsClient cudamiManifestationsClient;
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
@@ -118,6 +120,7 @@ public class CudamiClient {
     this.cudamiLinkedDataFileResourcesClient =
         new CudamiLinkedDataFileResourcesClient(http, cudamiServerUrl, mapper);
     this.cudamiLocalesClient = new CudamiLocalesClient(http, cudamiServerUrl, mapper);
+    this.cudamiManifestationsClient = new CudamiManifestationsClient(http, cudamiServerUrl, mapper);
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
@@ -217,6 +220,10 @@ public class CudamiClient {
 
   public CudamiLocalesClient forLocales() {
     return cudamiLocalesClient;
+  }
+
+  public CudamiManifestationsClient forManifestations() {
+    return cudamiManifestationsClient;
   }
 
   public CudamiPersonsClient forPersons() {
