@@ -56,10 +56,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
 
   @Override
   public String getColumnName(String modelProperty) {
-    switch (modelProperty) {
-      default:
-        return super.getColumnName(modelProperty);
-    }
+    return super.getColumnName(modelProperty);
+    //    switch (modelProperty) {
+    //      default:
+    //        return super.getColumnName(modelProperty);
+    //    }
   }
 
   @Override
