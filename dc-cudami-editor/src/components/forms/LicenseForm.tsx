@@ -92,7 +92,7 @@ const LicenseForm = ({uuid}: Props) => {
           evt.preventDefault()
           const {error = false, uuid: uuidFromApi} = await submitData(
             apiContextPath,
-            {...license, label: cleanLocalizedText(license.label)},
+            {...license, label: cleanLocalizedText(label)},
             type,
             uuid,
           )
@@ -196,7 +196,7 @@ const LicenseForm = ({uuid}: Props) => {
           dispatch(removeLanguage(language))
           setLicense({
             ...license,
-            label: omit(license.label, [language?.name ?? '']),
+            label: omit(label, [language?.name ?? '']),
           })
         }}
         toggle={() => dispatch(toggleDialog(DialogNames.REMOVE_LANGUAGE))}
