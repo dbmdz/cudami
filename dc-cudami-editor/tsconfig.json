@@ -12,7 +12,9 @@
     ],
     "module": "commonjs",
     "moduleResolution": "node",
+    "noImplicitReturns": false,
     "removeComments": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "es5"
