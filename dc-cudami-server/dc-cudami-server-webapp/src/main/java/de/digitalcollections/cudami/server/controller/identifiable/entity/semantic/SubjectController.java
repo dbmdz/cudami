@@ -33,7 +33,7 @@ public class SubjectController {
 
   @Operation(summary = "Get all subjects")
   @GetMapping(
-      value = {"/v6/expressiontypes"},
+      value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Subject> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -50,7 +50,7 @@ public class SubjectController {
 
   @Operation(summary = "Get subject by UUID")
   @GetMapping(
-      value = {"/v6/expressiontypes/{uuid}"},
+      value = {"/v6/subjects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject getByUuid(@PathVariable UUID uuid) {
     return service.getByUuid(uuid);
@@ -58,7 +58,7 @@ public class SubjectController {
 
   @Operation(summary = "Save a newly created subject")
   @PostMapping(
-      value = {"/v6/expressiontypes"},
+      value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject save(@RequestBody Subject subject, BindingResult errors) {
     return service.save(subject);
@@ -66,7 +66,7 @@ public class SubjectController {
 
   @Operation(summary = "Update a subject")
   @PutMapping(
-      value = {"/v6/expressiontypes/{uuid}"},
+      value = {"/v6/subjects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject update(
       @PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors) {
