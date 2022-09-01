@@ -112,9 +112,15 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public List<Locale> getLanguages() {
     String query =
-        "SELECT DISTINCT jsonb_object_keys("
+        "SELECT jsonb_object_keys("
             + tableAlias
             + ".label) as languages FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " UNION SELECT jsonb_object_keys("
+            + tableAlias
+            + ".description) FROM "
             + tableName
             + " AS "
             + tableAlias;
