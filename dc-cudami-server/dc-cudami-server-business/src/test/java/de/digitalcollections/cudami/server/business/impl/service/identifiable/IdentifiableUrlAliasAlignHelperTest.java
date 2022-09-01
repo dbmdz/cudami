@@ -38,7 +38,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
   public void setup() {
     CudamiConfig.UrlAlias urlAliasConfig =
         new CudamiConfig.UrlAlias(List.of(IdentifiableObjectType.DIGITAL_OBJECT.toString()), 0);
-    cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
+    cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000, null);
 
     slugGeneratorService = mock(IdentifiableUrlAliasAlignHelper.SlugGeneratorService.class);
   }

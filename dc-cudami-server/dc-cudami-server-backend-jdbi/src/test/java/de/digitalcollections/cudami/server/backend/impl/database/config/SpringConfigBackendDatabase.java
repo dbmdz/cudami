@@ -84,7 +84,7 @@ public class SpringConfigBackendDatabase {
 
   @Bean
   CudamiConfig cudamiConfig() {
-    var cudamiConfig = new CudamiConfig(null, null, 5000);
+    var cudamiConfig = new CudamiConfig(null, null, 5000, null);
     return cudamiConfig;
   }
 }

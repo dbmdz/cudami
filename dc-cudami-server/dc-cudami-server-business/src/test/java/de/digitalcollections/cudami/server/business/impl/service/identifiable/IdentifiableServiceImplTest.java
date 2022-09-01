@@ -53,7 +53,7 @@ class IdentifiableServiceImplTest {
     when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
     identifierService = mock(IdentifierService.class);
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
-    CudamiConfig cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000);
+    CudamiConfig cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000, null);
 
     LocaleService localeService = mock(LocaleService.class);
 
