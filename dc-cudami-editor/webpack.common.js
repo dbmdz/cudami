@@ -31,7 +31,7 @@ module.exports = {
       {
         exclude: /(node_modules)/,
         test: /\.jsx?$/,
-        use: ['babel-loader'],
+        use: 'babel-loader',
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/,
@@ -44,7 +44,7 @@ module.exports = {
       },
       {
         test: /\.(woff2|ttf)$/,
-        use: ['file-loader'],
+        use: 'file-loader',
       },
     ],
   },
