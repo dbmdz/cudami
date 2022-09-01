@@ -32,7 +32,7 @@ public class TagController {
 
   @Operation(summary = "Get all tags")
   @GetMapping(
-      value = {"/v6/expressiontypes"},
+      value = {"/v6/tags"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Tag> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
@@ -49,7 +49,7 @@ public class TagController {
 
   @Operation(summary = "Get tag by UUID")
   @GetMapping(
-      value = {"/v6/expressiontypes/{uuid}"},
+      value = {"/v6/tags/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag getByUuid(@PathVariable UUID uuid) {
     return service.getByUuid(uuid);
@@ -57,7 +57,7 @@ public class TagController {
 
   @Operation(summary = "Save a newly created tag")
   @PostMapping(
-      value = {"/v6/expressiontypes"},
+      value = {"/v6/tags"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag save(@RequestBody Tag tag, BindingResult errors) {
     return service.save(tag);
@@ -65,7 +65,7 @@ public class TagController {
 
   @Operation(summary = "Update a tag")
   @PutMapping(
-      value = {"/v6/expressiontypes/{uuid}"},
+      value = {"/v6/tags/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors) {
     assert Objects.equals(uuid, tag.getUuid());
