@@ -1,0 +1,23 @@
+cudami:
+  typeDeclarations:
+    involvementRoles:
+    - ILLUSTRATOR
+
+    manufacturingTypes:
+    - PRINT
+
+    mediaTypes:
+    - BOOK
+
+    tagTypes:
+    - TAG
+
+    expressionTypes:
+    - mainType: TEXT
+      subType: HANDWRITING
+
+    titleTypes:
+    - mainType: main
+      subType: main
+    - mainType: main
+      subType: sub

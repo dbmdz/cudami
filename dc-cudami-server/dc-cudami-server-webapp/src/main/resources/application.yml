@@ -66,6 +66,8 @@ spring:
     banner-mode: 'off'
   profiles:
     active: local
+    include:
+    - cudamitypes
   security:
     user:
       name: admin

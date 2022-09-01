@@ -12,15 +12,18 @@ public class CudamiConfig {
   private Defaults defaults;
   private UrlAlias urlAlias;
   private int offsetForAlternativePaging = 0;
+  private TypeDeclarations typeDeclarations;
 
   @JsonCreator(mode = Mode.PROPERTIES)
   public CudamiConfig(
       @JsonProperty(value = "defaults") Defaults defaults,
       @JsonProperty(value = "urlAlias") UrlAlias urlAlias,
-      @JsonProperty(value = "offsetForAlternativePaging") int offsetForAlternativePaging) {
+      @JsonProperty(value = "offsetForAlternativePaging") int offsetForAlternativePaging,
+      @JsonProperty(value = "typeDeclarations") TypeDeclarations typeDeclarations) {
     this.defaults = defaults;
     this.urlAlias = urlAlias;
     this.offsetForAlternativePaging = offsetForAlternativePaging;
+    this.typeDeclarations = typeDeclarations;
   }
 
   public Defaults getDefaults() {
@@ -33,6 +36,10 @@ public class CudamiConfig {
 
   public int getOffsetForAlternativePaging() {
     return offsetForAlternativePaging;
+  }
+
+  public TypeDeclarations getTypeDeclarations() {
+    return typeDeclarations;
   }
 
   public static class Defaults {
