@@ -3,6 +3,8 @@ enum DialogNames {
   REMOVE_LANGUAGE = 'removeLanguage',
 }
 
+type LocalizedText = Record<string, string>
+
 interface Language {
   displayName: string
   name: string
@@ -10,7 +12,7 @@ interface Language {
 
 interface License extends UniqueObject {
   acronym?: string
-  label?: Record<string, string>
+  label?: LocalizedText
   url?: string
 }
 
@@ -27,6 +29,12 @@ interface FeedbackMessage {
   values?: Record<string, unknown>
 }
 
+interface RenderingTemplate extends UniqueObject {
+  description?: LocalizedText
+  label?: LocalizedText
+  name?: string
+}
+
 interface UniqueObject {
   created?: Date
   lastModified?: Date
@@ -34,4 +42,4 @@ interface UniqueObject {
 }
 
 export {DialogNames}
-export type {FeedbackMessage, Language, License}
+export type {FeedbackMessage, Language, License, RenderingTemplate}

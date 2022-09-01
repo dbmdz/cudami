@@ -16,7 +16,9 @@
               <script th:src="@{/js/rendering-template-editor.bundle.js}"></script>
               <script th:inline="javascript">
                 RenderingTemplateEditor({
+                  activeLanguage: /*[[${activeLanguage}]]*/ '',
                   apiContextPath: /*[[@{/}]]*/ '',
+                  existingLanguages: /*[[${existingLanguages}]]*/ [],
                   id: "editor",
                   uiLocale: /*[[${#locale.language}]]*/ '',
                   uuid: /*[[${uuid}]]*/ ''
