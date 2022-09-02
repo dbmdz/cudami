@@ -2,22 +2,71 @@ cudami:
   typeDeclarations:
     involvementRoles:
     - ILLUSTRATOR
+    - AUTHOR
+    - COMPOSER
+    - CREATOR_UNSPECIFIED
+    - CONTRIB_PERFORMANCE
+    - CONTRIB_PRODUCTION
+    - CONTRIB_TEXT
+    - CONTRIB_VISUALARTS
+    - EDITOR
+    - RELATION_TO_OBJECT
+    - TRANSLATOR
+    - VISUALARTIST
+    - OTHER
 
     manufacturingTypes:
     - PRINT
+    - HANDMADE
 
-    mediaTypes:
+    mediaTypes: #TODO
     - BOOK
 
-    tagTypes:
+    tagTypes: #TODO
     - TAG
 
-    expressionTypes:
+    expressionTypes: #TODO
     - mainType: TEXT
       subType: HANDWRITING
 
     titleTypes:
+    - mainType: abbr
+      subType: main
+    - mainType: alt
+      subType: main
+    - mainType: alt
+      subType: sub
+    - mainType: alt
+      subType: part
+    - mainType: former
+      subType: main
+    - mainType: former
+      subType: part
+    - mainType: former
+      subType: sub
+    - mainType: host
+      subType:
     - mainType: main
       subType: main
     - mainType: main
+      subType: part
+    - mainType: main
+      subType: sub
+    - mainType: par
+      subType: main
+    - mainType: par
+      subType: part
+    - mainType: par
+      subType: sub
+    - mainType: trans
+      subType: main
+    - mainType: trans
+      subType: part
+    - mainType: trans
+      subType: sub
+    - mainType: uni
+      subType: main
+    - mainType: uni
+      subType: part
+    - mainType: uni
       subType: sub
