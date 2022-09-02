@@ -25,9 +25,28 @@ cudami:
     tagTypes: #TODO
     - TAG
 
-    expressionTypes: #TODO
+    expressionTypes:
     - mainType: TEXT
-      subType: HANDWRITING
+      subType: HANDMADE
+    - mainType: TEXT
+      subType: PRINT
+    - mainType: SCORE
+      subType: HANDMADE
+    - mainType: SCORE
+      subType: PRINT
+    - mainType: MAP
+      subType: HANDMADE
+    - mainType: MAP
+      subType: PRINT
+    - mainType: IMAGE
+      subType: HANDMADE
+    - mainType: IMAGE
+      subType: PRINT
+    - mainType: SPATIAL
+      subType: HANDMADE
+    - mainType: SPATIAL
+      subType: PRINT
+
 
     titleTypes:
     - mainType: ABBR
