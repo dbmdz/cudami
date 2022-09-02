@@ -30,43 +30,43 @@ cudami:
       subType: HANDWRITING
 
     titleTypes:
-    - mainType: abbr
-      subType: main
-    - mainType: alt
-      subType: main
-    - mainType: alt
-      subType: sub
-    - mainType: alt
-      subType: part
-    - mainType: former
-      subType: main
-    - mainType: former
-      subType: part
-    - mainType: former
-      subType: sub
-    - mainType: host
+    - mainType: ABBR
+      subType: MAIN
+    - mainType: ALT
+      subType: MAIN
+    - mainType: ALT
+      subType: SUB
+    - mainType: ALT
+      subType: PART
+    - mainType: FORMER
+      subType: MAIN
+    - mainType: FORMER
+      subType: PART
+    - mainType: FORMER
+      subType: SUB
+    - mainType: HOST
       subType:
-    - mainType: main
-      subType: main
-    - mainType: main
-      subType: part
-    - mainType: main
-      subType: sub
-    - mainType: par
-      subType: main
-    - mainType: par
-      subType: part
-    - mainType: par
-      subType: sub
-    - mainType: trans
-      subType: main
-    - mainType: trans
-      subType: part
-    - mainType: trans
-      subType: sub
-    - mainType: uni
-      subType: main
-    - mainType: uni
-      subType: part
-    - mainType: uni
-      subType: sub
+    - mainType: MAIN
+      subType: MAIN
+    - mainType: MAIN
+      subType: PART
+    - mainType: MAIN
+      subType: SUB
+    - mainType: PAR
+      subType: MAIN
+    - mainType: PAR
+      subType: PART
+    - mainType: PAR
+      subType: SUB
+    - mainType: TRANS
+      subType: MAIN
+    - mainType: TRANS
+      subType: PART
+    - mainType: TRANS
+      subType: SUB
+    - mainType: UNI
+      subType: MAIN
+    - mainType: UNI
+      subType: PART
+    - mainType: UNI
+      subType: SUB
