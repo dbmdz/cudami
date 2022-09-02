@@ -3,9 +3,11 @@ package de.digitalcollections.cudami.model.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.digitalcollections.model.MainSubType;
+import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,8 +18,8 @@ public class TypeDeclarations {
   private List<String> mediaTypes;
   private List<String> tagTypes;
 
-  private List<MainSubType> expressionTypes;
-  private List<MainSubType> titleTypes;
+  private List<ExpressionType> expressionTypes;
+  private List<TitleType> titleTypes;
 
   @JsonCreator(mode = Mode.PROPERTIES)
   public TypeDeclarations(
@@ -25,8 +27,8 @@ public class TypeDeclarations {
       @JsonProperty(value = "manufacturingTypes") List<String> manufacturingTypes,
       @JsonProperty(value = "mediaTypes") List<String> mediaTypes,
       @JsonProperty(value = "tagTypes") List<String> tagTypes,
-      @JsonProperty(value = "expressionTypes") List<MainSubType> expressionTypes,
-      @JsonProperty(value = "titleTypes") List<MainSubType> titleTypes) {
+      @JsonProperty(value = "expressionTypes") List<ExpressionType> expressionTypes,
+      @JsonProperty(value = "titleTypes") List<TitleType> titleTypes) {
     this.involvementRoles =
         involvementRoles != null ? List.copyOf(involvementRoles) : Collections.emptyList();
     this.manufacturingTypes =
@@ -55,16 +57,16 @@ public class TypeDeclarations {
     return List.copyOf(tagTypes);
   }
 
-  public List<MainSubType> getExpressionTypes() {
+  public List<ExpressionType> getExpressionTypes() {
     return List.copyOf(expressionTypes);
   }
 
-  public List<MainSubType> getTitleTypes() {
+  public List<TitleType> getTitleTypes() {
     return List.copyOf(titleTypes);
   }
 
-  private List<MainSubType> searchMainSubType(List<MainSubType> types, MainSubType pattern) {
-    Optional<MainSubType> result = types.stream().filter(mst -> mst.equals(pattern)).findFirst();
+  private <T extends MainSubType> List<T> searchMainSubType(List<T> types, T pattern) {
+    Optional<T> result = types.stream().filter(mst -> mst.equals(pattern)).findFirst();
     if (result.isPresent()) {
       return List.of(result.get());
     }
@@ -84,11 +86,11 @@ public class TypeDeclarations {
    * @param subType can be {@code null}
    * @return list of matching types or an empty list
    */
-  public List<MainSubType> findExpressionTypes(String mainType, String subType) {
+  public List<ExpressionType> findExpressionTypes(String mainType, String subType) {
     if (mainType == null && subType == null) {
       return Collections.emptyList();
     }
-    MainSubType pattern = new MainSubType(mainType, subType);
+    ExpressionType pattern = new ExpressionType(mainType, subType);
     return searchMainSubType(expressionTypes, pattern);
   }
 
@@ -100,49 +102,11 @@ public class TypeDeclarations {
    * @param subType can be {@code null}
    * @return list of matching types or an empty list
    */
-  public List<MainSubType> findTitleTypes(String mainType, String subType) {
+  public List<TitleType> findTitleTypes(String mainType, String subType) {
     if (mainType == null && subType == null) {
       return Collections.emptyList();
     }
-    MainSubType pattern = new MainSubType(mainType, subType);
+    TitleType pattern = new TitleType(mainType, subType);
     return searchMainSubType(titleTypes, pattern);
-  }
-
-  public static class MainSubType {
-
-    private final String mainType;
-    private final String subType;
-
-    @JsonCreator(mode = Mode.PROPERTIES)
-    public MainSubType(
-        @JsonProperty(value = "mainType") String mainType,
-        @JsonProperty(value = "subType") String subType) {
-      this.mainType = mainType;
-      this.subType = subType;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (obj == null || !(obj instanceof MainSubType)) {
-        return false;
-      }
-      MainSubType other = (MainSubType) obj;
-      return Objects.equals(mainType, other.mainType) && Objects.equals(subType, other.subType);
-    }
-
-    @Override
-    public int hashCode() {
-      return (mainType != null ? mainType.hashCode() : 0)
-          + (subType != null ? subType.hashCode() : 0)
-          + 187;
-    }
-
-    public String getMainType() {
-      return mainType;
-    }
-
-    public String getSubType() {
-      return subType;
-    }
   }
 }
