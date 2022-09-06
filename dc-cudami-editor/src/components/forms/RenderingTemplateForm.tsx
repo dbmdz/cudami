@@ -49,9 +49,8 @@ const submitData = async (
   context: string,
   data: RenderingTemplate,
   type: string,
-  uuid: string,
 ) => {
-  const {error = false} = await (uuid
+  const {error = false} = await (data.uuid
     ? update(context, data, type)
     : save(context, data, type))
   return error
@@ -98,7 +97,6 @@ const RenderingTemplateForm = ({uuid}: Props) => {
               label: cleanLocalizedText(label),
             },
             type,
-            uuid,
           )
           if (error) {
             dispatch(
