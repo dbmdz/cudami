@@ -45,13 +45,8 @@ interface Props {
   uuid: string
 }
 
-const submitData = async (
-  context: string,
-  data: License,
-  type: string,
-  uuid: string,
-) => {
-  const response = await (uuid
+const submitData = async (context: string, data: License, type: string) => {
+  const response = await (data.uuid
     ? update(context, data, type)
     : save(context, data, type))
   return response
@@ -94,7 +89,6 @@ const LicenseForm = ({uuid}: Props) => {
             apiContextPath,
             {...license, label: cleanLocalizedText(label)},
             type,
-            uuid,
           )
           if (error) {
             dispatch(

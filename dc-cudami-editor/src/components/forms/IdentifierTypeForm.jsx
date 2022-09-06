@@ -9,8 +9,8 @@ import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
 import ActionButtons from './ActionButtons'
 
-const submitData = async (context, data, type, uuid) => {
-  const {error = false} = await (uuid
+const submitData = async (context, data, type) => {
+  const {error = false} = await (data.uuid
     ? update(context, data, type)
     : save(context, data, type))
   return error
@@ -44,12 +44,7 @@ const IdentifierTypeForm = ({apiContextPath = '/', uuid}) => {
         id={formId}
         onSubmit={async (evt) => {
           evt.preventDefault()
-          const error = await submitData(
-            apiContextPath,
-            identifierType,
-            type,
-            uuid,
-          )
+          const error = await submitData(apiContextPath, identifierType, type)
           if (error) {
             return setFeedbackMessage({
               color: 'danger',
