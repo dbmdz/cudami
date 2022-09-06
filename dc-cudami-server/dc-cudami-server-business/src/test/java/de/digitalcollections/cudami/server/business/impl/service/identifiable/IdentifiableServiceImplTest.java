@@ -115,10 +115,11 @@ class IdentifiableServiceImplTest {
   public void exceptionOnSaveWhenRepoFails() {
     when(repo.save(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
 
+    var identifiable = Identifiable.builder().label("label").build();
     assertThrows(
         IdentifiableServiceException.class,
         () -> {
-          service.save(new Identifiable());
+          service.save(identifiable);
         });
   }
 
@@ -169,10 +170,11 @@ class IdentifiableServiceImplTest {
   public void exceptionOnUpdateWhenRepoFails() {
     when(repo.update(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
 
+    var identifiable = Identifiable.builder().label("label").build();
     assertThrows(
         IdentifiableServiceException.class,
         () -> {
-          service.update(new Identifiable());
+          service.update(identifiable);
         });
   }
 

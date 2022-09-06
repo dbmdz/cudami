@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The V5 WorkController")
 class V5WorkControllerTest extends BaseControllerTest {
 
-  @MockBean private WorkService workService;
+  @MockBean private WorkService<Work> workService;
 
   @DisplayName("shall return a paged list of works")
   @ParameterizedTest
@@ -30,14 +30,13 @@ class V5WorkControllerTest extends BaseControllerTest {
       })
   public void find(String path) throws Exception {
     PageResponse<Work> expected =
-        (PageResponse<Work>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(0)
-                .forAscendingOrderedField("label", "de")
-                .withoutContent()
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(0)
+            .forAscendingOrderedField("label", "de")
+            .withoutContent()
+            .build();
 
     when(workService.find(any(PageRequest.class))).thenReturn(expected);
 

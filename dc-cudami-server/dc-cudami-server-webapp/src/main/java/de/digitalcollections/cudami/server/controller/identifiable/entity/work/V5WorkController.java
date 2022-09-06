@@ -13,7 +13,6 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +27,7 @@ public class V5WorkController {
   private final WorkService workService;
   private final ObjectMapper objectMapper;
 
-  public V5WorkController(
-      @Qualifier("workService") WorkService workService, ObjectMapper objectMapper) {
+  public V5WorkController(WorkService<Work> workService, ObjectMapper objectMapper) {
     this.workService = workService;
     this.objectMapper = objectMapper;
   }
