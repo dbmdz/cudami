@@ -45,6 +45,16 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_item}">...</label></div>
                 <div class="col-md-9"><a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="*{partOfItem.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</a></div>
               </div>
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{exemplifies_manifestation}">...</label></div>
+                <div class="col-md-9">
+                  <div th:switch="*{exemplifiesManifestation}">
+                    <i th:case="true" class="fas fa-check text-success"></i>
+                    <i th:case="false" class="fas fa-times text-danger"></i>
+                    <i th:case="*" class="fas fa-question-circle"></i>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
