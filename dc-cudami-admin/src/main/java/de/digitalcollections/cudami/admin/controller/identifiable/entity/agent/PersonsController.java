@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -141,15 +142,16 @@ public class PersonsController extends AbstractController {
   }
 
   @GetMapping("/persons/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
+  public String view(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
     Person person = service.getByUuid(uuid);
+    if (person == null) {
+      throw new ResourceNotFoundException();
+    }
+    Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingLanguages =
         languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("person", person);
-
+    model.addAttribute("existingLanguages", existingLanguages).addAttribute("person", person);
     return "persons/view";
   }
 }
