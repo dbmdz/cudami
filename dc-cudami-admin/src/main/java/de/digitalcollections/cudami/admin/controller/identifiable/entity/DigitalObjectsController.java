@@ -165,6 +165,7 @@ public class DigitalObjectsController extends AbstractController {
             displayLocale, service.getLanguagesOfContainedDigitalObjects(uuid));
 
     model
+        .addAttribute("defaultLanguage", localeService.getDefaultLanguage().getLanguage())
         .addAttribute("digitalObject", digitalObject)
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("existingCollectionLanguages", existingCollectionLanguages)

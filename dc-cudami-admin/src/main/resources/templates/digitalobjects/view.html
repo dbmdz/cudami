@@ -72,6 +72,45 @@
           </div>
         </div>
 
+        <div class="row" th:if="*{creationInfo}">
+          <div class="col-sm-12">
+            <h2 th:text="#{creation_info}">...</h2>
+            <h3 th:text="#{creation_info_creator}"></h3>
+            <th:block th:with="creationCreator=*{creationInfo.creator}">
+              <div th:if="${creationCreator}" th:switch="${creationCreator.identifiableObjectType.name()}">
+                <a
+                  th:case="'CORPORATE_BODY'"
+                  th:href="@{/corporatebodies/{uuid}(uuid=${creationCreator.uuid})}"
+                  th:text="${creationCreator.label.getText(defaultLanguage)}"
+                >
+                  ...
+                </a>
+                <a
+                  th:case="'PERSON'"
+                  th:href="@{/persons/{uuid}(uuid=${creationCreator.uuid})}"
+                  th:text="${creationCreator.label.getText(defaultLanguage)}"
+                >
+                  ...
+                </a>
+              </div>
+            </th:block>
+            <h3 th:text="#{date}"></h3>
+            <th:block th:with="creationDate=*{creationInfo.date},df=#{date.format}">
+              <span th:if="${creationDate}" th:text="${#temporals.format(creationDate,df)}">...</span>
+            </th:block>
+            <h3 th:text="#{geolocation}"></h3>
+            <th:block th:with="creationLocation=*{creationInfo.geoLocation}">
+              <a
+                th:if="${creationLocation}"
+                th:href="@{/geolocations/{uuid}(uuid=${creationLocation.uuid})}"
+                th:text="${creationLocation.label.getText(defaultLanguage)}"
+              >
+                ...
+              </a>
+            </th:block>
+          </div>
+        </div>
+
         <div class="mt-3 row" th:if="*{notes}">
           <div class="col-sm-12">
             <th:block th:insert="fragments/entity::renderNotes(*{notes})"></th:block>
