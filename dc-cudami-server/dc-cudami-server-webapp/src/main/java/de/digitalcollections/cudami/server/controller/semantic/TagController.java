@@ -47,6 +47,8 @@ public class TagController {
     return service.find(pageRequest);
   }
 
+  // TODO GetByIdentifier
+
   @Operation(summary = "Get tag by UUID")
   @GetMapping(
       value = {"/v6/tags/{uuid}"},

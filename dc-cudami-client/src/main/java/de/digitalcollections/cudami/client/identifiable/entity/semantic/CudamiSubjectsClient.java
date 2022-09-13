@@ -1,0 +1,34 @@
+package de.digitalcollections.cudami.client.identifiable.entity.semantic;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiRestClient;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.semantic.Subject;
+import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.codec.binary.Base64;
+
+public class CudamiSubjectsClient extends CudamiRestClient<Subject> {
+
+  public CudamiSubjectsClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
+    super(http, serverUrl, Subject.class, mapper, API_VERSION_PREFIX + "/subjects");
+  }
+
+  /**
+   * Retrieves a subject by its namespace and id
+   *
+   * @param namespace the namespace. Must be plain text, not encoded in any way
+   * @param id the id. Must be in plain text, not encoded in any way
+   * @return the Tag or null
+   * @throws TechnicalException in case of an error
+   */
+  public Subject getByIdentifier(String namespace, String id) throws TechnicalException {
+    String namespaceAndId = namespace + ":" + id;
+
+    String encodedNamespaceAndId =
+        Base64.encodeBase64URLSafeString(namespaceAndId.getBytes(StandardCharsets.UTF_8));
+
+    return doGetRequestForObject(
+        String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+  }
+}

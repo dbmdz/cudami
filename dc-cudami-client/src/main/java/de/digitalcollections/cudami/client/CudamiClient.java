@@ -20,6 +20,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPerso
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiHumanSettlementsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.relation.CudamiEntityRelationsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
@@ -68,6 +69,7 @@ public class CudamiClient {
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
   private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
+  private final CudamiSubjectsClient cudamiSubjectsClient;
   private final CudamiTagsClient cudamiTagsClient;
   private final CudamiTopicsClient cudamiTopicsClient;
   private final CudamiUrlAliasClient cudamiUrlAliasClient;
@@ -127,6 +129,7 @@ public class CudamiClient {
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
     this.cudamiRenderingTemplatesClient =
         new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
+    this.cudamiSubjectsClient = new CudamiSubjectsClient(http, cudamiServerUrl, mapper);
     this.cudamiTagsClient = new CudamiTagsClient(http, cudamiServerUrl, mapper);
     this.cudamiTopicsClient = new CudamiTopicsClient(http, cudamiServerUrl, mapper);
     this.cudamiUrlAliasClient = new CudamiUrlAliasClient(http, cudamiServerUrl, mapper);
@@ -242,6 +245,10 @@ public class CudamiClient {
 
   public CudamiRenderingTemplatesClient forRenderingTemplates() {
     return cudamiRenderingTemplatesClient;
+  }
+
+  public CudamiSubjectsClient forSubjects() {
+    return cudamiSubjectsClient;
   }
 
   public CudamiTagsClient forTags() {
