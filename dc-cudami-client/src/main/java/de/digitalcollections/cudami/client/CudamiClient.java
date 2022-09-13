@@ -23,6 +23,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.relation.CudamiEn
 import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiPublicationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
@@ -68,6 +69,7 @@ public class CudamiClient {
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
+  private final CudamiPublicationsClient cudamiPublicationsClient;
   private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
   private final CudamiSubjectsClient cudamiSubjectsClient;
   private final CudamiTagsClient cudamiTagsClient;
@@ -127,6 +129,7 @@ public class CudamiClient {
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
+    this.cudamiPublicationsClient = new CudamiPublicationsClient(http, cudamiServerUrl, mapper);
     this.cudamiRenderingTemplatesClient =
         new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
     this.cudamiSubjectsClient = new CudamiSubjectsClient(http, cudamiServerUrl, mapper);
@@ -241,6 +244,10 @@ public class CudamiClient {
 
   public CudamiProjectsClient forProjects() {
     return cudamiProjectsClient;
+  }
+
+  public CudamiPublicationsClient forPublications() {
+    return cudamiPublicationsClient;
   }
 
   public CudamiRenderingTemplatesClient forRenderingTemplates() {
