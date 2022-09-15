@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
@@ -17,8 +18,18 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   // TODO
   public static final String TABLE_NAME = "tags";
-  public static final String TABLE_ALIAS = "ts";
-  public static final String MAPPING_PREFIX = "ts";
+  public static final String TABLE_ALIAS = "tags";
+  public static final String MAPPING_PREFIX = "tags";
+
+  public static final String SQL_INSERT_FIELDS =
+      " uuid, namespace, id, tag_type, created, last_modified";
+  public static final String SQL_INSERT_VALUES =
+      " :uuid, :namespace, :id, :tagType, :created, :lastModified";
+  public static final String SQL_REDUCED_FIELDS_TAGS =
+      String.format(
+          " %1$s.uuid, %1$s.namespace, %1$s.id, %1$s.tag_type, %1$s.created, %1$s.last_modified",
+          TABLE_ALIAS);
+  public static final String SQL_FULL_FIELDS_TAGS = SQL_REDUCED_FIELDS_TAGS;
 
   public TagRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
@@ -28,14 +39,43 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   public Tag getByUuid(UUID uuid) {
-    // TODO Auto-generated method stub
-    return null;
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_TAGS
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + " WHERE uuid = :uuid";
+
+    Tag tag =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(Tag.class).findOne().orElse(null));
+
+    return tag;
   }
 
   @Override
   public Tag save(Tag tag) {
-    // TODO Auto-generated method stub
-    return null;
+    tag.setUuid(UUID.randomUUID());
+    tag.setCreated(LocalDateTime.now());
+    tag.setLastModified(LocalDateTime.now());
+
+    final String sql =
+        "INSERT INTO "
+            + tableName
+            + "("
+            + SQL_INSERT_FIELDS
+            + ")"
+            + " VALUES ("
+            + SQL_INSERT_VALUES
+            + ")"
+            + " RETURNING *";
+
+    Tag result =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
+    return result;
   }
 
   @Override
@@ -46,8 +86,12 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    // TODO Auto-generated method stub
-    return false;
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
+    return true;
   }
 
   @Override
