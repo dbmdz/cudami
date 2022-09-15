@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.semantic.Tag;
+import de.digitalcollections.model.text.LocalizedText;
+import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,12 +51,20 @@ class TagRepositoryImplTest {
   @DisplayName("can save and retrieve by uuid")
   @Test
   void saveAndRetrieveByUuid() {
-    Tag tag = Tag.builder().namespace("tag-namespace").id("tag-id").tagType("tag-type").build();
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
+    Tag tag =
+        Tag.builder()
+            .label(label)
+            .namespace("tag-namespace")
+            .id("tag-id")
+            .tagType("tag-type")
+            .build();
 
     Tag savedTag = repo.save(tag);
 
     assertThat(savedTag.getNamespace()).isEqualTo(tag.getNamespace());
     assertThat(savedTag.getId()).isEqualTo(tag.getId());
+    assertThat(savedTag.getLabel()).isEqualTo(label);
     assertThat(savedTag.getTagType()).isEqualTo(tag.getTagType());
     assertThat(savedTag.getUuid()).isNotNull();
     assertThat(savedTag.getCreated()).isNotNull();
@@ -68,7 +78,13 @@ class TagRepositoryImplTest {
   @DisplayName("can save and successfully delete")
   @Test
   void saveAndDelete() {
-    Tag tag = Tag.builder().namespace("tag-namespace").id("tag-id2").tagType("tag-type").build();
+    Tag tag =
+        Tag.builder()
+            .label(new LocalizedText(Locale.GERMAN, "Test"))
+            .namespace("tag-namespace")
+            .id("tag-id2")
+            .tagType("tag-type")
+            .build();
 
     Tag savedTag = repo.save(tag);
     boolean success = repo.delete(savedTag.getUuid());

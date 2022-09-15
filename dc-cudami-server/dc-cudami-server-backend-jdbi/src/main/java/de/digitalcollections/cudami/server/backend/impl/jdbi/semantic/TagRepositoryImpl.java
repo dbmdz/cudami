@@ -22,12 +22,12 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   public static final String MAPPING_PREFIX = "tags";
 
   public static final String SQL_INSERT_FIELDS =
-      " uuid, namespace, id, tag_type, created, last_modified";
+      " uuid, label, namespace, id, tag_type, created, last_modified";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :namespace, :id, :tagType, :created, :lastModified";
+      " :uuid, :label, :namespace, :id, :tagType, :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
-          " %1$s.uuid, %1$s.namespace, %1$s.id, %1$s.tag_type, %1$s.created, %1$s.last_modified",
+          " %1$s.uuid, %1$s.label,  %1$s.namespace, %1$s.id, %1$s.tag_type, %1$s.created, %1$s.last_modified",
           TABLE_ALIAS);
   public static final String SQL_FULL_FIELDS_TAGS = SQL_REDUCED_FIELDS_TAGS;
 
