@@ -44,6 +44,7 @@ delete from rel_entity_fileresources;
 delete from rel_identifiable_entities;
 delete from rel_identifiable_fileresources;
 delete from rendering_templates;
+delete from tags;
 delete from topic_entities;
 delete from topic_fileresources;
 delete from topic_topics;
