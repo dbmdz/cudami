@@ -21,9 +21,9 @@ import de.digitalcollections.cudami.client.identifiable.entity.geo.location.Cuda
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiHumanSettlementsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.relation.CudamiEntityRelationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.semantic.CudamiSubjectsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiInvolvementsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
-import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiPublicationsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesBinaryClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
@@ -61,6 +61,7 @@ public class CudamiClient {
   private final CudamiIdentifiablesClient<Identifiable> cudamiIdentifiablesClient;
   private final CudamiIdentifierTypesClient cudamiIdentifierTypesClient;
   private final CudamiImageFileResourcesClient cudamiImageFileResourcesClient;
+  private final CudamiInvolvementsClient cudamiInvolvementsClient;
   private final CudamiItemsClient cudamiItemsClient;
   private final CudamiLicensesClient cudamiLicensesClient;
   private final CudamiLinkedDataFileResourcesClient cudamiLinkedDataFileResourcesClient;
@@ -69,7 +70,6 @@ public class CudamiClient {
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
-  private final CudamiPublicationsClient cudamiPublicationsClient;
   private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
   private final CudamiSubjectsClient cudamiSubjectsClient;
   private final CudamiTagsClient cudamiTagsClient;
@@ -120,6 +120,7 @@ public class CudamiClient {
         new CudamiIdentifierTypesClient(http, cudamiServerUrl, mapper);
     this.cudamiImageFileResourcesClient =
         new CudamiImageFileResourcesClient(http, cudamiServerUrl, mapper);
+    this.cudamiInvolvementsClient = new CudamiInvolvementsClient(http, cudamiServerUrl, mapper);
     this.cudamiItemsClient = new CudamiItemsClient(http, cudamiServerUrl, mapper);
     this.cudamiLicensesClient = new CudamiLicensesClient(http, cudamiServerUrl, mapper);
     this.cudamiLinkedDataFileResourcesClient =
@@ -129,7 +130,6 @@ public class CudamiClient {
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
-    this.cudamiPublicationsClient = new CudamiPublicationsClient(http, cudamiServerUrl, mapper);
     this.cudamiRenderingTemplatesClient =
         new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
     this.cudamiSubjectsClient = new CudamiSubjectsClient(http, cudamiServerUrl, mapper);
@@ -214,6 +214,10 @@ public class CudamiClient {
     return cudamiImageFileResourcesClient;
   }
 
+  public CudamiInvolvementsClient forInvolvements() {
+    return cudamiInvolvementsClient;
+  }
+
   public CudamiItemsClient forItems() {
     return cudamiItemsClient;
   }
@@ -244,10 +248,6 @@ public class CudamiClient {
 
   public CudamiProjectsClient forProjects() {
     return cudamiProjectsClient;
-  }
-
-  public CudamiPublicationsClient forPublications() {
-    return cudamiPublicationsClient;
   }
 
   public CudamiRenderingTemplatesClient forRenderingTemplates() {
