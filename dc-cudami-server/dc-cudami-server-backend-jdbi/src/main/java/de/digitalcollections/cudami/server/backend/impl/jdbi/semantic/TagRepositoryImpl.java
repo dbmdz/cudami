@@ -108,14 +108,32 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   public String getColumnName(String modelProperty) {
-    // TODO Auto-generated method stub
-    return null;
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
+      case "label":
+        return tableAlias + ".label";
+      case "lastModified":
+        return tableAlias + ".last_modified";
+      case "namespace":
+        return tableAlias + ".namespace";
+      case "id":
+        return tableAlias + ".id";
+      case "tagType":
+        return tableAlias + ".tag_type";
+      case "uuid":
+        return tableAlias + ".uuid";
+      default:
+        return null;
+    }
   }
 
   @Override
   protected String getUniqueField() {
-    // TODO Auto-generated method stub
-    return null;
+    return "uuid";
   }
 
   @Override
