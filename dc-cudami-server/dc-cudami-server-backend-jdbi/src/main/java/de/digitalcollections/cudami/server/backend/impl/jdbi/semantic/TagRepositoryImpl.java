@@ -7,16 +7,22 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagRepository {
 
-  // TODO
   public static final String TABLE_NAME = "tags";
   public static final String TABLE_ALIAS = "tags";
   public static final String MAPPING_PREFIX = "tags";
@@ -24,7 +30,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   public static final String SQL_INSERT_FIELDS =
       " uuid, label, namespace, id, tag_type, created, last_modified";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :label, :namespace, :id, :tagType, :created, :lastModified";
+      " :uuid, :label::JSONB, :namespace, :id, :tagType, :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
           " %1$s.uuid, %1$s.label,  %1$s.namespace, %1$s.id, %1$s.tag_type, %1$s.created, %1$s.last_modified",
@@ -80,8 +86,17 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   public Tag update(Tag tag) {
-    // TODO Auto-generated method stub
-    return null;
+    tag.setLastModified(LocalDateTime.now());
+
+    final String sql =
+        "UPDATE "
+            + tableName
+            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, tag_type=:tagType WHERE uuid=:uuid RETURNING *";
+
+    Tag result =
+        dbi.withHandle(
+            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
+    return result;
   }
 
   @Override
@@ -96,14 +111,31 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   public PageResponse<Tag> find(PageRequest pageRequest) {
-    // TODO Auto-generated method stub
-    return null;
+    Map argumentMappings = new HashMap<>(0);
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Tag> result =
+        retrieveList(
+            SQL_REDUCED_FIELDS_TAGS,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    // TODO Auto-generated method stub
-    return null;
+    return new ArrayList<>(
+        Arrays.asList("created", "label", "namespace", "id", "tagType", "lastModified"));
   }
 
   @Override
@@ -138,7 +170,53 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
-    // TODO Auto-generated method stub
-    return false;
+    switch (modelProperty) {
+      case "label":
+      case "tagType":
+      case "namespace":
+      case "id":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  private long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    return total;
+  }
+
+  private List<Tag> retrieveList(
+      String fieldsSql,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy) {
+    final String sql =
+        "SELECT "
+            + fieldsSql
+            + " FROM "
+            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
+            + " AS "
+            + tableAlias
+            + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
+                ? " " + orderBy
+                : (StringUtils.hasText(orderBy) ? " ORDER BY " + orderBy : ""));
+
+    List<Tag> result =
+        dbi.withHandle(
+            (Handle handle) ->
+                handle
+                    .createQuery(sql)
+                    .bindMap(argumentMappings)
+                    .mapToBean(Tag.class)
+                    .collect(Collectors.toList()));
+    return result;
   }
 }

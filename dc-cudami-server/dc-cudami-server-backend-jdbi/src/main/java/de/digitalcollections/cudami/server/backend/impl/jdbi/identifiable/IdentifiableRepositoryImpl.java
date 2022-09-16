@@ -63,13 +63,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   public String getSqlInsertFields() {
     return " uuid, created, description, identifiable_objecttype, identifiable_type, "
-        + "label, last_modified, previewfileresource, preview_hints, split_label";
+        + "label, last_modified, previewfileresource, preview_hints, split_label, tags_uuids";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public String getSqlInsertValues() {
     return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
-        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[]";
+        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[], tags_uuids::UUID[]";
   }
 
   public String getSqlSelectAllFields() {
@@ -124,7 +124,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
     return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
-        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]";
+        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]"
+        + ", tags_uuids=:tags_uuids::UUID[]";
   }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
@@ -323,6 +324,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         } else {
           identifiable.getLocalizedUrlAliases().add(urlAlias);
         }
+      }
+      if (rowView.getColumn("tags_uuids", UUID.class) != null) {
+        // TODO: Fill tags recursivly? Or not?
       }
 
       extendReducedIdentifiable(identifiable, rowView);
@@ -532,6 +536,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         return tableAlias + ".identifiable_type";
       case "uuid":
         return tableAlias + ".uuid";
+      case "tags_uuids":
+        return tableAlias + ".tags_uuids";
       default:
         return null;
     }
