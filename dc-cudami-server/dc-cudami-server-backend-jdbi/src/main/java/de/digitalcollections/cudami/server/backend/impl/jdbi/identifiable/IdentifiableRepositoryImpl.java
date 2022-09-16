@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -24,6 +25,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
@@ -69,15 +71,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public String getSqlInsertValues() {
     return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
-        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[], tags_uuids::UUID[]";
+        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[]";
   }
-
+  
   public String getSqlSelectAllFields() {
     return getSqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix) + TagRepositoryImpl.SQL_FULL_FIELDS_TAGS;
+
   }
 
   public String getSqlSelectReducedFields() {
@@ -205,11 +208,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
-    // currently there is no difference to full.
-    this.basicReduceRowsBiFunction = createReduceRowsBiFunction(true, true);
+    // currently there is no difference to full, except that we do not want tags in reduced selects.
+    this.basicReduceRowsBiFunction = createReduceRowsBiFunction(true, true, false);
 
     // set full reduce rows bifunction for full selects (find one)
-    this.fullReduceRowsBiFunction = createReduceRowsBiFunction(true, true);
+    this.fullReduceRowsBiFunction = createReduceRowsBiFunction(true, true, true);
 
     // for detailes select (only used in find one, not lists): if additional objects should be
     // "joined" into instance, set bi function for doing this:
@@ -276,7 +279,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
-      boolean withIdentifiers, boolean withPreviewImage) {
+      boolean withIdentifiers, boolean withPreviewImage, boolean withTags) {
     return (map, rowView) -> {
       I identifiable =
           map.computeIfAbsent(
@@ -325,8 +328,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
           identifiable.getLocalizedUrlAliases().add(urlAlias);
         }
       }
-      if (rowView.getColumn("tags_uuids", UUID.class) != null) {
-        // TODO: Fill tags recursivly? Or not?
+      if (withTags
+          && rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        Tag tag = rowView.getRow(Tag.class);
+        if (tag != null) {
+          identifiable.addTag(tag);
+        }
       }
 
       extendReducedIdentifiable(identifiable, rowView);
@@ -802,7 +809,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ".uuid = "
                 + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + ".target_uuid"
-                + UrlAliasRepositoryImpl.WEBSITESJOIN);
+                + UrlAliasRepositoryImpl.WEBSITESJOIN
+                + String.format(
+                    " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.tags_uuids) ",
+                    TagRepositoryImpl.TABLE_NAME, TagRepositoryImpl.TABLE_ALIAS, tableAlias));
+
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
     }
@@ -835,6 +846,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     bindings.put("previewFileResource", previewImageUuid);
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
+    bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
     if (identifiable.getUuid() == null) {
       // in case of fileresource the uuid is created on binary upload (before metadata save)
@@ -956,6 +968,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     bindings.put("previewFileResource", previewImageUuid);
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
+    bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
 
     identifiable.setLastModified(LocalDateTime.now());

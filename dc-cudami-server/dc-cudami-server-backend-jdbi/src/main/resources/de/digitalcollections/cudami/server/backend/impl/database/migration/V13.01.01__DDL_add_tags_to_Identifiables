@@ -1,6 +1,0 @@
-ALTER TABLE identifiables ADD COLUMN tags_uuids UUID[];
-CREATE TRIGGER tr_identifiables_tags_uuids
-BEFORE INSERT OR UPDATE
-ON identifiables
-FOR EACH ROW
-EXECUTE FUNCTION check_array_uuids_exist('tags', 'tags_uuids');

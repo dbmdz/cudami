@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -453,5 +455,24 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
       return 0;
     }
     return sortIndex;
+  }
+
+  protected UUID[] extractUuids(List<? extends UniqueObject> uniqueObjects) {
+    if (uniqueObjects == null || uniqueObjects.isEmpty()) {
+      return null;
+    }
+    return uniqueObjects.stream()
+        .collect(
+            ArrayList<UUID>::new,
+            (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
+            ArrayList::addAll)
+        .toArray(new UUID[1]);
+  }
+
+  protected UUID[] extractUuids(Set<? extends UniqueObject> uniqueObjects) {
+    if (uniqueObjects == null) {
+      return null;
+    }
+    return extractUuids(new ArrayList<>(uniqueObjects));
   }
 }
