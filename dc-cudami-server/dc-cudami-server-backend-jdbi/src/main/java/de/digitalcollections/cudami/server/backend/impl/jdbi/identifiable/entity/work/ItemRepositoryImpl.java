@@ -162,18 +162,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     }
   }
 
-  private UUID[] extractHolderUuids(Item item) {
-    if (item == null || item.getHolders() == null || item.getHolders().isEmpty()) {
-      return null;
-    }
-    return item.getHolders().stream()
-        .collect(
-            ArrayList<UUID>::new,
-            (result, holder) -> result.add(holder.getUuid()),
-            ArrayList::addAll)
-        .toArray(new UUID[1]);
-  }
-
   @Override
   public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
@@ -307,7 +295,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   @Override
   public Item save(Item item) {
     HashMap<String, Object> bindings = new HashMap<>();
-    bindings.put("holder_uuids", extractHolderUuids(item));
+    bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.save(item, bindings);
     Item result = getByUuid(item.getUuid());
     return result;
@@ -316,7 +304,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   @Override
   public Item update(Item item) {
     HashMap<String, Object> bindings = new HashMap<>();
-    bindings.put("holder_uuids", extractHolderUuids(item));
+    bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
     Item result = getByUuid(item.getUuid());
     return result;

@@ -33,8 +33,8 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
       " :uuid, :label::JSONB, :namespace, :id, :tagType, :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
-          " %1$s.uuid, %1$s.label,  %1$s.namespace, %1$s.id, %1$s.tag_type, %1$s.created, %1$s.last_modified",
-          TABLE_ALIAS);
+          " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.namespace as %2$s_namespace, %1$s.id as %2$s_id, %1$s.tag_type as %2$s_tag_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
+          TABLE_ALIAS, MAPPING_PREFIX);
   public static final String SQL_FULL_FIELDS_TAGS = SQL_REDUCED_FIELDS_TAGS;
 
   public TagRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -56,7 +56,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
     Tag tag =
         dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapToBean(Tag.class).findOne().orElse(null));
+            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Tag.class).findOne().orElse(null));
 
     return tag;
   }
@@ -215,7 +215,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
                 handle
                     .createQuery(sql)
                     .bindMap(argumentMappings)
-                    .mapToBean(Tag.class)
+                    .mapTo(Tag.class)
                     .collect(Collectors.toList()));
     return result;
   }
