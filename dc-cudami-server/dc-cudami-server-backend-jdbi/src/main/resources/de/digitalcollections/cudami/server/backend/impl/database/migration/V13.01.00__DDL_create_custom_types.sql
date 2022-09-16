@@ -12,6 +12,11 @@ CREATE TYPE Title AS (
 CREATE TYPE Publication AS (
   locations               UUID[],
   publishers              UUID[],
-  publishers_presentation varchar[]
+  publishers_presentation varchar[] COLLATE "ucs_basic"
+);
+
+CREATE TYPE MapTextToUuids AS (
+  key varchar COLLATE "ucs_basic",
+  uuids UUID[]
 );
 

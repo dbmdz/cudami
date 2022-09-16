@@ -1,29 +1,28 @@
 CREATE TABLE IF NOT EXISTS manifestations (
   LIKE entities INCLUDING ALL,
-  composition varchar,
-  dimensions varchar,
-  expressionTypes MainSubType[],
-  involvements_uuids UUID[],
-  language varchar,
-  manufacturingType varchar,
-  mediaTypes varchar[],
-  otherLanguages varchar[],
-  parent UUID CONSTRAINT fk_parent REFERENCES manifestations (uuid),
-  publications Publication[],
-  publishingDatePresentation varchar,
-  publishingDateRange daterange,
-  scale varchar,
-  series_uuids UUID[],
-  sortKey varchar,
-  subjects_uuids UUID[],
-  titles Title[],
-  version varchar,
-  work UUID CONSTRAINT fk_work REFERENCES work
+  composition                varchar COLLATE "ucs_basic",
+  dimensions                 varchar COLLATE "ucs_basic",
+  expressionTypes            MainSubType[],
+  involvements_uuids         UUID[],
+  language                   varchar COLLATE "ucs_basic",
+  manufacturingType          varchar COLLATE "ucs_basic",
+  mediaTypes                 varchar[] COLLATE "ucs_basic",
+  otherLanguages             varchar[] COLLATE "ucs_basic",
+  parent                     UUID,
+  publications               Publication[],
+  publishingDatePresentation varchar COLLATE "ucs_basic",
+  publishingDateRange        daterange,
+  scale                      varchar COLLATE "ucs_basic",
+  series_uuids               UUID[],
+  sortKey                    varchar COLLATE "ucs_basic",
+  subjects_uuids             UUID[],
+  titles                     Title[] NOT NULL,
+  version                    varchar COLLATE "ucs_basic",
+  work                       UUID CONSTRAINT fk_work REFERENCES works
 )
-INHERITS entities;
+INHERITS (entities);
 
--- TODO: Trigger for involvements, series, subjects ✓
--- TODO: create those tables
+ALTER TABLE manifestations ADD CONSTRAINT fk_parent FOREIGN KEY (parent) REFERENCES manifestations;
 
 CREATE TRIGGER tr_manifestations_involvements
 BEFORE INSERT OR UPDATE ON manifestations
