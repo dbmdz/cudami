@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 /** Extract parameters from a HttpServletRequest */
 public class ParameterHelper {
@@ -54,5 +55,45 @@ public class ParameterHelper {
       right += ":";
     }
     return Pair.of(left, right);
+  }
+
+  public static Triple<String, String, String> extractTripleOfStringsFromUri(
+      String requestUri, String leadingPathRegex) {
+    if (requestUri == null) {
+      return Triple.of(null, null, null);
+    }
+
+    String paramString = requestUri.replaceFirst(leadingPathRegex, "").replaceFirst("\\.json$", "");
+
+    if (!paramString.contains(":")) {
+      paramString = new String(Base64.decodeBase64(paramString), StandardCharsets.UTF_8);
+    }
+
+    return extractTripleOfStrings(paramString);
+  }
+
+  /**
+   * Extract a triple of strings from a string, separated by a (the first and second) colon
+   *
+   * @param string the string
+   * @return a triple of strings, separated by the first and second colon. The third string can
+   *     contain multiple * colons
+   */
+  public static Triple<String, String, String> extractTripleOfStrings(String string) {
+    if (!string.contains(":")) {
+      return Triple.of(string, null, null);
+    }
+    String[] params = string.split(":");
+    if (params.length < 3) {
+      return Triple.of(params[0], params[1], null);
+    }
+
+    String left = params[0];
+    String middle = params[1];
+    String right = String.join(":", Arrays.copyOfRange(params, 2, params.length));
+    if (string.endsWith(":")) {
+      right += ":";
+    }
+    return Triple.of(left, middle, right);
   }
 }
