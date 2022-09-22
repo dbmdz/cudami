@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS tags (
   uuid UUID NOT NULL PRIMARY KEY,
-  label JSONB not null,
+  label JSONB,
   namespace VARCHAR collate "ucs_basic",
   id VARCHAR COLLATE "ucs_basic",
   tag_type VARCHAR collate "ucs_basic",
