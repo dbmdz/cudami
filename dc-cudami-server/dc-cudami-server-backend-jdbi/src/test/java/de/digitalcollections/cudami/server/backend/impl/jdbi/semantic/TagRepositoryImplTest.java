@@ -196,12 +196,24 @@ class TagRepositoryImplTest {
     assertThat(pageResponse.getContent()).isEmpty();
   }
 
+  @DisplayName("can return by tagType, namespace and id")
+  @Test
+  void getByTagTypeAndIdentifier() {
+    Tag savedTag = ensureSavedTag(null, null, "tag-namespace", "tag-id8", "tag-type");
+
+    Tag foundTag = repo.getByTagTypeAndIdentifier("tag-type", "tag-namespace", "tag-id8");
+    assertThat(foundTag).isEqualTo(savedTag);
+  }
+
   // ------------------------------------------------------------------------------------------
   private Tag ensureSavedTag(
       Locale labelLocale, String labelText, String namespace, String id, String tagType) {
     Tag tag =
         Tag.builder()
-            .label(new LocalizedText(labelLocale, labelText))
+            .label(
+                labelLocale != null && labelText != null
+                    ? new LocalizedText(labelLocale, labelText)
+                    : null)
             .namespace(namespace)
             .id(id)
             .tagType(tagType)

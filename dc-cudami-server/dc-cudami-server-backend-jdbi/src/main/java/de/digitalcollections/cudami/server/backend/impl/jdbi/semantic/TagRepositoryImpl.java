@@ -133,6 +133,31 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   }
 
   @Override
+  public Tag getByTagTypeAndIdentifier(String tagType, String namespace, String id) {
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_TAGS
+            + " FROM "
+            + tableName
+            + " WHERE tag_type = :tagType"
+            + " AND namespace = :namespace"
+            + " AND id = :id";
+
+    Tag tag =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("tagType", tagType)
+                    .bind("namespace", namespace)
+                    .bind("id", id)
+                    .mapTo(Tag.class)
+                    .findOne()
+                    .orElse(null));
+
+    return tag;
+  }
+
+  @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(
         Arrays.asList("created", "label", "namespace", "id", "tagType", "lastModified"));

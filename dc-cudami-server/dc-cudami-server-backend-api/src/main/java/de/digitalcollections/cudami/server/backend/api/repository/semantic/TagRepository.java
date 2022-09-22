@@ -23,4 +23,6 @@ public interface TagRepository {
   boolean delete(List<UUID> uuids);
 
   PageResponse<Tag> find(PageRequest pageRequest);
+
+  Tag getByTagTypeAndIdentifier(String tagType, String namespace, String id);
 }
