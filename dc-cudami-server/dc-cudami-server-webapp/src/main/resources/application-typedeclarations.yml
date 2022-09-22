@@ -22,8 +22,9 @@ cudami:
     mediaTypes: #TODO
       - BOOK
 
-    tagTypes: #TODO
-      - TAG
+    tagTypes:
+      - IDENTIFIER
+      - SHELFGROUP
 
     expressionTypes:
       - mainType: TEXT
