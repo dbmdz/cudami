@@ -146,11 +146,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
-        retrieveList(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix),
-            innerQuery,
-            argumentMappings,
-            orderBy);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
@@ -201,11 +197,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
-        retrieveList(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix),
-            innerQuery,
-            argumentMappings,
-            orderBy);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
@@ -305,11 +297,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     argumentMappings.put("uuid", uuid);
 
     List<Webpage> result =
-        retrieveList(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix),
-            innerQuery,
-            argumentMappings,
-            "ORDER BY idx ASC");
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -345,9 +333,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                     .build())
             .build();
 
-    Webpage result =
-        retrieveOne(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix), sqlAdditionalJoins, filtering);
+    Webpage result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
 
     return result;
   }
@@ -368,11 +354,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     argumentMappings.put("uuid", uuid);
 
     List<Webpage> result =
-        retrieveList(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix),
-            innerQuery,
-            argumentMappings,
-            null);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 
