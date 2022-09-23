@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -23,7 +24,7 @@ public class GeoLocationServiceImpl<G extends GeoLocation> extends EntityService
 
   @Autowired
   public GeoLocationServiceImpl(
-      GeoLocationRepository<G> repository,
+      @Qualifier("geoLocationRepository") GeoLocationRepository<G> repository,
       IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,

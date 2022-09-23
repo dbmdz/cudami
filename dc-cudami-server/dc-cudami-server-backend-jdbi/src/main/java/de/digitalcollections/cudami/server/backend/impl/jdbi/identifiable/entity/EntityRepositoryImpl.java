@@ -39,7 +39,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + ", custom_attrs"
         + ", navdate"
         + ", notes"
-        + (isRepoForNamedEntity() ? ", name, nameLocalesOfOriginalScript, split_name" : "");
+        + (isRepoForNamedEntity() ? ", name, name_locales_original_scripts, split_name" : "");
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
@@ -51,7 +51,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + ", :navDate"
         + ", :notes::JSONB"
         + (isRepoForNamedEntity()
-            ? ", :name::JSONB, :nameLocalesOfOriginalScript::varchar[], :split_name::varchar[]"
+            ? ", :name::JSONB, :nameLocalesOfOriginalScripts::varchar[], :split_name::varchar[]"
             : "");
   }
 
@@ -82,7 +82,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + "_notes"
         + (isRepoForNamedEntity()
             ? String.format(
-                ", %1$s.name %2$s_name, %1$s.nameLocalesOfOriginalScript %2$s_nameLocalesOfOriginalScript",
+                ", %1$s.name %2$s_name, %1$s.name_locales_original_scripts %2$s_nameLocalesOfOriginalScripts",
                 tableAlias, mappingPrefix)
             : "");
   }
@@ -94,7 +94,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     return super.getSqlUpdateFieldValues()
         + ", custom_attrs=:customAttributes::JSONB, notes=:notes::JSONB"
         + (isRepoForNamedEntity()
-            ? ", name=:name::JSONB, nameLocalesOfOriginalScript=:nameLocalesOfOriginalScript::varchar[], split_name=:split_name::varchar[]"
+            ? ", name=:name::JSONB, name_locales_original_scripts=:nameLocalesOfOriginalScripts::varchar[], split_name=:split_name::varchar[]"
             : "");
   }
 
@@ -267,7 +267,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E save(E entity, Map<String, Object> bindings) {
-    if (bindings != null && isRepoForNamedEntity()) {
+    if (bindings == null) {
+      bindings = new HashMap<>(0);
+    }
+    if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
     return super.save(entity, bindings);
@@ -305,6 +308,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E update(E entity, Map<String, Object> bindings) {
+    if (bindings == null) {
+      bindings = new HashMap<>(0);
+    }
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
