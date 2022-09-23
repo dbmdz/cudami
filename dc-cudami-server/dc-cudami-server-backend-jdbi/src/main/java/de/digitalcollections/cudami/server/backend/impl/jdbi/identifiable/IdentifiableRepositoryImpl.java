@@ -61,22 +61,22 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
-  public static String getSqlInsertFields() {
+  public String getSqlInsertFields() {
     return " uuid, created, description, identifiable_objecttype, identifiable_type, "
         + "label, last_modified, previewfileresource, preview_hints, split_label";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
+  public String getSqlInsertValues() {
     return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
         + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[]";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  public String getSqlSelectAllFields() {
+    return getSqlSelectReducedFields();
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+  public String getSqlSelectReducedFields() {
     return " "
         + tableAlias
         + ".uuid "
@@ -112,7 +112,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         + "_previewImageRenderingHints";
   }
 
-  public static String getSqlUpdateFieldValues() {
+  public String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
     return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
@@ -126,13 +126,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       };
   public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> basicReduceRowsBiFunction;
   public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> fullReduceRowsBiFunction;
-  protected final Class identifiableImplClass;
-  private final String sqlInsertFields;
-  private final String sqlInsertValues;
-  protected String sqlSelectAllFields;
+  protected final Class<? extends Identifiable> identifiableImplClass;
   protected final String sqlSelectAllFieldsJoins;
-  protected String sqlSelectReducedFields;
-  private final String sqlUpdateFieldValues;
 
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -142,11 +137,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Identifiable.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -155,12 +145,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class identifiableImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Identifiable> identifiableImplClass,
       int offsetForAlternativePaging) {
     this(
         dbi,
@@ -168,11 +153,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         null,
         offsetForAlternativePaging);
   }
@@ -182,12 +162,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class identifiableImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Identifiable> identifiableImplClass,
       String sqlSelectAllFieldsJoins,
       int offsetForAlternativePaging) {
     this(
@@ -196,11 +171,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         sqlSelectAllFieldsJoins,
         null,
         offsetForAlternativePaging);
@@ -211,12 +181,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class identifiableImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Identifiable> identifiableImplClass,
       String sqlSelectAllFieldsJoins,
       BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction,
       int offsetForAlternativePaging) {
@@ -244,12 +209,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
 
     this.identifiableImplClass = identifiableImplClass;
-    this.sqlInsertFields = sqlInsertFields;
-    this.sqlInsertValues = sqlInsertValues;
-    this.sqlSelectAllFields = sqlSelectAllFields;
     this.sqlSelectAllFieldsJoins = sqlSelectAllFieldsJoins;
-    this.sqlSelectReducedFields = sqlSelectReducedFields;
-    this.sqlUpdateFieldValues = sqlUpdateFieldValues;
   }
 
   protected String addCrossTablePageRequestParams(
@@ -401,7 +361,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addPageRequestParams(pageRequest, innerQuery);
     List<I> result =
         retrieveList(
-            sqlSelectReducedFields,
+            getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
             getOrderBy(pageRequest.getSorting()));
@@ -473,12 +433,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<I> getAllFull() {
-    return retrieveList(sqlSelectAllFields, null, null, null);
+    return retrieveList(getSqlSelectAllFields(), null, null, null);
   }
 
   @Override
   public List<I> getAllReduced() {
-    return retrieveList(sqlSelectReducedFields, null, null, null);
+    return retrieveList(getSqlSelectReducedFields(), null, null, null);
   }
 
   @Override
@@ -523,7 +483,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     innerSelect.append(")");
     I result =
         retrieveOne(
-            sqlSelectAllFields, sqlSelectAllFieldsJoins, null, arguments, innerSelect.toString());
+            getSqlSelectAllFields(),
+            sqlSelectAllFieldsJoins,
+            null,
+            arguments,
+            innerSelect.toString());
     return result;
   }
 
@@ -534,7 +498,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
 
-    I result = retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
+    I result = retrieveOne(getSqlSelectAllFields(), sqlSelectAllFieldsJoins, filtering);
     return result;
   }
 
@@ -649,14 +613,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**"));
     return templates;
-  }
-
-  public String getSqlSelectAllFields() {
-    return sqlSelectAllFields;
-  }
-
-  public String getSqlSelectReducedFields() {
-    return sqlSelectReducedFields;
   }
 
   @Override
@@ -879,7 +835,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
 
     final String sql =
-        "INSERT INTO " + tableName + "(" + sqlInsertFields + ") VALUES (" + sqlInsertValues + ")";
+        "INSERT INTO "
+            + tableName
+            + "("
+            + getSqlInsertFields()
+            + ") VALUES ("
+            + getSqlInsertValues()
+            + ")";
 
     dbi.withHandle(
         h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
@@ -983,7 +945,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
 
-    final String sql = "UPDATE " + tableName + " SET" + sqlUpdateFieldValues + " WHERE uuid=:uuid";
+    final String sql =
+        "UPDATE " + tableName + " SET" + getSqlUpdateFieldValues() + " WHERE uuid=:uuid";
 
     dbi.withHandle(
         h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());

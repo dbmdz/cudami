@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.NamedEntity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -32,28 +33,36 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
-  public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields()
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
         + ", custom_attrs"
         + ", navdate"
-        + ", notes";
+        + ", notes"
+        + (isRepoForNamedEntity() ? ", name, nameLocalesOfOriginalScript, split_name" : "");
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
+  @Override
+  public String getSqlInsertValues() {
     // refid is generated as serial, DO NOT SET!
-    return IdentifiableRepositoryImpl.getSqlInsertValues()
+    return super.getSqlInsertValues()
         + ", :customAttributes::JSONB"
         + ", :navDate"
-        + ", :notes::JSONB";
+        + ", :notes::JSONB"
+        + (isRepoForNamedEntity()
+            ? ", :name::JSONB, :nameLocalesOfOriginalScript::varchar[], :split_name::varchar[]"
+            : "");
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  @Override
+  public String getSqlSelectAllFields() {
+    return getSqlSelectReducedFields();
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields() {
+    return super.getSqlSelectReducedFields()
         + ", "
         + tableAlias
         + ".custom_attrs "
@@ -70,14 +79,23 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         + tableAlias
         + ".notes "
         + mappingPrefix
-        + "_notes";
+        + "_notes"
+        + (isRepoForNamedEntity()
+            ? String.format(
+                ", %1$s.name %2$s_name, %1$s.nameLocalesOfOriginalScript %2$s_nameLocalesOfOriginalScript",
+                tableAlias, mappingPrefix)
+            : "");
   }
 
-  public static String getSqlUpdateFieldValues() {
+  @Override
+  public String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
-    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
-        + ", custom_attrs=:customAttributes::JSONB, notes=:notes::JSONB";
+    return super.getSqlUpdateFieldValues()
+        + ", custom_attrs=:customAttributes::JSONB, notes=:notes::JSONB"
+        + (isRepoForNamedEntity()
+            ? ", name=:name::JSONB, nameLocalesOfOriginalScript=:nameLocalesOfOriginalScript::varchar[], split_name=:split_name::varchar[]"
+            : "");
   }
 
   private FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
@@ -93,11 +111,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Entity.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
   }
@@ -107,12 +120,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class entityImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Entity> entityImplClass,
       int offsetForAlternativePaging) {
     this(
         dbi,
@@ -120,11 +128,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         null,
         offsetForAlternativePaging);
   }
@@ -134,12 +137,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class entityImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Entity> entityImplClass,
       String sqlSelectAllFieldsJoins,
       int offsetForAlternativePaging) {
     this(
@@ -148,11 +146,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         sqlSelectAllFieldsJoins,
         null,
         offsetForAlternativePaging);
@@ -163,12 +156,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      Class entityImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
+      Class<? extends Entity> entityImplClass,
       String sqlSelectAllFieldsJoins,
       BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction,
       int offsetForAlternativePaging) {
@@ -178,11 +166,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         sqlSelectAllFieldsJoins,
         additionalReduceRowsBiFunction,
         offsetForAlternativePaging);
@@ -218,7 +201,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
             .build();
 
-    return retrieveOne(sqlSelectAllFields, sqlSelectAllFieldsJoins, filtering);
+    return retrieveOne(getSqlSelectAllFields(), sqlSelectAllFieldsJoins, filtering);
   }
 
   @Override
@@ -244,7 +227,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
         new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);
-    return retrieveList(sqlSelectReducedFields, innerQuery, null, null);
+    return retrieveList(getSqlSelectReducedFields(), innerQuery, null, null);
   }
 
   @Override
@@ -274,8 +257,19 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         "ORDER BY idx ASC");
   }
 
+  /**
+   * Specify if this repository handles an {@code Entity} subclass that implements the interface
+   * {@code NamedEntity} so the additional fields are being added properly.
+   */
+  protected boolean isRepoForNamedEntity() {
+    return NamedEntity.class.isAssignableFrom(identifiableImplClass);
+  }
+
   @Override
   public E save(E entity, Map<String, Object> bindings) {
+    if (isRepoForNamedEntity()) {
+      bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
+    }
     return super.save(entity, bindings);
   }
 
@@ -311,6 +305,9 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E update(E entity, Map<String, Object> bindings) {
+    if (isRepoForNamedEntity()) {
+      bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
+    }
     return super.update(entity, bindings);
   }
 }
