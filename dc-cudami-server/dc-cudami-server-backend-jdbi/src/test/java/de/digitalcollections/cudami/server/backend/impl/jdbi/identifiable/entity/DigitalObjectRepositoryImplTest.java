@@ -88,7 +88,7 @@ class DigitalObjectRepositoryImplTest {
 
   @Autowired private EntityRepositoryImpl<GeoLocation> geoLocationEntityRepositoryImpl;
 
-  @Autowired private GeoLocationRepositoryImpl geoLocationRepositoryImpl;
+  @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
 
   @Autowired private IdentifierRepositoryImpl identifierRepositoryImpl;
 

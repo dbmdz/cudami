@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Repository("geoLocationRepository")
 public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepositoryImpl<G>
     implements GeoLocationRepository<G> {
 
