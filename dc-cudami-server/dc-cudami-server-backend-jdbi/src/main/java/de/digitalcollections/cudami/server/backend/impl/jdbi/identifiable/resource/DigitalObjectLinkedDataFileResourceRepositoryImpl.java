@@ -12,17 +12,12 @@ import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepositoryImpl
     implements DigitalObjectLinkedDataFileResourceRepository {
-
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(DigitalObjectLinkedDataFileResourceRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "dold";
   public static final String TABLE_ALIAS = "do_ld";
@@ -53,7 +48,7 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
 
   @Override
   public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    final String fieldsSql = LinkedDataFileResourceRepositoryImpl.getSqlSelectAllFields("f", "fr");
+    final String fieldsSql = linkedDataFileResourceRepositoryImpl.getSqlSelectAllFields("f", "fr");
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT "
@@ -76,11 +71,8 @@ public class DigitalObjectLinkedDataFileResourceRepositoryImpl extends JdbiRepos
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", digitalObjectUuid);
 
-    List<LinkedDataFileResource> linkedDataFileResources =
-        linkedDataFileResourceRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return linkedDataFileResources;
+    return linkedDataFileResourceRepositoryImpl.retrieveList(
+        fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
   }
 
   @Override

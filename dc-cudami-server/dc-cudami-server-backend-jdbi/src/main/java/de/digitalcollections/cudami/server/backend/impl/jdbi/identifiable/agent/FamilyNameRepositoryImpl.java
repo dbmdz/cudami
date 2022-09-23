@@ -20,25 +20,9 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "familynames";
 
-  public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields();
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return IdentifiableRepositoryImpl.getSqlInsertValues();
-  }
-
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlUpdateFieldValues() {
-    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues();
   }
 
   @Autowired
@@ -49,11 +33,6 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
         TABLE_ALIAS,
         MAPPING_PREFIX,
         FamilyName.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

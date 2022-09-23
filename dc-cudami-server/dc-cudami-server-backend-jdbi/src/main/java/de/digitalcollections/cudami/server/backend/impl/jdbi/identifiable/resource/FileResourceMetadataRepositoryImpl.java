@@ -31,23 +31,25 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources";
 
-  public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields()
-        + ", filename, http_base_url, mimetype, size_in_bytes, uri";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", filename, http_base_url, mimetype, size_in_bytes, uri";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return IdentifiableRepositoryImpl.getSqlInsertValues()
-        + ", :filename, :httpBaseUrl, :mimeType, :sizeInBytes, :uri";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :filename, :httpBaseUrl, :mimeType, :sizeInBytes, :uri";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".filename "
@@ -71,8 +73,9 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         + "_uri";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", filename=:filename, http_base_url=:httpBaseUrl, mimetype=:mimeType, size_in_bytes=:sizeInBytes, uri=:uri";
   }
 
@@ -84,11 +87,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         FileResource.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -98,11 +96,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String tableAlias,
       String mappingPrefix,
       Class fileResourceImplClass,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
       int offsetForAlternativePaging) {
     super(
         dbi,
@@ -110,11 +103,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         tableAlias,
         mappingPrefix,
         fileResourceImplClass,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         offsetForAlternativePaging);
   }
 
@@ -123,11 +111,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      String sqlSelectAllFields,
-      String sqlSelectReducedFields,
-      String sqlInsertFields,
-      String sqlInsertValues,
-      String sqlUpdateFieldValues,
       String sqlSelectAllFieldsJoins,
       BiFunction<Map<UUID, F>, RowView, Map<UUID, F>> additionalReduceRowsBiFunction,
       int offsetForAlternativePaging) {
@@ -137,11 +120,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         tableAlias,
         mappingPrefix,
         FileResource.class,
-        sqlSelectAllFields,
-        sqlSelectReducedFields,
-        sqlInsertFields,
-        sqlInsertValues,
-        sqlUpdateFieldValues,
         sqlSelectAllFieldsJoins,
         additionalReduceRowsBiFunction,
         offsetForAlternativePaging);

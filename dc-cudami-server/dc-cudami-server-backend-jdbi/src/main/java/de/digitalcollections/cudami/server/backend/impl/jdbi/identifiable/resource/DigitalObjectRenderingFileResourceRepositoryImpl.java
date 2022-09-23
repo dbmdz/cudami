@@ -14,8 +14,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,14 +21,11 @@ import org.springframework.stereotype.Repository;
 public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiRepositoryImpl
     implements DigitalObjectRenderingFileResourceRepository {
 
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(DigitalObjectRenderingFileResourceRepositoryImpl.class);
-
   public static final String MAPPING_PREFIX = "dorr";
   public static final String TABLE_ALIAS = "do_rr";
   public static final String TABLE_NAME = "digitalobject_renderingresources";
 
-  private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
+  private final FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
   @Autowired
   public DigitalObjectRenderingFileResourceRepositoryImpl(
@@ -77,7 +72,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
 
   @Override
   public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
-    final String fieldsSql = FileResourceMetadataRepositoryImpl.getSqlSelectAllFields("f", "fr");
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectAllFields("f", "fr");
 
     StringBuilder innerQuery =
         new StringBuilder(
@@ -101,14 +96,11 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", digitalObjectUuid);
 
-    List<FileResource> fileResources =
-        fileResourceMetadataRepositoryImpl
-            .retrieveList(fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC")
-            .stream()
-            .map(f -> fillResourceType(f))
-            .collect(Collectors.toList());
-
-    return fileResources;
+    return fileResourceMetadataRepositoryImpl
+        .retrieveList(fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC")
+        .stream()
+        .map(this::fillResourceType)
+        .collect(Collectors.toList());
   }
 
   @Override
