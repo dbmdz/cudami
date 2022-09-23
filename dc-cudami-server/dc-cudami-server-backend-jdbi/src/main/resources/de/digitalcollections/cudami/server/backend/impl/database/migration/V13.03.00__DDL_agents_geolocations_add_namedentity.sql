@@ -12,6 +12,5 @@ UPDATE agents SET name = label,
   split_name = split_label;
 
 UPDATE geolocations SET name = label,
-  split_name = split_label,
-  name_locales_original_scripts = (SELECT ARRAY[a] FROM jsonb_object_keys(label) t(a) LIMIT 1);
+  split_name = split_label;
 
