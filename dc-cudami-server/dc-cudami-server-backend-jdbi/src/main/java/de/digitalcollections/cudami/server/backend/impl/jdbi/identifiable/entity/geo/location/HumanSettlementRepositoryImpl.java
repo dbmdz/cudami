@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSettlement>
+public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<HumanSettlement>
     implements HumanSettlementRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementRepositoryImpl.class);
@@ -20,17 +19,25 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
   public static final String TABLE_ALIAS = "h";
   public static final String TABLE_NAME = "humansettlements";
 
-  public static String getSqlInsertFields() {
-    return GeoLocationRepositoryImpl.getSqlInsertFields() + ", settlement_type";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", settlement_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return GeoLocationRepositoryImpl.getSqlInsertValues() + ", :humanSettlementType";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :humanSettlementType";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return GeoLocationRepositoryImpl.getSqlSelectAllFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields();
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".settlement_type "
@@ -38,18 +45,9 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
         + "_humanSettlementType";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return GeoLocationRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".settlement_type "
-        + mappingPrefix
-        + "_humanSettlementType";
-  }
-
-  public static String getSqlUpdateFieldValues() {
-    return GeoLocationRepositoryImpl.getSqlUpdateFieldValues()
-        + ", settlement_type=:humanSettlementType";
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", settlement_type=:humanSettlementType";
   }
 
   @Autowired
@@ -60,11 +58,6 @@ public class HumanSettlementRepositoryImpl extends EntityRepositoryImpl<HumanSet
         TABLE_ALIAS,
         MAPPING_PREFIX,
         HumanSettlement.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

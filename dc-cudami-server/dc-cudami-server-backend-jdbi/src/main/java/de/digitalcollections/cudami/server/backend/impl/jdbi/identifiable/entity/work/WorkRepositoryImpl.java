@@ -30,22 +30,20 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "works";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields() + ", date_published, timevalue_published";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", date_published, timevalue_published";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :datePublished, :timeValuePublished::JSONB";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :datePublished, :timeValuePublished::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".date_published "
@@ -57,8 +55,9 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
         + "_timeValuePublished";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB";
   }
 
@@ -71,18 +70,27 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
       AgentRepositoryImpl agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl,
       CudamiConfig cudamiConfig) {
-    super(
+    this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Work.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
+        agentRepositoryImpl,
+        itemRepositoryImpl,
         cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  public WorkRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends Work> workImplClass,
+      AgentRepositoryImpl agentRepositoryImpl,
+      ItemRepositoryImpl itemRepositoryImpl,
+      int offsetForAlternativePaging) {
+    super(dbi, tableName, tableAlias, mappingPrefix, workImplClass, offsetForAlternativePaging);
     this.agentRepositoryImpl = agentRepositoryImpl;
     this.itemRepositoryImpl = itemRepositoryImpl;
   }

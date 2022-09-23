@@ -39,9 +39,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
-  private final GeoLocationService geoLocationService;
+  private final GeoLocationService<GeoLocation> geoLocationService;
 
-  public GeoLocationController(GeoLocationService geoLocationservice) {
+  public GeoLocationController(GeoLocationService<GeoLocation> geoLocationservice) {
     this.geoLocationService = geoLocationservice;
   }
 

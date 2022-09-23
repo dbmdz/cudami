@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import org.slf4j.Logger;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class HumanSettlementServiceImpl extends EntityServiceImpl<HumanSettlement>
+public class HumanSettlementServiceImpl extends GeoLocationServiceImpl<HumanSettlement>
     implements HumanSettlementService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementServiceImpl.class);

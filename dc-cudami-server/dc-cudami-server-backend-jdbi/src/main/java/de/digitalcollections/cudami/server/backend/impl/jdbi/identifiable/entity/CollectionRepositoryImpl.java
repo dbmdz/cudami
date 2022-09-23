@@ -37,17 +37,19 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields() + ", publication_end, publication_start, text";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", publication_end, publication_start, text";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :publicationEnd, :publicationStart, :text::JSONB";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :publicationEnd, :publicationStart, :text::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -56,8 +58,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         + "_text";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".publication_start "
@@ -69,8 +72,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         + "_publicationEnd";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", publication_end=:publicationEnd, publication_start=:publicationStart, text=:text::JSONB";
   }
 
@@ -86,11 +90,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Collection.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -179,7 +178,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
@@ -384,7 +383,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     argumentMappings.put("uuid", uuid);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -422,7 +421,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .build())
             .build();
 
-    Collection result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
+    Collection result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
     return result;
   }
 
@@ -443,7 +442,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     argumentMappings.put("uuid", uuid);
 
     List<Collection> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 

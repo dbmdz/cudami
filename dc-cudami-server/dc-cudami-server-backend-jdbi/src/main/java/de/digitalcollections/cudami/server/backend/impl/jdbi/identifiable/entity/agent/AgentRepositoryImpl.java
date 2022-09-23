@@ -24,27 +24,6 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   public static final String TABLE_ALIAS = "ag";
   public static final String TABLE_NAME = "agents";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields();
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues();
-  }
-
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues();
-  }
-
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
@@ -53,11 +32,6 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Agent.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

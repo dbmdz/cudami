@@ -35,18 +35,20 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields()
-        + ", date_published, text, timevalue_published";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", date_published, text, timevalue_published";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
         + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -55,8 +57,9 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + "_text";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".date_published "
@@ -68,8 +71,9 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         + "_timeValuePublished";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
@@ -86,11 +90,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Article.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }

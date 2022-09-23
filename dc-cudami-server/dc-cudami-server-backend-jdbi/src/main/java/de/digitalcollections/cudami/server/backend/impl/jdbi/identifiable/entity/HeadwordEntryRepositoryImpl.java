@@ -68,16 +68,19 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     };
   }
 
-  public static String getSqlInsertFields() {
-    return ArticleRepositoryImpl.getSqlInsertFields() + ", headword";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", headword";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return ArticleRepositoryImpl.getSqlInsertValues() + ", :headword";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :headword";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -96,12 +99,9 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         + "_label";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return ArticleRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlUpdateFieldValues() {
-    return ArticleRepositoryImpl.getSqlUpdateFieldValues() + ", headword=:headword";
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", headword=:headword";
   }
 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
@@ -117,11 +117,6 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         TABLE_ALIAS,
         MAPPING_PREFIX,
         HeadwordEntry.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction(),
         cudamiConfig.getOffsetForAlternativePaging());
@@ -141,7 +136,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
     List<HeadwordEntry> result =
         retrieveList(
-            sqlSelectAllFields,
+            getSqlSelectAllFields(),
             innerQuery,
             argumentMappings,
             "ORDER BY " + tableAlias + ".date_published ASC");

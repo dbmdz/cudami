@@ -28,11 +28,12 @@ public class V5GeoLocationController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(V5GeoLocationController.class);
 
-  private final GeoLocationService geoLocationService;
+  private final GeoLocationService<GeoLocation> geoLocationService;
 
   private final ObjectMapper objectMapper;
 
-  public V5GeoLocationController(GeoLocationService geoLocationservice, ObjectMapper objectMapper) {
+  public V5GeoLocationController(
+      GeoLocationService<GeoLocation> geoLocationservice, ObjectMapper objectMapper) {
     this.geoLocationService = geoLocationservice;
     this.objectMapper = objectMapper;
   }

@@ -114,8 +114,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             return map;
           };
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields()
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
         + ", creation_geolocation_uuid"
         + ", creation_date"
         + ", creation_creator_uuid"
@@ -126,8 +127,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
         + ", :creationInfo?.geoLocation?.uuid"
         + ", :creationInfo?.date"
         + ", :creationInfo?.creator?.uuid"
@@ -137,7 +139,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + ", :parent?.uuid";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + LicenseRepositoryImpl.TABLE_ALIAS
@@ -181,8 +184,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + "_number_binaryresources";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".parent_uuid "
@@ -195,8 +199,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + "_item_uuid";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", creation_geolocation_uuid=:creationInfo?.geoLocation?.uuid"
         + ", creation_date=:creationInfo?.date"
         + ", creation_creator_uuid=:creationInfo?.creator?.uuid"
@@ -215,7 +220,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Lazy @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
 
-  @Lazy @Autowired private GeoLocationRepositoryImpl geoLocationRepositoryImpl;
+  @Lazy @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
   @Lazy @Autowired private EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl;
 
   @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
@@ -235,11 +240,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         TABLE_ALIAS,
         MAPPING_PREFIX,
         DigitalObject.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
         ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
         cudamiConfig.getOffsetForAlternativePaging());
@@ -635,7 +635,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return getFileResources(digitalObjectUuid);
   }
 
-  public void setGeoLocationRepositoryImpl(GeoLocationRepositoryImpl geoLocationRepositoryImpl) {
+  public void setGeoLocationRepositoryImpl(
+      GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl) {
     this.geoLocationRepositoryImpl = geoLocationRepositoryImpl;
   }
 

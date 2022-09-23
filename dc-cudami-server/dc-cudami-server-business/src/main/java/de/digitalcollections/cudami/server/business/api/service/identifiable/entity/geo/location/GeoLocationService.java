@@ -8,7 +8,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
-public interface GeoLocationService extends EntityService<GeoLocation> {
+public interface GeoLocationService<G extends GeoLocation> extends EntityService<G> {
 
   static final double EARTH_RADIUS_KM = 6371.009; // [km] 6378.137
 

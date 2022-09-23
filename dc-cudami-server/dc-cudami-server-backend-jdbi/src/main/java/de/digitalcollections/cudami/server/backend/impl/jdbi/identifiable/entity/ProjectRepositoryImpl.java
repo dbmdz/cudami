@@ -29,16 +29,19 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields() + ", end_date, start_date, text";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", end_date, start_date, text";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -47,8 +50,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         + "_text";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".end_date "
@@ -60,8 +64,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         + "_startDate";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", end_date=:endDate, start_date=:startDate, text=:text::JSONB";
   }
 
@@ -75,11 +80,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Project.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

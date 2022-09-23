@@ -56,13 +56,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public String getSqlSelectAllFields() {
-    return getSqlSelectReducedFields();
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
-  public String getSqlSelectReducedFields() {
-    return super.getSqlSelectReducedFields()
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".custom_attrs "

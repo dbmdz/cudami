@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class GeoLocationServiceImpl extends EntityServiceImpl<GeoLocation>
-    implements GeoLocationService {
+public class GeoLocationServiceImpl<G extends GeoLocation> extends EntityServiceImpl<G>
+    implements GeoLocationService<G> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationServiceImpl.class);
 
   @Autowired
   public GeoLocationServiceImpl(
-      GeoLocationRepository repository,
+      GeoLocationRepository<G> repository,
       IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,

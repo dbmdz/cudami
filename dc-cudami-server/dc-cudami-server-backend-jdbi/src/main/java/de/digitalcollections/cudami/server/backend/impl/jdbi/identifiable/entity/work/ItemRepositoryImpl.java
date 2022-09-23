@@ -38,18 +38,21 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "items";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields()
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
         + ", exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
         + ", :exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -63,8 +66,9 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
           " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids) ",
           AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".part_of_item "
@@ -74,23 +78,26 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + ".manifestation "
         + mappingPrefix
         + "_manifestation_uuid, "
-        + AgentRepositoryImpl.getSqlSelectReducedFields(
+        + agentRepository.getSqlSelectReducedFields(
             "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final WorkRepositoryImpl workRepositoryImpl;
+  private final AgentRepositoryImpl agentRepository;
 
   @Autowired
   public ItemRepositoryImpl(
       Jdbi dbi,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       @Lazy WorkRepositoryImpl workRepositoryImpl,
+      @Lazy AgentRepositoryImpl agentRepository,
       CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -98,15 +105,11 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Item.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         SQL_SELECT_ALL_FIELDS_JOINS,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
+    this.agentRepository = agentRepository;
   }
 
   @Override
