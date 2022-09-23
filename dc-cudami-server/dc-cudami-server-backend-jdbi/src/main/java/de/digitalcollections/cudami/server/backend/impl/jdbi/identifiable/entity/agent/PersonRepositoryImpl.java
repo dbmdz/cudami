@@ -102,18 +102,21 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
     };
   }
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields()
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
         + ", dateofbirth, dateofdeath, gender, locationofbirth, locationofdeath, timevalueofbirth, timevalueofdeath";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
         + ", :dateOfBirth, :dateOfDeath, :gender, :locationOfBirth, :locationOfDeath, :timeValueOfBirth::JSONB, :timeValueOfDeath::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     final String familyNameMappingPrefix = FamilyNameRepositoryImpl.MAPPING_PREFIX;
     final String givenNameMappingPrefix = GivenNameRepositoryImpl.MAPPING_PREFIX;
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
@@ -134,8 +137,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         + "_label";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".dateofbirth "
@@ -159,8 +163,9 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         + "_timeValueOfDeath";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", dateofbirth=:dateOfBirth, dateofdeath=:dateOfDeath, gender=:gender, locationofbirth=:locationOfBirth, locationofdeath=:locationOfDeath, timevalueofbirth=:timeValueOfBirth::JSONB, timevalueofdeath=:timeValueOfDeath::JSONB";
   }
 
@@ -183,11 +188,6 @@ public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implement
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Person.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         SQL_FULL_FIELDS_JOINS,
         createAdditionalReduceRowsBiFunction(),
         cudamiConfig.getOffsetForAlternativePaging());

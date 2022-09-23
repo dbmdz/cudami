@@ -18,22 +18,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The V5 GeoLocationController")
 class V5GeoLocationControllerTest extends BaseControllerTest {
 
-  @MockBean private GeoLocationService geoLocationService;
+  @MockBean private GeoLocationService<GeoLocation> geoLocationService;
 
   @DisplayName("shall return a paged list of geolocations")
   @ParameterizedTest
   @ValueSource(strings = {"/v5/geolocations?pageSize=1&pageNumber=0"})
   void testFind(String path) throws Exception {
     PageResponse<GeoLocation> expected =
-        (PageResponse<GeoLocation>)
-            PageResponse.builder()
-                .forRequestPage(0)
-                .forPageSize(1)
-                .withTotalElements(0)
-                .forAscendingOrderedField("label", "de")
-                .forAscendingOrderedField("label")
-                .forAscendingOrderedField("uuid")
-                .build();
+        PageResponse.builder()
+            .forRequestPage(0)
+            .forPageSize(1)
+            .withTotalElements(0)
+            .forAscendingOrderedField("label", "de")
+            .forAscendingOrderedField("label")
+            .forAscendingOrderedField("uuid")
+            .build();
 
     when(geoLocationService.find(any(PageRequest.class))).thenReturn(expected);
 

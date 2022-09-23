@@ -20,7 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The GeoLocationController")
 class GeoLocationControllerTest extends BaseControllerTest {
 
-  @MockBean private GeoLocationService geoLocationService;
+  @MockBean private GeoLocationService<GeoLocation> geoLocationService;
 
   @DisplayName("can retrieve by identifier with plaintext id")
   @ParameterizedTest

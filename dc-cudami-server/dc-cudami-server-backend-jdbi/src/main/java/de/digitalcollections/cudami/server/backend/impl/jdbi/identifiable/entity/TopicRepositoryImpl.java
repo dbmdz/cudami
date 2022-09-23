@@ -38,27 +38,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   public static final String TABLE_ALIAS = "t";
   public static final String TABLE_NAME = "topics";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields();
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues();
-  }
-
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues();
-  }
-
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
@@ -74,11 +53,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Topic.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
     this.fileResourceMetadataRepositoryImpl = fileResourceMetadataRepositoryImpl;
@@ -141,7 +115,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
@@ -334,7 +308,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     argumentMappings.put("uuid", uuid);
 
     List<Topic> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, "ORDER BY idx ASC");
     return result;
   }
 
@@ -439,7 +413,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                     .build())
             .build();
 
-    Topic result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
+    Topic result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
 
     return result;
   }
@@ -458,7 +432,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + " WHERE tt.child_topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
-    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -494,7 +469,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", entityUuid);
 
-    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 
@@ -512,7 +488,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + " WHERE tf.fileresource_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", fileResourceUuid);
-    List<Topic> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
   }
 

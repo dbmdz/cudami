@@ -4,4 +4,4 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 
 /** Repository for GeoLocation persistence handling. */
-public interface GeoLocationRepository extends EntityRepository<GeoLocation> {}
+public interface GeoLocationRepository<G extends GeoLocation> extends EntityRepository<G> {}

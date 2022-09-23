@@ -19,24 +19,29 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public static final String TABLE_ALIAS = "mf";
   public static final String MAPPING_PREFIX = "mf";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields();
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields();
   }
 
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues();
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues();
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues();
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues();
   }
 
   public ManifestationRepositoryImpl(Jdbi jdbi, CudamiConfig cudamiConfig) {
@@ -46,11 +51,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Manifestation.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

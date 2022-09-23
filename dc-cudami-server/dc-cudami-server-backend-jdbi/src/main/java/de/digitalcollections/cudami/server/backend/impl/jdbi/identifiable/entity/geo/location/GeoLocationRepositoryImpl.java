@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
-    implements GeoLocationRepository {
+public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepositoryImpl<G>
+    implements GeoLocationRepository<G> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationRepositoryImpl.class);
 
@@ -20,17 +20,19 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "geolocations";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields() + ", coordinate_location, geolocation_type";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", coordinate_location, geolocation_type";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues()
-        + ", :coordinateLocation::JSONB, :geoLocationType";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :coordinateLocation::JSONB, :geoLocationType";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -39,8 +41,9 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
         + "_coordinateLocation";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".geolocation_type "
@@ -48,38 +51,43 @@ public class GeoLocationRepositoryImpl extends EntityRepositoryImpl<GeoLocation>
         + "_geoLocationType";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
-        + ", coordinate_location=:coordinateLocation::JSONB";
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", coordinate_location=:coordinateLocation::JSONB";
   }
 
   @Autowired
   public GeoLocationRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
+    this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         GeoLocation.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
+  public GeoLocationRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends GeoLocation> entityImplClass,
+      int offsetForAlternativePaging) {
+    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
+  }
+
   @Override
-  public GeoLocation save(GeoLocation geoLocation) {
+  public G save(G geoLocation) {
     super.save(geoLocation);
-    GeoLocation result = getByUuid(geoLocation.getUuid());
+    G result = getByUuid(geoLocation.getUuid());
     return result;
   }
 
   @Override
-  public GeoLocation update(GeoLocation geoLocation) {
+  public G update(G geoLocation) {
     super.update(geoLocation);
-    GeoLocation result = getByUuid(geoLocation.getUuid());
+    G result = getByUuid(geoLocation.getUuid());
     return result;
   }
 }

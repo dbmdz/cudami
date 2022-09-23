@@ -31,21 +31,20 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "websites";
 
-  public static String getSqlInsertFields() {
-    return EntityRepositoryImpl.getSqlInsertFields() + ", registration_date, url";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", registration_date, url";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return EntityRepositoryImpl.getSqlInsertValues() + ", :registrationDate, :url";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :registrationDate, :url";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return EntityRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".url "
@@ -57,9 +56,9 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         + "_registrationDate";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return EntityRepositoryImpl.getSqlUpdateFieldValues()
-        + ", registration_date=:registrationDate, url=:url";
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", registration_date=:registrationDate, url=:url";
   }
 
   private final WebpageRepositoryImpl webpageRepositoryImpl;
@@ -73,11 +72,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Website.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
     this.webpageRepositoryImpl = webpageRepositoryImpl;
   }
