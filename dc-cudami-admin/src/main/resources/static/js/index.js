@@ -26,7 +26,7 @@ function addLanguageChangeHandler() {
         : new URLSearchParams('')
     urlParams.set('activeLanguage', selectedLanguage)
     editUrl = [editUrl[0], urlParams.toString()]
-    $('#edit-button, #sticky-edit-button').attr('href', editUrl.join('?'))
+    $('#edit-button').attr('href', editUrl.join('?'))
   })
 }
 
@@ -42,36 +42,6 @@ function appendQueryParameters() {
       `${currentHref}&${existingQueryParameters.toString()}`,
     )
   }
-}
-
-function moveEditButtonToNavbar() {
-  var navbar = document.querySelector('.navbar')
-  var editButton = document.getElementById('edit-button')
-  var editButtonInNavbar = document.createElement('li')
-  editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
-  editButtonInNavbar.innerHTML = `<a class="border border-white btn btn-primary btn-sm" id="sticky-edit-button">${editButton.innerText}</a>`
-  var observer = new IntersectionObserver(
-    (entry, _) => {
-      var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
-      if (inView) {
-        editButton.classList.add('visible')
-        editButton.classList.remove('invisible')
-        editButtonInNavbar.remove()
-      } else {
-        editButton.classList.add('invisible')
-        editButton.classList.remove('visible')
-        editButtonInNavbar
-          .querySelector('a')
-          .setAttribute('href', editButton.getAttribute('href'))
-        navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
-      }
-    },
-    {
-      rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
-      threshold: 1,
-    },
-  )
-  observer.observe(editButton)
 }
 
 function addUserStatusChangeHandler(url) {

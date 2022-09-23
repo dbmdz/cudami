@@ -8,31 +8,27 @@
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${item}">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <ol class="breadcrumb hidden-xs-down">
-              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-              <li class="breadcrumb-item"><a th:href="@{/items}" th:text="#{items}">...</a></li>
-            </ol>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-6">
-            <h1 th:text="|#{item}|">...</h1>
-          </div>
-        </div>
-        <hr/>
-      </div>
-    </div>
-
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
+        <div class="border content-header mx-n1 mb-2 p-1 sticky-top">
+          <div class="row">
+            <div class="col-12">
+              <ol class="breadcrumb hidden-xs-down">
+                <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/items}" th:text="#{items}">...</a></li>
+              </ol>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <h1 th:text="|#{item}|">...</h1>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div class="col-sm-12">
-            <div class="container-fluid rows-striped">
+            <div class="rows-striped">
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
                 <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>

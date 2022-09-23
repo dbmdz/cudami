@@ -39,3 +39,8 @@ a[href^="http"]:not(.no-external):after {
   -ms-flex-pack: center;
   justify-content: center;
 }
+
+.content-header.sticky-top {
+  background-color: #f4f6f9;
+  top: 48px;
+}
