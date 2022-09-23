@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
@@ -56,9 +57,12 @@ public class ItemRepositoryImplTest {
       @Autowired Jdbi jdbi,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
       @Autowired WorkRepositoryImpl workRepository,
+      @Autowired AgentRepositoryImpl agentRepository,
       @Autowired CudamiConfig config) {
     this.digitalObjectRepository = digitalObjectRepository;
-    repo = new ItemRepositoryImpl(jdbi, digitalObjectRepository, workRepository, config);
+    repo =
+        new ItemRepositoryImpl(
+            jdbi, digitalObjectRepository, workRepository, agentRepository, config);
   }
 
   @Test
