@@ -267,7 +267,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E save(E entity, Map<String, Object> bindings) {
-    if (isRepoForNamedEntity()) {
+    if (bindings != null && isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
     return super.save(entity, bindings);

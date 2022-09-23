@@ -921,6 +921,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   protected String[] splitToArray(LocalizedText localizedText) {
+    if (localizedText == null) {
+      return new String[0];
+    }
     List<String> splitLabels =
         localizedText.values().stream()
             .map(text -> IdentifiableRepository.splitToArray(text))
