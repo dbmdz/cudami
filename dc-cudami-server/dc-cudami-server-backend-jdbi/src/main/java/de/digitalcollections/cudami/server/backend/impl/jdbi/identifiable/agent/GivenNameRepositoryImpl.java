@@ -20,21 +20,25 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "givennames";
 
-  public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields() + ", gender";
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", gender";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return IdentifiableRepositoryImpl.getSqlInsertValues() + ", :gender";
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :gender";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".gender "
@@ -42,8 +46,9 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         + "_gender";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues() + ", gender=:gender";
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", gender=:gender";
   }
 
   @Autowired
@@ -54,11 +59,6 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         TABLE_ALIAS,
         MAPPING_PREFIX,
         GivenName.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

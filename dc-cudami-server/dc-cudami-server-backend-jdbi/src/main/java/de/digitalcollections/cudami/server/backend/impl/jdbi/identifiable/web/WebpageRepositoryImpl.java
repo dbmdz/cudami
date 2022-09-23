@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -29,24 +27,25 @@ import org.springframework.stereotype.Repository;
 public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     implements WebpageRepository {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(WebpageRepositoryImpl.class);
-
   public static final String MAPPING_PREFIX = "wp";
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "webpages";
 
-  public static String getSqlInsertFields() {
-    return IdentifiableRepositoryImpl.getSqlInsertFields()
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
         + ", publication_end, publication_start, rendering_hints, text";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public static String getSqlInsertValues() {
-    return IdentifiableRepositoryImpl.getSqlInsertValues()
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
         + ", :publicationEnd, :publicationStart, :renderingHints::JSONB, :text::JSONB";
   }
 
-  public static String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
@@ -55,8 +54,9 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         + "_text";
   }
 
-  public static String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return IdentifiableRepositoryImpl.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
         + ".publication_end "
@@ -72,8 +72,9 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         + "_renderingHints";
   }
 
-  public static String getSqlUpdateFieldValues() {
-    return IdentifiableRepositoryImpl.getSqlUpdateFieldValues()
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
         + ", publication_end=:publicationEnd, publication_start=:publicationStart, rendering_hints=:renderingHints::JSONB, text=:text::JSONB";
   }
 
@@ -85,11 +86,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Webpage.class,
-        getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX),
-        getSqlInsertFields(),
-        getSqlInsertValues(),
-        getSqlUpdateFieldValues(),
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -150,7 +146,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, orderBy);
+        retrieveList(
+            getSqlSelectReducedFields(tableAlias, mappingPrefix),
+            innerQuery,
+            argumentMappings,
+            orderBy);
 
     StringBuilder countQuery =
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
@@ -201,7 +201,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
+        retrieveList(
+            getSqlSelectReducedFields(tableAlias, mappingPrefix),
+            innerQuery,
+            argumentMappings,
+            orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
@@ -301,7 +305,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     argumentMappings.put("uuid", uuid);
 
     List<Webpage> result =
-        retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, "ORDER BY idx ASC");
+        retrieveList(
+            getSqlSelectReducedFields(tableAlias, mappingPrefix),
+            innerQuery,
+            argumentMappings,
+            "ORDER BY idx ASC");
     return result;
   }
 
@@ -337,7 +345,9 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                     .build())
             .build();
 
-    Webpage result = retrieveOne(sqlSelectReducedFields, sqlAdditionalJoins, filtering);
+    Webpage result =
+        retrieveOne(
+            getSqlSelectReducedFields(tableAlias, mappingPrefix), sqlAdditionalJoins, filtering);
 
     return result;
   }
@@ -357,7 +367,12 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", uuid);
 
-    List<Webpage> result = retrieveList(sqlSelectReducedFields, innerQuery, argumentMappings, null);
+    List<Webpage> result =
+        retrieveList(
+            getSqlSelectReducedFields(tableAlias, mappingPrefix),
+            innerQuery,
+            argumentMappings,
+            null);
     return result;
   }
 
