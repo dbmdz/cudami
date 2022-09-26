@@ -22,6 +22,16 @@ cudami:
     mediaTypes: #TODO
       - BOOK
 
+    subTypes:
+      - BY
+      - GENRE
+      - GEO
+      - INST
+      - MEETING
+      - PERSON
+      - TITLE
+      - TOPIC
+
     tagTypes:
       - IDENTIFIER
       - SHELFGROUP
