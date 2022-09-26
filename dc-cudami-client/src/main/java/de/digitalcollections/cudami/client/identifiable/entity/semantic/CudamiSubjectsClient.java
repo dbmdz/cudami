@@ -31,4 +31,24 @@ public class CudamiSubjectsClient extends CudamiRestClient<Subject> {
     return doGetRequestForObject(
         String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
   }
+
+  /**
+   * Retrieves a subject by its type, namespace and id
+   *
+   * @param type the type. Must be plain text, not encoded in any wav
+   * @param namespace the namespace. Must be plain text, not encoded in any way
+   * @param id the id. Must be in plain text, not encoded in any way
+   * @return the Subject or null
+   * @throws TechnicalException in case of an error
+   */
+  public Subject getByTypeAndIdentifier(String type, String namespace, String id)
+      throws TechnicalException {
+    String typeAndNamespaceAndId = type + ":" + namespace + ":" + id;
+
+    String encodedTypeAndNamespaceAndId =
+        Base64.encodeBase64URLSafeString(typeAndNamespaceAndId.getBytes(StandardCharsets.UTF_8));
+
+    return doGetRequestForObject(
+        String.format(baseEndpoint + "/identifier/%s", encodedTypeAndNamespaceAndId));
+  }
 }
