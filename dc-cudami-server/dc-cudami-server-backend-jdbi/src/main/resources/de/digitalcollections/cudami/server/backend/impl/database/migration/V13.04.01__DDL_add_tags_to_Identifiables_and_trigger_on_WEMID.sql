@@ -12,7 +12,7 @@ ON items
 FOR EACH ROW
 EXECUTE FUNCTION check_array_uuids_exist('tags', 'tags_uuids');
 
-CREATE TRIGGER tr_digitalobjects_manifestations_uuids
+CREATE TRIGGER tr_manifestations_tags_uuids
 BEFORE INSERT OR UPDATE
 ON manifestations
 FOR EACH ROW
