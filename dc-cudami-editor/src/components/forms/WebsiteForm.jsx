@@ -5,7 +5,7 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 const WebsiteForm = ({
   activeLanguage,
@@ -28,26 +28,15 @@ const WebsiteForm = ({
         onSubmit()
       }}
     >
-      <Row>
-        <Col xs="6" sm="9">
-          <h1>
-            {identifiable.uuid
-              ? t('editWebsite', {url: identifiable.url})
-              : t('createWebsite')}
-          </h1>
-        </Col>
-        <Col xs="6" sm="3">
-          <ActionButtons
-            disabled={invalidLanguages.length > 0 || !identifiable.url}
-            formId={formId}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
-          <hr />
-        </Col>
-      </Row>
+      <Header
+        buttonsDisabled={invalidLanguages.length > 0 || !identifiable.url}
+        formId={formId}
+        heading={
+          identifiable.uuid
+            ? t('editWebsite', {url: identifiable.url})
+            : t('createWebsite')
+        }
+      />
       <Row>
         <Col sm="12">
           {identifiable.uuid && (

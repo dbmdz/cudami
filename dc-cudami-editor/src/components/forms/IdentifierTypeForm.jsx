@@ -7,7 +7,7 @@ import {Col, Form, Row} from 'reactstrap'
 import {getByUuid, save, typeToEndpointMapping, update} from '../../api'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 const submitData = async (context, data, type) => {
   const {error = false} = await (data.uuid
@@ -54,26 +54,13 @@ const IdentifierTypeForm = ({apiContextPath = '/', uuid}) => {
           window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}`
         }}
       >
-        <Row>
-          <Col xs="6" sm="9">
-            <h1>
-              {uuid
-                ? t('editIdentifierType', {label})
-                : t('createIdentifierType')}
-            </h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons
-              disabled={[label, namespace, pattern].some((field) => !field)}
-              formId={formId}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={[label, namespace, pattern].some((field) => !field)}
+          formId={formId}
+          heading={
+            uuid ? t('editIdentifierType', {label}) : t('createIdentifierType')
+          }
+        />
         <Row>
           <Col sm="12">
             {uuid && (

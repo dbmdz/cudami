@@ -39,7 +39,7 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import {cleanLocalizedText} from '../utils'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 interface Props {
   uuid: string
@@ -109,23 +109,15 @@ const RenderingTemplateForm = ({uuid}: Props) => {
           window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}`
         }}
       >
-        <Row>
-          <Col xs="6" sm="9">
-            <h1>
-              {uuid
-                ? t('editRenderingTemplate', {name})
-                : t('createRenderingTemplate')}
-            </h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons disabled={!name} formId={formId} />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={!name}
+          formId={formId}
+          heading={
+            uuid
+              ? t('editRenderingTemplate', {name})
+              : t('createRenderingTemplate')
+          }
+        />
         <Row>
           <Col sm="12">
             {uuid && (

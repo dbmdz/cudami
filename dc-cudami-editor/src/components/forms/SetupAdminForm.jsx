@@ -7,7 +7,7 @@ import {Col, Form, Row} from 'reactstrap'
 import {getUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 const submitData = async (context, user, passwords) => {
   const {error, json} = await saveOrUpdateUser(
@@ -67,28 +67,17 @@ const UserForm = ({apiContextPath = '/'}) => {
           window.location.href = `${apiContextPath}${typeToEndpointMapping.user}/${uuid}`
         }}
       >
-        <Row form>
-          <Col xs="6" sm="9">
-            <h1>{t('createUser')}</h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons
-              disabled={[
-                email,
-                firstname,
-                lastname,
-                passwords.pwd1,
-                passwords.pwd2,
-              ].some((field) => !field)}
-              formId={formId}
-            />
-          </Col>
-        </Row>
-        <Row form>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={[
+            email,
+            firstname,
+            lastname,
+            passwords.pwd1,
+            passwords.pwd2,
+          ].some((field) => !field)}
+          formId={formId}
+          heading={t('createUser')}
+        />
         <Row form>
           <Col sm="12">
             <InputWithLabel

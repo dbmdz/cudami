@@ -39,7 +39,7 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import {cleanLocalizedText} from '../utils'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 interface Props {
   uuid: string
@@ -102,19 +102,11 @@ const LicenseForm = ({uuid}: Props) => {
           window.location.href = `${apiContextPath}${typeToEndpointMapping[type]}/${uuidFromApi}`
         }}
       >
-        <Row>
-          <Col xs="6" sm="9">
-            <h1>{uuid ? t('editLicense', {url}) : t('createLicense')}</h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons disabled={!url} formId={formId} />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={!url}
+          formId={formId}
+          heading={uuid ? t('editLicense', {url}) : t('createLicense')}
+        />
         <Row>
           <Col sm="12">
             {uuid && (

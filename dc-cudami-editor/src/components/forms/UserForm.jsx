@@ -8,7 +8,7 @@ import {getUser, saveOrUpdateUser, typeToEndpointMapping} from '../../api'
 import CheckboxWithLabel from '../CheckboxWithLabel'
 import FeedbackMessage from '../FeedbackMessage'
 import InputWithLabel from '../InputWithLabel'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 const submitData = async (context, user, passwords) => {
   const {error, json} = await saveOrUpdateUser(
@@ -80,22 +80,11 @@ const UserForm = ({allRoles, apiContextPath = '/', uuid}) => {
           window.location.href = `${apiContextPath}${typeToEndpointMapping.user}/${uuid}`
         }}
       >
-        <Row form>
-          <Col xs="6" sm="9">
-            <h1>{uuid ? t('editUser', {email}) : t('createUser')}</h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons
-              disabled={requiredFields.some((field) => !field)}
-              formId={formId}
-            />
-          </Col>
-        </Row>
-        <Row form>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={requiredFields.some((field) => !field)}
+          formId={formId}
+          heading={uuid ? t('editUser', {email}) : t('createUser')}
+        />
         <Row form>
           <Col sm="12">
             {uuid && (

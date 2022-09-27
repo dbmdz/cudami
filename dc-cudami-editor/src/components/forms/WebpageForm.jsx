@@ -20,7 +20,7 @@ import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
 import TemplateSelector from '../TemplateSelector'
-import ActionButtons from './ActionButtons'
+import Header from './Header'
 
 const WebpageForm = ({
   activeLanguage,
@@ -56,22 +56,11 @@ const WebpageForm = ({
           onSubmit()
         }}
       >
-        <Row>
-          <Col xs="6" sm="9">
-            <h1>{uuid ? t('editWebpage') : t('createWebpage')}</h1>
-          </Col>
-          <Col xs="6" sm="3">
-            <ActionButtons
-              disabled={invalidLanguages.length > 0}
-              formId={formId}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col sm="12">
-            <hr />
-          </Col>
-        </Row>
+        <Header
+          buttonsDisabled={invalidLanguages.length > 0}
+          formId={formId}
+          heading={uuid ? t('editWebpage') : t('createWebpage')}
+        />
         {uuid && (
           <Row>
             <Col sm="12">

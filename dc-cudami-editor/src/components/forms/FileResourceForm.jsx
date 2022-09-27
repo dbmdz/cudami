@@ -5,8 +5,8 @@ import InputWithLabel from '../InputWithLabel'
 import LanguageAdder from '../LanguageAdder'
 import LanguageTab from '../LanguageTab'
 import Teaser from '../Teaser'
-import ActionButtons from './ActionButtons'
 import FileResourceUploadForm from './FileResourceUploadForm'
+import Header from './Header'
 
 const FileResourceForm = ({
   activeLanguage,
@@ -22,7 +22,7 @@ const FileResourceForm = ({
 }) => {
   const {t} = useTranslation()
   if (!identifiable.uuid) {
-    return <FileResourceUploadForm onUpdate={onUpdate} />
+    return <FileResourceUploadForm formId={formId} onUpdate={onUpdate} />
   }
   return (
     <Form
@@ -32,22 +32,11 @@ const FileResourceForm = ({
         onSubmit()
       }}
     >
-      <Row>
-        <Col xs="6" sm="9">
-          <h1>{t('editFileResource', {name: identifiable.filename})}</h1>
-        </Col>
-        <Col xs="6" sm="3">
-          <ActionButtons
-            disabled={invalidLanguages.length > 0}
-            formId={formId}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="12">
-          <hr />
-        </Col>
-      </Row>
+      <Header
+        buttonsDisabled={invalidLanguages.length > 0}
+        formId={formId}
+        heading={t('editFileResource', {name: identifiable.filename})}
+      />
       <Row>
         <Col sm="12">
           <InputWithLabel
