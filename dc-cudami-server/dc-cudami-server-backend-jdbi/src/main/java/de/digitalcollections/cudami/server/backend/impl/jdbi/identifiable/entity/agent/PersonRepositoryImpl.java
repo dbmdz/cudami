@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.identifiable.agent.GivenName;
@@ -31,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PersonRepositoryImpl extends EntityRepositoryImpl<Person> implements PersonRepository {
+public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements PersonRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonRepositoryImpl.class);
 

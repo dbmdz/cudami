@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class CorporateBodyServiceImpl extends EntityServiceImpl<CorporateBody>
+public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
     implements CorporateBodyService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyServiceImpl.class);

@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateBody>
+public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBody>
     implements CorporateBodyRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodyRepositoryImpl.class);
@@ -64,6 +63,8 @@ public class CorporateBodyRepositoryImpl extends EntityRepositoryImpl<CorporateB
         TABLE_ALIAS,
         MAPPING_PREFIX,
         CorporateBody.class,
+        null,
+        null,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

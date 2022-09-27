@@ -27,7 +27,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @DisplayName("The Agent Repository")
 class AgentRepositoryImplTest {
 
-  AgentRepositoryImpl repo;
+  AgentRepositoryImpl<Agent> repo;
 
   @Autowired CudamiConfig cudamiConfig;
 
@@ -36,7 +36,7 @@ class AgentRepositoryImplTest {
 
   @BeforeEach
   public void beforeEach() {
-    repo = new AgentRepositoryImpl(jdbi, cudamiConfig);
+    repo = new AgentRepositoryImpl<>(jdbi, cudamiConfig);
   }
 
   @Test
