@@ -159,6 +159,11 @@ class TagRepositoryImplTest {
                                 .withExpression("id")
                                 .isEquals("tag-id6")
                                 .build())
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("type")
+                                .isEquals("type")
+                                .build())
                         .build())
                 .build());
     assertThat(pageResponse.getContent()).containsExactly(savedTag);
@@ -193,7 +198,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can return by type, namespace and id")
   @Test
-  void getByTagTypeAndIdentifier() {
+  void getByTypeAndIdentifier() {
     Tag savedTag = ensureSavedTag(null, null, "tag-namespace", "tag-id8", "type");
 
     Tag foundTag = repo.getByTypeAndIdentifier("type", "tag-namespace", "tag-id8");

@@ -543,8 +543,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         return tableAlias + ".identifiable_type";
       case "uuid":
         return tableAlias + ".uuid";
-      case "tags_uuids":
-        return tableAlias + ".tags_uuids";
       default:
         return null;
     }

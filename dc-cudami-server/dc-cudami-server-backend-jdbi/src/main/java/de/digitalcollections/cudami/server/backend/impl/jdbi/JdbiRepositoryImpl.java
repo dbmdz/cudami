@@ -8,10 +8,10 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -457,7 +457,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return sortIndex;
   }
 
-  protected UUID[] extractUuids(List<? extends UniqueObject> uniqueObjects) {
+  protected UUID[] extractUuids(Collection<? extends UniqueObject> uniqueObjects) {
     if (uniqueObjects == null || uniqueObjects.isEmpty()) {
       return null;
     }
@@ -467,12 +467,5 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
             (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
             ArrayList::addAll)
         .toArray(new UUID[1]);
-  }
-
-  protected UUID[] extractUuids(Set<? extends UniqueObject> uniqueObjects) {
-    if (uniqueObjects == null) {
-      return null;
-    }
-    return extractUuids(new ArrayList<>(uniqueObjects));
   }
 }
