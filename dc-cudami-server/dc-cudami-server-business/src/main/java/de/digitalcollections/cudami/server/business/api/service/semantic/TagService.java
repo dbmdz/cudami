@@ -21,6 +21,6 @@ public interface TagService {
 
   PageResponse<Tag> find(PageRequest pageRequest);
 
-  Tag getByTagTypeAndIdentifier(String tagType, String namespace, String id)
+  Tag getByTypeAndIdentifier(String type, String namespace, String id)
       throws CudamiServiceException;
 }

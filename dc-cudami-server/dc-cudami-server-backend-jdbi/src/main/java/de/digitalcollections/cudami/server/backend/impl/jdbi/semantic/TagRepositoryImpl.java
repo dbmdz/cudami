@@ -28,12 +28,12 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   public static final String MAPPING_PREFIX = "tags";
 
   public static final String SQL_INSERT_FIELDS =
-      " uuid, label, namespace, id, tag_type, created, last_modified";
+      " uuid, label, namespace, id, type, created, last_modified";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :label::JSONB, :namespace, :id, :tagType, :created, :lastModified";
+      " :uuid, :label::JSONB, :namespace, :id, :type, :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
-          " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.namespace as %2$s_namespace, %1$s.id as %2$s_id, %1$s.tag_type as %2$s_tag_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
+          " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.namespace as %2$s_namespace, %1$s.id as %2$s_id, %1$s.type as %2$s_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
           TABLE_ALIAS, MAPPING_PREFIX);
   public static final String SQL_FULL_FIELDS_TAGS = SQL_REDUCED_FIELDS_TAGS;
 
@@ -91,7 +91,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
     final String sql =
         "UPDATE "
             + tableName
-            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, tag_type=:tagType WHERE uuid=:uuid RETURNING *";
+            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, type=:type WHERE uuid=:uuid RETURNING *";
 
     Tag result =
         dbi.withHandle(
@@ -133,13 +133,13 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   }
 
   @Override
-  public Tag getByTagTypeAndIdentifier(String tagType, String namespace, String id) {
+  public Tag getByTypeAndIdentifier(String type, String namespace, String id) {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_TAGS
             + " FROM "
             + tableName
-            + " WHERE tag_type = :tagType"
+            + " WHERE type = :type"
             + " AND namespace = :namespace"
             + " AND id = :id";
 
@@ -147,7 +147,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
         dbi.withHandle(
             h ->
                 h.createQuery(sql)
-                    .bind("tagType", tagType)
+                    .bind("type", type)
                     .bind("namespace", namespace)
                     .bind("id", id)
                     .mapTo(Tag.class)
@@ -160,7 +160,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(
-        Arrays.asList("created", "label", "namespace", "id", "tagType", "lastModified"));
+        Arrays.asList("created", "label", "namespace", "id", "type", "lastModified"));
   }
 
   @Override
@@ -179,8 +179,8 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
         return tableAlias + ".namespace";
       case "id":
         return tableAlias + ".id";
-      case "tagType":
-        return tableAlias + ".tag_type";
+      case "type":
+        return tableAlias + ".type";
       case "uuid":
         return tableAlias + ".uuid";
       default:
@@ -197,7 +197,7 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "label":
-      case "tagType":
+      case "type":
       case "namespace":
       case "id":
         return true;

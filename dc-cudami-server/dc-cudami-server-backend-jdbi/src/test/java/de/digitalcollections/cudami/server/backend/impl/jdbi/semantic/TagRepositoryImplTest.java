@@ -30,7 +30,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
-    classes = {HeadwordRepositoryImpl.class})
+    classes = {TagRepositoryImpl.class})
 @ContextConfiguration(classes = SpringConfigBackendDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Tag Repository")
@@ -60,19 +60,14 @@ class TagRepositoryImplTest {
   void saveAndRetrieveByUuid() {
     LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Tag tag =
-        Tag.builder()
-            .label(label)
-            .namespace("tag-namespace")
-            .id("tag-id")
-            .tagType("tag-type")
-            .build();
+        Tag.builder().label(label).namespace("tag-namespace").id("tag-id").type("type").build();
 
     Tag savedTag = repo.save(tag);
 
     assertThat(savedTag.getNamespace()).isEqualTo(tag.getNamespace());
     assertThat(savedTag.getId()).isEqualTo(tag.getId());
     assertThat(savedTag.getLabel()).isEqualTo(label);
-    assertThat(savedTag.getTagType()).isEqualTo(tag.getTagType());
+    assertThat(savedTag.getType()).isEqualTo(tag.getType());
     assertThat(savedTag.getUuid()).isNotNull();
     assertThat(savedTag.getCreated()).isNotNull();
     assertThat(savedTag.getLastModified()).isNotNull();
@@ -85,7 +80,7 @@ class TagRepositoryImplTest {
   @DisplayName("can save and successfully delete")
   @Test
   void saveAndDelete() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id2", "tag-type");
+    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id2", "type");
     boolean success = repo.delete(savedTag.getUuid());
     assertThat(success).isTrue();
 
@@ -96,14 +91,14 @@ class TagRepositoryImplTest {
   @DisplayName("can save and update")
   @Test
   void saveAndUpdate() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id3", "tag-type");
+    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id3", "type");
 
     Tag tagToUpdate =
         Tag.builder()
             .label(new LocalizedText(Locale.GERMAN, "different label"))
             .namespace(savedTag.getNamespace())
             .id(savedTag.getId())
-            .tagType(savedTag.getTagType())
+            .type(savedTag.getType())
             .uuid(savedTag.getUuid())
             .created(savedTag.getCreated())
             .build();
@@ -116,7 +111,7 @@ class TagRepositoryImplTest {
   @DisplayName("can retrieve all tags with paging")
   @Test
   void findAllPaged() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id4", "tag-type");
+    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id4", "type");
 
     PageResponse<Tag> pageResponse =
         repo.find(PageRequest.builder().pageNumber(0).pageSize(99).build());
@@ -126,8 +121,8 @@ class TagRepositoryImplTest {
   @DisplayName("can retrieve all tags with sorting")
   @Test
   void findAllPagedAndSorted() {
-    Tag savedTag1 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5b", "tag-type");
-    Tag savedTag2 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5a", "tag-type");
+    Tag savedTag1 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5b", "type");
+    Tag savedTag2 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5a", "type");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -145,7 +140,7 @@ class TagRepositoryImplTest {
   @DisplayName("can retrieve tags with filtering")
   @Test
   void findFiltered() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id6", "tag-type");
+    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id6", "type");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -172,7 +167,7 @@ class TagRepositoryImplTest {
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
   void noMatches() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id7", "tag-type");
+    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id7", "type");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -196,18 +191,18 @@ class TagRepositoryImplTest {
     assertThat(pageResponse.getContent()).isEmpty();
   }
 
-  @DisplayName("can return by tagType, namespace and id")
+  @DisplayName("can return by type, namespace and id")
   @Test
   void getByTagTypeAndIdentifier() {
-    Tag savedTag = ensureSavedTag(null, null, "tag-namespace", "tag-id8", "tag-type");
+    Tag savedTag = ensureSavedTag(null, null, "tag-namespace", "tag-id8", "type");
 
-    Tag foundTag = repo.getByTagTypeAndIdentifier("tag-type", "tag-namespace", "tag-id8");
+    Tag foundTag = repo.getByTypeAndIdentifier("type", "tag-namespace", "tag-id8");
     assertThat(foundTag).isEqualTo(savedTag);
   }
 
   // ------------------------------------------------------------------------------------------
   private Tag ensureSavedTag(
-      Locale labelLocale, String labelText, String namespace, String id, String tagType) {
+      Locale labelLocale, String labelText, String namespace, String id, String type) {
     Tag tag =
         Tag.builder()
             .label(
@@ -216,7 +211,7 @@ class TagRepositoryImplTest {
                     : null)
             .namespace(namespace)
             .id(id)
-            .tagType(tagType)
+            .type(type)
             .build();
 
     return repo.save(tag);
