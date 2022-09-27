@@ -15,17 +15,19 @@ import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /** Service for Agent handling. */
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
-@Service
-public class AgentServiceImpl extends EntityServiceImpl<Agent> implements AgentService {
+@Service("agentService")
+public class AgentServiceImpl<A extends Agent> extends EntityServiceImpl<A>
+    implements AgentService<A> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentServiceImpl.class);
 
   public AgentServiceImpl(
-      AgentRepository repository,
+      @Qualifier("agentRepository") AgentRepository<A> repository,
       IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
@@ -42,11 +44,11 @@ public class AgentServiceImpl extends EntityServiceImpl<Agent> implements AgentS
 
   @Override
   public Set<DigitalObject> getDigitalObjects(UUID uuidAgent) {
-    return ((AgentRepository) repository).getDigitalObjects(uuidAgent);
+    return ((AgentRepository<A>) repository).getDigitalObjects(uuidAgent);
   }
 
   @Override
   public Set<Work> getWorks(UUID uuidAgent) {
-    return ((AgentRepository) repository).getWorks(uuidAgent);
+    return ((AgentRepository<A>) repository).getWorks(uuidAgent);
   }
 }

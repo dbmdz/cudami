@@ -6,17 +6,21 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /** Repository for Agent persistence handling. No own table, using entities table. */
-@Repository
-public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements AgentRepository {
+@Repository("agentRepository")
+public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A>
+    implements AgentRepository<A> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AgentRepositoryImpl.class);
 
@@ -26,13 +30,35 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
 
   @Autowired
   public AgentRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
+    this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Agent.class,
+        null,
+        null,
         cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  public AgentRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends Agent> agentImplClass,
+      String sqlSelectAllFieldsJoins,
+      BiFunction<Map<UUID, A>, RowView, Map<UUID, A>> additionalReduceRowsBiFunction,
+      int offsetForAlternativePaging) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        agentImplClass,
+        sqlSelectAllFieldsJoins,
+        additionalReduceRowsBiFunction,
+        offsetForAlternativePaging);
   }
 
   @Override
@@ -46,16 +72,16 @@ public class AgentRepositoryImpl extends EntityRepositoryImpl<Agent> implements 
   }
 
   @Override
-  public Agent save(Agent agent) {
+  public A save(A agent) {
     super.save(agent);
-    Agent result = getByUuid(agent.getUuid());
+    A result = getByUuid(agent.getUuid());
     return result;
   }
 
   @Override
-  public Agent update(Agent agent) {
+  public A update(A agent) {
     super.update(agent);
-    Agent result = getByUuid(agent.getUuid());
+    A result = getByUuid(agent.getUuid());
     return result;
   }
 }

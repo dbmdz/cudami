@@ -7,11 +7,11 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.Set;
 import java.util.UUID;
 
-public interface AgentService extends EntityService<Agent> {
+public interface AgentService<A extends Agent> extends EntityService<A> {
 
   Set<DigitalObject> getDigitalObjects(UUID uuidAgent);
 
-  default Set<Work> getWorks(Agent agent) {
+  default Set<Work> getWorks(A agent) {
     if (agent == null) {
       return null;
     }

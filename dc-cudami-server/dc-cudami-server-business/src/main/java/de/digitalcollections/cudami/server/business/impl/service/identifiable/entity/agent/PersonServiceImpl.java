@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
-import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class PersonServiceImpl extends EntityServiceImpl<Person> implements PersonService {
+public class PersonServiceImpl extends AgentServiceImpl<Person> implements PersonService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonServiceImpl.class);
 
