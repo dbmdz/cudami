@@ -31,6 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,7 +48,11 @@ public class ItemRepositoryImplTest {
   private ItemRepositoryImpl repo;
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
-  @Autowired AgentRepository agentRepository;
+
+  @Autowired
+  @Qualifier("agentRepository")
+  AgentRepository<Agent> agentRepository;
+
   @Autowired PersonRepository personRepository;
 
   private DigitalObjectRepository digitalObjectRepository;
@@ -57,7 +62,7 @@ public class ItemRepositoryImplTest {
       @Autowired Jdbi jdbi,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
       @Autowired WorkRepositoryImpl workRepository,
-      @Autowired AgentRepositoryImpl agentRepository,
+      @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository,
       @Autowired CudamiConfig config) {
     this.digitalObjectRepository = digitalObjectRepository;
     repo =

@@ -3,10 +3,12 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.SeriesRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Series;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository("seriesRepository")
@@ -20,7 +22,7 @@ public class SeriesRepositoryImpl extends WorkRepositoryImpl<Series> implements 
 
   public SeriesRepositoryImpl(
       Jdbi dbi,
-      AgentRepositoryImpl agentRepositoryImpl,
+      @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl,
       CudamiConfig cudamiConfig) {
     super(
