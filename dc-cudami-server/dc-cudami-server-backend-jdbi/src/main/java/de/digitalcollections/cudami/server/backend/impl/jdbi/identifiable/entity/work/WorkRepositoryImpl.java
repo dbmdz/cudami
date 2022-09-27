@@ -18,6 +18,7 @@ import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository("workRepository")
@@ -61,13 +62,13 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
         + ", date_published=:datePublished, timevalue_published=:timeValuePublished::JSONB";
   }
 
-  private final AgentRepositoryImpl agentRepositoryImpl;
+  private final AgentRepositoryImpl<Agent> agentRepositoryImpl;
   private final ItemRepositoryImpl itemRepositoryImpl;
 
   @Autowired
   public WorkRepositoryImpl(
       Jdbi dbi,
-      AgentRepositoryImpl agentRepositoryImpl,
+      @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl,
       CudamiConfig cudamiConfig) {
     this(
@@ -87,7 +88,7 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
       String tableAlias,
       String mappingPrefix,
       Class<? extends Work> workImplClass,
-      AgentRepositoryImpl agentRepositoryImpl,
+      AgentRepositoryImpl<Agent> agentRepositoryImpl,
       ItemRepositoryImpl itemRepositoryImpl,
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, workImplClass, offsetForAlternativePaging);
