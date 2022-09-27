@@ -369,7 +369,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     addPageRequestParams(pageRequest, innerQuery);
     List<I> result =
         retrieveList(
-            getSqlSelectReducedFields(tableAlias, mappingPrefix),
+            getSqlSelectReducedFields(),
             innerQuery,
             argumentMappings,
             getOrderBy(pageRequest.getSorting()));
@@ -441,12 +441,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public List<I> getAllFull() {
-    return retrieveList(getSqlSelectAllFields(tableAlias, mappingPrefix), null, null, null);
+    return retrieveList(getSqlSelectAllFields(), null, null, null);
   }
 
   @Override
   public List<I> getAllReduced() {
-    return retrieveList(getSqlSelectReducedFields(tableAlias, mappingPrefix), null, null, null);
+    return retrieveList(getSqlSelectReducedFields(), null, null, null);
   }
 
   @Override
@@ -491,7 +491,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     innerSelect.append(")");
     I result =
         retrieveOne(
-            getSqlSelectAllFields(tableAlias, mappingPrefix),
+            getSqlSelectAllFields(),
             sqlSelectAllFieldsJoins,
             null,
             arguments,
@@ -506,9 +506,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     }
     filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
 
-    I result =
-        retrieveOne(
-            getSqlSelectAllFields(tableAlias, mappingPrefix), sqlSelectAllFieldsJoins, filtering);
+    I result = retrieveOne(getSqlSelectAllFields(), sqlSelectAllFieldsJoins, filtering);
     return result;
   }
 
