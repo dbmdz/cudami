@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -14,6 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.legal.LicenseRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -35,6 +35,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.production.CreationInfo;
+import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,6 +85,8 @@ class DigitalObjectRepositoryImplTest {
 
   @Autowired
   private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
+
+  @Autowired private TagRepositoryImpl tagRepository;
 
   @Autowired CudamiConfig cudamiConfig;
 
@@ -160,6 +164,9 @@ class DigitalObjectRepositoryImplTest {
     DigitalObject parent =
         repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
 
+    Tag tag =
+        tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
+
     DigitalObject digitalObject =
         DigitalObject.builder()
             .label(Locale.GERMAN, "deutschsprachiges Label")
@@ -169,6 +176,7 @@ class DigitalObjectRepositoryImplTest {
             .license(EXISTING_LICENSE)
             .creationInfo(creationInfo)
             .parent(parent)
+            .tag(tag)
             .build();
 
     // The "save" method internally retrieves the object by findOne
@@ -190,6 +198,9 @@ class DigitalObjectRepositoryImplTest {
     assertThat(actual.getParent()).isNotNull();
     assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
     assertThat(actual.getParent().getLabel()).isEqualTo(parent.getLabel());
+
+    assertThat(actual.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
+        .containsExactly(tag.getUuid());
   }
 
   @Test

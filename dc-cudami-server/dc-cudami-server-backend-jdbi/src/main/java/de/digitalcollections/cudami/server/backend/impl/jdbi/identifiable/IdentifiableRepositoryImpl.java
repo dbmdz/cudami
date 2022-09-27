@@ -779,6 +779,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
                 + UrlAliasRepositoryImpl.getSelectFields(true)
+                + ", "
+                + TagRepositoryImpl.SQL_REDUCED_FIELDS_TAGS
                 + " FROM "
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
