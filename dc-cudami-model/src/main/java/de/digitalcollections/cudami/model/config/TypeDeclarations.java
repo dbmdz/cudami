@@ -36,7 +36,7 @@ public class TypeDeclarations {
     this.manufacturingTypes =
         manufacturingTypes != null ? List.copyOf(manufacturingTypes) : Collections.emptyList();
     this.mediaTypes = mediaTypes != null ? List.copyOf(mediaTypes) : Collections.emptyList();
-    this.subjectTypes = mediaTypes != null ? List.copyOf(subjectTypes) : Collections.emptyList();
+    this.subjectTypes = subjectTypes != null ? List.copyOf(subjectTypes) : Collections.emptyList();
     this.tagTypes = tagTypes != null ? List.copyOf(tagTypes) : Collections.emptyList();
 
     this.expressionTypes =

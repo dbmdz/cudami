@@ -22,7 +22,7 @@ cudami:
     mediaTypes: #TODO
       - BOOK
 
-    subTypes:
+    subjectTypes:
       - BY
       - GENRE
       - GEO
