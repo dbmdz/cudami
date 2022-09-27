@@ -73,7 +73,7 @@ public class TagController {
           "No type, namespace and/or ids were provided in a colon separated manner");
     }
     Tag tag =
-        service.getByTagTypeAndIdentifier(
+        service.getByTypeAndIdentifier(
             typeNamespaceId.getLeft(), typeNamespaceId.getMiddle(), typeNamespaceId.getRight());
     return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

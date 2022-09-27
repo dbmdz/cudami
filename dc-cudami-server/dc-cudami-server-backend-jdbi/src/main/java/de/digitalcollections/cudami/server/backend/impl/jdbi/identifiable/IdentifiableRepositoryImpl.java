@@ -73,14 +73,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
         + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[]";
   }
-  
+
   public String getSqlSelectAllFields() {
     return getSqlSelectAllFields(tableAlias, mappingPrefix);
   }
 
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix) + TagRepositoryImpl.SQL_FULL_FIELDS_TAGS;
-
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + TagRepositoryImpl.SQL_FULL_FIELDS_TAGS;
   }
 
   public String getSqlSelectReducedFields() {

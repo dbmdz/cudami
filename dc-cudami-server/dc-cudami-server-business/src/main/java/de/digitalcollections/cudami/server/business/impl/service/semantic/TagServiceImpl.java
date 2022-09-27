@@ -52,10 +52,10 @@ public class TagServiceImpl implements TagService {
   }
 
   @Override
-  public Tag getByTagTypeAndIdentifier(String tagType, String namespace, String id)
+  public Tag getByTypeAndIdentifier(String tagType, String namespace, String id)
       throws CudamiServiceException {
     try {
-      return repository.getByTagTypeAndIdentifier(tagType, namespace, id);
+      return repository.getByTypeAndIdentifier(tagType, namespace, id);
     } catch (Exception e) {
       throw new CudamiServiceException(
           "cannot get by tagType=" + tagType + ", namespace=" + namespace + ", id=" + id + ": " + e,
