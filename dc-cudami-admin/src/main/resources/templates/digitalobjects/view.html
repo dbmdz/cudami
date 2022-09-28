@@ -122,6 +122,34 @@
                   </ul>
                 </div>
               </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{linked_data_resources}">...</label>
+                </div>
+                <div class="col-md-9" th:with="resources=*{linkedDataResources}">
+                  <ul class="mb-0 list-inline" th:if="${resources} and not ${#lists.isEmpty(resources)}">
+                    <li class="list-inline-item" th:each="resource : ${resources}">
+                      <span class="border border-dark p-2 badge badge-light badge-pill">
+                        <a th:href="@{/fileresources/{uuid}(uuid=${resource.uuid})}" th:text="${resource.label?.getText(defaultLanguage)} ?: ${resource.uuid}"></a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{rendering_resources}">...</label>
+                </div>
+                <div class="col-md-9" th:with="resources=*{renderingResources}">
+                  <ul class="mb-0 list-inline" th:if="${resources} and not ${#lists.isEmpty(resources)}">
+                    <li class="list-inline-item" th:each="resource : ${resources}">
+                      <span class="border border-dark p-2 badge badge-light badge-pill">
+                        <a th:href="@{/fileresources/{uuid}(uuid=${resource.uuid})}" th:text="${resource.label?.getText(defaultLanguage)} ?: ${resource.uuid}"></a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
