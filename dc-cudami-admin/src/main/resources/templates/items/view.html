@@ -59,7 +59,7 @@
                   <label class="font-weight-bold" th:text="#{parent_item}">...</label>
                 </div>
                 <div class="col-md-9" th:with="partOfItem=*{partOfItem}">
-                  <a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="${partOfItem.uuid}">...</a>
+                  <a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="${partOfItem.label?.getText(defaultLanguage)} ?: ${partOfItem.uuid}">...</a>
                 </div>
               </div>
               <div class="row">

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -27,10 +28,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class ItemsController {
   private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
   private final CudamiItemsClient service;
 
   public ItemsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
     this.service = client.forItems();
   }
 
@@ -91,6 +94,7 @@ public class ItemsController {
         languageSortingHelper.sortLanguages(
             displayLocale, service.getLanguagesOfDigitalObjects(uuid));
     model
+        .addAttribute("defaultLanguage", localeService.getDefaultLanguage().getLanguage())
         .addAttribute("item", item)
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages);

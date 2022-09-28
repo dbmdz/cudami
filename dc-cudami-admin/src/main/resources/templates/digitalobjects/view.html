@@ -59,7 +59,7 @@
                   <label class="font-weight-bold" th:text="#{item}">...</label>
                 </div>
                 <div class="col-md-9" th:with="item=*{item}">
-                  <a th:href="@{/items/{uuid}(uuid=${item.uuid})}" th:text="${item.uuid}">...</a>
+                  <a th:href="@{/items/{uuid}(uuid=${item.uuid})}" th:text="${item.label?.getText(defaultLanguage)} ?: ${item.uuid}">...</a>
                 </div>
               </div>
               <div class="row" th:if="*{parent?.uuid}">
@@ -67,7 +67,7 @@
                   <label class="font-weight-bold" th:text="#{parent_digital_object}">...</label>
                 </div>
                 <div class="col-md-9" th:with="parent=*{parent}">
-                  <a th:href="@{/digitalobjects/{uuid}(uuid=${parent.uuid})}" th:text="${parent.uuid}">...</a>
+                  <a th:href="@{/digitalobjects/{uuid}(uuid=${parent.uuid})}" th:text="${parent.label?.getText(defaultLanguage)} ?: ${parent.uuid}">...</a>
                 </div>
               </div>
               <div class="row" th:if="*{numberOfBinaryResources}">
