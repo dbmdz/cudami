@@ -72,6 +72,33 @@
                   </div>
                 </div>
               </div>
+              <div class="row">
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{holders}">...</label>
+                </div>
+                <div class="col-md-9" th:with="holders=*{holders}">
+                  <ul class="mb-0 list-inline" th:if="${holders} and not ${#lists.isEmpty(holders)}">
+                    <li class="list-inline-item" th:each="holder : ${holders}">
+                      <span class="border border-dark p-2 badge badge-light badge-pill" th:switch="${holder.identifiableObjectType.name()}">
+                        <a
+                          th:case="'CORPORATE_BODY'"
+                          th:href="@{/corporatebodies/{uuid}(uuid=${holder.uuid})}"
+                          th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
+                        >
+                          ...
+                        </a>
+                        <a
+                          th:case="'PERSON'"
+                          th:href="@{/persons/{uuid}(uuid=${holder.uuid})}"
+                          th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
+                        >
+                          ...
+                        </a>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
