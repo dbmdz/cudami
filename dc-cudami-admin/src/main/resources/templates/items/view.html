@@ -41,9 +41,26 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
                 <div class="col-md-9" id="identifiers-list"></div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${item}, ${existingLanguages}, false)"></th:block>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="rows-striped">
               <div class="row" th:if="*{partOfItem?.uuid}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_item}">...</label></div>
-                <div class="col-md-9"><a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="*{partOfItem.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</a></div>
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{parent_item}">...</label>
+                </div>
+                <div class="col-md-9" th:with="partOfItem=*{partOfItem}">
+                  <a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="${partOfItem.uuid}">...</a>
+                </div>
               </div>
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{exemplifies_manifestation}">...</label></div>
@@ -56,12 +73,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${item}, ${existingLanguages}, false)"></th:block>
           </div>
         </div>
 

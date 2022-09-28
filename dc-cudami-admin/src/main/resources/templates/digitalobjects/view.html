@@ -41,13 +41,34 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
                 <div class="col-md-9" id="identifiers-list"></div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${digitalObject}, ${existingLanguages}, false)"></th:block>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="rows-striped">
               <div class="row" th:if="*{item?.uuid}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{item}">...</label></div>
-                <div class="col-md-9"><a th:href="@{/items/{uuid}(uuid=*{item.uuid})}" th:text="*{item.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</a></div>
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{item}">...</label>
+                </div>
+                <div class="col-md-9" th:with="item=*{item}">
+                  <a th:href="@{/items/{uuid}(uuid=${item.uuid})}" th:text="${item.uuid}">...</a>
+                </div>
               </div>
               <div class="row" th:if="*{parent?.uuid}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_digital_object}">...</label></div>
-                <div class="col-md-9"><a th:href="@{/digitalobjects/{uuid}(uuid=*{parent.uuid})}" th:text="*{parent.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</a></div>
+                <div class="col-md-3">
+                  <label class="font-weight-bold" th:text="#{parent_digital_object}">...</label>
+                </div>
+                <div class="col-md-9" th:with="parent=*{parent}">
+                  <a th:href="@{/digitalobjects/{uuid}(uuid=${parent.uuid})}" th:text="${parent.uuid}">...</a>
+                </div>
               </div>
               <div class="row" th:if="*{numberOfBinaryResources}">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{number_of_binary_resources}">...</label></div>
@@ -63,12 +84,6 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${digitalObject}, ${existingLanguages}, false)"></th:block>
           </div>
         </div>
 
