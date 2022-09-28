@@ -20,11 +20,12 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
   public static final String TABLE_NAME = "subjects";
   public static final String TABLE_ALIAS = "subj";
   public static final String MAPPING_PREFIX = "subj";
+  public static final String MAPPING_PREFIX_IDENTIFIER = "subjid";
 
   public static final String SQL_INSERT_FIELDS =
       " uuid, label, type, identifiers, created, last_modified";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :label::JSONB, :type, :identifiers, :created, :lastModified";
+      " :uuid, :label::JSONB, :type, :identifiers[], :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_SUBJECTS =
       String.format(
           " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.identifiers as %2$s_identifiers, %1$s.type as %2$s_type, %1$s.identifiers as %2$s_identifiers, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
