@@ -69,7 +69,7 @@ class SubjectRepositoryImplTest {
     assertThat(savedSubject.getLastModified()).isNotNull();
     assertThat(savedSubject.getType()).isEqualTo("test");
     assertThat(savedSubject.getLabel()).isEqualTo(label);
-    assertThat(savedSubject.getIdentifiers()).containsExactly(identifier1, identifier2);
+    assertThat(savedSubject.getIdentifiers()).containsExactlyInAnyOrder(identifier1, identifier2);
 
     Subject retrievedSubject = repo.getByUuid(savedSubject.getUuid());
 
