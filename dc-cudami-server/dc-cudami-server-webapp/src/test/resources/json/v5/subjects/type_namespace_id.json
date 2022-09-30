@@ -1,0 +1,11 @@
+{
+  "objectType": "SUBJECT",
+  "identifiers": [
+    {
+      "objectType": "IDENTIFIER",
+      "id": "id",
+      "namespace": "namespace"
+    }
+  ],
+  "type": "type"
+}

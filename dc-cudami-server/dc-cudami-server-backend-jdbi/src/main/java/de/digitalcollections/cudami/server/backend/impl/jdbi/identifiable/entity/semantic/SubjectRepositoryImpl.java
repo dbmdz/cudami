@@ -8,16 +8,19 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.argument.AbstractArgumentFactory;
-import org.jdbi.v3.core.argument.Argument;
-import org.jdbi.v3.core.config.ConfigRegistry;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements SubjectRepository {
@@ -63,6 +66,41 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
   }
 
   @Override
+  public Subject getByTypeAndIdentifier(String type, String namespace, String id) {
+    final String sql =
+        "SELECT "
+            + SQL_FULL_FIELDS_SUBJECTS
+            + " FROM "
+            + tableName
+            + " "
+            + tableAlias
+            + ", UNNEST("
+            + tableAlias
+            + ".identifiers) subjids"
+            + " WHERE subj.type = :type"
+            + " AND subjids.namespace = :namespace"
+            + " AND subjids.id = :id";
+
+    // select * from subjects where '(''subject-namespace'',''subject-id8'')'::dbIdentifier =
+    // ANY(identifiers);
+
+    // SELECT * FROM subjects subj, UNNEST(subj.identifiers) as subjids where subjids.id='id';
+
+    Subject subject =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sql)
+                    .bind("type", type)
+                    .bind("namespace", namespace)
+                    .bind("id", id)
+                    .mapTo(Subject.class)
+                    .findOne()
+                    .orElse(null));
+
+    return subject;
+  }
+
+  @Override
   public Subject save(Subject subject) {
     subject.setUuid(UUID.randomUUID());
     subject.setCreated(LocalDateTime.now());
@@ -79,6 +117,21 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             + ")"
             + " RETURNING *";
 
+    return dbi.withHandle(
+        h -> h.createQuery(sql).bindBean(subject).mapToBean(Subject.class).findOne().orElse(null));
+  }
+
+  //  test=# select * from subjects, unnest(identifiers) where namespace='name,space1';
+
+  @Override
+  public Subject update(Subject subject) {
+    subject.setLastModified(LocalDateTime.now());
+
+    final String sql =
+        "UPDATE "
+            + tableName
+            + " SET label=:label::JSONB, last_modified=:lastModified, identifiers=:identifiers, type=:type WHERE uuid=:uuid RETURNING *";
+
     Subject result =
         dbi.withHandle(
             h ->
@@ -91,39 +144,89 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
   }
 
   @Override
-  public Subject update(Subject subject) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public boolean delete(List<UUID> uuids) {
-    // TODO Auto-generated method stub
-    return false;
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                .bindList("uuids", uuids)
+                .execute());
+    return true;
   }
 
   @Override
   public PageResponse<Subject> find(PageRequest pageRequest) {
-    // TODO Auto-generated method stub
-    return null;
+    Map argumentMappings = new HashMap<>(0);
+    String commonSql =
+        " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + ", unnest(identifiers) as "
+            + tableAlias
+            + "_identifier";
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Subject> result =
+        retrieveList(
+            SQL_REDUCED_FIELDS_SUBJECTS,
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    // TODO Auto-generated method stub
-    return null;
+    return new ArrayList<>(
+        Arrays.asList(
+            "created",
+            "label",
+            tableAlias + "_identifier.namespace",
+            tableAlias + "_identifier.id",
+            "type",
+            "lastModified"));
   }
+
+  // select * from subjects, unnest(identifiers) where id='id1';
+  // select subj.* from subjects as subj ,unnest(identifiers) as subj_identifier where
+  // subj_identifier.namespace='subject-namespace';
 
   @Override
   public String getColumnName(String modelProperty) {
-    // TODO Auto-generated method stub
-    return null;
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
+      case "label":
+        return tableAlias + ".label";
+      case "lastModified":
+        return tableAlias + ".last_modified";
+      case "identifiers_namespace":
+        return tableAlias + "_identifier.namespace";
+      case "identifiers_id":
+        return tableAlias + "_identifier.id";
+      case "type":
+        return tableAlias + ".type";
+      case "uuid":
+        return tableAlias + ".uuid";
+      default:
+        return null;
+    }
   }
 
   @Override
   protected String getUniqueField() {
-    // TODO Auto-generated method stub
-    return null;
+    return "uuid";
   }
 
   @Override
@@ -132,17 +235,42 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
     return false;
   }
 
-  private class DbIdentifierArgumentFactory extends AbstractArgumentFactory<Identifier> {
+  private long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    return total;
+  }
 
-    protected DbIdentifierArgumentFactory() {
-      super(Types.JAVA_OBJECT);
-    }
+  private List<Subject> retrieveList(
+      String fieldsSql,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy) {
+    final String sql =
+        "SELECT "
+            + fieldsSql
+            + " FROM "
+            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
+            + " AS "
+            + tableAlias
+            + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
+                ? " " + orderBy
+                : (StringUtils.hasText(orderBy) ? " ORDER BY " + orderBy : ""));
 
-    @Override
-    protected Argument build(Identifier value, ConfigRegistry config) {
-      return (position, statement, ctx) ->
-          statement.setString(
-              position, "ROW('" + value.getNamespace() + "','" + value.getId() + "')");
-    }
+    List<Subject> result =
+        dbi.withHandle(
+            (Handle handle) ->
+                handle
+                    .createQuery(sql)
+                    .bindMap(argumentMappings)
+                    .mapTo(Subject.class)
+                    .collect(Collectors.toList()));
+    return result;
   }
 }
