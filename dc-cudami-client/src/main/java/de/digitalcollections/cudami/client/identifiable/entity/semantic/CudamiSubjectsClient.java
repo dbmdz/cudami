@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.semantic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.semantic.Subject;
+import de.digitalcollections.model.semantic.Subject;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;

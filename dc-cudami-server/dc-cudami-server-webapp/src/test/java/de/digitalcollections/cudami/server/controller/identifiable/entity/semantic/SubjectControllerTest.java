@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.identifiable.entity.semantic.Subject;
+import de.digitalcollections.model.semantic.Subject;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.DisplayName;
