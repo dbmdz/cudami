@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.entity.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -19,4 +20,7 @@ public interface SubjectService {
   boolean delete(List<UUID> uuids);
 
   PageResponse<Subject> find(PageRequest pageRequest);
+
+  Subject getByTypeAndIdentifier(String type, String namespace, String id)
+      throws CudamiServiceException;
 }

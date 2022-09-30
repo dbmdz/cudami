@@ -23,4 +23,6 @@ public interface SubjectRepository {
   boolean delete(List<UUID> uuids);
 
   PageResponse<Subject> find(PageRequest pageRequest);
+
+  Subject getByTypeAndIdentifier(String type, String namespace, String id);
 }

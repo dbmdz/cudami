@@ -17,6 +17,14 @@ class DbIdentifierMapperTest {
     dbIdentifierMapper = new DbIdentifierMapper();
   }
 
+  @DisplayName("formats the entry correctly")
+  @Test
+  public void formatEntry() {
+    Identifier identifier = Identifier.builder().namespace("the-namespace").id("the-id").build();
+    String expected = "(\"the-namespace\",\"the-id\")";
+    assertThat((String) dbIdentifierMapper.convertArrayElement(identifier)).isEqualTo(expected);
+  }
+
   @DisplayName("can handle a null value from the database")
   @Test
   public void handleNullValue() {
@@ -38,25 +46,34 @@ class DbIdentifierMapperTest {
   @DisplayName("rejects an empty filled identifier")
   @Test
   public void handleEmptyFilled() {
-    assertThat(dbIdentifierMapper.extractIdentifier("('','')")).isNull();
+    assertThat(dbIdentifierMapper.extractIdentifier("(\"\",\"\")")).isNull();
   }
 
   @DisplayName("rejects a partially filled identifier (only namespace)")
   @Test
   public void partialFillOnlyNamespace() {
-    assertThat(dbIdentifierMapper.extractIdentifier("('namespace','')")).isNull();
+    assertThat(dbIdentifierMapper.extractIdentifier("(\"namespace\",\"\")")).isNull();
   }
 
   @DisplayName("rejects a partially filled identifier (only id)")
   @Test
   public void partialFillOnlyId() {
-    assertThat(dbIdentifierMapper.extractIdentifier("('','id')")).isNull();
+    assertThat(dbIdentifierMapper.extractIdentifier("(\"\",\"id\")")).isNull();
+  }
+
+  @DisplayName("can extract an identifier with special characters")
+  @Test
+  public void specialCharacters() {
+    String identifierStr = "(\"name,space1\",id1)";
+    Identifier expected = Identifier.builder().namespace("name,space1").id("id1").build();
+    assertThat(dbIdentifierMapper.extractIdentifier(identifierStr)).isEqualTo(expected);
   }
 
   @DisplayName("can fill an identifier")
   @Test
   public void fillIdentifier() {
     Identifier expected = Identifier.builder().namespace("name,space").id("id'd").build();
-    assertThat(dbIdentifierMapper.extractIdentifier("('name,space','id'd')")).isEqualTo(expected);
+    assertThat(dbIdentifierMapper.extractIdentifier("(\"name,space\",\"id'd\")"))
+        .isEqualTo(expected);
   }
 }

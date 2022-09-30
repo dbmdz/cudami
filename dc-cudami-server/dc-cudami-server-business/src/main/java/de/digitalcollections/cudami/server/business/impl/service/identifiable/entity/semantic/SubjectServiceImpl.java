@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.semantic;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.model.identifiable.entity.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -48,5 +49,16 @@ public class SubjectServiceImpl implements SubjectService {
   @Override
   public PageResponse<Subject> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
+  }
+
+  @Override
+  public Subject getByTypeAndIdentifier(String type, String namespace, String id)
+      throws CudamiServiceException {
+    try {
+      return repository.getByTypeAndIdentifier(type, namespace, id);
+    } catch (Exception e) {
+      throw new CudamiServiceException(
+          "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
+    }
   }
 }

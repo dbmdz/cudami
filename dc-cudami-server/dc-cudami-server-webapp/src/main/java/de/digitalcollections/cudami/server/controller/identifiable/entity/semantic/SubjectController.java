@@ -1,6 +1,10 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.semantic.Subject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -11,7 +15,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Triple;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +54,29 @@ public class SubjectController {
       pageRequest.setSorting(sorting);
     }
     return service.find(pageRequest);
+  }
+
+  @Operation(
+      summary = "Get a subject by type, namespace and id",
+      description =
+          "Separate type, namespace and id with a colon, e.g. foo:bar:baz. It is also possible, to add a .json suffix, which will be ignored then")
+  @GetMapping(
+      value = {"/v6/subjects/identifier/**"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Subject> getByIdentifier(HttpServletRequest request)
+      throws IdentifiableServiceException, ValidationException, CudamiServiceException {
+    Triple<String, String, String> typeNamespaceId =
+        ParameterHelper.extractTripleOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
+    if (typeNamespaceId.getLeft().isBlank()
+        || (typeNamespaceId.getMiddle() == null || typeNamespaceId.getMiddle().isBlank())
+        || (typeNamespaceId.getRight() == null || typeNamespaceId.getRight().isBlank())) {
+      throw new ValidationException(
+          "No type, namespace and/or ids were provided in a colon separated manner");
+    }
+    Subject subject =
+        service.getByTypeAndIdentifier(
+            typeNamespaceId.getLeft(), typeNamespaceId.getMiddle(), typeNamespaceId.getRight());
+    return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get subject by UUID")
