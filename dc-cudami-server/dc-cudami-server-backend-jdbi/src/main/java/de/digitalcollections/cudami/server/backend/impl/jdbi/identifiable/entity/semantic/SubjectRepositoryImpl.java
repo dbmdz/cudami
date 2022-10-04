@@ -190,10 +190,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             "lastModified"));
   }
 
-  // select * from subjects, unnest(identifiers) where id='id1';
-  // select subj.* from subjects as subj ,unnest(identifiers) as subj_identifier where
-  // subj_identifier.namespace='subject-namespace';
-
   @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
