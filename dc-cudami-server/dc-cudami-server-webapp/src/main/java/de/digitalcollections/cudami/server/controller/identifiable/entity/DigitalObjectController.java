@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -112,8 +113,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         searchTerm,
         labelTerm,
         labelLanguage,
-        "parent.uuid",
-        parentUuidFilterCriterion);
+        Pair.of("parent.uuid", parentUuidFilterCriterion));
   }
 
   @Operation(summary = "Get paged projects of a digital objects")

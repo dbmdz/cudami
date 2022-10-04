@@ -45,7 +45,8 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
 
   @Override
   protected String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
-    if (filterCriterion.getExpression().startsWith("label")) {
+    Matcher labelOrName = Pattern.compile("^(label|name)").matcher(filterCriterion.getExpression());
+    if (labelOrName.find()) {
       if (filterCriterion.getValue() == null || !(filterCriterion.getValue() instanceof String)) {
         return "";
       }
@@ -54,17 +55,19 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
         value = String.format("\"%s\"", value);
       } else if (filterCriterion.getOperation() != FilterOperation.CONTAINS) {
         throw new UnsupportedOperationException(
-            "The `label` can only be filtered by using CONTAINS (should be preferred) or EQUALS!");
+            "`label` and `name` can only be filtered by using CONTAINS (should be preferred) or EQUALS!");
       }
       String urlParams =
-          String.format("label=%s", URLEncoder.encode(value, StandardCharsets.UTF_8));
+          String.format(
+              "%s=%s", labelOrName.group(1), URLEncoder.encode(value, StandardCharsets.UTF_8));
       Matcher matchLanguage =
-          Pattern.compile("\\.(\\w{1,3})$").matcher(filterCriterion.getExpression());
+          Pattern.compile("\\.([\\w_-]+)$").matcher(filterCriterion.getExpression());
       if (matchLanguage.find()) {
         // there is a language defined
         return urlParams
             + String.format(
-                "&labelLanguage=%s",
+                "&%sLanguage=%s",
+                labelOrName.group(1),
                 URLEncoder.encode(matchLanguage.group(1), StandardCharsets.UTF_8));
       }
       return urlParams;

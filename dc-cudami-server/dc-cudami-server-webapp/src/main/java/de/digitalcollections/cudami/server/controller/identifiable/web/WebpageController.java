@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -87,10 +88,8 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
         null,
         labelTerm,
         labelLanguage,
-        "publicationStart",
-        publicationStart,
-        "publicationEnd",
-        publicationEnd);
+        Pair.of("publicationStart", publicationStart),
+        Pair.of("publicationEnd", publicationEnd));
   }
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
