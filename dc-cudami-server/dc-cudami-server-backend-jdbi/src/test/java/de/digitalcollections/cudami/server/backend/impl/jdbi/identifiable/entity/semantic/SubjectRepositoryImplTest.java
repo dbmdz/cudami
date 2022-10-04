@@ -94,6 +94,9 @@ class SubjectRepositoryImplTest {
 
     Subject nonexistingSubject = repo.getByUuid(savedSubject.getUuid());
     assertThat(nonexistingSubject).isNull();
+
+    boolean nonsuccess = repo.delete(savedSubject.getUuid()); // second attempt must fail!
+    assertThat(nonsuccess).isFalse();
   }
 
   @DisplayName("can save and update")
