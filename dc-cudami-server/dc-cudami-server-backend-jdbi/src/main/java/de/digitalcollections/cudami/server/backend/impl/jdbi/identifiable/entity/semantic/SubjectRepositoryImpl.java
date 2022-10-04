@@ -81,7 +81,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             + " AND subjids.namespace = :namespace"
             + " AND subjids.id = :id";
 
-
     Subject subject =
         dbi.withHandle(
             h ->
@@ -117,7 +116,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
         h -> h.createQuery(sql).bindBean(subject).mapToBean(Subject.class).findOne().orElse(null));
   }
 
-
   @Override
   public Subject update(Subject subject) {
     subject.setLastModified(LocalDateTime.now());
@@ -140,12 +138,17 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-    return true;
+    if (uuids == null || uuids.isEmpty()) {
+      return true;
+    }
+
+    int deletions =
+        dbi.withHandle(
+            h ->
+                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                    .bindList("uuids", uuids)
+                    .execute());
+    return deletions == uuids.size();
   }
 
   @Override
@@ -222,8 +225,17 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
-    // TODO Auto-generated method stub
-    return false;
+    if (modelProperty == null) {
+      return false;
+    }
+
+    switch (modelProperty) {
+      case "identifiers_namespace":
+      case "type":
+        return true;
+      default:
+        return false;
+    }
   }
 
   private long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
