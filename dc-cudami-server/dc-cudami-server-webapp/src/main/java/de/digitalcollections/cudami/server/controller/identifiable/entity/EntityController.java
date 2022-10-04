@@ -81,8 +81,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         searchTerm,
         labelTerm,
         labelLanguage,
-        "entityType",
-        entityTypeCriterion);
+        Pair.of("entityType", entityTypeCriterion));
   }
 
   @Override

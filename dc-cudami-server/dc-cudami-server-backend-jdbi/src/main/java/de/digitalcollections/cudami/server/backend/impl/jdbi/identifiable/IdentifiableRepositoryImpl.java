@@ -642,23 +642,32 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
-    if (fc.getExpression().startsWith("label")) {
+    Matcher labelOrName = Pattern.compile("^(label|name)").matcher(fc.getExpression());
+    if (labelOrName.find()) {
       if (!(fc.getValue() instanceof String)) {
         throw new IllegalArgumentException("Value of label must be a string!");
       }
       String value = (String) fc.getValue();
       switch (fc.getOperation()) {
         case CONTAINS:
+          if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
+            throw new IllegalArgumentException("Filtering by label or name are exclusively!");
+          }
           argumentMappings.put(
               SearchTermTemplates.ARRAY_CONTAINS.placeholder,
               IdentifiableRepository.splitToArray(value));
-          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_label");
+          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
+              tableAlias, "split_" + labelOrName.group(1));
         case EQUALS:
-          Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(fc.getExpression());
+          if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
+            throw new IllegalArgumentException("Filtering by label or name are exclusively!");
+          }
+          Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
           String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
           argumentMappings.put(
               SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
-          return SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "label", language);
+          return SearchTermTemplates.JSONB_PATH.renderTemplate(
+              tableAlias, labelOrName.group(1), language);
         default:
           throw new UnsupportedOperationException(
               "Filtering by label only supports CONTAINS (to be preferred) or EQUALS operator!");

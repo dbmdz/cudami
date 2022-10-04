@@ -14,6 +14,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.NamedEntity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
@@ -26,8 +27,10 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -112,34 +115,38 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
    * @param pageResponse the response from the repo, must always contain the request too (if
    *     everything goes right)
    */
-  protected void filterByLabel(PageResponse<I> pageResponse, FilterCriterion<String> labelFilter) {
+  protected void filterBySplitField(
+      PageResponse<I> pageResponse,
+      FilterCriterion<String> filter,
+      Function<Identifiable, Optional<LocalizedText>> retrieveField) {
     if (!pageResponse.hasContent()) {
       return;
     }
     // we must differentiate several cases
-    if (labelFilter.getOperation() == FilterOperation.EQUALS) {
+    if (filter.getOperation() == FilterOperation.EQUALS) {
       // everything has been done by repo already
       return;
     }
 
     // for CONTAINS the language, if any, has not been taken into account yet
-    Matcher matchLanguage = Pattern.compile("\\.(\\w{1,3})$").matcher(labelFilter.getExpression());
+    Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(filter.getExpression());
     if (matchLanguage.find()) {
       // there is a language...
       Locale language = Locale.forLanguageTag(matchLanguage.group(1));
       List<String> searchTerms =
-          Arrays.asList(IdentifiableRepository.splitToArray((String) labelFilter.getValue()));
+          Arrays.asList(IdentifiableRepository.splitToArray((String) filter.getValue()));
       List<I> filteredContent =
           pageResponse.getContent().parallelStream()
               .filter(
                   identifiable -> {
-                    String label = identifiable.getLabel().get(language);
-                    if (label == null) {
+                    String text =
+                        retrieveField.apply(identifiable).orElse(new LocalizedText()).get(language);
+                    if (text == null) {
                       return false;
                     }
-                    List<String> splitLabel =
-                        Arrays.asList(IdentifiableRepository.splitToArray(label));
-                    return splitLabel.containsAll(searchTerms);
+                    List<String> splitText =
+                        Arrays.asList(IdentifiableRepository.splitToArray(text));
+                    return splitText.containsAll(searchTerms);
                   })
               .collect(Collectors.toList());
       // fix total elements count roughly
@@ -153,22 +160,38 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   @Override
   public PageResponse<I> find(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
-    // filter by label is quite special due to optimization
+    // filter by label or name (NamedEntity) is quite special due to optimization
     FilterCriterion<String> labelFilter = null;
+    FilterCriterion<String> nameFilter = null;
     if (pageRequest.hasFiltering()) {
       labelFilter =
           pageRequest.getFiltering().getFilterCriteria().stream()
               .filter(fc -> fc.getExpression().startsWith("label"))
               .findAny()
               .orElse(null);
+      nameFilter =
+          pageRequest.getFiltering().getFilterCriteria().stream()
+              .filter(fc -> fc.getExpression().startsWith("name"))
+              .findAny()
+              .orElse(null);
     }
     PageResponse<I> response = repository.find(pageRequest);
-    if (labelFilter == null) {
+    if (labelFilter == null && nameFilter == null) {
       // nothing special here, go on
       return response;
     }
-    // filter by label specials go here
-    filterByLabel(response, labelFilter);
+    // filter by label or name specials go here, it is an either-or though
+    if (labelFilter != null) {
+      filterBySplitField(response, labelFilter, i -> Optional.ofNullable(i.getLabel()));
+    } else {
+      filterBySplitField(
+          response,
+          nameFilter,
+          i ->
+              i instanceof NamedEntity
+                  ? Optional.ofNullable(((NamedEntity) i).getName())
+                  : Optional.empty());
+    }
     // TODO: what happens if all entries have been removed by the filter?
     return response;
   }

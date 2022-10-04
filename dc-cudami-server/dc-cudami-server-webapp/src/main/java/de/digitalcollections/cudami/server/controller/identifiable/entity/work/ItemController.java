@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -125,8 +126,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         searchTerm,
         labelTerm,
         labelLanguage,
-        "part_of_item.uuid",
-        partOfItemUuidFilterCriterion);
+        Pair.of("part_of_item.uuid", partOfItemUuidFilterCriterion));
   }
 
   @Operation(summary = "Get paged list of digital objects of this item")

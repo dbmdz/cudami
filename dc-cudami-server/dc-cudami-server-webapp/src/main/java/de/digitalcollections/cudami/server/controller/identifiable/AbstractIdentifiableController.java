@@ -53,8 +53,8 @@ public abstract class AbstractIdentifiableController<T extends Identifiable> {
    * @param searchTerm
    * @param labelTerm
    * @param labelLanguage
-   * @param filterCriteria must be pairs of a {@code String}, the expression, and the corresponding
-   *     {@code FilterCriterion}
+   * @param filterCriteria must be {@code Pair}s of a {@code String}, the expression, and the
+   *     corresponding {@code FilterCriterion}
    * @return
    */
   protected PageResponse<T> find(
@@ -64,52 +64,97 @@ public abstract class AbstractIdentifiableController<T extends Identifiable> {
       String searchTerm,
       String labelTerm,
       Locale labelLanguage,
-      Object... filterCriteria) {
+      Pair<String, FilterCriterion<?>>... filterCriteria) {
+    return find(
+        pageNumber,
+        pageSize,
+        sortBy,
+        searchTerm,
+        labelTerm,
+        labelLanguage,
+        null,
+        null,
+        filterCriteria);
+  }
+
+  /**
+   * The usual find implementation
+   *
+   * <p>For {@code filterCriteria} we use a varargs parameter instead of a {@code Map<String,
+   * FilterCriterion<?>>}, because the beautiful shorthand {@code Map.of} does not support null
+   * values and so it would make things unnecessary difficult inside the extending class.
+   *
+   * <p>Do not mess things up by passing {@code null} for {@code filterCriteria} if there are not
+   * any. Since it is varargs you can just omit this parameter.
+   *
+   * @param pageNumber
+   * @param pageSize
+   * @param sortBy
+   * @param searchTerm
+   * @param labelTerm
+   * @param labelLanguage
+   * @param nameTerm
+   * @param nameLanguage
+   * @param filterCriteria must be {@code Pair}s of a {@code String}, the expression, and the
+   *     corresponding {@code FilterCriterion}
+   * @return
+   */
+  protected PageResponse<T> find(
+      int pageNumber,
+      int pageSize,
+      List<Order> sortBy,
+      String searchTerm,
+      String labelTerm,
+      Locale labelLanguage,
+      String nameTerm,
+      Locale nameLanguage,
+      Pair<String, FilterCriterion<?>>... filterCriteria) {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
 
-    if (filterCriteria.length > 0 && filterCriteria.length % 2 == 0) {
-      // Since Map.of doesn't support null values we try it this varargs-way.
-      // There must be two entries per criterion so the array's length must be even.
-      for (int i = 0; i < filterCriteria.length; i += 2) {
-        if (filterCriteria[i + 1] == null) {
-          continue;
-        }
-        if (!(filterCriteria[i] instanceof String)
-            || !(filterCriteria[i + 1] instanceof FilterCriterion)) {
-          throw new IllegalArgumentException(
-              "`filterCriteria` must be pairs of a `String`, the expression, and the corresponding `FilterCriterion`");
-        }
-        String expression = (String) filterCriteria[i];
-        FilterCriterion<?> criterion = (FilterCriterion<?>) filterCriteria[i + 1];
-        criterion.setExpression(expression);
-        pageRequest.add(new Filtering(List.of(criterion)));
+    // Since Map.of doesn't support null values we try it this varargs-way.
+    for (Pair<String, FilterCriterion<?>> criterionPair : filterCriteria) {
+      if (criterionPair.getRight() == null) {
+        continue;
       }
+      String expression = criterionPair.getLeft();
+      FilterCriterion<?> criterion = criterionPair.getRight();
+      criterion.setExpression(expression);
+      pageRequest.add(new Filtering(List.of(criterion)));
     }
 
     addLabelFilter(pageRequest, labelTerm, labelLanguage);
+    addNameFilter(pageRequest, nameTerm, nameLanguage);
     return getService().find(pageRequest);
   }
 
   protected abstract IdentifiableService<T> getService();
 
   protected void addLabelFilter(PageRequest pageRequest, String labelTerm, Locale labelLanguage) {
-    if (pageRequest == null || labelTerm == null) {
+    addFilterForSplitField("label", pageRequest, labelTerm, labelLanguage);
+  }
+
+  protected void addNameFilter(PageRequest pageRequest, String nameTerm, Locale nameLanguage) {
+    addFilterForSplitField("name", pageRequest, nameTerm, nameLanguage);
+  }
+
+  private void addFilterForSplitField(
+      String expression, PageRequest pageRequest, String term, Locale language) {
+    if (expression == null || pageRequest == null || term == null) {
       return;
     }
-    labelTerm = labelTerm.trim();
-    String expression = "label";
-    if (labelLanguage != null) {
-      expression += "." + labelLanguage.getLanguage();
+    term = term.trim();
+    if (language != null) {
+      expression += "." + language.getLanguage();
     }
     FilterOperation operation = FilterOperation.CONTAINS;
-    if (labelTerm.matches("\".+\"")) {
+    if (term.matches("\".+\"")) {
       operation = FilterOperation.EQUALS;
     }
     pageRequest.add(
-        Filtering.builder().add(new FilterCriterion<>(expression, operation, labelTerm)).build());
+        Filtering.builder().add(new FilterCriterion<>(expression, operation, term)).build());
   }
 }

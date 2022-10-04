@@ -12,6 +12,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import java.util.Locale;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,14 @@ class AbstractIdentifiableControllerTest {
     FilterCriterion<?> filterCriterionFoo = FilterCriterion.builder().isEquals("foovalue").build();
     FilterCriterion<?> filterCriterionBar = FilterCriterion.builder().contains("barvalue").build();
     testAbstractIdentifiableController.find(
-        0, 1, null, null, null, null, "foo", filterCriterionFoo, "bar", filterCriterionBar);
+        0,
+        1,
+        null,
+        null,
+        null,
+        null,
+        Pair.of("foo", filterCriterionFoo),
+        Pair.of("bar", filterCriterionBar));
     verify(personService, times(1)).find(pageRequestArgumentCaptor.capture());
 
     PageRequest actual = pageRequestArgumentCaptor.getValue();

@@ -99,8 +99,11 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
+      @RequestParam(name = "name", required = false) String nameTerm,
+      @RequestParam(name = "nameLanguage", required = false) Locale nameLanguage) {
+    return super.find(
+        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, nameTerm, nameLanguage);
   }
 
   @Override

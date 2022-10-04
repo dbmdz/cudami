@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -99,6 +100,8 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
+      @RequestParam(name = "name", required = false) String nameTerm,
+      @RequestParam(name = "nameLanguage", required = false) Locale nameLanguage,
       @RequestParam(name = "previewImage", required = false)
           FilterCriterion<UUID> previewImageFilter) {
     return super.find(
@@ -108,8 +111,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
         searchTerm,
         labelTerm,
         labelLanguage,
-        "previewImage",
-        previewImageFilter);
+        nameTerm,
+        nameLanguage,
+        Pair.of("previewImage", previewImageFilter));
   }
 
   @Operation(summary = "get all persons born at given geo location")
