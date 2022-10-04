@@ -117,7 +117,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
         h -> h.createQuery(sql).bindBean(subject).mapToBean(Subject.class).findOne().orElse(null));
   }
 
-  //  test=# select * from subjects, unnest(identifiers) where namespace='name,space1';
 
   @Override
   public Subject update(Subject subject) {
