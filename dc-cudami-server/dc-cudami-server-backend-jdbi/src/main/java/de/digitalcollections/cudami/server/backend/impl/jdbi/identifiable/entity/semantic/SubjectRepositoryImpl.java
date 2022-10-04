@@ -81,10 +81,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             + " AND subjids.namespace = :namespace"
             + " AND subjids.id = :id";
 
-    // select * from subjects where '(''subject-namespace'',''subject-id8'')'::dbIdentifier =
-    // ANY(identifiers);
-
-    // SELECT * FROM subjects subj, UNNEST(subj.identifiers) as subjids where subjids.id='id';
 
     Subject subject =
         dbi.withHandle(
