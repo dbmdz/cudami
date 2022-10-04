@@ -77,7 +77,7 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             + ", UNNEST("
             + tableAlias
             + ".identifiers) subjids"
-            + " WHERE subj.type = :type"
+            + String.format(" WHERE %s.type = :type", tableAlias)
             + " AND subjids.namespace = :namespace"
             + " AND subjids.id = :id";
 
