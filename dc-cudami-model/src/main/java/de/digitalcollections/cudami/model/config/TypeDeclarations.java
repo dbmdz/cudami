@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.digitalcollections.model.MainSubType;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
+import de.digitalcollections.model.relation.Predicate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +15,10 @@ import java.util.stream.Collectors;
 
 public class TypeDeclarations {
 
-  private List<String> involvementRoles;
   private List<String> manufacturingTypes;
   private List<String> mediaTypes;
+
+  private List<Predicate> relationPredicates;
   private List<String> subjectTypes;
   private List<String> tagTypes;
 
@@ -24,15 +27,12 @@ public class TypeDeclarations {
 
   @JsonCreator(mode = Mode.PROPERTIES)
   public TypeDeclarations(
-      @JsonProperty(value = "involvementRoles") List<String> involvementRoles,
       @JsonProperty(value = "manufacturingTypes") List<String> manufacturingTypes,
       @JsonProperty(value = "mediaTypes") List<String> mediaTypes,
       @JsonProperty(value = "subjectTypes") List<String> subjectTypes,
       @JsonProperty(value = "tagTypes") List<String> tagTypes,
       @JsonProperty(value = "expressionTypes") List<ExpressionType> expressionTypes,
       @JsonProperty(value = "titleTypes") List<TitleType> titleTypes) {
-    this.involvementRoles =
-        involvementRoles != null ? List.copyOf(involvementRoles) : Collections.emptyList();
     this.manufacturingTypes =
         manufacturingTypes != null ? List.copyOf(manufacturingTypes) : Collections.emptyList();
     this.mediaTypes = mediaTypes != null ? List.copyOf(mediaTypes) : Collections.emptyList();
@@ -44,8 +44,9 @@ public class TypeDeclarations {
     this.titleTypes = titleTypes != null ? List.copyOf(titleTypes) : Collections.emptyList();
   }
 
-  public List<String> getInvolvementRoles() {
-    return List.copyOf(involvementRoles);
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "filled at runtime")
+  public List<Predicate> getRelationPredicates() {
+    return relationPredicates;
   }
 
   public List<String> getManufacturingTypes() {
@@ -70,6 +71,11 @@ public class TypeDeclarations {
 
   public List<TitleType> getTitleTypes() {
     return List.copyOf(titleTypes);
+  }
+
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "filled at runtime")
+  public void setRelationPredicates(List<Predicate> relationPredicates) {
+    this.relationPredicates = relationPredicates;
   }
 
   private <T extends MainSubType> List<T> searchMainSubType(List<T> types, T pattern) {

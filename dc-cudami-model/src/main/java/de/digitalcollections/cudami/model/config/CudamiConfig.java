@@ -14,6 +14,9 @@ public class CudamiConfig {
   private int offsetForAlternativePaging = 0;
   private TypeDeclarations typeDeclarations;
 
+  @SuppressFBWarnings(
+      value = "EI_EXPOSE_REP2",
+      justification = "typeDeclarations are partially filled at runtime")
   @JsonCreator(mode = Mode.PROPERTIES)
   public CudamiConfig(
       @JsonProperty(value = "defaults") Defaults defaults,
@@ -38,6 +41,7 @@ public class CudamiConfig {
     return offsetForAlternativePaging;
   }
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "partially filled at runtime")
   public TypeDeclarations getTypeDeclarations() {
     return typeDeclarations;
   }
