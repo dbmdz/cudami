@@ -5,6 +5,9 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.text.LocalizedText;
+import java.util.Locale;
+import java.util.Set;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,9 +45,10 @@ class AgentRepositoryImplTest {
   @Test
   @DisplayName("can save (create) an agent")
   void testCreate() {
-    Agent agent = Agent.builder().label("Test").build();
+    Agent agent = Agent.builder().label("Test").addName(Locale.ENGLISH, "a name").build();
 
-    Agent actual = repo.save(agent);
+    Agent saved = repo.save(agent);
+    Agent actual = repo.getByUuid(saved.getUuid());
 
     assertThat(actual).isEqualTo(agent);
   }
@@ -52,10 +56,13 @@ class AgentRepositoryImplTest {
   @Test
   @DisplayName("can update an agent")
   void testUpdate() {
-    Agent agent = repo.save(Agent.builder().label("Test").build());
+    Agent agent = repo.save(Agent.builder().label("Test").addName("some name").build());
     agent.setLabel("changed test");
+    agent.setName(new LocalizedText(Locale.ENGLISH, "some english name"));
+    agent.setNameLocalesOfOriginalScripts(Set.of(Locale.ENGLISH));
 
-    Agent actual = repo.update(agent);
+    Agent saved = repo.update(agent);
+    Agent actual = repo.getByUuid(saved.getUuid());
 
     assertThat(actual).isEqualTo(agent);
   }

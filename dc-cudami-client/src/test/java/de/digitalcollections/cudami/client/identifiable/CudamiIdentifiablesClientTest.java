@@ -60,4 +60,25 @@ public class CudamiIdentifiablesClientTest
 
     assertThat(client.filterCriterionToUrlParam(fcDate)).isEqualTo(expDate);
   }
+
+  @Test
+  @DisplayName("params for name filtering are treated different")
+  public void testNameParams() {
+    var fcLabel =
+        FilterCriterion.builder().withExpression("name").contains("something special").build();
+    var expLabel = "name=something+special";
+
+    var fcLabelWithLanguage =
+        FilterCriterion.builder().withExpression("name.en").contains("something").build();
+    var expLabelWithLanguage = "name=something&nameLanguage=en";
+
+    var fcLabelEquals =
+        FilterCriterion.builder().withExpression("name").isEquals("something special").build();
+    var expLabelEquals = "name=%22something+special%22";
+
+    assertThat(client.filterCriterionToUrlParam(fcLabel)).isEqualTo(expLabel);
+    assertThat(client.filterCriterionToUrlParam(fcLabelWithLanguage))
+        .isEqualTo(expLabelWithLanguage);
+    assertThat(client.filterCriterionToUrlParam(fcLabelEquals)).isEqualTo(expLabelEquals);
+  }
 }
