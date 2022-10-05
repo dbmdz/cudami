@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -15,8 +16,11 @@ public class ConfigController {
 
   private CudamiConfig cudamiConfig;
 
-  public ConfigController(CudamiConfig cudamiConfig) {
+  private PredicateService predicateService;
+
+  public ConfigController(CudamiConfig cudamiConfig, PredicateService predicateService) {
     this.cudamiConfig = cudamiConfig;
+    this.predicateService = predicateService;
   }
 
   @Operation(summary = "Get cudami configuration")
@@ -24,6 +28,7 @@ public class ConfigController {
       value = {"/v6/config", "/v5/config"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CudamiConfig getCudamiConfig() {
+    cudamiConfig.getTypeDeclarations().setRelationPredicates(predicateService.getAll());
     return cudamiConfig;
   }
 }

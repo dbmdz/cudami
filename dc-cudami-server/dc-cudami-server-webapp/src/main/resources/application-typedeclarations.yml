@@ -1,19 +1,5 @@
 cudami:
   typeDeclarations:
-    involvementRoles:
-      - ILLUSTRATOR
-      - AUTHOR
-      - COMPOSER
-      - CREATOR_UNSPECIFIED
-      - CONTRIB_PERFORMANCE
-      - CONTRIB_PRODUCTION
-      - CONTRIB_TEXT
-      - CONTRIB_VISUALARTS
-      - EDITOR
-      - RELATION_TO_OBJECT
-      - TRANSLATOR
-      - VISUALARTIST
-      - OTHER
 
     manufacturingTypes:
       - PRINT
