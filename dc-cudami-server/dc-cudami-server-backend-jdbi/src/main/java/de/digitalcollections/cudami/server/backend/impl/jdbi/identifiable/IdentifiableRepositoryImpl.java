@@ -651,7 +651,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       switch (fc.getOperation()) {
         case CONTAINS:
           if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
-            throw new IllegalArgumentException("Filtering by label or name are exclusively!");
+            throw new IllegalArgumentException(
+                "Filtering by label and by name are mutually exclusive!");
           }
           argumentMappings.put(
               SearchTermTemplates.ARRAY_CONTAINS.placeholder,
@@ -660,7 +661,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
               tableAlias, "split_" + labelOrName.group(1));
         case EQUALS:
           if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
-            throw new IllegalArgumentException("Filtering by label or name are exclusively!");
+            throw new IllegalArgumentException(
+                "Filtering by label and by name are mutually exclusive!");
           }
           Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
           String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
