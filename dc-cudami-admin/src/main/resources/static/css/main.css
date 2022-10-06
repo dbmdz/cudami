@@ -28,6 +28,17 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
+.bootstrap-table {
+  background-color: #FFF;
+}
+
+.rows-striped .row:nth-of-type(odd) {
+  background-color: #FCFCFC;
+}
+/*.rows-striped .row:nth-of-type(even) {
+  background: #FFFFFF;
+}*/
+
 .welcome {
   -ms-flex-align: center;
   align-items: center;

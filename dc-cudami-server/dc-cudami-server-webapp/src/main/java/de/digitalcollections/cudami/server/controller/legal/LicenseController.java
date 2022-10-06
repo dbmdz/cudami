@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.legal;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -69,8 +70,8 @@ public class LicenseController {
   @Operation(summary = "Delete a license by uuid")
   @DeleteMapping(
       value = {
-        "/v6/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUuid(
@@ -150,8 +151,8 @@ public class LicenseController {
   @Operation(summary = "Get a license by uuid")
   @GetMapping(
       value = {
-        "/v6/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/licenses/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License getByUuid(@PathVariable UUID uuid) {
@@ -163,7 +164,7 @@ public class LicenseController {
       value = {"/v6/licenses/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return this.service.getLanguages();
+    return service.getLanguages();
   }
 
   @InitBinder

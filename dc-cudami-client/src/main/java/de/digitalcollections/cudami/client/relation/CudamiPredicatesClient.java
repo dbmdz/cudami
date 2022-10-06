@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 
 public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
 
@@ -15,25 +16,30 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
     super(http, serverUrl, Predicate.class, mapper, API_VERSION_PREFIX + "/predicates");
   }
 
+  @Override
   public List<Predicate> getAll() throws TechnicalException {
     return doGetRequestForObjectList(baseEndpoint, Predicate.class);
+  }
+
+  public Predicate getByValue(String value) throws TechnicalException {
+    return doGetRequestForObject(
+            String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
+  }
+
+  public List<Locale> getLanguages() throws TechnicalException {
+    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
   public Predicate update(Predicate predicate) throws TechnicalException {
     if (predicate.getUuid() == null) {
       // Old consumers don't set the UUID, we must provide the value in the request path
       return doPutRequestForObject(
-          String.format(
-              "%s/%s",
-              baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
-          predicate);
+              String.format(
+                      "%s/%s",
+                      baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
+              predicate);
     }
 
     return super.update(predicate.getUuid(), predicate);
-  }
-
-  public Predicate getByValue(String value) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
   }
 }

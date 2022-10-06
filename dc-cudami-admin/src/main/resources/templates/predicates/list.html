@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="#{relation_types}">Relation types</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+
+            <table data-toggle="table"
+                   th:data-url="@{/api/predicates}"
+                   data-pagination="true"
+                   data-search="true"
+                   data-side-pagination="server">
+              <thead>
+                <tr>
+                  <th data-field="uuid">Item ID</th>
+                  <th data-field="value" th:text="#{predicate_value}">Value</th>
+                  <th data-field="created">Item Price</th>
+                  <th data-field="lastModified">Item Price</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

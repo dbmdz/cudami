@@ -32,7 +32,7 @@ public class PredicateController {
   @GetMapping(value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"})
   public List<Predicate> getAll() {
     return predicateService.getAll();
-  }
+    }
 
   @Operation(summary = "Get a predicate by its value")
   @GetMapping(
