@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+  <th:block th:fragment="confirmYesNoDialog">
+    <div class="modal fade" id="confirmYesNoDialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Please confirm</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Do you really want to delete this item?</p>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn_no}">No</button>
+            <a class="btn btn-danger" id="confirm" th:text="#{btn_yes}">Yes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Dialog show event handler -->
+    <script type="text/javascript">
+      $('#confirmYesNoDialog').on('show.bs.modal', function (e) {
+        $title = $(e.relatedTarget).data('title');
+        $(this).find('.modal-title').text($title);
+        
+        $message = $(e.relatedTarget).data('message');
+        $(this).find('.modal-body p').text($message);
+
+        // Pass form reference to modal for submission on yes/ok
+        var href = $(e.relatedTarget).data('href');
+        if (href == undefined) {
+          return;
+        }
+        $(this).find('.modal-footer #confirm').attr('href', href);
+      });
+    </script>
+  </th:block>
+</body>
+</html>

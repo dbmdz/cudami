@@ -14,7 +14,8 @@
         <div class="row">
           <div class="col-12">
 
-            <table data-toggle="table"
+            <table id="table-pred"
+                   data-toggle="table"
                    th:data-url="@{/api/predicates}"
                    data-pagination="true"
                    data-search="true"
@@ -24,18 +25,55 @@
                    data-sort-order="asc">
               <thead>
                 <tr>
-                  <th data-field="uuid" th:text="#{lbl.uuid}">Item ID</th>
+                  <th data-field="uuid" th:text="#{lbl.uuid}">ID</th>
                   <th data-field="value" data-sortable="true" th:text="#{lbl.value}">Value</th>
-                  <th data-field="created" th:text="#{lbl.created}">Item Price</th>
-                  <th data-field="lastModified" th:text="#{lbl.last_modified}">Item Price</th>
+                  <th data-field="created" th:text="#{lbl.created}">created</th>
+                  <th data-field="lastModified" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="actions" data-formatter="renderActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
-
           </div>
         </div>
       </div>
     </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
+
+    <script th:inline="javascript">
+      var $table = $('#table-pred');
+      var baseUrl = /*[[@{'/predicates'}]]*/ '';
+
+      function renderActions(value, row) {
+      var $itemType = /*[[#{predicate}]]*/ '';
+      var $itemId = [row.value];
+        return [
+          '<a href="' + baseUrl + '/' + [row.uuid] + '" title="View"><i class="fa fa-eye"></i></a>',
+          '<a href="' + baseUrl + '/' + [row.uuid] + '/edit" title="Edit"><i class="fa fa-edit"></i></a>',
+                  /*[+
+                   '<a class="remove" title=[[#{tooltip.delete}]]' +
+                   'data-href="' + baseUrl + '/' + [row.uuid] + '/delete"' +
+                   'data-message=[[#{modal.msg.confirm_delete}]]' +
+                   'data-title=[[#{modal.title.warning}]]' +
+                   'data-target="#confirmYesNoDialog"' +
+                   'data-toggle="modal"' +
+                   '><i class="fa fa-trash"></i></a>'
+                   +]*/
+        ].join(' ');
+      }
+
+      window.actionEvents = {
+        'click .remove': function (row) {
+          alert('You clicked view action, row: ' + JSON.stringify(row));
+          $table.bootstrapTable('remove', {
+            field: 'id',
+            values: [row.id]
+          })
+        }
+      }
+    </script>
   </th:block>
 </body>
 </html>
