@@ -3,12 +3,14 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.relation;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -163,6 +165,16 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
             + " AS "
             + tableAlias;
     return dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
+  }
+
+  @Override
+  protected List<String> getSearchTermTemplates(String tblAlias, String originalSearchTerm) {
+    if (originalSearchTerm == null) {
+      return Collections.EMPTY_LIST;
+    }
+    List<String> searchTermTemplates = super.getSearchTermTemplates(tblAlias, originalSearchTerm);
+    searchTermTemplates.add(SearchTermTemplates.ILIKE_SEARCH.renderTemplate(tblAlias, "value"));
+    return searchTermTemplates;
   }
 
   @Override
