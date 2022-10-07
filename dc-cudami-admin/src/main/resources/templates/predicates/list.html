@@ -18,11 +18,14 @@
                    th:data-url="@{/api/predicates}"
                    data-pagination="true"
                    data-search="true"
-                   data-side-pagination="server">
+                   data-server-sort="true"
+                   data-side-pagination="server"
+                   data-sort-name="value"
+                   data-sort-order="asc">
               <thead>
                 <tr>
                   <th data-field="uuid" th:text="#{lbl.uuid}">Item ID</th>
-                  <th data-field="value" th:text="#{lbl.value}">Value</th>
+                  <th data-field="value" data-sortable="true" th:text="#{lbl.value}">Value</th>
                   <th data-field="created" th:text="#{lbl.created}">Item Price</th>
                   <th data-field="lastModified" th:text="#{lbl.last_modified}">Item Price</th>
                 </tr>

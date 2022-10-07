@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
+import static de.digitalcollections.model.list.sorting.Order.builder;
+
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -9,6 +11,7 @@ import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.relation.Predicate;
@@ -100,22 +103,26 @@ public class PredicatesController {
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "sort", required = false) String sort,
+      @RequestParam(name = "order", required = false) String order,
       HttpServletRequest request)
       throws TechnicalException {
     Map<String, String[]> parameterMap = request.getParameterMap();
-    LOGGER.info("parameters: " + parameterMap);
+
+    Sorting sorting = null;
+    if (sort != null && order != null) {
+      Order sortingOrder = builder().property(sort).direction(Direction.fromString(order)).build();
+      sorting = Sorting.builder().order(sortingOrder).build();
+    }
 
     PageRequest pageRequest =
         PageRequest.builder()
             .pageNumber((int) Math.ceil(offset / limit))
             .pageSize(limit)
             .searchTerm(searchTerm)
+            .sorting(sorting)
             .build();
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+
     PageResponse<Predicate> pageResponse = service.find(pageRequest);
     return new BTResponse<>(pageResponse);
   }
