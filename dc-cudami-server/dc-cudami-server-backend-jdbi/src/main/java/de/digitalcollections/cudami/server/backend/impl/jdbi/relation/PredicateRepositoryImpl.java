@@ -222,9 +222,10 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
 
   @Override
   public Predicate save(Predicate predicate) {
+    LocalDateTime now = LocalDateTime.now();
     predicate.setUuid(UUID.randomUUID());
-    predicate.setCreated(predicate.getLastModified());
-    predicate.setLastModified(LocalDateTime.now());
+    predicate.setCreated(now);
+    predicate.setLastModified(now);
 
     String createQuery =
         "INSERT INTO "
