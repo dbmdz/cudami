@@ -28,7 +28,7 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
-.bootstrap-table {
+.bootstrap-table table.table{
   background-color: #FFF;
 }
 
