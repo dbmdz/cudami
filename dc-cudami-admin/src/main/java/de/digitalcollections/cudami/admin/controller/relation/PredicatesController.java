@@ -103,8 +103,8 @@ public class PredicatesController {
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false) String sort,
-      @RequestParam(name = "order", required = false) String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       HttpServletRequest request)
       throws TechnicalException {
     Map<String, String[]> parameterMap = request.getParameterMap();
