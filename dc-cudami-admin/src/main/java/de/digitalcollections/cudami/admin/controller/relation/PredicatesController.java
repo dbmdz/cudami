@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedText;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -92,18 +93,18 @@ public class PredicatesController {
     return "predicates/edit";
   }
 
+  @SuppressFBWarnings
   @GetMapping("/api/predicates")
   @ResponseBody
   public BTResponse<Predicate> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       HttpServletRequest request)
       throws TechnicalException {
     Map<String, String[]> parameterMap = request.getParameterMap();
+    LOGGER.info("parameters: " + parameterMap);
     PageRequest pageRequest = new PageRequest(searchTerm, (int) Math.ceil(offset / limit), limit);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
