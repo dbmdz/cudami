@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.digitalcollections.model.MainSubType;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
-import de.digitalcollections.model.relation.Predicate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +17,7 @@ public class TypeDeclarations {
   private List<String> manufacturingTypes;
   private List<String> mediaTypes;
 
-  private List<Predicate> relationPredicates;
+  private List<String> relationPredicates;
   private List<String> subjectTypes;
   private List<String> tagTypes;
 
@@ -45,7 +44,7 @@ public class TypeDeclarations {
   }
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "filled at runtime")
-  public List<Predicate> getRelationPredicates() {
+  public List<String> getRelationPredicates() {
     return relationPredicates;
   }
 
@@ -74,7 +73,7 @@ public class TypeDeclarations {
   }
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "filled at runtime")
-  public void setRelationPredicates(List<Predicate> relationPredicates) {
+  public void setRelationPredicates(List<String> relationPredicates) {
     this.relationPredicates = relationPredicates;
   }
 
