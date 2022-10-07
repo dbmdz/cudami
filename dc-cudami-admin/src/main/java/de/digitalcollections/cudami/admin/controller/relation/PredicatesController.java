@@ -105,7 +105,13 @@ public class PredicatesController {
       throws TechnicalException {
     Map<String, String[]> parameterMap = request.getParameterMap();
     LOGGER.info("parameters: " + parameterMap);
-    PageRequest pageRequest = new PageRequest(searchTerm, (int) Math.ceil(offset / limit), limit);
+
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber((int) Math.ceil(offset / limit))
+            .pageSize(limit)
+            .searchTerm(searchTerm)
+            .build();
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
