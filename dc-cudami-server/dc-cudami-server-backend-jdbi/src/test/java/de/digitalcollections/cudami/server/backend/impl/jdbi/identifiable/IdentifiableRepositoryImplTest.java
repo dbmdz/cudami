@@ -101,7 +101,7 @@ class IdentifiableRepositoryImplTest {
 
     actual = repo.getCommonSearchSql("test", "search term");
     expected =
-        "(test.split_label @> :searchTermArray::TEXT[] OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
+        "(test.split_label::TEXT[] @> :searchTermArray::TEXT[] OR jsonb_path_exists(test.description, ('$.** ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath))";
     assertThat(actual).isEqualTo(expected);
   }
 
