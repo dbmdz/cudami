@@ -16,7 +16,7 @@ public enum SearchTermTemplates {
   JSONB_PATH(
       "jsonb_path_exists(%s.%s, ('$.%s ? (@ like_regex \"' || :searchTerm || '\" flag \"iq\")')::jsonpath)",
       "searchTerm"),
-  ARRAY_CONTAINS("%s.%s @> :searchTermArray::TEXT[]", "searchTermArray");
+  ARRAY_CONTAINS("%s.%s::TEXT[] @> :searchTermArray::TEXT[]", "searchTermArray");
 
   private final String template;
   public final String placeholder;
