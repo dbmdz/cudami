@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -33,6 +34,11 @@ public class EntityRelationServiceImpl implements EntityRelationService {
   }
 
   @Override
+  public void deleteByObject(UUID objectEntityUuid) {
+    repository.deleteByObject(objectEntityUuid);
+  }
+
+  @Override
   public PageResponse<EntityRelation> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
   }
@@ -43,7 +49,16 @@ public class EntityRelationServiceImpl implements EntityRelationService {
   }
 
   @Override
-  public List<EntityRelation> save(List<EntityRelation> entityRelations) {
-    return repository.save(entityRelations);
+  public List<EntityRelation> save(List<EntityRelation> entityRelations)
+      throws CudamiServiceException {
+    // We assume, that all referenced predicates, the "normal" and the additional ones
+    // are already available in the service. If not, the repository would throw
+    // a ForeignKey exception
+    try {
+      return repository.save(entityRelations);
+    } catch (Exception e) {
+      throw new CudamiServiceException(
+          "Cannot persist EntityRelations " + entityRelations + ": " + e, e);
+    }
   }
 }

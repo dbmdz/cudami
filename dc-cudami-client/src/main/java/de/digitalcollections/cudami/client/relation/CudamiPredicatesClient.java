@@ -1,9 +1,7 @@
 package de.digitalcollections.cudami.client.relation;
 
-import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.client.BaseRestClient;
+import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.relation.Predicate;
 import java.net.URLEncoder;
@@ -11,7 +9,7 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-public class CudamiPredicatesClient extends BaseRestClient<Predicate> {
+public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
 
   public CudamiPredicatesClient(HttpClient http, String serverUrl, ObjectMapper mapper) {
     super(http, serverUrl, Predicate.class, mapper, API_VERSION_PREFIX + "/predicates");
@@ -26,5 +24,10 @@ public class CudamiPredicatesClient extends BaseRestClient<Predicate> {
         String.format(
             "%s/%s", baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
         predicate);
+  }
+
+  public Predicate getByValue(String value) throws TechnicalException {
+    return doGetRequestForObject(
+        String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
   }
 }
