@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -15,6 +16,12 @@ public interface EntityRelationRepository {
   }
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+
+  default void deleteByObject(Entity objectEntity) {
+    deleteByObject(objectEntity.getUuid());
+  }
+
+  void deleteByObject(UUID objectEntityUuid);
 
   default void deleteBySubject(Entity subjectEntity) {
     deleteBySubject(subjectEntity.getUuid());
@@ -47,6 +54,7 @@ public interface EntityRelationRepository {
    *
    * @param entityRelations list of entity-predicate-entity relations to be persisted
    * @return list of persisted EntityRelations
+   * @throws RepositoryException in case of an error, e.g. a referenced predicate does not yet exist
    */
-  List<EntityRelation> save(List<EntityRelation> entityRelations);
+  List<EntityRelation> save(List<EntityRelation> entityRelations) throws RepositoryException;
 }

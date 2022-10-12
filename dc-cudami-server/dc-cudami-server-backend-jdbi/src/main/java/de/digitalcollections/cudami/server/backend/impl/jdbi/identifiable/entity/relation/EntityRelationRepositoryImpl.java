@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+// TODO: Neues Feld additional_predicates: UUID[] einführen und befüllen.
+
 @Repository
 public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     implements EntityRelationRepository {
@@ -43,6 +45,15 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   @Override
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
     save(subjectEntityUuid, predicate, objectEntityUuid);
+  }
+
+  @Override
+  public void deleteByObject(UUID objectEntityUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate("DELETE FROM " + tableName + " WHERE object = :uuid")
+                .bind("uuid", objectEntityUuid)
+                .execute());
   }
 
   @Override
