@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,6 +29,15 @@ public class PredicateController {
   @GetMapping(value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"})
   public List<Predicate> getAll() {
     return predicateService.getAll();
+  }
+
+  @Operation(summary = "Get a predicate by its value")
+  @GetMapping(
+      value = {"/v6/predicates"},
+      params = "url",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Predicate getByValue(@RequestParam(name = "value", required = true) String value) {
+    return predicateService.getByValue(value);
   }
 
   @Operation(summary = "create or update a predicate, identified by its value")
