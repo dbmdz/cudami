@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -22,6 +23,12 @@ public interface EntityRelationService {
 
   void deleteBySubject(UUID subjectEntityUuid);
 
+  default void deleteByObject(Entity objectEntity) {
+    deleteByObject(objectEntity.getUuid());
+  }
+
+  void deleteByObject(UUID objectEntityUuid);
+
   /**
    * Get paged, sorted, filtered relations
    *
@@ -42,5 +49,5 @@ public interface EntityRelationService {
    * @param entityRelations a list of entity relations to persist
    * @return the persisted list of entity relations
    */
-  List<EntityRelation> save(List<EntityRelation> entityRelations);
+  List<EntityRelation> save(List<EntityRelation> entityRelations) throws CudamiServiceException;
 }
