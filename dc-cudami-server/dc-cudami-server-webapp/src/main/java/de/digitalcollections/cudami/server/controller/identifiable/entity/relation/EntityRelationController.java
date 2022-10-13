@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -68,7 +69,8 @@ public class EntityRelationController {
    */
   List<EntityRelation> saveEntityRelationsForSubject(
       @PathVariable("subjectuuid") UUID subjectUuid,
-      @RequestBody List<EntityRelation> entityRelations) {
+      @RequestBody List<EntityRelation> entityRelations)
+      throws CudamiServiceException {
     if (!subjectUuid.equals(entityRelations.get(0).getSubject().getUuid())) {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
@@ -85,7 +87,8 @@ public class EntityRelationController {
         "/latest/entities/relations"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations) {
+  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
+      throws CudamiServiceException {
     return entityRelationService.save(entityRelations);
   }
 }
