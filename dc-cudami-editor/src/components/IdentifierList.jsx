@@ -20,6 +20,8 @@ const IdentifierList = ({identifiers = [], identifierTypes = []}) =>
         )
       })}
     </List>
-  ) : null
+  ) : (
+    '---'
+  )
 
 export default IdentifierList
