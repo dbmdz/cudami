@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,10 +32,9 @@ public class PredicateController {
 
   @Operation(summary = "Get a predicate by its value")
   @GetMapping(
-      value = {"/v6/predicates"},
-      params = "url",
+      value = {"/v6/predicates/{value}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate getByValue(@RequestParam(name = "value", required = true) String value) {
+  public Predicate getByValue(@PathVariable("value") String value) {
     return predicateService.getByValue(value);
   }
 
