@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -94,6 +95,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
     assertThat(actual.getTargetLanguage()).isEqualTo(Locale.GERMAN);
   }
 
+  @Disabled(value = "default alias is now created, so implement a different test")
   @DisplayName("does not create a default UrlAliases for a webpage")
   @Test
   public void noDefaultUrlAliasCreationForWebpage() throws CudamiServiceException {

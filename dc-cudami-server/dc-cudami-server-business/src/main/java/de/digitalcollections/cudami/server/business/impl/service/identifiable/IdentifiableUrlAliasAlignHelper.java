@@ -195,24 +195,27 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       actualIdentifiable.setLocalizedUrlAliases(urlAliases);
     }
     for (Locale lang : actualIdentifiable.getLabel().getLocales()) {
-      // not for webpages
-      if (!(actualIdentifiable instanceof Webpage)
-          && (!urlAliases.containsKey(lang)
-              || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null))) {
-        // there is not any default alias (w/o website); create one.
-        UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
-        defaultAlias.setTargetLanguage(lang);
-        defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
-        defaultAlias.setTargetIdentifiableObjectType(
-            actualIdentifiable.getIdentifiableObjectType());
-        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
-        try {
-          defaultAlias.setSlug(
-              slugGeneratorService.apply(lang, actualIdentifiable.getLabel().getText(lang), null));
-        } catch (CudamiServiceException e) {
-          throw new CudamiServiceException("An error occured during slug generation.", e);
+      if (actualIdentifiable instanceof Webpage) {
+        // there has to be one alias for each locale/language of label (= "default alias")
+        if (!urlAliases.containsKey(lang)) {
+          // create a default alias in the missing language
+          UrlAlias defaultAlias = createUrlAlias(lang);
+          defaultAlias.setPrimary(true); // it is the only one, so it is primary
+
+          Website website = null;
+          // TODO set website for webpage if not set (using its parent webpage)
+          // TODO a webpage without parent and without website is not allowed
+          // webpageservice.getwebsite and set in urlalias
+          defaultAlias.setWebsite(website);
+
+          urlAliases.add(defaultAlias);
         }
+      } else if (!urlAliases.containsKey(lang)
+          || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null)) {
+        // there has to be one alias without a related website for each locale/language of label (=
+        // "default alias")
+        UrlAlias defaultAlias = createUrlAlias(lang);
+        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
         urlAliases.add(defaultAlias);
       }
 
@@ -221,10 +224,25 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
           || !urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
         throw new CudamiServiceException(
             String.format(
-                "There is not any primary alias for language '%s' of identifiable '%s'.",
+                "Missing primary alias for language '%s' for identifiable '%s'.",
                 lang, actualIdentifiable.getUuid()));
       }
     }
+  }
+
+  private UrlAlias createUrlAlias(Locale lang) throws CudamiServiceException {
+    UrlAlias defaultAlias = new UrlAlias();
+    defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+    defaultAlias.setTargetLanguage(lang);
+    defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
+    defaultAlias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
+    try {
+      defaultAlias.setSlug(
+          slugGeneratorService.apply(lang, actualIdentifiable.getLabel().getText(lang), null));
+    } catch (CudamiServiceException e) {
+      throw new CudamiServiceException("An error occured during slug generation.", e);
+    }
+    return defaultAlias;
   }
 
   private void fixMissingLocalizedUrlAliases() {
@@ -299,6 +317,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   // We do not want to have any services in this class but we need the slug generator.
   // It can easyly be passed into a parameter of this functional interface type.
   public interface SlugGeneratorService {
+
     String apply(Locale locale, String label, UUID website) throws CudamiServiceException;
   }
 }
