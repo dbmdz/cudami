@@ -32,6 +32,8 @@
       <div class="container-fluid">
         <th:block th:insert="fragments/identifiable::renderIdentifiers(${digitalObject}, true)"></th:block>
 
+        <th:block th:insert="fragments/uniqueobject::renderDates(${digitalObject})"></th:block>
+
         <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${digitalObject}, ${existingLanguages}, false)"></th:block>

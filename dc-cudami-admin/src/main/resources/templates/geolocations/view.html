@@ -24,6 +24,8 @@
       <div class="container-fluid">
         <th:block th:insert="fragments/identifiable::renderIdentifiers(${geoLocation}, true)"></th:block>
 
+        <th:block th:insert="fragments/uniqueobject::renderDates(${geoLocation})"></th:block>
+
         <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${geoLocation}, ${existingLanguages}, false)"></th:block>

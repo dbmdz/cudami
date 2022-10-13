@@ -55,11 +55,22 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-12">
-            <div class="rows-striped">
+            <div class="mb-3 rows-striped">
               <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">UUID</label></div>
+                <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">UUID</label></div>
                 <div class="col-md-9"><span th:text="*{uuid}">23</span></div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <th:block th:insert="fragments/uniqueobject::renderDates(${user})"></th:block>
+
+        <hr/>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="rows-striped">
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{username}">Username / Email</label></div>
                 <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
