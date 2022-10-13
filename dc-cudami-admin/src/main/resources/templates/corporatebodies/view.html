@@ -40,10 +40,6 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{identifiers}">...</label></div>
                 <div class="col-md-9" id="identifiers-list"></div>
               </div>
-              <div class="row" th:if="*{homepageUrl}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{homepage}">Homepage</label></div>
-                <div class="col-md-9"><a th:href="*{homepageUrl}" th:text="*{homepageUrl}" target="_blank">http://www.example.de/</a></div>
-              </div>
             </div>
           </div>
         </div>
@@ -51,6 +47,17 @@
         <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${corporateBody}, ${existingLanguages}, true)"></th:block>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="rows-striped">
+              <div class="row" th:if="*{homepageUrl}">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{homepage}">Homepage</label></div>
+                <div class="col-md-9"><a th:href="*{homepageUrl}" th:text="*{homepageUrl}" target="_blank">http://www.example.de/</a></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

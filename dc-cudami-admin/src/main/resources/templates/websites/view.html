@@ -34,10 +34,6 @@
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
                 <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
               </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{url}">URL</label></div>
-                <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
-              </div>
             </div>
           </div>
         </div>
@@ -45,6 +41,17 @@
         <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${website}, ${existingLanguages}, false)"></th:block>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="rows-striped">
+              <div class="row">
+                <div class="col-md-3"><label class="font-weight-bold" th:text="#{url}">URL</label></div>
+                <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
+              </div>
+            </div>
           </div>
         </div>
 
