@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="renderDates(uniqueObject)">
+    <section class="mb-3 rows-striped">
+      <div class="row">
+        <div class="col-md-3 mb-1"><label class="font-weight-bold mb-0" th:text="#{created}">created</label></div>
+        <div class="col-md-3 mb-1">
+          <span th:with="df=#{dateTime.format},dateTime=${uniqueObject.created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+        </div>
+        <div class="col-md-3 mb-1"><label class="font-weight-bold mb-0" th:text="#{last_modified}">last modified</label></div>
+        <div class="col-md-3 mb-1">
+          <span th:with="df=#{dateTime.format},dateTime=${uniqueObject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+        </div>
+      </div>
+    </section>
+  </th:block>
+
+  </body>
+</html>

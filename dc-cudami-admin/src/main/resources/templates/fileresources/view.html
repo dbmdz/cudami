@@ -29,6 +29,8 @@
       <div class="container-fluid">
         <th:block th:insert="fragments/identifiable::renderIdentifiers(${fileresource}, false)"></th:block>
 
+        <th:block th:insert="fragments/uniqueobject::renderDates(${fileresource})"></th:block>
+
         <div class="row">
           <div class="col-sm-12">
             <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${fileresource}, ${existingLanguages}, false)"></th:block>
@@ -57,18 +59,6 @@
               <div class="row">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{uri}">URI</label></div>
                 <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{created}">created</label></div>
-                <div class="col-md-9">
-                  <span th:with="df=#{dateTime.format},dateTime=*{created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{last_modified}">last modified</label></div>
-                <div class="col-md-9">
-                  <span th:with="df=#{dateTime.format},dateTime=*{lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
-                </div>
               </div>
             </div>
           </div>
