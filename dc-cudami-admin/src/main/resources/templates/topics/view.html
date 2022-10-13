@@ -40,16 +40,7 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{id}">ID</label></div>
-                <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <th:block th:insert="fragments/identifiable::renderIdentifiers(${topic}, true)"></th:block>
 
         <div class="row">
           <div class="col-sm-12">
@@ -84,7 +75,13 @@
       moveEditButtonToNavbar()
     </script>
     <script th:src="@{/js/identifiable-list.bundle.js}"></script>
+    <script th:src="@{/js/identifier-list.bundle.js}"></script>
     <script th:inline="javascript">
+      IdentifierList({
+        apiContextPath: /*[[@{/}]]*/ '',
+        id: "identifiers-list",
+        identifiers: /*[[${topic.identifiers}]]*/ []
+      });
       IdentifiableList({
         apiContextPath: /*[[@{/}]]*/ '',
         existingLanguages: /*[[${existingSubtopicLanguages}]]*/ [],
