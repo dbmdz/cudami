@@ -1,4 +1,4 @@
-import filesize from 'filesize'
+import {filesize} from 'filesize'
 import {useContext} from 'react'
 import {useTranslation} from 'react-i18next'
 import {FaHashtag, FaImage} from 'react-icons/fa'
