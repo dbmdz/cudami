@@ -80,7 +80,7 @@
                    with font-awesome or any other icon font library -->
               <th:block sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
                 <li class="nav-item"
-                    th:classappend="${menu?.matches('(identifiertypes|licenses|renderingtemplates|users)')} ? menu-open"
+                    th:classappend="${menu?.matches('(identifiertypes|licenses|predicates|renderingtemplates|users)')} ? menu-open"
                 >
                   <a href="#" class="nav-link">
                     <p>
