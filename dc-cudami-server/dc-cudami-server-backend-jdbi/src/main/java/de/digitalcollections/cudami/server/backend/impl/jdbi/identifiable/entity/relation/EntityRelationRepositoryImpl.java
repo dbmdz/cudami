@@ -51,7 +51,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public void deleteByObject(UUID objectEntityUuid) {
     dbi.withHandle(
         h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE object = :uuid")
+            h.createUpdate("DELETE FROM " + tableName + " WHERE object_uuid = :uuid")
                 .bind("uuid", objectEntityUuid)
                 .execute());
   }
