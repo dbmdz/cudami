@@ -10,7 +10,7 @@
 
     <link rel="shortcut icon" th:href="@{/images/favicon.png}">
 
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-table/dist/bootstrap-table.min.css}"></script>
     
     <link rel="stylesheet" th:href="@{/webjars/AdminLTE/plugins/fontawesome-free/css/all.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/AdminLTE/dist/css/adminlte.min.css}">
@@ -376,7 +376,8 @@
         appendQueryParameters()
       })
     </script>
-    <script src="https://unpkg.com/bootstrap-table@1.21.1/dist/bootstrap-table.min.js"></script>
+    
+    <script th:src="@{/webjars/bootstrap-table/dist/bootstrap-table.min.js}"></script>
     
     <th:block layout:fragment="beforeBodyEnds"></th:block>
   </body>
