@@ -6,8 +6,8 @@ import de.digitalcollections.model.relation.Predicate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.http.MediaType;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,17 +41,40 @@ public class PredicateController {
   @Operation(summary = "create or update a predicate, identified by its value")
   @PutMapping(
       value = {
-        "/v6/predicates/{value}",
+        "/v6/predicates/{value:(?! [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12} )}",
         "/v5/predicates/{value}",
         "/v3/predicates/{value}",
         "/latest/predicates/{value}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate update(
-      @PathVariable("value") String value, @RequestBody Predicate predicate, BindingResult errors)
+  public Predicate updateByValue(
+      @PathVariable("value") String value, @RequestBody Predicate predicate)
       throws PredicatesServiceException {
     if (value == null || predicate == null || !value.equals(predicate.getValue())) {
-      throw new IllegalArgumentException("value of path does not match value of predicate");
+      throw new IllegalArgumentException(
+          "value of path="
+              + value
+              + " does not match value of predicate="
+              + (predicate != null ? predicate.getValue() : "null"));
+    }
+
+    return predicateService.save(predicate);
+  }
+
+  @Operation(summary = "create or update a predicate, identified by its uuid")
+  @PutMapping(
+      value = {
+        "/v6/predicates/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Predicate updateByUuid(@PathVariable("uuid") UUID uuid, @RequestBody Predicate predicate)
+      throws PredicatesServiceException {
+    if (uuid == null || predicate == null || !uuid.equals(predicate.getUuid())) {
+      throw new IllegalArgumentException(
+          "uuid of path="
+              + uuid
+              + " does not match uuid of predicate="
+              + (predicate != null ? predicate.getUuid() : "null"));
     }
 
     return predicateService.save(predicate);
