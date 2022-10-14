@@ -27,8 +27,8 @@
                 <tr>
                   <th data-field="uuid" th:text="#{lbl.uuid}">ID</th>
                   <th data-field="value" data-sortable="true" th:text="#{lbl.value}">Value</th>
-                  <th data-field="created" th:text="#{lbl.created}">created</th>
-                  <th data-field="lastModified" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" th:text="#{lbl.created}">created</th>
+                  <th data-field="lastModified" data-sortable="true" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="actions" data-formatter="renderActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -42,28 +42,20 @@
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
 
+    <div th:replace="fragments/identifiable :: actions"></div>
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       function renderActions(value, row) {
         /*[+
-        const baseUrl = [[@{'/predicates'}]];
+        const baseUrl = [[@{'/predicates'}]] + '/' + [row.uuid];
         const itemType = [[#{lbl.predicate.inline}]];
         const itemId = [row.value];
-        const modalDeleteMessage = `[(#{modal.msg.confirm_delete})]`;
-        const modalDeleteTitle = [[#{modal.title.warning}]];
-        const tooltipDelete = [[#{tooltip.delete}]];
         +]*/
       
         return [
-          '<a href="' + baseUrl + '/' + [row.uuid] + '" title="View"><i class="fa fa-eye"></i></a>',
-          '<a href="' + baseUrl + '/' + [row.uuid] + '/edit" title="Edit"><i class="fa fa-edit"></i></a>',
-          '<a class="remove" title="' + tooltipDelete + '"' +
-                  'data-href="' + baseUrl + '/' + [row.uuid] + '/delete"' +
-                  'data-message="' + modalDeleteMessage + '"' +
-                  'data-title="' + modalDeleteTitle + '"' +
-                  'data-target="#confirmYesNoDialog"' +
-                  'data-toggle="modal"' +
-                  '><i class="fa fa-trash"></i></a>'
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl),
+          renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
       }
       /*]]>*/

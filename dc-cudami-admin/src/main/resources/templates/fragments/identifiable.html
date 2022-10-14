@@ -81,6 +81,38 @@
     </div>
 
   </th:block>
-
+  
+  <th:block th:fragment="actions">
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function renderDeleteAction(baseUrl, itemType, itemId) {
+        /*[+
+        const modalDeleteMessage = `[(#{modal.msg.confirm_delete})]`;
+        const modalDeleteTitle = [[#{modal.title.warning}]];
+        const tooltipDelete = [[#{tooltip.delete}]];
+        +]*/
+        return '<a class="remove" title="' + tooltipDelete + '"' +
+                  'data-href="' + baseUrl + '/delete"' +
+                  'data-message="' + modalDeleteMessage + '"' +
+                  'data-title="' + modalDeleteTitle + '"' +
+                  'data-target="#confirmYesNoDialog"' +
+                  'data-toggle="modal"' +
+                  '><i class="fa fa-trash"></i></a>';
+      }
+      function renderEditAction(baseUrl) {
+        /*[+
+        const tooltipEdit = [[#{tooltip.edit}]];
+        +]*/
+        return '<a href="' + baseUrl + '/edit" title="' + tooltipEdit + '"><i class="fa fa-edit"></i></a>';
+      }
+      function renderViewAction(baseUrl) {
+        /*[+
+        const tooltipView = [[#{tooltip.view}]];
+        +]*/
+        return '<a href="' + baseUrl + '" title="' + tooltipView + '"><i class="fa fa-eye"></i></a>';
+      }
+      /*]]>*/
+    </script>
+  </th:block>
   </body>
 </html>
