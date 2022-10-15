@@ -77,4 +77,11 @@ public class ArticlesController extends AbstractController {
   protected String module() {
     return "articles";
   }
+
+  @GetMapping("/articles/{uuid}")
+  public String view(@PathVariable UUID uuid, Model model) throws TechnicalException {
+    Article article = service.getByUuid(uuid);
+    model.addAttribute("article", article);
+    return "articles/view";
+  }
 }

@@ -24,7 +24,8 @@
                    data-server-sort="true"
                    data-side-pagination="server"
                    data-sort-name="lastModified"
-                   data-sort-order="desc">
+                   data-sort-order="desc"
+                   data-unique-id="uuid">
               <thead>
                 <tr>
                   <th data-field="index" data-formatter="renderRowNumber" th:text="#{lbl.row_number}">#</th>
@@ -46,7 +47,7 @@
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
 
-    <div th:replace="fragments/identifiable :: actions"></div>
+    <div th:replace="fragments/bootstrap-table :: actions"></div>
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       function renderActions(value, row) {
@@ -71,9 +72,10 @@
       }
       function renderLabel(value, row) {
         /*[+
+         const baseUrl = [[@{'/articles'}]] + '/' + [row.uuid];
          const locale = [[${#locale}]];
          +]*/
-        return [value[locale]];
+        return '<a href="' + baseUrl + '">' + [value[locale]] + '</a>';
       }
       function renderRowNumber(value, row, index) {
         var $table = $('#table-articles');
