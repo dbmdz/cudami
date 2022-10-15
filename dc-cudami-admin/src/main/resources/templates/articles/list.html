@@ -30,8 +30,8 @@
                   <th data-field="index" data-formatter="renderRowNumber" th:text="#{lbl.row_number}">#</th>
                   <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
                   <th data-field="label" data-sortable="true" data-formatter="renderLabel" th:text="#{lbl.label}">Label</th>
-                  <th data-field="lastModified" data-sortable="true" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" th:text="#{lbl.created}">created</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
                   <th data-field="actions" data-formatter="renderActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -61,6 +61,13 @@
           renderEditAction(baseUrl),
           renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
+      }
+      function renderDate(value, row) {
+        /*[+
+         const locale = [[${#locale}]];
+         +]*/
+        var date = new Date(value);
+        return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'medium' }).format(date);
       }
       function renderLabel(value, row) {
         /*[+
