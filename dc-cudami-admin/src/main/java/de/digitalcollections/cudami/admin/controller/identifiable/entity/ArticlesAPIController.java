@@ -1,17 +1,20 @@
-package de.digitalcollections.cudami.admin.controller.relation;
+package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import static de.digitalcollections.model.list.sorting.Order.builder;
 
+import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.relation.Predicate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.UUID;
@@ -29,28 +32,49 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for predicate management pages. */
+/** Controller for articles management pages. */
 @RestController
-public class PredicatesAPIController {
+public class ArticlesAPIController extends AbstractController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesAPIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesAPIController.class);
 
-  private final CudamiPredicatesClient service;
+  private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
+  private final CudamiArticlesClient service;
 
-  public PredicatesAPIController(CudamiClient client) {
-    this.service = client.forPredicates();
+  public ArticlesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+    this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
+    this.service = client.forArticles();
   }
 
-  @GetMapping("/api/predicates/new")
+  @GetMapping("/api/articles/new")
   @ResponseBody
-  public Predicate createModel() throws TechnicalException {
+  public Article create() throws TechnicalException {
     return service.create();
   }
 
+  //  @GetMapping("/api/articles")
+  //  @ResponseBody
+  //  public PageResponse<Article> find(
+  //          @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int
+  // pageNumber,
+  //          @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+  //          @RequestParam(name = "searchTerm", required = false) String searchTerm,
+  //          @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+  //          throws TechnicalException {
+  //    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+  //    if (sortBy != null) {
+  //      Sorting sorting = new Sorting(sortBy);
+  //      pageRequest.setSorting(sorting);
+  //    }
+  //    return this.service.find(pageRequest);
+  //  }
+
   @SuppressFBWarnings
-  @GetMapping("/api/predicates")
+  @GetMapping("/api/articles")
   @ResponseBody
-  public BTResponse<Predicate> find(
+  public BTResponse<Article> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
@@ -75,34 +99,34 @@ public class PredicatesAPIController {
             .sorting(sorting)
             .build();
 
-    PageResponse<Predicate> pageResponse = service.find(pageRequest);
+    PageResponse<Article> pageResponse = service.find(pageRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/predicates/{uuid}")
+  @GetMapping("/api/articles/{uuid}")
   @ResponseBody
-  public Predicate getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+  public Article getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @PostMapping("/api/predicates")
-  public ResponseEntity save(@RequestBody Predicate predicate) {
+  @PostMapping("/api/articles")
+  public ResponseEntity save(@RequestBody Article article) {
     try {
-      Predicate predicateDB = service.save(predicate);
-      return ResponseEntity.status(HttpStatus.CREATED).body(predicateDB);
+      Article articleDb = service.save(article);
+      return ResponseEntity.status(HttpStatus.CREATED).body(articleDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save predicate: ", e);
+      LOGGER.error("Cannot save article: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @PutMapping("/api/predicates/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Predicate predicate) {
+  @PutMapping("/api/articles/{uuid}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article) {
     try {
-      Predicate predicateDB = service.update(uuid, predicate);
-      return ResponseEntity.ok(predicateDB);
+      Article articleDb = service.update(uuid, article);
+      return ResponseEntity.ok(articleDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot update predicate with uuid={}", uuid, e);
+      LOGGER.error("Cannot save article with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }

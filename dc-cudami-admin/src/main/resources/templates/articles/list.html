@@ -8,28 +8,74 @@
     <title th:text="#{articles}">Articles</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="list"></div>
-              <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-              <script th:inline="javascript">
-                IdentifiableList({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  existingLanguages: /*[[${existingLanguages}]]*/ [],
-                  id: "list",
-                  showEdit: true,
-                  showNew: true,
-                  type: "article",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
-            </div>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            
+            <table id="table-articles"
+                   data-toggle="table"
+                   th:data-url="@{/api/articles}"
+                   th:data-locale="${#locale}"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-search="true"
+                   data-server-sort="true"
+                   data-side-pagination="server"
+                   data-sort-name="lastModified"
+                   data-sort-order="desc">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="renderRowNumber" th:text="#{lbl.row_number}">#</th>
+                  <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
+                  <th data-field="label" data-sortable="true" data-formatter="renderLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="lastModified" data-sortable="true" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="renderActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
           </div>
         </div>
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
+
+    <div th:replace="fragments/identifiable :: actions"></div>
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function renderActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/articles'}]] + '/' + [row.uuid];
+         const itemType = [[#{lbl.article.inline}]];
+         const itemId = [row.value];
+         +]*/
+
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl),
+          renderDeleteAction(baseUrl, itemType, itemId)
+        ].join(' ');
+      }
+      function renderLabel(value, row) {
+        /*[+
+         const locale = [[${#locale}]];
+         +]*/
+        return [value[locale]];
+      }
+      function renderRowNumber(value, row, index) {
+        var $table = $('#table-articles');
+        var pageNumber = $table.bootstrapTable('getOptions').pageNumber;
+        var pageSize = $table.bootstrapTable('getOptions').pageSize;
+        return ((pageNumber - 1) * pageSize) + index + 1;
+      }
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
 </html>
