@@ -67,9 +67,10 @@ public class ArticlesController extends AbstractController {
   @GetMapping("/articles")
   public String list(Model model) throws TechnicalException {
     final Locale locale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(locale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("defaultLanguage", localeService.getDefaultLanguage());
     return "articles/list";
   }
 
