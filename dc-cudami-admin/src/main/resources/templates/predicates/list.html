@@ -43,7 +43,7 @@
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
 
-    <div th:replace="fragments/identifiable :: actions"></div>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       function renderActions(value, row) {

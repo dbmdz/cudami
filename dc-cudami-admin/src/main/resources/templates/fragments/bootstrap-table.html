@@ -3,37 +3,55 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
-  <th:block th:fragment="actions">
+  <th:block th:fragment="data-formatter">
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      function renderDate(value, row) {
+        /*[+
+         const locale = [[${#locale}]];
+         +]*/
+        var date = new Date(value);
+        return new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeStyle: 'medium'}).format(date);
+      }
       function renderDeleteAction(baseUrl, itemType, itemId) {
         /*[+
-        const modalDeleteMessage = `[(#{modal.msg.confirm_delete})]`;
-        const modalDeleteTitle = [[#{modal.title.warning}]];
-        const tooltipDelete = [[#{tooltip.delete}]];
-        +]*/
+         const modalDeleteMessage = `[(#{modal.msg.confirm_delete})]`;
+         const modalDeleteTitle = [[#{modal.title.warning}]];
+         const tooltipDelete = [[#{tooltip.delete}]];
+         +]*/
         return '<a class="remove" title="' + tooltipDelete + '"' +
-                  'data-href="' + baseUrl + '/delete"' +
-                  'data-message="' + modalDeleteMessage + '"' +
-                  'data-title="' + modalDeleteTitle + '"' +
-                  'data-target="#confirmYesNoDialog"' +
-                  'data-toggle="modal"' +
-                  '><i class="fa fa-trash"></i></a>';
+                'data-href="' + baseUrl + '/delete"' +
+                'data-message="' + modalDeleteMessage + '"' +
+                'data-title="' + modalDeleteTitle + '"' +
+                'data-target="#confirmYesNoDialog"' +
+                'data-toggle="modal"' +
+                '><i class="fa fa-trash"></i></a>';
       }
       function renderEditAction(baseUrl) {
         /*[+
-        const tooltipEdit = [[#{tooltip.edit}]];
-        +]*/
+         const tooltipEdit = [[#{tooltip.edit}]];
+         +]*/
         return '<a href="' + baseUrl + '/edit" title="' + tooltipEdit + '"><i class="fa fa-edit"></i></a>';
+      }
+      function renderLabel(baseUrl, value, locale) {
+        return '<a href="' + baseUrl + '">' + renderLocalizedText(value, locale) + '</a>';
+      }
+      function renderLocalizedText(value, locale) {
+        return [value[locale]];
+      }
+      function renderRowNumber(table, index) {
+        var pageNumber = table.bootstrapTable('getOptions').pageNumber;
+        var pageSize = table.bootstrapTable('getOptions').pageSize;
+        return ((pageNumber - 1) * pageSize) + index + 1;
       }
       function renderViewAction(baseUrl) {
         /*[+
-        const tooltipView = [[#{tooltip.view}]];
-        +]*/
+         const tooltipView = [[#{tooltip.view}]];
+         +]*/
         return '<a href="' + baseUrl + '" title="' + tooltipView + '"><i class="fa fa-eye"></i></a>';
       }
       /*]]>*/
     </script>
   </th:block>
-  </body>
+</body>
 </html>
