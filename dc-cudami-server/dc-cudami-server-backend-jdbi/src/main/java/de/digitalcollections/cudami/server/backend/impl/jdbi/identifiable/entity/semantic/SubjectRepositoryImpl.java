@@ -39,12 +39,13 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
           TABLE_ALIAS, MAPPING_PREFIX);
   public static final String SQL_FULL_FIELDS_SUBJECTS = SQL_REDUCED_FIELDS_SUBJECTS;
 
-  public SubjectRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public SubjectRepositoryImpl(
+      Jdbi dbi, CudamiConfig cudamiConfig, DbIdentifierMapper dbIdentifierMapper) {
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     this.dbi.registerRowMapper(BeanMapper.factory(Subject.class, MAPPING_PREFIX));
-    this.dbi.registerArrayType(new DbIdentifierMapper());
-    this.dbi.registerColumnMapper(Identifier.class, new DbIdentifierMapper());
+    this.dbi.registerArrayType(dbIdentifierMapper);
+    this.dbi.registerColumnMapper(Identifier.class, dbIdentifierMapper);
   }
 
   @Override

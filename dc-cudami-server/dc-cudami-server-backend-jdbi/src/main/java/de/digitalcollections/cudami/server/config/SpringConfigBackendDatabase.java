@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.TitleTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.PublicationMapper;
@@ -73,6 +74,11 @@ public class SpringConfigBackendDatabase {
   @Bean
   public DataSourceTransactionManager transactionManager(DataSource dataSource) {
     return new DataSourceTransactionManager(dataSource);
+  }
+
+  @Bean
+  public DbIdentifierMapper dbIdentifierMapper() {
+    return new DbIdentifierMapper();
   }
 
   @Bean

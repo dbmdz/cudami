@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.type;
 import de.digitalcollections.model.MainSubType;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.jdbi.v3.core.array.SqlArrayType;
@@ -11,6 +12,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 
 public class MainSubTypeMapper<M extends MainSubType> {
 
+  @SuppressFBWarnings("URF_UNREAD_FIELD")
   private Class<M> derivedClass;
 
   protected MainSubTypeMapper(Class<M> derivedClass) {
