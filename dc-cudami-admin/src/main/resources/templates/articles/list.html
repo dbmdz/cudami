@@ -26,7 +26,7 @@
               <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
               <select name="locales" id="articles-locales">
                 <th:block th:each="locale : ${existingLanguages}">
-                  <option th:value="${locale.language}" th:text="${locale.displayLanguage}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                  <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
                 </th:block>
               </select>
             </div>
