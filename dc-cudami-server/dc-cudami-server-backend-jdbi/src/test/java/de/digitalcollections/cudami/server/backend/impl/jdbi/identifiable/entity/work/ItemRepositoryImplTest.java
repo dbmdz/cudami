@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -41,7 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {ItemRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The Item Repository Test")
 public class ItemRepositoryImplTest {
 

@@ -4,7 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -37,7 +37,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = IdentifiableRepositoryImpl.class)
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The Identifiable Repository")
 @Sql(scripts = "classpath:cleanup_database.sql")
 class IdentifiableRepositoryImplTest {
