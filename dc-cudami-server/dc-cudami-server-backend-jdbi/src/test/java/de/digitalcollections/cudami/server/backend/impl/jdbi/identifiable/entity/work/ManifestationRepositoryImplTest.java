@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
@@ -29,7 +29,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ManifestationRepositoryImpl.class)
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The Manifestation Repository")
 @Sql(scripts = "classpath:cleanup_database.sql")
 class ManifestationRepositoryImplTest {

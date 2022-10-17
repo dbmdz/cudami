@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -30,7 +30,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {WebsiteRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Website Repository")
 class WebsiteRepositoryImplTest {
