@@ -11,8 +11,16 @@
   <th:block layout:fragment="content">
     <div class="content-header">
       <div class="container-fluid">
+        
         <div class="row">
-          <div class="col-12">
+          <div class="col">
+            <h1 th:text="#{page.title.articles}">Articles</h1>
+            <hr>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col">
 
             <div id="toolbar-articles">
               <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
