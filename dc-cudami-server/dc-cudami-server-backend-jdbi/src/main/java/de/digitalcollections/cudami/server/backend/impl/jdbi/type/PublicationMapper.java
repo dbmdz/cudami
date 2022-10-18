@@ -20,13 +20,13 @@ public class PublicationMapper implements SqlArrayType<Publication> {
     Predicate<List<?>> isNullOrEmpty = list -> list == null || list.isEmpty();
     return "("
         + (isNullOrEmpty.test(element.getPublicationLocations())
-            ? ""
+            ? "{}"
             : String.format("{%s}", commaSeparatedUuids(element.getPublicationLocations())))
         + (isNullOrEmpty.test(element.getPublishers())
-            ? ","
+            ? ",{}"
             : String.format(",{%s}", commaSeparatedUuids(element.getPublishers())))
         + (isNullOrEmpty.test(element.getPublishersPresentation())
-            ? ","
+            ? ",{}"
             : String.format(",{%s}", commaSeparatedStrings(element.getPublishersPresentation())))
         + ")";
   }
