@@ -8,26 +8,124 @@
     <title th:text="#{digital_objects}">Digital Objects</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="list"></div>
-              <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-              <script th:inline="javascript">
-                IdentifiableList({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  existingLanguages: /*[[${existingLanguages}]]*/ [],
-                  id: "list",
-                  type: "digitalObject",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.digital_objects}">Digital Objects</h1>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+
+            <div id="toolbar-digitalobjects">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+                <select name="locales" id="digitalobjects-locales">
+                  <th:block th:each="locale : ${existingLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
             </div>
+            <table id="table-digitalobjects"
+                   data-toggle="table"
+                   th:data-url="@{/api/digitalobjects}"
+                   th:data-locale="${#locale}"
+                   data-cookie="true"
+                   data-cookie-id-table="table-digitalobjects"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-search="true"
+                   data-server-sort="true"
+                   data-side-pagination="server"
+                   data-sort-name="lastModified"
+                   data-sort-order="desc"
+                   data-toolbar="#toolbar-digitalobjects"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
           </div>
         </div>
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      /*[+
+       $('#table-articles').attr('itemLocale', [[${defaultLanguage}]]);
+       +]*/
+      /*]]>*/
+    </script>
+
+    <script type="text/javascript">
+      $(function () {
+        $("#digitalobjects-locales").change(function () {
+          let itemLocale = this.value;
+          let $table = $('#table-digitalobjects');
+          $table.attr('itemLocale', itemLocale);
+          $table.bootstrapTable('refresh');
+        });
+      });
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+         const itemLocale = $('#table-digitalobjects').attr('itemLocale');
+         const itemType = [[#{lbl.digital_object.inline}]];
+         const itemId = renderLocalizedText(row.label, itemLocale);
+         +]*/
+
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl),
+          renderDeleteAction(baseUrl, itemType, itemId)
+        ].join(' ');
+      }
+      function formatLabel(value, row) {
+        /*[+
+         const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+         const itemLocale = $('#table-digitalobjects').attr('itemLocale');
+         +]*/
+        return renderLabel(baseUrl, value, itemLocale);
+      }
+      function formatPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = row.previewImage;
+        return renderPreviewImage(previewImage, tooltipNoPreviewImage);
+      }
+      function formatRowNumber(value, row, index) {
+        let $table = $('#table-digitalobjects');
+        return renderRowNumber($table, index);
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+
+  </th:block>
+</body>
 </html>

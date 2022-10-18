@@ -10,7 +10,7 @@
         /*[+
          const locale = [[${#locale}]];
          +]*/
-        var date = new Date(value);
+        let date = new Date(value);
         return new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeStyle: 'medium'}).format(date);
       }
       function renderDeleteAction(baseUrl, itemType, itemId) {
@@ -39,9 +39,37 @@
       function renderLocalizedText(value, locale) {
         return [value[locale]];
       }
+      function renderPreviewImage(previewImage, tooltipNoPreviewImage) {
+        let html = '<figure class="mb-0 mx-auto" style="max-width: 30px;">';
+        if (previewImage === undefined) {
+          html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
+        } else {
+          let tooltip = previewImage.filename;
+          // TODO: see PreviewImage.jsx for renderingHints logic
+          // const {altText, caption, title} = previewImage.renderingHints;
+          let imageUrl;
+          if (!previewImage.httpBaseUrl || !previewImage.mimeType) {
+            imageUrl = previewImage.uri;
+          } else {
+            const mimeExtensionMapping = {
+              gif: 'gif',
+              png: 'png'
+            };
+            const subMimeType = previewImage.mimeType.split('/')[1];
+            imageUrl = `${previewImage.httpBaseUrl}/full/30,/0/default.${
+                    mimeExtensionMapping[subMimeType] ?? 'jpg'
+                    }`;
+          }
+          html += '<img alt="" title="' + tooltip + '" class="img-fluid mw-100" src="' + imageUrl + '"/>';
+          // TODO figcaption
+          // <figcaption className="figure-caption">{caption[language]}</figcaption>
+        }
+        html += '</figure>';
+        return html;
+      }
       function renderRowNumber(table, index) {
-        var pageNumber = table.bootstrapTable('getOptions').pageNumber;
-        var pageSize = table.bootstrapTable('getOptions').pageSize;
+        let pageNumber = table.bootstrapTable('getOptions').pageNumber;
+        let pageSize = table.bootstrapTable('getOptions').pageSize;
         return ((pageNumber - 1) * pageSize) + index + 1;
       }
       function renderViewAction(baseUrl) {

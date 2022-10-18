@@ -47,7 +47,8 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
                   <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
@@ -89,7 +90,7 @@
       /*<![CDATA[*/
       function formatActions(value, row) {
         /*[+
-         const baseUrl = [[@{'/articles'}]] + '/' + [row.uuid];
+         const baseUrl = [[@{'/articles'}]] + '/' + row.uuid;
          const itemLocale = $('#table-articles').attr('itemLocale');
          const itemType = [[#{lbl.article.inline}]];
          const itemId = renderLocalizedText(row.label, itemLocale);
@@ -103,10 +104,47 @@
       }
       function formatLabel(value, row) {
         /*[+
-         const baseUrl = [[@{'/articles'}]] + '/' + [row.uuid];
+         const baseUrl = [[@{'/articles'}]] + '/' + row.uuid;
          const itemLocale = $('#table-articles').attr('itemLocale');
          +]*/
         return renderLabel(baseUrl, value, itemLocale);
+      }
+      function formatPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = row.previewImage;
+        
+        let html = '<figure class="mb-0 mx-auto" style="max-width: 30px;">';
+        if (previewImage === undefined) {
+          /*
+           * <figure className={className} style={{maxWidth: `${width}px`}}>
+      <img
+        alt={
+          image ? altText?.[language] ?? image.filename : t('noPreviewImage')
+        }
+        className="img-fluid mw-100"
+        src={
+          image
+            ? getImageUrl(image, `${width},`)
+            : `${apiContextPath}images/no-image.png`
+        }
+        title={title?.[language]}
+      />
+      {showCaption && caption?.[language] && (
+        <figcaption className="figure-caption">{caption[language]}</figcaption>
+      )}
+    </figure>
+           */
+          
+          
+          
+          html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
+        } else {
+          html += '<img alt="--" title="kein Vorschaubild" class="img-fluid mw-100" src="/images/no-image.png"/>';
+        }
+        html += '</figure>';
+        return html;
       }
       function formatRowNumber(value, row, index) {
         var $table = $('#table-articles');
