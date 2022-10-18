@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,6 +57,18 @@ public class PredicateController {
               + value
               + " does not match value of predicate="
               + (predicate != null ? predicate.getValue() : "null"));
+    }
+
+    return predicateService.save(predicate);
+  }
+
+  @Operation(summary = "create a predicate")
+  @PostMapping(
+      value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Predicate create(@RequestBody Predicate predicate) throws PredicatesServiceException {
+    if (predicate == null || predicate.getValue() == null) {
+      throw new IllegalArgumentException("Invalid predicate: " + predicate);
     }
 
     return predicateService.save(predicate);
