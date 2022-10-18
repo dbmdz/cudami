@@ -20,10 +20,18 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
   }
 
   public Predicate save(Predicate predicate) throws TechnicalException {
+    if (predicate.getUuid() == null) {
+      // create
+      return super.save(predicate);
+    }
+
+    // update by uuid
     return doPutRequestForObject(
-        String.format(
-            "%s/%s", baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
-        predicate);
+        String.format("%s/%s", baseEndpoint, predicate.getUuid()), predicate);
+  }
+
+  public Predicate create(Predicate predicate) throws TechnicalException {
+    return super.save(predicate);
   }
 
   public Predicate getByValue(String value) throws TechnicalException {
