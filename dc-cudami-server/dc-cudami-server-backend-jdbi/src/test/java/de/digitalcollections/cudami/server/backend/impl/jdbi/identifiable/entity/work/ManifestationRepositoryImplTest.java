@@ -17,6 +17,7 @@ import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +77,7 @@ class ManifestationRepositoryImplTest {
                 Title.builder()
                     .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
                     .titleType(new TitleType("main", "main"))
+                    .textLocalesOfOriginalScripts(Set.of(Locale.GERMAN, Locale.ENGLISH))
                     .build())
             .build();
     Manifestation saved = repo.save(manifestation);
