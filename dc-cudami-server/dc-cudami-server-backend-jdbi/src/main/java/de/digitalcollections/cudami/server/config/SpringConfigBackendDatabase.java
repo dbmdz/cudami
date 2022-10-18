@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.TitleTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.PublicationMapper;
@@ -99,5 +100,10 @@ public class SpringConfigBackendDatabase {
   @Bean
   public PublicationMapper publicationMapper() {
     return new PublicationMapper();
+  }
+
+  @Bean
+  public LocalDateRangeMapper dateRangeMapper() {
+    return new LocalDateRangeMapper();
   }
 }
