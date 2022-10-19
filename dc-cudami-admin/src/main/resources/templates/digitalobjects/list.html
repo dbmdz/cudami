@@ -36,6 +36,7 @@
                    data-toggle="table"
                    th:data-url="@{/api/digitalobjects}"
                    th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
                    data-cookie="true"
                    data-cookie-id-table="table-digitalobjects"
                    data-id-field="uuid"
@@ -72,8 +73,18 @@
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       /*[+
-       $('#table-articles').attr('itemLocale', [[${defaultLanguage}]]);
+       let itemLocale = [[${defaultLanguage}]];
        +]*/
+      const $table = $('#table-digitalobjects');
+      
+      $table.attr('itemLocale', itemLocale);
+
+      window.ajaxOptions = {
+        beforeSend: function (jqXHR, settings) {
+          let itemLocale = $table.attr('itemLocale');
+          settings.url = settings.url + '&itemLocale=' + itemLocale;
+        }
+      };
       /*]]>*/
     </script>
 
@@ -81,7 +92,6 @@
       $(function () {
         $("#digitalobjects-locales").change(function () {
           let itemLocale = this.value;
-          let $table = $('#table-digitalobjects');
           $table.attr('itemLocale', itemLocale);
           $table.bootstrapTable('refresh');
         });
@@ -119,7 +129,6 @@
         return renderPreviewImage(previewImage, tooltipNoPreviewImage);
       }
       function formatRowNumber(value, row, index) {
-        let $table = $('#table-digitalobjects');
         return renderRowNumber($table, index);
       }
       /*]]>*/

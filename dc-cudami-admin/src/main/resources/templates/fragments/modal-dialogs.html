@@ -32,8 +32,9 @@
         $title = $(e.relatedTarget).data('title');
         $(this).find('.modal-title').text($title);
         
-        $message = $(e.relatedTarget).data('message');
-        $(this).find('.modal-body p').text($message);
+        let message = unescape($(e.relatedTarget).data('message'));
+        message = message.replace(/&quot;/g, '"');
+        $(this).find('.modal-body p').text(message);
 
         // Pass form reference to modal for submission on yes/ok
         var href = $(e.relatedTarget).data('href');

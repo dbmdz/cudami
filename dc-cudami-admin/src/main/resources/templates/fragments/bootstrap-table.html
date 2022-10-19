@@ -21,7 +21,7 @@
          +]*/
         return '<a class="remove" title="' + tooltipDelete + '"' +
                 'data-href="' + baseUrl + '/delete"' +
-                'data-message="' + modalDeleteMessage + '"' +
+                'data-message="' + escape(modalDeleteMessage) + '"' +
                 'data-title="' + modalDeleteTitle + '"' +
                 'data-target="#confirmYesNoDialog"' +
                 'data-toggle="modal"' +

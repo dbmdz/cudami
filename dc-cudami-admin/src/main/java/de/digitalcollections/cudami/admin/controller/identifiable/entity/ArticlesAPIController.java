@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import static de.digitalcollections.model.list.sorting.Order.builder;
-
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
@@ -70,7 +68,6 @@ public class ArticlesAPIController extends AbstractController {
   //    }
   //    return this.service.find(pageRequest);
   //  }
-
   @SuppressFBWarnings
   @GetMapping("/api/articles")
   @ResponseBody
@@ -78,7 +75,7 @@ public class ArticlesAPIController extends AbstractController {
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       HttpServletRequest request)
       throws TechnicalException {
@@ -87,7 +84,21 @@ public class ArticlesAPIController extends AbstractController {
 
     Sorting sorting = null;
     if (sort != null && order != null) {
-      Order sortingOrder = builder().property(sort).direction(Direction.fromString(order)).build();
+      Order sortingOrder;
+      if ("label".equals(sort)) {
+        // TODO send itemLocale as request param !
+        String language = "de";
+        sortingOrder =
+            Order.builder()
+                .property("label")
+                .subProperty(language)
+                .direction(Direction.fromString(order))
+                .build();
+
+      } else {
+        sortingOrder =
+            Order.builder().property(sort).direction(Direction.fromString(order)).build();
+      }
       sorting = Sorting.builder().order(sortingOrder).build();
     }
 

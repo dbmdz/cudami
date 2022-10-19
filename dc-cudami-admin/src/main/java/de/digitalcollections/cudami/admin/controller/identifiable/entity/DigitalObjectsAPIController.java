@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import static de.digitalcollections.model.list.sorting.Order.builder;
-
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
@@ -17,9 +15,11 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import java.util.Map;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for digital objects management pages. */
 @RestController
 public class DigitalObjectsAPIController extends AbstractController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
@@ -42,22 +44,39 @@ public class DigitalObjectsAPIController extends AbstractController {
     this.service = client.forDigitalObjects();
   }
 
+  @SuppressFBWarnings
   @GetMapping({"/api/digitalobjects", "/api/digitalobjects/search"})
   @ResponseBody
   public BTResponse<DigitalObject> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "itemLocale", required = false) String itemLocale,
       HttpServletRequest request)
       throws TechnicalException {
-    Map<String, String[]> parameterMap =
-        request.getParameterMap(); // just for introspection of incoming request....
+    LOGGER.info(request.getQueryString()); // just for introspection of incoming request....
 
     Sorting sorting = null;
     if (sort != null && order != null) {
-      Order sortingOrder = builder().property(sort).direction(Direction.fromString(order)).build();
+      Order sortingOrder;
+      if ("label".equals(sort)) {
+        String language = itemLocale;
+        if (language == null) {
+          language = localeService.getDefaultLanguage().getLanguage();
+        }
+        sortingOrder =
+            Order.builder()
+                .property("label")
+                .subProperty(language)
+                .direction(Direction.fromString(order))
+                .build();
+
+      } else {
+        sortingOrder =
+            Order.builder().property(sort).direction(Direction.fromString(order)).build();
+      }
       sorting = Sorting.builder().order(sortingOrder).build();
     }
 
