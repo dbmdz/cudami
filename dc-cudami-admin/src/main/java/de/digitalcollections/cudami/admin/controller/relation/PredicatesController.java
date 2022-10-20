@@ -75,9 +75,11 @@ public class PredicatesController {
 
   @GetMapping("/predicates")
   public String list(Model model) throws TechnicalException {
-    Locale locale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages", languageSortingHelper.sortLanguages(locale, service.getLanguages()));
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("defaultLanguage", localeService.getDefaultLanguage());
     return "predicates/list";
   }
 
