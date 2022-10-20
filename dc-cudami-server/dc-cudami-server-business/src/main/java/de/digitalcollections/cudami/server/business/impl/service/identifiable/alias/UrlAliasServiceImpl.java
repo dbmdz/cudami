@@ -351,7 +351,11 @@ public class UrlAliasServiceImpl implements UrlAliasService {
                 + ", website="
                 + u.getWebsite()
                 + ", target="
-                + u.getTargetUuid());
+                + u.getTargetUuid()
+                + " in "
+                + tuples
+                + " of "
+                + localizedUrlAliases);
       } else {
         tuples.add(key);
       }
