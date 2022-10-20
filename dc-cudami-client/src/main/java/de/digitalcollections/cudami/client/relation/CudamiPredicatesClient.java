@@ -19,19 +19,17 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
     return doGetRequestForObjectList(baseEndpoint, Predicate.class);
   }
 
-  public Predicate save(Predicate predicate) throws TechnicalException {
+  public Predicate update(Predicate predicate) throws TechnicalException {
     if (predicate.getUuid() == null) {
-      // create
-      return super.save(predicate);
+      // Old consumers don't set the UUID, we must provide the value in the request path
+      return doPutRequestForObject(
+          String.format(
+              "%s/%s",
+              baseEndpoint, URLEncoder.encode(predicate.getValue(), StandardCharsets.UTF_8)),
+          predicate);
     }
 
-    // update by uuid
-    return doPutRequestForObject(
-        String.format("%s/%s", baseEndpoint, predicate.getUuid()), predicate);
-  }
-
-  public Predicate create(Predicate predicate) throws TechnicalException {
-    return super.save(predicate);
+    return super.update(predicate.getUuid(), predicate);
   }
 
   public Predicate getByValue(String value) throws TechnicalException {

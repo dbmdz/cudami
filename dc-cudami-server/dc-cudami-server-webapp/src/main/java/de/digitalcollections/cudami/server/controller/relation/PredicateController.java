@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PredicateController {
 
   private final PredicateService predicateService;
+  private static final String REGEX_UUID =
+      "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
   public PredicateController(PredicateService predicateService) {
     this.predicateService = predicateService;
@@ -39,19 +41,41 @@ public class PredicateController {
     return predicateService.getByValue(value);
   }
 
-  @Operation(summary = "create or update a predicate, identified by its value")
+  /*
+  Since we cannot use .* als "fallback" mapping (Spring reports "ambigious handler methods"), we
+  must evaluate the parameter manually
+   */
+  @Operation(summary = "create or update a predicate, identified either by its value or by uuid")
   @PutMapping(
       value = {
-        "/v6/predicates/{value:(?! [0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12} )}",
-        "/v5/predicates/{value}",
-        "/v3/predicates/{value}",
-        "/latest/predicates/{value}"
+        "/v6/predicates/{valueOrUuid:.*}",
+        "/v5/predicates/{valueOrUuid:.*}",
+        "/v3/predicates/{valueOrUuid:.*}",
+        "/latest/predicates/{valueOrUuid:.*}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate updateByValue(
-      @PathVariable("value") String value, @RequestBody Predicate predicate)
+  public Predicate update(
+      @PathVariable("valueOrUuid") String valueOrUuid, @RequestBody Predicate predicate)
       throws PredicatesServiceException {
-    if (value == null || predicate == null || !value.equals(predicate.getValue())) {
+    if (valueOrUuid == null || valueOrUuid.isBlank() || predicate == null) {
+      throw new IllegalArgumentException(
+          "path must contain either the value or the uuid of the predicate to be updated, which must be provided as request body");
+    }
+
+    if (valueOrUuid.matches(REGEX_UUID)) {
+      UUID uuid = UUID.fromString(valueOrUuid);
+      if (!predicate.getUuid().equals(uuid)) {
+        throw new IllegalArgumentException(
+            "path value of uuid="
+                + uuid
+                + " does not match uuid of predicate="
+                + predicate.getUuid());
+      }
+      return predicateService.save(predicate);
+    }
+
+    String value = valueOrUuid;
+    if (!value.matches(predicate.getValue())) {
       throw new IllegalArgumentException(
           "value of path="
               + value
@@ -62,32 +86,13 @@ public class PredicateController {
     return predicateService.save(predicate);
   }
 
-  @Operation(summary = "create a predicate")
+  @Operation(summary = "saves a predicate")
   @PostMapping(
       value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate create(@RequestBody Predicate predicate) throws PredicatesServiceException {
+  public Predicate save(@RequestBody Predicate predicate) throws PredicatesServiceException {
     if (predicate == null || predicate.getValue() == null) {
       throw new IllegalArgumentException("Invalid predicate: " + predicate);
-    }
-
-    return predicateService.save(predicate);
-  }
-
-  @Operation(summary = "create or update a predicate, identified by its uuid")
-  @PutMapping(
-      value = {
-        "/v6/predicates/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate updateByUuid(@PathVariable("uuid") UUID uuid, @RequestBody Predicate predicate)
-      throws PredicatesServiceException {
-    if (uuid == null || predicate == null || !uuid.equals(predicate.getUuid())) {
-      throw new IllegalArgumentException(
-          "uuid of path="
-              + uuid
-              + " does not match uuid of predicate="
-              + (predicate != null ? predicate.getUuid() : "null"));
     }
 
     return predicateService.save(predicate);
