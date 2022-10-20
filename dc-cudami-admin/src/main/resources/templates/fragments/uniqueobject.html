@@ -6,13 +6,17 @@
   <th:block th:fragment="renderDates(uniqueObject)">
     <section class="mb-3 rows-striped">
       <div class="row">
-        <div class="col-md-3 mb-1"><label class="font-weight-bold mb-0" th:text="#{created}">created</label></div>
         <div class="col-md-3 mb-1">
-          <span th:with="df=#{dateTime.format},dateTime=${uniqueObject.created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+          <label class="font-weight-bold mb-0">
+            <span class="mr-1" th:text="#{created}"></span>
+            /
+            <span class="ml-1" th:text="#{last_modified}"></span>
+          </label>
         </div>
-        <div class="col-md-3 mb-1"><label class="font-weight-bold mb-0" th:text="#{last_modified}">last modified</label></div>
-        <div class="col-md-3 mb-1">
-          <span th:with="df=#{dateTime.format},dateTime=${uniqueObject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+        <div class="col-md-9 mb-1">
+          <span class="mr-2" th:with="df=#{dateTime.format},dateTime=${uniqueObject.created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+          /
+          <span class="ml-2" th:with="df=#{dateTime.format},dateTime=${uniqueObject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
         </div>
       </div>
     </section>
