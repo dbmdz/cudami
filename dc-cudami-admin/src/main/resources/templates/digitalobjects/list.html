@@ -57,6 +57,7 @@
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
+                  <!--<th data-field="actions" data-formatter="formatActions" data-events="operateEvents" th:text="#{lbl.actions}">Actions</th>-->
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -86,7 +87,7 @@
           $table.bootstrapTable('refresh');
         });
       });
-      
+
       function formatRowNumber(value, row, index) {
         return renderRowNumber($table, index);
       }
@@ -94,6 +95,12 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+//      window.operateEvents = {
+//        'click .delete': function (e, value, row, index) {
+//          alert('You click like action, row: ' + JSON.stringify(row.uuid))
+//        }
+//      };
+
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
