@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
@@ -33,13 +32,10 @@ public class DigitalObjectsAPIController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiDigitalObjectsClient service;
 
-  public DigitalObjectsAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
+  public DigitalObjectsAPIController(CudamiClient client) {
     this.localeService = client.forLocales();
     this.service = client.forDigitalObjects();
   }
