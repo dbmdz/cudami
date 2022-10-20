@@ -43,6 +43,7 @@
                    data-pagination="true"
                    data-search="true"
                    data-server-sort="true"
+                   data-show-search-clear-button="true"
                    data-side-pagination="server"
                    data-sort-name="lastModified"
                    data-sort-order="desc"
@@ -72,16 +73,11 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      /*[+
-       let itemLocale = [[${defaultLanguage}]];
-       +]*/
       const $table = $('#table-digitalobjects');
-      
-      $table.attr('itemLocale', itemLocale);
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $table.attr('itemLocale');
+          let itemLocale = $("#digitalobjects-locales").val();
           settings.url = settings.url + '&itemLocale=' + itemLocale;
         }
       };
@@ -91,8 +87,6 @@
     <script type="text/javascript">
       $(function () {
         $("#digitalobjects-locales").change(function () {
-          let itemLocale = this.value;
-          $table.attr('itemLocale', itemLocale);
           $table.bootstrapTable('refresh');
         });
       });
@@ -103,7 +97,7 @@
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-         const itemLocale = $('#table-digitalobjects').attr('itemLocale');
+         const itemLocale = $("#digitalobjects-locales").val();
          const itemType = [[#{lbl.digital_object.inline}]];
          const itemId = renderLocalizedText(row.label, itemLocale);
          +]*/
@@ -117,7 +111,7 @@
       function formatLabel(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-         const itemLocale = $('#table-digitalobjects').attr('itemLocale');
+         const itemLocale = $("#digitalobjects-locales").val();
          +]*/
         return renderLabel(baseUrl, value, itemLocale);
       }
