@@ -38,7 +38,8 @@ Features:
 
 ## Requirements
 
-The minimum version of PostgreSQL is `12`, as cudami uses features that are not available in older versions.
+- the minimum version of the JRE used to start the applications is `17`
+- the minimum version of PostgreSQL is `12`, as cudami uses features that are not available in older versions
 
 ## Installation
 
