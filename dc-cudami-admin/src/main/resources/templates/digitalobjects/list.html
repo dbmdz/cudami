@@ -97,10 +97,10 @@
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-         const itemLocale = $("#digitalobjects-locales").val();
          const itemType = [[#{lbl.digital_object.inline}]];
-         const itemId = renderLocalizedText(row.label, itemLocale);
          +]*/
+        const itemLocale = $("#digitalobjects-locales").val();
+        const itemId = renderLocalizedText(row.label, itemLocale);
 
         return [
           renderViewAction(baseUrl),
@@ -111,8 +111,9 @@
       function formatLabel(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-         const itemLocale = $("#digitalobjects-locales").val();
          +]*/
+        const itemLocale = $("#digitalobjects-locales").val();
+
         return renderLabel(baseUrl, value, itemLocale);
       }
       function formatPreviewImage(value, row) {
