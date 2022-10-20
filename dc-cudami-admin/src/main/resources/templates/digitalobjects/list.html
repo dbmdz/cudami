@@ -71,8 +71,7 @@
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modal-dialogs :: confirmYesNoDialog"></div>
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
+    <script type="text/javascript">
       const $table = $('#table-digitalobjects');
 
       window.ajaxOptions = {
@@ -81,15 +80,16 @@
           settings.url = settings.url + '&itemLocale=' + itemLocale;
         }
       };
-      /*]]>*/
-    </script>
 
-    <script type="text/javascript">
       $(function () {
         $("#digitalobjects-locales").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
+      
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
@@ -122,9 +122,6 @@
          +]*/
         let previewImage = row.previewImage;
         return renderPreviewImage(previewImage, tooltipNoPreviewImage);
-      }
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
       }
       /*]]>*/
     </script>
