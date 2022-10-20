@@ -37,6 +37,9 @@
         return '<a href="' + baseUrl + '">' + renderLocalizedText(value, locale) + '</a>';
       }
       function renderLocalizedText(value, locale) {
+        if (value === undefined) {
+          return "";
+        }
         return [value[locale]];
       }
       function renderPreviewImage(previewImage, tooltipNoPreviewImage) {
