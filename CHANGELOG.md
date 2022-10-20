@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - WEMI part: Manifestations
 - POST/PUT/PATCH-Requests require the attribute `objectType` in the JSON body. If it is missing, it is heuristically set
 - Labels of Identifiables must not be empty
+- **Breaking**: Changed runtime dependency from JRE11 to JRE17
 
 ## [6.1.0](https://github.com/dbmdz/cudami/releases/tag/6.1.0) - 2022-07-29
 
