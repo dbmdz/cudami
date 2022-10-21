@@ -41,7 +41,18 @@ public class PredicatesController {
 
   @GetMapping("/predicates/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    Predicate predicate = service.create();
+    Locale defaultLanguage = localeService.getDefaultLanguage();
+    predicate.setLabel(new LocalizedText(defaultLanguage, ""));
+    model.addAttribute("predicate", predicate);
+
+    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> sortedLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
+
+    model.addAttribute("allLanguages", sortedLanguages);
+    model.addAttribute("activeLanguage", defaultLanguage);
     return "predicates/create";
   }
 

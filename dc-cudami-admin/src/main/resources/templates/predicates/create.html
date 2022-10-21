@@ -4,27 +4,54 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{identifier_types}: #{identifier_type_create}|">Identifier types: Create a new identifier type</title>
+    <title th:text="|#{predicates}: #{identifier_type_create}|">... create ...</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="editor"></div>
-              <script th:src="@{/js/identifier-type-editor.bundle.js}"></script>
-              <script th:inline="javascript">
-                IdentifierTypeEditor({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  id: "editor",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
-            </div>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+
+            <form action="#" th:action="@{/predicates/new}" th:object="${predicate}" method="post">
+              <div class="row">
+                <div class="col-6 col-sm-9"><h1>Create a new relation type</h1></div>
+                <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary">Save</button></div></div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <hr>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="name" class="form-label font-weight-bold">Label</label>
+
+                    <div class="input-group" th:each="entry : *{label.entrySet()}">
+
+                      <select id="label-locales">
+                        <th:block th:each="locale : ${allLanguages}">
+                          <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}" th:selected="${#strings.equals(locale.language, entry.key)}">English</option>
+                        </th:block>
+                      </select>
+                      <input type="text" aria-label="Label" class="form-control" th:field="*{label['__${entry.key}__']}"/>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="value" class="form-label font-weight-bold">Wert</label>
+                    <input th:field="*{value}" id="value" required="" type="text" class="form-control" aria-invalid="true" value="">
+                  </div>
+
+                </div>
+              </div>
+            </form>
+
           </div>
         </div>
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+</body>
 </html>
