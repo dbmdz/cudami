@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,19 +49,15 @@ public class PredicateController {
   @Operation(summary = "create or update a predicate, identified either by its value or by uuid")
   @PutMapping(
       value = {
-        "/v6/predicates/{valueOrUuid:.*}",
-        "/v5/predicates/{valueOrUuid:.*}",
-        "/v3/predicates/{valueOrUuid:.*}",
-        "/latest/predicates/{valueOrUuid:.*}"
+        "/v6/predicates/{valueOrUuid:.+}",
+        "/v5/predicates/{valueOrUuid:.+}",
+        "/v3/predicates/{valueOrUuid:.+}",
+        "/latest/predicates/{valueOrUuid:.+}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
-      @PathVariable("valueOrUuid") String valueOrUuid, @RequestBody Predicate predicate)
+      @PathVariable("valueOrUuid") String valueOrUuid, @NotNull @RequestBody Predicate predicate)
       throws PredicatesServiceException {
-    if (valueOrUuid == null || valueOrUuid.isBlank() || predicate == null) {
-      throw new IllegalArgumentException(
-          "path must contain either the value or the uuid of the predicate to be updated, which must be provided as request body");
-    }
 
     if (valueOrUuid.matches(REGEX_UUID)) {
       UUID uuid = UUID.fromString(valueOrUuid);
@@ -77,10 +74,7 @@ public class PredicateController {
     String value = valueOrUuid;
     if (!value.matches(predicate.getValue())) {
       throw new IllegalArgumentException(
-          "value of path="
-              + value
-              + " does not match value of predicate="
-              + (predicate != null ? predicate.getValue() : "null"));
+          "value of path=" + value + " does not match value of predicate=" + predicate.getValue());
     }
 
     return predicateService.save(predicate);
