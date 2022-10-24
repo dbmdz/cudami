@@ -5,8 +5,11 @@ cudami:
       - PRINT
       - HANDMADE
 
-    mediaTypes: #TODO
+    mediaTypes:
       - BOOK
+      - ISSUE
+      - NEWSPAPER
+      - SERIAL
 
     subjectTypes:
       - BY
