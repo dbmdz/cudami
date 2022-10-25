@@ -5,7 +5,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="#{relation_types}">Relation types</title>
+    <title th:text="#{predicates}">Relation types</title>
   </head>
   <body>
   <th:block layout:fragment="content">
@@ -30,6 +30,7 @@
                    th:data-url="@{/api/predicates}"
                    th:data-locale="${#locale}"
                    data-ajax-options="ajaxOptions"
+                   data-buttons="buttons"
                    data-cookie="true"
                    data-cookie-id-table="table-predicates"
                    data-id-field="uuid"
@@ -65,20 +66,17 @@
 
     <script type="text/javascript">
       const $table = $('#table-predicates');
-
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
           let itemLocale = $("#predicates-locales").val();
           settings.url = settings.url + '&itemLocale=' + itemLocale;
         }
       };
-
       $(function () {
         $("#predicates-locales").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
-
       function formatRowNumber(value, row, index) {
         return renderRowNumber($table, index);
       }
@@ -92,6 +90,24 @@
 //        }
 //      };
 
+      function buttons() {
+        /*[+
+         const baseUrl = [[@{'/predicates'}]];
+         +]*/
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new';
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+      }
+
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
@@ -99,7 +115,6 @@
          +]*/
         const itemLocale = $("#digitalobjects-locales").val();
         const itemId = row.value;
-
         return [
           renderViewAction(baseUrl),
           renderEditAction(baseUrl),
@@ -111,7 +126,6 @@
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
          +]*/
         const itemLocale = $("#predicates-locales").val();
-
         return renderLabel(baseUrl, value, itemLocale);
       }
       /*]]>*/

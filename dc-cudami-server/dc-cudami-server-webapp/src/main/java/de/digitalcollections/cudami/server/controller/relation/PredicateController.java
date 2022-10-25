@@ -40,7 +40,7 @@ public class PredicateController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate getByValue(@PathVariable("value") String value) {
     return predicateService.getByValue(value);
-  }
+    }
 
   /*
   Since we cannot use .* als "fallback" mapping (Spring reports "ambigious handler methods"), we

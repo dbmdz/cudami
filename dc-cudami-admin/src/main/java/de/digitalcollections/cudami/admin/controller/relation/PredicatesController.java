@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
+import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -12,30 +13,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Controller for predicate management pages. */
 @Controller
-public class PredicatesController {
+public class PredicatesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
+  private final MessageSource messageSource;
   private final CudamiPredicatesClient service;
 
-  public PredicatesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+  public PredicatesController(
+      MessageSource messageSource,
+      LanguageSortingHelper languageSortingHelper,
+      CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = client.forLocales();
+    this.messageSource = messageSource;
     this.service = client.forPredicates();
   }
 
@@ -45,12 +57,14 @@ public class PredicatesController {
     Locale defaultLanguage = localeService.getDefaultLanguage();
     predicate.setLabel(new LocalizedText(defaultLanguage, ""));
     model.addAttribute("predicate", predicate);
+    List<Locale> existingLanguages = List.of(defaultLanguage);
 
     List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
     final Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> sortedLanguages =
         languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
 
+    model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
     model.addAttribute("activeLanguage", defaultLanguage);
     return "predicates/create";
@@ -97,6 +111,39 @@ public class PredicatesController {
   @ModelAttribute("menu")
   protected String module() {
     return "predicates";
+  }
+
+  @PostMapping("/predicates/new")
+  public String save(
+      @ModelAttribute @Valid Predicate predicate,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
+    verifyBinding(results);
+    if (results.hasErrors()) {
+      return "predicates/create";
+    }
+    Predicate predicateDB = null;
+    try {
+      //      predicateDB = service.save(predicate, results);
+      predicateDB = service.save(predicate);
+      LOGGER.info("Successfully saved website");
+    } catch (TechnicalException e) {
+      LOGGER.error("Cannot save website: ", e);
+      String message =
+          messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
+      redirectAttributes.addFlashAttribute("error_message", message);
+      return "redirect:/websites";
+    }
+    //    if (results.hasErrors()) {
+    //      return "predicates/create";
+    //    }
+    status.setComplete();
+    String message =
+        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/predicates/" + predicateDB.getUuid().toString();
   }
 
   @GetMapping("/predicates/{uuid}")
