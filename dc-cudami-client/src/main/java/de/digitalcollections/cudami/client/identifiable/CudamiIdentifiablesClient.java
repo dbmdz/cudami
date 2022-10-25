@@ -113,7 +113,7 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
    *
    * @param namespace the namespace. Must be plain text, not encoded in any way
    * @param id the id. Must be in plain text, not encoded in any way
-   * @param additionalParameters a map<String,String> of additional parameters
+   * @param additionalParameters a map&lt;String,String&gt; of additional parameters
    * @return the Identifiable or null
    * @throws TechnicalException in case of an error
    */
