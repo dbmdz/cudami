@@ -63,10 +63,10 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + String.format(
-        ", %1$s.composition %2$s_composition, %1$s.dimensions %2$_dimensions, %1$s.otherlanguages %2$s_otherLanguages"
-            + ", %1$s.publications %2$s_publications, %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange"
-            + ", %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version",
-        tableAlias, mappingPrefix);
+            ", %1$s.composition %2$s_composition, %1$s.dimensions %2$_dimensions, %1$s.otherlanguages %2$s_otherLanguages"
+                + ", %1$s.publications %2$s_publications, %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange"
+                + ", %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version",
+            tableAlias, mappingPrefix);
   }
 
   // TODO: to join: subjects, parents and relations (extra table), work
@@ -75,10 +75,10 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + String.format(
-        ", %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType"
-            + ", %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes"
-            + ", %1$s.titles %2$s_titles",
-        tableAlias, mappingPrefix);
+            ", %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType"
+                + ", %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes"
+                + ", %1$s.titles %2$s_titles",
+            tableAlias, mappingPrefix);
   }
 
   @Override
