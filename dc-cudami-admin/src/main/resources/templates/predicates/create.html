@@ -5,6 +5,48 @@
       layout:decorate="~{base}">
   <head>
     <title th:text="|#{predicates}: #{identifier_type_create}|">... create ...</title>
+
+    <script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+      {
+      "imports": {
+      "orderedmap": "/webjars/orderedmap/index.es.js",
+      "prosemirror-commands": "/webjars/prosemirror-commands/dist/index.es.js",
+      "prosemirror-dropcursor": "/webjars/prosemirror-dropcursor/dist/index.es.js",
+      "prosemirror-gapcursor": "/webjars/prosemirror-gapcursor/dist/index.es.js",
+      "prosemirror-history": "/webjars/prosemirror-history/dist/index.es.js",
+      "prosemirror-keymap": "/webjars/prosemirror-keymap/dist/index.es.js",
+      "prosemirror-model": "/webjars/prosemirror-model/dist/index.es.js",
+      "prosemirror-schema-list": "/webjars/prosemirror-schema-list/dist/index.es.js",
+      "prosemirror-state": "/webjars/prosemirror-state/dist/index.es.js",
+      "prosemirror-transform": "/webjars/prosemirror-transform/dist/index.es.js",
+      "prosemirror-view": "/webjars/prosemirror-view/dist/index.es.js",
+      "rope-sequence": "/webjars/rope-sequence/dist/index.es.js",
+      "@tiptap/core": "/webjars/tiptap__core/dist/tiptap-core.esm.js",
+      "@tiptap/extension-blockquote": "/webjars/tiptap__extension-blockquote/dist/tiptap-extension-blockquote.esm.js",
+      "@tiptap/extension-bold": "/webjars/tiptap__extension-bold/dist/tiptap-extension-bold.esm.js",
+      "@tiptap/extension-bullet-list": "/webjars/tiptap__extension-bullet-list/dist/tiptap-extension-bullet-list.esm.js",
+      "@tiptap/extension-code": "/webjars/tiptap__extension-code/dist/tiptap-extension-code.esm.js",
+      "@tiptap/extension-code-block": "/webjars/tiptap__extension-code-block/dist/tiptap-extension-code-block.esm.js",
+      "@tiptap/extension-document": "/webjars/tiptap__extension-document/dist/tiptap-extension-document.esm.js",
+      "@tiptap/extension-dropcursor": "/webjars/tiptap__extension-dropcursor/dist/tiptap-extension-dropcursor.esm.js",
+      "@tiptap/extension-gapcursor": "/webjars/tiptap__extension-gapcursor/dist/tiptap-extension-gapcursor.esm.js",
+      "@tiptap/extension-hard-break": "/webjars/tiptap__extension-hard-break/dist/tiptap-extension-hard-break.esm.js",
+      "@tiptap/extension-heading": "/webjars/tiptap__extension-heading/dist/tiptap-extension-heading.esm.js",
+      "@tiptap/extension-history": "/webjars/tiptap__extension-history/dist/tiptap-extension-history.esm.js",
+      "@tiptap/extension-horizontal-rule": "/webjars/tiptap__extension-horizontal-rule/dist/tiptap-extension-horizontal-rule.esm.js",
+      "@tiptap/extension-italic": "/webjars/tiptap__extension-italic/dist/tiptap-extension-italic.esm.js",
+      "@tiptap/extension-list-item": "/webjars/tiptap__extension-list-item/dist/tiptap-extension-list-item.esm.js",
+      "@tiptap/extension-ordered-list": "/webjars/tiptap__extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js",
+      "@tiptap/extension-paragraph": "/webjars/tiptap__extension-paragraph/dist/tiptap-extension-paragraph.esm.js",
+      "@tiptap/extension-strike": "/webjars/tiptap__extension-strike/dist/tiptap-extension-strike.esm.js",
+      "@tiptap/extension-text": "/webjars/tiptap__extension-text/dist/tiptap-extension-text.esm.js",
+      "@tiptap/starter-kit": "/webjars/tiptap__starter-kit/dist/tiptap-starter-kit.esm.js",
+      "w3c-keyname": "/webjars/w3c-keyname/index.es.js"
+      }
+      }
+    </script>
+
   </head>
   <body>
   <th:block layout:fragment="content">
@@ -55,6 +97,13 @@
                                 <div class="form-group">
                                   <label th:for="label-__${language}__" class="font-weight-bold" th:text="#{lbl.label}">Label</label>
                                   <input th:id="label-__${language}__" class="form-control" required="" type="text" value="" th:field="*{label['__${language}__']}" />
+                                </div>
+                                <div class="form-group">
+                                  <label class="font-weight-bold" th:text="#{lbl.abstract}">Abstract</label>
+                                  <div th:replace="fragments/tiptap :: editor-menu"></div>
+                                  <div id="editor"></div>
+                                  <input id="contentJSON" type="hidden" th:field="*{description['__${language}__']}"/>
+                                  <script th:src="@{/js/tiptap.js}" type="module"></script>
                                 </div>
                               </div>
                             </div>
@@ -125,52 +174,52 @@
       </div>
     </div>
     <script type="text/javascript" th:inline="javascript">
-      let targetLocalizedForm;
-      $('#addLanguageDialog').on('show.bs.modal', function (e) {
-        targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
-      });
-      $("#addLanguageDialog").on('click', '.btn-primary', function () {
-        /*[- remove class 'active' from all 'nav-item a' links -]*/
-        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).find('.nav-link').removeClass('active');
+let targetLocalizedForm;
+$('#addLanguageDialog').on('show.bs.modal', function (e) {
+  targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
+});
+$("#addLanguageDialog").on('click', '.btn-primary', function () {
+  /*[- remove class 'active' from all 'nav-item a' links -]*/
+  let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+  $(navTabs).find('.nav-link').removeClass('active');
 
-        /*[- append a new active tab with selected language before plus tab -]*/
-        let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
-        let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
-        /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-        let newTab = $(navTabs).children('.nav-item').first().clone();
-        let navLink = $(newTab).children('.nav-link').first();
-        $(navLink).attr('href', '#' + selectedOptionValue);
-        $(navLink).text(selectedOptionText);
-        $(navLink).addClass('active');
-        let plusTab = $(navTabs).find('.nav-item').last();
-        $(plusTab).before(newTab);
+  /*[- append a new active tab with selected language before plus tab -]*/
+  let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
+  let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
+  /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
+  let newTab = $(navTabs).children('.nav-item').first().clone();
+  let navLink = $(newTab).children('.nav-link').first();
+  $(navLink).attr('href', '#' + selectedOptionValue);
+  $(navLink).text(selectedOptionText);
+  $(navLink).addClass('active');
+  let plusTab = $(navTabs).find('.nav-item').last();
+  $(plusTab).before(newTab);
 
-        /*[- append a new tab pane for new language by cloning an existing pane -]*/
-        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
-        let newTabPane = $(targetLocalizedForm).find('.tab-pane').first().clone();
-        $(newTabPane).attr('id', selectedOptionValue);
-        $(newTabPane).addClass('active');
-        /*[-
-         * set ids and properties of form elements to be in sync with new language
-         * e.g. <label for="label-en"...> -> <label for="label-am"...>
-         * e.g. <input id="label-en" name="label['en']"...> -> <input id="label-am" name="label['am']"...>
-        -]*/
-        $(newTabPane).find('label').each(function () {
-          let newForAttribute = $(this).attr('for').split('-')[0] + '-' + selectedOptionValue;
-          $(this).attr('for', newForAttribute);
-        });
-        $(newTabPane).find('input').each(function () {
-          let newIdAttribute = $(this).attr('id').split('-')[0] + '-' + selectedOptionValue;
-          $(this).attr('id', newIdAttribute);
-          let newNameAttribute = $(this).attr('name').split('[')[0] + '[\'' + selectedOptionValue + '\']';
-          $(this).attr('name', newNameAttribute);
-          $(this).val('');
-        });
+  /*[- append a new tab pane for new language by cloning an existing pane -]*/
+  $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+  let newTabPane = $(targetLocalizedForm).find('.tab-pane').first().clone();
+  $(newTabPane).attr('id', selectedOptionValue);
+  $(newTabPane).addClass('active');
+  /*[-
+   * set ids and properties of form elements to be in sync with new language
+   * e.g. <label for="label-en"...> -> <label for="label-am"...>
+   * e.g. <input id="label-en" name="label['en']"...> -> <input id="label-am" name="label['am']"...>
+   -]*/
+  $(newTabPane).find('label').each(function () {
+    let newForAttribute = $(this).attr('for').split('-')[0] + '-' + selectedOptionValue;
+    $(this).attr('for', newForAttribute);
+  });
+  $(newTabPane).find('input').each(function () {
+    let newIdAttribute = $(this).attr('id').split('-')[0] + '-' + selectedOptionValue;
+    $(this).attr('id', newIdAttribute);
+    let newNameAttribute = $(this).attr('name').split('[')[0] + '[\'' + selectedOptionValue + '\']';
+    $(this).attr('name', newNameAttribute);
+    $(this).val('');
+  });
 
-        let tabContent = $(targetLocalizedForm).find('.tab-content').first();
-        $(tabContent).append(newTabPane);
-      });
+  let tabContent = $(targetLocalizedForm).find('.tab-content').first();
+  $(tabContent).append(newTabPane);
+});
     </script>
   </th:block>
 </body>

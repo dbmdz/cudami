@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+    <!-- see https://tiptap.dev/guide/menus#buttons -->
+
+  <th:block th:fragment="editor-menu">
+    <div id="editorMenu" class="editorMenu border-1 p-1">
+      <div class="btn-group" role="group" aria-label="...">
+        <div class="dropdown open">
+          <button type="button" class="btn btn-default dropdown-toggle" tabindex="-1" data-toggle="dropdown" data-original-title="" title="" aria-expanded="true">Paragraph <b class="caret"></b></button>
+          <ul class="dropdown-menu">
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h1"><h1>Header H1</h1></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h2"><h2>Header H2</h2></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h3"><h3>Header H3</h3></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h4"><h4>Header H4</h4></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h5"><h5>Header H5</h5></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="h6"><h6>Header H6</h6></a></li>
+            <li class="active"><a href="#" tabindex="-1" data-action="formatblock" data-value="p"><p>Paragraph</p></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="blockquote"><blockquote>Blockquote</blockquote></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="pre"><pre>Preformatted</pre></a></li>
+            <li><a href="#" tabindex="-1" data-action="formatblock" data-value="div"><div>Div block</div></a></li>
+          </ul>
+        </div>
+      </div>
+      &nbsp;
+      <div class="btn-group" role="group" aria-label="...">
+        <!-- see https://www.tiptap.dev/api/marks -->
+        <button id="btnBold" type="button" class="btn btn-default" tabindex="-1" title="Bold"
+                data-value="bold" onclick="editor.chain().focus().toggleBold().run()"><span class="fa fa-bold"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" title="Italic"
+                data-value="italic" onclick="editor.chain().focus().toggleItalic().run()"><span class="fa fa-italic"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" title="Underline"
+                data-value="underline" onclick="editor.chain().focus().toggleUnderline().run()"><span class="fa fa-underline"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
+                data-value="strike" data-original-title="" title="" onclick="editor.chain().focus().toggleStrike().run()"><span class="fa fa-strikethrough"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
+                data-value="subscript" data-original-title="" title=""><span class="fa fa-subscript"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="text"
+                data-value="superscript" data-original-title="" title=""><span class="fa fa-superscript"></span></button>
+      </div>
+      &nbsp;
+      <div class="btn-group" role="group" aria-label="...">
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="unordered" data-original-title="" title=""
+                onclick="editor.chain().focus().toggleBulletList().run()"><span class="fa fa-list-ul"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="ordered" data-original-title="" title=""><span class="fa fa-list-ol"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="indent" data-original-title="" title=""><span class="fa fa-indent"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="lists" data-value="outdent" data-original-title="" title=""><span class="fa fa-outdent"></span></button></div>
+      &nbsp;
+      <div class="btn-group" role="group" aria-label="...">
+        <!--<button type="button" class="btn btn-default" tabindex="-1" data-action="insert" data-value="emoji" data-original-title="" title=""><span class="fa fa-smile fa-smile-o"></span></button>-->
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="insert" data-value="link" data-original-title="" title=""><span class="fa fa-link"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="insert" data-value="image" data-original-title="" title="" data-toggle="modal" data-target="#insertImageModal"><span class="fa fa-image"></span></button>
+        <button type="button" class="btn btn-default" tabindex="-1" data-action="insert" data-value="video" data-original-title="" title=""><span class="fa fa-video-camera fa-video"></span></button>
+        <!--<button type="button" class="btn btn-default" tabindex="-1" data-action="insert" data-value="symbol" data-original-title="" title=""><span class="fa fa-hashtag"></span></button>-->
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>
