@@ -9,6 +9,7 @@ import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.CustomAttributes;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.time.TimeValueRange;
 import de.digitalcollections.model.view.RenderingHints;
 import de.digitalcollections.model.view.RenderingHintsPreviewImage;
 import org.jdbi.v3.core.Jdbi;
@@ -35,6 +36,7 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerArgument(new JsonbArgumentFactory<>(TimeValue.class, objectMapper));
     db.registerArgument(
         new JsonbListArgumentFactory<>(LocalizedStructuredContent.class, objectMapper));
+    db.registerArgument(new JsonbArgumentFactory<>(TimeValueRange.class, objectMapper));
 
     // column mapper
     db.registerColumnMapper(new JsonbColumnMapperFactory(CoordinateLocation.class, objectMapper));
@@ -48,5 +50,6 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerColumnMapper(new JsonbColumnMapperFactory(TimeValue.class, objectMapper));
     db.registerColumnMapper(
         new JsonbListColumnMapperFactory(LocalizedStructuredContent.class, objectMapper));
+    db.registerColumnMapper(new JsonbColumnMapperFactory(TimeValueRange.class, objectMapper));
   }
 }
