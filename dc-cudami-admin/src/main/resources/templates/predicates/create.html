@@ -6,7 +6,9 @@
   <head>
     <title th:text="|#{predicates}: #{identifier_type_create}|">... create ...</title>
 
-    <script async src="https://unpkg.com/es-module-shims@1.3.0/dist/es-module-shims.js"></script>
+    <link th:href="@{/css/tiptap.css}" rel="stylesheet">
+
+    <script async th:src="@{/webjars/es-module-shims/dist/es-module-shims.js}"></script>
     <script type="importmap">
       {
       "imports": {
@@ -41,6 +43,7 @@
       "@tiptap/extension-paragraph": "/webjars/tiptap__extension-paragraph/dist/tiptap-extension-paragraph.esm.js",
       "@tiptap/extension-strike": "/webjars/tiptap__extension-strike/dist/tiptap-extension-strike.esm.js",
       "@tiptap/extension-text": "/webjars/tiptap__extension-text/dist/tiptap-extension-text.esm.js",
+      "@tiptap/extension-underline": "/webjars/tiptap__extension-underline/dist/tiptap-extension-underline.esm.js",
       "@tiptap/starter-kit": "/webjars/tiptap__starter-kit/dist/tiptap-starter-kit.esm.js",
       "w3c-keyname": "/webjars/w3c-keyname/index.es.js"
       }
@@ -52,95 +55,76 @@
   <th:block layout:fragment="content">
     <div class="content-header">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
+        <form action="#" th:action="@{#}" th:object="${predicate}" method="post" role="form">
+          <div th:replace="fragments/feedback-messages :: form"></div>
 
-            <form action="#" th:action="@{/predicates/new}" th:object="${predicate}" method="post">
-              <div class="row">
-                <div class="col-6 col-sm-9"><h1>Create a new relation type</h1></div>
-                <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary">Save</button></div></div>
-              </div>
-              <div class="row">
-                <div class="col-sm-12">
-                  <hr>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-12">
-                  <div class="localized-form">
-                    <ul class="nav nav-tabs" role="tablist">
-                      <li class="nav-item" th:each="language,iter : ${existingLanguages}">
-                        <a
-                          class="language-switcher nav-link"
-                          data-toggle="tab"
-                          role="tab"
-                          th:classappend="${iter.index} == 0 ? active"
-                          th:href="${'#' + language}"
-                          th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-                          th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
-                          >
-                          language
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a title="Sprache hinzufügen" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog">
-                          <i class="fa fa-plus"></i>
-                        </a>
-                      </li>
-                    </ul>
-                    <div class="tab-content">
-                      <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-                        <div class="card">
-                          <div class="card-body bg-light">
-                            <div class="row">
-                              <div class="col-sm-12">
-                                <div class="form-group">
-                                  <label th:for="label-__${language}__" class="font-weight-bold" th:text="#{lbl.label}">Label</label>
-                                  <input th:id="label-__${language}__" class="form-control" required="" type="text" value="" th:field="*{label['__${language}__']}" />
-                                </div>
-                                <div class="form-group">
-                                  <label class="font-weight-bold" th:text="#{lbl.abstract}">Abstract</label>
-                                  <div th:replace="fragments/tiptap :: editor-menu"></div>
-                                  <div id="editor"></div>
-                                  <input id="contentJSON" type="hidden" th:field="*{description['__${language}__']}"/>
-                                  <script th:src="@{/js/tiptap.js}" type="module"></script>
-                                </div>
-                              </div>
+          <div class="row">
+            <div class="col-6 col-sm-9"><h1>Create a new relation type</h1></div>
+            <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary" onClick="syncContent()">Save</button></div></div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <hr>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="localized-form">
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="nav-item" th:each="language,iter : ${existingLanguages}">
+                    <a
+                      class="language-switcher nav-link"
+                      data-toggle="tab"
+                      role="tab"
+                      th:classappend="${iter.index} == 0 ? active"
+                      th:href="${'#' + language}"
+                      th:with="languageToDisplay=${language.getDisplayName(#locale)}"
+                      th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+                      >
+                      language
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a title="Sprache hinzufügen" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog">
+                      <i class="fa fa-plus"></i>
+                    </a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+                    <div class="card">
+                      <div class="card-body bg-light">
+                        <div class="row">
+                          <div class="col-sm-12">
+                            <div class="form-group">
+                              <label th:for="label-__${language}__" th:text="#{lbl.label}">Label</label>
+                              <input th:id="label-__${language}__" class="form-control" type="text" value="" th:field="*{label['__${language}__']}" />
+                            </div>
+                            <div class="form-group">
+                              <label th:text="#{lbl.abstract}">Abstract</label>
+                              <div th:replace="fragments/tiptap :: editor-menu-short"></div>
+                              <div id="editor"></div>
+                              <input id="contentJSON" type="hidden" th:field="*{description['__${language}__']}"/>
+                              <script th:src="@{/js/tiptap.js}" type="module"></script>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  <div class="form-group">
-                    <label for="value" class="form-label font-weight-bold">Wert</label>
-                    <input th:field="*{value}" id="value" required="" type="text" class="form-control" aria-invalid="true" value="">
-                  </div>
-
-
-                  <!--                <div class="form-group">
-                                    <label for="label" class="form-label font-weight-bold">Label</label>
-                  
-                                    <div class="input-group" th:each="entry : *{label.entrySet()}">
-                  
-                                      <select id="label-locales">
-                                        <th:block th:each="locale : ${allLanguages}">
-                                          <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}" th:selected="${#strings.equals(locale.language, entry.key)}">English</option>
-                                        </th:block>
-                                      </select>
-                                      <input type="text" aria-label="Label" class="form-control" th:field="*{label['__${entry.key}__']}"/>
-                                    </div>
-                                  </div>-->
-
-
-
                 </div>
               </div>
-            </form>
 
+              <div class="form-group">
+                <label for="value">Wert</label>
+                <input th:field="*{value}" id="value" type="text" class="form-control" aria-invalid="true" value="">
+                <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}">...</p>
+              </div>
+
+            </div>
           </div>
-        </div>
+        </form>
+
       </div>
     </div>
   </th:block>
@@ -174,52 +158,64 @@
       </div>
     </div>
     <script type="text/javascript" th:inline="javascript">
-let targetLocalizedForm;
-$('#addLanguageDialog').on('show.bs.modal', function (e) {
-  targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
-});
-$("#addLanguageDialog").on('click', '.btn-primary', function () {
-  /*[- remove class 'active' from all 'nav-item a' links -]*/
-  let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-  $(navTabs).find('.nav-link').removeClass('active');
+      let targetLocalizedForm;
+      $('#addLanguageDialog').on('show.bs.modal', function (e) {
+        targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
+      });
+      $("#addLanguageDialog").on('click', '.btn-primary', function () {
+        /*[- remove class 'active' from all 'nav-item a' links -]*/
+        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+        $(navTabs).find('.nav-link').removeClass('active');
 
-  /*[- append a new active tab with selected language before plus tab -]*/
-  let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
-  let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
-  /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-  let newTab = $(navTabs).children('.nav-item').first().clone();
-  let navLink = $(newTab).children('.nav-link').first();
-  $(navLink).attr('href', '#' + selectedOptionValue);
-  $(navLink).text(selectedOptionText);
-  $(navLink).addClass('active');
-  let plusTab = $(navTabs).find('.nav-item').last();
-  $(plusTab).before(newTab);
+        /*[- append a new active tab with selected language before plus tab -]*/
+        let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
+        let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
+        /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
+        let newTab = $(navTabs).children('.nav-item').first().clone();
+        let navLink = $(newTab).children('.nav-link').first();
+        $(navLink).attr('href', '#' + selectedOptionValue);
+        $(navLink).text(selectedOptionText);
+        $(navLink).addClass('active');
+        let plusTab = $(navTabs).find('.nav-item').last();
+        $(plusTab).before(newTab);
 
-  /*[- append a new tab pane for new language by cloning an existing pane -]*/
-  $(targetLocalizedForm).find('.tab-pane').removeClass('active');
-  let newTabPane = $(targetLocalizedForm).find('.tab-pane').first().clone();
-  $(newTabPane).attr('id', selectedOptionValue);
-  $(newTabPane).addClass('active');
-  /*[-
-   * set ids and properties of form elements to be in sync with new language
-   * e.g. <label for="label-en"...> -> <label for="label-am"...>
-   * e.g. <input id="label-en" name="label['en']"...> -> <input id="label-am" name="label['am']"...>
-   -]*/
-  $(newTabPane).find('label').each(function () {
-    let newForAttribute = $(this).attr('for').split('-')[0] + '-' + selectedOptionValue;
-    $(this).attr('for', newForAttribute);
-  });
-  $(newTabPane).find('input').each(function () {
-    let newIdAttribute = $(this).attr('id').split('-')[0] + '-' + selectedOptionValue;
-    $(this).attr('id', newIdAttribute);
-    let newNameAttribute = $(this).attr('name').split('[')[0] + '[\'' + selectedOptionValue + '\']';
-    $(this).attr('name', newNameAttribute);
-    $(this).val('');
-  });
+        /*[- append a new tab pane for new language by cloning an existing pane -]*/
+        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+        let newTabPane = $(targetLocalizedForm).find('.tab-pane').first().clone();
+        $(newTabPane).attr('id', selectedOptionValue);
+        $(newTabPane).addClass('active');
+        /*[-
+         * set ids and properties of form elements to be in sync with new language
+         * e.g. <label for="label-en"...> -> <label for="label-am"...>
+         * e.g. <input id="label-en" name="label['en']"...> -> <input id="label-am" name="label['am']"...>
+         -]*/
+        $(newTabPane).find('label').each(function () {
+          if ($(this).attr('for')) {
+            let newForAttribute = $(this).attr('for').split('-')[0] + '-' + selectedOptionValue;
+            $(this).attr('for', newForAttribute);
+          }
+        });
+        $(newTabPane).find('input').each(function () {
+          if ($(this).attr('id')) {
+            let newIdAttribute = $(this).attr('id').split('-')[0] + '-' + selectedOptionValue;
+            $(this).attr('id', newIdAttribute);
+          }
+          if ($(this).attr('name')) {
+            let newNameAttribute = $(this).attr('name').split('[')[0] + '[\'' + selectedOptionValue + '\']';
+            $(this).attr('name', newNameAttribute);
+          }
+          $(this).val('');
+        });
 
-  let tabContent = $(targetLocalizedForm).find('.tab-content').first();
-  $(tabContent).append(newTabPane);
-});
+        let tabContent = $(targetLocalizedForm).find('.tab-content').first();
+        $(tabContent).append(newTabPane);
+      });
+
+      function syncContent() {
+//        var json = JSON.stringify(window.view.state.doc.toJSON());
+        var json = JSON.stringify(editor.getJSON());
+        document.getElementById("contentJSON").value = json;
+      }
     </script>
   </th:block>
 </body>

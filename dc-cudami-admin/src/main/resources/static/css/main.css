@@ -37,32 +37,6 @@ a[href^="http"]:not(.no-external):after {
   background-color: #FFF;
 }
 
-#editor, .editor {
-  background: white;
-  color: black;
-  background-clip: padding-box;
-  border-radius: 4px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  padding: 5px 0;
-  margin-bottom: 23px;
-  min-height: 400px;
-}
-
-.editorMenu {
-  background-color: #f0f0f2;
-  border: 1px solid #aaa;
-  border-radius: 4px 4px 0px 0px;
-}
-.editorMenu .btn-default {
-  color: #333;
-  /*background-color: #fff;*/
-  border-color: #ccc;
-}
-
-.editorMenu .btn-default.is-active {
-  background-color: #ddd;
-}
-
 .rows-striped > .row:nth-of-type(odd) {
   background-color: #FCFCFC;
 }
