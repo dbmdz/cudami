@@ -69,7 +69,11 @@ class ManifestationRepositoryImplTest {
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .publisher(publisher)
+            .publication(
+                Publisher.builder()
+                    .agent(List.of(publisher))
+                    .locations(List.of(publicationLocation))
+                    .build())
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
                 Title.builder()
