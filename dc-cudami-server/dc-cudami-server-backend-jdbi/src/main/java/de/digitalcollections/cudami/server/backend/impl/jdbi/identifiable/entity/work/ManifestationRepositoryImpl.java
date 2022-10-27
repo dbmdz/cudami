@@ -63,7 +63,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + String.format(
-            ", %1$s.composition %2$s_composition, %1$s.dimensions %2$_dimensions, %1$s.otherlanguages %2$s_otherLanguages"
+            ", %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages"
                 + ", %1$s.publications %2$s_publications, %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange"
                 + ", %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version",
             tableAlias, mappingPrefix);
