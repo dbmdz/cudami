@@ -9,7 +9,7 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publication;
+import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.text.LocalizedText;
@@ -68,9 +68,9 @@ class ManifestationRepositoryImplTest {
             .language(Locale.GERMAN)
             .mediaType("BOOK")
             .publication(
-                Publication.builder()
-                    .publishers(List.of(publisher))
-                    .publicationLocations(List.of(publicationLocation))
+                Publisher.builder()
+                    .agent(List.of(publisher))
+                    .locations(List.of(publicationLocation))
                     .build())
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
