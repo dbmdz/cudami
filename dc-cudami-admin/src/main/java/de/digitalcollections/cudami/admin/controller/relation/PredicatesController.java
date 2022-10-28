@@ -118,13 +118,8 @@ public class PredicatesController extends AbstractController {
     verifyBinding(results);
     if (results.hasErrors()) {
       Locale defaultLanguage = localeService.getDefaultLanguage();
-
-      List<Locale> existingLanguages = getExistingLanguages(defaultLanguage, predicate);
-      model.addAttribute("existingLanguages", existingLanguages);
-
-      List<Locale> allLanguages = getAllLanguages();
-      model.addAttribute("allLanguages", allLanguages);
-
+      model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
+      model.addAttribute("allLanguages", getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
       return "predicates/create";
     }
