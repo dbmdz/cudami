@@ -3,10 +3,12 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.PublicationMapper;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Title;
@@ -37,6 +39,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public static final String TABLE_NAME = "manifestations";
   public static final String TABLE_ALIAS = "mf";
   public static final String MAPPING_PREFIX = "mf";
+
+  private EntityRepositoryImpl<Entity> entityRepository;
 
   @Override
   public String getSqlInsertFields() {
@@ -83,7 +87,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
-  // TODO: to join: AllFields{ subjects ✓ }, ReducedFields{ work, parents and relations }
+  // TODO: to join: AllFields{ subjects ✓ }, ReducedFields{ work, parents ✓ and relations ✓ }
 
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
@@ -92,25 +96,48 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
             %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
             %1$s.titles %2$s_titles,
-            %3$s.subject_uuid %3$s_subjectUuid, %3$s.title %3$s_title, %3$s.sortKey %3$s_sortKey
             """
-            .formatted(tableAlias, mappingPrefix);
+            .formatted(tableAlias, mappingPrefix)
+        // parents
+        + """
+            mms.title parent_title, mms.sortKey parent_sortKey,
+            parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
+            """
+        // relations
+        + "%1$s.predicate %2$s_predicate, %1$s.sortKey %2$s_sortKey, "
+            .formatted(
+                EntityRelationRepositoryImpl.TABLE_ALIAS,
+                EntityRelationRepositoryImpl.MAPPING_PREFIX)
+        + entityRepository.getSqlSelectReducedFields();
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
       """
       LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
-      LEFT JOIN manifestation_manifestations mms ON mms.object_uuid = %1$s.uuid
+      LEFT JOIN (
+        manifestation_manifestations mms INNER JOIN manifestations parent
+        ON parent.uuid = mms.subject_uuid
+      ) ON mms.object_uuid = %1$s.uuid
+      LEFT JOIN (
+        %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
+      ) ON %5$s.object_uuid = %1$s.uuid
       """
           .formatted(
-              TABLE_ALIAS, SubjectRepositoryImpl.TABLE_NAME, SubjectRepositoryImpl.TABLE_ALIAS);
+              TABLE_ALIAS,
+              /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
+              SubjectRepositoryImpl.TABLE_ALIAS,
+              /*4-5*/ EntityRelationRepositoryImpl.TABLE_NAME,
+              EntityRelationRepositoryImpl.TABLE_ALIAS,
+              /*6-7*/ EntityRepositoryImpl.TABLE_NAME,
+              EntityRepositoryImpl.TABLE_ALIAS);
 
   public ManifestationRepositoryImpl(
       Jdbi jdbi,
       CudamiConfig cudamiConfig,
       ExpressionTypeMapper expressionTypeMapper,
       PublicationMapper publicationMapper,
-      LocalDateRangeMapper dateRangeMapper) {
+      LocalDateRangeMapper dateRangeMapper,
+      EntityRepositoryImpl<Entity> entityRepository) {
     super(
         jdbi,
         TABLE_NAME,
@@ -123,6 +150,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     dbi.registerArrayType(publicationMapper);
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
+
+    this.entityRepository = entityRepository;
   }
 
   private BiFunction<String, Map<String, Object>, String> buildTitleSql(
