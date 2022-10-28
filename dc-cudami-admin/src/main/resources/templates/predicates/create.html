@@ -115,7 +115,7 @@
                 </div>
               </div>
 
-              <div class="form-group">
+              <div class="form-group" th:classappend="${#fields.hasErrors('value')}? has-error">
                 <label for="value">Wert</label>
                 <input th:field="*{value}" id="value" type="text" class="form-control" aria-invalid="true" value="">
                 <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}">...</p>

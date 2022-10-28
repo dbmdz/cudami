@@ -31,10 +31,23 @@ a[href^="http"]:not(.no-external):after {
 .alert {
   border-radius: 0px;
   width: 100%;
+  font-size: 14px;
+  padding: 5px 15px;
+}
+.alert i {
+  margin-right: 10px;
 }
 
 .bootstrap-table table.table{
   background-color: #FFF;
+}
+
+.has-error input {
+  border-color:red;
+}
+.has-error p {
+  font-size: 11px;
+  color:red;
 }
 
 .rows-striped > .row:nth-of-type(odd) {

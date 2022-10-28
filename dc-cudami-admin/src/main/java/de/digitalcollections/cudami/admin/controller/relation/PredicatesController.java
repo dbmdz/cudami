@@ -61,10 +61,7 @@ public class PredicatesController extends AbstractController {
     model.addAttribute("predicate", predicate);
     List<Locale> existingLanguages = List.of(defaultLanguage);
 
-    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> sortedLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
+    List<Locale> sortedLanguages = getAllLanguages();
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
@@ -80,13 +77,8 @@ public class PredicatesController extends AbstractController {
       throws TechnicalException {
     Predicate predicate = service.getByUuid(uuid);
 
-    List<Locale> existingLanguages = List.of(localeService.getDefaultLanguage());
-    LocalizedText label = predicate.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
-    }
+    List<Locale> existingLanguages =
+        getExistingLanguages(localeService.getDefaultLanguage(), predicate);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -121,9 +113,19 @@ public class PredicatesController extends AbstractController {
       BindingResult results,
       Model model,
       SessionStatus status,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes redirectAttributes)
+      throws TechnicalException {
     verifyBinding(results);
     if (results.hasErrors()) {
+      Locale defaultLanguage = localeService.getDefaultLanguage();
+
+      List<Locale> existingLanguages = getExistingLanguages(defaultLanguage, predicate);
+      model.addAttribute("existingLanguages", existingLanguages);
+
+      List<Locale> allLanguages = getAllLanguages();
+      model.addAttribute("allLanguages", allLanguages);
+
+      model.addAttribute("activeLanguage", defaultLanguage);
       return "predicates/create";
     }
     Predicate predicateDB = null;
@@ -146,6 +148,25 @@ public class PredicatesController extends AbstractController {
         messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/predicates/" + predicateDB.getUuid().toString();
+  }
+
+  private List<Locale> getAllLanguages() throws TechnicalException {
+    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> sortedLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
+    return sortedLanguages;
+  }
+
+  private List<Locale> getExistingLanguages(Locale defaultLanguage, Predicate predicate) {
+    List<Locale> existingLanguages = List.of(defaultLanguage);
+    LocalizedText label = predicate.getLabel();
+    if (!CollectionUtils.isEmpty(label)) {
+      Locale displayLocale = LocaleContextHolder.getLocale();
+      existingLanguages =
+          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
+    }
+    return existingLanguages;
   }
 
   @GetMapping("/predicates/{uuid}")

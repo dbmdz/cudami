@@ -8,29 +8,29 @@
     <th:block th:fragment="global">
       <div class="row" th:if="${error_message}">
         <div class="alert alert-danger">
-          <span class="glyphicon glyphicon-exclamation-sign"></span> <span class="sr-only">Error:</span> <span th:text="${error_message}">Error message</span>
+          <i class="fas fa-exclamation-circle"></i> <span class="sr-only">Error:</span> <span th:text="${error_message}">Error message</span>
         </div>
       </div>
       <div class="row" th:if="${info_message}">
         <div class="alert alert-info">
-          <span class="glyphicon glyphicon-info-sign"></span> <span class="sr-only">Info:</span> <span th:text="${info_message}">Info message</span>
+          <i class="fas fa-info-circle"></i> <span class="sr-only">Info:</span> <span th:text="${info_message}">Info message</span>
         </div>
       </div>
       <div class="row" th:if="${success_message}">
         <div class="alert alert-success">
-          <span class="glyphicon glyphicon-ok-sign"></span> <span class="sr-only">Success:</span> <span th:text="${success_message}">Success message</span>
+          <i class="fas fa-check-circle"></i> <span class="sr-only">Success:</span> <span th:text="${success_message}">Success message</span>
         </div>
       </div>
       <div class="row" th:if="${warning_message}">
         <div class="alert alert-warning">
-          <span class="glyphicon glyphicon-warning-sign"></span> <span class="sr-only">Warning:</span> <span th:text="${warning_message}">Warning</span>
+          <i class="fas fa-exclamation-triangle"></i> <span class="sr-only">Warning:</span> <span th:text="${warning_message}">Warning</span>
         </div>
       </div>
     </th:block>
     
     <th:block th:fragment="form">
       <div class="alert alert-warning" th:if="${#fields.hasAnyErrors()}">
-        <span class="glyphicon glyphicon-warning-sign"></span> <span th:text="#{msg.correct_input_errors}">Correct invalid input, please.</span>
+        <i class="fas fa-exclamation-triangle"></i> <span th:text="#{msg.correct_input_errors}">Correct invalid input, please.</span>
         <ul th:if="${#fields.hasErrors('global')}">
           <li th:each="err : ${#fields.errors('global')}" th:utext="${err}">Input is incorrect</li>
         </ul>
