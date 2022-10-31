@@ -35,4 +35,19 @@ class CudamiPredicatesClientTest
     client.getAll();
     verifyHttpRequestByMethodAndRelativeURL("get", "");
   }
+
+  @Test
+  @DisplayName("can retrieve by value")
+  public void retrieveByValue() throws Exception {
+    client.getByValue("is_author_of");
+    verifyHttpRequestByMethodAndRelativeURL("get", "/is_author_of");
+  }
+
+  @Test
+  @DisplayName("can retrieve by uuid")
+  public void retrieveByUUID() throws Exception {
+    UUID uuid = UUID.randomUUID();
+    client.getByUuid(uuid);
+    verifyHttpRequestByMethodAndRelativeURL("get", "/" + uuid);
+  }
 }
