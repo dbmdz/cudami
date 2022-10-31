@@ -468,4 +468,16 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
             ArrayList::addAll)
         .toArray(new UUID[1]);
   }
+
+  protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    return total;
+  }
 }

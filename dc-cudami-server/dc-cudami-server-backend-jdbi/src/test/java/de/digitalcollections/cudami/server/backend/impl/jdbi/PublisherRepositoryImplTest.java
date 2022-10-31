@@ -11,7 +11,17 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.work.Publisher;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,25 +79,7 @@ class PublisherRepositoryImplTest {
   @DisplayName("can save and retrieve by uuid")
   @Test
   void saveAndRetrieveByUuid() throws RepositoryException {
-    CorporateBody agent =
-        corporateBodyRepository.save(
-            CorporateBody.builder()
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build());
-    HumanSettlement place1 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 1").build());
-    HumanSettlement place2 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 2").build());
-    Publisher publisher =
-        Publisher.builder()
-            .agent(agent)
-            .location(place1)
-            .location(place2)
-            .publisherPresentation("Ort 1, Ort 2 : Körperschaft")
-            .build();
+    Publisher publisher = buildPublisher();
 
     Publisher savedPublisher = repo.save(publisher);
 
@@ -107,25 +99,7 @@ class PublisherRepositoryImplTest {
   @DisplayName("can save and successfully delete")
   @Test
   void saveAndDelete() throws RepositoryException {
-    CorporateBody agent =
-        corporateBodyRepository.save(
-            CorporateBody.builder()
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build());
-    HumanSettlement place1 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 1").build());
-    HumanSettlement place2 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 2").build());
-    Publisher publisher =
-        Publisher.builder()
-            .agent(agent)
-            .location(place1)
-            .location(place2)
-            .publisherPresentation("Ort 1, Ort 2 : Körperschaft")
-            .build();
+    Publisher publisher = buildPublisher();
 
     Publisher savedPublisher = repo.save(publisher);
     int deleted = repo.deleteByUuid(savedPublisher.getUuid());
@@ -144,31 +118,12 @@ class PublisherRepositoryImplTest {
   @DisplayName("can save and update")
   @Test
   void saveAndUpdate() throws RepositoryException {
-    CorporateBody agent =
-        corporateBodyRepository.save(
-            CorporateBody.builder()
-                .label(Locale.GERMAN, "Körperschaft")
-                .label(Locale.ENGLISH, "Corporate Body")
-                .build());
-    HumanSettlement place1 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 1").build());
-    HumanSettlement place2 =
-        humanSettlementRepository.save(
-            HumanSettlement.builder().label(Locale.GERMAN, "Ort 2").build());
-    Publisher publisher =
-        repo.save(
-            Publisher.builder()
-                .agent(agent)
-                .location(place1)
-                .location(place2)
-                .publisherPresentation("Ort 1, Ort 2 : Körperschaft")
-                .build());
+    Publisher publisher = repo.save(buildPublisher());
 
     Publisher publisherToUpdate =
         Publisher.builder()
-            .agent(agent)
-            .location(place1)
+            .agent(publisher.getAgent())
+            .location(publisher.getLocations().get(0))
             .publisherPresentation("Ort 1 : Körperschaft")
             .uuid(publisher.getUuid())
             .lastModified(publisher.getLastModified())
@@ -178,5 +133,171 @@ class PublisherRepositoryImplTest {
     Publisher updatedPublisher = repo.update(publisherToUpdate);
 
     assertThat(updatedPublisher).isEqualTo(publisherToUpdate);
+  }
+
+  @DisplayName("can retrieve all Publishers with paging")
+  @Test
+  void findAllPaged() throws RepositoryException {
+    Publisher savedPublisher = repo.save(buildPublisher());
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(PageRequest.builder().pageNumber(0).pageSize(99).build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher);
+  }
+
+  @DisplayName("can retrieve all Publishers with sorting")
+  @Test
+  void findAllPagedAndSorted() throws RepositoryException {
+    HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
+    HumanSettlement place2 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 2"));
+    CorporateBody corporateBody = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher"));
+
+    Publisher savedPublisher1 =
+        repo.save(
+            buildPublisher(List.of(place2, place1), corporateBody, "Ort 2, Ort 1 : Körperschaft"));
+    Publisher savedPublisher2 =
+        repo.save(
+            buildPublisher(List.of(place1, place2), corporateBody, "Ort 1, Ort 2 : Körperschaft"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .sorting(
+                    Sorting.builder()
+                        .order(
+                            Order.builder()
+                                .property("publisherPresentation")
+                                .direction(Direction.ASC)
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher2, savedPublisher1);
+  }
+
+  @DisplayName("can retrieve publishers with filtering of agent and location")
+  @Test
+  void findFilteredAgentLocation() throws RepositoryException {
+    HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
+    HumanSettlement place2 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 2"));
+    CorporateBody corporateBody1 = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher 1"));
+    CorporateBody corporateBody2 = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher 2"));
+
+    Publisher savedPublisher1 =
+        repo.save(buildPublisher(List.of(place1), corporateBody1, "Ort 1 : Körperschaft 1"));
+    Publisher savedPublisher2 =
+        repo.save(buildPublisher(List.of(place2), corporateBody2, "Ort 2 : Körperschaft 2"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("agent_uuid")
+                                .isEquals(corporateBody1.getUuid().toString())
+                                .build())
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("location_uuid")
+                                .contains(place1.getUuid().toString())
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher1);
+  }
+
+  @DisplayName("can retrieve publishers with filtering of publisherPresentation")
+  @Test
+  void findFilteredPublisherPresentation() throws RepositoryException {
+    HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
+    HumanSettlement place2 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 2"));
+    CorporateBody corporateBody1 = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher 1"));
+    CorporateBody corporateBody2 = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher 2"));
+
+    Publisher savedPublisher1 =
+        repo.save(buildPublisher(List.of(place1), corporateBody1, "Ort 1 : Körperschaft 1"));
+    Publisher savedPublisher2 =
+        repo.save(buildPublisher(List.of(place2), corporateBody2, "Ort 2 : Körperschaft 2"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("publisherPresentation")
+                                .isEquals(savedPublisher2.getPublisherPresentation())
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher2);
+  }
+
+  @DisplayName("can return an empty filtered set when no matches are found")
+  @Test
+  void noMatches() throws RepositoryException {
+    repo.save(buildPublisher());
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("publisherPresentation")
+                                .isEquals("nonexistant")
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).isEmpty();
+  }
+
+  // -------------------------------------------------------------------------------------------------------
+
+  private Publisher buildPublisher() {
+    CorporateBody agent =
+        ensureCorporateBody(
+            Map.of(Locale.GERMAN, "Körperschaft", Locale.ENGLISH, "Corporate Body"));
+    HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
+    HumanSettlement place2 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 2"));
+    return Publisher.builder()
+        .agent(agent)
+        .locations(List.of(place1, place2))
+        .publisherPresentation("Ort 1, Ort 2 : Körperschaft")
+        .build();
+  }
+
+  private Publisher buildPublisher(
+      List<HumanSettlement> places, CorporateBody corporateBody, String publisherPresentation) {
+    return Publisher.builder()
+        .locations(places)
+        .agent(corporateBody)
+        .publisherPresentation(publisherPresentation)
+        .build();
+  }
+
+  private HumanSettlement ensureHumanSettlement(Map<Locale, String> placeNames) {
+    LocalizedText placeName = new LocalizedText();
+    placeName.putAll(placeNames);
+
+    return humanSettlementRepository.save(
+        HumanSettlement.builder().label(placeName).name(placeName).build());
+  }
+
+  private CorporateBody ensureCorporateBody(Map<Locale, String> names) {
+    LocalizedText name = new LocalizedText();
+    name.putAll(names);
+    return corporateBodyRepository.save(CorporateBody.builder().label(name).name(name).build());
   }
 }
