@@ -13,11 +13,15 @@ import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
@@ -60,7 +64,77 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
 
   @Override
   public PageResponse<Publisher> find(PageRequest pageRequest) throws RepositoryException {
-    return null;
+    String orderBy = getOrderBy(pageRequest.getSorting());
+
+    StringBuilder sql =
+        new StringBuilder(
+            "SELECT "
+                + getSqlFullFields()
+                + ", l.id as l_id"
+                + " FROM "
+                + tableName
+                + " "
+                + tableAlias
+                + " cross join unnest(publ.location_uuids) l(id) " // Required to preserve order of
+                // array items
+                + " LEFT JOIN "
+                + corporateBodyRepository.tableName
+                + " "
+                + corporateBodyRepository.tableAlias
+                + " ON "
+                + corporateBodyRepository.tableAlias
+                + ".uuid="
+                + tableAlias
+                + ".agent_uuid"
+                + " LEFT JOIN "
+                + personRepository.tableName
+                + " "
+                + personRepository.tableAlias
+                + " ON "
+                + personRepository.tableAlias
+                + ".uuid="
+                + tableAlias
+                + ".agent_uuid"
+                + " LEFT JOIN "
+                + humanSettlementRepository.tableName
+                + " "
+                + humanSettlementRepository.tableAlias
+                + " ON "
+                + humanSettlementRepository.tableAlias
+                + ".uuid=l.id");
+
+    Map argumentMappings = new HashMap<>();
+    String executedSearchTerm = addSearchTerm(pageRequest, sql, argumentMappings);
+    addFiltering(pageRequest, sql, argumentMappings);
+
+    // Append default ordering to ensure deterministic paging results
+    if (orderBy == null) {
+      sql.append(" ORDER BY " + tableAlias + "_publisherPresentation");
+    }
+
+    addPageRequestParams(pageRequest, sql);
+    final String query = sql.toString();
+
+    List<Publisher> result =
+        dbi.withHandle(
+                (Handle handle) ->
+                    handle
+                        .createQuery(query)
+                        .bindMap(argumentMappings)
+                        .reduceRows(
+                            (Map<UUID, Publisher> results, RowView rowView) -> {
+                              fullFieldsReduceRowsBiFunction.apply(results, rowView);
+                            }))
+            .collect(Collectors.toList());
+
+    StringBuilder countQuery =
+        new StringBuilder("SELECT count(*) FROM " + tableName + " " + tableAlias);
+    addSearchTerm(pageRequest, countQuery, argumentMappings);
+    addFiltering(pageRequest, countQuery, argumentMappings);
+
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override
@@ -145,7 +219,6 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
         if (locationUuid != null) {
           publisher.addLocation(rowView.getRow(HumanSettlement.class));
         }
-
         publisher.setPublisherPresentation(
             rowView.getColumn(mappingPrefix + "_publisherPresentation", String.class));
         publisher.setCreated(rowView.getColumn(mappingPrefix + "_created", LocalDateTime.class));
@@ -245,21 +318,44 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return null;
+    return new ArrayList<>(Arrays.asList("created", "publisherPresentation", "lastModified"));
   }
 
   @Override
   public String getColumnName(String modelProperty) {
-    return null;
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "created":
+        return tableAlias + ".created";
+      case "lastModified":
+        return tableAlias + ".last_modified";
+      case "uuid":
+        return tableAlias + ".uuid";
+      case "agent_uuid":
+        return tableAlias + ".agent_uuid::varchar";
+      case "location_uuid":
+        return tableAlias + ".location_uuids::varchar";
+      case "publisherPresentation":
+        return tableAlias + ".publisherPresentation";
+      default:
+        return null;
+    }
   }
 
   @Override
   protected String getUniqueField() {
-    return null;
+    return "uuid";
   }
 
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
-    return false;
+    switch (modelProperty) {
+      case "publisherPresentation":
+        return true;
+      default:
+        return false;
+    }
   }
 }

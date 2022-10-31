@@ -239,18 +239,6 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
     }
   }
 
-  private long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-    return total;
-  }
-
   private List<Subject> retrieveList(
       String fieldsSql,
       StringBuilder innerQuery,
