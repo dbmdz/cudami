@@ -35,4 +35,10 @@ class CudamiPredicatesClientTest
     client.getAll();
     verifyHttpRequestByMethodAndRelativeURL("get", "");
   }
+
+  @DisplayName("can get by value")
+  public void testGetByUrl_String() throws Exception {
+    client.getByValue("is_author_of");
+    verifyHttpRequestByMethodAndRelativeURL("get", "/is_author_of");
+  }
 }
