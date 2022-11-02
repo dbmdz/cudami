@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -52,6 +53,8 @@ public class PublisherController {
           FilterCriterion<UUID> filterCriterionAgentUuid,
       @RequestParam(name = "location_uuid", required = false)
           FilterCriterion<UUID> filterCriterionLocationUuid,
+      @RequestParam(name = "location_uuids", required = false)
+          String rawFilterCriterionLocationUuids,
       @RequestParam(name = "publisherPresentation", required = false)
           FilterCriterion<String> filterCriterionPublisherPresentation)
       throws CudamiServiceException {
@@ -76,6 +79,19 @@ public class PublisherController {
       }
       filterCriterionLocationUuid.setExpression("location_uuid");
       filtering.add(filterCriterionLocationUuid);
+    }
+
+    if (rawFilterCriterionLocationUuids != null) {
+      if (filtering == null) {
+        filtering = new Filtering();
+      }
+      String[] uuids = rawFilterCriterionLocationUuids.replaceFirst("^.*:", "").split(",");
+      FilterCriterion fc =
+          FilterCriterion.builder()
+              .withExpression("location_uuids")
+              .isEquals(Arrays.stream(uuids).map(UUID::fromString).toList())
+              .build();
+      filtering.add(fc);
     }
 
     if (filterCriterionPublisherPresentation != null) {
