@@ -25,11 +25,11 @@
 
 <th:block th:fragment="renderContentBlocks(contentBlocks)">
   <th:block th:each="block, iter : ${contentBlocks}">
-    <th:block th:insert="~{::renderContentBlock(${block})}"></th:block>
+    <th:block th:insert="~{::renderContentBlock(${block}, ${iter.index})}"></th:block>
   </th:block>
 </th:block>
 
-<th:block th:fragment="renderContentBlock(block)">
+<th:block th:fragment="renderContentBlock(block, idx)">
   <th:block th:if="${block.class.simpleName == 'Blockquote'}">
     <blockquote>
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
@@ -52,23 +52,23 @@
     <br/>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'Heading'}">
-    <h1 th:if="${block.getAttribute('level') == 1}">
+  <th:block th:if="${block.class.simpleName == 'Heading'}" th:with="id=${renderTocLinks ? idx : null}">
+    <h1 th:if="${block.getAttribute('level') == 1}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h1>
-    <h2 th:if="${block.getAttribute('level') == 2}">
+    <h2 th:if="${block.getAttribute('level') == 2}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h2>
-    <h3 th:if="${block.getAttribute('level') == 3}">
+    <h3 th:if="${block.getAttribute('level') == 3}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h3>
-    <h4 th:if="${block.getAttribute('level') == 4}">
+    <h4 th:if="${block.getAttribute('level') == 4}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h4>
-    <h5 th:if="${block.getAttribute('level') == 5}">
+    <h5 th:if="${block.getAttribute('level') == 5}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h5>
-    <h6 th:if="${block.getAttribute('level') == 6}">
+    <h6 th:if="${block.getAttribute('level') == 6}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h6>
   </th:block>

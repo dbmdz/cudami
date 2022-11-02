@@ -19,6 +19,13 @@
         </div>
       </th:block>
 
+      <!-- toc of webpage: -->
+      <th:block th:if="${webpage.renderingHints?.showInPageNavigation}">
+        <nav class="webpage-toc">
+          <th:block th:insert="cudami/fragments/toc::toc(${toc})"></th:block>
+        </nav>
+      </th:block>
+
       <!-- text of webpage: -->
       <th:block th:if="${webpage.text}">
         <div class="webpage-text">
