@@ -25,7 +25,9 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements PublisherRepository {
 
   private CorporateBodyRepositoryImpl corporateBodyRepository;
