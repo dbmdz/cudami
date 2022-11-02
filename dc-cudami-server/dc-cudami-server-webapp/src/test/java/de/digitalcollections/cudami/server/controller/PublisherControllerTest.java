@@ -199,8 +199,7 @@ class PublisherControllerTest extends BaseControllerTest {
             + "&location_uuids=eq:"
             + locationUuid1
             + ","
-            + locationUuid2
-            + "",
+            + locationUuid2,
         200);
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =
         ArgumentCaptor.forClass(PageRequest.class);
