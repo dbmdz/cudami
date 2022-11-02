@@ -339,6 +339,8 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
         return tableAlias + ".agent_uuid::varchar";
       case "location_uuid":
         return tableAlias + ".location_uuids::varchar";
+      case "location_uuids":
+        return tableAlias + ".location_uuids::varchar[]";
       case "publisherPresentation":
         return tableAlias + ".publisherPresentation";
       default:

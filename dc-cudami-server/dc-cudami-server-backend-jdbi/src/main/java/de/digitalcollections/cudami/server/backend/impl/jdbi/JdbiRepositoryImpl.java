@@ -258,14 +258,50 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           break;
         case CONTAINS:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" ILIKE '%' || ")
-              .append(":")
-              .append(criterionKey)
-              .append(" || '%')");
-          argumentMappings.put(criterionKey, fc.getValue());
+
+          // Collections: siehe SearchTermTemplates " DB @> query"
+          if (fc.getValue() instanceof Collection<?> valueCollection
+              && !((Collection<?>) fc.getValue()).isEmpty()) {
+            String arrayType = "varchar[]";
+            Object valueSample = valueCollection.stream().findFirst().get();
+
+            if (valueSample instanceof UUID) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(UUID[]::new));
+              arrayType = "UUID[]";
+            } else if (valueSample instanceof String) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(String[]::new));
+              arrayType = "varchar[]";
+            } else if (valueSample instanceof Integer) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Integer[]::new));
+              arrayType = "int[]";
+            } else if (valueSample instanceof Long) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Long[]::new));
+              arrayType = "long[]";
+            }
+            query
+                .append("(")
+                .append(expression)
+                .append(" @> ")
+                .append(":")
+                .append(criterionKey)
+                .append("::")
+                .append(arrayType)
+                .append(")");
+
+          } else {
+            query
+                .append("(")
+                .append(expression)
+                .append(" ILIKE '%' || ")
+                .append(":")
+                .append(criterionKey)
+                .append(" || '%')");
+            argumentMappings.put(criterionKey, fc.getValue());
+          }
           break;
         case STARTS_WITH:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
@@ -280,14 +316,48 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
           break;
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" = ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
+          if (fc.getValue() instanceof Collection<?> valueCollection
+              && !((Collection<?>) fc.getValue()).isEmpty()) {
+            String arrayType = "varchar[]";
+            Object valueSample = valueCollection.stream().findFirst().get();
+
+            if (valueSample instanceof UUID) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(UUID[]::new));
+              arrayType = "UUID[]";
+            } else if (valueSample instanceof String) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(String[]::new));
+              arrayType = "varchar[]";
+            } else if (valueSample instanceof Integer) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Integer[]::new));
+              arrayType = "int[]";
+            } else if (valueSample instanceof Long) {
+              argumentMappings.put(
+                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Long[]::new));
+              arrayType = "long[]";
+            }
+
+            query
+                .append("(")
+                .append(expression)
+                .append(" = ")
+                .append(":")
+                .append(criterionKey)
+                .append("::")
+                .append(arrayType)
+                .append(")");
+          } else {
+            query
+                .append("(")
+                .append(expression)
+                .append(" = ")
+                .append(":")
+                .append(criterionKey)
+                .append(")");
+            argumentMappings.put(criterionKey, fc.getValue());
+          }
           break;
         case NOT_EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html

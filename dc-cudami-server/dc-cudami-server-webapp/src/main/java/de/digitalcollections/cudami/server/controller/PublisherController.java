@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.server.business.api.service.PublisherService
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.model.identifiable.entity.work.Publisher;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -37,7 +39,6 @@ public class PublisherController {
     this.service = service;
   }
 
-  // TODO: Add filtering for (agent uuid, list of location uuids)
   @Operation(summary = "Get all publishers")
   @GetMapping(
       value = {"/v6/publishers"},
@@ -46,14 +47,53 @@ public class PublisherController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "agent_uuid", required = false)
+          FilterCriterion<UUID> filterCriterionAgentUuid,
+      @RequestParam(name = "location_uuid", required = false)
+          FilterCriterion<UUID> filterCriterionLocationUuid,
+      @RequestParam(name = "publisherPresentation", required = false)
+          FilterCriterion<String> filterCriterionPublisherPresentation)
       throws CudamiServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.find(pageRequest);
+
+    Filtering filtering = null;
+    if (filterCriterionAgentUuid != null) {
+      if (filtering == null) {
+        filtering = new Filtering();
+      }
+      filterCriterionAgentUuid.setExpression("agent_uuid");
+      filtering.add(filterCriterionAgentUuid);
+    }
+
+    if (filterCriterionLocationUuid != null) {
+      if (filtering == null) {
+        filtering = new Filtering();
+      }
+      filterCriterionLocationUuid.setExpression("location_uuid");
+      filtering.add(filterCriterionLocationUuid);
+    }
+
+    if (filterCriterionPublisherPresentation != null) {
+      if (filtering == null) {
+        filtering = new Filtering();
+      }
+      filterCriterionPublisherPresentation.setExpression("publisherPresentation");
+      filtering.add(filterCriterionPublisherPresentation);
+    }
+
+    if (filtering != null) {
+      pageRequest.add(filtering);
+    }
+
+    System.out.println("pageRequest=" + pageRequest);
+
+    var foo = service.find(pageRequest);
+    return foo;
   }
 
   @Operation(summary = "Get a publisher by its UUID")

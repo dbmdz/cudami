@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -15,8 +16,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("The JdbiRepository")
 public class JdbiRepositoryImplTest {
 
   JdbiRepositoryImpl instance = new MyImpl();
@@ -67,6 +71,31 @@ public class JdbiRepositoryImplTest {
     assertEquals(argumentMappings.get("filtervalue_1"), "Schiff");
   }
 
+  @DisplayName("can create a WhereClause for collection contains")
+  @Test
+  public void testGetWhereClauseContainsCollection() {
+    UUID uuid1 = UUID.randomUUID();
+    UUID uuid2 = UUID.randomUUID();
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    // NOT_IN
+    String filteringProperty = "foo_uuids";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .contains(List.of(uuid1, uuid2))
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("(foo_uuids @> :filtervalue_1::UUID[])", whereClause);
+    UUID[] actual = (UUID[]) argumentMappings.get("filtervalue_1");
+    assertThat(actual).containsExactly(uuid1, uuid2);
+  }
+
   @Test
   public void testGetWhereClauseEquals() {
     Map<String, Object> argumentMappings = new HashMap<>(0);
@@ -82,6 +111,31 @@ public class JdbiRepositoryImplTest {
 
     assertEquals("(age = :filtervalue_1)", whereClause);
     assertEquals(argumentMappings.get("filtervalue_1"), 73);
+  }
+
+  @DisplayName("can create a WhereClause for collection equality")
+  @Test
+  public void testGetWhereClauseEqualsForCollection() {
+    UUID uuid1 = UUID.randomUUID();
+    UUID uuid2 = UUID.randomUUID();
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    // EQUALS
+    String filteringProperty = "foo_uuids";
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression(filteringProperty)
+                    .isEquals(List.of(uuid1, uuid2))
+                    .build())
+            .build();
+    FilterCriterion<?> fc = filtering.getFilterCriterionFor(filteringProperty);
+    String whereClause = instance.getWhereClause(fc, argumentMappings, 1);
+
+    assertEquals("(foo_uuids = :filtervalue_1::UUID[])", whereClause);
+    UUID[] actual = (UUID[]) argumentMappings.get("filtervalue_1");
+    assertThat(actual).containsExactly(uuid1, uuid2);
   }
 
   @Test

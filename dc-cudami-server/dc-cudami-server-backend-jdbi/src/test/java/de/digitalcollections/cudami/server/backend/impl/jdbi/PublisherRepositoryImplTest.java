@@ -176,7 +176,7 @@ class PublisherRepositoryImplTest {
     assertThat(pageResponse.getContent()).containsExactly(savedPublisher2, savedPublisher1);
   }
 
-  @DisplayName("can retrieve publishers with filtering of agent and location")
+  @DisplayName("can retrieve publishers with filtering of agent and one location")
   @Test
   void findFilteredAgentLocation() throws RepositoryException {
     HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
@@ -209,6 +209,48 @@ class PublisherRepositoryImplTest {
                         .build())
                 .build());
     assertThat(pageResponse.getContent()).containsExactly(savedPublisher1);
+  }
+
+  @DisplayName(
+      "can retrieve publishers with filtering of agent and multiple locations in the given order")
+  @Test
+  void findFilteredAgentMultipleLocations() throws RepositoryException {
+    HumanSettlement place1 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 1"));
+    HumanSettlement place2 = ensureHumanSettlement(Map.of(Locale.GERMAN, "Ort 2"));
+    CorporateBody corporateBody1 = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher 1"));
+
+    Publisher savedPublisher =
+        repo.save(
+            buildPublisher(
+                List.of(place1, place2), corporateBody1, "Ort 1, Ort 2 : Körperschaft 1"));
+
+    Publisher unwantedPublisher =
+        repo.save(
+            buildPublisher(
+                List.of(place2, place1), corporateBody1, "Ort 2, Ort 1: Körperschaft 1"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("agent_uuid")
+                                .isEquals(corporateBody1.getUuid().toString())
+                                .build())
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("location_uuids")
+                                .isEquals(
+                                    List.of(
+                                        place1.getUuid().toString(), place2.getUuid().toString()))
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher);
   }
 
   @DisplayName("can retrieve publishers with filtering of publisherPresentation")
