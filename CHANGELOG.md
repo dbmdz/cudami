@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Added
 
 - Added rendering of ToC if `renderingHints.showInPageNavigation` in the webpage is `true`
+- Add rendering of ToC links if `renderTocLinks` is set to `true` somewhere in the model
 
 ## [6.1.1](https://github.com/dbmdz/cudami/releases/tag/6.1.1) - 2022-08-29
 
