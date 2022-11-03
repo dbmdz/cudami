@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.server.backend.api.repository.PublisherRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
@@ -9,15 +11,13 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publication;
+import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +40,7 @@ class ManifestationRepositoryImplTest {
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
   @Autowired HumanSettlementRepository humanSettlementRepository;
+  @Autowired PublisherRepository publisherRepository;
 
   @Test
   @DisplayName("is testable")
@@ -48,10 +49,9 @@ class ManifestationRepositoryImplTest {
   }
 
   @Test
-  void testSaveManifestationMapOfStringObject() {
-    CorporateBody publisher =
-        CorporateBody.builder().label("Publisher").addName("Publisher").build();
-    publisher = corporateBodyRepository.save(publisher);
+  void testSaveManifestationMapOfStringObject() throws RepositoryException {
+    CorporateBody agent = CorporateBody.builder().label("Publisher").addName("Publisher").build();
+    agent = corporateBodyRepository.save(agent);
 
     HumanSettlement publicationLocation =
         HumanSettlement.builder()
@@ -59,7 +59,9 @@ class ManifestationRepositoryImplTest {
             .label("München")
             .build();
     publicationLocation = humanSettlementRepository.save(publicationLocation);
-
+    var publisher =
+        publisherRepository.save(
+            Publisher.builder().agent(agent).location(publicationLocation).build());
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "ein Label")
@@ -67,20 +69,20 @@ class ManifestationRepositoryImplTest {
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .publication(
-                Publication.builder()
-                    .publishers(List.of(publisher))
-                    .publicationLocations(List.of(publicationLocation))
-                    .build())
+            .publisher(publisher)
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
                 Title.builder()
                     .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
                     .titleType(new TitleType("main", "main"))
-                    .textLocalesOfOriginalScripts(Set.of(Locale.GERMAN, Locale.ENGLISH))
+                    .textLocaleOfOriginalScript(Locale.GERMAN)
+                    .textLocaleOfOriginalScript(Locale.ENGLISH)
                     .build())
             .build();
     Manifestation saved = repo.save(manifestation);
+
+    Manifestation actual = repo.getByUuid(saved.getUuid());
+    assertThat(actual).isEqualTo(saved);
   }
 
   @Test

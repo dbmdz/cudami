@@ -679,6 +679,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
+  @Override
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
         dbi.withHandle(
@@ -795,6 +796,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
                 + tableAlias
+                + " "
                 + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME

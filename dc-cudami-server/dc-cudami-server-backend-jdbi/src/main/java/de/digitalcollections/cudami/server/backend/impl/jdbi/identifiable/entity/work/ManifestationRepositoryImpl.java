@@ -7,16 +7,22 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
+import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Title;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
+import org.jdbi.v3.core.result.RowView;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -87,7 +93,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
-  // TODO: to join: AllFields{ subjects ✓ }, ReducedFields{ work, parents ✓ and relations ✓ }
+  // TODO: to join: AllFields{ subjects ✓, publishers }, ReducedFields{ work, parents ✓ and
+  // relations ✓ }
 
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
@@ -104,7 +111,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
             """
         // relations
-        + "%1$s.predicate %2$s_predicate, %1$s.sortKey %2$s_sortKey, "
+        + "%1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex, "
             .formatted(
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX)
@@ -175,10 +182,49 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             title.getTitleType() != null ? title.getTitleType().getSubType() : null);
         bindings.put(String.format("titles_%d_text", i), title.getText());
         bindings.put(
-            String.format("titles_%d_textLocales", i), title.getTextLocalesOfOriginalScripts());
+            String.format("titles_%d_textLocales", i),
+            title.getTextLocalesOfOriginalScripts() != null
+                ? title.getTextLocalesOfOriginalScripts().stream()
+                    .map(l -> l.toLanguageTag())
+                    .toArray(n -> new String[n])
+                : null);
       }
       return sql.replace("{{titles}}", "ARRAY[" + String.join(", ", titleConstructors) + "]");
     };
+  }
+
+  @Override
+  protected void extendReducedIdentifiable(Manifestation manifestation, RowView rowView) {
+    // parents
+    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      if (manifestation.getParents() == null) {
+        manifestation.setParents(new ArrayList<>(1));
+      }
+      String parentTitle = rowView.getColumn("parent_title", String.class);
+      if (!manifestation.getParents().parallelStream()
+          .anyMatch(
+              relSpec ->
+                  Objects.equals(relSpec.getSubject().getUuid(), parentUuid)
+                      && Objects.equals(relSpec.getTitle(), parentTitle))) {
+        Manifestation parent =
+            Manifestation.builder()
+                .uuid(parentUuid)
+                .label(rowView.getColumn("parent_label", LocalizedText.class))
+                .titles(
+                    rowView.getColumn("parent_titles", new GenericType<List<Title>>() {})) // TODO
+                .manifestationType(rowView.getColumn("parent_manifestationType", String.class))
+                .build();
+        manifestation
+            .getParents()
+            .add(
+                RelationSpecification.<Manifestation>builder()
+                    .title(parentTitle)
+                    .sortKey(rowView.getColumn("parent_sortKey", String.class))
+                    .subject(parent)
+                    .build());
+      }
+    }
   }
 
   @Override
