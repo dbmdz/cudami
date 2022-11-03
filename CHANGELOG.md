@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [6.1.3](https://github.com/dbmdz/cudami/releases/tag/6.1.3) - 2022-11-03
+
+No real changes, but the publishing did not work well...
+
 ## [6.1.2](https://github.com/dbmdz/cudami/releases/tag/6.1.2) - 2022-11-03
 
 ### Added
