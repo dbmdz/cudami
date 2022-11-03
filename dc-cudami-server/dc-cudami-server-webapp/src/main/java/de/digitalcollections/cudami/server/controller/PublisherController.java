@@ -106,10 +106,7 @@ public class PublisherController {
       pageRequest.add(filtering);
     }
 
-    System.out.println("pageRequest=" + pageRequest);
-
-    var foo = service.find(pageRequest);
-    return foo;
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get a publisher by its UUID")
