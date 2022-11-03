@@ -52,7 +52,7 @@
     <br/>
   </th:block>
 
-  <th:block th:if="${block.class.simpleName == 'Heading'}" th:with="id=${renderTocLinks ? idx : null}">
+  <th:block th:if="${block.class.simpleName == 'Heading'}" th:with="id=${#objects.nullSafe(renderTocLinks, false) ? idx : null}">
     <h1 th:if="${block.getAttribute('level') == 1}" th:id="${id}">
       <th:block th:insert="~{::renderContentBlocks(${block.contentBlocks})}"></th:block>
     </h1>
