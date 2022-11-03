@@ -65,7 +65,7 @@ const AddLinkDialog = ({isOpen, toggle}) => {
               onChange={(value) =>
                 setAttributes({...attributes, href: value.trim()})
               }
-              pattern="^(https?://|/|mailto:).*$"
+              pattern="^(https?://|mailto:|/|#).*$"
               required
               value={attributes.href}
             />
