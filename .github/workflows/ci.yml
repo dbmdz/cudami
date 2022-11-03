@@ -86,7 +86,7 @@ jobs:
         run: echo "PROJECT_VERSION=$(xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]/text()' pom.xml)" >> $GITHUB_ENV
       - name: Set project version as output variable
         id: projectversion
-        run: echo "::set-output name=PROJECT_VERSION::${{ env.PROJECT_VERSION }}"
+        run: echo "PROJECT_VERSION=${{ env.PROJECT_VERSION }}" >> $GITHUB_OUTPUT
       # Publish snapshot
       - name: Set up JDK 17 for publishing a snapshot
         if: github.event_name == 'push' && endswith(env.PROJECT_VERSION, 'SNAPSHOT')
