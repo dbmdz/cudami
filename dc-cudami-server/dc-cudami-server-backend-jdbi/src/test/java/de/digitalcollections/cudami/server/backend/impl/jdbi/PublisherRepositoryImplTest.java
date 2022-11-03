@@ -199,12 +199,12 @@ class PublisherRepositoryImplTest {
                         .add(
                             FilterCriterion.builder()
                                 .withExpression("agent_uuid")
-                                .isEquals(corporateBody1.getUuid().toString())
+                                .isEquals(corporateBody1.getUuid())
                                 .build())
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("location_uuid")
-                                .contains(place1.getUuid().toString())
+                                .withExpression("location_uuids")
+                                .isEquals(List.of(place1.getUuid()))
                                 .build())
                         .build())
                 .build());
@@ -239,14 +239,12 @@ class PublisherRepositoryImplTest {
                         .add(
                             FilterCriterion.builder()
                                 .withExpression("agent_uuid")
-                                .isEquals(corporateBody1.getUuid().toString())
+                                .isEquals(corporateBody1.getUuid())
                                 .build())
                         .add(
                             FilterCriterion.builder()
                                 .withExpression("location_uuids")
-                                .isEquals(
-                                    List.of(
-                                        place1.getUuid().toString(), place2.getUuid().toString()))
+                                .isEquals(List.of(place1.getUuid(), place2.getUuid()))
                                 .build())
                         .build())
                 .build());
@@ -299,7 +297,7 @@ class PublisherRepositoryImplTest {
                         .add(
                             FilterCriterion.builder()
                                 .withExpression("agent_uuid")
-                                .isEquals(corporateBody.getUuid().toString())
+                                .isEquals(corporateBody.getUuid())
                                 .build())
                         .build())
                 .build());
@@ -322,7 +320,7 @@ class PublisherRepositoryImplTest {
                         .add(
                             FilterCriterion.builder()
                                 .withExpression("location_uuids")
-                                .isEquals(List.of(place.getUuid().toString()))
+                                .isEquals(List.of(place.getUuid()))
                                 .build())
                         .build())
                 .build());

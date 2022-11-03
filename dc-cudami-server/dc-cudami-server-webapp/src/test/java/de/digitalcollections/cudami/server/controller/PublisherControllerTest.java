@@ -148,8 +148,8 @@ class PublisherControllerTest extends BaseControllerTest {
                             .build())
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("location_uuid")
-                            .isEquals(locationUuid)
+                            .withExpression("location_uuids")
+                            .isEquals(List.of(locationUuid))
                             .build())
                     .build())
             .build();
@@ -157,7 +157,7 @@ class PublisherControllerTest extends BaseControllerTest {
     testHttpGetWithExpectedStatus(
         "/v6/publishers?pageSize=1&pageNumber=0&agent_uuid=eq:"
             + agentUuid
-            + "&location_uuid=eq:"
+            + "&location_uuids=eq:"
             + locationUuid,
         200);
     ArgumentCaptor<PageRequest> pageRequestArgumentCaptor =

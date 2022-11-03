@@ -53,7 +53,7 @@ class ManifestationRepositoryImplTest {
     CorporateBody agent = CorporateBody.builder().label("Publisher").addName("Publisher").build();
     agent = corporateBodyRepository.save(agent);
 
-    HumanSettlement publicationLocation =
+    HumanSettlement location =
         HumanSettlement.builder()
             .name(new LocalizedText(Locale.GERMAN, "München"))
             .label("München")
@@ -69,11 +69,7 @@ class ManifestationRepositoryImplTest {
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .publication(
-                Publisher.builder()
-                    .agent(List.of(publisher))
-                    .locations(List.of(publicationLocation))
-                    .build())
+            .publisher(Publisher.builder().agent(agent).locations(List.of(location)).build())
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
                 Title.builder()
