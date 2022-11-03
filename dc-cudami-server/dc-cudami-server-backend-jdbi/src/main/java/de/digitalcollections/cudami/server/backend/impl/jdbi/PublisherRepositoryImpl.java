@@ -118,8 +118,6 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
     addPageRequestParams(pageRequest, sql);
     final String query = sql.toString();
 
-    System.err.println(query);
-
     List<Publisher> result =
         dbi.withHandle(
                 (Handle handle) ->
