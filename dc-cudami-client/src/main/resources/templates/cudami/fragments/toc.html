@@ -31,15 +31,25 @@
 
   <th:block th:fragment="renderToCEntry(tocEntry)">
     <li>
-      <a th:href="'#' + __${tocEntry.targetId}__" th:utext="${tocEntry.label}">label</a>
-    <th:block th:if="${tocEntry.children}">
-      <ul>
-        <th:block th:each="child : ${tocEntry.children}">
-          <th:block th:insert="~{::renderToCEntry(${child})}"></th:block>
-        </th:block>
-      </ul>
-    </th:block>
-  </li>
-</th:block>
+      <th:block th:if="${tocEntry.label} AND ${tocEntry.targetId}">
+        <a
+          th:if="${renderTocLinks}"
+          th:href="'#' + __${tocEntry.targetId}__"
+          th:utext="${tocEntry.label}"
+        >label</a>
+        <span
+          th:unless="${renderTocLinks}"
+          th:utext="${tocEntry.label}"
+        >label</span>
+      </th:block>
+      <th:block th:if="${tocEntry.children}">
+        <ul>
+          <th:block th:each="child : ${tocEntry.children}">
+            <th:block th:insert="~{::renderToCEntry(${child})}"></th:block>
+          </th:block>
+        </ul>
+      </th:block>
+    </li>
+  </th:block>
 </body>
 </html>

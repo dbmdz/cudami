@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.view.RenderingHints;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,7 +64,13 @@ public class WebpageHtmlController {
       Locale returnedLocale = getLocale(webpage);
       model.addAttribute("locale", returnedLocale);
     }
-    model.addAttribute("renderLabel", Boolean.parseBoolean(renderLabel));
+
+    RenderingHints renderingHints = webpage.getRenderingHints();
+    if (renderingHints != null) {
+      renderingHints.setShowInPageNavigation(false);
+    }
+
+    model.addAttribute("renderLabel", Boolean.valueOf(renderLabel));
     model.addAttribute("webpage", webpage);
     return "webpage";
   }
