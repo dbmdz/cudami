@@ -259,29 +259,11 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
         case CONTAINS:
           // @see https://www.postgresql.org/docs/11/functions-matching.html
 
-          // Collections: siehe SearchTermTemplates " DB @> query"
           if (fc.getValue() instanceof Collection<?> valueCollection
-              && !((Collection<?>) fc.getValue()).isEmpty()) {
-            String arrayType = "varchar[]";
-            Object valueSample = valueCollection.stream().findFirst().get();
-
-            if (valueSample instanceof UUID) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(UUID[]::new));
-              arrayType = "UUID[]";
-            } else if (valueSample instanceof String) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(String[]::new));
-              arrayType = "varchar[]";
-            } else if (valueSample instanceof Integer) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Integer[]::new));
-              arrayType = "int[]";
-            } else if (valueSample instanceof Long) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Long[]::new));
-              arrayType = "long[]";
-            }
+              && !valueCollection.isEmpty()) {
+            String arrayType =
+                getArrayTypeAndFillArgumentMappings(
+                    argumentMappings, criterionKey, valueCollection);
             query
                 .append("(")
                 .append(expression)
@@ -317,27 +299,10 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
         case EQUALS:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           if (fc.getValue() instanceof Collection<?> valueCollection
-              && !((Collection<?>) fc.getValue()).isEmpty()) {
-            String arrayType = "varchar[]";
-            Object valueSample = valueCollection.stream().findFirst().get();
-
-            if (valueSample instanceof UUID) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(UUID[]::new));
-              arrayType = "UUID[]";
-            } else if (valueSample instanceof String) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(String[]::new));
-              arrayType = "varchar[]";
-            } else if (valueSample instanceof Integer) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Integer[]::new));
-              arrayType = "int[]";
-            } else if (valueSample instanceof Long) {
-              argumentMappings.put(
-                  criterionKey, ((Collection<?>) fc.getValue()).stream().toArray(Long[]::new));
-              arrayType = "long[]";
-            }
+              && !valueCollection.isEmpty()) {
+            String arrayType =
+                getArrayTypeAndFillArgumentMappings(
+                    argumentMappings, criterionKey, valueCollection);
 
             query
                 .append("(")
@@ -485,6 +450,27 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return query.toString();
   }
 
+  private static String getArrayTypeAndFillArgumentMappings(
+      Map<String, Object> argumentMappings, String criterionKey, Collection<?> valueCollection) {
+    String arrayType = "varchar[]";
+    Object valueSample = valueCollection.stream().findFirst().get();
+
+    if (valueSample instanceof UUID) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(UUID[]::new));
+      arrayType = "UUID[]";
+    } else if (valueSample instanceof String) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(String[]::new));
+      arrayType = "varchar[]";
+    } else if (valueSample instanceof Integer) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Integer[]::new));
+      arrayType = "int[]";
+    } else if (valueSample instanceof Long) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Long[]::new));
+      arrayType = "long[]";
+    }
+    return arrayType;
+  }
+
   /*
    * if filtering has other target object type than actual (this) repository instance
    * use this method to rename filter expression names to target table alias and column names
@@ -529,7 +515,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
   protected UUID[] extractUuids(Collection<? extends UniqueObject> uniqueObjects) {
     if (uniqueObjects == null || uniqueObjects.isEmpty()) {
-      return null;
+      return new UUID[0];
     }
     return uniqueObjects.stream()
         .collect(

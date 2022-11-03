@@ -77,7 +77,8 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
                 + tableName
                 + " "
                 + tableAlias
-                + " cross join unnest(publ.location_uuids) l(id) " // Required to preserve order of
+                + " LEFT JOIN UNNEST(publ.location_uuids) l(id) ON true " // Required to preserve
+                // order of
                 // array items
                 + " LEFT JOIN "
                 + corporateBodyRepository.tableName
@@ -116,6 +117,8 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
 
     addPageRequestParams(pageRequest, sql);
     final String query = sql.toString();
+
+    System.err.println(query);
 
     List<Publisher> result =
         dbi.withHandle(
@@ -202,6 +205,7 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
                     fn -> {
                       return Publisher.builder()
                           .uuid(rowView.getColumn(mappingPrefix + "_uuid", UUID.class))
+                          .locations(new ArrayList<>())
                           .build();
                     });
 

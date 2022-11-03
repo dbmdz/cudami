@@ -283,6 +283,52 @@ class PublisherRepositoryImplTest {
     assertThat(pageResponse.getContent()).containsExactly(savedPublisher2);
   }
 
+  @DisplayName("can find publishers without locations")
+  @Test
+  void findWithoutLocations() throws RepositoryException {
+    CorporateBody corporateBody = ensureCorporateBody(Map.of(Locale.GERMAN, "Publisher"));
+    Publisher savedPublisher = repo.save(buildPublisher(List.of(), corporateBody, "Publisher"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("agent_uuid")
+                                .isEquals(corporateBody.getUuid().toString())
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher);
+  }
+
+  @DisplayName("can find publishers without an agent")
+  @Test
+  void findWithoutAgent() throws RepositoryException {
+    HumanSettlement place = ensureHumanSettlement(Map.of(Locale.GERMAN, "Place"));
+    Publisher savedPublisher = repo.save(buildPublisher(List.of(place), null, "Place"));
+
+    PageResponse<Publisher> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(99)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("location_uuids")
+                                .isEquals(List.of(place.getUuid().toString()))
+                                .build())
+                        .build())
+                .build());
+    assertThat(pageResponse.getContent()).containsExactly(savedPublisher);
+  }
+
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
   void noMatches() throws RepositoryException {
