@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMa
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.TitleTypeMapper;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.type.PublicationMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -95,11 +94,6 @@ public class SpringConfigBackendDatabase {
   @Bean
   public TitleMapper titleMapper(ObjectMapper objectMapper, TitleTypeMapper titleTypeMapper) {
     return new TitleMapper(objectMapper, titleTypeMapper);
-  }
-
-  @Bean
-  public PublicationMapper publicationMapper() {
-    return new PublicationMapper();
   }
 
   @Bean

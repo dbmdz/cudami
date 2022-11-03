@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.type.PublicationMapper;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
@@ -47,7 +46,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     return super.getSqlInsertFields()
         + ", composition, dimensions, expressiontypes"
         + ", language, manifestationtype, manufacturingtype"
-        + ", mediatypes, otherlanguages, publications"
+        + ", mediatypes, otherlanguages"
         + ", publishingdatepresentation, publishingdaterange, publishing_timevaluerange"
         + ", scale, subjects_uuids, version"
         + ", work, titles";
@@ -58,7 +57,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     return super.getSqlInsertValues()
         + ", :composition, :dimensions, :expressionTypes::mainsubtype[]"
         + ", :language, :manifestationType, :manufacturingType"
-        + ", :mediaTypes::varchar[], :otherLanguages::varchar[], :publications::publication[]"
+        + ", :mediaTypes::varchar[], :otherLanguages::varchar[]"
         + ", :publishingDatePresentation, :publishingDateRange::daterange, :publishingTimeValueRange::jsonb"
         + ", :scale, :subjects_uuids::UUID[], :version"
         + ", :work?.uuid, {{titles}}";
@@ -69,7 +68,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     return super.getSqlUpdateFieldValues()
         + "composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[], "
         + "language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType, "
-        + "mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[], publications=:publications::publication[], "
+        + "mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[], "
         + "publishingdatepresentation=:publishingDatePresentation, publishingdaterange=:publishingDateRange::daterange, "
         + "publishing_timevaluerange=:publishingTimeValueRange::jsonb, scale=:scale, "
         + "subjects_uuids=:subjects_uuids::UUID[], version=:version, "
@@ -80,9 +79,10 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + String.format(
-            ", %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages"
-                + ", %1$s.publications %2$s_publications, %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange"
-                + ", %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version",
+            """
+            , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
+            %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange,
+            %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version, """,
             tableAlias, mappingPrefix)
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
@@ -135,7 +135,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Jdbi jdbi,
       CudamiConfig cudamiConfig,
       ExpressionTypeMapper expressionTypeMapper,
-      PublicationMapper publicationMapper,
       LocalDateRangeMapper dateRangeMapper,
       EntityRepositoryImpl<Entity> entityRepository) {
     super(
@@ -147,9 +146,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         SQL_SELECT_ALL_FIELDS_JOINS,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerArrayType(expressionTypeMapper);
-    dbi.registerArrayType(publicationMapper);
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
+    dbi.registerColumnMapper(dateRangeMapper);
 
     this.entityRepository = entityRepository;
   }
