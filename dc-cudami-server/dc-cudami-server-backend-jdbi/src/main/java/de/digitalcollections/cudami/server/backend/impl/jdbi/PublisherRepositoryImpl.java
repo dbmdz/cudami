@@ -81,29 +81,29 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
                 // order of
                 // array items
                 + " LEFT JOIN "
-                + corporateBodyRepository.tableName
+                + corporateBodyRepository.getTableName()
                 + " "
-                + corporateBodyRepository.tableAlias
+                + corporateBodyRepository.getTableAlias()
                 + " ON "
-                + corporateBodyRepository.tableAlias
+                + corporateBodyRepository.getTableAlias()
                 + ".uuid="
                 + tableAlias
                 + ".agent_uuid"
                 + " LEFT JOIN "
-                + personRepository.tableName
+                + personRepository.getTableName()
                 + " "
-                + personRepository.tableAlias
+                + personRepository.getTableAlias()
                 + " ON "
-                + personRepository.tableAlias
+                + personRepository.getTableAlias()
                 + ".uuid="
                 + tableAlias
                 + ".agent_uuid"
                 + " LEFT JOIN "
-                + humanSettlementRepository.tableName
+                + humanSettlementRepository.getTableName()
                 + " "
-                + humanSettlementRepository.tableAlias
+                + humanSettlementRepository.getTableAlias()
                 + " ON "
-                + humanSettlementRepository.tableAlias
+                + humanSettlementRepository.getTableAlias()
                 + ".uuid=l.id");
 
     Map argumentMappings = new HashMap<>();
@@ -338,11 +338,9 @@ public class PublisherRepositoryImpl extends JdbiRepositoryImpl implements Publi
       case "uuid":
         return tableAlias + ".uuid";
       case "agent_uuid":
-        return tableAlias + ".agent_uuid::varchar";
-      case "location_uuid":
-        return tableAlias + ".location_uuids::varchar";
+        return tableAlias + ".agent_uuid::UUID";
       case "location_uuids":
-        return tableAlias + ".location_uuids::varchar[]";
+        return tableAlias + ".location_uuids::UUID[]";
       case "publisherPresentation":
         return tableAlias + ".publisherPresentation";
       default:
