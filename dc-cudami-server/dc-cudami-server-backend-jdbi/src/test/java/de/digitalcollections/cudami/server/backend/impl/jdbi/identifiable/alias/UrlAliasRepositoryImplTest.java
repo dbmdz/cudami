@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -16,11 +17,13 @@ import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -37,6 +40,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -51,8 +57,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UrlAliasRepositoryImplTest {
 
+  protected static final Locale LOCALE_UND_LATN =
+      new Locale.Builder().setLanguage("und").setScript("Latn").build();
+  protected static final Locale LOCALE_UND_HANI =
+      new Locale.Builder().setLanguage("und").setScript("Hani").build();
+
   UrlAliasRepositoryImpl repo;
   @Autowired Jdbi jdbi;
+  @Autowired PersonRepository personRepository;
   @Autowired WebpageRepository webpageRepository;
   @Autowired WebsiteRepository websiteRepository;
   @Autowired CudamiConfig cudamiConfig;
@@ -240,5 +252,67 @@ public class UrlAliasRepositoryImplTest {
   public void delete() throws UrlAliasRepositoryException {
     int count = this.repo.delete(List.of(this.urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
+  }
+
+  @DisplayName("can differenciate between scripts of a locale")
+  @Order(9)
+  @Test
+  public void scriptOfLocale() throws UrlAliasRepositoryException {
+    // Save a person
+    LocalizedText personName =
+        LocalizedText.builder()
+            .text(LOCALE_UND_LATN, "Yu ji shan ren")
+            .text(LOCALE_UND_HANI, "玉几山人")
+            .build();
+    Person person =
+        personRepository.save(Person.builder().name(personName).label(personName).build());
+
+    // Save the UrlAlias for the UND_LATN slug
+    repo.save(
+        UrlAlias.builder()
+            .slug("yu-ji-shan-ren")
+            .targetLanguage(LOCALE_UND_LATN)
+            .isPrimary()
+            .targetUuid(person.getUuid().toString())
+            .targetType(IdentifiableObjectType.PERSON, IdentifiableType.ENTITY)
+            .build());
+
+    // Save the UrlAlias for the UND_HANI slug must not throw an exception!
+    UrlAlias saved =
+        repo.save(
+            UrlAlias.builder()
+                .slug("yu-ji-shan-ren")
+                .targetLanguage(LOCALE_UND_HANI)
+                .isPrimary()
+                .targetUuid(person.getUuid().toString())
+                .targetType(IdentifiableObjectType.PERSON, IdentifiableType.ENTITY)
+                .build());
+    Locale targetLanguage = saved.getTargetLanguage();
+    Locale expected = LOCALE_UND_HANI;
+    assertThat(targetLanguage).isEqualTo(expected);
+  }
+
+  @DisplayName("can build the locale for only given language")
+  @MethodSource("localeForLanguageTag")
+  @ParameterizedTest(name = "{0} equals {1} locale {2}")
+  public void localeForOnlyLanguage(String languageTag, boolean isEqual, Locale expectedLocale) {
+    if (isEqual) {
+      assertThat(UrlAliasRepositoryImpl.buildLocaleFromLanguageTag(languageTag))
+          .isEqualTo(expectedLocale);
+    } else {
+      assertThat(UrlAliasRepositoryImpl.buildLocaleFromLanguageTag(languageTag))
+          .isNotEqualTo(expectedLocale);
+    }
+  }
+
+  private static List<Arguments> localeForLanguageTag() {
+    return List.of(
+        Arguments.of("de", true, new Locale("de")),
+        Arguments.of(
+            "zh-Hani", true, new Locale.Builder().setLanguage("zh").setScript("Hani").build()),
+        Arguments.of(
+            "und-Hani", true, new Locale.Builder().setLanguage("und").setScript("Hani").build()),
+        Arguments.of(
+            "und-Hani", false, new Locale.Builder().setLanguage("und").setScript("Latn").build()));
   }
 }

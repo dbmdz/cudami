@@ -391,7 +391,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     filtering.add(
         FilterCriterion.builder()
             .withExpression("targetLanguage")
-            .isEquals(targetLanguage.getLanguage())
+            .isEquals(targetLanguage.toLanguageTag())
             .build());
     filtering.add(FilterCriterion.builder().withExpression("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
@@ -417,12 +417,29 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
         map.compute(
             row.getColumn(mappingPrefix + "_uuid", UUID.class),
             (uuid, urlAlias) -> urlAlias != null ? urlAlias : row.getRow(UrlAlias.class));
-    if (alias != null && row.getColumn(WEBSITESALIAS + "_uuid", UUID.class) != null) {
-      Website website = new Website(row.getColumn(WEBSITESALIAS + "_url", URL.class));
-      website.setUuid(row.getColumn(WEBSITESALIAS + "_uuid", UUID.class));
-      website.setLabel(row.getColumn(WEBSITESALIAS + "_label", LocalizedText.class));
-      alias.setWebsite(website);
+    if (alias != null) {
+      if (row.getColumn(WEBSITESALIAS + "_uuid", UUID.class) != null) {
+        Website website = new Website(row.getColumn(WEBSITESALIAS + "_url", URL.class));
+        website.setUuid(row.getColumn(WEBSITESALIAS + "_uuid", UUID.class));
+        website.setLabel(row.getColumn(WEBSITESALIAS + "_label", LocalizedText.class));
+        alias.setWebsite(website);
+      }
+      String targetLanguage = row.getColumn(mappingPrefix + "_targetlanguage", String.class);
+      if (targetLanguage != null) {
+        Locale targetLocale = buildLocaleFromLanguageTag(targetLanguage);
+        alias.setTargetLanguage(targetLocale);
+      }
     }
+  }
+
+  protected static Locale buildLocaleFromLanguageTag(String languageTag) {
+    Locale targetLocale = Locale.forLanguageTag(languageTag);
+    if (languageTag.contains("-")) {
+      // Creating a locale with a script is really, really weird!
+      String[] parts = languageTag.split("-");
+      targetLocale = new Locale.Builder().setLanguage(parts[0]).setScript(parts[1]).build();
+    }
+    return targetLocale;
   }
 
   @Override
@@ -451,7 +468,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createQuery(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
+                      .bind("targetLanguage", urlAlias.getTargetLanguage().toLanguageTag())
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
@@ -484,7 +501,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createUpdate(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
+                      .bind("targetLanguage", urlAlias.getTargetLanguage().toLanguageTag())
                       .execute());
       if (affected != 1) {
         throw new UrlAliasRepositoryException(
