@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -20,12 +21,14 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.work.Item;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.FileResourceType;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
@@ -50,6 +53,7 @@ class DigitalObjectServiceImplTest {
   private DigitalObjectRepository repo;
   protected HookProperties hookProperties;
   private IdentifierService identifierService;
+  private ItemService itemService;
   private LocaleService localeService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
@@ -66,6 +70,7 @@ class DigitalObjectServiceImplTest {
         mock(DigitalObjectRenderingFileResourceService.class);
     hookProperties = mock(HookProperties.class);
     identifierService = mock(IdentifierService.class);
+    itemService = mock(ItemService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
     projectService = mock(ProjectService.class);
@@ -84,6 +89,7 @@ class DigitalObjectServiceImplTest {
             collectionService,
             projectService,
             identifierService,
+            itemService,
             urlAliasService,
             digitalObjectLinkedDataFileResourceService,
             digitalObjectRenderingFileResourceService,
@@ -358,6 +364,69 @@ class DigitalObjectServiceImplTest {
         .deleteLinkedDataFileResources(eq(uuid));
     verify(digitalObjectRenderingFileResourceService, times(1))
         .deleteRenderingFileResources(eq(uuid));
+  }
+
+  @Test
+  @DisplayName("returns false when the given item is null")
+  public void addToNullItem()
+      throws ConflictException, IdentifiableServiceException, ValidationException {
+    assertThat(service.addItemToDigitalObject(null, UUID.randomUUID())).isFalse();
+  }
+
+  @Test
+  @DisplayName("returns false when the given item is null")
+  public void addNonexistingDigitalObjectToItem()
+      throws ConflictException, IdentifiableServiceException, ValidationException {
+    UUID uuid = UUID.randomUUID();
+
+    when(service.getByUuid(eq(uuid))).thenReturn(null);
+
+    assertThat(service.addItemToDigitalObject(Item.builder().build(), uuid)).isFalse();
+  }
+
+  @Test
+  @DisplayName("returns false when the given item is null")
+  public void addExistingAndAlreadyConntectedDigitalObjectToItem()
+      throws ConflictException, IdentifiableServiceException, ValidationException {
+    Item item = Item.builder().uuid(UUID.randomUUID()).build();
+    DigitalObject digitalObject =
+        DigitalObject.builder().uuid(UUID.randomUUID()).item(item).build();
+
+    when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
+
+    assertThat(service.addItemToDigitalObject(item, digitalObject.getUuid())).isTrue();
+  }
+
+  @Test
+  @DisplayName("returns false when the given item is null")
+  public void addExistingButOtherwiseConntectedDigitalObjectToItem() {
+    Item item = Item.builder().uuid(UUID.randomUUID()).build();
+    Item otherItem = Item.builder().uuid(UUID.randomUUID()).build();
+    DigitalObject digitalObject =
+        DigitalObject.builder().uuid(UUID.randomUUID()).item(otherItem).build();
+
+    when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
+    assertThrows(
+        ConflictException.class,
+        () -> {
+          service.addItemToDigitalObject(item, digitalObject.getUuid());
+        });
+  }
+
+  @Test
+  @DisplayName("returns false when the given item is null")
+  public void addExistingAndNotConntectedDigitalObjectToItem()
+      throws ConflictException, IdentifiableServiceException, ValidationException {
+    Item item = Item.builder().uuid(UUID.randomUUID()).build();
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .uuid(UUID.randomUUID())
+            .label(LocalizedText.builder().text(Locale.ITALY, "Viva Italia!").build())
+            .build();
+
+    when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
+
+    assertThat(service.addItemToDigitalObject(item, digitalObject.getUuid())).isTrue();
   }
 
   /*
