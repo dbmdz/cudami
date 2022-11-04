@@ -31,6 +31,11 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Identifiable-UrlAlias-Align-Helper tests")
 public class IdentifiableUrlAliasAlignHelperTest {
 
+  protected static final Locale LOCALE_UND_LATN =
+      new Locale.Builder().setLanguage("und").setScript("Latn").build();
+  protected static final Locale LOCALE_UND_HANI =
+      new Locale.Builder().setLanguage("und").setScript("Hani").build();
+
   CudamiConfig cudamiConfig;
   IdentifiableUrlAliasAlignHelper.SlugGeneratorService slugGeneratorService;
 
@@ -146,6 +151,39 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
     assertThat(localizedUrlALiases.get(Locale.ENGLISH).get(0).getSlug()).isEqualTo("hello-world");
     assertThat(localizedUrlALiases.get(Locale.ENGLISH).get(0).isPrimary()).isTrue();
+  }
+
+  @DisplayName(
+      "avoids creating an UrlAlias, when slug and languare are the same and only script differs")
+  @Test
+  public void doesNotAddUrlAliasWhenOnlyScriptDiffers() throws CudamiServiceException {
+    when(slugGeneratorService.apply(eq(LOCALE_UND_LATN), eq("Yu ji shan ren"), eq(null)))
+        .thenReturn("yu-ji-shan-ren");
+    when(slugGeneratorService.apply(eq(LOCALE_UND_HANI), eq("玉几山人"), eq(null)))
+        .thenReturn("yu-ji-shan-ren");
+
+    UUID expectedTargetUuid = UUID.randomUUID();
+
+    Entity entity = new Entity();
+    final LocalizedText label = new LocalizedText(LOCALE_UND_LATN, "Yu ji shan ren");
+    label.setText(LOCALE_UND_HANI, "玉几山人");
+    entity.setLabel(label);
+    entity.setUuid(expectedTargetUuid);
+
+    IdentifiableUrlAliasAlignHelper.checkDefaultAliases(entity, cudamiConfig, slugGeneratorService);
+
+    LocalizedUrlAliases localizedUrlAliases = entity.getLocalizedUrlAliases();
+
+    final Locale LOCALE_UND = Locale.forLanguageTag("und");
+
+    assertThat(localizedUrlAliases.flatten())
+        .hasSize(1); // only for language "und" (ROOT), but not for combinations with scripts
+    assertThat(localizedUrlAliases.hasTargetLanguage(LOCALE_UND)).isTrue();
+    assertThat(localizedUrlAliases.hasTargetLanguage(LOCALE_UND_LATN)).isFalse();
+    assertThat(localizedUrlAliases.hasTargetLanguage(LOCALE_UND_HANI)).isFalse();
+
+    assertThat(localizedUrlAliases.get(LOCALE_UND).get(0).getSlug()).isEqualTo("yu-ji-shan-ren");
+    assertThat(localizedUrlAliases.get(LOCALE_UND).get(0).isPrimary()).isTrue();
   }
 
   @DisplayName("throws an exception, when primary UrlAliases are missing")

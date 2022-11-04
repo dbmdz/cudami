@@ -194,35 +194,45 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       urlAliases = new LocalizedUrlAliases();
       actualIdentifiable.setLocalizedUrlAliases(urlAliases);
     }
-    for (Locale lang : actualIdentifiable.getLabel().getLocales()) {
-      // not for webpages
-      if (!(actualIdentifiable instanceof Webpage)
-          && (!urlAliases.containsKey(lang)
-              || urlAliases.get(lang).stream().allMatch(alias -> alias.getWebsite() != null))) {
-        // there is not any default alias (w/o website); create one.
-        UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
-        defaultAlias.setTargetLanguage(lang);
-        defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
-        defaultAlias.setTargetIdentifiableObjectType(
-            actualIdentifiable.getIdentifiableObjectType());
-        defaultAlias.setPrimary(!urlAliases.containsKey(lang));
-        try {
-          defaultAlias.setSlug(
-              slugGeneratorService.apply(lang, actualIdentifiable.getLabel().getText(lang), null));
-        } catch (CudamiServiceException e) {
-          throw new CudamiServiceException("An error occured during slug generation.", e);
+    for (Locale labelLang : actualIdentifiable.getLabel().getLocales()) {
+      Locale urlAliasLang =
+          Locale.forLanguageTag(
+              labelLang.toLanguageTag().replaceFirst("-.*$", "")); // removes the script
+
+      if (!urlAliases.containsKey(urlAliasLang)) {
+        // We don't yet have an UrlAlias for that language (w/o script), so we must create one.
+
+        // not for webpages
+        if (!(actualIdentifiable instanceof Webpage)
+            && (!urlAliases.containsKey(urlAliasLang)
+                || urlAliases.get(urlAliasLang).stream()
+                    .allMatch(alias -> alias.getWebsite() != null))) {
+          // there is not any default alias (w/o website); create one.
+          UrlAlias defaultAlias = new UrlAlias();
+          defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+          defaultAlias.setTargetLanguage(urlAliasLang);
+          defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
+          defaultAlias.setTargetIdentifiableObjectType(
+              actualIdentifiable.getIdentifiableObjectType());
+          defaultAlias.setPrimary(!urlAliases.containsKey(urlAliasLang));
+          try {
+            String labelText = actualIdentifiable.getLabel().getText(labelLang);
+            String slug = slugGeneratorService.apply(labelLang, labelText, null);
+            defaultAlias.setSlug(slug);
+          } catch (CudamiServiceException e) {
+            throw new CudamiServiceException("An error occured during slug generation.", e);
+          }
+          urlAliases.add(defaultAlias);
         }
-        urlAliases.add(defaultAlias);
       }
 
-      // check that a primary alias exists for this language, even for webpages
-      if (urlAliases.get(lang) == null
-          || !urlAliases.get(lang).stream().anyMatch(alias -> alias.isPrimary())) {
+      // check that a primary alias exists for this language (again w/o script), even for webpages
+      if (urlAliases.get(urlAliasLang) == null
+          || !urlAliases.get(urlAliasLang).stream().anyMatch(alias -> alias.isPrimary())) {
         throw new CudamiServiceException(
             String.format(
-                "There is not any primary alias for language '%s' of identifiable '%s'.",
-                lang, actualIdentifiable.getUuid()));
+                "There is not any primary alias for language '%s' (%s) of identifiable '%s'.",
+                urlAliasLang, labelLang, actualIdentifiable.getUuid()));
       }
     }
   }
