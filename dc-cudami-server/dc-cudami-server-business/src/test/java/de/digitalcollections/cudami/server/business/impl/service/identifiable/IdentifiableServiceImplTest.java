@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
@@ -25,6 +26,7 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
@@ -40,6 +42,11 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("The Identifiable Service")
 class IdentifiableServiceImplTest {
+
+  protected static final Locale LOCALE_UND_LATN =
+      new Locale.Builder().setLanguage("und").setScript("Latn").build();
+  protected static final Locale LOCALE_UND_HANI =
+      new Locale.Builder().setLanguage("und").setScript("Hani").build();
 
   private IdentifiableServiceImpl service;
   private IdentifiableRepository repo;
@@ -805,5 +812,34 @@ class IdentifiableServiceImplTest {
         () -> {
           service.save(manifestation);
         });
+  }
+
+  @DisplayName(
+      "does not generate duplicates for identical slugs for identical languages but different scripts")
+  @Test
+  public void avoidDuplicatesForDifferentScripts()
+      throws UrlAliasRepositoryException, ValidationException, IdentifiableServiceException,
+          CudamiServiceException {
+    LocalizedText personName =
+        LocalizedText.builder()
+            .text(LOCALE_UND_LATN, "Yu ji shan ren")
+            .text(LOCALE_UND_HANI, "玉几山人")
+            .build();
+    Person person = Person.builder().name(personName).label(personName).build();
+
+    // Mock the services in a way, that they return exactly what they got as argument
+    when(urlAliasService.save(any(UrlAlias.class))).thenAnswer(i -> i.getArguments()[0]);
+    when(repo.save(any(Person.class))).thenAnswer(i -> i.getArguments()[0]);
+    when(urlAliasService.generateSlug(any(), any(String.class), eq(null)))
+        .thenReturn("yu-ji-shan-ren");
+
+    Person actual = (Person) service.save(person);
+
+    LocalizedUrlAliases actualLocalizedUrlAliases = actual.getLocalizedUrlAliases();
+    List<UrlAlias> actualUrlAliases = actualLocalizedUrlAliases.flatten();
+
+    assertThat(actualUrlAliases).hasSize(1);
+    assertThat(actualUrlAliases.get(0).getTargetLanguage()).isEqualTo(Locale.forLanguageTag("und"));
+    assertThat(actualUrlAliases.get(0).getSlug()).isEqualTo("yu-ji-shan-ren");
   }
 }
