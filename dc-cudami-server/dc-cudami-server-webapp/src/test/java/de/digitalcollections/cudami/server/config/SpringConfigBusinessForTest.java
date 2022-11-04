@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.config;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import java.util.Locale;
@@ -12,6 +13,11 @@ import org.springframework.context.annotation.Primary;
 
 @TestConfiguration
 public class SpringConfigBusinessForTest {
+
+  @Bean
+  public DigitalObjectService digitalObjectService() {
+    return Mockito.mock(DigitalObjectService.class);
+  }
 
   @Bean
   public EntityService entityService() {
