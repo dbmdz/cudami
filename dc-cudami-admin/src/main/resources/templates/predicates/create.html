@@ -12,17 +12,18 @@
     <script type="importmap">
       {
       "imports": {
-      "orderedmap": "/webjars/orderedmap/index.es.js",
+      "linkifyjs": "/webjars/linkifyjs/dist/linkify.es.js",
+      "orderedmap": "/webjars/orderedmap/dist/index.js",
       "prosemirror-commands": "/webjars/prosemirror-commands/dist/index.es.js",
       "prosemirror-dropcursor": "/webjars/prosemirror-dropcursor/dist/index.es.js",
       "prosemirror-gapcursor": "/webjars/prosemirror-gapcursor/dist/index.es.js",
       "prosemirror-history": "/webjars/prosemirror-history/dist/index.es.js",
       "prosemirror-keymap": "/webjars/prosemirror-keymap/dist/index.es.js",
-      "prosemirror-model": "/webjars/prosemirror-model/dist/index.es.js",
+      "prosemirror-model": "/webjars/prosemirror-model/dist/index.js",
       "prosemirror-schema-list": "/webjars/prosemirror-schema-list/dist/index.es.js",
-      "prosemirror-state": "/webjars/prosemirror-state/dist/index.es.js",
-      "prosemirror-transform": "/webjars/prosemirror-transform/dist/index.es.js",
-      "prosemirror-view": "/webjars/prosemirror-view/dist/index.es.js",
+      "prosemirror-state": "/webjars/prosemirror-state/dist/index.js",
+      "prosemirror-transform": "/webjars/prosemirror-transform/dist/index.js",
+      "prosemirror-view": "/webjars/prosemirror-view/dist/index.js",
       "rope-sequence": "/webjars/rope-sequence/dist/index.es.js",
       "@tiptap/core": "/webjars/tiptap__core/dist/tiptap-core.esm.js",
       "@tiptap/extension-blockquote": "/webjars/tiptap__extension-blockquote/dist/tiptap-extension-blockquote.esm.js",
@@ -38,10 +39,13 @@
       "@tiptap/extension-history": "/webjars/tiptap__extension-history/dist/tiptap-extension-history.esm.js",
       "@tiptap/extension-horizontal-rule": "/webjars/tiptap__extension-horizontal-rule/dist/tiptap-extension-horizontal-rule.esm.js",
       "@tiptap/extension-italic": "/webjars/tiptap__extension-italic/dist/tiptap-extension-italic.esm.js",
+      "@tiptap/extension-link": "/webjars/tiptap__extension-link/dist/tiptap-extension-link.esm.js",
       "@tiptap/extension-list-item": "/webjars/tiptap__extension-list-item/dist/tiptap-extension-list-item.esm.js",
       "@tiptap/extension-ordered-list": "/webjars/tiptap__extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js",
       "@tiptap/extension-paragraph": "/webjars/tiptap__extension-paragraph/dist/tiptap-extension-paragraph.esm.js",
       "@tiptap/extension-strike": "/webjars/tiptap__extension-strike/dist/tiptap-extension-strike.esm.js",
+      "@tiptap/extension-subscript": "/webjars/tiptap__extension-subscript/dist/tiptap-extension-subscript.esm.js",
+      "@tiptap/extension-superscript": "/webjars/tiptap__extension-superscript/dist/tiptap-extension-superscript.esm.js",
       "@tiptap/extension-text": "/webjars/tiptap__extension-text/dist/tiptap-extension-text.esm.js",
       "@tiptap/extension-underline": "/webjars/tiptap__extension-underline/dist/tiptap-extension-underline.esm.js",
       "@tiptap/starter-kit": "/webjars/tiptap__starter-kit/dist/tiptap-starter-kit.esm.js",
@@ -60,7 +64,7 @@
 
           <div class="row">
             <div class="col-6 col-sm-9"><h1>Create a new relation type</h1></div>
-            <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary" onClick="syncContent()">Save</button></div></div>
+            <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary">Save</button></div></div>
           </div>
           <div class="row">
             <div class="col-sm-12">
@@ -210,12 +214,6 @@
         let tabContent = $(targetLocalizedForm).find('.tab-content').first();
         $(tabContent).append(newTabPane);
       });
-
-      function syncContent() {
-//        var json = JSON.stringify(window.view.state.doc.toJSON());
-        var json = JSON.stringify(editor.getJSON());
-        document.getElementById("contentJSON").value = json;
-      }
     </script>
   </th:block>
 </body>

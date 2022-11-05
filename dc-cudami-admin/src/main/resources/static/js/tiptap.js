@@ -1,14 +1,20 @@
 import { Editor } from '@tiptap/core'
-import {Schema} from 'prosemirror-model'
+//import {Schema} from 'prosemirror-model'
 import StarterKit from '@tiptap/starter-kit'
+import Link from '@tiptap/extension-link'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
 import Underline from '@tiptap/extension-underline'
-import marks from './marks.js'
-import nodes from './nodes.js'
+//import marks from './marks.js'
+//import nodes from './nodes.js'
 
         window.editor = new Editor({
           element: document.querySelector('#editor'),
           extensions: [
+            Link,
             StarterKit,
+            Subscript,
+            Superscript,
             Underline
           ],
 //          onBeforeCreate({editor}) {
