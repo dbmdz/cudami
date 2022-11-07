@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.DigitalObject;
@@ -31,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The ItemController")
 class ItemControllerTest extends BaseControllerTest {
 
+  @MockBean private DigitalObjectService digitalObjectService;
   @MockBean private ItemService itemService;
 
   @DisplayName("can retrieve an item by identifier without any special characters")
