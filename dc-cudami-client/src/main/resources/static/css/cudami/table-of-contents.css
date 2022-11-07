@@ -8,6 +8,7 @@ nav.webpage-toc li {
 
 nav.webpage-toc li > ul > li:before {
   content: '└';
+  padding-right: 3px;
 }
 
 div.webpage-text h1 > a.heading-link,
