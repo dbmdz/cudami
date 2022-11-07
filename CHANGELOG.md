@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
+
+### Fixed
+
+- Fixed display of ToC navigation
+
 ## [6.1.3](https://github.com/dbmdz/cudami/releases/tag/6.1.3) - 2022-11-03
 
 No real changes, but the publishing did not work well...
@@ -15,7 +21,7 @@ No real changes, but the publishing did not work well...
 ### Added
 
 - Added rendering of ToC if `renderingHints.showInPageNavigation` in the webpage is `true`
-- Add rendering of ToC links if `renderTocLinks` is set to `true` somewhere in the model
+- Added rendering of ToC links if `renderTocLinks` is set to `true` somewhere in the model
 
 ## [6.1.1](https://github.com/dbmdz/cudami/releases/tag/6.1.1) - 2022-08-29
 
