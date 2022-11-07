@@ -13,6 +13,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
 
+## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
+
+### Fixed
+
+- Fixed display of ToC navigation
+
 ## [6.1.3](https://github.com/dbmdz/cudami/releases/tag/6.1.3) - 2022-11-03
 
 No real changes, but the publishing did not work well...
