@@ -28,9 +28,7 @@
     <div class="content">
       <div class="container-fluid rows-striped">
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
-
-        <div class="row mt-3 mb-3 p-3" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
+         <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item" th:each="language,iter : ${existingLanguages}">
@@ -67,6 +65,8 @@
             </div>
           </div>
         </div>
+        
+        <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
 
         <div class="row">
           <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>

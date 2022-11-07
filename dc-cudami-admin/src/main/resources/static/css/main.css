@@ -50,10 +50,10 @@ a[href^="http"]:not(.no-external):after {
   color:red;
 }
 
-.rows-striped > .row:nth-of-type(odd) {
+.rows-striped > .row:nth-of-type(even) {
   background-color: #FCFCFC;
 }
-/*.rows-striped .row:nth-of-type(even) {
+/*.rows-striped .row:nth-of-type(odd) {
   background: #FFFFFF;
 }*/
 

@@ -246,6 +246,13 @@
       <version>8.1.1</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <!-- until dependencies are refreshed at webjars.org -->
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>prosemirror-schema-list</artifactId>
+      <version>1.2.2</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 
   <build>
