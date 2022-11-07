@@ -3,12 +3,20 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.type;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.identifiable.entity.work.Title;
-import java.util.Collection;
+import de.digitalcollections.model.identifiable.entity.work.TitleType;
+import de.digitalcollections.model.text.LocalizedText;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.jdbi.v3.core.array.SqlArrayType;
+import java.util.stream.Stream;
+import org.jdbi.v3.core.mapper.ColumnMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-public class TitleMapper implements SqlArrayType<Title> {
+public class TitleMapper implements ColumnMapper<Title> {
 
   private ObjectMapper objectMapper;
   private MainSubTypeMapper.TitleTypeMapper titleTypeMapper;
@@ -18,37 +26,63 @@ public class TitleMapper implements SqlArrayType<Title> {
     this.titleTypeMapper = titleTypeMapper;
   }
 
-  @Override
-  public String getTypeName() {
-    return "title";
-  }
+  //  @Override
+  //  public String getTypeName() {
+  //    return "title";
+  //  }
+  //
+  //  @Override
+  //  public Object convertArrayElement(Title element) {
+  //    try {
+  //      boolean hasLocaleList =
+  //          element.getTextLocalesOfOriginalScripts() != null
+  //              && !element.getTextLocalesOfOriginalScripts().isEmpty();
+  //      return "(\""
+  //          + (element.getTitleType() != null
+  //              ? titleTypeMapper.convertArrayElement(element.getTitleType())
+  //              : "{}")
+  //          + "\",\""
+  //          + (element.getText() != null
+  //              ? objectMapper.writeValueAsString(element.getText()).replaceAll("\"", "\"\"")
+  //              : "")
+  //          + "\",\""
+  //          + (hasLocaleList
+  //              ? String.format(
+  //                  "{%s}", commaSeparatedLocales(element.getTextLocalesOfOriginalScripts()))
+  //              : "{}")
+  //          + "\")";
+  //    } catch (JsonProcessingException e) {
+  //      return "ERROR processing title.text";
+  //    }
+  //  }
+
+  //  private String commaSeparatedLocales(Collection<Locale> list) {
+  //    return list.stream().map(locale -> locale.toString()).collect(Collectors.joining(","));
+  //  }
 
   @Override
-  public Object convertArrayElement(Title element) {
-    try {
-      boolean hasLocaleList =
-          element.getTextLocalesOfOriginalScripts() != null
-              && !element.getTextLocalesOfOriginalScripts().isEmpty();
-      return "(\""
-          + (element.getTitleType() != null
-              ? titleTypeMapper.convertArrayElement(element.getTitleType())
-              : "{}")
-          + "\",\""
-          + (element.getText() != null
-              ? objectMapper.writeValueAsString(element.getText()).replaceAll("\"", "\"\"")
-              : "")
-          + "\",\""
-          + (hasLocaleList
-              ? String.format(
-                  "{%s}", commaSeparatedLocales(element.getTextLocalesOfOriginalScripts()))
-              : "{}")
-          + "\")";
-    } catch (JsonProcessingException e) {
-      return "ERROR processing title.text";
+  public Title map(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
+    String value = r.getString(columnNumber);
+    Matcher valueParts =
+        Pattern.compile(
+                "^\"[(](?<titletype>\\p{Punct}{2}[(].+?[)]\\p{Punct}{2}),(?<text>\\p{Punct}{2}[{].+?[}]\\p{Punct}{2}),(?<orig>\\p{Punct}{,2}[{][\\w,-]+[}]\\p{Punct}{,2})[)]\"$",
+                Pattern.UNICODE_CHARACTER_CLASS)
+            .matcher(value);
+    if (!valueParts.find()) {
+      return null;
     }
-  }
-
-  private String commaSeparatedLocales(Collection<Locale> list) {
-    return list.stream().map(locale -> locale.toString()).collect(Collectors.joining(","));
+    TitleType titleType = titleTypeMapper.createTypeFromString(valueParts.group("titletype"));
+    LocalizedText titleText = null;
+    try {
+      titleText = objectMapper.readValue(valueParts.group("text"), LocalizedText.class);
+    } catch (JsonProcessingException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    Set<Locale> localesOfOriginalScripts =
+        Stream.of(valueParts.group("orig").split(","))
+            .map(s -> Locale.forLanguageTag(s))
+            .collect(Collectors.toSet());
+    return new Title(titleText, localesOfOriginalScripts, titleType);
   }
 }

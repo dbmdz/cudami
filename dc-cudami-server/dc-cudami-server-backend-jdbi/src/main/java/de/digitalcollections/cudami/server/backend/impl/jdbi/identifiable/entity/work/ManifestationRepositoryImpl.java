@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
@@ -143,6 +144,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       CudamiConfig cudamiConfig,
       ExpressionTypeMapper expressionTypeMapper,
       LocalDateRangeMapper dateRangeMapper,
+      TitleMapper titleMapper,
       EntityRepositoryImpl<Entity> entityRepository) {
     super(
         jdbi,
@@ -156,6 +158,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
     dbi.registerColumnMapper(dateRangeMapper);
+    dbi.registerColumnMapper(titleMapper);
 
     this.entityRepository = entityRepository;
   }
