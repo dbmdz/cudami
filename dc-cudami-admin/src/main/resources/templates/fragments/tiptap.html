@@ -83,11 +83,11 @@
       <button type="button" class="btn btn-default" tabindex="-1" title="Strike" data-value="strike"
               th:onclick="|editors.get('__${editorId}__').chain().focus().toggleStrike().run()|"><span class="fa fa-strikethrough"></span></button>
 
-      <button type="button" class="btn btn-default" tabindex="-1" title="Subscript" data-value="subscript"
-              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleSubscript().run()|"><span class="fa fa-subscript"></span></button>
-
       <button type="button" class="btn btn-default" tabindex="-1" title="Superscript" data-value="superscript"
               th:onclick="|editors.get('__${editorId}__').chain().focus().toggleSuperscript().run()|"><span class="fa fa-superscript"></span></button>
+              
+      <button type="button" class="btn btn-default" tabindex="-1" title="Subscript" data-value="subscript"
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleSubscript().run()|"><span class="fa fa-subscript"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Link" data-value="link"
               data-target="#dialog-link" data-toggle="modal" th:onclick="|targetEditor=editors.get('__${editorId}__')|"><span class="fa fa-link"></span></button>
@@ -137,12 +137,6 @@
       $("#dialog-link").on('click', '.btn-primary', function (event) {
         let linkUrl = $("#dialog-link input[name='url']").val();
         let linkTitle = $("#dialog-link input[name='title']").val();
-        /*
-         * let attrs={ title: 'mylink', href:'google.com' }
-         let schema=view.state.schema
-         let node=schema.text(attrs.title, [schema.marks.link.create(attrs)])
-         view.dispatch(view.state.tr.replaceSelectionWith(node, false))
-         */
         if (linkTitle) {
           targetEditor.chain().focus().extendMarkRange("link").setLink({href: linkUrl, title: linkTitle}).run();
         } else {

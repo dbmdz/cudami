@@ -207,50 +207,43 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__core</artifactId>
-      <version>2.0.0-beta.174</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__extension-link</artifactId>
-      <version>2.0.0-beta.199</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__extension-subscript</artifactId>
-      <version>2.0.0-beta.199</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__extension-superscript</artifactId>
-      <version>2.0.0-beta.199</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__extension-underline</artifactId>
-      <version>2.0.0-beta.199</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>tiptap__starter-kit</artifactId>
-      <version>2.0.0-beta.183</version>
+      <version>2.0.0-beta.202</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>url-search-params-polyfill</artifactId>
       <version>8.1.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <!-- until dependencies are refreshed at webjars.org -->
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>prosemirror-schema-list</artifactId>
-      <version>1.2.2</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
