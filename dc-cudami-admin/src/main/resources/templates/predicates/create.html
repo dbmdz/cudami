@@ -57,7 +57,7 @@
                             </div>
                             <div class="form-group">
                               <label th:text="#{lbl.abstract}">Abstract</label>
-                              <div th:id="description-menu-__${language}__" th:insert="fragments/tiptap :: editor-menu-short" class="editorMenu border-1 p-1"></div>
+                              <div th:id="description-menu-__${language}__" th:data-editor-id="description-editor-__${language}__" th:insert="fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${language})" class="editorMenu border-1 p-1"></div>
                               <div th:id="description-editor-__${language}__" th:data-menu-id="description-menu-__${language}__"></div>
                               <input th:id="description-json-__${language}__" type="hidden" th:field="*{description['__${language}__']}"/>
                               <script th:inline="javascript" type="module">
@@ -67,7 +67,7 @@
                                  let idEditorMenu    = [[description-menu-__${language}__]];
                                  let idJsonField     = [[description-json-__${language}__]];
                                  +]*/
-                                new MiniEditor(idEditorElement, idEditorMenu, idJsonField);
+                                editors.set(idEditorElement, new MiniEditor(idEditorElement, idEditorMenu, idJsonField));
                               </script>
                             </div>
                           </div>

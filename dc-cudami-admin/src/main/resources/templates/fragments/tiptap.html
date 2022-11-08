@@ -61,36 +61,36 @@
     </div>
   </th:block>
 
-  <th:block th:fragment="editor-menu-short">
+  <th:block th:fragment="editor-menu-short (editorId)">
     <div class="btn-group" role="group" aria-label="...">
       <button type="button" class="btn btn-default" tabindex="-1" title="Undo" disabled="true" data-value="undo"
-              onclick="editor.chain().focus().undo().run()"><i class="fa fa-undo"></i></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().undo().run()|"><i class="fa fa-undo"></i></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Redo" disabled="true" data-value="redo"
-              onclick="editor.chain().focus().redo().run()"><i class="fa fa-redo"></i></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().redo().run()|"><i class="fa fa-redo"></i></button>
     </div>
     &nbsp;
     <div class="btn-group" role="group" aria-label="...">
       <button type="button" class="btn btn-default" tabindex="-1" title="Bold" data-value="bold"
-              onclick="editor.chain().focus().toggleBold().run()"><span class="fa fa-bold"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleBold().run()|"><span class="fa fa-bold"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Italic" data-value="italic"
-              onclick="editor.chain().focus().toggleItalic().run()"><span class="fa fa-italic"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleItalic().run()|"><span class="fa fa-italic"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Underline" data-value="underline"
-              onclick="editor.chain().focus().toggleUnderline().run()"><span class="fa fa-underline"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleUnderline().run()|"><span class="fa fa-underline"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Strike" data-value="strike"
-              onclick="editor.chain().focus().toggleStrike().run()"><span class="fa fa-strikethrough"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleStrike().run()|"><span class="fa fa-strikethrough"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Subscript" data-value="subscript"
-              onclick="editor.chain().focus().toggleSubscript().run()"><span class="fa fa-subscript"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleSubscript().run()|"><span class="fa fa-subscript"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Superscript" data-value="superscript"
-              onclick="editor.chain().focus().toggleSuperscript().run()"><span class="fa fa-superscript"></span></button>
+              th:onclick="|editors.get('__${editorId}__').chain().focus().toggleSuperscript().run()|"><span class="fa fa-superscript"></span></button>
 
       <button type="button" class="btn btn-default" tabindex="-1" title="Link" data-value="link"
-              data-target="#dialog-link" data-toggle="modal"><span class="fa fa-link"></span></button>
+              data-target="#dialog-link" data-toggle="modal" th:onclick="|targetEditor=editors.get('__${editorId}__')|"><span class="fa fa-link"></span></button>
       <!--        <button type="button" class="btn btn-default" tabindex="-1" title="Link" data-value="link"
                       onclick="editor.chain().focus().setLink({href: 'http://www.google.de/'}).run()"><span class="fa fa-link"></span></button>-->
     </div>
@@ -128,7 +128,13 @@
     </div>
 
     <script type="text/javascript">
-      $("#dialog-link").on('click', '.btn-primary', function () {
+      $("#dialog-link").on('show.bs.modal', function (event) {
+        const previousUrl = targetEditor.getAttributes('link').href;
+        $("#link-url-input").val(previousUrl);
+        const previousTitle = targetEditor.getAttributes('link').title;
+        $("#link-title-input").val(previousTitle);
+      });
+      $("#dialog-link").on('click', '.btn-primary', function (event) {
         let linkUrl = $("#dialog-link input[name='url']").val();
         let linkTitle = $("#dialog-link input[name='title']").val();
         /*
@@ -138,9 +144,9 @@
          view.dispatch(view.state.tr.replaceSelectionWith(node, false))
          */
         if (linkTitle) {
-          editor.chain().focus().extendMarkRange("link").setLink({href: linkUrl, title: linkTitle}).run();
+          targetEditor.chain().focus().extendMarkRange("link").setLink({href: linkUrl, title: linkTitle}).run();
         } else {
-          editor.chain().focus().extendMarkRange("link").setLink({href: linkUrl}).run();
+          targetEditor.chain().focus().extendMarkRange("link").setLink({href: linkUrl}).run();
         }
         $('#dialog-link').modal('hide');
       });
