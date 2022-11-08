@@ -227,6 +227,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public DigitalObject getByIdentifierWithWEMI(String namespace, String id) {
     DigitalObject digitalObject = getByIdentifier(namespace, id);
+    if (digitalObject == null) {
+      return null;
+    }
     if (digitalObject.getItem() != null) {
       Item item = itemService.getByUuid(digitalObject.getItem().getUuid());
 
