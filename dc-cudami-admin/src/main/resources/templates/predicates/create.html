@@ -46,8 +46,8 @@
                   </li>
                 </ul>
                 <div class="tab-content">
-                  <th:block th:each="fieldLanguage, iter : ${existingLanguages}" th:with="active=${iter.index == 0}, beanName='predicate'">
-                    <div th:replace="fragments/forms/label-description-form :: html"></div>
+                  <th:block th:each="language, iter : ${existingLanguages}">
+                    <div th:replace="fragments/forms/label-description-form :: html(fieldLanguage=${language},active=${iter.index == 0},beanName='predicate')"></div>
                   </th:block>
                 </div>
               </div>
