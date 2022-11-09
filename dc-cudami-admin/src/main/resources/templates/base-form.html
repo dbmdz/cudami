@@ -60,89 +60,9 @@
   <body>
 
   <th:block layout:fragment="beforeBodyEnds">
-    <div class="modal fade" id="addLanguageDialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" th:text="#{modal.title.choose_language}">Choose a language</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <form>
-                <select id="label-locales" class="form-control">
-                  <th:block th:each="locale : ${allLanguages}">
-                    <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}">English</option>
-                  </th:block>
-                </select>
-              </form>
-            </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-            <button type="submit" class="btn btn-primary" data-dismiss="modal" th:text="#{btn.add}">Add</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script type="text/javascript" th:inline="javascript">
-      let targetLocalizedForm;
-      $('#addLanguageDialog').on('show.bs.modal', function (e) {
-        targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
-      });
-      $("#addLanguageDialog").on('click', '.btn-primary', function () {
-        /*[- remove class 'active' from all 'nav-item a' links -]*/
-        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).find('.nav-link').removeClass('active');
-
-        /*[- append a new active tab with selected language before plus tab -]*/
-        let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
-        let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
-        /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-        let newTab = $(navTabs).children('.nav-item').first().clone();
-        let navLink = $(newTab).children('.nav-link').first();
-        $(navLink).attr('href', '#' + selectedOptionValue);
-        $(navLink).text(selectedOptionText);
-        $(navLink).addClass('active');
-        let plusTab = $(navTabs).find('.nav-item').last();
-        $(plusTab).before(newTab);
-
-        /*[- append a new tab pane for new language by cloning an existing pane -]*/
-        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
-        let newTabPane = $(targetLocalizedForm).find('.tab-pane').first().clone();
-        $(newTabPane).attr('id', selectedOptionValue);
-        $(newTabPane).addClass('active');
-        /*[-
-         * set ids and properties of form elements to be in sync with new language
-         * e.g. <label for="label-en"...> -> <label for="label-am"...>
-         * e.g. <input id="label-en" name="label['en']"...> -> <input id="label-am" name="label['am']"...>
-         -]*/
-        $(newTabPane).find('label').each(function () {
-          if ($(this).attr('for')) {
-            let newForAttribute = $(this).attr('for').split('-')[0] + '-' + selectedOptionValue;
-            $(this).attr('for', newForAttribute);
-          }
-        });
-        $(newTabPane).find('input').each(function () {
-          if ($(this).attr('id')) {
-            let newIdAttribute = $(this).attr('id').split('-')[0] + '-' + selectedOptionValue;
-            $(this).attr('id', newIdAttribute);
-          }
-          if ($(this).attr('name')) {
-            let newNameAttribute = $(this).attr('name').split('[')[0] + '[\'' + selectedOptionValue + '\']';
-            $(this).attr('name', newNameAttribute);
-          }
-          $(this).val('');
-        });
-
-        let tabContent = $(targetLocalizedForm).find('.tab-content').first();
-        $(tabContent).append(newTabPane);
-      });
-    </script>
-
-    <th:block th:replace="fragments/tiptap :: modal-dialog-editor-link"></th:block>
+    <th:block th:replace="fragments/modals/add-language :: add-language-dialog"></th:block>
+    <th:block th:replace="fragments/modals/add-link :: add-link-dialog"></th:block>
   </th:block>
+  
 </body>
 </html>

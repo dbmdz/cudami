@@ -94,7 +94,7 @@
     </div>
   </th:block>
   <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals-confirmation :: confirmYesNoDialog-bootstrap4"></div>
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
     <script th:inline="javascript">
       $(addUserStatusChangeHandler(/*[[@{/api/users/{uuid}(uuid=${user.uuid})}]]*/))
     </script>

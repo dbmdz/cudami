@@ -5,7 +5,7 @@
     <title></title>
   </head>
   <body>
-  <th:block th:fragment="confirmYesNoDialog">
+  <th:block th:fragment="confirm-yes-no-dialog">
     <div class="modal fade" id="confirmYesNoDialog">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -38,7 +38,7 @@
 
         // Pass form reference to modal for submission on yes/ok
         var href = $(e.relatedTarget).data('href');
-        if (href == undefined) {
+        if (href === undefined) {
           return;
         }
         $(this).find('.modal-footer #confirm').attr('href', href);

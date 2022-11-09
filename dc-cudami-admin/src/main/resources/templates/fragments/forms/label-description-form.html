@@ -1,0 +1,40 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute">
+  <head>
+  </head>
+  <body>
+  <th:block layout:fragment="html(fieldLanguage, active, beanName)" th:object="${__${beanName}__}">
+    <div th:id="${fieldLanguage}" class="tab-pane" th:classappend="active ? 'active'">
+      <div class="card">
+        <div class="card-body bg-light">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label th:for="label-__${fieldLanguage}__" th:text="#{lbl.label}">Label</label>
+                <input th:id="label-__${fieldLanguage}__" class="form-control" type="text" value="" th:field="*{label['__${fieldLanguage}__']}" />
+              </div>
+              <div class="form-group">
+                <label th:text="#{lbl.abstract}">Abstract</label>
+                <div th:id="description-menu-__${fieldLanguage}__" th:insert="fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${fieldLanguage})" class="editorMenu border-1 p-1"></div>
+                <div th:id="description-editor-__${fieldLanguage}__" th:data-menu-id="description-menu-__${fieldLanguage}__"></div>
+                <input th:id="description-json-__${fieldLanguage}__" type="hidden" th:field="*{description['__${fieldLanguage}__']}"/>
+                <script th:inline="javascript" type="module">
+                  import { MiniEditor } from '@cudami/tiptap';
+                  /*[+
+                   let idEditorElement = [[description-editor-__${fieldLanguage}__]];
+                   let idEditorMenu    = [[description-menu-__${fieldLanguage}__]];
+                   let idJsonField     = [[description-json-__${fieldLanguage}__]];
+                   +]*/
+                  editors.set(idEditorElement, new MiniEditor(idEditorElement, idEditorMenu, idJsonField));
+                </script>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

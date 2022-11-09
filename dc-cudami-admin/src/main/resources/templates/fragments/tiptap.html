@@ -95,56 +95,5 @@
                       onclick="editor.chain().focus().setLink({href: 'http://www.google.de/'}).run()"><span class="fa fa-link"></span></button>-->
     </div>
   </th:block>
-
-  <th:block th:fragment="modal-dialog-editor-link">
-    <div class="modal fade" id="dialog-link">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <!-- TODO: title depending on add/edit link -->
-            <h4 class="modal-title">Add Link</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <form class="">
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="link-url-input">URL</label>
-                <input id="link-url-input" name="url" pattern="^(https?://|mailto:|/|#).*$" required="" type="text" class="form-control" value="">
-              </div>
-              <div class="form-group">
-                <label for="link-title-input">Tooltip</label>
-                <input id="link-title-input" name="title" type="text" class="form-control" value="">
-              </div>
-            </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-              <a class="btn btn-primary" id="confirm" th:text="#{btn.add}">Add</a>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <script type="text/javascript">
-      $("#dialog-link").on('show.bs.modal', function (event) {
-        const previousUrl = targetEditor.getAttributes('link').href;
-        $("#link-url-input").val(previousUrl);
-        const previousTitle = targetEditor.getAttributes('link').title;
-        $("#link-title-input").val(previousTitle);
-      });
-      $("#dialog-link").on('click', '.btn-primary', function (event) {
-        let linkUrl = $("#dialog-link input[name='url']").val();
-        let linkTitle = $("#dialog-link input[name='title']").val();
-        if (linkTitle) {
-          targetEditor.chain().focus().extendMarkRange("link").setLink({href: linkUrl, title: linkTitle}).run();
-        } else {
-          targetEditor.chain().focus().extendMarkRange("link").setLink({href: linkUrl}).run();
-        }
-        $('#dialog-link').modal('hide');
-      });
-    </script>
-  </th:block>
 </body>
 </html>

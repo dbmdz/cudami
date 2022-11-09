@@ -46,35 +46,9 @@
                   </li>
                 </ul>
                 <div class="tab-content">
-                  <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-                    <div class="card">
-                      <div class="card-body bg-light">
-                        <div class="row">
-                          <div class="col-sm-12">
-                            <div class="form-group">
-                              <label th:for="label-__${language}__" th:text="#{lbl.label}">Label</label>
-                              <input th:id="label-__${language}__" class="form-control" type="text" value="" th:field="*{label['__${language}__']}" />
-                            </div>
-                            <div class="form-group">
-                              <label th:text="#{lbl.abstract}">Abstract</label>
-                              <div th:id="description-menu-__${language}__" th:data-editor-id="description-editor-__${language}__" th:insert="fragments/tiptap :: editor-menu-short(editorId='description-editor-' + ${language})" class="editorMenu border-1 p-1"></div>
-                              <div th:id="description-editor-__${language}__" th:data-menu-id="description-menu-__${language}__"></div>
-                              <input th:id="description-json-__${language}__" type="hidden" th:field="*{description['__${language}__']}"/>
-                              <script th:inline="javascript" type="module">
-                                import { MiniEditor } from '@cudami/tiptap';
-                                /*[+
-                                 let idEditorElement = [[description-editor-__${language}__]];
-                                 let idEditorMenu    = [[description-menu-__${language}__]];
-                                 let idJsonField     = [[description-json-__${language}__]];
-                                 +]*/
-                                editors.set(idEditorElement, new MiniEditor(idEditorElement, idEditorMenu, idJsonField));
-                              </script>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <th:block th:each="fieldLanguage, iter : ${existingLanguages}" th:with="active=${iter.index == 0}, beanName='predicate'">
+                    <div th:replace="fragments/forms/label-description-form :: html"></div>
+                  </th:block>
                 </div>
               </div>
 

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="add-language-dialog">
+    <div class="modal fade" id="addLanguageDialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" th:text="#{modal.title.choose_language}">Choose a language</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <form>
+                <select id="label-locales" class="form-control">
+                  <th:block th:each="locale : ${allLanguages}">
+                    <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}">English</option>
+                  </th:block>
+                </select>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
+            <button type="submit" class="btn btn-primary" data-dismiss="modal" th:text="#{btn.add}">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" th:inline="javascript">
+      let targetLocalizedForm;
+      $('#addLanguageDialog').on('show.bs.modal', function (e) {
+        targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
+      });
+      $("#addLanguageDialog").on('click', '.btn-primary', function () {
+        let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
+        let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
+
+        /*[- remove class 'active' from all 'nav-item a' links -]*/
+        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+        $(navTabs).find('.nav-link').removeClass('active');
+
+        /*[- append a new active tab with selected language before plus tab -]*/
+        /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
+        let newTab = $(navTabs).children('.nav-item').first().clone();
+        let navLink = $(newTab).children('.nav-link').first();
+        $(navLink).attr('href', '#' + selectedOptionValue);
+        $(navLink).text(selectedOptionText);
+        $(navLink).addClass('active');
+        let plusTab = $(navTabs).find('.nav-item').last();
+        $(plusTab).before(newTab);
+
+        /*[- remove class 'active' from all '.tab-pane' panes -]*/
+        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+
+        /*[- append a new tab pane for new language by getting fragment for new language from server -]*/
+        /*[+
+         let fragmentBaseUrl = [[@{/fragments/forms/label-description}]];
+         let uiLocale = [[${#locale.language}]];
+         +]*/
+        let tabContent = $(targetLocalizedForm).find('.tab-content').first();
+        $.ajax({type: "GET",
+          url: fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + selectedOptionValue,
+          success: function (html) {
+            $(tabContent).append(html);
+          }
+        });
+      });
+    </script>
+  </th:block>
+
+</body>
+</html>
