@@ -33,13 +33,19 @@
     </div>
     <script type="text/javascript" th:inline="javascript">
       let targetLocalizedForm;
+      let fragmentBaseUrl;
       $('#addLanguageDialog').on('show.bs.modal', function (e) {
+        /*[+
+         fragmentBaseUrl = [[@{/fragments/forms}]];
+         +]*/
         targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
+        fragmentBaseUrl = fragmentBaseUrl + '/' + $(e.relatedTarget).data("fragment");
       });
       $("#addLanguageDialog").on('click', '.btn-primary', function () {
         let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
         let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
-
+        let tabIdPrefix = $(targetLocalizedForm).data("tabid-prefix");
+        
         /*[- remove class 'active' from all 'nav-item a' links -]*/
         let navTabs = $(targetLocalizedForm).children('.nav-tabs');
         $(navTabs).find('.nav-link').removeClass('active');
@@ -48,7 +54,7 @@
         /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
         let newTab = $(navTabs).children('.nav-item').first().clone();
         let navLink = $(newTab).children('.nav-link').first();
-        $(navLink).attr('href', '#' + selectedOptionValue);
+        $(navLink).attr('href', '#' + tabIdPrefix + selectedOptionValue);
         $(navLink).text(selectedOptionText);
         $(navLink).addClass('active');
         let plusTab = $(navTabs).find('.nav-item').last();
@@ -59,7 +65,6 @@
 
         /*[- append a new tab pane for new language by getting fragment for new language from server -]*/
         /*[+
-         let fragmentBaseUrl = [[@{/fragments/forms/label-description}]];
          let uiLocale = [[${#locale.language}]];
          +]*/
         let tabContent = $(targetLocalizedForm).find('.tab-content').first();
