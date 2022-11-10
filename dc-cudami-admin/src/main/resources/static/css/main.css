@@ -50,6 +50,11 @@ a[href^="http"]:not(.no-external):after {
   color:red;
 }
 
+.required::after {
+  content: " *";
+  color: red;
+}
+
 .rows-striped > .row:nth-of-type(even) {
   background-color: #FCFCFC;
 }

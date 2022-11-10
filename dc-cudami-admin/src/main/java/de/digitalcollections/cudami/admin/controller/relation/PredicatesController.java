@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -38,6 +39,7 @@ public class PredicatesController extends AbstractController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
+  private final LabelNotBlankValidator labelNotBlankValidator;
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final MessageSource messageSource;
@@ -46,7 +48,9 @@ public class PredicatesController extends AbstractController {
   public PredicatesController(
       MessageSource messageSource,
       LanguageSortingHelper languageSortingHelper,
-      CudamiClient client) {
+      CudamiClient client,
+      LabelNotBlankValidator labelNotBlankValidator) {
+    this.labelNotBlankValidator = labelNotBlankValidator;
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = client.forLocales();
     this.messageSource = messageSource;
@@ -116,6 +120,10 @@ public class PredicatesController extends AbstractController {
       RedirectAttributes redirectAttributes)
       throws TechnicalException {
     verifyBinding(results);
+    validate(
+        predicate,
+        results); // TODO: move it to service layer on server side using new VaslidationException of
+    // dc model
     if (results.hasErrors()) {
       Locale defaultLanguage = localeService.getDefaultLanguage();
       model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
@@ -162,6 +170,10 @@ public class PredicatesController extends AbstractController {
           languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
     }
     return existingLanguages;
+  }
+
+  private void validate(Predicate predicate, BindingResult results) {
+    labelNotBlankValidator.validate(predicate.getLabel(), results);
   }
 
   @GetMapping("/predicates/{uuid}")
