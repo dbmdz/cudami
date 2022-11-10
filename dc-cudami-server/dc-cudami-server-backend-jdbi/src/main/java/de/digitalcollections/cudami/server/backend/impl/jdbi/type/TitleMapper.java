@@ -26,40 +26,6 @@ public class TitleMapper implements ColumnMapper<Title> {
     this.titleTypeMapper = titleTypeMapper;
   }
 
-  //  @Override
-  //  public String getTypeName() {
-  //    return "title";
-  //  }
-  //
-  //  @Override
-  //  public Object convertArrayElement(Title element) {
-  //    try {
-  //      boolean hasLocaleList =
-  //          element.getTextLocalesOfOriginalScripts() != null
-  //              && !element.getTextLocalesOfOriginalScripts().isEmpty();
-  //      return "(\""
-  //          + (element.getTitleType() != null
-  //              ? titleTypeMapper.convertArrayElement(element.getTitleType())
-  //              : "{}")
-  //          + "\",\""
-  //          + (element.getText() != null
-  //              ? objectMapper.writeValueAsString(element.getText()).replaceAll("\"", "\"\"")
-  //              : "")
-  //          + "\",\""
-  //          + (hasLocaleList
-  //              ? String.format(
-  //                  "{%s}", commaSeparatedLocales(element.getTextLocalesOfOriginalScripts()))
-  //              : "{}")
-  //          + "\")";
-  //    } catch (JsonProcessingException e) {
-  //      return "ERROR processing title.text";
-  //    }
-  //  }
-
-  //  private String commaSeparatedLocales(Collection<Locale> list) {
-  //    return list.stream().map(locale -> locale.toString()).collect(Collectors.joining(","));
-  //  }
-
   @Override
   public Title map(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
     String value = r.getString(columnNumber);
