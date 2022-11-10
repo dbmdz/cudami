@@ -420,10 +420,7 @@ class DigitalObjectServiceImplTest {
       throws ConflictException, IdentifiableServiceException, ValidationException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =
-        DigitalObject.builder()
-            .uuid(UUID.randomUUID())
-            .label(LocalizedText.builder().text(Locale.ITALY, "Viva Italia!").build())
-            .build();
+        DigitalObject.builder().uuid(UUID.randomUUID()).label(Locale.ITALY, "Viva Italia!").build();
 
     when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
