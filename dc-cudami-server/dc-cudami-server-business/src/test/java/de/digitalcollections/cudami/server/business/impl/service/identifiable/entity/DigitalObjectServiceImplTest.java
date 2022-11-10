@@ -374,7 +374,7 @@ class DigitalObjectServiceImplTest {
   }
 
   @Test
-  @DisplayName("returns false when the given item is null")
+  @DisplayName("returns false when the given uuid was not found")
   public void addNonexistingDigitalObjectToItem()
       throws ConflictException, IdentifiableServiceException, ValidationException {
     UUID uuid = UUID.randomUUID();
@@ -385,7 +385,7 @@ class DigitalObjectServiceImplTest {
   }
 
   @Test
-  @DisplayName("returns false when the given item is null")
+  @DisplayName("returns true if the digital object is already connected to the item")
   public void addExistingAndAlreadyConntectedDigitalObjectToItem()
       throws ConflictException, IdentifiableServiceException, ValidationException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
@@ -398,7 +398,8 @@ class DigitalObjectServiceImplTest {
   }
 
   @Test
-  @DisplayName("returns false when the given item is null")
+  @DisplayName(
+      "throws ConflictException if the digital object is already connected to another item")
   public void addExistingButOtherwiseConntectedDigitalObjectToItem() {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     Item otherItem = Item.builder().uuid(UUID.randomUUID()).build();
@@ -414,7 +415,7 @@ class DigitalObjectServiceImplTest {
   }
 
   @Test
-  @DisplayName("returns false when the given item is null")
+  @DisplayName("returns true when the digital object was successfully connected with the item")
   public void addExistingAndNotConntectedDigitalObjectToItem()
       throws ConflictException, IdentifiableServiceException, ValidationException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
