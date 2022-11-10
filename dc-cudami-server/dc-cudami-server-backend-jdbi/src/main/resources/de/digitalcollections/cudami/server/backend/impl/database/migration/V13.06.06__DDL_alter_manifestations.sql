@@ -12,5 +12,6 @@ ALTER TABLE manifestations
   DROP COLUMN IF EXISTS sortkey;
 
 ALTER TABLE manifestations
+  DROP CONSTRAINT IF EXISTS fk_previewfileresource,
   ADD CONSTRAINT fk_previewfileresource FOREIGN KEY (previewfileresource) REFERENCES fileresources_image;
 
