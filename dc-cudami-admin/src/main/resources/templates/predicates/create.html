@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base-form}">
   <head>
-    <title th:text="|#{predicates}: #{identifier_type_create}|">Relation types Create a new relation type</title>
+    <title th:text="|#{predicates}: #{predicates_create}|">Relation types: Create a new relation type</title>
   </head>
   <body>
   <th:block layout:fragment="content">
@@ -14,8 +14,8 @@
           <div th:replace="fragments/feedback-messages :: form"></div>
 
           <div class="row">
-            <div class="col-6 col-sm-9"><h1>Create a new relation type</h1></div>
-            <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary">Save</button></div></div>
+            <div class="col-6 col-sm-9"><h1 th:text="#{predicates_create}">Create a new relation type</h1></div>
+            <div class="col-6 col-sm-3"><div class="float-right visible"><button type="submit" class="btn btn-primary" th:text="#{save}">Save</button></div></div>
           </div>
           <div class="row">
             <div class="col-sm-12">
@@ -40,7 +40,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a title="Sprache hinzufügen" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-description">
+                    <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-description">
                       <i class="fa fa-plus"></i>
                     </a>
                   </li>
