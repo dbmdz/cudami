@@ -1,14 +1,14 @@
 function activateExternalLinks() {
   $('a[href]')
-    .filter(function () {
-      var linkTarget = $(this).attr('href')
-      var isExternalLink = false
-      if (/^https?:\/\//.test(linkTarget)) {
-        isExternalLink = true
-      }
-      return isExternalLink
-    })
-    .attr('target', '_blank')
+          .filter(function () {
+            var linkTarget = $(this).attr('href')
+            var isExternalLink = false
+            if (/^https?:\/\//.test(linkTarget)) {
+              isExternalLink = true
+            }
+            return isExternalLink
+          })
+          .attr('target', '_blank')
 }
 
 function activatePopovers() {
@@ -21,9 +21,9 @@ function addLanguageChangeHandler() {
     var selectedLanguage = $(this).attr('href').slice(1)
     var editUrl = $('#edit-button').attr('href').split('?')
     var urlParams =
-      editUrl.length > 1
-        ? new URLSearchParams(editUrl[1])
-        : new URLSearchParams('')
+            editUrl.length > 1
+            ? new URLSearchParams(editUrl[1])
+            : new URLSearchParams('')
     urlParams.set('activeLanguage', selectedLanguage)
     editUrl = [editUrl[0], urlParams.toString()]
     $('#edit-button, #sticky-edit-button').attr('href', editUrl.join('?'))
@@ -38,9 +38,9 @@ function appendQueryParameters() {
     var changeLocaleLink = document.querySelector('a#change-locale')
     var currentHref = changeLocaleLink.getAttribute('href')
     changeLocaleLink.setAttribute(
-      'href',
-      `${currentHref}&${existingQueryParameters.toString()}`,
-    )
+            'href',
+            `${currentHref}&${existingQueryParameters.toString()}`,
+            )
   }
 }
 
@@ -51,26 +51,26 @@ function moveEditButtonToNavbar() {
   editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
   editButtonInNavbar.innerHTML = `<a class="border border-white btn btn-primary btn-sm" id="sticky-edit-button">${editButton.innerText}</a>`
   var observer = new IntersectionObserver(
-    (entry, _) => {
-      var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
-      if (inView) {
-        editButton.classList.add('visible')
-        editButton.classList.remove('invisible')
-        editButtonInNavbar.remove()
-      } else {
-        editButton.classList.add('invisible')
-        editButton.classList.remove('visible')
-        editButtonInNavbar
-          .querySelector('a')
-          .setAttribute('href', editButton.getAttribute('href'))
-        navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
-      }
-    },
-    {
-      rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
-      threshold: 1,
-    },
-  )
+          (entry, _) => {
+    var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
+    if (inView) {
+      editButton.classList.add('visible')
+      editButton.classList.remove('invisible')
+      editButtonInNavbar.remove()
+    } else {
+      editButton.classList.add('invisible')
+      editButton.classList.remove('visible')
+      editButtonInNavbar
+              .querySelector('a')
+              .setAttribute('href', editButton.getAttribute('href'))
+      navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
+    }
+  },
+          {
+            rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
+            threshold: 1,
+          },
+          )
   observer.observe(editButton)
 }
 
@@ -102,4 +102,8 @@ function addUserStatusChangeHandler(url) {
   } else {
     confirm.addEventListener('click', listener(enable))
   }
+}
+
+function prependErrorIcon(element) {
+  $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }

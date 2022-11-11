@@ -18,6 +18,18 @@
 
   <!-- Custom styles for this template -->
   <link th:href="@{/css/main.css}" rel="stylesheet">
+  
+    <!-- jQuery -->
+  <script th:src="@{/webjars/AdminLTE/plugins/jquery/jquery.min.js}"></script>
+  <!-- Bootstrap 4 -->
+  <script th:src="@{/webjars/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
+  <!-- AdminLTE App -->
+  <script th:src="@{/webjars/AdminLTE/dist/js/adminlte.min.js}"></script>
+
+  <!-- Polyfill for URLSearchParams -->
+  <script th:src="@{|/webjars/url-search-params-polyfill/index.js|}"></script>
+
+  <script th:src="@{/js/index.js}"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed text-sm">
   <div class="wrapper">
@@ -362,17 +374,6 @@
 
   <!-- REQUIRED SCRIPTS -->
 
-  <!-- jQuery -->
-  <script th:src="@{/webjars/AdminLTE/plugins/jquery/jquery.min.js}"></script>
-  <!-- Bootstrap 4 -->
-  <script th:src="@{/webjars/AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js}"></script>
-  <!-- AdminLTE App -->
-  <script th:src="@{/webjars/AdminLTE/dist/js/adminlte.min.js}"></script>
-
-  <!-- Polyfill for URLSearchParams -->
-  <script th:src="@{|/webjars/url-search-params-polyfill/index.js|}"></script>
-
-  <script th:src="@{/js/index.js}"></script>
   <script>
     $(function () {
       activateExternalLinks()

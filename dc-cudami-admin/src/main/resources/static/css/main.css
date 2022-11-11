@@ -42,17 +42,22 @@ a[href^="http"]:not(.no-external):after {
   background-color: #FFF;
 }
 
+.error {
+  color: rgb(220, 53, 69);
+}
+
 .has-error input {
   border-color:red;
 }
+
 .has-error p {
   font-size: 11px;
-  color:red;
+  color: rgb(220, 53, 69);
 }
 
 .required::after {
   content: " *";
-  color: red;
+  color: rgb(220, 53, 69);
 }
 
 .rows-striped > .row:nth-of-type(even) {
