@@ -33,10 +33,14 @@ import Underline from '@tiptap/extension-underline'
               editable: true,
               injectCSS: true,
               onCreate( { editor }) {
-                // The editor is ready.
+                // The editor is ready. Now teak the schema to target semantics:
                 editor.schema.nodes.bulletList.name = 'bullet_list';
                 editor.schema.nodes.listItem.name = 'list_item';
                 editor.schema.nodes.orderedList.name = 'ordered_list';
+                
+                editor.schema.marks.bold.name = 'strong';
+                editor.schema.marks.italic.name = 'em';
+                editor.schema.marks.strike.name = 'strikethrough';
 
                 try {
                   editor.commands.setContent(JSON.parse(document.getElementById(idJsonField).value));
