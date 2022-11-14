@@ -38,7 +38,11 @@ import Underline from '@tiptap/extension-underline'
                 editor.schema.nodes.listItem.name = 'list_item';
                 editor.schema.nodes.orderedList.name = 'ordered_list';
 
-                editor.commands.setContent(JSON.parse(document.getElementById(idJsonField).value));
+                try {
+                  editor.commands.setContent(JSON.parse(document.getElementById(idJsonField).value));
+                } catch (e) {
+                  // thrown if field is empty
+                }
               },
               onFocus( { editor, event }) {
                 // The editor is focused.
