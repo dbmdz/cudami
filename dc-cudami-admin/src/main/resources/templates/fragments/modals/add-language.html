@@ -45,21 +45,36 @@
         let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
         let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
         let tabIdPrefix = $(targetLocalizedForm).data("tabid-prefix");
-        
-        /*[- remove class 'active' from all 'nav-item a' links -]*/
+
+        addNavTab(selectedOptionValue, selectedOptionText, tabIdPrefix);
+        addTabPane(selectedOptionValue);
+        bindTabEvents();
+      });
+
+      function addDeleteLink(languageTab) {
+        if ($(languageTab).children(".deleteAction").length === 0) {
+          let targetId = $(languageTab).children(".nav-link").attr("href");
+          $(languageTab).append('<a class="deleteAction" data-href="javascript:deleteTab(\'' + targetId + '\');" data-message="huch" data-title="Warnung" data-target="#confirmYesNoDialog" data-toggle="modal"><i class="fa fa-trash ml-2"></i></a>');
+        }
+      }
+
+      function addNavTab(languageAcronym, languageLabel, idPrefix) {
+        /*[- remove class 'active' from all 'nav-item's and '.nav-link' links -]*/
         let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+        $(navTabs).children(".nav-item").removeClass('active');
         $(navTabs).find('.nav-link').removeClass('active');
 
         /*[- append a new active tab with selected language before plus tab -]*/
         /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-        let newTab = $(navTabs).children('.nav-item').first().clone();
-        let navLink = $(newTab).children('.nav-link').first();
-        $(navLink).attr('href', '#' + tabIdPrefix + selectedOptionValue);
-        $(navLink).text(selectedOptionText);
-        $(navLink).addClass('active');
-        let plusTab = $(navTabs).find('.nav-item').last();
-        $(plusTab).before(newTab);
+//        let newTab = $(navTabs).children('.nav-item').first().clone();
+        let newTab = '<li class="nav-item language-tab active"><a class="language-switcher nav-link" class="active" data-toggle="tab" role="tab" href="#' + idPrefix + languageAcronym + '">' + languageLabel + '</a></li>';
+        let lastLanguageTab = $(navTabs).find('.language-tab').last();
+        $(lastLanguageTab).after(newTab);
 
+        updateActionsInTabs(navTabs);
+      }
+
+      function addTabPane(languageAcronym) {
         /*[- remove class 'active' from all '.tab-pane' panes -]*/
         $(targetLocalizedForm).find('.tab-pane').removeClass('active');
 
@@ -69,12 +84,53 @@
          +]*/
         let tabContent = $(targetLocalizedForm).find('.tab-content').first();
         $.ajax({type: "GET",
-          url: fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + selectedOptionValue,
+          url: fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + languageAcronym,
           success: function (html) {
             $(tabContent).append(html);
           }
         });
-      });
+      }
+
+      function deleteTab(id) {
+        /*[- remove tab linking to given id -]*/
+        $(".nav-tabs").find("a[href='" + id + "']").each(function (index) {
+          targetLocalizedForm = $(this).closest('.localized-form');
+          // remove tab:
+          $(this).parent().remove();
+        });
+        /*[- remove tab-pane with given id -]*/
+        $(targetLocalizedForm).find(id).remove();
+
+        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+        $(navTabs).children(".nav-item").removeClass('active');
+        $(navTabs).find('.nav-link').removeClass('active');
+        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+
+        $(targetLocalizedForm).find(".nav-item").first().addClass("active");
+        $(targetLocalizedForm).find(".tab-pane").first().addClass("active");
+        updateActionsInTabs(navTabs);
+        $('#confirmYesNoDialog').modal('hide');
+      }
+
+      function removeDeleteLink(languageTab) {
+        if ($(languageTab).children(".deleteAction").length === 1) {
+          $(languageTab).children(".deleteAction").remove();
+        }
+      }
+
+      function updateActionsInTabs(navTabs) {
+        /*[- remove delete links from all language tabs ("add"-tab excluded) if there is only one language tab, otherwise add delete link (if not exists yet) to all language tabs -]*/
+        let languageTabsCount = $(navTabs).children('.language-tab').length;
+        if (languageTabsCount === 1) {
+          $(navTabs).children('.language-tab').each(function (index) {
+            removeDeleteLink(this);
+          });
+        } else {
+          $(navTabs).children('.language-tab').each(function (index) {
+            addDeleteLink(this);
+          });
+        }
+      }
     </script>
   </th:block>
 

@@ -104,6 +104,16 @@ function addUserStatusChangeHandler(url) {
   }
 }
 
+function bindTabEvents() {
+  $('.nav-tabs a').on('shown.bs.tab', function (event) {
+    let targetNavItem = $(event.target).parent();
+    let targetNavTabs = $(targetNavItem).parent();
+
+    $(targetNavTabs).children(".nav-item").removeClass("active");
+    $(targetNavItem).addClass("active");
+  });
+}
+
 function prependErrorIcon(element) {
   $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }

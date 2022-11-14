@@ -55,6 +55,34 @@ a[href^="http"]:not(.no-external):after {
   color: rgb(220, 53, 69);
 }
 
+.nav-tabs .nav-item {
+  border: 1px solid transparent;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+  border-top-color: rgb(222, 226, 230);
+  border-right-color: rgb(222, 226, 230);
+  border-bottom-color: rgb(255, 255, 255);
+  border-left-color: rgb(222, 226, 230);
+  margin-bottom: -1px;
+  padding: .4rem .8rem;
+  white-space: nowrap;
+}
+.nav-tabs .nav-link {
+  display: inline;
+  margin-bottom: 0px;
+  border: none;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+.nav-tabs .nav-item.active {
+  background-color: #FFF;
+}
+
+.nav-tabs .nav-item.active a.language-switcher {
+  color: #495057;
+}
+
 .required::after {
   content: " *";
   color: rgb(220, 53, 69);
