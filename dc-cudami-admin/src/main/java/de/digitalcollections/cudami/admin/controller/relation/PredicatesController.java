@@ -70,6 +70,8 @@ public class PredicatesController extends AbstractController {
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
     model.addAttribute("activeLanguage", defaultLanguage);
+
+    model.addAttribute("mode", "create");
     return "predicates/create-or-edit";
   }
 
@@ -95,7 +97,18 @@ public class PredicatesController extends AbstractController {
     List<Locale> sortedLanguages = getAllLanguages();
     model.addAttribute("allLanguages", sortedLanguages);
 
+    model.addAttribute("mode", "edit");
     return "predicates/create-or-edit";
+  }
+
+  @GetMapping("/predicates/{uuid}/delete")
+  public String delete(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    service.deleteByUuid(uuid);
+    String message =
+        messageSource.getMessage("msg.deleted_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/predicates";
   }
 
   private List<Locale> getAllLanguages() throws TechnicalException {

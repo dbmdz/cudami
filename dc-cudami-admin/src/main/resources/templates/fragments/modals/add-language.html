@@ -53,8 +53,15 @@
 
       function addDeleteLink(languageTab) {
         if ($(languageTab).children(".deleteAction").length === 0) {
-          let targetId = $(languageTab).children(".nav-link").attr("href");
-          $(languageTab).append('<a class="deleteAction" data-href="javascript:deleteTab(\'' + targetId + '\');" data-message="huch" data-title="Warnung" data-target="#confirmYesNoDialog" data-toggle="modal"><i class="fa fa-trash ml-2"></i></a>');
+          let navLink = $(languageTab).children(".nav-link");
+          let targetId = $(navLink).attr("href");
+          let tabLabel = $(navLink).text();
+          /*[+
+           const modalDeleteMessage = `[(#{modal.msg.confirm_delete_tab})]`;
+           const modalDeleteTitle = [[#{modal.title.warning}]];
+           const tooltipDelete = [[#{tooltip.delete}]];
+           +]*/
+          $(languageTab).append('<a class="deleteAction" title="' + tooltipDelete + '" data-href="javascript:deleteTab(\'' + targetId + '\');" data-message="' + escape(modalDeleteMessage) + '" data-title="' + modalDeleteTitle + '" data-target="#confirmYesNoDialog" data-toggle="modal"><i class="fa fa-trash ml-2"></i></a>');
         }
       }
 

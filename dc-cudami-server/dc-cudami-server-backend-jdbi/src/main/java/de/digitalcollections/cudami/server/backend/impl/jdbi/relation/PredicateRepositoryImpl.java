@@ -182,7 +182,8 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
     return "value";
   }
 
-  private long retrieveCount(StringBuilder sqlCount, Map<String, Object> argumentMappings) {
+  @Override
+  protected long retrieveCount(StringBuilder sqlCount, Map<String, Object> argumentMappings) {
     long total =
         dbi.withHandle(
             h ->
