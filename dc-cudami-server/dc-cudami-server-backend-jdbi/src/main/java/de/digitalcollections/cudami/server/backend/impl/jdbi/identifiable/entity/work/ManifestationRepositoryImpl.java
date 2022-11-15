@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.text.LocalizedText;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,9 @@ import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
 import org.springframework.stereotype.Repository;
 
+@SuppressFBWarnings(
+    value = "VA_FORMAT_STRING_USES_NEWLINE",
+    justification = "Newline is OK in multiline strings")
 @Repository
 public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestation>
     implements ManifestationRepository {
