@@ -70,7 +70,7 @@ public class PredicatesController extends AbstractController {
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
     model.addAttribute("activeLanguage", defaultLanguage);
-    return "predicates/create";
+    return "predicates/create-or-edit";
   }
 
   @GetMapping("/predicates/{uuid}/edit")
@@ -80,20 +80,41 @@ public class PredicatesController extends AbstractController {
       Model model)
       throws TechnicalException {
     Predicate predicate = service.getByUuid(uuid);
+    model.addAttribute("predicate", predicate);
 
     List<Locale> existingLanguages =
         getExistingLanguages(localeService.getDefaultLanguage(), predicate);
+    model.addAttribute("existingLanguages", existingLanguages);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
     } else {
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("value", predicate.getValue());
-    model.addAttribute("uuid", predicate.getUuid());
 
-    return "predicates/edit";
+    List<Locale> sortedLanguages = getAllLanguages();
+    model.addAttribute("allLanguages", sortedLanguages);
+
+    return "predicates/create-or-edit";
+  }
+
+  private List<Locale> getAllLanguages() throws TechnicalException {
+    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> sortedLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
+    return sortedLanguages;
+  }
+
+  private List<Locale> getExistingLanguages(Locale defaultLanguage, Predicate predicate) {
+    List<Locale> existingLanguages = List.of(defaultLanguage);
+    LocalizedText label = predicate.getLabel();
+    if (!CollectionUtils.isEmpty(label)) {
+      Locale displayLocale = LocaleContextHolder.getLocale();
+      existingLanguages =
+          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
+    }
+    return existingLanguages;
   }
 
   @GetMapping("/predicates")
@@ -120,32 +141,28 @@ public class PredicatesController extends AbstractController {
       RedirectAttributes redirectAttributes)
       throws TechnicalException {
     verifyBinding(results);
-    validate(
-        predicate,
-        results); // TODO: move it to service layer on server side using new VaslidationException of
-    // dc model
+    validate(predicate, results);
+    // TODO: move validate() to service layer on server side using new ValidationException of dc
+    // model?
     if (results.hasErrors()) {
       Locale defaultLanguage = localeService.getDefaultLanguage();
       model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
       model.addAttribute("allLanguages", getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
-      return "predicates/create";
+      return "predicates/create-or-edit";
     }
     Predicate predicateDB = null;
     try {
       //      predicateDB = service.save(predicate, results);
       predicateDB = service.save(predicate);
-      LOGGER.info("Successfully saved website");
+      LOGGER.info("Successfully saved predicate");
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save website: ", e);
+      LOGGER.error("Cannot save predicate: ", e);
       String message =
           messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
-      return "redirect:/websites";
+      return "redirect:/predicates";
     }
-    //    if (results.hasErrors()) {
-    //      return "predicates/create";
-    //    }
     status.setComplete();
     String message =
         messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
@@ -153,23 +170,43 @@ public class PredicatesController extends AbstractController {
     return "redirect:/predicates/" + predicateDB.getUuid().toString();
   }
 
-  private List<Locale> getAllLanguages() throws TechnicalException {
-    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> sortedLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
-    return sortedLanguages;
-  }
-
-  private List<Locale> getExistingLanguages(Locale defaultLanguage, Predicate predicate) {
-    List<Locale> existingLanguages = List.of(defaultLanguage);
-    LocalizedText label = predicate.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
+  @PostMapping(value = "/predicates/{pathUuid}/edit")
+  public String update(
+      @PathVariable UUID pathUuid,
+      @ModelAttribute @Valid Predicate predicate,
+      BindingResult results,
+      Model model,
+      SessionStatus status,
+      RedirectAttributes redirectAttributes) {
+    verifyBinding(results);
+    validate(predicate, results);
+    // TODO: move validate() to service layer on server side using new ValidationException of dc
+    // model?
+    if (results.hasErrors()) {
+      return "predicates/create-or-edit";
     }
-    return existingLanguages;
+
+    try {
+      // get predicate from db
+      Predicate predicateDb = service.getByUuid(pathUuid);
+      // just update the fields, that were editable
+      predicateDb.setLabel(predicate.getLabel());
+      predicateDb.setDescription(predicate.getDescription());
+
+      service.update(pathUuid, predicateDb);
+    } catch (TechnicalException e) {
+      String message = "Cannot update predicate with uuid=" + pathUuid + ": " + e;
+      LOGGER.error(message, e);
+      redirectAttributes.addFlashAttribute("error_message", message);
+      return "redirect:/predicates/" + pathUuid + "/edit";
+    }
+
+    status.setComplete();
+    String message =
+        messageSource.getMessage(
+            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/predicates/" + pathUuid;
   }
 
   private void validate(Predicate predicate, BindingResult results) {
