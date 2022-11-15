@@ -44,7 +44,7 @@ public class MainSubTypeMapper<M extends MainSubType> {
     // \p{Punct} is punctuation including " and \
     Matcher valueParts =
         Pattern.compile(
-                "^\\p{Punct}{,2}[(]\\p{Punct}{,2}([\\w\\p{Punct}]*)\\p{Punct}{,2},\\p{Punct}{,2}([\\w\\p{Punct}]*)\\p{Punct}{,2}[)]\\p{Punct}{,2}$")
+                "^\\p{Punct}{0,2}[(]\\p{Punct}{0,2}([\\w\\p{Punct}]*)\\p{Punct}{0,2},\\p{Punct}{0,2}([\\w\\p{Punct}]*)\\p{Punct}{0,2}[)]\\p{Punct}{0,2}$")
             .matcher(value);
     if (!valueParts.find()) {
       return null;

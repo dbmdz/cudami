@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.PublisherRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.Vector;
 import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
@@ -96,9 +96,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
-  // TODO: to join: AllFields{ subjects ✓, publishers }, ReducedFields{ work, parents ✓ and
-  // relations ✓ }
-
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
@@ -110,12 +107,15 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .formatted(tableAlias, mappingPrefix)
         // parents
         + """
-            mms.title parent_title, mms.sortKey parent_sortKey, max(mms.sortKey) OVER (PARTITION BY %s.uuid) parent_max_sortkey,
+            mms.title parent_title, mms.sortKey parent_sortKey,
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
             """
             .formatted(tableAlias)
         // relations
-        + "%1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex, max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, "
+        // %1$s.additional_predicates %2$s_additionalPredicates,
+        + """
+          %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
+          max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
             .formatted(
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX,
@@ -133,10 +133,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
       ) ON %5$s.object_uuid = %1$s.uuid
-      LEFT JOIN (
-        manifestation_publishers mpub INNER JOIN %8$s %9$s
-          ON mpub.publisher_uuid = %9$s.uuid
-      ) ON mpub.manifestation_uuid = %1$s.uuid
       """
           .formatted(
               TABLE_ALIAS,
@@ -145,9 +141,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
               /*4-5*/ EntityRelationRepositoryImpl.TABLE_NAME,
               EntityRelationRepositoryImpl.TABLE_ALIAS,
               /*6-7*/ EntityRepositoryImpl.TABLE_NAME,
-              EntityRepositoryImpl.TABLE_ALIAS,
-              /*8-9*/ PublisherRepositoryImpl.TABLE_NAME,
-              PublisherRepositoryImpl.TABLE_ALIAS);
+              EntityRepositoryImpl.TABLE_ALIAS);
 
   public ManifestationRepositoryImpl(
       Jdbi jdbi,
@@ -238,7 +232,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                     .sortKey(rowView.getColumn("parent_sortKey", String.class))
                     .subject(parent)
                     .build());
-        // TODO: sortKey
       }
     }
 
@@ -246,20 +239,33 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
     if (entityUuid != null) {
       if (manifestation.getRelations() == null) {
-        manifestation.setRelations(new ArrayList<>(1));
+        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
+        Vector<EntityRelation> relations = new Vector<>(maxIndex);
+        relations.setSize(maxIndex);
+        manifestation.setRelations(relations);
       }
       String relationPredicate =
           rowView.getColumn(
               EntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
       if (!manifestation.getRelations().stream()
           .anyMatch(
-              predicate ->
-                  Objects.equals(entityUuid, predicate.getSubject().getUuid())
-                      && Objects.equals(relationPredicate, predicate.getPredicate()))) {
+              relation ->
+                  Objects.equals(entityUuid, relation.getSubject().getUuid())
+                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
         Entity relatedEntity = rowView.getRow(Entity.class);
-        manifestation.addRelation(
-            EntityRelation.builder().subject(relatedEntity).predicate(relationPredicate).build());
-        // TODO: sortindex!!
+        manifestation
+            .getRelations()
+            .set(
+                rowView.getColumn(
+                    EntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex", Integer.class),
+                EntityRelation.builder()
+                    .subject(relatedEntity)
+                    .predicate(relationPredicate)
+                    .additionalPredicates(
+                        rowView.getColumn(
+                            EntityRelationRepositoryImpl.MAPPING_PREFIX + "_additionalPredicates",
+                            new GenericType<List<String>>() {}))
+                    .build());
       }
     }
 

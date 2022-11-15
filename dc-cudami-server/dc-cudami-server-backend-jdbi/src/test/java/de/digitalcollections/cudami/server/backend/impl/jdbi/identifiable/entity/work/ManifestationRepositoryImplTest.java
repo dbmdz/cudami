@@ -6,14 +6,15 @@ import de.digitalcollections.cudami.server.backend.api.repository.PublisherRepos
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
+import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
@@ -41,6 +42,7 @@ class ManifestationRepositoryImplTest {
   @Autowired CorporateBodyRepository corporateBodyRepository;
   @Autowired HumanSettlementRepository humanSettlementRepository;
   @Autowired PublisherRepository publisherRepository;
+  @Autowired PredicateRepository predicateRepository;
 
   @Test
   @DisplayName("is testable")
@@ -50,18 +52,17 @@ class ManifestationRepositoryImplTest {
 
   @Test
   void testSaveManifestationMapOfStringObject() throws RepositoryException {
-    CorporateBody agent = CorporateBody.builder().label("Publisher").addName("Publisher").build();
-    agent = corporateBodyRepository.save(agent);
+    CorporateBody editor = CorporateBody.builder().label("Editor").addName("Editor").build();
+    editor = corporateBodyRepository.save(editor);
+    CorporateBody someoneElse =
+        CorporateBody.builder().label("Someone else").addName("Someone else").build();
+    someoneElse = corporateBodyRepository.save(someoneElse);
 
-    HumanSettlement location =
-        HumanSettlement.builder()
-            .name(new LocalizedText(Locale.GERMAN, "München"))
-            .label("München")
-            .build();
-    publicationLocation = humanSettlementRepository.save(publicationLocation);
-    var publisher =
-        publisherRepository.save(
-            Publisher.builder().agent(agent).location(publicationLocation).build());
+    Predicate isEditorOf =
+        predicateRepository.save(Predicate.builder().value("is_editor_of").build());
+    Predicate isSomethingElseOf =
+        predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
+
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "ein Label")
@@ -69,7 +70,7 @@ class ManifestationRepositoryImplTest {
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .publisher(Publisher.builder().agent(agent).locations(List.of(location)).build())
+            //            .publisher(publisher)
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
                 Title.builder()
@@ -78,8 +79,20 @@ class ManifestationRepositoryImplTest {
                     .textLocaleOfOriginalScript(Locale.GERMAN)
                     .textLocaleOfOriginalScript(Locale.ENGLISH)
                     .build())
+            .title(
+                Title.builder()
+                    .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
+                    .titleType(new TitleType("main", "sub"))
+                    .textLocaleOfOriginalScript(Locale.GERMAN)
+                    .build())
             .build();
+    manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
+    manifestation.addRelation(
+        new EntityRelation(someoneElse, "is_somethingelse_of", manifestation));
     Manifestation saved = repo.save(manifestation);
+
+    // we add the relations manually, actually done by the service
+    // TODO
 
     Manifestation actual = repo.getByUuid(saved.getUuid());
     assertThat(actual).isEqualTo(saved);

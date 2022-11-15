@@ -31,7 +31,7 @@ public class TitleMapper implements ColumnMapper<Title> {
     String value = r.getString(columnNumber);
     Matcher valueParts =
         Pattern.compile(
-                "^\"[(](?<titletype>\\p{Punct}{2}[(].+?[)]\\p{Punct}{2}),(?<text>\\p{Punct}{2}[{].+?[}]\\p{Punct}{2}),(?<orig>\\p{Punct}{,2}[{][\\w,-]+[}]\\p{Punct}{,2})[)]\"$",
+                "^[(](?<titletype>\\p{Punct}*?[(].+?[)]\\p{Punct}*?),(?<text>\\p{Punct}*?[{].+?[}]\\p{Punct}*?),(?<orig>\\p{Punct}*?[{][\\w,-]+[}]\\p{Punct}*?)[)]$",
                 Pattern.UNICODE_CHARACTER_CLASS)
             .matcher(value);
     if (!valueParts.find()) {
