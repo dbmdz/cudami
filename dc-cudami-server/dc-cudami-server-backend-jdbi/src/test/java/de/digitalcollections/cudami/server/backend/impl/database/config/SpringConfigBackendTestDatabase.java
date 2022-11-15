@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
+import de.digitalcollections.cudami.server.config.SpringConfigBackendDatabase;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -14,6 +15,7 @@ import org.jdbi.v3.sqlobject.SqlObjectPlugin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -22,8 +24,10 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 @Configuration
-@ComponentScan(basePackages = {"de.digitalcollections.cudami.server.backend.impl.jdbi"})
-public class SpringConfigBackendDatabase {
+@ComponentScan(
+    basePackages = {"de.digitalcollections.cudami.server.backend.impl.jdbi"},
+    basePackageClasses = SpringConfigBackendDatabase.class)
+public class SpringConfigBackendTestDatabase {
 
   private static final DockerImageName DOCKER_IMAGE_NAME = DockerImageName.parse("postgres:12");
   private static Boolean isMigrated = false;
@@ -37,17 +41,20 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
+  @Primary
   public PostgreSQLContainer postgreSQLContainer() {
     return postgreSQLContainer;
   }
 
   @Bean
-  public ObjectMapper objectMapper() {
+  @Primary
+  public ObjectMapper testObjectMapper() {
     return new DigitalCollectionsObjectMapper();
   }
 
   @Bean
-  public DataSource dataSource() {
+  @Primary
+  public DataSource testDataSource() {
     DriverManagerDataSource dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(postgreSQLContainer.getDriverClassName());
     dataSource.setUrl(postgreSQLContainer.getJdbcUrl());
@@ -57,7 +64,8 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
-  Jdbi jdbi(ObjectMapper objectMapper, DataSource dataSource) {
+  @Primary
+  Jdbi testJdbi(ObjectMapper objectMapper, DataSource dataSource) {
     Jdbi jdbi = Jdbi.create(dataSource);
     jdbi.installPlugin(new SqlObjectPlugin());
     jdbi.installPlugin(new DcCommonsJdbiPlugin());
@@ -83,7 +91,8 @@ public class SpringConfigBackendDatabase {
   }
 
   @Bean
-  CudamiConfig cudamiConfig() {
+  @Primary
+  CudamiConfig testCudamiConfig() {
     var cudamiConfig = new CudamiConfig(null, null, 5000, null);
     return cudamiConfig;
   }

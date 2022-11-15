@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
@@ -25,12 +25,15 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {AgentRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Agent Repository")
 class AgentRepositoryImplTest {
 
   AgentRepositoryImpl<Agent> repo;
+
+  private static final Locale LOCALE_ZH_HANI =
+      new Locale.Builder().setLanguage("zh").setScript("Hani").build();
 
   @Autowired CudamiConfig cudamiConfig;
 
@@ -58,8 +61,13 @@ class AgentRepositoryImplTest {
   void testUpdate() {
     Agent agent = repo.save(Agent.builder().label("Test").addName("some name").build());
     agent.setLabel("changed test");
-    agent.setName(new LocalizedText(Locale.ENGLISH, "some english name"));
-    agent.setNameLocalesOfOriginalScripts(Set.of(Locale.ENGLISH));
+    LocalizedText name =
+        LocalizedText.builder()
+            .text(Locale.ENGLISH, "some english name")
+            .text(LOCALE_ZH_HANI, "難經辨眞")
+            .build();
+    agent.setName(name);
+    agent.setNameLocalesOfOriginalScripts(Set.of(Locale.ENGLISH, LOCALE_ZH_HANI));
 
     Agent saved = repo.update(agent);
     Agent actual = repo.getByUuid(saved.getUuid());

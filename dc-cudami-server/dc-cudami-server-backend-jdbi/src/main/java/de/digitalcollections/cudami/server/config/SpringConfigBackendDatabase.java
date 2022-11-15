@@ -3,6 +3,11 @@ package de.digitalcollections.cudami.server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.plugins.JsonbJdbiPlugin;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.TitleTypeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -69,5 +74,30 @@ public class SpringConfigBackendDatabase {
   @Bean
   public DataSourceTransactionManager transactionManager(DataSource dataSource) {
     return new DataSourceTransactionManager(dataSource);
+  }
+
+  @Bean
+  public DbIdentifierMapper dbIdentifierMapper() {
+    return new DbIdentifierMapper();
+  }
+
+  @Bean
+  public MainSubTypeMapper.ExpressionTypeMapper expressionTypeMapper() {
+    return new MainSubTypeMapper.ExpressionTypeMapper();
+  }
+
+  @Bean
+  public MainSubTypeMapper.TitleTypeMapper titleTypeMapper() {
+    return new MainSubTypeMapper.TitleTypeMapper();
+  }
+
+  @Bean
+  public TitleMapper titleMapper(ObjectMapper objectMapper, TitleTypeMapper titleTypeMapper) {
+    return new TitleMapper(objectMapper, titleTypeMapper);
+  }
+
+  @Bean
+  public LocalDateRangeMapper dateRangeMapper() {
+    return new LocalDateRangeMapper();
   }
 }

@@ -51,8 +51,6 @@ public class PublisherController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "agent_uuid", required = false)
           FilterCriterion<UUID> filterCriterionAgentUuid,
-      @RequestParam(name = "location_uuid", required = false)
-          FilterCriterion<UUID> filterCriterionLocationUuid,
       @RequestParam(name = "location_uuids", required = false)
           String rawFilterCriterionLocationUuids,
       @RequestParam(name = "publisherPresentation", required = false)
@@ -71,14 +69,6 @@ public class PublisherController {
       }
       filterCriterionAgentUuid.setExpression("agent_uuid");
       filtering.add(filterCriterionAgentUuid);
-    }
-
-    if (filterCriterionLocationUuid != null) {
-      if (filtering == null) {
-        filtering = new Filtering();
-      }
-      filterCriterionLocationUuid.setExpression("location_uuid");
-      filtering.add(filterCriterionLocationUuid);
     }
 
     if (rawFilterCriterionLocationUuids != null) {

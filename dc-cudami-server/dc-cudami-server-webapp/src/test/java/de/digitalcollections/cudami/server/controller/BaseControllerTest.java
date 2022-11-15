@@ -197,9 +197,15 @@ public abstract class BaseControllerTest {
    */
   protected void testPutJsonWithState(String path, String jsonBody, int expectedState)
       throws Exception {
-    mockMvc
-        .perform(put(path).contentType(MediaType.APPLICATION_JSON).content(jsonBody))
-        .andExpect(status().is(expectedState));
+    if (jsonBody != null) {
+      mockMvc
+          .perform(put(path).contentType(MediaType.APPLICATION_JSON).content(jsonBody))
+          .andExpect(status().is(expectedState));
+    } else {
+      mockMvc
+          .perform(put(path).contentType(MediaType.APPLICATION_JSON))
+          .andExpect(status().is(expectedState));
+    }
   }
 
   /**

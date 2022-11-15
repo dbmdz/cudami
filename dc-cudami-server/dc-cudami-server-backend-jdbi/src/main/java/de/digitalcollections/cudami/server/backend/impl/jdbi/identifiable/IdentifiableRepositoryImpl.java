@@ -679,6 +679,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
+  @Override
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
         dbi.withHandle(
@@ -795,6 +796,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
                 + tableAlias
+                + " "
                 + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME
@@ -847,6 +849,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public I save(I identifiable, Map<String, Object> bindings) {
+    return save(identifiable, bindings, null);
+  }
+
+  public I save(
+      I identifiable,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -857,7 +866,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
     if (identifiable.getUuid() == null) {
       // in case of fileresource the uuid is created on binary upload (before metadata save)
       // to make saving on storage using uuid is possible
@@ -870,7 +878,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       identifiable.setLastModified(LocalDateTime.now());
     }
 
-    final String sql =
+    final String finalSql;
+    String sql =
         "INSERT INTO "
             + tableName
             + "("
@@ -878,9 +887,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + ") VALUES ("
             + getSqlInsertValues()
             + ")";
+    if (sqlModifier != null) {
+      finalSql = sqlModifier.apply(sql, bindings);
+    } else {
+      finalSql = sql;
+    }
+
+    final Map<String, Object> finalBindings = new HashMap<>(bindings);
 
     dbi.withHandle(
-        h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
+        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
 
     return identifiable;
   }
@@ -970,6 +986,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
   @Override
   public I update(I identifiable, Map<String, Object> bindings) {
+    return update(identifiable, bindings, null);
+  }
+
+  public I update(
+      I identifiable,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -979,17 +1002,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
 
     identifiable.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
 
-    final String sql =
-        "UPDATE " + tableName + " SET" + getSqlUpdateFieldValues() + " WHERE uuid=:uuid";
+    final String finalSql;
+    String sql = "UPDATE " + tableName + " SET" + getSqlUpdateFieldValues() + " WHERE uuid=:uuid";
 
+    if (sqlModifier != null) {
+      finalSql = sqlModifier.apply(sql, bindings);
+    } else {
+      finalSql = sql;
+    }
+
+    final Map<String, Object> finalBindings = new HashMap<>(bindings);
     dbi.withHandle(
-        h -> h.createUpdate(sql).bindMap(finalBindings).bindBean(identifiable).execute());
+        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
 
     return identifiable;
   }

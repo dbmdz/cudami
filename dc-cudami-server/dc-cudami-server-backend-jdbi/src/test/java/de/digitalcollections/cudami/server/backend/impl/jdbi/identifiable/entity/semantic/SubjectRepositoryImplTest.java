@@ -3,7 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendDatabase;
+import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -33,7 +34,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {SubjectRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendDatabase.class)
+@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Subject Repository")
 class SubjectRepositoryImplTest {
@@ -46,9 +47,11 @@ class SubjectRepositoryImplTest {
 
   @Autowired Jdbi jdbi;
 
+  @Autowired DbIdentifierMapper dbIdentifierMapper;
+
   @BeforeEach
   public void beforeEach() {
-    repo = new SubjectRepositoryImpl(jdbi, cudamiConfig);
+    repo = new SubjectRepositoryImpl(jdbi, cudamiConfig, dbIdentifierMapper);
   }
 
   @Test
