@@ -147,6 +147,7 @@ public class PredicatesController extends AbstractController {
 
   @PostMapping("/predicates/new")
   public String save(
+      @ModelAttribute("formData") Predicate predicateFormData,
       @ModelAttribute @Valid Predicate predicate,
       BindingResult results,
       Model model,
@@ -155,6 +156,14 @@ public class PredicatesController extends AbstractController {
       throws TechnicalException {
     model.addAttribute("mode", "create");
     verifyBinding(results);
+
+    // set hashmap fields from form data:
+    // needed session attribute independent "predicateFormData" because session attributes just get
+    // data set,
+    // but do not remove hashmap entry (language, if tab is removed)
+    predicate.setLabel(predicateFormData.getLabel());
+    predicate.setDescription(predicateFormData.getDescription());
+
     validate(predicate, results);
     // TODO: move validate() to service layer on server side using new ValidationException of dc
     // model?
@@ -187,7 +196,8 @@ public class PredicatesController extends AbstractController {
   @PostMapping(value = "/predicates/{pathUuid}/edit")
   public String update(
       @PathVariable UUID pathUuid,
-      @ModelAttribute @Valid Predicate predicate,
+      @ModelAttribute("formData") Predicate predicateFormData,
+      @ModelAttribute Predicate predicate,
       BindingResult results,
       Model model,
       SessionStatus status,
@@ -195,6 +205,14 @@ public class PredicatesController extends AbstractController {
       throws TechnicalException {
     model.addAttribute("mode", "edit");
     verifyBinding(results);
+
+    // just update the fields, that were editable
+    // needed session attribute independent "predicateFormData" because session attributes just get
+    // data set,
+    // but do not remove hashmap entry (language, if tab is removed)
+    predicate.setLabel(predicateFormData.getLabel());
+    predicate.setDescription(predicateFormData.getDescription());
+
     validate(predicate, results);
     // TODO: move validate() to service layer on server side using new ValidationException of dc
     // model?
@@ -207,13 +225,7 @@ public class PredicatesController extends AbstractController {
     }
 
     try {
-      // get predicate from db
-      Predicate predicateDb = service.getByUuid(pathUuid);
-      // just update the fields, that were editable
-      predicateDb.setLabel(predicate.getLabel());
-      predicateDb.setDescription(predicate.getDescription());
-
-      service.update(pathUuid, predicateDb);
+      service.update(pathUuid, predicate);
     } catch (TechnicalException e) {
       String message = "Cannot update predicate with uuid=" + pathUuid + ": " + e;
       LOGGER.error(message, e);
