@@ -16,6 +16,7 @@
           </div>
           <div class="col-sm-6">
             <div class="float-right">
+              <a class="btn btn-danger mr-2" th:title="#{tooltip.delete}" th:data-href="@{*{uuid} + '/delete'}" th:data-message="#{modal.msg.confirm_delete_obj(#{predicate}, ${predicate.value})}" th:data-title="#{modal.title.warning}" data-target="#confirmYesNoDialog" data-toggle="modal" th:text="#{btn.delete}">Delete</a>
               <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
             </div>
           </div>
@@ -28,7 +29,7 @@
     <div class="content">
       <div class="container-fluid rows-striped">
 
-         <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
+        <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" role="tablist">
               <li class="nav-item" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
@@ -65,7 +66,7 @@
             </div>
           </div>
         </div>
-        
+
         <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
 
         <div class="row">
@@ -78,6 +79,7 @@
   </th:block>
 
   <section layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
     <script>
       addLanguageChangeHandler()
       moveEditButtonToNavbar()

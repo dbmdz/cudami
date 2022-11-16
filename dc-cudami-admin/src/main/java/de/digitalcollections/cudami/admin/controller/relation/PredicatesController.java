@@ -153,6 +153,7 @@ public class PredicatesController extends AbstractController {
       SessionStatus status,
       RedirectAttributes redirectAttributes)
       throws TechnicalException {
+    model.addAttribute("mode", "create");
     verifyBinding(results);
     validate(predicate, results);
     // TODO: move validate() to service layer on server side using new ValidationException of dc
@@ -190,12 +191,18 @@ public class PredicatesController extends AbstractController {
       BindingResult results,
       Model model,
       SessionStatus status,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    model.addAttribute("mode", "edit");
     verifyBinding(results);
     validate(predicate, results);
     // TODO: move validate() to service layer on server side using new ValidationException of dc
     // model?
     if (results.hasErrors()) {
+      Locale defaultLanguage = localeService.getDefaultLanguage();
+      model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
+      model.addAttribute("allLanguages", getAllLanguages());
+      model.addAttribute("activeLanguage", defaultLanguage);
       return "predicates/create-or-edit";
     }
 
