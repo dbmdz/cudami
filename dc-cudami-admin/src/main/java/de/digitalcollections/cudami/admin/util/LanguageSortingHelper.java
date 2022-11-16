@@ -5,11 +5,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LanguageSortingHelper {
   List<Locale> prioritisedSortedLanguages;
 
-  public LanguageSortingHelper(List<Locale> prioritisedSortedLanguages) {
+  public LanguageSortingHelper(
+      @Value("${cudami.prioritisedSortedLanguages}") List<Locale> prioritisedSortedLanguages) {
     this.prioritisedSortedLanguages = List.copyOf(prioritisedSortedLanguages);
   }
 
