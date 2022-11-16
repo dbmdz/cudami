@@ -55,7 +55,7 @@ a[href^="http"]:not(.no-external):after {
   color: rgb(220, 53, 69);
 }
 
-.nav-tabs .nav-item {
+.nav-tabs .nav-tab {
   border: 1px solid transparent;
   border-top-left-radius: .25rem;
   border-top-right-radius: .25rem;
@@ -67,7 +67,7 @@ a[href^="http"]:not(.no-external):after {
   padding: .4rem .8rem;
   white-space: nowrap;
 }
-.nav-tabs .nav-link {
+.nav-tabs .nav-tab .nav-link {
   display: inline;
   margin-bottom: 0px;
   border: none;
@@ -75,11 +75,11 @@ a[href^="http"]:not(.no-external):after {
   padding: 0px;
 }
 
-.nav-tabs .nav-item.active {
+.nav-tabs .nav-tab.active {
   background-color: #FFF;
 }
 
-.nav-tabs .nav-item.active a.language-switcher {
+.nav-tabs .nav-tab.active a.language-switcher {
   color: #495057;
 }
 

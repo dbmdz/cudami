@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
 - Add GUI for Predicates (CRUD) in administration section
+  - for table using https://bootstrap-table.com/
+  - for wysiwyg editor using prosemirror + https://tiptap.dev/
+  - for forms Spring MVC
+  - for dynamic (modals, etc.) jQuery
+- Split some controller into API and "not-API"-Controllers to make GUI and REST-methods more visible
 
 ## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
 

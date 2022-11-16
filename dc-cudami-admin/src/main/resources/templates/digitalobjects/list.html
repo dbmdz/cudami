@@ -55,6 +55,7 @@
                   <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
                   <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="formatIdentifiers" th:text="#{identifiers}">Identifiers</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
                   <!--<th data-field="actions" data-formatter="formatActions" data-events="operateEvents" th:text="#{lbl.actions}">Actions</th>-->
@@ -111,9 +112,18 @@
 
         return [
           renderViewAction(baseUrl),
-          renderEditAction(baseUrl),
-          renderDeleteAction(baseUrl, itemType, itemId)
+//          renderEditAction(baseUrl),
+//          renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
+      }
+      function formatIdentifiers(value, row) {
+        let html = '';
+        var arrayLength = value.length;
+        for (let i = 0; i < arrayLength; i++) {
+          let identifier = value[i];
+          html = html + '<span title="' + identifier.namespace + '" class="border border-dark p-2 badge badge-light badge-pill mr-2">' + identifier.namespace + ':' + identifier.id + '</span>';
+        }
+        return html;
       }
       function formatLabel(value, row) {
         /*[+

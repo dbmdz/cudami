@@ -26,7 +26,7 @@
             <div class="col-sm-12">
               <div class="localized-form" data-tabid-prefix="lbl-desc-">
                 <ul class="nav nav-tabs" role="tablist">
-                  <li class="nav-item language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
+                  <li class="nav-tab language-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
                     <a
                       class="language-switcher nav-link"
                       th:classappend="${iter.index} == 0 ? active"
@@ -39,7 +39,7 @@
                       language
                     </a>
                   </li>
-                  <li class="nav-item">
+                  <li class="nav-tab">
                     <a th:title="#{tooltip.add_new_language}" class="nav-link" data-toggle="modal" data-target="#addLanguageDialog" data-fragment="label-description">
                       <i class="fa fa-plus"></i>
                     </a>

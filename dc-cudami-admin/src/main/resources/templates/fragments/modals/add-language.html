@@ -66,15 +66,15 @@
       }
 
       function addNavTab(languageAcronym, languageLabel, idPrefix) {
-        /*[- remove class 'active' from all 'nav-item's and '.nav-link' links -]*/
+        /*[- remove class 'active' from all 'nav-tab's and '.nav-link' links -]*/
         let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).children(".nav-item").removeClass('active');
+        $(navTabs).children(".nav-tab").removeClass('active');
         $(navTabs).find('.nav-link').removeClass('active');
 
         /*[- append a new active tab with selected language before plus tab -]*/
         /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-//        let newTab = $(navTabs).children('.nav-item').first().clone();
-        let newTab = '<li class="nav-item language-tab active"><a class="language-switcher nav-link" class="active" data-toggle="tab" role="tab" href="#' + idPrefix + languageAcronym + '">' + languageLabel + '</a></li>';
+//        let newTab = $(navTabs).children('.nav-tab').first().clone();
+        let newTab = '<li class="nav-tab language-tab active"><a class="language-switcher nav-link" class="active" data-toggle="tab" role="tab" href="#' + idPrefix + languageAcronym + '">' + languageLabel + '</a></li>';
         let lastLanguageTab = $(navTabs).find('.language-tab').last();
         $(lastLanguageTab).after(newTab);
 
@@ -109,11 +109,11 @@
         $(targetLocalizedForm).find(id).remove();
 
         let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).children(".nav-item").removeClass('active');
+        $(navTabs).children(".nav-tab").removeClass('active');
         $(navTabs).find('.nav-link').removeClass('active');
         $(targetLocalizedForm).find('.tab-pane').removeClass('active');
 
-        $(targetLocalizedForm).find(".nav-item").first().addClass("active");
+        $(targetLocalizedForm).find(".nav-tab").first().addClass("active");
         $(targetLocalizedForm).find(".tab-pane").first().addClass("active");
         updateActionsInTabs(navTabs);
         $('#confirmYesNoDialog').modal('hide');

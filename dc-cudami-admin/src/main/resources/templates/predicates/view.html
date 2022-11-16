@@ -32,7 +32,7 @@
         <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
           <div class="col-sm-12">
             <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
+              <li class="nav-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
                 <a
                   class="language-switcher nav-link"
                   data-toggle="tab"
