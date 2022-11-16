@@ -12,7 +12,9 @@ public interface PredicateService {
 
   long count();
 
-  void delete(String value);
+  boolean delete(UUID uuid);
+
+  boolean delete(String value);
 
   /**
    * Return all predicates paged.

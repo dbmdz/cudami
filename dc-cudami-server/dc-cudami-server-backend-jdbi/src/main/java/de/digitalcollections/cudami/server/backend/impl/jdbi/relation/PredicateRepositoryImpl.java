@@ -50,12 +50,25 @@ public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements Predi
   }
 
   @Override
-  public void delete(String value) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE value = :value")
-                .bind("value", value)
-                .execute());
+  public boolean deleteByUuid(UUID uuid) {
+    int count =
+        dbi.withHandle(
+            h ->
+                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid=:uuid")
+                    .bind("uuid", uuid)
+                    .execute());
+    return count == 1;
+  }
+
+  @Override
+  public boolean deleteByValue(String value) {
+    int count =
+        dbi.withHandle(
+            h ->
+                h.createUpdate("DELETE FROM " + tableName + " WHERE value = :value")
+                    .bind("value", value)
+                    .execute());
+    return count == 1;
   }
 
   @Override

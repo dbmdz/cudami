@@ -75,6 +75,16 @@ public class PredicatesController extends AbstractController {
     return "predicates/create-or-edit";
   }
 
+  @GetMapping("/predicates/{uuid}/delete")
+  public String delete(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    service.deleteByUuid(uuid);
+    String message =
+        messageSource.getMessage("msg.deleted_successfully", null, LocaleContextHolder.getLocale());
+    redirectAttributes.addFlashAttribute("success_message", message);
+    return "redirect:/predicates";
+  }
+
   @GetMapping("/predicates/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
@@ -99,16 +109,6 @@ public class PredicatesController extends AbstractController {
 
     model.addAttribute("mode", "edit");
     return "predicates/create-or-edit";
-  }
-
-  @GetMapping("/predicates/{uuid}/delete")
-  public String delete(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
-      throws TechnicalException {
-    service.deleteByUuid(uuid);
-    String message =
-        messageSource.getMessage("msg.deleted_successfully", null, LocaleContextHolder.getLocale());
-    redirectAttributes.addFlashAttribute("success_message", message);
-    return "redirect:/predicates";
   }
 
   private List<Locale> getAllLanguages() throws TechnicalException {

@@ -27,8 +27,13 @@ public class PredicateServiceImpl implements PredicateService {
   }
 
   @Override
-  public void delete(String value) {
-    repository.delete(value);
+  public boolean delete(UUID uuid) {
+    return repository.deleteByUuid(uuid);
+  }
+
+  @Override
+  public boolean delete(String value) {
+    return repository.deleteByValue(value);
   }
 
   @Override
