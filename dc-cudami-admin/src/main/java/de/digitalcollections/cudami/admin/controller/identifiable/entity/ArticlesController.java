@@ -5,8 +5,10 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -80,9 +82,20 @@ public class ArticlesController extends AbstractController {
   }
 
   @GetMapping("/articles/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model) throws TechnicalException {
+  public String view(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = service.getByUuid(uuid);
-    model.addAttribute("article", article);
+    if (article == null) {
+      throw new ResourceNotFoundException();
+    }
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
+    List<FileResource> relatedFileResources = service.getRelatedFileResources(article.getUuid());
+    model
+        .addAttribute("article", article)
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("relatedFileResources", relatedFileResources);
     return "articles/view";
   }
 }
