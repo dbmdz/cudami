@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - for wysiwyg editor using prosemirror + https://tiptap.dev/
   - for forms Spring MVC
   - for dynamic (modals, etc.) jQuery
+- Fix too many tabs at digital object list
+- Use new list in article list to proof preview image rendering
 - Split some controller into API and "not-API"-Controllers to make GUI and REST-methods more visible
 
 ## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
