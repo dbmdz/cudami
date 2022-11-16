@@ -109,7 +109,7 @@ function bindTabEvents() {
     let targetNavItem = $(event.target).parent();
     let targetNavTabs = $(targetNavItem).parent();
 
-    $(targetNavTabs).children(".nav-item").removeClass("active");
+    $(targetNavTabs).children(".nav-tab").removeClass("active");
     $(targetNavItem).addClass("active");
   });
 }
