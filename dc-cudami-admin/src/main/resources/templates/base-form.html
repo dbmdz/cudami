@@ -65,12 +65,15 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      /*[- mark every tab containing validation error(s) with an error icon -]*/
       $('.localized-form').each(function (i, localizedForm) {
+        /*[- mark every tab containing validation error(s) with an error icon -]*/
         $(localizedForm).find(".tab-pane").each(function (i, tabPane) {
           let tabPaneId = $(tabPane).attr('id');
           $(tabPane).has(".has-error").length ? prependErrorIcon($('a[href="#' + tabPaneId + '"]')) : "";
         });
+        /*[- add delete action to every tab if more than one tab present -]*/
+        let navTabs = $(localizedForm).children('.nav-tabs');
+        updateActionsInTabs(navTabs);
       });
     </script>
   </th:block>
