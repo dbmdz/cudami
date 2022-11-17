@@ -68,11 +68,13 @@ public class EntityRelationRepositoryTest {
             Map.of(Locale.ENGLISH, "subject entity label"),
             Map.of(Locale.ENGLISH, "object entity label"),
             predicate.getValue());
+    entityRelation.setAdditionalPredicates(List.of("addPred1", "addPred2"));
     entityRepository.save(entityRelation.getSubject());
     entityRepository.save(entityRelation.getObject());
     predicateRepository.save(predicate);
-    List<EntityRelation> actual = repository.save(List.of(entityRelation));
+    repository.save(List.of(entityRelation));
 
+    List<EntityRelation> actual = repository.getBySubject(entityRelation.getSubject());
     assertThat(actual).hasSize(1);
     assertThat(actual.get(0).getPredicate()).isEqualTo(entityRelation.getPredicate());
     assertThat(actual.get(0).getSubject().getLabel().getText(Locale.ENGLISH))
@@ -82,6 +84,8 @@ public class EntityRelationRepositoryTest {
     assertThat(actual.get(0).getObject().getLabel().getText(Locale.ENGLISH))
         .isEqualTo(entityRelation.getObject().getLabel().getText(Locale.ENGLISH));
     assertThat(actual.get(0).getObject().getUuid()).isEqualTo(entityRelation.getObject().getUuid());
+    assertThat(actual.get(0).getAdditionalPredicates())
+        .isEqualTo(entityRelation.getAdditionalPredicates());
   }
 
   @Test

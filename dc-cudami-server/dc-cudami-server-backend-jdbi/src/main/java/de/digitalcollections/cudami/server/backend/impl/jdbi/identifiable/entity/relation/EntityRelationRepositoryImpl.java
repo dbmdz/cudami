@@ -8,6 +8,9 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +35,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public static final String TABLE_NAME = "rel_entity_entities";
 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
+  private final EntityRelationMapper<Entity> entityRelationMapper;
 
   @Autowired
   public EntityRelationRepositoryImpl(
@@ -40,6 +45,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
+    this.entityRelationMapper = new EntityRelationMapper<Entity>(entityRepositoryImpl);
   }
 
   @Override
@@ -74,30 +80,17 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
     StringBuilder query =
         new StringBuilder(
-            "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object"
+            "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object, rel.additional_predicates rel_addpredicates"
                 + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
     addPageRequestParams(pageRequest, query);
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
                     .bindMap(argumentMappings)
-                    .reduceResultSet(
-                        new ArrayList<EntityRelation>(),
-                        (acc, rs, ctx) -> {
-                          String subjectUuid = rs.getString("rel_subject");
-                          String predicate = rs.getString("rel_predicate");
-                          String objectUuid = rs.getString("rel_object");
-
-                          Entity subject =
-                              entityRepositoryImpl.getByUuid(UUID.fromString(subjectUuid));
-                          Entity object =
-                              entityRepositoryImpl.getByUuid(UUID.fromString(objectUuid));
-
-                          acc.add(new EntityRelation(subject, predicate, object));
-
-                          return acc;
-                        }));
+                    .map(entityRelationMapper.getMapper(null))
+                    .list());
 
     String countQuery = "SELECT count(*)" + commonSql;
     long count =
@@ -132,20 +125,18 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public List<EntityRelation> getBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
-        "SELECT rel.predicate as predicate, e.uuid as uuid, e.refid e_refId, e.created as created, e.description as description, e.identifiable_type as identifiable_type, e.label as label, e.last_modified as last_modified, e.identifiable_objecttype as identifiable_objecttype"
+        "SELECT subject_uuid rel_subject, predicate rel_predicate, object_uuid rel_object, additional_predicates rel_addpredicates"
             + " FROM "
             + tableName
-            + " AS "
-            + tableAlias
-            + " INNER JOIN entities e ON rel.object_uuid=e.uuid"
-            + " WHERE rel.subject_uuid = :uuid";
+            + " WHERE subject_uuid = :uuid"
+            + " ORDER BY sortindex";
 
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
                     .bind("uuid", subjectEntity.getUuid())
-                    .map(new EntityRelationMapper(subjectEntity))
+                    .map(entityRelationMapper.getMapper(subjectEntity))
                     .list());
     return result;
   }
@@ -195,14 +186,22 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
               handle.prepareBatch(
                   "INSERT INTO "
                       + tableName
-                      + "(subject_uuid, predicate, object_uuid) "
-                      + "VALUES(:subjectUuid, :predicate, :objectUuid) "
-                      + "ON CONFLICT ON CONSTRAINT rel_entity_entities_pkey DO NOTHING");
-          for (EntityRelation relation : entityRelations) {
+                      + "(subject_uuid, predicate, object_uuid, additional_predicates, sortindex) "
+                      + "VALUES(:subjectUuid, :predicate, :objectUuid, :additional_predicates, :sortindex) "
+                      + "ON CONFLICT (subject_uuid, predicate, object_uuid) DO UPDATE SET "
+                      + "additional_predicates = EXCLUDED.additional_predicates, "
+                      + "sortindex = EXCLUDED.sortindex");
+          for (int i = 0; i < entityRelations.size(); i++) {
+            var relation = entityRelations.get(i);
             preparedBatch
                 .bind("subjectUuid", relation.getSubject().getUuid())
                 .bind("predicate", relation.getPredicate())
                 .bind("objectUuid", relation.getObject().getUuid())
+                .bindByType(
+                    "additional_predicates",
+                    relation.getAdditionalPredicates(),
+                    new GenericType<List<String>>() {})
+                .bind("sortindex", i)
                 .add();
           }
           preparedBatch.execute();
