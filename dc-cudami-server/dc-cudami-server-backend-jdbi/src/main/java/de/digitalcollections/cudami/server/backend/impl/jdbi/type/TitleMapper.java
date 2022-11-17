@@ -29,9 +29,12 @@ public class TitleMapper implements ColumnMapper<Title> {
   @Override
   public Title map(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
     String value = r.getString(columnNumber);
+    if (value == null) return null;
+    // looks like:
+    // ("(MAIN,MAIN)","{""de"": ""Ein deutscher Titel""}","{de,en}")
     Matcher valueParts =
         Pattern.compile(
-                "^[(](?<titletype>\\p{Punct}*?[(].+?[)]\\p{Punct}*?),(?<text>\\p{Punct}*?[{].+?[}]\\p{Punct}*?),(?<orig>\\p{Punct}*?[{][\\w,-]+[}]\\p{Punct}*?)[)]$",
+                "^[(]\\p{Punct}*?(?<titletype>[(].+?[)])\\p{Punct}*?,\\p{Punct}*?(?<text>[{].+?[}])\\p{Punct}*?,\\p{Punct}*?[{](?<orig>[\\w,_-]+)[}]\\p{Punct}*?[)]$",
                 Pattern.UNICODE_CHARACTER_CLASS)
             .matcher(value);
     if (!valueParts.find()) {
@@ -40,7 +43,9 @@ public class TitleMapper implements ColumnMapper<Title> {
     TitleType titleType = titleTypeMapper.createTypeFromString(valueParts.group("titletype"));
     LocalizedText titleText = null;
     try {
-      titleText = objectMapper.readValue(valueParts.group("text"), LocalizedText.class);
+      titleText =
+          objectMapper.readValue(
+              valueParts.group("text").replaceAll("\"{2,}", "\""), LocalizedText.class);
     } catch (JsonProcessingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

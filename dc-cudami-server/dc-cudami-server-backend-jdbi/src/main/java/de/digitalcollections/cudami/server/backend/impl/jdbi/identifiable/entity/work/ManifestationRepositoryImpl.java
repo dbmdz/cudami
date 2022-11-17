@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
-        + "composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[], "
+        + ", composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[], "
         + "language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType, "
         + "mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[], "
         + "publishingdatepresentation=:publishingDatePresentation, publishingdaterange=:publishingDateRange::daterange, "
@@ -165,8 +166,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     dbi.registerArrayType(expressionTypeMapper);
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
-    dbi.registerColumnMapper(dateRangeMapper);
-    dbi.registerColumnMapper(titleMapper);
+    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
+    dbi.registerColumnMapper(Title.class, titleMapper);
 
     this.entityRepository = entityRepository;
   }

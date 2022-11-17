@@ -34,13 +34,12 @@ public class LocalDateRangeMapper implements ArgumentFactory, ColumnMapper<Local
   public LocalDateRange map(ResultSet r, int columnNumber, StatementContext ctx)
       throws SQLException {
     String value = r.getString(columnNumber);
+    if (value == null) return null;
     Matcher valueParts =
         Pattern.compile(
                 "^(?<lowbound>\\[|\\()(?<lower>[\\d-]+),(?<upper>[\\d-]+)(?<upbound>\\]|\\))$")
             .matcher(value);
-    if (!valueParts.find()) {
-      return null;
-    }
+    if (!valueParts.find()) return null;
     LocalDate lower = LocalDate.parse(valueParts.group("lower"));
     LocalDate upper = LocalDate.parse(valueParts.group("upper"));
     if (valueParts.group("lowbound").equals("(")) {
