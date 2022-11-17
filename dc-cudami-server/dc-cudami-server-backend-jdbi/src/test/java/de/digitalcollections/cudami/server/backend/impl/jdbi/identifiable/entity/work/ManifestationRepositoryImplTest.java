@@ -18,6 +18,7 @@ import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,18 @@ class ManifestationRepositoryImplTest {
     Predicate isSomethingElseOf =
         predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
 
+    List<Title> titles =
+        List.of(
+            Title.builder()
+                .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
+                .titleType(new TitleType("main", "main"))
+                .textLocaleOfOriginalScript(Locale.GERMAN)
+                .textLocaleOfOriginalScript(Locale.ENGLISH)
+                .build(),
+            Title.builder()
+                .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
+                .titleType(new TitleType("main", "sub"))
+                .build());
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "ein Label")
@@ -72,19 +85,8 @@ class ManifestationRepositoryImplTest {
             .mediaType("BOOK")
             //            .publisher(publisher)
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
-            .title(
-                Title.builder()
-                    .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
-                    .titleType(new TitleType("main", "main"))
-                    .textLocaleOfOriginalScript(Locale.GERMAN)
-                    .textLocaleOfOriginalScript(Locale.ENGLISH)
-                    .build())
-            .title(
-                Title.builder()
-                    .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
-                    .titleType(new TitleType("main", "sub"))
-                    .textLocaleOfOriginalScript(Locale.GERMAN)
-                    .build())
+            .title(titles.get(0))
+            .title(titles.get(1))
             .build();
     manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
@@ -95,6 +97,7 @@ class ManifestationRepositoryImplTest {
     // TODO
 
     Manifestation actual = repo.getByUuid(saved.getUuid());
+    assertThat(actual.getTitles()).isEqualTo(titles);
     // assertThat(actual).isEqualTo(saved);
   }
 

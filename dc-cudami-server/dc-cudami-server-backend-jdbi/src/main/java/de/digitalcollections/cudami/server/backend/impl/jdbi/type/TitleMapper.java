@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jdbi.v3.core.mapper.ColumnMapper;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.springframework.util.StringUtils;
 
 public class TitleMapper implements ColumnMapper<Title> {
 
@@ -34,7 +35,7 @@ public class TitleMapper implements ColumnMapper<Title> {
     // ("(MAIN,MAIN)","{""de"": ""Ein deutscher Titel""}","{de,en}")
     Matcher valueParts =
         Pattern.compile(
-                "^[(]\\p{Punct}*?(?<titletype>[(].+?[)])\\p{Punct}*?,\\p{Punct}*?(?<text>[{].+?[}])\\p{Punct}*?,\\p{Punct}*?[{](?<orig>[\\w,_-]+)[}]\\p{Punct}*?[)]$",
+                "^[(]\\p{Punct}*?(?<titletype>[(].+?[)])\\p{Punct}*?,\\p{Punct}*?(?<text>[{].+?[}])\\p{Punct}*?,(\\p{Punct}*?[{](?<orig>[\\w,_-]+)[}]\\p{Punct}*?)?[)]$",
                 Pattern.UNICODE_CHARACTER_CLASS)
             .matcher(value);
     if (!valueParts.find()) {
@@ -50,10 +51,13 @@ public class TitleMapper implements ColumnMapper<Title> {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    Set<Locale> localesOfOriginalScripts =
-        Stream.of(valueParts.group("orig").split(","))
-            .map(s -> Locale.forLanguageTag(s))
-            .collect(Collectors.toSet());
+    Set<Locale> localesOfOriginalScripts = null;
+    if (StringUtils.hasText(valueParts.group("orig"))) {
+      localesOfOriginalScripts =
+          Stream.of(valueParts.group("orig").split(","))
+              .map(s -> Locale.forLanguageTag(s))
+              .collect(Collectors.toSet());
+    }
     return new Title(titleText, localesOfOriginalScripts, titleType);
   }
 }
