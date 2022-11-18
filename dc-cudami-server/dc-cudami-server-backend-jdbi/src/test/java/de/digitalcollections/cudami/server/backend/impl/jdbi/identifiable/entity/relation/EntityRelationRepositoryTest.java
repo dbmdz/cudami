@@ -7,11 +7,14 @@ import de.digitalcollections.cudami.server.backend.impl.database.config.SpringCo
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.relation.PredicateRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.model.TestModelFixture;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,7 +46,7 @@ public class EntityRelationRepositoryTest {
 
   @Autowired
   @Qualifier("entityRepositoryImpl")
-  private EntityRepositoryImpl entityRepository;
+  private EntityRepositoryImpl<Entity> entityRepository;
 
   @Autowired private PredicateRepositoryImpl predicateRepository;
 
@@ -60,7 +63,9 @@ public class EntityRelationRepositoryTest {
 
   @Test
   @DisplayName("should save an EntityRelation")
-  void saveEntityRelation() {
+  void saveEntityRelation()
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation entityRelation =
@@ -89,17 +94,102 @@ public class EntityRelationRepositoryTest {
   }
 
   @Test
+  @DisplayName("should save two EntityRelations and retrieve in same order")
+  void saveEntityRelations()
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
+    Predicate predicate = new Predicate();
+    predicate.setValue("is_test");
+    EntityRelation entityRelation =
+        TestModelFixture.createEntityRelation(
+            Map.of(Locale.ENGLISH, "subject entity label"),
+            Map.of(Locale.ENGLISH, "object entity label"),
+            predicate.getValue());
+    entityRelation.setAdditionalPredicates(List.of("addPred1"));
+    entityRepository.save(entityRelation.getSubject());
+    entityRelation.setSubject(entityRepository.getByUuid(entityRelation.getSubject().getUuid()));
+    entityRepository.save(entityRelation.getObject());
+    entityRelation.setObject(entityRepository.getByUuid(entityRelation.getObject().getUuid()));
+    predicateRepository.save(predicate);
+
+    Predicate predicate2 = new Predicate();
+    predicate2.setValue("is_test_2");
+    EntityRelation entityRelation2 =
+        new EntityRelation(
+            entityRelation.getSubject(),
+            predicate2.getValue(),
+            TestModelFixture.createEntity(
+                Entity.class, Map.of(Locale.GERMAN, "Label"), Collections.emptyMap()));
+    entityRelation2.setAdditionalPredicates(List.of("addPred2"));
+    entityRepository.save(entityRelation2.getObject());
+    entityRelation2.setObject(entityRepository.getByUuid(entityRelation2.getObject().getUuid()));
+    predicateRepository.save(predicate2);
+
+    repository.save(List.of(entityRelation, entityRelation2));
+
+    List<EntityRelation> actual = repository.getBySubject(entityRelation.getSubject());
+    assertThat(actual).hasSize(2);
+    assertThat(actual.get(0)).isEqualTo(entityRelation);
+    assertThat(actual.get(1)).isEqualTo(entityRelation2);
+  }
+
+  @Test
+  @DisplayName("should update the relation if already exists")
+  void updateRelations()
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
+    Predicate predicate = new Predicate();
+    predicate.setValue("is_test");
+    EntityRelation entityRelation =
+        TestModelFixture.createEntityRelation(
+            Map.of(Locale.ENGLISH, "subject entity label"),
+            Map.of(Locale.ENGLISH, "object entity label"),
+            predicate.getValue());
+    entityRepository.save(entityRelation.getSubject());
+    entityRepository.save(entityRelation.getObject());
+    entityRelation =
+        new EntityRelation(
+            entityRepository.getByUuid(entityRelation.getSubject().getUuid()),
+            predicate.getValue(),
+            entityRepository.getByUuid(entityRelation.getObject().getUuid()));
+    entityRelation.setAdditionalPredicates(List.of("addPred1"));
+    predicateRepository.save(predicate);
+
+    repository.save(entityRelation);
+
+    // now lets change the additional predicate(s)
+    entityRelation.setAdditionalPredicates(List.of("predicate1", "predicate2", "predicate3"));
+    repository.save(entityRelation);
+
+    List<EntityRelation> actual = repository.getBySubject(entityRelation.getSubject().getUuid());
+    assertThat(actual).hasSize(1);
+    assertThat(actual.get(0)).isEqualTo(entityRelation);
+    assertThat(actual.get(0).getAdditionalPredicates())
+        .containsExactly("predicate1", "predicate2", "predicate3");
+  }
+
+  @Test
   @DisplayName("returns properly sized pages")
   void testSearchPageSize() {
     List<EntityRelation> relations = new ArrayList<>();
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              EntityRelation entityRelation =
-                  TestModelFixture.createEntityRelation(
-                      Map.of(Locale.ENGLISH, "subject entity label " + i),
-                      Map.of(Locale.ENGLISH, "object entity label " + i),
-                      "is_test");
+              EntityRelation entityRelation;
+              try {
+                entityRelation =
+                    TestModelFixture.createEntityRelation(
+                        Map.of(Locale.ENGLISH, "subject entity label " + i),
+                        Map.of(Locale.ENGLISH, "object entity label " + i),
+                        "is_test");
+              } catch (InstantiationException
+                  | IllegalAccessException
+                  | IllegalArgumentException
+                  | InvocationTargetException
+                  | NoSuchMethodException
+                  | SecurityException e) {
+                entityRelation = null;
+              }
               relations.add(entityRelation);
             });
     relations.forEach(

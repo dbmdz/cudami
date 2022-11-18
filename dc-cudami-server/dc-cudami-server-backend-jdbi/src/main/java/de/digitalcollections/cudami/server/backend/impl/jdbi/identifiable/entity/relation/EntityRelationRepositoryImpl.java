@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-// TODO: Neues Feld additional_predicates: UUID[] einführen und befüllen.
-
 @Repository
 public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     implements EntityRelationRepository {

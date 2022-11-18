@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -39,6 +40,7 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -232,10 +234,20 @@ class DigitalObjectRepositoryImplTest {
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              repo.save(
-                  TestModelFixture.createDigitalObject(
-                      Map.of(Locale.GERMAN, "de labeltest" + i, Locale.ENGLISH, "en labeltest" + i),
-                      Map.of(Locale.GERMAN, "de desctest" + i, Locale.ENGLISH, "en desctest" + i)));
+              try {
+                repo.save(
+                    TestModelFixture.createDigitalObject(
+                        Map.of(
+                            Locale.GERMAN, "de labeltest" + i, Locale.ENGLISH, "en labeltest" + i),
+                        Map.of(
+                            Locale.GERMAN, "de desctest" + i, Locale.ENGLISH, "en desctest" + i)));
+              } catch (InstantiationException
+                  | IllegalAccessException
+                  | IllegalArgumentException
+                  | InvocationTargetException
+                  | NoSuchMethodException
+                  | SecurityException e) {
+              }
             });
 
     String query = "test";
@@ -261,7 +273,9 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @DisplayName("can filter by the parent uuid")
-  void filterByParentUuid() {
+  void filterByParentUuid()
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
     // Insert the parent DigitalObject
     DigitalObject parent =
         TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());
