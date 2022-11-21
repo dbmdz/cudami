@@ -13,6 +13,7 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
+import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
@@ -28,6 +29,7 @@ import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.stereotype.Repository;
 
 @SuppressFBWarnings(
@@ -117,15 +119,20 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             """
             .formatted(tableAlias)
         // relations
-        // %1$s.additional_predicates %2$s_additionalPredicates,
         + """
           %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
+          %1$s.additional_predicates %2$s_additionalPredicates,
           max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
             .formatted(
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX,
                 tableAlias)
-        + entityRepository.getSqlSelectReducedFields();
+        + entityRepository.getSqlSelectReducedFields()
+        // publishers
+        + """
+          , mp.publisher_uuid publisher_uuid, mp.sortkey publisher_sortKey,
+          max(mp.sortkey) OVER (PARTITION BY %1$s.uuid) publisher_max_sortkey"""
+            .formatted(TABLE_ALIAS);
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
@@ -138,6 +145,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
       ) ON %5$s.object_uuid = %1$s.uuid
+      LEFT JOIN manifestation_publishers mp ON mp.manifestation_uuid = %1$s.uuid
       """
           .formatted(
               TABLE_ALIAS,
@@ -243,9 +251,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     // relations
     UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
     if (entityUuid != null) {
-      if (manifestation.getRelations() == null) {
+      if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
         int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityRelation> relations = new Vector<>(maxIndex);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
         relations.setSize(maxIndex);
         manifestation.setRelations(relations);
       }
@@ -255,7 +263,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       if (!manifestation.getRelations().stream()
           .anyMatch(
               relation ->
-                  Objects.equals(entityUuid, relation.getSubject().getUuid())
+                  relation != null
+                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
                       && Objects.equals(relationPredicate, relation.getPredicate()))) {
         Entity relatedEntity = rowView.getRow(Entity.class);
         manifestation
@@ -274,8 +283,66 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       }
     }
 
+    // publishers
+    UUID publisherUuid = rowView.getColumn("publisher_uuid", UUID.class);
+    if (publisherUuid != null) {
+      if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
+        int maxIndex = rowView.getColumn("publisher_max_sortkey", Integer.class);
+        Vector<Publisher> publishers = new Vector<>(++maxIndex);
+        publishers.setSize(maxIndex);
+        manifestation.setPublishers(publishers);
+      }
+      if (!manifestation.getPublishers().stream()
+          .anyMatch(publ -> publ != null && Objects.equals(publisherUuid, publ.getUuid()))) {
+        manifestation
+            .getPublishers()
+            .set(
+                rowView.getColumn("publisher_sortKey", Integer.class),
+                Publisher.builder().uuid(publisherUuid).build());
+      }
+    }
+
     // subjects
     // TODO
+  }
+
+  private void savePublishers(Manifestation manifestation) {
+    if (manifestation == null) {
+      return;
+    }
+    dbi.useHandle(
+        handle ->
+            handle
+                .createUpdate(
+                    "DELETE FROM manifestation_publishers WHERE manifestation_uuid = :uuid")
+                .bind("uuid", manifestation.getUuid())
+                .execute());
+
+    if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
+      return;
+    }
+    dbi.useHandle(
+        handle -> {
+          PreparedBatch batch =
+              handle.prepareBatch(
+                  """
+          INSERT INTO manifestation_publishers (
+            manifestation_uuid, publisher_uuid, sortkey
+          )
+          VALUES (
+            :manifestation, :publisher, :sortkey
+          )
+          """);
+          int sortkey = 0;
+          for (Publisher publisher : manifestation.getPublishers()) {
+            batch
+                .bind("manifestation", manifestation.getUuid())
+                .bind("publisher", publisher.getUuid())
+                .bind("sortkey", sortkey++)
+                .add();
+          }
+          batch.execute();
+        });
   }
 
   @Override
@@ -284,7 +351,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    return super.save(manifestation, bindings, buildTitleSql(manifestation));
+    Manifestation savedManifestation =
+        super.save(manifestation, bindings, buildTitleSql(manifestation));
+    savePublishers(manifestation);
+    savedManifestation.setPublishers(manifestation.getPublishers());
+    return savedManifestation;
   }
 
   @Override
@@ -293,7 +364,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    return super.update(manifestation, bindings, buildTitleSql(manifestation));
+    Manifestation updatedManifestation =
+        super.update(manifestation, bindings, buildTitleSql(manifestation));
+    savePublishers(manifestation);
+    updatedManifestation.setPublishers(manifestation.getPublishers());
+    return updatedManifestation;
   }
 
   @Override
