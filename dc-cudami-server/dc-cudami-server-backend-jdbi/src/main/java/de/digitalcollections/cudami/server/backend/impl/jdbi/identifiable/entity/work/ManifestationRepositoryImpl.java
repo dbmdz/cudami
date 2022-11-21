@@ -39,18 +39,6 @@ import org.springframework.stereotype.Repository;
 public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestation>
     implements ManifestationRepository {
 
-  /* THIS IS STILL A BIG TODO!
-   *
-   * - ArgumentMapper for
-   *
-   *   - Publication ✓
-   *   - Title ✓
-   *   - MainSubType ✓
-   *   - DateRange ✓
-   *
-   * - remove involvements trigger ✓
-   */
-
   public static final String TABLE_NAME = "manifestations";
   public static final String TABLE_ALIAS = "mf";
   public static final String MAPPING_PREFIX = "mf";
@@ -170,6 +158,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         MAPPING_PREFIX,
         Manifestation.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
+        ManifestationRepositoryImpl::additionalReduceRowsBiConsumer,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerArrayType(expressionTypeMapper);
     dbi.registerArgument(dateRangeMapper);
@@ -178,6 +167,12 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     dbi.registerColumnMapper(Title.class, titleMapper);
 
     this.entityRepository = entityRepository;
+  }
+
+  protected static void additionalReduceRowsBiConsumer(
+      Map<UUID, Manifestation> map, RowView rowView) {
+    // subjects
+    // TODO
   }
 
   private BiFunction<String, Map<String, Object>, String> buildTitleSql(
@@ -301,9 +296,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 Publisher.builder().uuid(publisherUuid).build());
       }
     }
-
-    // subjects
-    // TODO
   }
 
   private void savePublishers(Manifestation manifestation) {
