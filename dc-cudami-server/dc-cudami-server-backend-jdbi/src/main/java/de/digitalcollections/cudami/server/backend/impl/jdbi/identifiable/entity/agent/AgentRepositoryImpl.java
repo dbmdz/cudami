@@ -9,7 +9,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
       String mappingPrefix,
       Class<? extends Agent> agentImplClass,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, A>, RowView, Map<UUID, A>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, A>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
         dbi,
@@ -57,7 +57,7 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
         mappingPrefix,
         agentImplClass,
         sqlSelectAllFieldsJoins,
-        additionalReduceRowsBiFunction,
+        additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }
 

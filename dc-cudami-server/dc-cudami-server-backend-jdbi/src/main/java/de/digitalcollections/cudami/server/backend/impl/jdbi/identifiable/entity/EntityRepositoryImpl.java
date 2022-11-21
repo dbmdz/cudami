@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -158,7 +159,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, E>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
         dbi,
@@ -167,7 +168,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         mappingPrefix,
         entityImplClass,
         sqlSelectAllFieldsJoins,
-        additionalReduceRowsBiFunction,
+        additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }
 

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -47,26 +47,24 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   public static final String TABLE_ALIAS = "he";
   public static final String TABLE_NAME = "headwordentries";
 
-  private static BiFunction<Map<UUID, HeadwordEntry>, RowView, Map<UUID, HeadwordEntry>>
-      createAdditionalReduceRowsBiFunction() {
-    return (map, rowView) -> {
-      // entity should be already in map, as we here just add additional data
-      HeadwordEntry headwordEntry =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  private static BiConsumer<Map<UUID, HeadwordEntry>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
+      (map, rowView) -> {
+        // entity should be already in map, as we here just add additional data
+        HeadwordEntry headwordEntry =
+            map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        UUID headwordUuid =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-        String label =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
-        final Headword headword = new Headword();
-        headword.setUuid(headwordUuid);
-        headword.setLabel(label);
-        headwordEntry.setHeadword(headword);
-      }
-      return map;
-    };
-  }
+        if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+            != null) {
+          UUID headwordUuid =
+              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+          String label =
+              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
+          final Headword headword = new Headword();
+          headword.setUuid(headwordUuid);
+          headword.setLabel(label);
+          headwordEntry.setHeadword(headword);
+        }
+      };
 
   @Override
   public String getSqlInsertFields() {
@@ -118,7 +116,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         MAPPING_PREFIX,
         HeadwordEntry.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction(),
+        ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }

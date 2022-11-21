@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -60,8 +60,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + ".uuid";
   public static final String TABLE_NAME = "digitalobjects";
 
-  private static final BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
-      ADDITIONAL_REDUCE_ROWS_BIFUNCTION =
+  private static final BiConsumer<Map<UUID, DigitalObject>, RowView>
+      ADDITIONAL_REDUCE_ROWS_BICONSUMER =
           (map, rowView) -> {
             DigitalObject digitalObject =
                 map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
@@ -110,8 +110,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             if (itemUuid != null) {
               digitalObject.setItem(Item.builder().uuid(itemUuid).build());
             }
-
-            return map;
           };
 
   @Override
@@ -241,7 +239,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         MAPPING_PREFIX,
         DigitalObject.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
-        ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
+        ADDITIONAL_REDUCE_ROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

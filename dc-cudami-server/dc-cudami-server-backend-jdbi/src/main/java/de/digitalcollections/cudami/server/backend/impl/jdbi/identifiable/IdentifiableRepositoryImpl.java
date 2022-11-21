@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,12 +132,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
-  public BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction =
-      (map, rowView) -> {
-        return map;
-      };
-  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> basicReduceRowsBiFunction;
-  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> fullReduceRowsBiFunction;
+  public BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer = (map, rowView) -> {};
+  public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
+  public final BiConsumer<Map<UUID, I>, RowView> fullReduceRowsBiConsumer;
   protected final Class<? extends Identifiable> identifiableImplClass;
   protected final String sqlSelectAllFieldsJoins;
 
@@ -194,7 +192,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
@@ -208,15 +206,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
     // currently there is no difference to full, except that we do not want tags in reduced selects.
-    this.basicReduceRowsBiFunction = createReduceRowsBiFunction(true, true, false);
+    this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, false);
 
     // set full reduce rows bifunction for full selects (find one)
-    this.fullReduceRowsBiFunction = createReduceRowsBiFunction(true, true, true);
+    this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, true);
 
     // for detailes select (only used in find one, not lists): if additional objects should be
     // "joined" into instance, set bi function for doing this:
-    if (additionalReduceRowsBiFunction != null) {
-      this.additionalReduceRowsBiFunction = additionalReduceRowsBiFunction;
+    if (additionalReduceRowsBiConsumer != null) {
+      this.additionalReduceRowsBiConsumer = additionalReduceRowsBiConsumer;
     }
 
     this.identifiableImplClass = identifiableImplClass;
@@ -277,7 +275,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 
-  private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
+  private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(
       boolean withIdentifiers, boolean withPreviewImage, boolean withTags) {
     return (map, rowView) -> {
       I identifiable =
@@ -336,8 +334,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       }
 
       extendReducedIdentifiable(identifiable, rowView);
-
-      return map;
     };
   }
 
@@ -754,7 +750,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                   .bindMap(argumentMappings)
                   .reduceRows(
                       (Map<UUID, I> map, RowView rowView) -> {
-                        basicReduceRowsBiFunction.apply(map, rowView);
+                        basicReduceRowsBiConsumer.accept(map, rowView);
                       })
                   .collect(Collectors.toList());
             });
@@ -839,8 +835,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                         .bindMap(bindMap)
                         .reduceRows(
                             (Map<UUID, I> map, RowView rowView) -> {
-                              fullReduceRowsBiFunction.apply(map, rowView);
-                              additionalReduceRowsBiFunction.apply(map, rowView);
+                              fullReduceRowsBiConsumer.accept(map, rowView);
+                              additionalReduceRowsBiConsumer.accept(map, rowView);
                             }))
             .findFirst()
             .orElse(null);
