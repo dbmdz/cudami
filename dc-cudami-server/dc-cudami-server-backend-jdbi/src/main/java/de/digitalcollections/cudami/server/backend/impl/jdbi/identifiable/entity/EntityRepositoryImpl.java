@@ -267,13 +267,21 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E save(E entity, Map<String, Object> bindings) {
+    return save(entity, bindings, null);
+  }
+
+  @Override
+  public E save(
+      E entity,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.save(entity, bindings);
+    return super.save(entity, bindings, sqlModifier);
   }
 
   @Override
@@ -308,12 +316,20 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public E update(E entity, Map<String, Object> bindings) {
+    return update(entity, bindings, null);
+  }
+
+  @Override
+  public E update(
+      E entity,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.update(entity, bindings);
+    return super.update(entity, bindings, sqlModifier);
   }
 }
