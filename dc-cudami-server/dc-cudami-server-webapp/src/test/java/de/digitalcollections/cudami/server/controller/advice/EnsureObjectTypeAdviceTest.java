@@ -18,7 +18,10 @@ import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.security.User;
 import de.digitalcollections.model.semantic.Headword;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -219,7 +222,12 @@ class EnsureObjectTypeAdviceTest {
     advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Predicate predicate = new Predicate();
     predicate.setLabel(new LocalizedText(Locale.GERMAN, "Test"));
-    predicate.setDescription(new LocalizedText(Locale.GERMAN, "Das ist ein Test"));
+    var text = new Text("Das ist ein Test");
+    var structuredContent = new StructuredContent();
+    structuredContent.addContentBlock(text);
+    var localizedStructuredContent = new LocalizedStructuredContent();
+    localizedStructuredContent.put(Locale.GERMAN, structuredContent);
+    predicate.setDescription(localizedStructuredContent);
     predicate.setValue("foo");
     String missingObjectTypeJSON = getMissingObjectTypeJSON(predicate);
 
