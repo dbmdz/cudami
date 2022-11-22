@@ -11,6 +11,7 @@
   <th:block layout:fragment="content">
     <div class="content-header">
       <div class="container-fluid">
+
         <div class="row">
           <div class="col">
             <h1 th:text="#{page.title.digital_objects}">Digital Objects</h1>
@@ -53,12 +54,10 @@
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="identifiers" data-sortable="false" data-formatter="formatIdentifiers" th:text="#{identifiers}">Identifiers</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
-                  <!--<th data-field="actions" data-formatter="formatActions" data-events="operateEvents" th:text="#{lbl.actions}">Actions</th>-->
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -96,12 +95,6 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-//      window.operateEvents = {
-//        'click .delete': function (e, value, row, index) {
-//          alert('You click like action, row: ' + JSON.stringify(row.uuid))
-//        }
-//      };
-
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
@@ -109,13 +102,11 @@
          +]*/
         const itemLocale = $("#digitalobjects-locales").val();
         const itemId = renderLocalizedText(row.label, itemLocale);
-
         return [
           renderViewAction(baseUrl),
-//          renderEditAction(baseUrl),
-//          renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
       }
+      
       function formatIdentifiers(value, row) {
         let html = '';
         var arrayLength = value.length;
@@ -125,14 +116,15 @@
         }
         return html;
       }
+      
       function formatLabel(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
          +]*/
         const itemLocale = $("#digitalobjects-locales").val();
-
         return renderLabel(baseUrl, value, itemLocale);
       }
+      
       function formatPreviewImage(value, row) {
         /*[+
          const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
@@ -143,7 +135,6 @@
       /*]]>*/
     </script>
     <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-
   </th:block>
 </body>
 </html>

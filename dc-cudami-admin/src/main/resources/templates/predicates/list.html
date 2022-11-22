@@ -11,8 +11,16 @@
   <th:block layout:fragment="content">
     <div class="content-header">
       <div class="container-fluid">
+        
         <div class="row">
-          <div class="col-12">
+          <div class="col">
+            <h1 th:text="#{page.title.predicates}">Relation types</h1>
+            <hr>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col">
 
             <div id="toolbar-predicates">
               <!-- TODO it always contains "und" undefined language? -->
@@ -46,7 +54,6 @@
               <thead>
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <!--<th data-field="uuid" th:text="#{lbl.uuid}">UUID</th>-->
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="value" data-sortable="true" th:text="#{lbl.value}">Value</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
@@ -55,6 +62,7 @@
                 </tr>
               </thead>
             </table>
+            
           </div>
         </div>
       </div>
@@ -66,17 +74,20 @@
 
     <script type="text/javascript">
       const $table = $('#table-predicates');
+      
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
           let itemLocale = $("#predicates-locales").val();
           settings.url = settings.url + '&itemLocale=' + itemLocale;
         }
       };
+      
       $(function () {
         $("#predicates-locales").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
+      
       function formatRowNumber(value, row, index) {
         return renderRowNumber($table, index);
       }
@@ -99,7 +110,7 @@
               title: 'Add a new row to the table'
             }
           }
-        }
+        };
       }
 
       function formatActions(value, row) {
@@ -115,6 +126,7 @@
           renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
       }
+      
       function formatLabel(value, row) {
         /*[+
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
