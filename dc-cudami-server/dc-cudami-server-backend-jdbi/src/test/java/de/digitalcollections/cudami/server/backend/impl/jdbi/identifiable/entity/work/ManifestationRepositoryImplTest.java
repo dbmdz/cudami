@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
@@ -21,11 +22,15 @@ import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,10 +58,37 @@ class ManifestationRepositoryImplTest {
   @Autowired EntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
 
+  UUID[] manifestationUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
+
   @Test
   @DisplayName("is testable")
   void containerIsUpAndRunning() {
     assertThat(postgreSQLContainer.isRunning()).isTrue();
+  }
+
+  void saveParentManifestation(UUID parentUuid) {
+    var noteText = new StructuredContent();
+    noteText.addContentBlock(new Text("some notes"));
+    var note = new LocalizedStructuredContent();
+    note.put(Locale.ENGLISH, noteText);
+    var manifestation =
+        Manifestation.builder()
+            .uuid(parentUuid)
+            .label(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
+            .manifestationType("SERIAL")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
+                    .build())
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("sub", "sub"))
+                    .text(new LocalizedText(Locale.ENGLISH, "...and its subtitle"))
+                    .build())
+            .note(note)
+            .build();
+    repo.save(manifestation);
   }
 
   @Test
@@ -101,6 +133,10 @@ class ManifestationRepositoryImplTest {
                 .type("SUBJECT_TYPE")
                 .build());
 
+    // parent
+    saveParentManifestation(manifestationUuids[0]);
+    Manifestation parent = repo.getByUuid(manifestationUuids[0]);
+
     List<Title> titles =
         List.of(
             Title.builder()
@@ -113,8 +149,10 @@ class ManifestationRepositoryImplTest {
                 .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
                 .titleType(new TitleType("main", "sub"))
                 .build());
+
     Manifestation manifestation =
         Manifestation.builder()
+            .uuid(manifestationUuids[1])
             .label(Locale.GERMAN, "ein Label")
             .composition("composition")
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
@@ -126,6 +164,7 @@ class ManifestationRepositoryImplTest {
             .title(titles.get(0))
             .title(titles.get(1))
             .subject(subject)
+            .parent(new RelationSpecification<Manifestation>("The child's title", null, parent))
             .build();
     manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
@@ -164,6 +203,9 @@ class ManifestationRepositoryImplTest {
                 .build());
 
     assertThat(actual.getSubjects()).containsExactlyInAnyOrder(subject);
+    assertThat(actual.getParents())
+        .containsExactlyInAnyOrder(
+            new RelationSpecification<Manifestation>("The child's title", null, parent));
   }
 
   @Test

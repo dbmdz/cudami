@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRange
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
@@ -16,9 +17,11 @@ import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +115,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + """
             mms.title parent_title, mms.sortKey parent_sortKey,
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
+            parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
+            parent.identifiable_objecttype parent_identifiableObjectType,
             """
         // relations
         + """
@@ -258,11 +263,17 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             Manifestation.builder()
                 .uuid(parentUuid)
                 .label(rowView.getColumn("parent_label", LocalizedText.class))
-                .titles(
-                    rowView.getColumn(
-                        "parent_titles",
-                        new GenericType<List<Title>>() {})) // TODO could this work??
+                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
                 .manifestationType(rowView.getColumn("parent_manifestationType", String.class))
+                .refId(rowView.getColumn("parent_refId", Integer.class))
+                .notes(
+                    rowView.getColumn(
+                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+                .created(rowView.getColumn("parent_created", LocalDateTime.class))
+                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+                .identifiableObjectType(
+                    rowView.getColumn(
+                        "parent_identifiableObjectType", IdentifiableObjectType.class))
                 .build();
         manifestation
             .getParents()
@@ -309,6 +320,43 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                     .build());
       }
     }
+  }
+
+  private void saveParents(Manifestation manifestation) {
+    if (manifestation == null) return;
+    /* - subject (subject_uuid) is the parent (superior manifestation)
+     * - object (object_uuid) is the child, i.e. this manifestation parameter
+     */
+    dbi.useHandle(
+        h ->
+            h.createUpdate("DELETE FROM manifestation_manifestations WHERE object_uuid = :uuid")
+                .bind("uuid", manifestation.getUuid())
+                .execute());
+
+    if (manifestation.getParents() == null || manifestation.getParents().isEmpty()) return;
+
+    dbi.useHandle(
+        h -> {
+          PreparedBatch batch =
+              h.prepareBatch(
+                  """
+          INSERT INTO manifestation_manifestations (
+            subject_uuid, object_uuid, title, sortkey
+          ) VALUES (
+            :subject, :object, :title, :sortkey
+          )""");
+          for (RelationSpecification<Manifestation> parent : manifestation.getParents()) {
+            if (parent.getSubject() == null || parent.getSubject().getUuid() == null) continue;
+
+            batch
+                .bind("object", manifestation.getUuid())
+                .bind("subject", parent.getSubject().getUuid())
+                .bind("title", parent.getTitle())
+                .bind("sortkey", parent.getSortKey())
+                .add();
+          }
+          batch.execute();
+        });
   }
 
   private void savePublishers(Manifestation manifestation) {
@@ -360,6 +408,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         super.save(manifestation, bindings, buildTitleSql(manifestation));
     savePublishers(manifestation);
     savedManifestation.setPublishers(manifestation.getPublishers());
+    saveParents(manifestation);
+    savedManifestation.setParents(manifestation.getParents());
     return savedManifestation;
   }
 
@@ -373,6 +423,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         super.update(manifestation, bindings, buildTitleSql(manifestation));
     savePublishers(manifestation);
     updatedManifestation.setPublishers(manifestation.getPublishers());
+    saveParents(manifestation);
+    updatedManifestation.setParents(manifestation.getParents());
     return updatedManifestation;
   }
 
