@@ -7,8 +7,10 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -18,6 +20,7 @@ import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.relation.Predicate;
+import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
@@ -48,6 +51,7 @@ class ManifestationRepositoryImplTest {
   @Autowired PublisherRepository publisherRepository;
   @Autowired PredicateRepository predicateRepository;
   @Autowired EntityRelationRepository entityRelationRepository;
+  @Autowired SubjectRepository subjectRepository;
 
   @Test
   @DisplayName("is testable")
@@ -88,6 +92,15 @@ class ManifestationRepositoryImplTest {
     var publisherTwo = Publisher.builder().agent(someoneElse).build();
     publisherTwo = publisherRepository.save(publisherTwo);
 
+    // subjects
+    Subject subject =
+        subjectRepository.save(
+            Subject.builder()
+                .label(new LocalizedText(Locale.ENGLISH, "My subject"))
+                .identifier(Identifier.builder().namespace("test").id("12345").build())
+                .type("SUBJECT_TYPE")
+                .build());
+
     List<Title> titles =
         List.of(
             Title.builder()
@@ -112,6 +125,7 @@ class ManifestationRepositoryImplTest {
             .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(titles.get(0))
             .title(titles.get(1))
+            .subject(subject)
             .build();
     manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
@@ -148,6 +162,8 @@ class ManifestationRepositoryImplTest {
                 .predicate("is_somethingelse_of")
                 .additionalPredicate("additional predicate")
                 .build());
+
+    assertThat(actual.getSubjects()).containsExactlyInAnyOrder(subject);
   }
 
   @Test

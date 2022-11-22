@@ -15,6 +15,7 @@ import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import de.digitalcollections.model.identifiable.entity.work.Title;
+import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -82,12 +83,19 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + String.format(
-            """
-            , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
-            %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange,
-            %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version, """,
-            tableAlias, mappingPrefix)
+        + """
+          , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
+          %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange,
+          %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version,
+          """
+            .formatted(tableAlias, mappingPrefix)
+        // publishers
+        + """
+          mp.publisher_uuid publisher_uuid, mp.sortkey publisher_sortKey,
+          max(mp.sortkey) OVER (PARTITION BY %1$s.uuid) publisher_max_sortkey,
+          """
+            .formatted(TABLE_ALIAS)
+        // subjects
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
@@ -105,7 +113,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             mms.title parent_title, mms.sortKey parent_sortKey,
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
             """
-            .formatted(tableAlias)
         // relations
         + """
           %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
@@ -115,12 +122,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX,
                 tableAlias)
-        + entityRepository.getSqlSelectReducedFields()
-        // publishers
-        + """
-          , mp.publisher_uuid publisher_uuid, mp.sortkey publisher_sortKey,
-          max(mp.sortkey) OVER (PARTITION BY %1$s.uuid) publisher_max_sortkey"""
-            .formatted(TABLE_ALIAS);
+        + entityRepository.getSqlSelectReducedFields();
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
@@ -171,8 +173,38 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
 
   protected static void additionalReduceRowsBiConsumer(
       Map<UUID, Manifestation> map, RowView rowView) {
+    Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+    // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
+
+    // publishers
+    UUID publisherUuid = rowView.getColumn("publisher_uuid", UUID.class);
+    if (publisherUuid != null) {
+      if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
+        int maxIndex = rowView.getColumn("publisher_max_sortkey", Integer.class);
+        Vector<Publisher> publishers = new Vector<>(++maxIndex);
+        publishers.setSize(maxIndex);
+        manifestation.setPublishers(publishers);
+      }
+      if (!manifestation.getPublishers().stream()
+          .anyMatch(publ -> publ != null && Objects.equals(publisherUuid, publ.getUuid()))) {
+        manifestation
+            .getPublishers()
+            .set(
+                rowView.getColumn("publisher_sortKey", Integer.class),
+                Publisher.builder().uuid(publisherUuid).build());
+      }
+    }
+
     // subjects
-    // TODO
+    UUID subjectUuid =
+        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+    if (subjectUuid != null
+        && (manifestation.getSubjects() == null
+            || !manifestation.getSubjects().stream()
+                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+      Subject subject = rowView.getRow(Subject.class);
+      manifestation.addSubject(subject);
+    }
   }
 
   private BiFunction<String, Map<String, Object>, String> buildTitleSql(
@@ -275,25 +307,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                             EntityRelationRepositoryImpl.MAPPING_PREFIX + "_additionalPredicates",
                             new GenericType<List<String>>() {}))
                     .build());
-      }
-    }
-
-    // publishers
-    UUID publisherUuid = rowView.getColumn("publisher_uuid", UUID.class);
-    if (publisherUuid != null) {
-      if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
-        int maxIndex = rowView.getColumn("publisher_max_sortkey", Integer.class);
-        Vector<Publisher> publishers = new Vector<>(++maxIndex);
-        publishers.setSize(maxIndex);
-        manifestation.setPublishers(publishers);
-      }
-      if (!manifestation.getPublishers().stream()
-          .anyMatch(publ -> publ != null && Objects.equals(publisherUuid, publ.getUuid()))) {
-        manifestation
-            .getPublishers()
-            .set(
-                rowView.getColumn("publisher_sortKey", Integer.class),
-                Publisher.builder().uuid(publisherUuid).build());
       }
     }
   }
