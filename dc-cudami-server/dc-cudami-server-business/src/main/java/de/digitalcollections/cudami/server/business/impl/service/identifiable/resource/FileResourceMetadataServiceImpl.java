@@ -74,18 +74,20 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id) {
+  public FileResource getByIdentifier(String namespace, String id)
+      throws IdentifiableServiceException {
     FileResource fileResource = repository.getByIdentifier(namespace, id);
     return getTypeSpecific(fileResource);
   }
 
   @Override
-  public FileResource getByUuid(UUID uuid) {
+  public FileResource getByUuid(UUID uuid) throws IdentifiableServiceException {
     FileResource fileResource = repository.getByUuid(uuid);
     return getTypeSpecific(fileResource);
   }
 
-  private FileResource getTypeSpecific(FileResource fileResource) {
+  private FileResource getTypeSpecific(FileResource fileResource)
+      throws IdentifiableServiceException {
     if (fileResource == null) {
       return null;
     }

@@ -143,7 +143,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity getByUuid(@PathVariable UUID uuid) {
+  public Entity getByUuid(@PathVariable UUID uuid) throws IdentifiableServiceException {
     return entityService.getByUuid(uuid);
   }
 

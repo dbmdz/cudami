@@ -194,7 +194,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject getByUuid(@PathVariable UUID uuid) {
+  public DigitalObject getByUuid(@PathVariable UUID uuid) throws IdentifiableServiceException {
     return digitalObjectService.getByUuid(uuid);
   }
 

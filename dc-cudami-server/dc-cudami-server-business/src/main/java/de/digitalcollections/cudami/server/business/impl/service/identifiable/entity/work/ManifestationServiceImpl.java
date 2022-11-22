@@ -13,6 +13,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Publisher;
@@ -47,6 +48,25 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
         cudamiConfig);
     this.entityRelationService = entityRealationService;
     this.publisherService = publisherService;
+  }
+
+  @Override
+  public Manifestation getByUuid(UUID uuid) throws IdentifiableServiceException {
+    Manifestation manifestation = super.getByUuid(uuid);
+    fillPublishers(manifestation);
+    return manifestation;
+  }
+
+  @Override
+  public Manifestation getByIdentifier(Identifier identifier) {
+    // TODO Auto-generated method stub
+    return super.getByIdentifier(identifier);
+  }
+
+  @Override
+  public Manifestation getByRefId(long refId) {
+    // TODO Auto-generated method stub
+    return super.getByRefId(refId);
   }
 
   @Override
@@ -100,14 +120,11 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     return manifestation;
   }
 
-  private void fillPublishers(Manifestation updatedManifestation)
-      throws IdentifiableServiceException {
-    if (updatedManifestation.getPublishers() == null) {
-      return;
-    }
+  private void fillPublishers(Manifestation manifestation) throws IdentifiableServiceException {
+    if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) return;
 
-    List<Publisher> filledPublishers = new ArrayList<>();
-    for (Publisher publisher : updatedManifestation.getPublishers()) {
+    List<Publisher> filledPublishers = new ArrayList<>(manifestation.getPublishers().size());
+    for (Publisher publisher : manifestation.getPublishers()) {
       UUID uuid = publisher.getUuid();
       try {
         filledPublishers.add(publisherService.getByUuid(uuid));
@@ -116,6 +133,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
             "Cannot retrieve publisher with uuid=" + uuid + ": " + e, e);
       }
     }
-    updatedManifestation.setPublishers(filledPublishers);
+    manifestation.setPublishers(filledPublishers);
   }
 }

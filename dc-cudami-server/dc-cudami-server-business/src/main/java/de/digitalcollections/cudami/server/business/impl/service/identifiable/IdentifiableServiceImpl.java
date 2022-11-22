@@ -98,7 +98,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   private boolean deleteIdentifiers(UUID identifiableUuid) throws CudamiServiceException {
-    I identifiable = getByUuid(identifiableUuid);
+    I identifiable;
+    try {
+      identifiable = getByUuid(identifiableUuid);
+    } catch (IdentifiableServiceException e) {
+      throw new CudamiServiceException(e);
+    }
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
@@ -224,12 +229,12 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I getByIdentifier(String namespace, String id) {
+  public I getByIdentifier(String namespace, String id) throws IdentifiableServiceException {
     return repository.getByIdentifier(namespace, id);
   }
 
   @Override
-  public I getByUuid(UUID uuid) {
+  public I getByUuid(UUID uuid) throws IdentifiableServiceException {
     return repository.getByUuid(uuid);
   }
 

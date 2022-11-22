@@ -400,7 +400,8 @@ class DigitalObjectServiceImplTest {
   @Test
   @DisplayName(
       "throws ConflictException if the digital object is already connected to another item")
-  public void addExistingButOtherwiseConntectedDigitalObjectToItem() {
+  public void addExistingButOtherwiseConntectedDigitalObjectToItem()
+      throws IdentifiableServiceException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     Item otherItem = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =

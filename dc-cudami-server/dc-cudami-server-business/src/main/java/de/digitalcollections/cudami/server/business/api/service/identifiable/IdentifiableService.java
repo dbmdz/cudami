@@ -100,9 +100,9 @@ public interface IdentifiableService<I extends Identifiable> {
 
   I getByIdentifier(Identifier identifier);
 
-  I getByIdentifier(String namespace, String id);
+  I getByIdentifier(String namespace, String id) throws IdentifiableServiceException;
 
-  I getByUuid(UUID uuid);
+  I getByUuid(UUID uuid) throws IdentifiableServiceException;
 
   I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException;
 

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -62,7 +63,7 @@ class EntityControllerTest extends BaseControllerTest {
   @DisplayName("returns an entity, e.g. a project, by its identifier")
   @ParameterizedTest
   @ValueSource(strings = {"/latest/entities/identifier/mdz-proj:1328176523.json"})
-  public void returnByIdentifier(String path) {
+  public void returnByIdentifier(String path) throws IdentifiableServiceException {
     Entity expected =
         Project.builder()
             .created("2020-09-30T16:25:09.365401")

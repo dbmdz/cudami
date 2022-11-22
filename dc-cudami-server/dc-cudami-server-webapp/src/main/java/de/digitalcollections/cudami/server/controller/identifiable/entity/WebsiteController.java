@@ -195,7 +195,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException {
+      throws JsonProcessingException, IdentifiableServiceException {
     Website website = websiteService.getByUuid(uuid);
 
     if (website == null) {

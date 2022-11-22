@@ -88,6 +88,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     }
   }
 
+  @Override
   @Operation(
       summary = "Get an identifiable by namespace and id",
       description =
@@ -114,7 +115,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Identifiable getByUuid(@PathVariable UUID uuid) {
+  public Identifiable getByUuid(@PathVariable UUID uuid) throws IdentifiableServiceException {
     return identifiableService.getByUuid(uuid);
   }
 }
