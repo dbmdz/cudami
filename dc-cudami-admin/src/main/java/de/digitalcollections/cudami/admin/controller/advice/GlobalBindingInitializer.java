@@ -1,9 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.advice;
 
-import de.digitalcollections.cudami.admin.propertyeditor.LocalizedStructuredContentEditor;
-import de.digitalcollections.cudami.admin.propertyeditor.LocalizedTextEditor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.admin.propertyeditor.JsonObjectEditor;
 import de.digitalcollections.cudami.admin.propertyeditor.RoleEditor;
-import de.digitalcollections.cudami.admin.propertyeditor.StructuredContentEditor;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -18,20 +17,19 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalBindingInitializer {
 
-  @Autowired private LocalizedStructuredContentEditor localizedStructuredContentEditor;
-
-  @Autowired private LocalizedTextEditor localizedTextContentEditor;
-
+  @Autowired private ObjectMapper objectMapper;
   @Autowired private RoleEditor roleEditor;
-
-  @Autowired private StructuredContentEditor structuredContentEditor;
 
   @InitBinder
   public void registerCustomEditors(WebDataBinder binder, WebRequest request) {
-    binder.registerCustomEditor(LocalizedStructuredContent.class, localizedStructuredContentEditor);
-    binder.registerCustomEditor(LocalizedText.class, localizedTextContentEditor);
+    binder.registerCustomEditor(
+        LocalizedStructuredContent.class,
+        new JsonObjectEditor(objectMapper, LocalizedStructuredContent.class));
+    binder.registerCustomEditor(
+        LocalizedText.class, new JsonObjectEditor(objectMapper, LocalizedText.class));
     binder.registerCustomEditor(Role.class, roleEditor);
     binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-    binder.registerCustomEditor(StructuredContent.class, structuredContentEditor);
+    binder.registerCustomEditor(
+        StructuredContent.class, new JsonObjectEditor(objectMapper, StructuredContent.class));
   }
 }
