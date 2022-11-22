@@ -67,39 +67,13 @@ public class PredicateController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    //    return predicateService.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm,
-    // labelLanguage);
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
 
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-
-    //    if (filterCriteria.length > 0 && filterCriteria.length % 2 == 0) {
-    //      // Since Map.of doesn't support null values we try it this varargs-way.
-    //      // There must be two entries per criterion so the array's length must be even.
-    //      for (int i = 0; i < filterCriteria.length; i += 2) {
-    //        if (filterCriteria[i + 1] == null) {
-    //          continue;
-    //        }
-    //        if (!(filterCriteria[i] instanceof String)
-    //            || !(filterCriteria[i + 1] instanceof FilterCriterion)) {
-    //          throw new IllegalArgumentException(
-    //              "`filterCriteria` must be pairs of a `String`, the expression, and the
-    // corresponding `FilterCriterion`");
-    //        }
-    //        String expression = (String) filterCriteria[i];
-    //        FilterCriterion<?> criterion = (FilterCriterion<?>) filterCriteria[i + 1];
-    //        criterion.setExpression(expression);
-    //        pageRequest.add(new Filtering(List.of(criterion)));
-    //      }
-    //    }
-    //
-    //    addLabelFilter(pageRequest, labelTerm, labelLanguage);
     return predicateService.find(pageRequest);
   }
 
