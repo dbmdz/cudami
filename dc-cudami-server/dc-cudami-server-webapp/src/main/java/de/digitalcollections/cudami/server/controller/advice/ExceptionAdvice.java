@@ -40,8 +40,6 @@ public class ExceptionAdvice {
 
   @ExceptionHandler(ValidationException.class)
   public ResponseEntity<Object> handleValidationException(ValidationException exception) {
-    LOGGER.error("Validation error: ", exception);
-
     Map<String, Object> body = new LinkedHashMap<>(2);
     body.put("timestamp", new Date());
     body.put("errors", exception.getErrors());
