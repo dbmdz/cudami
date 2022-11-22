@@ -28,6 +28,73 @@ a[href^="http"]:not(.no-external):after {
   padding-left: 3px;
 }
 
+.alert {
+  border-radius: 0px;
+  width: 100%;
+  font-size: 14px;
+  padding: 5px 15px;
+}
+.alert i {
+  margin-right: 10px;
+}
+
+.bootstrap-table table.table{
+  background-color: #FFF;
+}
+
+.error {
+  color: rgb(220, 53, 69);
+}
+
+.has-error input {
+  border-color:red;
+}
+
+.has-error p {
+  font-size: 11px;
+  color: rgb(220, 53, 69);
+}
+
+.nav-tabs .nav-tab {
+  border: 1px solid transparent;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+  border-top-color: rgb(222, 226, 230);
+  border-right-color: rgb(222, 226, 230);
+  border-bottom-color: rgb(255, 255, 255);
+  border-left-color: rgb(222, 226, 230);
+  margin-bottom: -1px;
+  padding: .4rem .8rem;
+  white-space: nowrap;
+}
+.nav-tabs .nav-tab .nav-link {
+  display: inline;
+  margin-bottom: 0px;
+  border: none;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+.nav-tabs .nav-tab.active {
+  background-color: #FFF;
+}
+
+.nav-tabs .nav-tab.active a.language-switcher {
+  color: #495057;
+}
+
+.required::after {
+  content: " *";
+  color: rgb(220, 53, 69);
+}
+
+.rows-striped > .row:nth-of-type(even) {
+  background-color: #FCFCFC;
+}
+/*.rows-striped .row:nth-of-type(odd) {
+  background: #FFFFFF;
+}*/
+
 .welcome {
   -ms-flex-align: center;
   align-items: center;

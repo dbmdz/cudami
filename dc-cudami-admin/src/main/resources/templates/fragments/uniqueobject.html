@@ -3,6 +3,27 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
+  <th:block th:fragment="renderFields(uniqueObject)">
+    <div class="row">
+      <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
+      <div class="col-md-9"><span th:text="${uniqueObject.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <label class="font-weight-bold mb-0">
+          <span class="mr-1" th:text="#{created}"></span>
+          /
+          <span class="ml-1" th:text="#{last_modified}"></span>
+        </label>
+      </div>
+      <div class="col-md-9">
+        <span class="mr-2" th:with="df=#{dateTime.format},dateTime=${uniqueObject.created}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+        /
+        <span class="ml-2" th:with="df=#{dateTime.format},dateTime=${uniqueObject.lastModified}" th:text="${#temporals.format(dateTime,df)}">01.01.2000 21:45:00</span>
+      </div>
+    </div>
+  </th:block>
+
   <th:block th:fragment="renderDates(uniqueObject)">
     <section class="mb-3 rows-striped">
       <div class="row">
@@ -22,5 +43,5 @@
     </section>
   </th:block>
 
-  </body>
+</body>
 </html>

@@ -137,10 +137,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
   @Operation(summary = "Get entity by uuid")
   @GetMapping(
       value = {
-        "/v6/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Entity getByUuid(@PathVariable UUID uuid) {

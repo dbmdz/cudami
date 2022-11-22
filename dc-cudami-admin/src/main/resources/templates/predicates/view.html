@@ -1,0 +1,89 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{predicates}: #{predicate} &quot;${predicate.value}&quot;|">...</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content" th:object="${predicate}">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-6">
+            <h1 th:text="|#{predicate} &quot;${predicate.value}&quot;|">...</h1>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-danger mr-2" th:title="#{tooltip.delete}" th:data-href="@{*{uuid} + '/delete'}" th:data-message="#{modal.msg.confirm_delete_obj(#{predicate}, ${predicate.value})}" th:data-title="#{modal.title.warning}" data-target="#confirmYesNoDialog" data-toggle="modal" th:text="#{btn.delete}">Delete</a>
+              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+            </div>
+          </div>
+        </div>
+        <hr/>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid rows-striped">
+
+        <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
+          <div class="col-sm-12">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
+                <a
+                  class="language-switcher nav-link"
+                  data-toggle="tab"
+                  role="tab"
+                  th:classappend="${iter.index} == 0 ? active"
+                  th:href="${'#' + language}"
+                  th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+                  th:with="languageToDisplay=${language.getDisplayName(#locale)}"
+                  >
+                  language
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+                <div class="card">
+                  <div class="card-body bg-light">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <label class="font-weight-bold">
+                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${predicate.label}, ${language})"></th:block>
+                        </label>
+                        <th:block th:if="${predicate.description?.containsKey(language)}">
+                          <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${predicate.description}, ${language})"></div>
+                        </th:block>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
+
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>
+          <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+
+  <section layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <script>
+      addLanguageChangeHandler()
+      moveEditButtonToNavbar()
+    </script>
+  </section>
+</body>
+</html>

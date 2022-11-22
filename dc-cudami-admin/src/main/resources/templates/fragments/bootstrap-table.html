@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="data-formatter">
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function renderDate(value, row) {
+        /*[+
+         const locale = [[${#locale}]];
+         +]*/
+        let date = new Date(value);
+        return new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeStyle: 'medium'}).format(date);
+      }
+      function renderDeleteAction(baseUrl, itemType, itemId) {
+        /*[+
+         const modalDeleteMessage = `[(#{modal.msg.confirm_delete})]`;
+         const modalDeleteTitle = [[#{modal.title.warning}]];
+         const tooltipDelete = [[#{tooltip.delete}]];
+         +]*/
+        return '<a class="remove" title="' + tooltipDelete + '"' +
+                'data-href="' + baseUrl + '/delete"' +
+                'data-message="' + escape(modalDeleteMessage) + '"' +
+                'data-title="' + modalDeleteTitle + '"' +
+                'data-target="#confirmYesNoDialog"' +
+                'data-toggle="modal"' +
+                '><i class="fa fa-trash"></i></a>';
+      }
+      function renderEditAction(baseUrl) {
+        /*[+
+         const tooltipEdit = [[#{tooltip.edit}]];
+         +]*/
+        return '<a href="' + baseUrl + '/edit" title="' + tooltipEdit + '"><i class="fa fa-edit"></i></a>';
+      }
+      function renderLabel(baseUrl, value, locale) {
+        return '<a href="' + baseUrl + '">' + renderLocalizedText(value, locale) + '</a>';
+      }
+      function renderLocalizedText(value, locale) {
+        if (value === undefined) {
+          return "";
+        }
+        return [value[locale]];
+      }
+      function renderPreviewImage(previewImage, tooltipNoPreviewImage) {
+        let html = '<figure class="mb-0 mx-auto" style="max-width: 30px;">';
+        if (previewImage === undefined) {
+          html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
+        } else {
+          let tooltip = previewImage.filename;
+          // TODO: see PreviewImage.jsx for renderingHints logic
+          // const {altText, caption, title} = previewImage.renderingHints;
+          let imageUrl;
+          if (!previewImage.httpBaseUrl || !previewImage.mimeType) {
+            imageUrl = previewImage.uri;
+          } else {
+            const mimeExtensionMapping = {
+              gif: 'gif',
+              png: 'png'
+            };
+            const subMimeType = previewImage.mimeType.split('/')[1];
+            imageUrl = `${previewImage.httpBaseUrl}/full/30,/0/default.${
+                    mimeExtensionMapping[subMimeType] ?? 'jpg'
+                    }`;
+          }
+          html += '<img alt="" title="' + tooltip + '" class="img-fluid mw-100" src="' + imageUrl + '"/>';
+          // TODO figcaption
+          // <figcaption className="figure-caption">{caption[language]}</figcaption>
+        }
+        html += '</figure>';
+        return html;
+      }
+      function renderRowNumber(table, index) {
+        let pageNumber = table.bootstrapTable('getOptions').pageNumber;
+        let pageSize = table.bootstrapTable('getOptions').pageSize;
+        return ((pageNumber - 1) * pageSize) + index + 1;
+      }
+      function renderViewAction(baseUrl) {
+        /*[+
+         const tooltipView = [[#{tooltip.view}]];
+         +]*/
+        return '<a href="' + baseUrl + '" title="' + tooltipView + '"><i class="fa fa-eye"></i></a>';
+      }
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
+</html>

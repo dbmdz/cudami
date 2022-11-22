@@ -18,11 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 public class MainControllerTest {
 
   @Autowired private MockMvc mockMvc;
-
   @MockBean private RoleEditor roleEditor;
-
   @MockBean private UserDetailsService userDetailsService;
-
   @MockBean private UserService userService;
 
   @Test

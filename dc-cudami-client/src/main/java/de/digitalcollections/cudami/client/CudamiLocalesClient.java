@@ -8,6 +8,7 @@ import de.digitalcollections.model.exception.TechnicalException;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class CudamiLocalesClient extends BaseRestClient<Locale> {
 
@@ -19,9 +20,14 @@ public class CudamiLocalesClient extends BaseRestClient<Locale> {
     return doGetRequestForObjectList(API_VERSION_PREFIX + "/languages", String.class);
   }
 
+  public List<Locale> getAllLanguagesAsLocales() throws TechnicalException {
+    List<Locale> allLocales = getAllLocales();
+    return allLocales.stream().filter(l -> l.getCountry().isBlank()).collect(Collectors.toList());
+  }
+
   @SuppressWarnings("unchecked")
-  public List<String> getAllLocales() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint, String.class);
+  public List<Locale> getAllLocales() throws TechnicalException {
+    return doGetRequestForObjectList(baseEndpoint, Locale.class);
   }
 
   public Locale getDefaultLanguage() throws TechnicalException {

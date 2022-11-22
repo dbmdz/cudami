@@ -33,6 +33,6 @@ class CudamiPredicatesClientTest
   @DisplayName("can find all")
   public void testFindAll() throws Exception {
     client.getAll();
-    verifyHttpRequestByMethodAndRelativeURL("get", "");
+    verifyHttpRequestByMethodAndRelativeURL("get", "/all");
   }
 }

@@ -1,0 +1,40 @@
+.editorMenu {
+  background-color: #f0f0f2;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+  border-radius: 4px 4px 0px 0px;
+}
+.editorMenu .btn-default {
+  color: #333;
+  /*background-color: #fff;*/
+  border-color: #ccc;
+}
+
+.editorMenu .btn-default:disabled {
+  opacity: .4;
+}
+
+.editorMenu .btn-default.is-active {
+  background-color: #ddd;
+}
+
+.ProseMirror {
+  background: white;
+  color: black;
+  background-clip: padding-box;
+  border-radius: 0px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-variant-ligatures: none;
+  margin-bottom: 23px;
+  min-height: 200px;
+  padding: 10px;
+  line-height: 1.2;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.ProseMirror p {
+  margin-bottom: 1em;
+}
