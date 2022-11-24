@@ -8,10 +8,9 @@
       /*<![CDATA[*/
       function renderDate(value, row) {
         /*[+
-         const locale = [[${#locale}]];
+         const locale = [[${#locale.getLanguage()}]];
          +]*/
-        let date = new Date(value);
-        return new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeStyle: 'medium'}).format(date);
+        return formatDate(value, locale);
       }
       function renderDeleteAction(baseUrl, itemType, itemId) {
         /*[+

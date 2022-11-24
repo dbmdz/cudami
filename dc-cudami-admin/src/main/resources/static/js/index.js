@@ -114,6 +114,28 @@ function bindTabEvents() {
   });
 }
 
+function formatDate(date, locale, onlyDate = false) {
+  if (!date) {
+    return null;
+  }
+  const dateToFormat = date instanceof Date ? date : new Date(date);
+  const options = {
+    day: '2-digit',
+    hour12: false,
+    month: '2-digit',
+    year: 'numeric'
+  };
+  if (onlyDate) {
+    return dateToFormat.toLocaleDateString(locale, options)
+  }
+  return dateToFormat.toLocaleString(locale, {
+    ...options,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
 function prependErrorIcon(element) {
   $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }
