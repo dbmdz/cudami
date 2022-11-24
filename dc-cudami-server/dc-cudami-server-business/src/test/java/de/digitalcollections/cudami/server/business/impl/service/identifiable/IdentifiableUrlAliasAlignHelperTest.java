@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -35,6 +36,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
       new Locale.Builder().setLanguage("und").setScript("Latn").build();
   protected static final Locale LOCALE_UND_HANI =
       new Locale.Builder().setLanguage("und").setScript("Hani").build();
+  protected static final Locale LOCALE_UND = Locale.forLanguageTag("und");
 
   CudamiConfig cudamiConfig;
   IdentifiableUrlAliasAlignHelper.SlugGeneratorService slugGeneratorService;
@@ -157,9 +159,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
       "avoids creating an UrlAlias, when slug and languare are the same and only script differs")
   @Test
   public void doesNotAddUrlAliasWhenOnlyScriptDiffers() throws CudamiServiceException {
-    when(slugGeneratorService.apply(eq(LOCALE_UND_LATN), eq("Yu ji shan ren"), eq(null)))
-        .thenReturn("yu-ji-shan-ren");
-    when(slugGeneratorService.apply(eq(LOCALE_UND_HANI), eq("玉几山人"), eq(null)))
+    when(slugGeneratorService.apply(eq(LOCALE_UND), eq("Yu ji shan ren"), eq(null)))
         .thenReturn("yu-ji-shan-ren");
 
     UUID expectedTargetUuid = UUID.randomUUID();
@@ -172,9 +172,8 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
     IdentifiableUrlAliasAlignHelper.checkDefaultAliases(entity, cudamiConfig, slugGeneratorService);
 
+    verify(slugGeneratorService, atMostOnce()).apply(eq(LOCALE_UND), any(), any());
     LocalizedUrlAliases localizedUrlAliases = entity.getLocalizedUrlAliases();
-
-    final Locale LOCALE_UND = Locale.forLanguageTag("und");
 
     assertThat(localizedUrlAliases.flatten())
         .hasSize(1); // only for language "und" (ROOT), but not for combinations with scripts

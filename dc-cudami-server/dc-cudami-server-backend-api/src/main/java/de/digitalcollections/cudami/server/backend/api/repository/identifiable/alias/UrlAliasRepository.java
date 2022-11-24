@@ -5,11 +5,58 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface UrlAliasRepository {
+
+  /**
+   * Filter the locales by their script and return only those with
+   *
+   * <ul>
+   *   <li>"" (no script)
+   *   <li>"Latn"
+   * </ul>
+   *
+   * @param locales
+   * @return
+   */
+  public static List<Locale> grabLocalesByScript(Collection<Locale> locales) {
+    if (locales == null) return Collections.emptyList();
+    List<String> scripts = List.of("", "Latn");
+    return locales.stream()
+        .filter(l -> l != null && scripts.contains(l.getScript()))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns the language of the passed locale w/o anything else e.g. country or script.
+   *
+   * <p>This is a safe method to always get a language code even if a language is not set at all or
+   * {@code Locale.ROOT} is used ("und" is returned). If the locale is {@code null} then "und"
+   * (Undetermined) is returned. See also {@link Locale#toLanguageTag()}.
+   *
+   * @param locale
+   * @return
+   */
+  public static String grabLanguage(Locale locale) {
+    if (locale == null) return "und";
+    return locale.toLanguageTag().split("-", 2)[0];
+  }
+
+  /**
+   * Same as {@link #grabLanguage(Locale)}.
+   *
+   * @param locale
+   * @return
+   */
+  public static Locale grabLanguageLocale(Locale locale) {
+    return Locale.forLanguageTag(grabLanguage(locale));
+  }
 
   /**
    * Remove the entries with the provided UUIDs (PK).

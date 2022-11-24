@@ -1,5 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.alias;
 
+import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
+import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguageLocale;
+
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
@@ -98,7 +101,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       Locale pLocale, LocalizedUrlAliases localizedUrlAliases) {
     final List<UrlAlias> filteredUrlAliases =
         localizedUrlAliases.flatten().stream()
-            .filter(u -> pLocale.equals(u.getTargetLanguage()))
+            .filter(u -> pLocale.equals(grabLanguageLocale(u.getTargetLanguage())))
             .collect(Collectors.toList());
     return new LocalizedUrlAliases(filteredUrlAliases);
   }
@@ -113,6 +116,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       return localizedUrlAliases;
     }
 
+    pLocale = grabLanguageLocale(pLocale);
     if (localizedUrlAliases.hasTargetLanguage(pLocale)) {
       // Remove all languages, which do not match the desired pLocale
       return filterForLocale(pLocale, localizedUrlAliases);
@@ -318,7 +322,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
                       + "-"
                       + u.getTargetUuid()
                       + "-"
-                      + u.getTargetLanguage();
+                      + grabLanguage(u.getTargetLanguage());
               Integer primariesPerTuple = primaries.getOrDefault(key, 0);
               if (u.isPrimary()) {
                 primariesPerTuple++;
@@ -339,7 +343,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
       String key =
           (u.getWebsite() != null ? u.getWebsite().getUuid() : "default")
               + "-"
-              + u.getTargetLanguage()
+              + grabLanguage(u.getTargetLanguage())
               + "-"
               + u.getSlug();
       if (tuples.contains(key)) {
@@ -347,7 +351,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
             "multiple entries for slug="
                 + u.getSlug()
                 + ", language="
-                + u.getTargetLanguage()
+                + grabLanguage(u.getTargetLanguage())
                 + ", website="
                 + u.getWebsite()
                 + ", target="

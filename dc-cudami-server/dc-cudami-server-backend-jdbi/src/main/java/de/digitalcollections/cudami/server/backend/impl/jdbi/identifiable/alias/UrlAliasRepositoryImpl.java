@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
+import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
+
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
@@ -391,7 +393,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     filtering.add(
         FilterCriterion.builder()
             .withExpression("targetLanguage")
-            .isEquals(targetLanguage.getLanguage())
+            .isEquals(grabLanguage(targetLanguage))
             .build());
     filtering.add(FilterCriterion.builder().withExpression("slug").isEquals(slug).build());
     Map<String, Object> bindings = new HashMap<>();
@@ -451,7 +453,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createQuery(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
+                      .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
@@ -484,7 +486,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                   h.createUpdate(sql)
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                      .bind("targetLanguage", urlAlias.getTargetLanguage().getLanguage())
+                      .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
                       .execute());
       if (affected != 1) {
         throw new UrlAliasRepositoryException(

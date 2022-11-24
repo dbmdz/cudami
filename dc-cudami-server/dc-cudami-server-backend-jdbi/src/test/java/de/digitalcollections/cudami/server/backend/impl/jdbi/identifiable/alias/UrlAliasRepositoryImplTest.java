@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias;
 
+import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
+import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLocalesByScript;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +40,9 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -240,5 +246,34 @@ public class UrlAliasRepositoryImplTest {
   public void delete() throws UrlAliasRepositoryException {
     int count = this.repo.delete(List.of(this.urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
+  }
+
+  private static Stream<Arguments> testGrabLanguage() {
+    return Stream.of(
+        Arguments.of(Locale.ROOT, "und"),
+        Arguments.of(new Locale("und"), "und"),
+        Arguments.of(Locale.GERMANY, "de"),
+        Arguments.of(Locale.ENGLISH, "en"),
+        Arguments.of(new Locale.Builder().setScript("Hani").build(), "und"),
+        Arguments.of(new Locale.Builder().setLanguage("en").setScript("Latn").build(), "en"));
+  }
+
+  @DisplayName("Test grabLanguage")
+  @ParameterizedTest
+  @MethodSource
+  public void testGrabLanguage(Locale locale, String expected) {
+    assertThat(grabLanguage(locale)).isEqualTo(expected);
+  }
+
+  @DisplayName("Test that any scripts are ignored that are not '' or 'Latn'")
+  @Test
+  public void testGrabLocalesByScript() {
+    var locales =
+        List.of(
+            new Locale.Builder().setLanguage("und").setScript("Latn").build(),
+            new Locale.Builder().setLanguage("zh").setScript("Hani").build(),
+            new Locale.Builder().setLanguage("en").build());
+    assertThat(grabLocalesByScript(locales))
+        .containsExactlyInAnyOrder(locales.get(0), locales.get(2));
   }
 }
