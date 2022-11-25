@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [6.2.0](https://github.com/dbmdz/cudami/releases/tag/6.2.0) - 2022-11-25
+
 ### Added
 
 - Add parameter `fill-wemi` to return a hierarchically (in direction `Item` -> `Manifestation` -> `Work`) filled `DigitalObject` (currently only with the `Item` data)
