@@ -95,6 +95,21 @@ a[href^="http"]:not(.no-external):after {
   background: #FFFFFF;
 }*/
 
+.bootstrap-table .fixed-table-container .table thead th {
+  padding-right: 0.5em;
+}
+.bootstrap-table .fixed-table-container .table thead th div {
+  background-size: 0.98em;
+}
+.bootstrap-table .fixed-table-container .table thead th .both.asc {
+  background-image: url(../images/sort-up-solid.svg);
+}
+.bootstrap-table .fixed-table-container .table thead th .both {
+  background-image: url(../images/sort-solid-disabled.svg);
+}
+.bootstrap-table .fixed-table-container .table thead th .both.desc {
+  background-image: url(../images/sort-down-solid.svg);
+}
 .welcome {
   -ms-flex-align: center;
   align-items: center;
