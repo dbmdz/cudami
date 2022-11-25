@@ -61,8 +61,9 @@ public class PredicateController {
 
   @Operation(summary = "Get all predicates as (sorted, paged) list")
   @GetMapping(
-      value = {"/v6/predicates"},
+      value = {"/v6/predicates/paged"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  // FIXME: delete "/paged" from mapping as soon as we proceed to breaking V7 API-Version
   public PageResponse<Predicate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
@@ -77,7 +78,8 @@ public class PredicateController {
     return predicateService.find(pageRequest);
   }
 
-  @GetMapping(value = {"/v6/predicates/all"})
+  @GetMapping(value = {"/v6/predicates"})
+  // FIXME: append "/all" to mapping as soon as we proceed to breaking V7 API-Version
   public List<Predicate> getAll() {
     return predicateService.getAll();
   }
