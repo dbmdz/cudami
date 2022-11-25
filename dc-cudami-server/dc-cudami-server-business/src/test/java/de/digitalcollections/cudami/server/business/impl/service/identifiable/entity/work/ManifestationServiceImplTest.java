@@ -20,6 +20,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.work.Manifestation;
@@ -191,5 +192,92 @@ class ManifestationServiceImplTest {
 
     Manifestation actualManifestation = manifestationService.update(manifestation);
     assertThat(actualManifestation.getPublishers()).containsExactly(publisher1, publisher2);
+  }
+
+  @DisplayName("can return a saved manifestation with filled parents")
+  @Test
+  public void filledParentsOnSave()
+      throws CudamiServiceException, ValidationException, IdentifiableServiceException {
+    UUID parentManifestationUuid = UUID.randomUUID();
+    Manifestation parentManifestation =
+        Manifestation.builder().uuid(parentManifestationUuid).label("parent").build();
+    RelationSpecification<Manifestation> parent =
+        RelationSpecification.<Manifestation>builder()
+            .title("Titel")
+            .sortKey("SortKey")
+            .subject(parentManifestation)
+            .build();
+    Manifestation manifestation = Manifestation.builder().label("foo").parent(parent).build();
+
+    Manifestation savedManifestation =
+        Manifestation.builder()
+            .uuid(UUID.randomUUID())
+            .label("foo")
+            .parents(List.of(parent))
+            .build();
+
+    when(manifestationRepository.save(any(Manifestation.class))).thenReturn(savedManifestation);
+    when(manifestationRepository.getByUuid(eq(parentManifestationUuid)))
+        .thenReturn(parentManifestation);
+
+    Manifestation actualManifestation = manifestationService.save(manifestation);
+    assertThat(actualManifestation.getParents()).containsExactly(parent);
+  }
+
+  @DisplayName("can return an updated manifestation with filled parents")
+  @Test
+  public void fillParentsOnUpdate() throws ValidationException, IdentifiableServiceException {
+    UUID parentManifestationUuid = UUID.randomUUID();
+    Manifestation parentManifestation =
+        Manifestation.builder().uuid(parentManifestationUuid).label("parent").build();
+    RelationSpecification<Manifestation> parent =
+        RelationSpecification.<Manifestation>builder()
+            .title("Titel")
+            .sortKey("SortKey")
+            .subject(parentManifestation)
+            .build();
+    UUID manifestationUuid = UUID.randomUUID();
+    Manifestation manifestation =
+        Manifestation.builder().uuid(manifestationUuid).label("foo").parent(parent).build();
+    RelationSpecification<Manifestation> rawParent =
+        RelationSpecification.<Manifestation>builder()
+            .title("Titel")
+            .sortKey("SortKey")
+            .subject(Manifestation.builder().uuid(parentManifestationUuid).build())
+            .build();
+
+    Manifestation updateManifestation =
+        Manifestation.builder().uuid(manifestationUuid).label("foo").parent(rawParent).build();
+
+    when(manifestationRepository.getByUuid(eq(parentManifestationUuid)))
+        .thenReturn(parentManifestation);
+    when(manifestationRepository.getByUuid(eq(manifestationUuid))).thenReturn(manifestation);
+    when(manifestationRepository.update(any(Manifestation.class))).thenReturn(updateManifestation);
+
+    Manifestation actualManifestation = manifestationService.update(manifestation);
+    assertThat(actualManifestation.getParents()).containsExactly(parent);
+  }
+
+  @DisplayName("fills the parent manifestations on retrieval by uuid")
+  @Test
+  public void fillParentsOnRetrievalByUuid() throws IdentifiableServiceException {
+    UUID manifestationUuid = UUID.randomUUID();
+    UUID parentManifestationUuid = UUID.randomUUID();
+    RelationSpecification<Manifestation> rawParent =
+        RelationSpecification.<Manifestation>builder()
+            .title("Titel")
+            .sortKey("SortKey")
+            .subject(Manifestation.builder().uuid(parentManifestationUuid).build())
+            .build();
+    Manifestation persistedManifestation =
+        Manifestation.builder().uuid(manifestationUuid).label("foo").parent(rawParent).build();
+
+    when(manifestationRepository.getByUuid(eq(manifestationUuid)))
+        .thenReturn(persistedManifestation);
+    when(manifestationRepository.getByUuid(eq(parentManifestationUuid)))
+        .thenReturn(new Manifestation());
+
+    Manifestation actualManifestation = manifestationService.getByUuid(manifestationUuid);
+    assertThat(actualManifestation.getParents()).hasSize(1);
   }
 }
