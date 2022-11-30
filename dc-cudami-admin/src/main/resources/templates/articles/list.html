@@ -99,16 +99,18 @@
       function buttons() {
         /*[+
          const baseUrl = [[@{'/articles'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
          +]*/
         return {
           btnAdd: {
-            text: 'Add new row',
+            text: textAdd,
             icon: 'fa-plus',
             event: function () {
               location.href = baseUrl + '/new';
             },
             attributes: {
-              title: 'Add a new row to the table'
+              title: tooltipAdd
             }
           }
         };
@@ -141,15 +143,7 @@
          const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
          +]*/
         let previewImage = row.previewImage;
-
-        let html = '<figure class="mb-0 mx-auto" style="max-width: 30px;">';
-        if (previewImage === undefined) {
-          html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
-        } else {
-          html += '<img alt="--" title="kein Vorschaubild" class="img-fluid mw-100" src="/images/no-image.png"/>';
-        }
-        html += '</figure>';
-        return html;
+        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>

@@ -41,8 +41,8 @@
         }
         return [value[locale]];
       }
-      function renderPreviewImage(previewImage, tooltipNoPreviewImage) {
-        let html = '<figure class="mb-0 mx-auto" style="max-width: 30px;">';
+      function renderPreviewImage(previewImage, width, tooltipNoPreviewImage) {
+        let html = '<figure class="mb-0 mx-auto" style="max-width: ' + width + 'px;">';
         if (previewImage === undefined) {
           html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
         } else {
@@ -58,7 +58,7 @@
               png: 'png'
             };
             const subMimeType = previewImage.mimeType.split('/')[1];
-            imageUrl = `${previewImage.httpBaseUrl}/full/30,/0/default.${
+            imageUrl = `${previewImage.httpBaseUrl}/full/${width},/0/default.${
                     mimeExtensionMapping[subMimeType] ?? 'jpg'
                     }`;
           }
