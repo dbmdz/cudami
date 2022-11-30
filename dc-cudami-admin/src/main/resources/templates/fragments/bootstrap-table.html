@@ -10,6 +10,12 @@
         /*[+
          const locale = [[${#locale.getLanguage()}]];
          +]*/
+        return formatDate(value, locale, true);
+      }
+      function renderDateTime(value, row) {
+        /*[+
+         const locale = [[${#locale.getLanguage()}]];
+         +]*/
         return formatDate(value, locale);
       }
       function renderDeleteAction(baseUrl, itemType, itemId) {
@@ -77,6 +83,21 @@
         }
         html += '</figure>';
         return html;
+      }
+      function renderPublicationStatus(value, row) {
+        /*[+
+         const tooltipNotYetPublished = [[#{tooltip.not_yet_published}]];
+         const tooltipPublished = [[#{tooltip.published}]];
+         const tooltipNoLongerPublished = [[#{tooltip.no_longer_published}]];
+         +]*/
+        if (value === 'NOT_YET_PUBLISHED') {
+          return '<span class="badge badge-pill badge-warning" title="' + tooltipNotYetPublished + '">&nbsp;</span>';
+        } else if (value === 'PUBLISHED') {
+          return '<span class="badge badge-pill badge-success" title="' + tooltipPublished + '">&nbsp;</span>';
+        } else if (value === 'NO_LONGER_PUBLISHED') {
+          return '<span class="badge badge-pill badge-danger" title="' + tooltipNoLongerPublished + '">&nbsp;</span>';
+        }
+        return value;
       }
       function renderRowNumber(table, index) {
         let pageNumber = table.bootstrapTable('getOptions').pageNumber;
