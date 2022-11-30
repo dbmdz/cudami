@@ -109,13 +109,7 @@
       }
       
       function formatIdentifiers(value, row) {
-        let html = '';
-        var arrayLength = value.length;
-        for (let i = 0; i < arrayLength; i++) {
-          let identifier = value[i];
-          html = html + '<span title="' + identifier.namespace + '" class="border border-dark p-2 badge badge-light badge-pill mr-2">' + identifier.namespace + ':' + identifier.id + '</span>';
-        }
-        return html;
+        return renderIdentifiers(value);
       }
       
       function formatLabel(value, row) {
