@@ -12,7 +12,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -49,7 +48,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   @Override
   public Manifestation getByUuid(UUID uuid) throws IdentifiableServiceException {
     Manifestation manifestation = super.getByUuid(uuid);
-    fillParents(manifestation);
     return manifestation;
   }
 
@@ -75,7 +73,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       throw new IdentifiableServiceException(
           "Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
-    fillParents(savedManifestation);
     return savedManifestation;
   }
 
@@ -89,7 +86,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       throw new IdentifiableServiceException(
           "Cannot update Manifestation=" + manifestation + ": " + e, e);
     }
-    fillParents(updatedManifestation);
     return updatedManifestation;
   }
 
@@ -116,14 +112,4 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     return manifestation;
   }
 
-  private void fillParents(Manifestation manifestation) throws IdentifiableServiceException {
-    if (manifestation.getParents() != null && !manifestation.getParents().isEmpty()) {
-      List<RelationSpecification<Manifestation>> parents = new ArrayList<>();
-      for (RelationSpecification parent : manifestation.getParents()) {
-        parent.setSubject(getByUuid(parent.getSubject().getUuid()));
-        parents.add(parent);
-      }
-      manifestation.setParents(parents);
-    }
-  }
 }
