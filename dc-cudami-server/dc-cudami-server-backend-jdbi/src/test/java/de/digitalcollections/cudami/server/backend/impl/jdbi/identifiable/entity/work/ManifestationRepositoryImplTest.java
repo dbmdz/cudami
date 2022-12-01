@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.server.backend.api.repository.PublisherRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
@@ -14,20 +13,17 @@ import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
+import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.Title;
+import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publisher;
-import de.digitalcollections.model.identifiable.entity.work.Title;
-import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
-import de.digitalcollections.model.time.LocalDateRange;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -53,7 +49,6 @@ class ManifestationRepositoryImplTest {
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
   @Autowired HumanSettlementRepository humanSettlementRepository;
-  @Autowired PublisherRepository publisherRepository;
   @Autowired PredicateRepository predicateRepository;
   @Autowired EntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
@@ -114,16 +109,6 @@ class ManifestationRepositoryImplTest {
             .build();
     publisherLocation = humanSettlementRepository.save(publisherLocation);
 
-    // publishers
-    var publisherOne =
-        Publisher.builder()
-            .agent(editor) // we use the same here since it does not matter
-            .location(publisherLocation)
-            .build();
-    publisherOne = publisherRepository.save(publisherOne);
-    var publisherTwo = Publisher.builder().agent(someoneElse).build();
-    publisherTwo = publisherRepository.save(publisherTwo);
-
     // subjects
     Subject subject =
         subjectRepository.save(
@@ -158,9 +143,6 @@ class ManifestationRepositoryImplTest {
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .publisher(publisherOne)
-            .publisher(publisherTwo)
-            .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(titles.get(0))
             .title(titles.get(1))
             .subject(subject)
@@ -183,13 +165,6 @@ class ManifestationRepositoryImplTest {
 
     assertThat(actual.getTitles()).isEqualTo(titles);
     assertThat(actual.getExpressionTypes()).isEqualTo(manifestation.getExpressionTypes());
-    assertThat(actual.getPublishingDateRange()).isEqualTo(manifestation.getPublishingDateRange());
-
-    assertThat(actual.getPublishers()).size().isEqualTo(2);
-    assertThat(actual.getPublishers().get(0))
-        .isEqualTo(Publisher.builder().uuid(publisherOne.getUuid()).build());
-    assertThat(actual.getPublishers().get(1))
-        .isEqualTo(Publisher.builder().uuid(publisherTwo.getUuid()).build());
 
     assertThat(actual.getRelations()).size().isEqualTo(2);
     assertThat(actual.getRelations().get(0))

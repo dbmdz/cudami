@@ -11,11 +11,10 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publisher;
-import de.digitalcollections.model.identifiable.entity.work.Title;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -181,6 +180,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
     // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
 
+    /* FIXME REMOVEME
     // publishers
     UUID publisherUuid = rowView.getColumn("publisher_uuid", UUID.class);
     if (publisherUuid != null) {
@@ -199,6 +199,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 Publisher.builder().uuid(publisherUuid).build());
       }
     }
+     */
 
     // subjects
     UUID subjectUuid =
@@ -359,45 +360,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         });
   }
 
-  private void savePublishers(Manifestation manifestation) {
-    if (manifestation == null) {
-      return;
-    }
-    dbi.useHandle(
-        handle ->
-            handle
-                .createUpdate(
-                    "DELETE FROM manifestation_publishers WHERE manifestation_uuid = :uuid")
-                .bind("uuid", manifestation.getUuid())
-                .execute());
-
-    if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
-      return;
-    }
-    dbi.useHandle(
-        handle -> {
-          PreparedBatch batch =
-              handle.prepareBatch(
-                  """
-          INSERT INTO manifestation_publishers (
-            manifestation_uuid, publisher_uuid, sortkey
-          )
-          VALUES (
-            :manifestation, :publisher, :sortkey
-          )
-          """);
-          int sortkey = 0;
-          for (Publisher publisher : manifestation.getPublishers()) {
-            batch
-                .bind("manifestation", manifestation.getUuid())
-                .bind("publisher", publisher.getUuid())
-                .bind("sortkey", sortkey++)
-                .add();
-          }
-          batch.execute();
-        });
-  }
-
   @Override
   public Manifestation save(Manifestation manifestation, Map<String, Object> bindings) {
     if (bindings == null) {
@@ -406,8 +368,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
     Manifestation savedManifestation =
         super.save(manifestation, bindings, buildTitleSql(manifestation));
-    savePublishers(manifestation);
-    savedManifestation.setPublishers(manifestation.getPublishers());
     saveParents(manifestation);
     savedManifestation.setParents(manifestation.getParents());
     return savedManifestation;
@@ -421,8 +381,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
     Manifestation updatedManifestation =
         super.update(manifestation, bindings, buildTitleSql(manifestation));
-    savePublishers(manifestation);
-    updatedManifestation.setPublishers(manifestation.getPublishers());
     saveParents(manifestation);
     updatedManifestation.setParents(manifestation.getParents());
     return updatedManifestation;

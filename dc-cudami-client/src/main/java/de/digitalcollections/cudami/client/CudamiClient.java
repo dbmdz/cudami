@@ -68,7 +68,6 @@ public class CudamiClient {
   private final CudamiPersonsClient cudamiPersonsClient;
   private final CudamiPredicatesClient cudamiPredicatesClient;
   private final CudamiProjectsClient cudamiProjectsClient;
-  private final CudamiPublishersClient cudamiPublishersClient;
   private final CudamiRenderingTemplatesClient cudamiRenderingTemplatesClient;
   private final CudamiSubjectsClient cudamiSubjectsClient;
   private final CudamiTagsClient cudamiTagsClient;
@@ -128,7 +127,6 @@ public class CudamiClient {
     this.cudamiPersonsClient = new CudamiPersonsClient(http, cudamiServerUrl, mapper);
     this.cudamiPredicatesClient = new CudamiPredicatesClient(http, cudamiServerUrl, mapper);
     this.cudamiProjectsClient = new CudamiProjectsClient(http, cudamiServerUrl, mapper);
-    this.cudamiPublishersClient = new CudamiPublishersClient(http, cudamiServerUrl, mapper);
     this.cudamiRenderingTemplatesClient =
         new CudamiRenderingTemplatesClient(http, cudamiServerUrl, mapper);
     this.cudamiSubjectsClient = new CudamiSubjectsClient(http, cudamiServerUrl, mapper);
@@ -243,10 +241,6 @@ public class CudamiClient {
 
   public CudamiProjectsClient forProjects() {
     return cudamiProjectsClient;
-  }
-
-  public CudamiPublishersClient forPublishers() {
-    return cudamiPublishersClient;
   }
 
   public CudamiRenderingTemplatesClient forRenderingTemplates() {

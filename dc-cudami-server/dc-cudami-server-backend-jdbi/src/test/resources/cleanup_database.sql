@@ -2,9 +2,7 @@
 delete from url_aliases;
 delete from rel_entity_entities;
 delete from predicates;
-delete from manifestation_publishers;
 delete from manifestation_manifestations;
-delete from publishers;
 
 delete from article_creators;
 delete from articles;

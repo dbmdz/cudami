@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.PublisherService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -15,9 +14,8 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Publisher;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,12 +27,10 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     implements ManifestationService {
 
   private EntityRelationService entityRelationService;
-  private PublisherService publisherService;
 
   public ManifestationServiceImpl(
       ManifestationRepository repository,
       IdentifierService identifierService,
-      PublisherService publisherService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
@@ -48,13 +44,11 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
         localeService,
         cudamiConfig);
     this.entityRelationService = entityRealationService;
-    this.publisherService = publisherService;
   }
 
   @Override
   public Manifestation getByUuid(UUID uuid) throws IdentifiableServiceException {
     Manifestation manifestation = super.getByUuid(uuid);
-    fillPublishers(manifestation);
     fillParents(manifestation);
     return manifestation;
   }
@@ -81,7 +75,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       throw new IdentifiableServiceException(
           "Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
-    fillPublishers(savedManifestation);
     fillParents(savedManifestation);
     return savedManifestation;
   }
@@ -96,7 +89,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       throw new IdentifiableServiceException(
           "Cannot update Manifestation=" + manifestation + ": " + e, e);
     }
-    fillPublishers(updatedManifestation);
     fillParents(updatedManifestation);
     return updatedManifestation;
   }
@@ -122,22 +114,6 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     manifestation.setRelations(relations);
 
     return manifestation;
-  }
-
-  private void fillPublishers(Manifestation manifestation) throws IdentifiableServiceException {
-    if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) return;
-
-    List<Publisher> filledPublishers = new ArrayList<>(manifestation.getPublishers().size());
-    for (Publisher publisher : manifestation.getPublishers()) {
-      UUID uuid = publisher.getUuid();
-      try {
-        filledPublishers.add(publisherService.getByUuid(uuid));
-      } catch (CudamiServiceException e) {
-        throw new IdentifiableServiceException(
-            "Cannot retrieve publisher with uuid=" + uuid + ": " + e, e);
-      }
-    }
-    manifestation.setPublishers(filledPublishers);
   }
 
   private void fillParents(Manifestation manifestation) throws IdentifiableServiceException {

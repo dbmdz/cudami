@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.model;
 
-import de.digitalcollections.model.identifiable.entity.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
