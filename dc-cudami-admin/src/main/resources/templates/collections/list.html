@@ -103,6 +103,26 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      function buttons() {
+        /*[+
+         const baseUrl = [[@{'/collections'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new';
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
+      
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
