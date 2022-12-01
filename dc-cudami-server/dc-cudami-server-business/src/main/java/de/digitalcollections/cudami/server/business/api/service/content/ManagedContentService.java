@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.content;
 import de.digitalcollections.model.content.ManagedContent;
 import de.digitalcollections.model.content.PublicationStatus;
 import de.digitalcollections.model.time.LocalDateRange;
-import de.digitalcollections.model.time.TimeBasedState;
+import de.digitalcollections.model.time.TimeBasedStatus;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,8 +25,8 @@ public interface ManagedContentService<T extends ManagedContent> {
     if (managedContentObject == null) {
       return;
     }
-    TimeBasedState tbs =
-        TimeBasedState.get(
+    TimeBasedStatus tbs =
+        TimeBasedStatus.get(
             new LocalDateRange(
                 managedContentObject.getPublicationStart(),
                 managedContentObject.getPublicationEnd()),
