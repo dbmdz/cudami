@@ -12,6 +12,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - POST/PUT/PATCH-Requests require the attribute `objectType` in the JSON body. If it is missing, it is heuristically set
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
+- UrlAlias uses `Locale.toLanguageTag()` explicitly to always retrieve a language, even for `Locale.ROOT` i.e. `und`
+
+### Fixed
+
+- UrlAlias does actively ignore any script of the target's locale
+- **SQL migration** (can be **long running**) replaces every emtpy string key in the labels (that comes from `Locale.ROOT` as language)
+by `"und"`
 
 ## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
 
