@@ -2,23 +2,21 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.server.backend.api.repository.PublisherRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.Title;
+import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.identifiable.entity.work.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Title;
-import de.digitalcollections.model.identifiable.entity.work.TitleType;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedText;
-import de.digitalcollections.model.time.LocalDateRange;
-import java.time.LocalDate;
 import java.util.Locale;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +39,6 @@ class ManifestationRepositoryImplTest {
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
   @Autowired HumanSettlementRepository humanSettlementRepository;
-  @Autowired PublisherRepository publisherRepository;
   @Autowired PredicateRepository predicateRepository;
 
   @Test
@@ -51,6 +48,7 @@ class ManifestationRepositoryImplTest {
   }
 
   @Test
+  @Disabled("work in progress!")
   void testSaveManifestationMapOfStringObject() throws RepositoryException {
     CorporateBody editor = CorporateBody.builder().label("Editor").addName("Editor").build();
     editor = corporateBodyRepository.save(editor);
@@ -71,7 +69,6 @@ class ManifestationRepositoryImplTest {
             .language(Locale.GERMAN)
             .mediaType("BOOK")
             //            .publisher(publisher)
-            .publishingDateRange(new LocalDateRange(LocalDate.of(2020, 1, 15), LocalDate.now()))
             .title(
                 Title.builder()
                     .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))

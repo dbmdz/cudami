@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.work;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
-import de.digitalcollections.model.identifiable.entity.work.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import java.net.http.HttpClient;
 
 public class CudamiManifestationsClient extends CudamiEntitiesClient<Manifestation> {

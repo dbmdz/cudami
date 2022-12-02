@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.SeriesService;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.entity.work.Series;
+import de.digitalcollections.model.identifiable.entity.manifestation.Series;
 import org.springframework.stereotype.Service;
 
 @Service("seriesService")
