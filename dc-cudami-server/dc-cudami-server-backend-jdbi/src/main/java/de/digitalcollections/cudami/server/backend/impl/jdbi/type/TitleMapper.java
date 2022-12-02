@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.type;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.model.identifiable.entity.work.Title;
-import de.digitalcollections.model.identifiable.entity.work.TitleType;
+import de.digitalcollections.model.identifiable.entity.manifestation.Title;
+import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.text.LocalizedText;
 import java.sql.ResultSet;
 import java.sql.SQLException;

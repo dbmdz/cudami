@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.model.identifiable.entity.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
