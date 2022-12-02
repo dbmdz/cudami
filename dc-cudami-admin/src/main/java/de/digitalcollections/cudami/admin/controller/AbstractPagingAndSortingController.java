@@ -14,17 +14,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject> {
 
   @SuppressFBWarnings
-  public PageResponse<T> find(
-      CudamiLocalesClient localeService,
-      CudamiRestClient<T> service,
-      int offset,
-      int limit,
-      String searchTerm,
+  protected PageRequest createPageRequest(
       String sort,
       String order,
-      String itemLocale)
+      String itemLocale,
+      CudamiLocalesClient localeService,
+      int offset,
+      int limit,
+      String searchTerm)
       throws TechnicalException {
-
     Sorting sorting = null;
     if (sort != null && order != null) {
       Order sortingOrder;
@@ -46,7 +44,6 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       }
       sorting = Sorting.builder().order(sortingOrder).build();
     }
-
     PageRequest pageRequest =
         PageRequest.builder()
             .pageNumber((int) Math.ceil(offset / limit))
@@ -54,7 +51,22 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
             .searchTerm(searchTerm)
             .sorting(sorting)
             .build();
+    return pageRequest;
+  }
 
+  public PageResponse<T> find(
+      CudamiLocalesClient localeService,
+      CudamiRestClient<T> service,
+      int offset,
+      int limit,
+      String searchTerm,
+      String sort,
+      String order,
+      String itemLocale)
+      throws TechnicalException {
+
+    PageRequest pageRequest =
+        createPageRequest(sort, order, itemLocale, localeService, offset, limit, searchTerm);
     PageResponse<T> pageResponse = service.find(pageRequest);
     return pageResponse;
   }

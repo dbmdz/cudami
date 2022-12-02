@@ -44,8 +44,11 @@
                    data-pagination="true"
                    data-pagination-v-align="both"
                    data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
                    data-server-sort="true"
                    data-show-search-button="true"
+                   data-show-search-clear-button="true"
                    data-side-pagination="server"
                    data-sort-name="lastModified"
                    data-sort-order="desc"
@@ -57,8 +60,8 @@
                   <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="identifiers" data-sortable="false" data-formatter="formatIdentifiers" th:text="#{identifiers}">Identifiers</th>
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -104,18 +107,12 @@
         const itemLocale = $("#digitalobjects-locales").val();
         const itemId = renderLocalizedText(row.label, itemLocale);
         return [
-          renderViewAction(baseUrl),
+          renderViewAction(baseUrl)
         ].join(' ');
       }
       
       function formatIdentifiers(value, row) {
-        let html = '';
-        var arrayLength = value.length;
-        for (let i = 0; i < arrayLength; i++) {
-          let identifier = value[i];
-          html = html + '<span title="' + identifier.namespace + '" class="border border-dark p-2 badge badge-light badge-pill mr-2">' + identifier.namespace + ':' + identifier.id + '</span>';
-        }
-        return html;
+        return renderIdentifiers(value);
       }
       
       function formatLabel(value, row) {
@@ -131,7 +128,7 @@
          const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
          +]*/
         let previewImage = row.previewImage;
-        return renderPreviewImage(previewImage, tooltipNoPreviewImage);
+        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>
