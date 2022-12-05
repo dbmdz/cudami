@@ -15,7 +15,6 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -111,5 +110,4 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
 
     return manifestation;
   }
-
 }

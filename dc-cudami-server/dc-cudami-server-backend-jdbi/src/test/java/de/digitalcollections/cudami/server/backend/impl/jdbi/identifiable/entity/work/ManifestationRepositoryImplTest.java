@@ -11,10 +11,13 @@ import de.digitalcollections.cudami.server.backend.api.repository.relation.Predi
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -24,6 +27,8 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
+import de.digitalcollections.model.time.LocalDateRange;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -101,14 +106,6 @@ class ManifestationRepositoryImplTest {
     Predicate isSomethingElseOf =
         predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
 
-    // humansettlement for the publisher
-    var publisherLocation =
-        HumanSettlement.builder()
-            .label("Anyplace")
-            .name(new LocalizedText(Locale.ENGLISH, "Anyplace"))
-            .build();
-    publisherLocation = humanSettlementRepository.save(publisherLocation);
-
     // subjects
     Subject subject =
         subjectRepository.save(
@@ -147,6 +144,30 @@ class ManifestationRepositoryImplTest {
             .title(titles.get(1))
             .subject(subject)
             .parent(new RelationSpecification<Manifestation>("The child's title", null, parent))
+            .publicationInfo(
+                PublicationInfo.builder()
+                    .publisher(
+                        Publisher.builder()
+                            .agent(
+                                Agent.builder()
+                                    .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
+                                    .build())
+                            .build())
+                    .navDateRange(
+                        new LocalDateRange(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 12, 31)))
+                    .build())
+            .productionInfo(
+                ProductionInfo.builder()
+                    .publisher(
+                        Publisher.builder()
+                            .agent(
+                                Agent.builder()
+                                    .name(new LocalizedText(Locale.ENGLISH, "Producer"))
+                                    .build())
+                            .build())
+                    .navDateRange(
+                        new LocalDateRange(LocalDate.of(2019, 10, 1), LocalDate.of(2020, 6, 30)))
+                    .build())
             .build();
     manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
@@ -181,6 +202,8 @@ class ManifestationRepositoryImplTest {
     assertThat(actual.getParents())
         .containsExactlyInAnyOrder(
             new RelationSpecification<Manifestation>("The child's title", null, parent));
+    assertThat(actual.getProductionInfo()).isEqualTo(manifestation.getProductionInfo());
+    assertThat(actual.getPublicationInfo()).isEqualTo(manifestation.getPublicationInfo());
   }
 
   @Test

@@ -51,35 +51,46 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @Override
   public String getSqlInsertFields() {
     return super.getSqlInsertFields()
-        + ", composition, dimensions, expressiontypes"
-        + ", language, manifestationtype, manufacturingtype"
-        + ", mediatypes, otherlanguages"
-        + ", publishingdatepresentation, publishingdaterange, publishing_timevaluerange"
-        + ", scale, subjects_uuids, version"
-        + ", work, titles";
+        + """
+        , composition, dimensions, expressiontypes,
+        language, manifestationtype, manufacturingtype,
+        mediatypes, otherlanguages,
+        scale, subjects_uuids, version,
+        work, titles,
+        publication_info, publication_nav_date,
+        production_info, production_nav_date,
+        distribution_info, distribution_nav_date
+        """;
   }
 
   @Override
   public String getSqlInsertValues() {
     return super.getSqlInsertValues()
-        + ", :composition, :dimensions, :expressionTypes::mainsubtype[]"
-        + ", :language, :manifestationType, :manufacturingType"
-        + ", :mediaTypes::varchar[], :otherLanguages::varchar[]"
-        + ", :publishingDatePresentation, :publishingDateRange::daterange, :publishingTimeValueRange::jsonb"
-        + ", :scale, :subjects_uuids::UUID[], :version"
-        + ", :work?.uuid, {{titles}}";
+        + """
+        , :composition, :dimensions, :expressionTypes::mainsubtype[],
+        :language, :manifestationType, :manufacturingType,
+        :mediaTypes::varchar[], :otherLanguages::varchar[],
+        :scale, :subjects_uuids::UUID[], :version,
+        :work?.uuid, {{titles}},
+        :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
+        :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
+        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange
+        """;
   }
 
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
-        + ", composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[], "
-        + "language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType, "
-        + "mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[], "
-        + "publishingdatepresentation=:publishingDatePresentation, publishingdaterange=:publishingDateRange::daterange, "
-        + "publishing_timevaluerange=:publishingTimeValueRange::jsonb, scale=:scale, "
-        + "subjects_uuids=:subjects_uuids::UUID[], version=:version, "
-        + "work=:work?.uuid, titles={{titles}}";
+        + """
+        , composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[],
+        language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType,
+        mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[],
+        scale=:scale, subjects_uuids=:subjects_uuids::UUID[], version=:version,
+        work=:work?.uuid, titles={{titles}},
+        publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
+        production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
+        distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange
+        """;
   }
 
   @Override
@@ -87,16 +98,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
           , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
-          %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange,
-          %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version,
+          %1$s.scale %2$s_scale, %1$s.version %2$s_version,
+          %1$s.publication_info %2$s_publicationInfo, %1$s.production_info %2$s_productionInfo,
+          %1$s.distribution_info %2$s_distributionInfo,
           """
             .formatted(tableAlias, mappingPrefix)
-        // publishers
-        + """
-          mp.publisher_uuid publisher_uuid, mp.sortkey publisher_sortKey,
-          max(mp.sortkey) OVER (PARTITION BY %1$s.uuid) publisher_max_sortkey,
-          """
-            .formatted(TABLE_ALIAS)
         // subjects
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
@@ -139,7 +145,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
       ) ON %5$s.object_uuid = %1$s.uuid
-      LEFT JOIN manifestation_publishers mp ON mp.manifestation_uuid = %1$s.uuid
       """
           .formatted(
               TABLE_ALIAS,
@@ -179,27 +184,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Map<UUID, Manifestation> map, RowView rowView) {
     Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
     // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
-
-    /* FIXME REMOVEME
-    // publishers
-    UUID publisherUuid = rowView.getColumn("publisher_uuid", UUID.class);
-    if (publisherUuid != null) {
-      if (manifestation.getPublishers() == null || manifestation.getPublishers().isEmpty()) {
-        int maxIndex = rowView.getColumn("publisher_max_sortkey", Integer.class);
-        Vector<Publisher> publishers = new Vector<>(++maxIndex);
-        publishers.setSize(maxIndex);
-        manifestation.setPublishers(publishers);
-      }
-      if (!manifestation.getPublishers().stream()
-          .anyMatch(publ -> publ != null && Objects.equals(publisherUuid, publ.getUuid()))) {
-        manifestation
-            .getPublishers()
-            .set(
-                rowView.getColumn("publisher_sortKey", Integer.class),
-                Publisher.builder().uuid(publisherUuid).build());
-      }
-    }
-     */
 
     // subjects
     UUID subjectUuid =
@@ -402,11 +386,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       case "manufacturingType":
       case "mediaTypes":
       case "otherLanguages":
-      case "publishingDatePresentation":
-      case "publishingDateRange":
         return modelProperty.toLowerCase();
-      case "publishingTimeValueRange":
-        return "publishing_timevaluerange";
       default:
         return super.getColumnName(modelProperty);
     }
