@@ -30,7 +30,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       Order sortingOrder;
       if ("label".equals(sort)) {
         String language = itemLocale;
-        if (language == null) {
+        if (language == null && localeService != null) {
           language = localeService.getDefaultLanguage().getLanguage();
         }
         sortingOrder =
@@ -39,7 +39,6 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
                 .subProperty(language)
                 .direction(Direction.fromString(order))
                 .build();
-
       } else {
         sortingOrder =
             Order.builder().property(sort).direction(Direction.fromString(order)).build();
