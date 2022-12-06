@@ -136,6 +136,17 @@ function formatDate(date, locale, onlyDate = false) {
   });
 }
 
+function formatStringArray(value) {
+  let html = '';
+  for (var i = 0; i < value.length; i++) {
+    html = html + value[i];
+    if (i < value.length - 1) {
+      html = html + ', ';
+    }
+  }
+  return html;
+}
+
 function prependErrorIcon(element) {
   $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }
