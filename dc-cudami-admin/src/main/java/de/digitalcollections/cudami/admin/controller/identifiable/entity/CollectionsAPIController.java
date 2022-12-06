@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for collection management pages. */
+/** Controller for all public "Collections" endpoints (API). */
 @RestController
 public class CollectionsAPIController extends AbstractPagingAndSortingController<Collection> {
 
