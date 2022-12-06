@@ -4,10 +4,7 @@ import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -17,21 +14,15 @@ import java.util.UUID;
 import javax.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -50,48 +41,49 @@ public class UserController extends AbstractController {
     this.service = service;
   }
 
+  @GetMapping("/users/{uuid}/activate")
+  public String activate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    boolean successful = service.setStatus(uuid, true);
+    if (successful) {
+      String message =
+          messageSource.getMessage("msg.user_activated", null, LocaleContextHolder.getLocale());
+      redirectAttributes.addFlashAttribute("success_message", message);
+    } else {
+      String message =
+          messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
+      redirectAttributes.addFlashAttribute("error_message", message);
+    }
+    return "redirect:/users";
+  }
+
   @GetMapping("/users/new")
   public String create() {
     return "users/create";
   }
 
-  @GetMapping("/api/users/new")
-  @ResponseBody
-  public User create(
-      @RequestParam(name = "admin", required = false, defaultValue = "false") boolean admin)
-      throws ServiceException {
-    if (admin) {
-      return service.createAdminUser();
+  @GetMapping("/users/{uuid}/deactivate")
+  public String deactivate(
+      @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
+      throws TechnicalException {
+    boolean successful = service.setStatus(uuid, false);
+    if (successful) {
+      String message =
+          messageSource.getMessage("msg.user_deactivated", null, LocaleContextHolder.getLocale());
+      redirectAttributes.addFlashAttribute("success_message", message);
+    } else {
+      String message =
+          messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
+      redirectAttributes.addFlashAttribute("error_message", message);
     }
-    return service.create();
+    return "redirect:/users";
   }
 
   @GetMapping("/users/{uuid}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
     model.addAttribute("user", service.getByUuid(uuid));
     return "users/edit";
-  }
-
-  @GetMapping("/api/users")
-  @ResponseBody
-  public PageResponse<User> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws ServiceException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
-  }
-
-  @GetMapping("/api/users/{uuid}")
-  @ResponseBody
-  public User getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    return this.service.getByUuid(uuid);
   }
 
   @GetMapping("/users")
@@ -107,52 +99,6 @@ public class UserController extends AbstractController {
   @ModelAttribute("allRoles")
   protected List<Role> populateAllRoles() {
     return Arrays.asList(Role.values());
-  }
-
-  @PostMapping("/api/users")
-  public ResponseEntity save(
-      @RequestParam(value = "pwd1", required = false) String password1,
-      @RequestParam(value = "pwd2", required = false) String password2,
-      @RequestBody @Valid User user,
-      BindingResult results)
-      throws ServiceException {
-    this.verifyBinding(results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    User userDb = service.create(user, password1, password2, results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    return ResponseEntity.ok(userDb);
-  }
-
-  @PatchMapping("/api/users/{uuid}")
-  public ResponseEntity setStatus(@PathVariable("uuid") UUID uuid, @RequestBody User user) {
-    boolean successful = service.setStatus(uuid, user.isEnabled());
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  @PutMapping("/api/users/{uuid}")
-  public ResponseEntity update(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pwd1", required = false) String password1,
-      @RequestParam(name = "pwd2", required = false) String password2,
-      @RequestBody User user,
-      BindingResult results)
-      throws ServiceException {
-    this.verifyBinding(results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    User updatedUser = this.service.update(user, password1, password2, results);
-    if (results.hasErrors()) {
-      return new ResponseEntity<>(results.getGlobalError(), HttpStatus.BAD_REQUEST);
-    }
-    return ResponseEntity.ok(updatedUser);
   }
 
   @GetMapping("/users/updatePassword")

@@ -8,24 +8,144 @@
     <title th:text="#{users}">Users</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="list"></div>
-              <script th:src="@{/js/user-list.bundle.js}"></script>
-              <script th:inline="javascript">
-                UserList({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  id: "list",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
-            </div>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.users}">Users</h1>
+            <hr>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col">
+
+            <div id="toolbar-users">
+
+            </div>
+            <table id="table-users"
+                   data-toggle="table"
+                   th:data-url="@{/api/users}"
+                   th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
+                   data-buttons="buttons"
+                   data-cookie="true"
+                   data-cookie-id-table="table-users"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="lastname"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-users"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="lastname" data-sortable="true" th:text="#{lbl.lastname}">Lastname</th>
+                  <th data-field="firstname" data-sortable="true" th:text="#{lbl.firstname}">Firstname</th>
+                  <th data-field="email" data-sortable="true" data-formatter="formatUsername" th:text="#{lbl.username}">Username / Email</th>
+                  <th data-field="roles" data-formatter="renderStringArray" th:text="#{lbl.roles}">Role(s)</th>
+                  <th data-field="enabled" data-formatter="formatStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      const $table = $('#table-users');
+
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
+      function formatStatus(value, row, index) {
+        return renderStatus(value);
+      }
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function buttons() {
+        /*[+
+         const baseUrl = [[@{'/users'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new';
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
+         const itemType = [[#{lbl.collection.inline}]];
+         +]*/
+        const itemId = row.email;
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl),
+          renderStatusAction(baseUrl, itemType, itemId, row.enabled)
+        ].join(' ');
+      }
+      function formatUsername(value, row) {
+        /*[+
+         const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
+         +]*/
+        return '<a href="' + baseUrl + '">' + value + '</a>';
+      }
+      function renderStatusAction(baseUrl, itemType, itemId, enabled) {
+        /*[+
+         const modalDeactivateMessage = `[(#{modal.msg.confirm_user_deactivation})]`;
+         const modalDeactivateTitle = [[#{modal.title.warning}]];
+         const tooltipReactivate = [[#{tooltip.activate_user}]];
+         const tooltipDeactivate = [[#{tooltip.deactivate_user}]];
+         +]*/
+        if (enabled) {
+          return '<a ' +
+                  'data-href="' + baseUrl + '/deactivate"' +
+                  'data-message="' + escape(modalDeactivateMessage) + '"' +
+                  'data-title="' + modalDeactivateTitle + '"' +
+                  'data-target="#confirmYesNoDialog"' +
+                  'data-toggle="modal">' +
+                  '<i class="fas fa-toggle-off text-muted" title="' + tooltipDeactivate + '"></i></a>';
+        } else {
+          return '<a href="' + baseUrl + '/activate">' +
+                  '<i class="fas fa-toggle-on text-success" title="' + tooltipReactivate + '"></i></a>';
+        }
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+  </th:block>
+</body>
 </html>

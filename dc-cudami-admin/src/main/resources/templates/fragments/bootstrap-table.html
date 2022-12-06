@@ -104,6 +104,20 @@
         let pageSize = table.bootstrapTable('getOptions').pageSize;
         return ((pageNumber - 1) * pageSize) + index + 1;
       }
+      function renderStatus(value) {
+        /*[+
+         const tooltipEnabled = [[#{tooltip.enabled.true}]];
+         const tooltipDisabled = [[#{tooltip.enabled.false}]];
+         +]*/
+        if (value === true) {
+          return '<i class="fas fa-toggle-on text-success" title="' + tooltipEnabled + '"></i>';
+        } else {
+          return '<i class="fas fa-toggle-off text-muted" title="' + tooltipDisabled + '"></i>';
+        }
+      }
+      function renderStringArray(value, row) {
+        return formatStringArray(value);
+      }
       function renderViewAction(baseUrl) {
         /*[+
          const tooltipView = [[#{tooltip.view}]];

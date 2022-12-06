@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.controller;
 
+import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
@@ -11,7 +12,8 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public abstract class AbstractPagingAndSortingController<T extends UniqueObject> {
+public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
+    extends AbstractController {
 
   @SuppressFBWarnings
   protected PageRequest createPageRequest(

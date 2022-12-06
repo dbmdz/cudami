@@ -11,14 +11,14 @@
   <th:block layout:fragment="content">
     <div class="content-header">
       <div class="container-fluid">
-        
+
         <div class="row">
           <div class="col">
             <h1 th:text="#{page.title.predicates}">Relation types</h1>
             <hr>
           </div>
         </div>
-        
+
         <div class="row">
           <div class="col">
 
@@ -57,13 +57,13 @@
                   <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                   <th data-field="value" data-sortable="true" th:text="#{lbl.value}">Value</th>
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDate" th:text="#{lbl.created}">created</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
-            
+
           </div>
         </div>
       </div>
@@ -75,20 +75,20 @@
 
     <script type="text/javascript">
       const $table = $('#table-predicates');
-      
+
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
           let itemLocale = $("#predicates-locales").val();
           settings.url = settings.url + '&itemLocale=' + itemLocale;
         }
       };
-      
+
       $(function () {
         $("#predicates-locales").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
-      
+
       function formatRowNumber(value, row, index) {
         return renderRowNumber($table, index);
       }
@@ -99,16 +99,18 @@
       function buttons() {
         /*[+
          const baseUrl = [[@{'/predicates'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
          +]*/
         return {
           btnAdd: {
-            text: 'Add new row',
+            text: textAdd,
             icon: 'fa-plus',
             event: function () {
               location.href = baseUrl + '/new';
             },
             attributes: {
-              title: 'Add a new row to the table'
+              title: tooltipAdd
             }
           }
         };
@@ -127,7 +129,7 @@
           renderDeleteAction(baseUrl, itemType, itemId)
         ].join(' ');
       }
-      
+
       function formatLabel(value, row) {
         /*[+
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
