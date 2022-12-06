@@ -33,20 +33,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ManifestationRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
+@TestMethodOrder(MethodOrderer.DisplayName.class)
+@TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("The Manifestation Repository")
-@Sql(scripts = "classpath:cleanup_database.sql")
 class ManifestationRepositoryImplTest {
 
   @Autowired PostgreSQLContainer postgreSQLContainer;
@@ -61,7 +67,10 @@ class ManifestationRepositoryImplTest {
   UUID[] manifestationUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
 
   @Test
-  @DisplayName("is testable")
+  @DisplayName("0.0. is testable")
+  @Sql(
+      scripts = "classpath:cleanup_database.sql",
+      executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
   void containerIsUpAndRunning() {
     assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
@@ -92,6 +101,7 @@ class ManifestationRepositoryImplTest {
   }
 
   @Test
+  @DisplayName("1.0. Save a manifestation with parent")
   void testSaveManifestation() throws RepositoryException {
     // agents for relations
     CorporateBody editor = CorporateBody.builder().label("Editor").addName("Editor").build();
@@ -182,7 +192,7 @@ class ManifestationRepositoryImplTest {
     // we add the relations manually, actually done by the service
     entityRelationRepository.save(manifestation.getRelations());
 
-    Manifestation actual = repo.getByUuid(saved.getUuid());
+    Manifestation actual = repo.getByUuid(manifestationUuids[1]);
 
     assertThat(actual.getTitles()).isEqualTo(titles);
     assertThat(actual.getExpressionTypes()).isEqualTo(manifestation.getExpressionTypes());
@@ -207,5 +217,25 @@ class ManifestationRepositoryImplTest {
   }
 
   @Test
-  void testUpdateManifestation() {}
+  @DisplayName("1.1. Update a manifestation")
+  void testUpdateManifestation() {
+    // get the Manifestation saved in 1.0.
+    Manifestation manifestation = repo.getByUuid(manifestationUuids[1]);
+    manifestation.getLabel().put(Locale.ENGLISH, "An updated label");
+    manifestation
+        .getTitles()
+        .add(
+            Title.builder()
+                .text(new LocalizedText(Locale.ENGLISH, "An updated Title"))
+                .titleType(new TitleType("MAIN", "MAIN"))
+                .build());
+    manifestation.setParents(null);
+    repo.update(manifestation);
+
+    var actual = repo.getByUuid(manifestationUuids[1]);
+    assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
+    assertThat(actual.getTitles()).size().isEqualTo(3);
+    assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
+    assertThat(actual.getParents()).isNull();
+  }
 }
