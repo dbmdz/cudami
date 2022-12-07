@@ -69,7 +69,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       @RequestParam(name = "itemLocale", required = false) String itemLocale)
       throws TechnicalException, ServiceException {
