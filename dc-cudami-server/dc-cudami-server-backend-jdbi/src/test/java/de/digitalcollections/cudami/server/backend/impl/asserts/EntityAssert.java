@@ -32,8 +32,9 @@ public class EntityAssert extends AbstractAssert<EntityAssert, Entity> {
     String serializedActual = null;
     String serializedExpected = null;
     try {
-      serializedActual = objectMapper.writeValueAsString(actual);
-      serializedExpected = objectMapper.writeValueAsString(expected);
+      serializedActual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(actual);
+      serializedExpected =
+          objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(expected);
       this.objects.assertEqual(this.info, serializedActual, serializedExpected);
       return this.myself;
     } catch (JsonProcessingException e) {

@@ -2,10 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
@@ -48,35 +47,24 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {DigitalObjectRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The DigitalObject Repository")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DigitalObjectRepositoryImplTest {
+class DigitalObjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   DigitalObjectRepositoryImpl repo;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-
-  @Autowired Jdbi jdbi;
 
   @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
@@ -89,13 +77,13 @@ class DigitalObjectRepositoryImplTest {
 
   @Autowired private TagRepositoryImpl tagRepository;
 
-  @Autowired CudamiConfig cudamiConfig;
-
   @Autowired private EntityRepositoryImpl<GeoLocation> geoLocationEntityRepositoryImpl;
 
   @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
 
   @Autowired private IdentifierRepositoryImpl identifierRepositoryImpl;
+
+  @Autowired private LicenseRepositoryImpl licenseRepository;
 
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
@@ -122,12 +110,6 @@ class DigitalObjectRepositoryImplTest {
     repo.setGeoLocationRepositoryImpl(geoLocationRepositoryImpl);
     repo.setLinkedDataFileResourceRepository(linkedDataFileResourceRepository);
     repo.setPersonRepository(personRepositoryImpl);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   @Test
@@ -202,6 +184,15 @@ class DigitalObjectRepositoryImplTest {
 
     assertThat(actual.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
         .containsExactly(tag.getUuid());
+
+    // Verify, that the method-persisted DigitalObject is the same, which is in the database
+    // Since some embeeded resource are not competely filled, we have to fill them explicitly
+    DigitalObject persisted = repo.getByUuid(digitalObject.getUuid());
+    if (persisted.getLicense() != null) {
+      persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
+    }
+
+    assertThat(actual).isEqualToComparingFieldByField(persisted);
   }
 
   @Test
@@ -376,8 +367,11 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @Order(Integer.MAX_VALUE)
-  @DisplayName("")
+  @DisplayName("can return all label languages")
   void returnLanguages() {
+    repo.save(DigitalObject.builder().label(Locale.GERMAN, "Test").build());
+    repo.save(DigitalObject.builder().label(Locale.ENGLISH, "Test").build());
+
     List<Locale> allLanguages = repo.getLanguages();
     assertThat(allLanguages).containsAll(List.of(Locale.GERMAN, Locale.ENGLISH));
 
@@ -391,9 +385,80 @@ class DigitalObjectRepositoryImplTest {
         .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
+  @Test
+  @DisplayName("can update a DigitalObject iwht its directly embedded resources")
+  void update() {
+    // Insert a license with uuid
+    ensureLicense(EXISTING_LICENSE);
+
+    // Insert a corporate body with UUID
+    CorporateBody creator =
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
+    CorporateBodyRepositoryImpl corporateBodyRepository =
+        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+    corporateBodyRepository.save(creator);
+
+    // Insert a geolocation with UUID
+    GeoLocation creationPlace =
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
+    GeoLocationRepositoryImpl geoLocationRepository =
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+    geoLocationRepository.save(creationPlace);
+
+    // Build a CreationInfo object with the formerly persisted contents
+    CreationInfo creationInfo =
+        CreationInfo.builder()
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
+            .build();
+
+    DigitalObject parent =
+        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+
+    Tag tag =
+        tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
+
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .parent(parent)
+            .tag(tag)
+            .refId(42)
+            .build();
+
+    repo.save(digitalObject);
+
+    digitalObject.setNumberOfBinaryResources(200);
+    DigitalObject beforeUpdate = createDeepCopy(digitalObject);
+
+    repo.update(digitalObject);
+    assertThat(digitalObject.getLastModified()).isNotEqualTo(beforeUpdate.getLastModified());
+
+    beforeUpdate.setLastModified(digitalObject.getLastModified());
+    assertThat(digitalObject).isEqualToComparingFieldByField(beforeUpdate);
+
+    // Verify, that the method-persisted DigitalObject is the same, which is in the database
+    // Since some embeeded resource are not competely filled, we have to fill them explicitly
+    DigitalObject persisted = repo.getByUuid(digitalObject.getUuid());
+    if (persisted.getLicense() != null) {
+      persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
+    }
+
+    assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
+  }
+
   // -----------------------------------------------------------------
   private void ensureLicense(License license) {
-    LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }

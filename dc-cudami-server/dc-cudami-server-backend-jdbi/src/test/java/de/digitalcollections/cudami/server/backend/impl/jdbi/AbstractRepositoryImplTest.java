@@ -5,22 +5,18 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = IdentifiableRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @Sql(scripts = "classpath:cleanup_database.sql")
 public abstract class AbstractRepositoryImplTest {
