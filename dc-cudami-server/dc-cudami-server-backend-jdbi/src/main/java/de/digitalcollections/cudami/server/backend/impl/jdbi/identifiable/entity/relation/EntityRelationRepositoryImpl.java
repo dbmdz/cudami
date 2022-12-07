@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -48,7 +49,12 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    save(subjectEntityUuid, predicate, objectEntityUuid);
+    try {
+      save(subjectEntityUuid, predicate, objectEntityUuid);
+    } catch (RepositoryException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -162,7 +168,8 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
+  public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException {
     Entity subject = new Entity();
     subject.setUuid(subjectEntityUuid);
 
@@ -173,9 +180,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<EntityRelation> save(List<EntityRelation> entityRelations) {
+  public void save(List<EntityRelation> entityRelations) throws RepositoryException {
     if (entityRelations == null) {
-      return null;
+      return;
     }
 
     dbi.useHandle(
@@ -204,7 +211,6 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
           }
           preparedBatch.execute();
         });
-    return entityRelations;
   }
 
   @Override

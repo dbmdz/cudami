@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
@@ -308,7 +309,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public Person save(Person person) {
+  public void save(Person person) throws RepositoryException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
@@ -324,8 +325,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
     // save family names
     List<FamilyName> familyNames = person.getFamilyNames();
     setRelatedFamilyNames(familyNames, person);
-    Person result = getByUuid(person.getUuid());
-    return result;
   }
 
   private void setRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
@@ -373,7 +372,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public Person update(Person person) {
+  public void update(Person person) throws RepositoryException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
@@ -401,7 +400,5 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
                 .bind("uuid", person.getUuid())
                 .execute());
     setRelatedFamilyNames(familyNames, person);
-    Person result = getByUuid(person.getUuid());
-    return result;
   }
 }

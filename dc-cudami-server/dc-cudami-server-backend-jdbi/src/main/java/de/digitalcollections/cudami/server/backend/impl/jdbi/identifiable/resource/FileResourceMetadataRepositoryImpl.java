@@ -165,13 +165,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  public F save(F fileResource) {
-    super.save(fileResource);
-    F result = getByUuid(fileResource.getUuid());
-    return result;
-  }
-
-  @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "filename":
@@ -180,12 +173,5 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       default:
         return super.supportsCaseSensitivityForProperty(modelProperty);
     }
-  }
-
-  @Override
-  public F update(F fileResource) {
-    super.update(fileResource);
-    F result = getByUuid(fileResource.getUuid());
-    return result;
   }
 }

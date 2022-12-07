@@ -76,18 +76,4 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
   }
-
-  @Override
-  public G save(G geoLocation) {
-    super.save(geoLocation);
-    G result = getByUuid(geoLocation.getUuid());
-    return result;
-  }
-
-  @Override
-  public G update(G geoLocation) {
-    super.update(geoLocation);
-    G result = getByUuid(geoLocation.getUuid());
-    return result;
-  }
 }

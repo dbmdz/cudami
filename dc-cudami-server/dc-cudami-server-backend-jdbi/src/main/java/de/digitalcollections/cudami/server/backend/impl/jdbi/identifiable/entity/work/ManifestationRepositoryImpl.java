@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
@@ -345,29 +346,25 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public Manifestation save(Manifestation manifestation, Map<String, Object> bindings) {
+  public void save(Manifestation manifestation, Map<String, Object> bindings)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    Manifestation savedManifestation =
-        super.save(manifestation, bindings, buildTitleSql(manifestation));
+    super.save(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
-    savedManifestation.setParents(manifestation.getParents());
-    return savedManifestation;
   }
 
   @Override
-  public Manifestation update(Manifestation manifestation, Map<String, Object> bindings) {
+  public void update(Manifestation manifestation, Map<String, Object> bindings)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    Manifestation updatedManifestation =
-        super.update(manifestation, bindings, buildTitleSql(manifestation));
+    super.update(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
-    updatedManifestation.setParents(manifestation.getParents());
-    return updatedManifestation;
   }
 
   @Override

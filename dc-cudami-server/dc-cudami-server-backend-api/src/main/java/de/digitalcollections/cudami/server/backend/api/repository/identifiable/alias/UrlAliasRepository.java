@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -149,7 +150,7 @@ public interface UrlAliasRepository {
    * @return the newly created dataset or {@code null}
    * @throws UrlAliasRepositoryException
    */
-  UrlAlias save(UrlAlias urlAlias) throws UrlAliasRepositoryException;
+  void save(UrlAlias urlAlias) throws RepositoryException;
 
   /**
    * Update an existing object.
@@ -158,5 +159,5 @@ public interface UrlAliasRepository {
    * @return the updated dataset or {@code null}
    * @throws UrlAliasRepositoryException
    */
-  UrlAlias update(UrlAlias urlAlias) throws UrlAliasRepositoryException;
+  void update(UrlAlias urlAlias) throws RepositoryException;
 }

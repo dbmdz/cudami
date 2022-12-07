@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
@@ -97,7 +98,7 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
   }
 
   @Override
-  public Subject save(Subject subject) {
+  public void save(Subject subject) throws RepositoryException {
     subject.setUuid(UUID.randomUUID());
     subject.setCreated(LocalDateTime.now());
     subject.setLastModified(LocalDateTime.now());
@@ -110,31 +111,21 @@ public class SubjectRepositoryImpl extends JdbiRepositoryImpl implements Subject
             + ")"
             + " VALUES ("
             + SQL_INSERT_VALUES
-            + ")"
-            + " RETURNING *";
+            + ")";
 
-    return dbi.withHandle(
-        h -> h.createQuery(sql).bindBean(subject).mapToBean(Subject.class).findOne().orElse(null));
+    dbi.useHandle(h -> h.createUpdate(sql).bindBean(subject).execute());
   }
 
   @Override
-  public Subject update(Subject subject) {
+  public void update(Subject subject) throws RepositoryException {
     subject.setLastModified(LocalDateTime.now());
 
     final String sql =
         "UPDATE "
             + tableName
-            + " SET label=:label::JSONB, last_modified=:lastModified, identifiers=:identifiers, type=:type WHERE uuid=:uuid RETURNING *";
+            + " SET label=:label::JSONB, last_modified=:lastModified, identifiers=:identifiers, type=:type WHERE uuid=:uuid";
 
-    Subject result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(subject)
-                    .mapToBean(Subject.class)
-                    .findOne()
-                    .orElse(null));
-    return result;
+    dbi.useHandle(h -> h.createUpdate(sql).bindBean(subject).execute());
   }
 
   @Override

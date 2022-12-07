@@ -70,18 +70,4 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
   public Set<Work> getWorks(UUID uuidAgent) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
-
-  @Override
-  public A save(A agent) {
-    super.save(agent);
-    A result = getByUuid(agent.getUuid());
-    return result;
-  }
-
-  @Override
-  public A update(A agent) {
-    super.update(agent);
-    A result = getByUuid(agent.getUuid());
-    return result;
-  }
 }

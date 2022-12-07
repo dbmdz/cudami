@@ -35,18 +35,4 @@ public class FamilyNameRepositoryImpl extends IdentifiableRepositoryImpl<FamilyN
         FamilyName.class,
         cudamiConfig.getOffsetForAlternativePaging());
   }
-
-  @Override
-  public FamilyName save(FamilyName familyName) {
-    super.save(familyName);
-    FamilyName result = getByUuid(familyName.getUuid());
-    return result;
-  }
-
-  @Override
-  public FamilyName update(FamilyName familyName) {
-    super.update(familyName);
-    FamilyName result = getByUuid(familyName.getUuid());
-    return result;
-  }
 }

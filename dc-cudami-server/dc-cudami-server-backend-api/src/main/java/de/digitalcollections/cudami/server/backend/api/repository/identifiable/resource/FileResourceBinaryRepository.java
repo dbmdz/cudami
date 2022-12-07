@@ -24,8 +24,7 @@ public interface FileResourceBinaryRepository {
   InputStream getInputStream(FileResource resource)
       throws TechnicalException, ResourceNotFoundException;
 
-  FileResource save(FileResource fileResource, InputStream binaryData) throws TechnicalException;
+  void save(FileResource fileResource, InputStream binaryData) throws TechnicalException;
 
-  FileResource save(FileResource fileResource, String input, Charset charset)
-      throws TechnicalException;
+  void save(FileResource fileResource, String input, Charset charset) throws TechnicalException;
 }

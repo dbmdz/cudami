@@ -511,13 +511,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic save(Topic topic) {
-    super.save(topic);
-    Topic result = getByUuid(topic.getUuid());
-    return result;
-  }
-
-  @Override
   public Topic saveWithParent(UUID childUuid, UUID parentUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -592,13 +585,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
           });
     }
     return getFileResources(topicUuid);
-  }
-
-  @Override
-  public Topic update(Topic topic) {
-    super.update(topic);
-    Topic result = getByUuid(topic.getUuid());
-    return result;
   }
 
   @Override

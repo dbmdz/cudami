@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -128,11 +129,11 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   List<FileResource> getRelatedFileResources(UUID identifiableUuid);
 
-  default I save(I identifiable) {
-    return save(identifiable, null);
+  default void save(I identifiable) throws RepositoryException {
+    save(identifiable, null);
   }
 
-  I save(I identifiable, Map<String, Object> bindings);
+  void save(I identifiable, Map<String, Object> bindings) throws RepositoryException;
 
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
@@ -170,9 +171,9 @@ public interface IdentifiableRepository<I extends Identifiable> {
   List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources);
 
-  default I update(I identifiable) {
-    return update(identifiable, null);
+  default void update(I identifiable) throws RepositoryException {
+    update(identifiable, null);
   }
 
-  I update(I identifiable, Map<String, Object> bindings);
+  void update(I identifiable, Map<String, Object> bindings) throws RepositoryException;
 }

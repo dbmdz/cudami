@@ -4,6 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
@@ -844,11 +845,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I save(I identifiable, Map<String, Object> bindings) {
-    return save(identifiable, bindings, null);
+  public void save(I identifiable, Map<String, Object> bindings) throws RepositoryException {
+    save(identifiable, bindings, null);
   }
 
-  public I save(
+  public void save(
       I identifiable,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -893,8 +894,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
 
     dbi.withHandle(
         h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
-
-    return identifiable;
   }
 
   @Override
@@ -981,11 +980,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I update(I identifiable, Map<String, Object> bindings) {
-    return update(identifiable, bindings, null);
+  public void update(I identifiable, Map<String, Object> bindings) throws RepositoryException {
+    update(identifiable, bindings, null);
   }
 
-  public I update(
+  public void update(
       I identifiable,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -1015,7 +1014,5 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     final Map<String, Object> finalBindings = new HashMap<>(bindings);
     dbi.withHandle(
         h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
-
-    return identifiable;
   }
 }

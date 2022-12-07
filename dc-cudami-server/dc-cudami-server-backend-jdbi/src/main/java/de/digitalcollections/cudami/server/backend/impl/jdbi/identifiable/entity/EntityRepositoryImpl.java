@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
@@ -267,12 +268,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E save(E entity, Map<String, Object> bindings) {
-    return save(entity, bindings, null);
+  public void save(E entity, Map<String, Object> bindings) throws RepositoryException {
+    save(entity, bindings, null);
   }
 
   @Override
-  public E save(
+  public void save(
       E entity,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -282,7 +283,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.save(entity, bindings, sqlModifier);
+    super.save(entity, bindings, sqlModifier);
   }
 
   @Override
@@ -316,12 +317,12 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E update(E entity, Map<String, Object> bindings) {
-    return update(entity, bindings, null);
+  public void update(E entity, Map<String, Object> bindings) throws RepositoryException {
+    update(entity, bindings, null);
   }
 
   @Override
-  public E update(
+  public void update(
       E entity,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -331,6 +332,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.update(entity, bindings, sqlModifier);
+    super.update(entity, bindings, sqlModifier);
   }
 }

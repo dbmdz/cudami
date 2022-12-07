@@ -25,7 +25,7 @@ public interface IdentifierTypeRepository {
 
   IdentifierType getByNamespace(String namespace);
 
-  IdentifierType save(IdentifierType identifier);
+  IdentifierType save(IdentifierType identifier) throws RepositoryException;
 
-  IdentifierType update(IdentifierType identifier);
+  IdentifierType update(IdentifierType identifier) throws RepositoryException;
 }

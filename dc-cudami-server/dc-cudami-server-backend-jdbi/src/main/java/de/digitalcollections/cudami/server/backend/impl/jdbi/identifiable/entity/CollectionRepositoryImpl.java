@@ -514,13 +514,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection save(Collection collection) {
-    super.save(collection);
-    Collection result = getByUuid(collection.getUuid());
-    return result;
-  }
-
-  @Override
   public Collection saveWithParent(UUID childUuid, UUID parentUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -567,13 +560,6 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
       return true;
     }
     return false;
-  }
-
-  @Override
-  public Collection update(Collection collection) {
-    super.update(collection);
-    Collection result = getByUuid(collection.getUuid());
-    return result;
   }
 
   @Override

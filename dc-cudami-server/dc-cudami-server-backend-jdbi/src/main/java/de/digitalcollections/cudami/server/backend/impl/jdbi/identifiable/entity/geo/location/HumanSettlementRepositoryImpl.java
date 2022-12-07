@@ -60,18 +60,4 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
         HumanSettlement.class,
         cudamiConfig.getOffsetForAlternativePaging());
   }
-
-  @Override
-  public HumanSettlement save(HumanSettlement humanSettlement) {
-    super.save(humanSettlement);
-    HumanSettlement result = getByUuid(humanSettlement.getUuid());
-    return result;
-  }
-
-  @Override
-  public HumanSettlement update(HumanSettlement humanSettlement) {
-    super.update(humanSettlement);
-    HumanSettlement result = getByUuid(humanSettlement.getUuid());
-    return result;
-  }
 }

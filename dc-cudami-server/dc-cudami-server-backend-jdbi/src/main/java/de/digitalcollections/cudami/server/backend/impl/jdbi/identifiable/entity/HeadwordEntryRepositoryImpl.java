@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -233,7 +234,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry save(HeadwordEntry headwordEntry) {
+  public void save(HeadwordEntry headwordEntry) throws RepositoryException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {
@@ -245,9 +246,6 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
     setCreatorsList(headwordEntry, creators);
-
-    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
-    return result;
   }
 
   private void setCreatorsList(HeadwordEntry headwordEntry, List<Agent> creators) {
@@ -280,7 +278,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry update(HeadwordEntry headwordEntry) {
+  public void update(HeadwordEntry headwordEntry) throws RepositoryException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {
@@ -292,8 +290,5 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
     setCreatorsList(headwordEntry, creators);
-
-    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
-    return result;
   }
 }

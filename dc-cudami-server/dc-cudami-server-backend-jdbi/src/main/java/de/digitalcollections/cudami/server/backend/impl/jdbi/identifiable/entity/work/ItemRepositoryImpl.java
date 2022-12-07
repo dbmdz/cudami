@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
@@ -293,20 +294,16 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public Item save(Item item) {
+  public void save(Item item) throws RepositoryException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.save(item, bindings);
-    Item result = getByUuid(item.getUuid());
-    return result;
   }
 
   @Override
-  public Item update(Item item) {
+  public void update(Item item) throws RepositoryException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
-    Item result = getByUuid(item.getUuid());
-    return result;
   }
 }

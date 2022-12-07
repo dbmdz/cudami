@@ -61,18 +61,4 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         GivenName.class,
         cudamiConfig.getOffsetForAlternativePaging());
   }
-
-  @Override
-  public GivenName save(GivenName givenName) {
-    super.save(givenName);
-    GivenName result = getByUuid(givenName.getUuid());
-    return result;
-  }
-
-  @Override
-  public GivenName update(GivenName givenName) {
-    super.update(givenName);
-    GivenName result = getByUuid(givenName.getUuid());
-    return result;
-  }
 }

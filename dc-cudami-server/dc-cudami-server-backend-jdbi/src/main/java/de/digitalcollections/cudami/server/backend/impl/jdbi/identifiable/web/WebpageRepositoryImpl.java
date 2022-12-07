@@ -407,13 +407,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
   }
 
   @Override
-  public Webpage save(Webpage webpage) {
-    super.save(webpage);
-    Webpage result = getByUuid(webpage.getUuid());
-    return result;
-  }
-
-  @Override
   public Webpage saveWithParent(UUID childWebpageUuid, UUID parentWebpageUuid) {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
@@ -451,13 +444,6 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 .execute());
 
     return getByUuid(webpageUuid);
-  }
-
-  @Override
-  public Webpage update(Webpage webpage) {
-    super.update(webpage);
-    Webpage result = getByUuid(webpage.getUuid());
-    return result;
   }
 
   @Override

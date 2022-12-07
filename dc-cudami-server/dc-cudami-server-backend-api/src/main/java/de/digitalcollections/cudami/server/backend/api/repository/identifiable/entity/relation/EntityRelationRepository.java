@@ -43,11 +43,12 @@ public interface EntityRelationRepository {
 
   List<EntityRelation> getBySubject(UUID subjectEntityUuid);
 
-  default void save(EntityRelation relation) {
+  default void save(EntityRelation relation) throws RepositoryException {
     save(List.of(relation));
   }
 
-  void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+  void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException;
 
   /**
    * Persists a list of EntityRelations
@@ -56,5 +57,5 @@ public interface EntityRelationRepository {
    * @return list of persisted EntityRelations
    * @throws RepositoryException in case of an error, e.g. a referenced predicate does not yet exist
    */
-  List<EntityRelation> save(List<EntityRelation> entityRelations);
+  void save(List<EntityRelation> entityRelations) throws RepositoryException;
 }

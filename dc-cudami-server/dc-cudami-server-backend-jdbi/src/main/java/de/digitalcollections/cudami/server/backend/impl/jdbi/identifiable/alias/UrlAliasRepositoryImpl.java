@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias
 import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
@@ -428,9 +429,9 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public UrlAlias save(UrlAlias urlAlias) throws UrlAliasRepositoryException {
+  public void save(UrlAlias urlAlias) throws RepositoryException {
     if (urlAlias == null) {
-      return null;
+      return;
     }
     if (urlAlias.getUuid() == null) {
       urlAlias.setUuid(UUID.randomUUID());
@@ -457,13 +458,12 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                       .mapTo(UUID.class)
                       .findOne()
                       .orElse(null));
-      return getByUuid(newUuid);
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new UrlAliasRepositoryException(
+      throw new RepositoryException(
           String.format("The SQL statement is defective: %s", detailMessage), e);
     } catch (JdbiException e) {
-      throw new UrlAliasRepositoryException(e);
+      throw new RepositoryException(e);
     }
   }
 
@@ -473,9 +473,9 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  public UrlAlias update(UrlAlias urlAlias) throws UrlAliasRepositoryException {
+  public void update(UrlAlias urlAlias) throws RepositoryException {
     if (urlAlias == null) {
-      return null;
+      return;
     }
     String sql =
         "UPDATE " + tableName + " SET " + getAssignmentsForUpdate() + " WHERE uuid = :uuid;";
@@ -489,17 +489,16 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
                       .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
                       .execute());
       if (affected != 1) {
-        throw new UrlAliasRepositoryException(
+        throw new RepositoryException(
             String.format(
                 "Update of '%s' went wrong. Affected rows: %d", urlAlias.getUuid(), affected));
       }
-      return getByUuid(urlAlias.getUuid());
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new UrlAliasRepositoryException(
+      throw new RepositoryException(
           String.format("The SQL statement is defective: %s", detailMessage), e);
     } catch (JdbiException e) {
-      throw new UrlAliasRepositoryException(e);
+      throw new RepositoryException(e);
     }
   }
 }

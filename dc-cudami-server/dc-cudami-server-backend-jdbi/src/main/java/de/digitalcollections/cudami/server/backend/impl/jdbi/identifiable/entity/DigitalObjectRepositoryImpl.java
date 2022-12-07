@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
@@ -569,11 +570,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObject save(DigitalObject digitalObject) {
+  public void save(DigitalObject digitalObject) throws RepositoryException {
     super.save(digitalObject);
-
-    DigitalObject result = getByUuid(digitalObject.getUuid());
-    return result;
   }
 
   // --------- repository setters for testing purposes only ----------------------
@@ -653,10 +651,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObject update(DigitalObject digitalObject) {
+  public void update(DigitalObject digitalObject) throws RepositoryException {
     super.update(digitalObject);
-
-    DigitalObject result = getByUuid(digitalObject.getUuid());
-    return result;
   }
 }
