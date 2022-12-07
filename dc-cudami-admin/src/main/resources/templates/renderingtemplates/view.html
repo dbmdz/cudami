@@ -31,7 +31,7 @@
       <div class="container-fluid rows-striped">
         <!-- TODO it always contains "und" undefined language? -->
         <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-          <div id="itemLocaleSwitcher" class="p-2 bg-white text-center mb-3">
+          <div id="itemLocaleSwitcher" class="global-action">
             <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
             <select name="locales" id="rendering_templates-locales">
               <th:block th:each="locale : ${existingLanguages}">
