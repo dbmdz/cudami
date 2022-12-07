@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class LanguageController {
+public class LanguageAPIController {
 
   private final CudamiLocalesClient service;
 
-  public LanguageController(CudamiClient cudamiClient) {
+  public LanguageAPIController(CudamiClient cudamiClient) {
     this.service = cudamiClient.forLocales();
   }
 

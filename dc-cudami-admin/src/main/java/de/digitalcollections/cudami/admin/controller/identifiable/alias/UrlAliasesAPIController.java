@@ -7,18 +7,18 @@ import de.digitalcollections.model.exception.TechnicalException;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for urlaliases. */
-@Controller
-public class UrlAliasesController extends AbstractController {
+/** Controller for all public "UrlAliases" endpoints (API). */
+@RestController
+public class UrlAliasesAPIController extends AbstractController {
 
   private final CudamiUrlAliasClient service;
 
-  public UrlAliasesController(CudamiClient client) {
+  public UrlAliasesAPIController(CudamiClient client) {
     this.service = client.forUrlAliases();
   }
 

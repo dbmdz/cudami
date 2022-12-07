@@ -7,13 +7,7 @@ import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
-import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
@@ -23,18 +17,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for topics management pages. */
 @Controller
@@ -64,12 +52,6 @@ public class TopicsController extends AbstractController {
     return "topics/create";
   }
 
-  @GetMapping("/api/topics/new")
-  @ResponseBody
-  public Topic create() throws TechnicalException {
-    return service.create();
-  }
-
   @GetMapping("/topics/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
@@ -92,60 +74,6 @@ public class TopicsController extends AbstractController {
     return "topics/edit";
   }
 
-  @GetMapping("/api/topics")
-  @ResponseBody
-  public PageResponse<Topic> findTop(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return this.service.findTopTopics(pageRequest);
-  }
-
-  @GetMapping("/api/topics/{uuid}/topics")
-  @ResponseBody
-  public PageResponse<Topic> findSubtopic(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubtopics(uuid, pageRequest);
-  }
-
-  @GetMapping("/api/topics/{uuid}/entities")
-  @ResponseBody
-  public PageResponse<Entity> getAttachedEntites(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws TechnicalException {
-    return this.service.findEntities(uuid, new PageRequest(pageNumber, pageSize));
-  }
-
-  @GetMapping("/api/topics/{uuid}")
-  @ResponseBody
-  public Topic getByUuid(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
-  @GetMapping("/api/topics/{uuid}/fileresources")
-  @ResponseBody
-  public PageResponse<FileResource> getRelatedFileResources(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
-      throws TechnicalException {
-    return this.service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
-  }
-
   @GetMapping("/topics")
   public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -158,35 +86,6 @@ public class TopicsController extends AbstractController {
   @ModelAttribute("menu")
   protected String module() {
     return "topics";
-  }
-
-  @PostMapping("/api/topics")
-  public ResponseEntity save(
-      @RequestBody Topic topic,
-      @RequestParam(name = "parentUuid", required = false) UUID parentUuid) {
-    try {
-      Topic topicDb = null;
-      if (parentUuid == null) {
-        topicDb = service.save(topic);
-      } else {
-        topicDb = service.saveWithParentTopic(topic, parentUuid);
-      }
-      return ResponseEntity.status(HttpStatus.CREATED).body(topicDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save topic: ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-  }
-
-  @PutMapping("/api/topics/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic) {
-    try {
-      Topic topicDb = service.update(uuid, topic);
-      return ResponseEntity.ok(topicDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save topic with uuid={}", uuid, e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
   }
 
   @GetMapping(
