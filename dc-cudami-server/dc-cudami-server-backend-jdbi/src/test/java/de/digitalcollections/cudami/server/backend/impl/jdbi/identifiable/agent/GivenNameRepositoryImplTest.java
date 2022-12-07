@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.identifiable.agent.GivenName.Gender;
@@ -22,7 +23,7 @@ class GivenNameRepositoryImplTest
 
   @Test
   @DisplayName("can save and fill uuid and timestamps")
-  void testSave() {
+  void testSave() throws RepositoryException {
     GivenName givenName =
         GivenName.builder().label(Locale.GERMAN, "Karl Ranseier").gender(Gender.MALE).build();
     saveAndAssertTimestampsAndEqualityToSaveable(givenName);
@@ -30,7 +31,7 @@ class GivenNameRepositoryImplTest
 
   @Test
   @DisplayName("can update and modify lastModified timestamp")
-  void testUpdate() {
+  void testUpdate() throws RepositoryException {
     GivenName givenName =
         GivenName.builder().label(Locale.GERMAN, "Karl Ranseier").gender(Gender.MALE).build();
     repo.save(givenName);

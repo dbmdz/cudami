@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -25,14 +26,14 @@ class AgentRepositoryImplTest
 
   @Test
   @DisplayName("can save (create) an agent")
-  void testSave() {
+  void testSave() throws RepositoryException {
     Agent agent = Agent.builder().label("Test").addName(Locale.ENGLISH, "a name").build();
     saveAndAssertTimestampsAndEqualityToSaveable(agent);
   }
 
   @Test
   @DisplayName("can update an agent")
-  void testUpdate() {
+  void testUpdate() throws RepositoryException {
     Agent agent = Agent.builder().label("Test").addName("some name").build();
     repo.save(agent);
 

@@ -113,7 +113,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can save and retrieve a DigitalObject with its directly embedded resources")
-  void saveDigitalObject() {
+  void saveDigitalObject() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -143,8 +143,8 @@ class DigitalObjectRepositoryImplTest
             .geoLocation(creationPlace)
             .build();
 
-    DigitalObject parent =
-        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
 
     Tag tag =
         tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
@@ -162,26 +162,27 @@ class DigitalObjectRepositoryImplTest
             .build();
 
     // The "save" method internally retrieves the object by findOne
-    DigitalObject actual = repo.save(digitalObject);
+    repo.save(digitalObject);
 
-    assertThat(actual.getLabel().getText(Locale.GERMAN)).isEqualTo("deutschsprachiges Label");
-    assertThat(actual.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
+    assertThat(digitalObject.getLabel().getText(Locale.GERMAN))
+        .isEqualTo("deutschsprachiges Label");
+    assertThat(digitalObject.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
     Paragraph paragraphDe =
-        (Paragraph) actual.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
+        (Paragraph) digitalObject.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
     assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
 
-    assertThat(actual.getLicense()).isEqualTo(digitalObject.getLicense());
+    assertThat(digitalObject.getLicense()).isEqualTo(EXISTING_LICENSE);
 
-    assertThat(actual.getCreationInfo().getCreator()).isEqualTo(creator);
-    assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
+    assertThat(digitalObject.getCreationInfo().getCreator()).isEqualTo(creator);
+    assertThat(digitalObject.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
         .isEqualTo("2022-02-25");
-    assertThat(actual.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
+    assertThat(digitalObject.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
 
-    assertThat(actual.getParent()).isNotNull();
-    assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
-    assertThat(actual.getParent().getLabel()).isEqualTo(parent.getLabel());
+    assertThat(digitalObject.getParent()).isNotNull();
+    assertThat(digitalObject.getParent().getUuid()).isEqualTo(parent.getUuid());
+    assertThat(digitalObject.getParent().getLabel()).isEqualTo(parent.getLabel());
 
-    assertThat(actual.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
+    assertThat(digitalObject.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
         .containsExactly(tag.getUuid());
 
     // Verify, that the method-persisted DigitalObject is the same, which is in the database
@@ -191,12 +192,12 @@ class DigitalObjectRepositoryImplTest
       persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
     }
 
-    assertThat(actual).isEqualToComparingFieldByField(persisted);
+    assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
   }
 
   @Test
   @DisplayName("returns the reduced DigitalObject without any creation info and embedded resources")
-  void returnReduced() {
+  void returnReduced() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
 
     // The "save" method internally retrieves the object by findOne
@@ -236,6 +237,8 @@ class DigitalObjectRepositoryImplTest
                   | InvocationTargetException
                   | NoSuchMethodException
                   | SecurityException e) {
+              } catch (RepositoryException e) {
+                throw new RuntimeException(e);
               }
             });
 
@@ -264,11 +267,11 @@ class DigitalObjectRepositoryImplTest
   @DisplayName("can filter by the parent uuid")
   void filterByParentUuid()
       throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException {
+          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     // Insert the parent DigitalObject
     DigitalObject parent =
         TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());
-    parent = repo.save(parent);
+    repo.save(parent);
 
     // Insert the ADO
     DigitalObject ado =
@@ -298,19 +301,20 @@ class DigitalObjectRepositoryImplTest
   void returnIdentifiers() throws RepositoryException {
     // Step1: Create the DigitalObject
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
-    DigitalObject persisted = repo.save(digitalObject);
+    repo.save(digitalObject);
 
     // Step2: Create the identifiers and connect with with the DigitalObject
-    Identifier identifier1 =
-        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace1", "1"));
-    Identifier identifier2 =
-        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace2", "2"));
+    Identifier identifier1 = new Identifier(digitalObject.getUuid(), "namespace1", "1");
+    identifierRepositoryImpl.save(identifier1);
+    Identifier identifier2 = new Identifier(digitalObject.getUuid(), "namespace2", "2");
+    identifierRepositoryImpl.save(identifier2);
 
     // Step3: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
         DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
-    DigitalObject otherPersisted = repo.save(otherDigitalObject);
-    identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
+    repo.save(otherDigitalObject);
+    identifierRepositoryImpl.save(
+        new Identifier(otherDigitalObject.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
@@ -330,7 +334,7 @@ class DigitalObjectRepositoryImplTest
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
-    digitalObject = repo.save(digitalObject);
+    repo.save(digitalObject);
     identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));
 
     DigitalObject actual = repo.getByIdentifier(new Identifier(null, "namespace", "key"));
@@ -344,7 +348,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("save item UUID with digital object and retrieve it properly")
-  void saveAndRetrieveItemUuid() {
+  void saveAndRetrieveItemUuid() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
     Item item =
         Item.builder()
@@ -353,21 +357,21 @@ class DigitalObjectRepositoryImplTest
             .identifier("mdz-sig", "Signatur")
             .title(Locale.GERMAN, "Ein Buchtitel")
             .build();
-    Item savedItem = itemRepository.save(item);
-    assertThat(savedItem.getUuid()).isNotNull();
+    itemRepository.save(item);
+    assertThat(item.getUuid()).isNotNull();
 
-    digitalObject.setItem(savedItem);
-    DigitalObject savedDigitalObject = repo.save(digitalObject);
-    assertThat(savedDigitalObject.getUuid()).isNotNull();
-    assertThat(savedDigitalObject.getItem().getUuid()).isEqualTo(savedItem.getUuid());
-    DigitalObject retrieved = repo.getByUuid(savedDigitalObject.getUuid());
-    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(savedItem.getUuid()).build());
+    digitalObject.setItem(item);
+    repo.save(digitalObject);
+    assertThat(digitalObject.getUuid()).isNotNull();
+    assertThat(digitalObject.getItem().getUuid()).isEqualTo(item.getUuid());
+    DigitalObject retrieved = repo.getByUuid(digitalObject.getUuid());
+    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(item.getUuid()).build());
   }
 
   @Test
   @Order(Integer.MAX_VALUE)
   @DisplayName("can return all label languages")
-  void returnLanguages() {
+  void returnLanguages() throws RepositoryException {
     repo.save(DigitalObject.builder().label(Locale.GERMAN, "Test").build());
     repo.save(DigitalObject.builder().label(Locale.ENGLISH, "Test").build());
 
@@ -377,7 +381,7 @@ class DigitalObjectRepositoryImplTest
     DigitalObject digitalObject = buildDigitalObject();
     LocalizedText label = digitalObject.getLabel();
     label.put(Locale.KOREAN, "테스트");
-    digitalObject = repo.save(digitalObject);
+    repo.save(digitalObject);
     List<Locale> languagesOfContainedDigitalObjects =
         repo.getLanguagesOfContainedDigitalObjects(digitalObject.getParent().getUuid());
     assertThat(languagesOfContainedDigitalObjects)
@@ -386,7 +390,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can update a DigitalObject iwht its directly embedded resources")
-  void update() {
+  void update() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -416,8 +420,8 @@ class DigitalObjectRepositoryImplTest
             .geoLocation(creationPlace)
             .build();
 
-    DigitalObject parent =
-        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
 
     Tag tag =
         tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
@@ -463,7 +467,7 @@ class DigitalObjectRepositoryImplTest
     }
   }
 
-  private DigitalObject buildDigitalObject() {
+  private DigitalObject buildDigitalObject() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -518,8 +522,8 @@ class DigitalObjectRepositoryImplTest
             .build();
 
     // Build a parent DigitalObject, save and retrieve it
-    DigitalObject parent =
-        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
 
     DigitalObject digitalObject =
         DigitalObject.builder()

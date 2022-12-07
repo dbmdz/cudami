@@ -101,7 +101,7 @@ class IdentifierRepositoryImplTest {
     assertThat(actual).isEqualTo(persisted);
   }
 
-  private void saveIdentifiable(UUID uuid) {
+  private void saveIdentifiable(UUID uuid) throws RepositoryException {
     Webpage webpage =
         Webpage.builder()
             .label(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))

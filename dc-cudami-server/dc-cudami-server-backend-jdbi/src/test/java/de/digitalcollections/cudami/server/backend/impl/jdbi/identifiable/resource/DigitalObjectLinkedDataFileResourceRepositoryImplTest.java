@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
@@ -54,7 +55,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
   @Test
-  void setLinkedDataFileResourcesForDigitalObject() {
+  void setLinkedDataFileResourcesForDigitalObject() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -63,7 +64,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
@@ -84,7 +85,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can retrieve LinkedDataFileResources for a DigitalObject")
   @Test
-  void getLinkedDataFileResourcesForDigitalObject() {
+  void getLinkedDataFileResourcesForDigitalObject() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -93,7 +94,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Try to persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
@@ -115,7 +116,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("can delete a list of LinkedDataFileResources by their uuids")
   @Test
-  void delete() {
+  void delete() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -124,7 +125,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
@@ -155,7 +156,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
   @DisplayName(
       "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
   @Test
-  void countMoreThanZero() {
+  void countMoreThanZero() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -164,7 +165,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =
@@ -189,7 +190,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("returns the number of deleted items")
   @Test
-  void deletionReturnsNumberOfDeletedItems() {
+  void deletionReturnsNumberOfDeletedItems() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -198,7 +199,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the LinkedDataFileResource
     LinkedDataFileResource linkedDataFileResource =

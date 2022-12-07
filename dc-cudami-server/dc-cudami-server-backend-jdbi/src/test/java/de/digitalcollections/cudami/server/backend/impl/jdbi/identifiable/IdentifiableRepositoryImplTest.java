@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -56,7 +57,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("retrieve one digital object")
-  void testGetByUuid() {
+  void testGetByUuid() throws RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
@@ -64,7 +65,7 @@ class IdentifiableRepositoryImplTest
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
 
-    identifiable = this.repo.save(identifiable);
+    this.repo.save(identifiable);
 
     Identifiable actual = this.repo.getByUuid(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
@@ -118,7 +119,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("saves an Identifiable and fills uuid and timestamps")
-  void testSave() {
+  void testSave() throws RepositoryException {
     Identifiable identifiable =
         Identifiable.builder()
             .type(IdentifiableType.ENTITY)
@@ -142,7 +143,7 @@ class IdentifiableRepositoryImplTest
 
   @DisplayName("can update and return an Identifiable with updated lastModified timestamp")
   @Test
-  public void testUpdate() {
+  public void testUpdate() throws RepositoryException {
     Identifiable identifiable =
         Identifiable.builder()
             .type(IdentifiableType.ENTITY)
@@ -181,7 +182,11 @@ class IdentifiableRepositoryImplTest
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              repo.save(createDigitalObjectWithLabels("test" + i));
+              try {
+                repo.save(createDigitalObjectWithLabels("test" + i));
+              } catch (RepositoryException e) {
+                throw new RuntimeException(e);
+              }
             });
 
     String searchTerm = "test";
@@ -292,21 +297,21 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("save and update `split_label`")
-  void testSaveUpdateOfSplitLabel() {
+  void testSaveUpdateOfSplitLabel() throws RepositoryException {
     // test save method
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setLabel(
         new LocalizedText(Locale.ENGLISH, "1 not so short Label to check the Label-Splitting"));
 
-    DigitalObject savedDigitalObject = (DigitalObject) repo.save(digitalObject);
-    assertThat(savedDigitalObject.getUuid()).isNotNull();
+    repo.save(digitalObject);
+    assertThat(digitalObject.getUuid()).isNotNull();
 
     String[] splitLabelDb =
         jdbi.withHandle(
             h ->
                 h.select(
                         "select split_label from identifiables where uuid = ?;",
-                        savedDigitalObject.getUuid())
+                        digitalObject.getUuid())
                     .mapTo(String[].class)
                     .findOne()
                     .orElse(null));
@@ -331,15 +336,15 @@ class IdentifiableRepositoryImplTest
     var label = new LocalizedText();
     label.setText(Locale.ENGLISH, "An English label, no. 1");
     label.setText(Locale.GERMAN, "Ein deutsches Label, nr. 2");
-    savedDigitalObject.setLabel(label);
-    repo.update(savedDigitalObject);
+    digitalObject.setLabel(label);
+    repo.update(digitalObject);
 
     String[] splitLabelUpdated =
         jdbi.withHandle(
             h ->
                 h.select(
                         "select split_label from identifiables where uuid = ?;",
-                        savedDigitalObject.getUuid())
+                        digitalObject.getUuid())
                     .mapTo(String[].class)
                     .findOne()
                     .orElse(null));

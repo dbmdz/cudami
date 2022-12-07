@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -34,8 +35,9 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("can save a website")
-  void saveWebsite() {
-    Webpage webpage = webpageRepository.save(Webpage.builder().label("webpage").build());
+  void saveWebsite() throws RepositoryException {
+    Webpage webpage = Webpage.builder().label("webpage").build();
+    webpageRepository.save(webpage);
     Website website =
         Website.builder()
             .label(Locale.GERMAN, "Digitale Sammlungen")
@@ -49,9 +51,11 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("can update a website")
-  void testUpdate() {
-    Webpage webpage1 = webpageRepository.save(Webpage.builder().label("webpage1").build());
-    Webpage webpage2 = webpageRepository.save(Webpage.builder().label("webpage2").build());
+  void testUpdate() throws RepositoryException {
+    Webpage webpage1 = Webpage.builder().label("webpage1").build();
+    webpageRepository.save(webpage1);
+    Webpage webpage2 = Webpage.builder().label("webpage2").build();
+    webpageRepository.save(webpage2);
 
     Website website =
         Website.builder()
@@ -71,7 +75,7 @@ class WebsiteRepositoryImplTest
 
   @Test
   @DisplayName("save a website with notes")
-  void saveWebsiteWithNotes() {
+  void saveWebsiteWithNotes() throws RepositoryException {
     var noteContent1 = new StructuredContent();
     noteContent1.addContentBlock(new Text("eine Bemerkung"));
     var note1 = new LocalizedStructuredContent();
@@ -91,9 +95,9 @@ class WebsiteRepositoryImplTest
             .note(note2)
             .build();
 
-    Website actual = repo.save(website);
+    repo.save(website);
 
-    assertThat(actual.getNotes()).isEqualTo(website.getNotes());
-    assertThat(actual.getUuid()).isNotNull();
+    assertThat(website.getNotes()).isEqualTo(website.getNotes());
+    assertThat(website.getUuid()).isNotNull();
   }
 }

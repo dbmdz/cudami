@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.relation.PredicateRepositoryImpl;
@@ -65,7 +66,7 @@ public class EntityRelationRepositoryTest {
   @DisplayName("should save an EntityRelation")
   void saveEntityRelation()
       throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException {
+          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation entityRelation =
@@ -97,7 +98,7 @@ public class EntityRelationRepositoryTest {
   @DisplayName("should save two EntityRelations and retrieve in same order")
   void saveEntityRelations()
       throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException {
+          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation entityRelation =
@@ -137,7 +138,7 @@ public class EntityRelationRepositoryTest {
   @DisplayName("should update the relation if already exists")
   void updateRelations()
       throws InstantiationException, IllegalAccessException, IllegalArgumentException,
-          InvocationTargetException, NoSuchMethodException, SecurityException {
+          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
     EntityRelation entityRelation =
@@ -170,7 +171,7 @@ public class EntityRelationRepositoryTest {
 
   @Test
   @DisplayName("returns properly sized pages")
-  void testSearchPageSize() {
+  void testSearchPageSize() throws RepositoryException {
     List<EntityRelation> relations = new ArrayList<>();
     IntStream.range(0, 20)
         .forEach(
@@ -194,8 +195,16 @@ public class EntityRelationRepositoryTest {
             });
     relations.forEach(
         rel -> {
-          entityRepository.save(rel.getSubject());
-          entityRepository.save(rel.getObject());
+          try {
+            entityRepository.save(rel.getSubject());
+          } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+          }
+          try {
+            entityRepository.save(rel.getObject());
+          } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+          }
         });
     repository.save(relations);
 

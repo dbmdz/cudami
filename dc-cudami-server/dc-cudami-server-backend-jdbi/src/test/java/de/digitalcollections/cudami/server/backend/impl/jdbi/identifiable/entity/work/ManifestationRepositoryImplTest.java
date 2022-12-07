@@ -75,7 +75,7 @@ class ManifestationRepositoryImplTest {
     assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
-  void saveParentManifestation(UUID parentUuid) {
+  void saveParentManifestation(UUID parentUuid) throws RepositoryException {
     var noteText = new StructuredContent();
     noteText.addContentBlock(new Text("some notes"));
     var note = new LocalizedStructuredContent();
@@ -105,10 +105,10 @@ class ManifestationRepositoryImplTest {
   void testSaveManifestation() throws RepositoryException {
     // agents for relations
     CorporateBody editor = CorporateBody.builder().label("Editor").addName("Editor").build();
-    editor = corporateBodyRepository.save(editor);
+    corporateBodyRepository.save(editor);
     CorporateBody someoneElse =
         CorporateBody.builder().label("Someone else").addName("Someone else").build();
-    someoneElse = corporateBodyRepository.save(someoneElse);
+    corporateBodyRepository.save(someoneElse);
 
     // predicates
     Predicate isEditorOf =
@@ -118,12 +118,12 @@ class ManifestationRepositoryImplTest {
 
     // subjects
     Subject subject =
-        subjectRepository.save(
-            Subject.builder()
-                .label(new LocalizedText(Locale.ENGLISH, "My subject"))
-                .identifier(Identifier.builder().namespace("test").id("12345").build())
-                .type("SUBJECT_TYPE")
-                .build());
+        Subject.builder()
+            .label(new LocalizedText(Locale.ENGLISH, "My subject"))
+            .identifier(Identifier.builder().namespace("test").id("12345").build())
+            .type("SUBJECT_TYPE")
+            .build();
+    subjectRepository.save(subject);
 
     // parent
     saveParentManifestation(manifestationUuids[0]);
@@ -187,7 +187,7 @@ class ManifestationRepositoryImplTest {
             .object(manifestation)
             .additionalPredicate("additional predicate")
             .build());
-    Manifestation saved = repo.save(manifestation);
+    repo.save(manifestation);
 
     // we add the relations manually, actually done by the service
     entityRelationRepository.save(manifestation.getRelations());
@@ -218,7 +218,7 @@ class ManifestationRepositoryImplTest {
 
   @Test
   @DisplayName("1.1. Update a manifestation")
-  void testUpdateManifestation() {
+  void testUpdateManifestation() throws RepositoryException {
     // get the Manifestation saved in 1.0.
     Manifestation manifestation = repo.getByUuid(manifestationUuids[1]);
     manifestation.getLabel().put(Locale.ENGLISH, "An updated label");
