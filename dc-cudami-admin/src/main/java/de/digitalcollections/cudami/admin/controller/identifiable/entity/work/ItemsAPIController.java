@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -10,9 +12,7 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
-import java.util.List;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,20 +33,20 @@ public class ItemsAPIController extends AbstractPagingAndSortingController<Item>
     this.service = client.forItems();
   }
 
+  @SuppressFBWarnings
   @GetMapping("/api/items")
   @ResponseBody
-  public PageResponse<Item> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
+  public BTResponse<Item> find(
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      throws TechnicalException, ServiceException {
+    PageResponse<Item> pageResponse =
+        super.find(localeService, service, offset, limit, searchTerm, sort, order, itemLocale);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/items/{uuid}/digitalobjects")
