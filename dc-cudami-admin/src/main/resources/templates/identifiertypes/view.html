@@ -1,0 +1,56 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{page.title.identifier_types}: #{lbl.identifier_type} &quot;${identifierType.namespace}&quot;|">...</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content" th:object="${identifierType}">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+          
+          <div class="col-sm-6">
+            <h1 th:text="|#{lbl.identifier_type} &quot;${identifierType.namespace}&quot;|">...</h1>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+            </div>
+          </div>
+        </div>
+        <hr/>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid rows-striped">
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
+
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.label}">Label</label></div>
+          <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.namespace}">Namespace</label></div>
+          <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.pattern}">Pattern</label></div>
+          <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+
+  <section layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+  </section>
+</body>
+</html>

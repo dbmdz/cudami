@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for predicate GUI-API endpoints. */
+/** Controller for all public "Predicates" endpoints (API). */
 @RestController
 public class PredicatesAPIController extends AbstractPagingAndSortingController<Predicate> {
 

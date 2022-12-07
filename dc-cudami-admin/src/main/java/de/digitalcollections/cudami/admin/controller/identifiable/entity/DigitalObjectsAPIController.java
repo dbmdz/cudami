@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for digital objects management pages. */
+/** Controller for all public "DigitalObjects" endpoints (API). */
 @RestController
 public class DigitalObjectsAPIController extends AbstractPagingAndSortingController<DigitalObject> {
 
