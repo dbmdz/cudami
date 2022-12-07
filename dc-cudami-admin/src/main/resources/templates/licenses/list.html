@@ -38,6 +38,7 @@
                    th:data-url="@{/api/licenses}"
                    th:data-locale="${#locale}"
                    data-ajax-options="ajaxOptions"
+                   data-buttons="buttons"
                    data-cookie="true"
                    data-cookie-id-table="table-licenses"
                    data-id-field="uuid"
@@ -102,6 +103,25 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      function buttons() {
+        /*[+
+         const baseUrl = [[@{'/licenses'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new';
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
