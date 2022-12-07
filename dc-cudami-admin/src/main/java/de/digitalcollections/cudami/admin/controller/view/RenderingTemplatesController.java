@@ -5,10 +5,12 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -21,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for rendering template management pages. */
 @Controller
@@ -78,15 +81,41 @@ public class RenderingTemplatesController extends AbstractController {
 
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
-    Locale locale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
+    Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
     return "renderingtemplates/list";
   }
 
   @ModelAttribute("menu")
   protected String module() {
     return "renderingtemplates";
+  }
+
+  @GetMapping("/renderingtemplates/{uuid}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "itemLocale", required = false) String itemLocale,
+      Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    RenderingTemplate renderingTemplate = service.getByUuid(uuid);
+    if (renderingTemplate == null) {
+      throw new ResourceNotFoundException();
+    }
+    model.addAttribute("renderingTemplate", renderingTemplate);
+
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String language = itemLocale;
+    if (language == null && localeService != null) {
+      language = localeService.getDefaultLanguage().getLanguage();
+    }
+    model.addAttribute("language", language);
+
+    return "renderingtemplates/view";
   }
 }

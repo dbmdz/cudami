@@ -66,7 +66,7 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("label", "name"));
+    return new ArrayList<>(Arrays.asList("created", "label", "lastModified", "name"));
   }
 
   @Override
