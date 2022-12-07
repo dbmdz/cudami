@@ -48,13 +48,9 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid) {
-    try {
-      save(subjectEntityUuid, predicate, objectEntityUuid);
-    } catch (RepositoryException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException {
+    save(subjectEntityUuid, predicate, objectEntityUuid);
   }
 
   @Override

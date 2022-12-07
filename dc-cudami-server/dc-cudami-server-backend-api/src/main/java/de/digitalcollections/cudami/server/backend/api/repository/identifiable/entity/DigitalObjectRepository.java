@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -48,12 +49,13 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
   default List<FileResource> setFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) {
+      DigitalObject digitalObject, List<FileResource> fileResources) throws RepositoryException {
     if (fileResources == null) {
       return null;
     }
     return setFileResources(digitalObject.getUuid(), fileResources);
   }
 
-  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources)
+      throws RepositoryException;
 }

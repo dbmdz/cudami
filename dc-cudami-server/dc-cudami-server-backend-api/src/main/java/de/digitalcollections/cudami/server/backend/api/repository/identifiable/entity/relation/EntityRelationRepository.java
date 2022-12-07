@@ -10,12 +10,13 @@ import java.util.UUID;
 
 public interface EntityRelationRepository {
 
-  default void addRelation(EntityRelation relation) {
+  default void addRelation(EntityRelation relation) throws RepositoryException {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
 
-  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException;
 
   default void deleteByObject(Entity objectEntity) {
     deleteByObject(objectEntity.getUuid());

@@ -594,7 +594,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public List<FileResource> setFileResources(
-      UUID digitalObjectUuid, List<FileResource> fileResources) {
+      UUID digitalObjectUuid, List<FileResource> fileResources) throws RepositoryException {
 
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -608,7 +608,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       // first save fileresources
       for (FileResource fileResource : fileResources) {
         if (fileResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save(fileResource);
+          try {
+            fileResourceMetadataRepositoryImpl.save(fileResource);
+          } catch (RepositoryException e) {
+            throw new RepositoryException("File resource cannot be saved properly!", e);
+          }
         }
       }
 

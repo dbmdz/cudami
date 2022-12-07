@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.List;
 import java.util.UUID;
@@ -21,9 +22,11 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
    * @param digitalObjectUuid the UUID of the DigitalObject
    * @param linkedDataFileResources List of LinkedDataFileResource to persist
    * @return
+   * @throws RepositoryException
    */
   List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
+      throws RepositoryException;
 
   default int delete(UUID uuid) {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
