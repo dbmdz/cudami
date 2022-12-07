@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -21,31 +21,27 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {ItemRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The Item Repository Test")
-public class ItemRepositoryImplTest {
-
-  private ItemRepositoryImpl repo;
+public class ItemRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<ItemRepositoryImpl> {
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
 
@@ -68,6 +64,34 @@ public class ItemRepositoryImplTest {
     repo =
         new ItemRepositoryImpl(
             jdbi, digitalObjectRepository, workRepository, agentRepository, config);
+  }
+
+  @Test
+  @DisplayName("can save an item")
+  public void saveItem() {
+    Item item = Item.builder().label(Locale.GERMAN, "Item").build();
+    saveAndAssertTimestampsAndEqualityToSaveable(item);
+  }
+
+  @Test
+  @DisplayName("can update an item")
+  void testUpdate() {
+    Item item = Item.builder().label(Locale.GERMAN, "Item").build();
+    repo.save(item);
+
+    Agent holder =
+        agentRepository.save(
+            Agent.builder()
+                .label(new LocalizedText(Locale.GERMAN, "Karl Ranseier"))
+                .name(new LocalizedText(Locale.GERMAN, "Karl Ranseier"))
+                .build());
+
+    item.setLabel("changed test");
+    item.setHolders(List.of(holder));
+
+    Item beforeUpdate = createDeepCopy(item);
+    updateAndAssertUpdatedLastModifiedTimestamp(item);
+    assertInDatabaseIsEqualToUpdateable(item, beforeUpdate, Function.identity());
   }
 
   @Test

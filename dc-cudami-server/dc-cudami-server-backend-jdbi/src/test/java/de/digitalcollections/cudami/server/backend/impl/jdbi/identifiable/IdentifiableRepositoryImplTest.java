@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -30,9 +30,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = IdentifiableRepositoryImpl.class)
 @DisplayName("The Identifiable Repository")
-class IdentifiableRepositoryImplTest extends AbstractRepositoryImplTest {
-
-  IdentifiableRepositoryImpl repo;
+class IdentifiableRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
 
   @BeforeEach
   public void beforeEach() {

@@ -4,7 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
@@ -62,9 +62,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
     classes = {DigitalObjectRepositoryImpl.class})
 @DisplayName("The DigitalObject Repository")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DigitalObjectRepositoryImplTest extends AbstractRepositoryImplTest {
-
-  DigitalObjectRepositoryImpl repo;
+class DigitalObjectRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<DigitalObjectRepositoryImpl> {
 
   @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 

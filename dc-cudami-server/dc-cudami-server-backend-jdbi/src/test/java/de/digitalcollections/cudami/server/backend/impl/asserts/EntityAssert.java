@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.asserts;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import org.assertj.core.api.AbstractAssert;
 
@@ -27,7 +26,7 @@ public class EntityAssert extends AbstractAssert<EntityAssert, Entity> {
     return super.isEqualTo(expected);
   }
 
-  public EntityAssert isEqualToComparingFieldByField(DigitalObject expected) {
+  public EntityAssert isEqualToComparingFieldByField(Entity expected) {
     ObjectMapper objectMapper = new DigitalCollectionsObjectMapper();
     String serializedActual = null;
     String serializedExpected = null;
