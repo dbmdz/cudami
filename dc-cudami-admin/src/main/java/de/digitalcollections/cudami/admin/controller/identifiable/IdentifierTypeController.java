@@ -38,8 +38,12 @@ public class IdentifierTypeController extends AbstractController {
   }
 
   @GetMapping("/identifiertypes/{uuid}/edit")
-  public String edit(@PathVariable UUID uuid, Model model) throws TechnicalException {
+  public String edit(@PathVariable UUID uuid, Model model)
+      throws TechnicalException, ResourceNotFoundException {
     IdentifierType identifierType = service.getByUuid(uuid);
+    if (identifierType == null) {
+      throw new ResourceNotFoundException();
+    }
     model.addAttribute("label", identifierType.getLabel());
     model.addAttribute("uuid", identifierType.getUuid());
     return "identifiertypes/edit";
