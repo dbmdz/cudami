@@ -8,28 +8,131 @@
     <title th:text="#{persons}">Persons</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="list"></div>
-              <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-              <script th:inline="javascript">
-                IdentifiableList({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  existingLanguages: /*[[${existingLanguages}]]*/ [],
-                  id: "list",
-                  showEdit: true,
-                  showNew: true,
-                  type: "person",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
-            </div>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.persons}">Persons</h1>
+            <hr>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col">
+
+            <div id="toolbar-persons">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+                <select name="locales" id="persons-locales">
+                  <th:block th:each="locale : ${existingLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
+            </div>
+            <table id="table-persons"
+                   data-toggle="table"
+                   th:data-url="@{/api/persons}"
+                   th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
+                   data-cookie="true"
+                   data-cookie-id-table="table-persons"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="label"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-persons"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="formatIdentifiers" th:text="#{identifiers}">Identifiers</th>
+
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      const $table = $('#table-persons');
+
+      window.ajaxOptions = {
+        beforeSend: function (jqXHR, settings) {
+          let itemLocale = $("#persons-locales").val();
+          settings.url = settings.url + '&itemLocale=' + itemLocale;
+        }
+      };
+
+      $(function () {
+        $("#persons-locales").change(function () {
+          $table.bootstrapTable('refresh');
+        });
+      });
+
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/persons'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl)
+        ].join(' ');
+      }
+
+      function formatIdentifiers(value, row) {
+        return renderIdentifiers(value);
+      }
+
+      function formatLabel(value, row) {
+        /*[+
+         const baseUrl = [[@{'/persons'}]] + '/' + row.uuid;
+         +]*/
+        const itemLocale = $("#collections-locales").val();
+        return renderLabel(baseUrl, value, itemLocale);
+      }
+
+      function formatPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = row.previewImage;
+        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+  </th:block>
+</body>
 </html>
