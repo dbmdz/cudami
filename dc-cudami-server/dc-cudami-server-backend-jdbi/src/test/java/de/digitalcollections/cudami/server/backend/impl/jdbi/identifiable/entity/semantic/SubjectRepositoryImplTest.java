@@ -90,30 +90,24 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("can save and update")
   @Test
   void saveAndUpdate() throws RepositoryException {
-    Subject savedSubject =
+    Subject subject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id3", "type");
-    Identifier savedSubjectIdentifier =
-        savedSubject.getIdentifiers().stream().findFirst().orElse(null);
+    Identifier savedSubjectIdentifier = subject.getIdentifiers().stream().findFirst().orElse(null);
 
-    Subject subjectToUpdate =
-        Subject.builder()
-            .label(new LocalizedText(Locale.GERMAN, "different label"))
-            .type(savedSubject.getType())
-            .uuid(savedSubject.getUuid())
-            .created(savedSubject.getCreated())
-            .identifiers(
-                Set.of(
-                    Identifier.builder()
-                        .namespace(savedSubjectIdentifier.getNamespace())
-                        .id("subject-id3other")
-                        .build()))
-            .build();
+    subject.setLabel(new LocalizedText(Locale.GERMAN, "different label"));
+    subject.setIdentifiers(
+        Set.of(
+            Identifier.builder()
+                .namespace(savedSubjectIdentifier.getNamespace())
+                .id("subject-id3other")
+                .build()));
 
-    Subject beforeUpdate = createDeepCopy(subjectToUpdate);
+    Subject beforeUpdate = createDeepCopy(subject);
 
-    repo.update(subjectToUpdate);
+    repo.update(subject);
 
-    assertThat(subjectToUpdate).isEqualTo(beforeUpdate);
+    beforeUpdate.setLastModified(subject.getLastModified());
+    assertThat(subject).isEqualTo(beforeUpdate);
   }
 
   @DisplayName("can retrieve all subjects with paging")

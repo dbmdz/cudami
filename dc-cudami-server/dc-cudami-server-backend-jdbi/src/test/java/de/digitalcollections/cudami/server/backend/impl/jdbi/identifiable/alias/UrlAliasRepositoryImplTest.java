@@ -3,8 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias
 import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLanguage;
 import static de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository.grabLocalesByScript;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -23,20 +21,15 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -46,140 +39,218 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = UrlAliasRepositoryImpl.class)
 @DisplayName("The UrlAlias Repository")
-@TestInstance(Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   UrlAliasRepositoryImpl repo;
   @Autowired WebpageRepository webpageRepository;
   @Autowired WebsiteRepository websiteRepository;
 
-  Website website;
-  UrlAlias urlAliasWithoutWebsite;
-  UrlAlias urlAliasWithWebsite;
-
-  @BeforeAll
-  public void setupTest() throws MalformedURLException, RepositoryException {
+  @BeforeEach
+  public void beforeEach() {
     this.repo = new UrlAliasRepositoryImpl(this.jdbi, cudamiConfig);
-    this.prepareWebsite();
-    this.urlAliasWithoutWebsite = this.getNewUrlAliasObject();
-    this.urlAliasWithWebsite = this.getNewUrlAliasObject();
-    this.urlAliasWithWebsite.setWebsite(this.website);
-    this.urlAliasWithWebsite.setSlug("impressum-with-website");
   }
 
-  private void prepareWebsite() throws MalformedURLException, RepositoryException {
-    // to meet the foreign key constraints we must do some preparation
-    this.website = new Website(new URL("https://my-first-website.com"));
-    this.website.setUuid(UUID.randomUUID());
-    this.website.setCreated(LocalDateTime.now());
-    this.website.setRefId(13);
-    this.website.setLastModified(LocalDateTime.now());
-    this.website.setLabel("Test website");
-    this.websiteRepository.save(this.website);
-  }
-
-  private UrlAlias getNewUrlAliasObject() throws RepositoryException {
-    UrlAlias urlAlias = new UrlAlias();
-    urlAlias.setSlug("impressum");
-    urlAlias.setTargetLanguage(Locale.GERMAN);
-    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.WEBPAGE);
-    urlAlias.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
-    webpageRepository.save(webpage);
-    urlAlias.setTargetUuid(webpage.getUuid());
-    return urlAlias;
-  }
-
-  @DisplayName("Save an UrlAlias object")
-  @Order(1)
+  @DisplayName("can save and retrieve an UrlAlias for a webpage with website")
   @Test
-  public void save() throws RepositoryException {
-    assertThat(this.urlAliasWithWebsite.getUuid()).isNull();
-    assertThat(this.urlAliasWithWebsite.getCreated()).isNull();
-    assertThat(this.urlAliasWithWebsite.getLastPublished()).isNull();
+  public void saveUrlAliasWithWebsite() throws MalformedURLException, RepositoryException {
+    Webpage webpage = ensurePersistedWebpage();
+    Website website = ensurePresistedWebsite(webpage);
 
+    UrlAlias urlAlias =
+        UrlAlias.builder()
+            .website(website)
+            .slug("impressum-with-website")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+
+    repo.save(urlAlias);
+
+    Assertions.assertThat(urlAlias.getUuid()).isNotNull();
+    Assertions.assertThat(urlAlias.getCreated()).isNotNull();
+    Assertions.assertThat(urlAlias.getLastPublished()).isNull();
+
+    UrlAlias actual = repo.getByUuid(urlAlias.getUuid());
+
+    // We know, that getByUuid does NOT fill the Website object. So we fill it
+    // manually in the "actual" object
+    if (actual.getWebsite().getUuid().equals(website.getUuid())) {
+      actual.setWebsite(website);
+    }
+    assertThat(actual).isEqualToComparingFieldByField(urlAlias);
+  }
+
+  @DisplayName("can save and retrieve an UrlAlias for a webpage without website")
+  @Test
+  public void saveUrlAliasWithoutWebsite() throws RepositoryException {
+    Webpage webpage = ensurePersistedWebpage();
+    UrlAlias urlAlias =
+        UrlAlias.builder()
+            .slug("impressum")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+
+    repo.save(urlAlias);
+
+    Assertions.assertThat(urlAlias.getUuid()).isNotNull();
+    Assertions.assertThat(urlAlias.getCreated()).isNotNull();
+    Assertions.assertThat(urlAlias.getLastPublished()).isNull();
+
+    UrlAlias actual = repo.getByUuid(urlAlias.getUuid());
+
+    assertThat(actual).isEqualToComparingFieldByField(urlAlias);
+  }
+
+  @DisplayName("can update an UrlAlias for a webpage without website")
+  @Test
+  public void updateWithoutWebsite() throws RepositoryException {
+    Webpage webpage = ensurePersistedWebpage();
+    UrlAlias urlAlias =
+        UrlAlias.builder()
+            .slug("impressum")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAlias);
+
+    urlAlias.setLastPublished(LocalDateTime.now());
+    urlAlias.setPrimary(true);
+    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
+    urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
+
+    UrlAlias beforeUpdate = createDeepCopy(urlAlias);
+
+    repo.update(urlAlias);
+
+    assertThat(urlAlias).isEqualToComparingFieldByField(beforeUpdate);
+
+    UrlAlias persisted = repo.getByUuid(urlAlias.getUuid());
+    assertThat(persisted).isEqualToComparingFieldByField(urlAlias);
+  }
+
+  @DisplayName("can update an UrlAlias for a webpage with website")
+  @Test
+  public void updateWithWebsite() throws RepositoryException, MalformedURLException {
+    Webpage webpage = ensurePersistedWebpage();
+    Website website = ensurePresistedWebsite(webpage);
+
+    UrlAlias urlAlias =
+        UrlAlias.builder()
+            .website(website)
+            .slug("impressum-for-website")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAlias);
+
+    urlAlias.setLastPublished(LocalDateTime.now());
+    urlAlias.setPrimary(true);
+    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
+    urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
+
+    UrlAlias beforeUpdate = createDeepCopy(urlAlias);
+
+    repo.update(urlAlias);
+
+    assertThat(urlAlias).isEqualToComparingFieldByField(beforeUpdate);
+
+    UrlAlias persisted = repo.getByUuid(urlAlias.getUuid());
+    // We know, that getByUuid does NOT fill the Website object. So we fill it
+    // manually in the "actual" object
+    if (persisted.getWebsite().getUuid().equals(website.getUuid())) {
+      persisted.setWebsite(website);
+    }
+    assertThat(persisted).isEqualToComparingFieldByField(urlAlias);
+  }
+
+  @DisplayName("can retrieve for targetUuid")
+  @Test
+  public void retrieveForTargetUuid() throws RepositoryException, MalformedURLException {
+    Webpage webpage = ensurePersistedWebpage();
+
+    UrlAlias urlAlias1 =
+        UrlAlias.builder()
+            .slug("impressum")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAlias1);
+
+    Website website = ensurePresistedWebsite(webpage);
+    UrlAlias urlAlias2 =
+        UrlAlias.builder()
+            .slug("impressum-for-website")
+            .website(website)
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAlias2);
+
+    LocalizedUrlAliases actual = repo.getAllForTarget(webpage.getUuid());
+    LocalizedUrlAliases expected = new LocalizedUrlAliases(urlAlias1, urlAlias2);
+    assertThat(actual).isEqualTo(expected);
+  }
+
+  @DisplayName("can retrieve the main link for a target uuid")
+  @Test
+  public void findMainLinks() throws RepositoryException, MalformedURLException {
+    Webpage webpageWirUeberUns = ensurePersistedWebpage();
+    Website website = ensurePresistedWebsite(webpageWirUeberUns);
+    UrlAlias urlAliasWithoutWebsite =
+        UrlAlias.builder()
+            .slug("wir_ueber_uns")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpageWirUeberUns.getUuid().toString())
+            .isPrimary()
+            .build();
+    repo.save(urlAliasWithoutWebsite);
+
+    UrlAlias urlAliasWithWebsite =
+        UrlAlias.builder()
+            .website(website)
+            .slug("wir_ueber_uns")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpageWirUeberUns.getUuid().toString())
+            .build();
     repo.save(urlAliasWithWebsite);
 
-    assertThat(urlAliasWithWebsite.getUuid()).isNotNull();
-    assertThat(urlAliasWithWebsite.getCreated()).isNotNull();
-    assertThat(urlAliasWithWebsite.getLastPublished()).isNull();
-    assertFalse(urlAliasWithWebsite.isPrimary());
-    assertEquals(urlAliasWithWebsite.getWebsite().getUuid(), this.website.getUuid());
-    assertEquals(urlAliasWithWebsite.getWebsite().getLabel(), this.website.getLabel());
-    assertEquals(urlAliasWithWebsite.getWebsite().getUrl(), this.website.getUrl());
-  }
+    UrlAlias anotherMainLink =
+        UrlAlias.builder()
+            .website(website)
+            .slug("another_main_link")
+            .targetLanguage(Locale.ENGLISH)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpageWirUeberUns.getUuid().toString())
+            .isPrimary()
+            .build();
+    repo.save(anotherMainLink);
 
-  @DisplayName("Retrieve object by UUID")
-  @Order(2)
-  @Test
-  public void getByUuid() throws RepositoryException {
-    UrlAlias found = this.repo.getByUuid(this.urlAliasWithWebsite.getUuid());
-    assertEquals(found, this.urlAliasWithWebsite);
-  }
-
-  @DisplayName("Update an UrlAlias object")
-  @Order(3)
-  @Test
-  public void update() throws RepositoryException {
-    repo.save(urlAliasWithoutWebsite);
-    urlAliasWithoutWebsite.setLastPublished(LocalDateTime.now());
-    urlAliasWithoutWebsite.setPrimary(true);
-    urlAliasWithoutWebsite.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
-    urlAliasWithoutWebsite.setTargetIdentifiableType(IdentifiableType.ENTITY);
-
-    UrlAlias beforeUpdate = createDeepCopy(urlAliasWithoutWebsite);
-
-    repo.update(this.urlAliasWithoutWebsite);
-
-    assertThat(urlAliasWithoutWebsite).isEqualTo(beforeUpdate);
-  }
-
-  @DisplayName("Retrieve LocalizedUrlAliases for target UUID")
-  @Order(4)
-  @Test
-  public void findAllForTarget() throws RepositoryException {
-    this.urlAliasWithWebsite = this.getNewUrlAliasObject();
-    this.urlAliasWithWebsite.setSlug("wir_ueber_uns");
-    this.urlAliasWithWebsite.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
-    this.urlAliasWithWebsite.setTargetIdentifiableType(IdentifiableType.RESOURCE);
-    this.urlAliasWithWebsite.setWebsite(this.website);
-    repo.save(this.urlAliasWithWebsite);
-
-    LocalizedUrlAliases actual =
-        this.repo.getAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid());
-    LocalizedUrlAliases expected =
-        new LocalizedUrlAliases(this.urlAliasWithoutWebsite, this.urlAliasWithWebsite);
-    assertTrue(actual.equals(expected));
-  }
-
-  @DisplayName("Retrieve main link for target UUID")
-  @Order(5)
-  @Test
-  public void findMainLinks() throws RepositoryException {
-    UrlAlias anotherMainLink = this.getNewUrlAliasObject();
-    anotherMainLink.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
-    anotherMainLink.setTargetLanguage(Locale.ENGLISH);
-    anotherMainLink.setSlug("another_main_link");
-    anotherMainLink.setPrimary(true);
-    anotherMainLink.setWebsite(this.website);
-    this.repo.save(anotherMainLink);
-
-    UrlAlias mainLinkInGerman = getNewUrlAliasObject();
-    mainLinkInGerman.setTargetUuid(urlAliasWithoutWebsite.getTargetUuid());
-    mainLinkInGerman.setSlug("main_link_in_german");
-    mainLinkInGerman.setTargetLanguage(Locale.GERMAN);
-    mainLinkInGerman.setPrimary(true);
-    mainLinkInGerman.setWebsite(website);
+    UrlAlias mainLinkInGerman =
+        UrlAlias.builder()
+            .website(website)
+            .slug("main_link_in_german")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpageWirUeberUns.getUuid().toString())
+            .isPrimary()
+            .build();
     repo.save(mainLinkInGerman);
 
-    LocalizedUrlAliases
-        allLinks = this.repo.getAllForTarget(this.urlAliasWithoutWebsite.getTargetUuid()),
+    LocalizedUrlAliases allLinks = repo.getAllForTarget(webpageWirUeberUns.getUuid()),
         mainLinksWithWebsite =
-            this.repo.findPrimaryLinksForWebsite(this.website.getUuid(), "wir_ueber_uns", false),
+            repo.findPrimaryLinksForWebsite(website.getUuid(), "wir_ueber_uns", false),
         mainLinksConsideringLang =
             repo.findPrimaryLinksForWebsite(website.getUuid(), "wir_ueber_uns"),
-        mainLinksWithoutWebsite = this.repo.findAllPrimaryLinks("wir_ueber_uns");
+        mainLinksWithoutWebsite = repo.findAllPrimaryLinks("wir_ueber_uns");
 
     assertThat(allLinks.flatten().size()).isEqualTo(4);
     assertThat(mainLinksWithWebsite.flatten().size()).isEqualTo(2);
@@ -193,10 +264,29 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
     assertThat(mainLinksConsideringLang.flatten().size()).isEqualTo(1);
   }
 
-  @DisplayName("Generic search method")
-  @Order(6)
+  @DisplayName("can find filtered UrlAliases")
   @Test
   public void find() throws RepositoryException {
+    Webpage webpage = ensurePersistedWebpage();
+    UrlAlias urlAliasUeber =
+        UrlAlias.builder()
+            .slug("ueber")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .isPrimary()
+            .build();
+    repo.save(urlAliasUeber);
+
+    UrlAlias urlAliasUnter =
+        UrlAlias.builder()
+            .slug("unter")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAliasUnter);
+
     PageRequest pageRequest = new PageRequest("ueber", 0, 10);
     pageRequest.add(
         Filtering.builder()
@@ -207,37 +297,61 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
                     .build())
             .build());
 
-    PageResponse<LocalizedUrlAliases> pageResponse = this.repo.find(pageRequest);
+    PageResponse<LocalizedUrlAliases> pageResponse = repo.find(pageRequest);
     assertTrue(pageResponse.hasContent());
     assertThat(pageResponse.getTotalElements()).isEqualTo(1);
     assertThat(pageResponse.getContent().size()).isEqualTo(1);
     assertTrue(pageResponse.getContent().get(0).containsKey(Locale.GERMAN));
     assertThat(pageResponse.getContent().get(0).get(Locale.GERMAN))
-        .isEqualTo(List.of(this.urlAliasWithWebsite));
+        .isEqualTo(List.of(urlAliasUeber));
   }
 
   @DisplayName("Check method hasUrlAlias")
-  @Order(7)
   @Test
-  public void hasUrlAlias() throws RepositoryException {
+  public void hasUrlAlias() throws RepositoryException, MalformedURLException {
+    Webpage webpage = ensurePersistedWebpage();
+    Website website = ensurePresistedWebsite(webpage);
+    UrlAlias urlAliasWithoutWebsite =
+        UrlAlias.builder()
+            .slug("wir_ueber_uns")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAliasWithoutWebsite);
+    UrlAlias urlAliasWithWebsite =
+        UrlAlias.builder()
+            .website(website)
+            .slug("wir_ueber_uns")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAliasWithWebsite);
+
     assertThrows(
-        RepositoryException.class,
-        () -> this.repo.hasUrlAlias("", this.website.getUuid(), Locale.ROOT));
-    assertFalse(
-        this.repo.hasUrlAlias(
-            this.urlAliasWithoutWebsite.getSlug(), this.website.getUuid(), Locale.ROOT));
-    assertTrue(this.repo.hasUrlAlias(this.urlAliasWithoutWebsite.getSlug(), null, Locale.GERMAN));
-    assertTrue(
-        this.repo.hasUrlAlias(
-            this.urlAliasWithWebsite.getSlug(), this.website.getUuid(), Locale.GERMAN));
-    assertFalse(this.repo.hasUrlAlias("does_not_exist", this.website.getUuid(), Locale.ROOT));
+        RepositoryException.class, () -> repo.hasUrlAlias("", website.getUuid(), Locale.ROOT));
+    assertThat(repo.hasUrlAlias(urlAliasWithWebsite.getSlug(), website.getUuid(), Locale.ROOT))
+        .isFalse();
+    assertThat(repo.hasUrlAlias(urlAliasWithoutWebsite.getSlug(), null, Locale.GERMAN)).isTrue();
+    assertThat(repo.hasUrlAlias(urlAliasWithWebsite.getSlug(), website.getUuid(), Locale.GERMAN))
+        .isTrue();
+    assertThat(repo.hasUrlAlias("does_not_exist", website.getUuid(), Locale.ROOT)).isFalse();
   }
 
-  @DisplayName("Delete an UrlAlias")
-  @Order(8)
+  @DisplayName("can delete an UrlAlias")
   @Test
   public void delete() throws RepositoryException {
-    int count = this.repo.delete(List.of(this.urlAliasWithoutWebsite.getUuid()));
+    Webpage webpage = ensurePersistedWebpage();
+    UrlAlias urlAliasWithoutWebsite =
+        UrlAlias.builder()
+            .slug("wir_ueber_uns")
+            .targetLanguage(Locale.GERMAN)
+            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
+            .targetUuid(webpage.getUuid().toString())
+            .build();
+    repo.save(urlAliasWithoutWebsite);
+    int count = repo.delete(List.of(urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
   }
 
@@ -268,5 +382,25 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
             new Locale.Builder().setLanguage("en").build());
     assertThat(grabLocalesByScript(locales))
         .containsExactlyInAnyOrder(locales.get(0), locales.get(2));
+  }
+
+  // --------------------------------------------------------------------
+  private Webpage ensurePersistedWebpage() throws RepositoryException {
+    Webpage webpage = Webpage.builder().label(Locale.GERMAN, "webpage").build();
+    webpageRepository.save(webpage);
+    return webpage;
+  }
+
+  private Website ensurePresistedWebsite(Webpage... rootPages)
+      throws MalformedURLException, RepositoryException {
+    Website website =
+        Website.builder()
+            .url("https://my-first-website.com")
+            .refId(13)
+            .label("Test website")
+            .rootPages(Arrays.asList(rootPages))
+            .build();
+    websiteRepository.save(website);
+    return website;
   }
 }
