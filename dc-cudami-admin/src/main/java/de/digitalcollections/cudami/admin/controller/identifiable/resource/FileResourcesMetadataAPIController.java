@@ -89,7 +89,7 @@ public class FileResourcesMetadataAPIController
 
   @GetMapping("/api/fileresources/type/{type}")
   @ResponseBody
-  public PageResponse<FileResource> searchFileResourcesByType(
+  public PageResponse<FileResource> findByType(
       @PathVariable String type,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
