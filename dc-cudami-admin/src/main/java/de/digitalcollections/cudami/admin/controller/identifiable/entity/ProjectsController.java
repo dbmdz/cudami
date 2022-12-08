@@ -8,30 +8,18 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsCli
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for project management pages. */
 @Controller
@@ -49,27 +37,10 @@ public class ProjectsController extends AbstractController {
     this.service = client.forProjects();
   }
 
-  @PostMapping("/api/projects/{uuid}/digitalobjects")
-  public ResponseEntity addDigitalObjects(
-      @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
-      throws TechnicalException {
-    boolean successful = service.addDigitalObjects(uuid, digitalObjects);
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
-  }
-
   @GetMapping("/projects/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "projects/create";
-  }
-
-  @GetMapping("/api/projects/new")
-  @ResponseBody
-  public Project create() throws TechnicalException {
-    return service.create();
   }
 
   @GetMapping("/projects/{uuid}/edit")
@@ -94,40 +65,6 @@ public class ProjectsController extends AbstractController {
     return "projects/edit";
   }
 
-  @GetMapping("/api/projects")
-  @ResponseBody
-  public PageResponse<Project> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
-  }
-
-  @GetMapping("/api/projects/{uuid}")
-  @ResponseBody
-  public Project getByUuid(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
-  @GetMapping("/api/projects/{uuid}/digitalobjects")
-  @ResponseBody
-  public PageResponse<DigitalObject> getDigitalObjects(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findDigitalObjects(uuid, pageRequest);
-  }
-
   @GetMapping("/projects")
   public String list(Model model) throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
@@ -141,40 +78,6 @@ public class ProjectsController extends AbstractController {
   @ModelAttribute("menu")
   protected String module() {
     return "projects";
-  }
-
-  @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
-  @ResponseBody
-  public ResponseEntity removeDigitalObject(
-      @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid)
-      throws TechnicalException {
-    boolean successful = service.removeDigitalObject(projectUuid, digitalobjectUuid);
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
-  }
-
-  @PostMapping("/api/projects")
-  public ResponseEntity save(@RequestBody Project project) {
-    try {
-      Project projectDb = service.save(project);
-      return ResponseEntity.status(HttpStatus.CREATED).body(projectDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save project: ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-  }
-
-  @PutMapping("/api/projects/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Project project) {
-    try {
-      Project projectDb = service.update(uuid, project);
-      return ResponseEntity.ok(projectDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save project with uuid={}", uuid, e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
   }
 
   @GetMapping("/projects/{uuid}")

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ConfigController {
+public class ConfigAPIController {
   private final CudamiConfigClient service;
 
-  public ConfigController(CudamiClient cudamiClient) {
+  public ConfigAPIController(CudamiClient cudamiClient) {
     this.service = cudamiClient.forConfig();
   }
 

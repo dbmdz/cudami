@@ -55,6 +55,13 @@ a[href^="http"]:not(.no-external):after {
   color: rgb(220, 53, 69);
 }
 
+.global-action {
+  background-color: #fef5e7;
+  border: solid 1px #ccc;
+  margin-bottom: 1em;
+  padding: 1em;
+  text-align: center;
+}
 .nav-tabs .nav-tab {
   border: 1px solid transparent;
   border-top-left-radius: .25rem;

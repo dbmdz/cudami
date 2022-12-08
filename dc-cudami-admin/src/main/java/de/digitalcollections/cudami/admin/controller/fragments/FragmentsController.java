@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class FragmentsController {
 
   @GetMapping(value = "/fragments/forms/label-description")
-  public String getFormFragementLabelDescription(
+  public String getFormFragmentLabelDescription(
       @RequestParam(name = "fieldLanguage", required = true) String fieldLanguage, Model model) {
     model.addAttribute("identifiable", new Identifiable());
     model.addAttribute("beanName", "identifiable");
