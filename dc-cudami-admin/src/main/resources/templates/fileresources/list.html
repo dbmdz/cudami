@@ -6,6 +6,8 @@
       layout:decorate="~{base}">
   <head>
     <title th:text="#{fileresources}">Files</title>
+
+    <script th:src="@{/webjars/filesize/lib/filesize.min.js}"></script>
   </head>
   <body>
     <section layout:fragment="content">
@@ -62,8 +64,8 @@
                     <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
                     <th data-field="filename" data-sortable="true" th:text="#{lbl.filename}">Filename</th>
                     <th data-field="mimeType" data-sortable="true" th:text="#{lbl.mimetype}">Mimetype</th>
-                    <th data-field="sizeInBytes" data-sortable="true" data-formatter="formatBytesize" th:text="#{lbl.filesize}">Filesize</th>
-                    
+                    <th data-field="sizeInBytes" data-sortable="true" data-formatter="formatBytesize" data-align="right" th:text="#{lbl.filesize}">Filesize</th>
+
                     <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                     <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
                     <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
@@ -98,7 +100,7 @@
       });
 
       function formatBytesize(value, row, index) {
-        return value;
+        return filesize(value, {base: 2, round: 0, standard: "jedec"});
       }
       
       function formatRowNumber(value, row, index) {
@@ -127,7 +129,7 @@
           }
         };
       }
-      
+
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
@@ -136,10 +138,6 @@
           renderViewAction(baseUrl),
           renderEditAction(baseUrl)
         ].join(' ');
-      }
-
-      function formatIdentifiers(value, row) {
-        return renderIdentifiers(value);
       }
 
       function formatLabel(value, row) {
