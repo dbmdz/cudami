@@ -268,8 +268,16 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public void save(E entity, Map<String, Object> bindings) throws RepositoryException {
-    save(entity, bindings, null);
+  protected List<String> getReturnedFieldsOnInsertUpdate() {
+    var fields = super.getReturnedFieldsOnInsertUpdate();
+    fields.add("refid");
+    return fields;
+  }
+
+  @Override
+  protected void insertUpdateCallback(E identifiable, Map<String, Object> returnedFields) {
+    super.insertUpdateCallback(identifiable, returnedFields);
+    identifiable.setRefId(Long.parseLong(returnedFields.getOrDefault("refid", 0).toString()));
   }
 
   @Override

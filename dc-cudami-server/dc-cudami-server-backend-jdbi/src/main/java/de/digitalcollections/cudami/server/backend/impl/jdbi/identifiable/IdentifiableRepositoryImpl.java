@@ -132,6 +132,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         + ", tags_uuids=:tags_uuids::UUID[]";
   }
 
+  /**
+   * On insert or update these fields will be returned to be processed by {@link
+   * #insertUpdateCallback(Identifiable, Map)}.
+   *
+   * @return modifiable list of fields, please do not return null
+   */
+  protected List<String> getReturnedFieldsOnInsertUpdate() {
+    return new ArrayList<>(0);
+  }
+
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
   public BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer = (map, rowView) -> {};
   public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
@@ -676,6 +686,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
+  /**
+   * After save and update the returned fields (declared in {@link
+   * #getReturnedFieldsOnInsertUpdate()}) can be processed here.
+   *
+   * @param identifiable the object that was passed to save/update
+   * @param returnedFields returned fields in a map of column names to values
+   */
+  protected void insertUpdateCallback(I identifiable, Map<String, Object> returnedFields) {
+    // can be implemented in derived classes
+  }
+
   @Override
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
@@ -844,6 +865,25 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return result;
   }
 
+  private void execInsertUpdate(
+      final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback) {
+    // because of a significant difference in execution duration it makes sense to distinguish here
+    if (withCallback) {
+      Map<String, Object> returnedFields =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(sql)
+                      .bindMap(bindings)
+                      .bindBean(identifiable)
+                      .mapToMap()
+                      .findOne()
+                      .orElse(Collections.emptyMap()));
+      insertUpdateCallback(identifiable, returnedFields);
+    } else {
+      dbi.withHandle(h -> h.createUpdate(sql).bindMap(bindings).bindBean(identifiable).execute());
+    }
+  }
+
   @Override
   public void save(I identifiable, Map<String, Object> bindings) throws RepositoryException {
     save(identifiable, bindings, null);
@@ -874,8 +914,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     if (identifiable.getLastModified() == null) {
       identifiable.setLastModified(LocalDateTime.now());
     }
-
-    final String finalSql;
+    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
     String sql =
         "INSERT INTO "
             + tableName
@@ -883,17 +922,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + getSqlInsertFields()
             + ") VALUES ("
             + getSqlInsertValues()
-            + ")";
+            + ")"
+            + (hasReturningStmt
+                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
+                : "");
     if (sqlModifier != null) {
-      finalSql = sqlModifier.apply(sql, bindings);
-    } else {
-      finalSql = sql;
+      sql = sqlModifier.apply(sql, bindings);
     }
-
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
-
-    dbi.withHandle(
-        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
+    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
   }
 
   @Override
@@ -1002,17 +1038,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
 
-    final String finalSql;
-    String sql = "UPDATE " + tableName + " SET" + getSqlUpdateFieldValues() + " WHERE uuid=:uuid";
+    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
+    String sql =
+        "UPDATE "
+            + tableName
+            + " SET"
+            + getSqlUpdateFieldValues()
+            + " WHERE uuid=:uuid"
+            + (hasReturningStmt
+                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
+                : "");
 
     if (sqlModifier != null) {
-      finalSql = sqlModifier.apply(sql, bindings);
-    } else {
-      finalSql = sql;
+      sql = sqlModifier.apply(sql, bindings);
     }
-
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
-    dbi.withHandle(
-        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
+    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
   }
 }
