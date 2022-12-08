@@ -9,7 +9,6 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
@@ -95,7 +94,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Save an UrlAlias object")
   @Order(1)
   @Test
-  public void save() throws UrlAliasRepositoryException, RepositoryException {
+  public void save() throws RepositoryException {
     assertThat(this.urlAliasWithWebsite.getUuid()).isNull();
     assertThat(this.urlAliasWithWebsite.getCreated()).isNull();
     assertThat(this.urlAliasWithWebsite.getLastPublished()).isNull();
@@ -114,7 +113,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Retrieve object by UUID")
   @Order(2)
   @Test
-  public void getByUuid() throws UrlAliasRepositoryException {
+  public void getByUuid() throws RepositoryException {
     UrlAlias found = this.repo.getByUuid(this.urlAliasWithWebsite.getUuid());
     assertEquals(found, this.urlAliasWithWebsite);
   }
@@ -122,7 +121,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Update an UrlAlias object")
   @Order(3)
   @Test
-  public void update() throws UrlAliasRepositoryException, RepositoryException {
+  public void update() throws RepositoryException {
     repo.save(urlAliasWithoutWebsite);
     urlAliasWithoutWebsite.setLastPublished(LocalDateTime.now());
     urlAliasWithoutWebsite.setPrimary(true);
@@ -139,7 +138,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Retrieve LocalizedUrlAliases for target UUID")
   @Order(4)
   @Test
-  public void findAllForTarget() throws UrlAliasRepositoryException, RepositoryException {
+  public void findAllForTarget() throws RepositoryException {
     this.urlAliasWithWebsite = this.getNewUrlAliasObject();
     this.urlAliasWithWebsite.setSlug("wir_ueber_uns");
     this.urlAliasWithWebsite.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
@@ -157,7 +156,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Retrieve main link for target UUID")
   @Order(5)
   @Test
-  public void findMainLinks() throws UrlAliasRepositoryException, RepositoryException {
+  public void findMainLinks() throws RepositoryException {
     UrlAlias anotherMainLink = this.getNewUrlAliasObject();
     anotherMainLink.setTargetUuid(this.urlAliasWithoutWebsite.getTargetUuid());
     anotherMainLink.setTargetLanguage(Locale.ENGLISH);
@@ -197,7 +196,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Generic search method")
   @Order(6)
   @Test
-  public void find() throws UrlAliasRepositoryException {
+  public void find() throws RepositoryException {
     PageRequest pageRequest = new PageRequest("ueber", 0, 10);
     pageRequest.add(
         Filtering.builder()
@@ -220,9 +219,9 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Check method hasUrlAlias")
   @Order(7)
   @Test
-  public void hasUrlAlias() throws UrlAliasRepositoryException {
+  public void hasUrlAlias() throws RepositoryException {
     assertThrows(
-        UrlAliasRepositoryException.class,
+        RepositoryException.class,
         () -> this.repo.hasUrlAlias("", this.website.getUuid(), Locale.ROOT));
     assertFalse(
         this.repo.hasUrlAlias(
@@ -237,7 +236,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
   @DisplayName("Delete an UrlAlias")
   @Order(8)
   @Test
-  public void delete() throws UrlAliasRepositoryException {
+  public void delete() throws RepositoryException {
     int count = this.repo.delete(List.of(this.urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
   }
