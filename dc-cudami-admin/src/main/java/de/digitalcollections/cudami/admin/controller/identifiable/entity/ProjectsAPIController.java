@@ -86,7 +86,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
 
   @GetMapping("/api/projects/{uuid}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public PageResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
