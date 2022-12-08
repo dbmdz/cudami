@@ -15,6 +15,10 @@
   <dependencies>
     <dependency>
       <groupId>de.digitalcollections.cudami</groupId>
+      <artifactId>dc-cudami-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.digitalcollections.cudami</groupId>
       <artifactId>dc-cudami-server-backend-api</artifactId>
     </dependency>
     <dependency>

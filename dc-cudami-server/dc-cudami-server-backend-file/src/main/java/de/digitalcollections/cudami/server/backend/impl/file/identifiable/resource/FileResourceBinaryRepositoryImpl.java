@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resource;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -63,13 +64,13 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   @Autowired
   public FileResourceBinaryRepositoryImpl(
-      @Value("${cudami.repositoryFolderPath}") String folderPath,
+      CudamiConfig cudamiConfig,
       @Value("${iiif.image.baseUrl:#{null}}") URL iiifImageBaseUrl,
       @Value("${media.video.baseUrl:#{null}}") URL mediaVideoBaseUrl,
       ResourceLoader resourceLoader) {
     this.iiifImageBaseUrl = iiifImageBaseUrl;
     this.mediaVideoBaseUrl = mediaVideoBaseUrl;
-    this.repositoryFolderPath = folderPath.replace("~", System.getProperty("user.home"));
+    this.repositoryFolderPath = cudamiConfig.getRepositoryFolderPath();
     this.resourceLoader = resourceLoader;
   }
 
