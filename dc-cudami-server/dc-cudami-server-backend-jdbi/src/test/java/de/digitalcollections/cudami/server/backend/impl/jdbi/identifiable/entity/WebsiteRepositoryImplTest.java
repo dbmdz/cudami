@@ -76,14 +76,14 @@ class WebsiteRepositoryImplTest {
   @Test
   @DisplayName("save a website with notes")
   void saveWebsiteWithNotes() {
-    var noteContent1 = new StructuredContent();
+    StructuredContent noteContent1 = new StructuredContent();
     noteContent1.addContentBlock(new Text("eine Bemerkung"));
-    var note1 = new LocalizedStructuredContent();
+    LocalizedStructuredContent note1 = new LocalizedStructuredContent();
     note1.put(Locale.GERMAN, noteContent1);
 
-    var noteContent2 = new StructuredContent();
+    StructuredContent noteContent2 = new StructuredContent();
     noteContent2.addContentBlock(new Text("zweite Bemerkung"));
-    var note2 = new LocalizedStructuredContent();
+    LocalizedStructuredContent note2 = new LocalizedStructuredContent();
     note2.put(Locale.GERMAN, noteContent2);
     Website website =
         Website.builder()
