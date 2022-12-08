@@ -80,7 +80,7 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
 
   @GetMapping("/api/topics/{uuid}/entities")
   @ResponseBody
-  public PageResponse<Entity> getAttachedEntites(
+  public PageResponse<Entity> findAttachedEntites(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
