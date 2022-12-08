@@ -101,21 +101,20 @@ public class ItemRepositoryImplTest
   void saveAndRetrieveOneHolder() throws RepositoryException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
-        CorporateBody.builder()
+        Agent.builder()
             .label(Locale.GERMAN, "A Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
     Agent holder0 = holders.get(0);
 
-    corporateBodyRepository.save((CorporateBody) holder0);
+    agentRepository.save(holder0);
     assertThat(holders.get(0).getUuid()).isNotNull();
 
     Item enclosingItem =
         Item.builder()
             .label(Locale.GERMAN, "Gesamt-Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Sig")
             .title(Locale.GERMAN, "Ein Gesamt-Buchtitel")
             .build();
     repo.save(enclosingItem);
@@ -124,7 +123,6 @@ public class ItemRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
             .title(Locale.GERMAN, "Ein Buchtitel")
             .holders(holders)
             .partOfItem(enclosingItem)
@@ -132,6 +130,8 @@ public class ItemRepositoryImplTest
 
     repo.save(item);
     Item retrievedItem = repo.getByUuid(item.getUuid());
+    // do not expect too much ;-)
+    item.setPartOfItem(Item.builder().uuid(enclosingItem.getUuid()).build());
     assertThat(item).isEqualTo(retrievedItem);
     assertThat(retrievedItem.getHolders().size()).isEqualTo(1);
     assertThat(retrievedItem.getHolders().get(0)).isEqualTo(holder0);
@@ -144,20 +144,20 @@ public class ItemRepositoryImplTest
   void saveAndRetrieveTwoHolders() throws RepositoryException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
-        CorporateBody.builder()
+        Agent.builder()
             .label(Locale.GERMAN, "A Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
     holders.add(
-        CorporateBody.builder()
+        Agent.builder()
             .label(Locale.GERMAN, "Some Amazing Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
-    CorporateBody holder0 = (CorporateBody) holders.get(0);
-    corporateBodyRepository.save(holder0);
-    CorporateBody holder1 = (CorporateBody) holders.get(1);
-    corporateBodyRepository.save(holder1);
+    Agent holder0 = holders.get(0);
+    agentRepository.save(holder0);
+    Agent holder1 = holders.get(1);
+    agentRepository.save(holder1);
 
     List<Agent> holdersInDb = List.of(holder0, holder1);
 
@@ -165,14 +165,13 @@ public class ItemRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
             .title(Locale.GERMAN, "Ein Buchtitel")
             .holders(holders)
             .build();
 
     repo.save(item);
     Item retrievedItem = repo.getByUuid(item.getUuid());
-    assertThat(item).isEqualTo(retrievedItem);
+    assertThat(retrievedItem).isEqualTo(item);
     assertThat(retrievedItem.getHolders().size()).isEqualTo(2);
     assertThat(retrievedItem.getHolders()).containsAll(holdersInDb);
   }
@@ -183,7 +182,6 @@ public class ItemRepositoryImplTest
     CorporateBody holder1 =
         CorporateBody.builder()
             .label("ACME Inc.")
-            .identifier("foobar", "42")
             .homepageUrl("https://www.digitale-sammlungen.de/")
             .build();
     corporateBodyRepository.save(holder1);
@@ -191,7 +189,6 @@ public class ItemRepositoryImplTest
     Person holder2 =
         Person.builder()
             .label("Karl Ranseier")
-            .identifier("gnd", "-1")
             .gender(Gender.MALE)
             .description(Locale.GERMAN, "Der erfolgloseste Entwickler aller Zeiten")
             .build();
@@ -214,10 +211,10 @@ public class ItemRepositoryImplTest
     assertThat(itemPersistedAgent2.getLabel()).isNotNull();
     assertThat(itemPersistedAgent2.getIdentifiers()).isEmpty();
 
-    Agent agent1 = agentRepository.getByUuid(itemPersistedAgent1.getUuid());
+    CorporateBody agent1 = corporateBodyRepository.getByUuid(itemPersistedAgent1.getUuid());
     assertThat(agent1).isEqualTo(holder1);
 
-    Agent agent2 = agentRepository.getByUuid(itemPersistedAgent2.getUuid());
+    Person agent2 = personRepository.getByUuid(itemPersistedAgent2.getUuid());
     assertThat(agent2).isEqualTo(holder2);
   }
 
@@ -313,6 +310,8 @@ public class ItemRepositoryImplTest
     repo.save(parentItem);
     Item expectedItem = Item.builder().partOfItem(parentItem).label("expected").build();
     repo.save(expectedItem);
+    // partOfItem is only an UUID so we must not expect more
+    expectedItem.setPartOfItem(Item.builder().uuid(parentItem.getUuid()).build());
 
     PageRequest pageRequest =
         PageRequest.builder()
