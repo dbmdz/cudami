@@ -51,7 +51,7 @@ public class ItemsAPIController extends AbstractPagingAndSortingController<Item>
 
   @GetMapping("/api/items/{uuid}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> getDigitalObjects(
+  public PageResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
