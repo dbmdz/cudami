@@ -36,7 +36,8 @@ public class CudamiConfig {
       throw new IllegalStateException(
           "Required `cudami.repositoryFolderPath` configuration missing.");
     }
-    this.repositoryFolderPath = repositoryFolderPath.replace("~", System.getProperty("user.home"));
+    this.repositoryFolderPath =
+        repositoryFolderPath.replace("~/", System.getProperty("user.home") + "/");
     this.typeDeclarations = typeDeclarations;
     this.urlAlias = urlAlias;
   }
