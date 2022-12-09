@@ -5,6 +5,7 @@ import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_P
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -37,41 +38,53 @@ public class CudamiUrlAliasClient extends BaseRestClient<UrlAlias> {
       throw new TechnicalException("generateSlug", e);
     }
 
-    if (websiteUuid == null) {
+    try {
+      if (websiteUuid == null) {
+        return doGetRequestForString(
+            String.format(baseEndpoint + "/slug/%s/%s", locale, encodedLabel));
+      }
       return doGetRequestForString(
-          String.format(baseEndpoint + "/slug/%s/%s", locale, encodedLabel));
+          String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
+    } catch (ResourceNotFoundException e) {
+      return null;
     }
-    return doGetRequestForString(
-        String.format(baseEndpoint + "/slug/%s/%s/%s", locale, encodedLabel, websiteUuid));
   }
 
   public LocalizedUrlAliases getPrimaryLinks(UUID websiteUuid, String slug)
       throws TechnicalException {
-    if (websiteUuid == null) {
+    try {
+      if (websiteUuid == null) {
+        return (LocalizedUrlAliases)
+            doGetRequestForObject(
+                String.format(baseEndpoint + "/primary/%s", slug), LocalizedUrlAliases.class);
+      }
+
       return (LocalizedUrlAliases)
           doGetRequestForObject(
-              String.format(baseEndpoint + "/primary/%s", slug), LocalizedUrlAliases.class);
+              String.format(baseEndpoint + "/primary/%s/%s", slug, websiteUuid),
+              LocalizedUrlAliases.class);
+    } catch (ResourceNotFoundException e) {
+      return null;
     }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/primary/%s/%s", slug, websiteUuid),
-            LocalizedUrlAliases.class);
   }
 
   public LocalizedUrlAliases getPrimaryLinksForLocale(UUID websiteUuid, String slug, Locale pLocale)
       throws TechnicalException {
-    if (websiteUuid == null) {
+    try {
+      if (websiteUuid == null) {
+        return (LocalizedUrlAliases)
+            doGetRequestForObject(
+                String.format(baseEndpoint + "/primary/%s?pLocale=%s", slug, pLocale),
+                LocalizedUrlAliases.class);
+      }
+
       return (LocalizedUrlAliases)
           doGetRequestForObject(
-              String.format(baseEndpoint + "/primary/%s?pLocale=%s", slug, pLocale),
+              String.format(baseEndpoint + "/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
               LocalizedUrlAliases.class);
+    } catch (ResourceNotFoundException e) {
+      return null;
     }
-
-    return (LocalizedUrlAliases)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/primary/%s/%s?pLocale=%s", slug, websiteUuid, pLocale),
-            LocalizedUrlAliases.class);
   }
 
   public boolean isPrimary(UUID websiteUuid, String slug) throws TechnicalException {

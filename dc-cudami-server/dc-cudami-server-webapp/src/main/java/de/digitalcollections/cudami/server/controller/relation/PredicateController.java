@@ -53,10 +53,9 @@ public class PredicateController {
           @PathVariable("uuid")
           UUID uuid) {
     boolean successful = predicateService.delete(uuid);
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.NO_CONTENT);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all predicates as (sorted, paged) list")
@@ -88,12 +87,16 @@ public class PredicateController {
   @GetMapping(
       value = {"/v6/predicates/{valueOrUuid:.+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate getByValueOrUUID(@PathVariable("valueOrUuid") String valueOrUuid) {
+  public ResponseEntity<Predicate> getByValueOrUUID(
+      @PathVariable("valueOrUuid") String valueOrUuid) {
+    Predicate result;
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
-      return predicateService.getByUuid(uuid);
+      result = predicateService.getByUuid(uuid);
+    } else {
+      result = predicateService.getByValue(valueOrUuid);
     }
-    return predicateService.getByValue(valueOrUuid);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all predicates")

@@ -81,11 +81,9 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (!isDeleted) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return isDeleted
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -150,11 +148,8 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(JSONObject.quote(result), HttpStatus.OK);
+    return new ResponseEntity<>(
+        JSONObject.quote(result), result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get an UrlAlias by uuid")
@@ -179,11 +174,7 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -221,11 +212,7 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "update an UrlAlias")

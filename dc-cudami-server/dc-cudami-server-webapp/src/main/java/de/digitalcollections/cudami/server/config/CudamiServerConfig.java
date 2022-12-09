@@ -11,9 +11,10 @@ public class CudamiServerConfig extends CudamiConfig {
 
   public CudamiServerConfig(
       Defaults defaults,
-      UrlAlias urlAlias,
       int offsetForAlternativePaging,
-      TypeDeclarations typeDeclarations) {
-    super(defaults, urlAlias, offsetForAlternativePaging, typeDeclarations);
+      String repositoryFolderPath,
+      TypeDeclarations typeDeclarations,
+      UrlAlias urlAlias) {
+    super(defaults, offsetForAlternativePaging, repositoryFolderPath, typeDeclarations, urlAlias);
   }
 }

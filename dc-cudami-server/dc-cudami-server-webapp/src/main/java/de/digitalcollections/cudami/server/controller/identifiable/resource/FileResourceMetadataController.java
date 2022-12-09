@@ -155,6 +155,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
         "/latest/fileresources/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<FileResource> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -183,13 +184,13 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-    FileResource fileResource;
+    FileResource result;
     if (pLocale == null) {
-      fileResource = metadataService.getByUuid(uuid);
+      result = metadataService.getByUuid(uuid);
     } else {
-      fileResource = metadataService.getByUuidAndLocale(uuid, pLocale);
+      result = metadataService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(fileResource, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all websites")

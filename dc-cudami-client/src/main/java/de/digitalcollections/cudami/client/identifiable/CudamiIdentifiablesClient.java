@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -133,11 +134,15 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
                   .collect(Collectors.joining("&"));
     }
 
-    return doGetRequestForObject(
-        String.format(
-            baseEndpoint + "/identifier/%s%s",
-            encodedNamespaceAndId,
-            expandedAdditionalParameters));
+    try {
+      return doGetRequestForObject(
+          String.format(
+              baseEndpoint + "/identifier/%s%s",
+              encodedNamespaceAndId,
+              expandedAdditionalParameters));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   /**
@@ -157,7 +162,11 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
   }
 
   public I getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
-    return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+    try {
+      return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Locale> getLanguages() throws TechnicalException {

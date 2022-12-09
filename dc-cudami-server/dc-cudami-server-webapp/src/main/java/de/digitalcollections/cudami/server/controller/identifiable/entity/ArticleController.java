@@ -97,7 +97,7 @@ public class ArticleController {
     } else {
       article = articleService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(article, HttpStatus.OK);
+    return new ResponseEntity<>(article, article != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all articles")

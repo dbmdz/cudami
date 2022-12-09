@@ -71,11 +71,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID subtopicUuid)
       throws IdentifiableServiceException {
     boolean successful = topicService.addChild(parentTopicUuid, subtopicUuid);
-
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get count of topics")
@@ -251,7 +249,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
     } else {
       topic = topicService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(topic, HttpStatus.OK);
+    return new ResponseEntity<>(topic, topic != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -263,7 +261,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{uuid}/children"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<Topic> getChildren(@PathVariable UUID uuid) {
+  public List<Topic> getChildren(@PathVariable UUID uuid) {
     return topicService.getChildren(uuid);
   }
 
@@ -309,7 +307,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{uuid}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  Topic getParent(@PathVariable UUID uuid) {
+  public Topic getParent(@PathVariable UUID uuid) {
     return topicService.getParent(uuid);
   }
 
@@ -317,7 +315,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @GetMapping(
       value = {"/v2/topics/{uuid}/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
+  public ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
     return new ResponseEntity<>(
         "no longer supported. use '/v3/topics/{uuid}/children' endpoint, returning list of child-topics",
         HttpStatus.GONE);
@@ -345,7 +343,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/entity/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
+  public List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
     return topicService.getTopicsOfEntity(uuid);
   }
 
@@ -358,7 +356,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/fileresource/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
+  public List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
     return topicService.getTopicsOfFileResource(uuid);
   }
 
@@ -371,17 +369,16 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
         "/latest/topics/{parentTopicUuid}/children/{subtopicUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  ResponseEntity<Boolean> removeChild(
+  public ResponseEntity<Boolean> removeChild(
       @Parameter(name = "parentTopicUuid", description = "The uuid of the parent topic")
           @PathVariable
           UUID parentTopicUuid,
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid) {
     boolean successful = topicService.removeChild(parentTopicUuid, subtopicUuid);
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created topic")

@@ -84,10 +84,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get all persons")
@@ -228,7 +227,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
     } else {
       result = personService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a person's digital objects")

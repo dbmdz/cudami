@@ -197,12 +197,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           UUID uuid)
       throws JsonProcessingException {
     Website website = websiteService.getByUuid(uuid);
-
-    if (website == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(website, HttpStatus.OK);
+    return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -313,11 +308,9 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     website.setUuid(uuid);
 
     boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
-
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations

@@ -7,12 +7,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.util.StringUtils;
 
 public class CudamiConfig {
+
   private Defaults defaults;
-  private UrlAlias urlAlias;
   private int offsetForAlternativePaging = 0;
+  private String repositoryFolderPath;
   private TypeDeclarations typeDeclarations;
+  private UrlAlias urlAlias;
 
   @SuppressFBWarnings(
       value = "EI_EXPOSE_REP2",
@@ -20,25 +23,35 @@ public class CudamiConfig {
   @JsonCreator(mode = Mode.PROPERTIES)
   public CudamiConfig(
       @JsonProperty(value = "defaults") Defaults defaults,
-      @JsonProperty(value = "urlAlias") UrlAlias urlAlias,
       @JsonProperty(value = "offsetForAlternativePaging") int offsetForAlternativePaging,
-      @JsonProperty(value = "typeDeclarations") TypeDeclarations typeDeclarations) {
+      @JsonProperty(value = "repositoryFolderPath") String repositoryFolderPath,
+      @JsonProperty(value = "typeDeclarations") TypeDeclarations typeDeclarations,
+      @JsonProperty(value = "urlAlias") UrlAlias urlAlias) {
+    if (defaults == null) {
+      throw new IllegalStateException("Required `cudami.defaults` configuration missing.");
+    }
     this.defaults = defaults;
-    this.urlAlias = urlAlias;
     this.offsetForAlternativePaging = offsetForAlternativePaging;
+    if (!StringUtils.hasText(repositoryFolderPath)) {
+      throw new IllegalStateException(
+          "Required `cudami.repositoryFolderPath` configuration missing.");
+    }
+    this.repositoryFolderPath =
+        repositoryFolderPath.replace("~/", System.getProperty("user.home") + "/");
     this.typeDeclarations = typeDeclarations;
+    this.urlAlias = urlAlias;
   }
 
   public Defaults getDefaults() {
     return defaults;
   }
 
-  public UrlAlias getUrlAlias() {
-    return urlAlias;
-  }
-
   public int getOffsetForAlternativePaging() {
     return offsetForAlternativePaging;
+  }
+
+  public String getRepositoryFolderPath() {
+    return repositoryFolderPath;
   }
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "partially filled at runtime")
@@ -46,7 +59,12 @@ public class CudamiConfig {
     return typeDeclarations;
   }
 
+  public UrlAlias getUrlAlias() {
+    return urlAlias;
+  }
+
   public static class Defaults {
+
     private String language;
     private Locale locale;
 
@@ -54,7 +72,14 @@ public class CudamiConfig {
     public Defaults(
         @JsonProperty(value = "language") String language,
         @JsonProperty(value = "locale") Locale locale) {
+      if (!StringUtils.hasText(language)) {
+        throw new IllegalStateException(
+            "Required `cudami.defaults.language` configuration missing.");
+      }
       this.language = language;
+      if (!StringUtils.hasText(locale.getLanguage())) {
+        throw new IllegalStateException("Required `cudami.defaults.locale` configuration missing.");
+      }
       this.locale = locale;
     }
 
@@ -68,6 +93,7 @@ public class CudamiConfig {
   }
 
   public static class UrlAlias {
+
     private static final int DB_MAX_LENGTH = 256;
 
     private List<String> generationExcludes;

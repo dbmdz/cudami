@@ -12,7 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,16 +67,18 @@ public class UserController {
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User getByUsername(@RequestParam(name = "email") String email) {
-    return userService.getByUsername(email);
+  public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email) {
+    User result = userService.getByUsername(email);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get user by uuid")
   @GetMapping(
       value = {"/v6/users/{uuid}", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User getByUuid(@PathVariable UUID uuid) {
-    return userService.getByUuid(uuid);
+  public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) {
+    User result = userService.getByUuid(uuid);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created user")

@@ -5,6 +5,7 @@ import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_P
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
@@ -31,10 +32,18 @@ public class CudamiLocalesClient extends BaseRestClient<Locale> {
   }
 
   public Locale getDefaultLanguage() throws TechnicalException {
-    return doGetRequestForObject(API_VERSION_PREFIX + "/languages/default");
+    try {
+      return doGetRequestForObject(API_VERSION_PREFIX + "/languages/default");
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public String getDefaultLocale() throws TechnicalException {
-    return doGetRequestForString(baseEndpoint + "/default");
+    try {
+      return doGetRequestForString(baseEndpoint + "/default");
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 }

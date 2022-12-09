@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -22,32 +23,46 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
 
   public boolean addDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format(
-                baseEndpoint + "/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid)));
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid), digitalObjects));
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid), digitalObjects);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean addSubcollection(UUID collectionUuid, UUID subcollectionUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format(
-                baseEndpoint + "/%s/subcollections/%s", collectionUuid, subcollectionUuid)));
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/subcollections/%s", collectionUuid, subcollectionUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean addSubcollections(UUID collectionUuid, List<Collection> subcollections)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format(baseEndpoint + "/%s/subcollections", collectionUuid), subcollections));
+    try {
+      doPostRequestForString(
+          String.format(baseEndpoint + "/%s/subcollections", collectionUuid), subcollections);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public PageResponse<Collection> findActive(PageRequest pageRequest) throws TechnicalException {
@@ -96,14 +111,22 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
   }
 
   public Collection getActiveByUuid(UUID uuid, Locale locale) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format(baseEndpoint + "/%s?active=true&pLocale=%s", uuid, locale));
+    try {
+      return doGetRequestForObject(
+          String.format(baseEndpoint + "/%s?active=true&pLocale=%s", uuid, locale));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
-    return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format(baseEndpoint + "/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+    try {
+      return (BreadcrumbNavigation)
+          doGetRequestForObject(
+              String.format(baseEndpoint + "/%s/breadcrumb", uuid), BreadcrumbNavigation.class);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Locale> getLanguagesOfTopCollections() throws TechnicalException {
@@ -121,18 +144,24 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
 
   public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doDeleteRequestForString(
-            String.format(
-                baseEndpoint + "/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid)));
+    try {
+      doDeleteRequestForString(
+          String.format(baseEndpoint + "/%s/digitalobjects/%s", collectionUuid, digitalObjectUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean removeSubcollection(UUID collectionUuid, UUID subcollectionUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doDeleteRequestForString(
-            String.format(
-                baseEndpoint + "/%s/subcollections/%s", collectionUuid, subcollectionUuid)));
+    try {
+      doDeleteRequestForString(
+          String.format(baseEndpoint + "/%s/subcollections/%s", collectionUuid, subcollectionUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public Collection saveWithParentCollection(Collection collection, UUID parentCollectionUuid)
@@ -143,11 +172,14 @@ public class CudamiCollectionsClient extends CudamiEntitiesClient<Collection> {
 
   public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        (String)
-            doPutRequestForObject(
-                String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
-                digitalObjects,
-                String.class));
+    try {
+      doPutRequestForObject(
+          String.format(baseEndpoint + "/%s/digitalobjects", collectionUuid),
+          digitalObjects,
+          String.class);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }

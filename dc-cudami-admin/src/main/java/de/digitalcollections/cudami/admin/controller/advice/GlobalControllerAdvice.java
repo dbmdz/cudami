@@ -36,8 +36,18 @@ public class GlobalControllerAdvice {
   @ExceptionHandler(ResourceNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public String handleResourceNotFoundException(Model model) {
+    /*
+    unsuitable for REST APIs. For such cases it is
+    preferable to use a ResponseEntity as
+    a return type and avoid the use of @ResponseStatus altogether.
+    */
     return "error/404";
   }
+
+  //  @ExceptionHandler(ResourceNotFoundException.class)
+  //  public ResponseEntity handleResourceNotFoundException(Model model) {
+  //    return ResponseEntity.notFound().build();
+  //  }
 
   @InitBinder
   public void registerCustomEditors(WebDataBinder binder, WebRequest request) {

@@ -125,7 +125,8 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
     } else {
       headwordEntry = headwordEntryService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(headwordEntry, HttpStatus.OK);
+    return new ResponseEntity<>(
+        headwordEntry, headwordEntry != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all headwordentries")

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -24,8 +25,11 @@ public class CudamiWebsitesClient extends CudamiEntitiesClient<Website> {
 
   public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootpages)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPutRequestForString(
-            String.format("%s/%s/rootpages", baseEndpoint, websiteUuid), rootpages));
+    try {
+      doPutRequestForString(String.format("%s/%s/rootpages", baseEndpoint, websiteUuid), rootpages);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -57,9 +58,13 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
-    return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
+    try {
+      return (BreadcrumbNavigation)
+          doGetRequestForObject(
+              String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Webpage> getChildren(UUID uuid) throws TechnicalException {
@@ -99,8 +104,11 @@ public class CudamiWebpagesClient extends CudamiIdentifiablesClient<Webpage> {
 
   public boolean updateChildrenOrder(UUID webpageUuid, List<Webpage> children)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPutRequestForString(
-            String.format("%s/%s/children", baseEndpoint, webpageUuid), children));
+    try {
+      doPutRequestForString(String.format("%s/%s/children", baseEndpoint, webpageUuid), children);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }

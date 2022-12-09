@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.legal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.legal.License;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -39,8 +40,12 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
   }
 
   public License getByUrl(String url) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s?url=%s", baseEndpoint, URLEncoder.encode(url, StandardCharsets.UTF_8)));
+    try {
+      return doGetRequestForObject(
+          String.format("%s?url=%s", baseEndpoint, URLEncoder.encode(url, StandardCharsets.UTF_8)));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public License getByUrl(URL url) throws TechnicalException {
@@ -48,6 +53,6 @@ public class CudamiLicensesClient extends CudamiRestClient<License> {
   }
 
   public List<Locale> getLanguages() throws TechnicalException {
-    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
+    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

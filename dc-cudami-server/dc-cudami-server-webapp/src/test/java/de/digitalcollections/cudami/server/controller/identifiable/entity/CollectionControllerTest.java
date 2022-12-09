@@ -111,7 +111,7 @@ class CollectionControllerTest extends BaseControllerTest {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
     when(collectionService.delete(eq(uuid))).thenReturn(true);
 
-    testDeleteSuccessfulOK(path);
+    testDeleteSuccessful(path);
 
     verify(collectionService, times(1)).delete(eq(uuid));
   }

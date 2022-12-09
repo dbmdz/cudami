@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -18,17 +19,24 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
 
   public boolean addDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format(
-                "%s/%s/digitalobjects/%s", baseEndpoint, projectUuid, digitalObjectUuid)));
+    try {
+      doPostRequestForString(
+          String.format("%s/%s/digitalobjects/%s", baseEndpoint, projectUuid, digitalObjectUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doPostRequestForString(
-            String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid), digitalObjects));
+    try {
+      doPostRequestForString(
+          String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid), digitalObjects);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest)
@@ -41,19 +49,25 @@ public class CudamiProjectsClient extends CudamiEntitiesClient<Project> {
 
   public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        doDeleteRequestForString(
-            String.format(
-                "%s/%s/digitalobjects/%s", baseEndpoint, projectUuid, digitalObjectUuid)));
+    try {
+      doDeleteRequestForString(
+          String.format("%s/%s/digitalobjects/%s", baseEndpoint, projectUuid, digitalObjectUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    return Boolean.parseBoolean(
-        (String)
-            doPutRequestForObject(
-                String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid),
-                digitalObjects,
-                String.class));
+    try {
+      doPutRequestForObject(
+          String.format("%s/%s/digitalobjects", baseEndpoint, projectUuid),
+          digitalObjects,
+          String.class);
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 }
