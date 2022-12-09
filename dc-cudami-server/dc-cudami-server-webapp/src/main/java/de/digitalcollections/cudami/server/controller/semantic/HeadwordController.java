@@ -64,11 +64,7 @@ public class HeadwordController {
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid) {
     boolean successful = headwordService.delete(uuid);
-
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all headwords as (filtered, sorted, paged) list")
@@ -186,8 +182,9 @@ public class HeadwordController {
         "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Headword getByUuid(@PathVariable UUID uuid) {
-    return headwordService.getByUuid(uuid);
+  public ResponseEntity<Headword> getByUuid(@PathVariable UUID uuid) {
+    Headword result = headwordService.getByUuid(uuid);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Find limited amount of random headwords")

@@ -70,10 +70,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful = projectService.addDigitalObject(project, digitalObject);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add existing digital objects to an existing project")
@@ -95,10 +92,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful = projectService.addDigitalObjects(project, digitalObjects);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -121,10 +115,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all projects as (sorted, paged) list")
@@ -206,7 +197,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     } else {
       project = projectService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(project, HttpStatus.OK);
+    return new ResponseEntity<>(project, project != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all projects")
@@ -245,10 +236,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful = projectService.removeDigitalObject(project, digitalObject);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created project")
@@ -279,10 +267,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful = projectService.setDigitalObjects(project, digitalObjects);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Update an project")

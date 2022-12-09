@@ -1,11 +1,14 @@
 package de.digitalcollections.cudami.server.controller;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,8 +31,12 @@ public class LocaleController {
         "/latest/languages/default"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Locale getDefaultLanguage() {
-    return new Locale(localeService.getDefaultLanguage());
+  public ResponseEntity<Locale> getDefaultLanguage() throws ResourceNotFoundException {
+    String defaultLanguage = localeService.getDefaultLanguage();
+    if (defaultLanguage == null) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return new ResponseEntity<>(new Locale(defaultLanguage), HttpStatus.OK);
   }
 
   @Operation(summary = "Get default locale")
@@ -42,8 +49,10 @@ public class LocaleController {
         "/latest/locales/default"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Locale getDefaultLocale() {
-    return localeService.getDefaultLocale();
+  public ResponseEntity<Locale> getDefaultLocale() throws ResourceNotFoundException {
+    Locale defaultLocale = localeService.getDefaultLocale();
+    return new ResponseEntity<>(
+        defaultLocale, defaultLocale != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all supported languages")

@@ -83,10 +83,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.addDigitalObject(collection, digitalObject);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add existing digital objects to an existing collection")
@@ -108,10 +105,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.addDigitalObjects(collection, digitalObjects);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add an existing collection to an existing collection")
@@ -137,10 +131,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.addChild(collection, subcollection);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add existing collections to an existing collection")
@@ -162,10 +153,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.addChildren(collection, subcollections);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get count of collections")
@@ -198,10 +186,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -359,6 +344,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         "/latest/collections/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<Collection> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -421,7 +407,8 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         collection = collectionService.getByUuidAndLocale(uuid, pLocale);
       }
     }
-    return new ResponseEntity<>(collection, HttpStatus.OK);
+    return new ResponseEntity<>(
+        collection, collection != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get the first created parent of a collection")
@@ -433,8 +420,9 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         "/latest/collections/{uuid}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Collection getParent(@PathVariable UUID uuid) {
-    return collectionService.getParent(uuid);
+  public ResponseEntity<Collection> getParent(@PathVariable UUID uuid) {
+    Collection parent = collectionService.getParent(uuid);
+    return new ResponseEntity<>(parent, parent != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get parent collections")
@@ -488,10 +476,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.removeDigitalObject(collection, digitalObject);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Remove an existing collection from an existing collection")
@@ -517,10 +502,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.removeChild(collection, subcollection);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created collection")
@@ -551,10 +533,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful = collectionService.saveDigitalObjects(collection, digitalObjects);
 
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created collection with parent collection")

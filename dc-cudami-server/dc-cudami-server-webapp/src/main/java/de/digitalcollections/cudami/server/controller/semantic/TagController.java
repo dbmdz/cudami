@@ -82,8 +82,9 @@ public class TagController {
   @GetMapping(
       value = {"/v6/tags/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Tag getByUuid(@PathVariable UUID uuid) {
-    return service.getByUuid(uuid);
+  public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) {
+    Tag result = service.getByUuid(uuid);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created tag")

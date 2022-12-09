@@ -83,8 +83,9 @@ public class SubjectController {
   @GetMapping(
       value = {"/v6/subjects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject getByUuid(@PathVariable UUID uuid) {
-    return service.getByUuid(uuid);
+  public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) {
+    Subject subject = service.getByUuid(uuid);
+    return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created subject")

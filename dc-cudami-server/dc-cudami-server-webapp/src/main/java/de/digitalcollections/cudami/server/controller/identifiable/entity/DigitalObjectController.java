@@ -86,10 +86,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -182,8 +179,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @GetMapping(
       value = {"/v5/digitalobjects/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject getByRefId(@PathVariable long refId) {
-    return digitalObjectService.getByRefId(refId);
+  public ResponseEntity<DigitalObject> getByRefId(@PathVariable long refId) {
+    DigitalObject digitalObject = digitalObjectService.getByRefId(refId);
+    return new ResponseEntity<>(
+        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a digital object by uuid")
@@ -195,8 +194,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public DigitalObject getByUuid(@PathVariable UUID uuid) {
-    return digitalObjectService.getByUuid(uuid);
+  public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) {
+    DigitalObject digitalObject = digitalObjectService.getByUuid(uuid);
+    return new ResponseEntity<>(
+        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get (active or all) paged collections of a digital objects")

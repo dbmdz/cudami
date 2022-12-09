@@ -139,7 +139,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
     } else {
       result = workService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get creators of a work")

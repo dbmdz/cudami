@@ -143,9 +143,10 @@ public class LicenseController {
       value = {"/v6/licenses", "/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License getByUrl(@RequestParam(name = "url", required = true) URL url)
+  public ResponseEntity<License> getByUrl(@RequestParam(name = "url", required = true) URL url)
       throws MalformedURLException {
-    return service.getByUrl(url);
+    License license = service.getByUrl(url);
+    return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a license by uuid")
@@ -155,8 +156,9 @@ public class LicenseController {
         "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License getByUuid(@PathVariable UUID uuid) {
-    return service.getByUuid(uuid);
+  public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) {
+    License license = service.getByUuid(uuid);
+    return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all licenses")

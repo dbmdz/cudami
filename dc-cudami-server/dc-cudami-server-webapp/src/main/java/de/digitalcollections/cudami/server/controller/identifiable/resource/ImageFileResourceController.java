@@ -88,6 +88,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
   @GetMapping(
       value = {"/v6/imagefileresources/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<ImageFileResource> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -111,13 +112,13 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-    ImageFileResource imageFileResource;
+    ImageFileResource result;
     if (pLocale == null) {
-      imageFileResource = service.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      imageFileResource = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(imageFileResource, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created ImageFileResource")

@@ -194,7 +194,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
         webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
       }
     }
-    return new ResponseEntity<>(webpage, HttpStatus.OK);
+    return new ResponseEntity<>(webpage, webpage != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")

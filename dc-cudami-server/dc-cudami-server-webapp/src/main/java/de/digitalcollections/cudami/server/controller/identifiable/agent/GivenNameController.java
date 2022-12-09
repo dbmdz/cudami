@@ -70,6 +70,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
   @GetMapping(
       value = {"/v6/givennames/identifier/**", "/v5/givennames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<GivenName> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -114,7 +115,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
     } else {
       result = givenNameService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "save a newly created givenname")
