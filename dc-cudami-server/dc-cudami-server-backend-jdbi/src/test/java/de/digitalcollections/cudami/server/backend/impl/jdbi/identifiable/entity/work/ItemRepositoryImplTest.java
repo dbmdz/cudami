@@ -101,14 +101,14 @@ public class ItemRepositoryImplTest
   void saveAndRetrieveOneHolder() throws RepositoryException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
-        Agent.builder()
+        CorporateBody.builder()
             .label(Locale.GERMAN, "A Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
-    Agent holder0 = holders.get(0);
+    CorporateBody holder0 = (CorporateBody) holders.get(0);
 
-    agentRepository.save(holder0);
+    corporateBodyRepository.save(holder0);
     assertThat(holders.get(0).getUuid()).isNotNull();
 
     Item enclosingItem =
@@ -144,20 +144,20 @@ public class ItemRepositoryImplTest
   void saveAndRetrieveTwoHolders() throws RepositoryException {
     List<Agent> holders = new ArrayList<>();
     holders.add(
-        Agent.builder()
+        CorporateBody.builder()
             .label(Locale.GERMAN, "A Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
     holders.add(
-        Agent.builder()
+        CorporateBody.builder()
             .label(Locale.GERMAN, "Some Amazing Company")
             .identifiableObjectType(IdentifiableObjectType.CORPORATE_BODY)
             .build());
 
-    Agent holder0 = holders.get(0);
-    agentRepository.save(holder0);
-    Agent holder1 = holders.get(1);
-    agentRepository.save(holder1);
+    CorporateBody holder0 = (CorporateBody) holders.get(0);
+    corporateBodyRepository.save(holder0);
+    CorporateBody holder1 = (CorporateBody) holders.get(1);
+    corporateBodyRepository.save(holder1);
 
     List<Agent> holdersInDb = List.of(holder0, holder1);
 
@@ -177,7 +177,8 @@ public class ItemRepositoryImplTest
   }
 
   @Test
-  @DisplayName("returns holder(s) as agents only with UUID and label and no other fields")
+  @DisplayName(
+      "returns holder(s) as concrete agents but only with UUID and label and no other fields")
   void returnHoldersAsAgents() throws RepositoryException {
     CorporateBody holder1 =
         CorporateBody.builder()
@@ -202,11 +203,13 @@ public class ItemRepositoryImplTest
     assertThat(persisted.getHolders()).hasSize(2);
 
     Agent itemPersistedAgent1 = persisted.getHolders().get(0);
+    assertThat(itemPersistedAgent1).isExactlyInstanceOf(CorporateBody.class);
     assertThat(itemPersistedAgent1.getUuid()).isNotNull();
     assertThat(itemPersistedAgent1.getLabel()).isNotNull();
     assertThat(itemPersistedAgent1.getIdentifiers()).isEmpty();
 
     Agent itemPersistedAgent2 = persisted.getHolders().get(1);
+    assertThat(itemPersistedAgent2).isExactlyInstanceOf(Person.class);
     assertThat(itemPersistedAgent2.getUuid()).isNotNull();
     assertThat(itemPersistedAgent2.getLabel()).isNotNull();
     assertThat(itemPersistedAgent2.getIdentifiers()).isEmpty();
@@ -262,6 +265,11 @@ public class ItemRepositoryImplTest
     retrievedItem.setHolders(List.of(holdersInDb.get(0), holdersInDb.get(2)));
     repo.update(retrievedItem);
     Item updatedItem = repo.getByUuid(retrievedItem.getUuid());
+
+    // before asserting anything we must fix the person: item repo only gets its data from table
+    // agents,
+    // so special fields are not selected
+    person.setGender(null);
 
     assertThat(updatedItem.getHolders().size()).isEqualTo(2);
     assertThat(updatedItem.getHolders()).contains(holdersInDb.get(0), holdersInDb.get(2));
