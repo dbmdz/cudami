@@ -53,6 +53,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("The Manifestation Repository")
+@Sql(scripts = "classpath:cleanup_database.sql")
 class ManifestationRepositoryImplTest {
 
   @Autowired PostgreSQLContainer postgreSQLContainer;

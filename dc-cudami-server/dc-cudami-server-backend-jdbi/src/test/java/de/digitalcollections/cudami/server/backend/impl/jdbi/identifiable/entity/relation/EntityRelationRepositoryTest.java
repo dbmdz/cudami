@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -38,6 +39,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     classes = EntityRelationRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The EntityRelationRepository")
+@Sql(scripts = "classpath:cleanup_database.sql")
 public class EntityRelationRepositoryTest {
   EntityRelationRepositoryImpl repository;
 
@@ -172,6 +174,10 @@ public class EntityRelationRepositoryTest {
   @Test
   @DisplayName("returns properly sized pages")
   void testSearchPageSize() throws RepositoryException {
+    Predicate predicate = new Predicate();
+    predicate.setValue("is_test");
+    predicateRepository.save(predicate);
+
     List<EntityRelation> relations = new ArrayList<>();
     IntStream.range(0, 20)
         .forEach(
@@ -182,7 +188,7 @@ public class EntityRelationRepositoryTest {
                     TestModelFixture.createEntityRelation(
                         Map.of(Locale.ENGLISH, "subject entity label " + i),
                         Map.of(Locale.ENGLISH, "object entity label " + i),
-                        "is_test");
+                        predicate.getValue());
               } catch (InstantiationException
                   | IllegalAccessException
                   | IllegalArgumentException
