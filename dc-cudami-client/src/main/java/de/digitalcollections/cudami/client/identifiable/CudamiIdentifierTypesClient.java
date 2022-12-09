@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -23,10 +24,18 @@ public class CudamiIdentifierTypesClient extends CudamiRestClient<IdentifierType
   }
 
   public IdentifierType getByNamespace(String namespace) throws TechnicalException {
-    return doGetRequestForObject(String.format(baseEndpoint + "/namespace/%s", namespace));
+    try {
+      return doGetRequestForObject(String.format(baseEndpoint + "/namespace/%s", namespace));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public IdentifierType getByUuidAndLocale(UUID uuid, String locale) throws TechnicalException {
-    return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+    try {
+      return doGetRequestForObject(String.format(baseEndpoint + "/%s?locale=%s", uuid, locale));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 }

@@ -58,7 +58,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Override

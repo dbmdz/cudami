@@ -71,8 +71,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID subtopicUuid)
       throws IdentifiableServiceException {
     boolean successful = topicService.addChild(parentTopicUuid, subtopicUuid);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get count of topics")
@@ -375,7 +376,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid) {
     boolean successful = topicService.removeChild(parentTopicUuid, subtopicUuid);
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created topic")

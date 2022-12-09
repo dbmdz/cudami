@@ -308,8 +308,9 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     website.setUuid(uuid);
 
     boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations

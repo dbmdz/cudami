@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.relation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
@@ -33,8 +34,12 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
   }
 
   public Predicate getByValue(String value) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
+    try {
+      return doGetRequestForObject(
+          String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Locale> getLanguages() throws TechnicalException {

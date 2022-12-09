@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.agent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import java.net.http.HttpClient;
 
@@ -13,6 +14,10 @@ public class CudamiCorporateBodiesClient extends CudamiEntitiesClient<CorporateB
   }
 
   public CorporateBody fetchAndSaveByGndId(String gndId) throws TechnicalException {
-    return doPostRequestForObject(String.format("%s/gnd/%s", baseEndpoint, gndId));
+    try {
+      return doPostRequestForObject(String.format("%s/gnd/%s", baseEndpoint, gndId));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 }

@@ -53,7 +53,9 @@ public class PredicateController {
           @PathVariable("uuid")
           UUID uuid) {
     boolean successful = predicateService.delete(uuid);
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all predicates as (sorted, paged) list")

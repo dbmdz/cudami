@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Article;
 import java.net.http.HttpClient;
 import java.util.Locale;
@@ -14,10 +15,14 @@ public class CudamiArticlesClient extends CudamiEntitiesClient<Article> {
   }
 
   public Article getByUuid(UUID uuid, Locale locale) throws TechnicalException {
-    if (locale != null) {
-      return doGetRequestForObject(String.format(baseEndpoint + "/%s?pLocale=%s", uuid, locale));
-    } else {
-      return doGetRequestForObject(String.format(baseEndpoint + "/%s", uuid));
+    try {
+      if (locale != null) {
+        return doGetRequestForObject(String.format(baseEndpoint + "/%s?pLocale=%s", uuid, locale));
+      } else {
+        return doGetRequestForObject(String.format(baseEndpoint + "/%s", uuid));
+      }
+    } catch (ResourceNotFoundException e) {
+      return null;
     }
   }
 }

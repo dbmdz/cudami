@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.semantic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.semantic.Subject;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -28,8 +29,12 @@ public class CudamiSubjectsClient extends CudamiRestClient<Subject> {
     String encodedNamespaceAndId =
         Base64.encodeBase64URLSafeString(namespaceAndId.getBytes(StandardCharsets.UTF_8));
 
-    return doGetRequestForObject(
-        String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+    try {
+      return doGetRequestForObject(
+          String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   /**
@@ -48,7 +53,11 @@ public class CudamiSubjectsClient extends CudamiRestClient<Subject> {
     String encodedTypeAndNamespaceAndId =
         Base64.encodeBase64URLSafeString(typeAndNamespaceAndId.getBytes(StandardCharsets.UTF_8));
 
-    return doGetRequestForObject(
-        String.format(baseEndpoint + "/identifier/%s", encodedTypeAndNamespaceAndId));
+    try {
+      return doGetRequestForObject(
+          String.format(baseEndpoint + "/identifier/%s", encodedTypeAndNamespaceAndId));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 }

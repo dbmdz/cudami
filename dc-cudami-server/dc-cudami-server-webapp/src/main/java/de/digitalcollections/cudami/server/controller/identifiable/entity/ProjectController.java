@@ -69,8 +69,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = projectService.addDigitalObject(project, digitalObject);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add existing digital objects to an existing project")
@@ -91,8 +92,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     project.setUuid(projectUuid);
 
     boolean successful = projectService.addDigitalObjects(project, digitalObjects);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -115,7 +117,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all projects as (sorted, paged) list")
@@ -235,8 +239,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     digitalObject.setUuid(digitalObjectUuid);
 
     boolean successful = projectService.removeDigitalObject(project, digitalObject);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created project")
@@ -266,8 +271,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     project.setUuid(projectUuid);
 
     boolean successful = projectService.setDigitalObjects(project, digitalObjects);
-
-    return new ResponseEntity<>(successful, successful ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Update an project")

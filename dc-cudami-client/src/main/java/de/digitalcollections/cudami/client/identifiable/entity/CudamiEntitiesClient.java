@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -53,7 +54,11 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
   }
 
   public E getByRefId(long refId) throws TechnicalException {
-    return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
+    try {
+      return doGetRequestForObject(String.format("%s/%d", baseEndpoint, refId));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List getRandomEntities(int count) throws TechnicalException {

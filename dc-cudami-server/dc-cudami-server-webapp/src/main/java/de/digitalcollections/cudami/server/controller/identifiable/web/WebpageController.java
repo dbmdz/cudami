@@ -333,10 +333,8 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @Parameter(example = "", description = "List of the children") @RequestBody
           List<Webpage> rootPages) {
     boolean successful = webpageService.updateChildrenOrder(uuid, rootPages);
-
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }

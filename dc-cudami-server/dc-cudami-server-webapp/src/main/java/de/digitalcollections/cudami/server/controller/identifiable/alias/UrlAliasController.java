@@ -81,11 +81,9 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (!isDeleted) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return isDeleted
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(
