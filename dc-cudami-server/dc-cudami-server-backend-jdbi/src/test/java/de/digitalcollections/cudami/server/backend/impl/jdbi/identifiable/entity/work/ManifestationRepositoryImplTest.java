@@ -8,9 +8,14 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
@@ -31,74 +36,41 @@ import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = ManifestationRepositoryImpl.class)
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = ManifestationRepositoryImpl.class)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-@TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("The Manifestation Repository")
-@Sql(scripts = "classpath:cleanup_database.sql")
-class ManifestationRepositoryImplTest {
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-  @Autowired ManifestationRepositoryImpl repo;
+class ManifestationRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<ManifestationRepositoryImpl> {
 
   @Autowired CorporateBodyRepository corporateBodyRepository;
   @Autowired HumanSettlementRepository humanSettlementRepository;
   @Autowired PredicateRepository predicateRepository;
   @Autowired EntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
+  @Autowired ExpressionTypeMapper expressionTypeMapper;
+  @Autowired LocalDateRangeMapper localDateRangeMapper;
+  @Autowired TitleMapper titleMapper;
+  @Autowired EntityRepositoryImpl<Entity> entityRepository;
 
-  UUID[] manifestationUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
-
-  @Test
-  @DisplayName("0.0. is testable")
-  @Sql(
-      scripts = "classpath:cleanup_database.sql",
-      executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  }
-
-  void saveParentManifestation(UUID parentUuid) throws RepositoryException {
-    var noteText = new StructuredContent();
-    noteText.addContentBlock(new Text("some notes"));
-    var note = new LocalizedStructuredContent();
-    note.put(Locale.ENGLISH, noteText);
-    var manifestation =
-        Manifestation.builder()
-            .uuid(parentUuid)
-            .label(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
-            .manifestationType("SERIAL")
-            .title(
-                Title.builder()
-                    .titleType(new TitleType("main", "main"))
-                    .text(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
-                    .build())
-            .title(
-                Title.builder()
-                    .titleType(new TitleType("sub", "sub"))
-                    .text(new LocalizedText(Locale.ENGLISH, "...and its subtitle"))
-                    .build())
-            .note(note)
-            .build();
-    repo.save(manifestation);
+  @BeforeEach
+  void beforeEach() {
+    repo =
+        new ManifestationRepositoryImpl(
+            jdbi,
+            cudamiConfig,
+            expressionTypeMapper,
+            localDateRangeMapper,
+            titleMapper,
+            entityRepository);
   }
 
   @Test
@@ -118,34 +90,110 @@ class ManifestationRepositoryImplTest {
         predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
 
     // subjects
-    Subject subject =
-        Subject.builder()
-            .label(new LocalizedText(Locale.ENGLISH, "My subject"))
-            .identifier(Identifier.builder().namespace("test").id("12345").build())
-            .type("SUBJECT_TYPE")
-            .build();
-    subjectRepository.save(subject);
+    Subject subject = ensurePersistedSubject();
 
     // parent
-    saveParentManifestation(manifestationUuids[0]);
-    Manifestation parent = repo.getByUuid(manifestationUuids[0]);
+    Manifestation parent = ensurePersistedParentManifestation();
 
-    List<Title> titles =
-        List.of(
-            Title.builder()
-                .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
-                .titleType(new TitleType("main", "main"))
-                .textLocaleOfOriginalScript(Locale.GERMAN)
-                .textLocaleOfOriginalScript(Locale.ENGLISH)
-                .build(),
-            Title.builder()
-                .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
-                .titleType(new TitleType("main", "sub"))
+    List<Title> titles = prepareTitles();
+
+    Manifestation manifestation = prepareManifestation(subject, parent, titles);
+    manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
+    manifestation.addRelation(
+        EntityRelation.builder()
+            .subject(someoneElse)
+            .predicate("is_somethingelse_of")
+            .object(manifestation)
+            .additionalPredicate("additional predicate")
+            .build());
+    repo.save(manifestation);
+
+    // we add the relations manually, actually done by the service
+    entityRelationRepository.save(manifestation.getRelations());
+
+    Manifestation actual = repo.getByUuid(manifestation.getUuid());
+
+    assertThat(actual.getTitles()).isEqualTo(titles);
+    assertThat(actual.getExpressionTypes()).isEqualTo(manifestation.getExpressionTypes());
+
+    assertThat(actual.getRelations()).size().isEqualTo(2);
+    assertThat(actual.getRelations().get(0))
+        .isEqualTo(new EntityRelation(editor, "is_editor_of", null));
+    assertThat(actual.getRelations().get(1))
+        .isEqualTo(
+            EntityRelation.builder()
+                .subject(someoneElse)
+                .predicate("is_somethingelse_of")
+                .additionalPredicate("additional predicate")
                 .build());
 
+    assertThat(actual.getSubjects()).containsExactlyInAnyOrder(subject);
+    assertThat(actual.getParents())
+        .containsExactlyInAnyOrder(
+            new RelationSpecification<Manifestation>("The child's title", null, parent));
+    assertThat(actual.getProductionInfo()).isEqualTo(manifestation.getProductionInfo());
+    assertThat(actual.getPublicationInfo()).isEqualTo(manifestation.getPublicationInfo());
+  }
+
+  @Test
+  @DisplayName("1.1. Update a manifestation")
+  void testUpdateManifestation() throws RepositoryException {
+    Subject subject = ensurePersistedSubject();
+    Manifestation parent = ensurePersistedParentManifestation();
+    List<Title> titles = prepareTitles();
+    Manifestation manifestation = prepareManifestation(subject, parent, titles);
+    repo.save(manifestation);
+
+    // get the Manifestation saved in 1.0.
+    Manifestation persisted = repo.getByUuid(manifestation.getUuid());
+    manifestation.getLabel().put(Locale.ENGLISH, "An updated label");
+    manifestation
+        .getTitles()
+        .add(
+            Title.builder()
+                .text(new LocalizedText(Locale.ENGLISH, "An updated Title"))
+                .titleType(new TitleType("MAIN", "MAIN"))
+                .build());
+    manifestation.setParents(null);
+    repo.update(manifestation);
+
+    var actual = repo.getByUuid(manifestation.getUuid());
+    assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
+    assertThat(actual.getTitles()).size().isEqualTo(3);
+    assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
+    assertThat(actual.getParents()).isNull();
+  }
+
+  // -------------------------------------------------------------------
+  private Manifestation ensurePersistedParentManifestation() throws RepositoryException {
+    var noteText = new StructuredContent();
+    noteText.addContentBlock(new Text("some notes"));
+    var note = new LocalizedStructuredContent();
+    note.put(Locale.ENGLISH, noteText);
+    var manifestation =
+        Manifestation.builder()
+            .label(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
+            .manifestationType("SERIAL")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.ENGLISH, "A parent manifestation"))
+                    .build())
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("sub", "sub"))
+                    .text(new LocalizedText(Locale.ENGLISH, "...and its subtitle"))
+                    .build())
+            .note(note)
+            .build();
+    repo.save(manifestation);
+    return manifestation;
+  }
+
+  private Manifestation prepareManifestation(
+      Subject subject, Manifestation parent, List<Title> titles) {
     Manifestation manifestation =
         Manifestation.builder()
-            .uuid(manifestationUuids[1])
             .label(Locale.GERMAN, "ein Label")
             .composition("composition")
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
@@ -180,63 +228,33 @@ class ManifestationRepositoryImplTest {
                         new LocalDateRange(LocalDate.of(2019, 10, 1), LocalDate.of(2020, 6, 30)))
                     .build())
             .build();
-    manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
-    manifestation.addRelation(
-        EntityRelation.builder()
-            .subject(someoneElse)
-            .predicate("is_somethingelse_of")
-            .object(manifestation)
-            .additionalPredicate("additional predicate")
-            .build());
-    repo.save(manifestation);
-
-    // we add the relations manually, actually done by the service
-    entityRelationRepository.save(manifestation.getRelations());
-
-    Manifestation actual = repo.getByUuid(manifestationUuids[1]);
-
-    assertThat(actual.getTitles()).isEqualTo(titles);
-    assertThat(actual.getExpressionTypes()).isEqualTo(manifestation.getExpressionTypes());
-
-    assertThat(actual.getRelations()).size().isEqualTo(2);
-    assertThat(actual.getRelations().get(0))
-        .isEqualTo(new EntityRelation(editor, "is_editor_of", null));
-    assertThat(actual.getRelations().get(1))
-        .isEqualTo(
-            EntityRelation.builder()
-                .subject(someoneElse)
-                .predicate("is_somethingelse_of")
-                .additionalPredicate("additional predicate")
-                .build());
-
-    assertThat(actual.getSubjects()).containsExactlyInAnyOrder(subject);
-    assertThat(actual.getParents())
-        .containsExactlyInAnyOrder(
-            new RelationSpecification<Manifestation>("The child's title", null, parent));
-    assertThat(actual.getProductionInfo()).isEqualTo(manifestation.getProductionInfo());
-    assertThat(actual.getPublicationInfo()).isEqualTo(manifestation.getPublicationInfo());
+    return manifestation;
   }
 
-  @Test
-  @DisplayName("1.1. Update a manifestation")
-  void testUpdateManifestation() throws RepositoryException {
-    // get the Manifestation saved in 1.0.
-    Manifestation manifestation = repo.getByUuid(manifestationUuids[1]);
-    manifestation.getLabel().put(Locale.ENGLISH, "An updated label");
-    manifestation
-        .getTitles()
-        .add(
-            Title.builder()
-                .text(new LocalizedText(Locale.ENGLISH, "An updated Title"))
-                .titleType(new TitleType("MAIN", "MAIN"))
-                .build());
-    manifestation.setParents(null);
-    repo.update(manifestation);
+  private Subject ensurePersistedSubject() throws RepositoryException {
+    Subject subject =
+        Subject.builder()
+            .label(new LocalizedText(Locale.ENGLISH, "My subject"))
+            .identifier(Identifier.builder().namespace("test").id("12345").build())
+            .type("SUBJECT_TYPE")
+            .build();
+    subjectRepository.save(subject);
+    return subject;
+  }
 
-    var actual = repo.getByUuid(manifestationUuids[1]);
-    assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
-    assertThat(actual.getTitles()).size().isEqualTo(3);
-    assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
-    assertThat(actual.getParents()).isNull();
+  private List<Title> prepareTitles() {
+    List<Title> titles =
+        List.of(
+            Title.builder()
+                .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
+                .titleType(new TitleType("main", "main"))
+                .textLocaleOfOriginalScript(Locale.GERMAN)
+                .textLocaleOfOriginalScript(Locale.ENGLISH)
+                .build(),
+            Title.builder()
+                .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
+                .titleType(new TitleType("main", "sub"))
+                .build());
+    return titles;
   }
 }
