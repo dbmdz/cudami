@@ -13,6 +13,7 @@ import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,15 @@ class WebsiteRepositoryImplTest
             .registrationDate("2022-05-04")
             .rootPages(List.of(webpage))
             .build();
+    repo.save(website);
+    webpageRepository.saveWithParentWebsite(webpage.getUuid(), website.getUuid());
 
-    saveAndAssertTimestampsAndEqualityToSaveable(website);
+    Assertions.assertThat(website.getUuid()).isNotNull();
+    Assertions.assertThat(website.getCreated()).isNotNull();
+    Assertions.assertThat(website.getLastModified()).isNotNull();
+
+    Website actual = repo.getByUuid(website.getUuid());
+    assertThat(actual).isEqualToComparingFieldByField(website);
   }
 
   @Test
