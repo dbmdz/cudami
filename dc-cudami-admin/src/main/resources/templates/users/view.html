@@ -56,6 +56,8 @@
 
         <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
 
+        <hr>
+        
         <div class="row">
           <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{username}">Username / Email</label></div>
           <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
