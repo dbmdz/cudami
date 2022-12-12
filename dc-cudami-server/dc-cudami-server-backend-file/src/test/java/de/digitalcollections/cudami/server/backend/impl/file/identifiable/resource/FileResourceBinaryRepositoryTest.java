@@ -3,9 +3,13 @@ package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resou
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.resource.VideoFileResource;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.io.ResourceLoader;
@@ -67,5 +71,16 @@ public class FileResourceBinaryRepositoryTest {
             + FileResourceBinaryRepositoryImpl.DEFAULT_FILENAME_WITHOUT_EXTENSION
             + ".bin";
     assertThat(uri.toString()).isEqualTo(expectedUri);
+  }
+
+  @DisplayName("can fill the attributes of a VideoFileResource")
+  @Test
+  public void fillAttributesImageFileResource() throws IOException {
+    VideoFileResource videoFileResource = VideoFileResource.builder().build();
+    videoFileResource.setHttpBaseUrl(new URL("http://foo.bar"));
+
+    repository.fillAttributes(videoFileResource);
+
+    assertThat(videoFileResource.getHttpBaseUrl()).isEqualTo(new URL("http://foo.bar"));
   }
 }
