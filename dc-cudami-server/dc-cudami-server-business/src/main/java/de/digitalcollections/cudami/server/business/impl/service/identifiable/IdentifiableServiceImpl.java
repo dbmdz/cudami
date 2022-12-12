@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -295,25 +296,24 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I save(I identifiable) throws IdentifiableServiceException, ValidationException {
+  public void save(I identifiable) throws ServiceException, ValidationException {
     try {
       validate(identifiable);
     } catch (CudamiServiceException e) {
       throw new IdentifiableServiceException(e.getMessage());
     }
 
-    I savedIdentifiable;
     try {
-      savedIdentifiable = repository.save(identifiable);
+      repository.save(identifiable);
     } catch (Exception e) {
       throw new IdentifiableServiceException(
           "Cannot save identifiable " + identifiable + ": " + e, e);
     }
 
     try {
-      savedIdentifiable.setIdentifiers(
+      identifiable.setIdentifiers(
           identifierService.saveForIdentifiable(
-              savedIdentifiable.getUuid(), identifiable.getIdentifiers()));
+              identifiable.getUuid(), identifiable.getIdentifiers()));
     } catch (CudamiServiceException e) {
       LOGGER.error(
           String.format(
@@ -324,28 +324,26 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
 
     try {
-      savedIdentifiable.setLocalizedUrlAliases(identifiable.getLocalizedUrlAliases());
       IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
-          savedIdentifiable, cudamiConfig, urlAliasService::generateSlug);
+          identifiable, cudamiConfig, urlAliasService::generateSlug);
       urlAliasService.validate(identifiable.getLocalizedUrlAliases());
 
-      if (savedIdentifiable.getLocalizedUrlAliases() != null
-          && !savedIdentifiable.getLocalizedUrlAliases().isEmpty()) {
+      if (identifiable.getLocalizedUrlAliases() != null
+          && !identifiable.getLocalizedUrlAliases().isEmpty()) {
         LocalizedUrlAliases savedUrlAliases = new LocalizedUrlAliases();
-        for (UrlAlias urlAlias : savedIdentifiable.getLocalizedUrlAliases().flatten()) {
+        for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
           // the targetUuid must be set at this point
-          urlAlias.setTargetUuid(savedIdentifiable.getUuid());
-          UrlAlias savedAlias = urlAliasService.save(urlAlias);
-          savedUrlAliases.add(savedAlias);
+          urlAlias.setTargetUuid(identifiable.getUuid());
+          urlAliasService.save(urlAlias);
+          savedUrlAliases.add(urlAlias);
         }
-        savedIdentifiable.setLocalizedUrlAliases(savedUrlAliases);
+        identifiable.setLocalizedUrlAliases(savedUrlAliases);
       }
     } catch (CudamiServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
       throw new IdentifiableServiceException(e.getMessage());
     }
-    return savedIdentifiable;
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {
@@ -369,7 +367,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I update(I identifiable) throws IdentifiableServiceException, ValidationException {
+  public void update(I identifiable) throws ServiceException, ValidationException {
     try {
       validate(identifiable);
     } catch (CudamiServiceException e) {
@@ -415,7 +413,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     try {
       // If we do not want any UrlAliases for this kind of identifiable, we return early
       if (IdentifiableUrlAliasAlignHelper.checkIdentifiableExcluded(identifiable, cudamiConfig)) {
-        return repository.getByUuid(identifiable.getUuid());
+        return;
       }
 
       // UrlAliases
@@ -445,8 +443,6 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       LOGGER.error("Error while updating URL aliases for " + identifiable, e);
       throw new IdentifiableServiceException(e.getMessage(), e);
     }
-
-    return repository.getByUuid(identifiable.getUuid());
   }
 
   @Override

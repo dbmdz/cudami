@@ -13,9 +13,9 @@ public interface SubjectService {
 
   Subject getByUuid(UUID uuid);
 
-  Subject save(Subject subject);
+  void save(Subject subject) throws CudamiServiceException;
 
-  Subject update(Subject subject);
+  void update(Subject subject) throws CudamiServiceException;
 
   boolean delete(List<UUID> uuids);
 

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.web;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -70,6 +70,5 @@ public interface WebpageService extends NodeService<Webpage> {
 
   Website getWebsite(UUID webpageUuid);
 
-  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
-      throws IdentifiableServiceException;
+  Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid) throws ServiceException;
 }

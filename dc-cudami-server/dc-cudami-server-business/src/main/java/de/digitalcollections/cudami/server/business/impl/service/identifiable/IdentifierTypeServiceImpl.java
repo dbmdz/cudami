@@ -63,8 +63,14 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType save(IdentifierType identifierType) {
-    IdentifierType saved = repository.save(identifierType);
+  public IdentifierType save(IdentifierType identifierType) throws CudamiServiceException {
+    IdentifierType saved;
+    try {
+      saved = repository.save(identifierType);
+    } catch (RepositoryException e) {
+      throw new CudamiServiceException(
+          "Cannot save IdentifierType: " + identifierType.toString(), e);
+    }
     if (saved != null) {
       identifierTypeCache.put(saved.getNamespace(), saved.getPattern());
     }
@@ -79,8 +85,14 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType update(IdentifierType identifierType) {
-    IdentifierType updated = repository.update(identifierType);
+  public IdentifierType update(IdentifierType identifierType) throws CudamiServiceException {
+    IdentifierType updated;
+    try {
+      updated = repository.update(identifierType);
+    } catch (RepositoryException e) {
+      throw new CudamiServiceException(
+          "Cannot update IdentifierType: " + identifierType.toString(), e);
+    }
     if (updated != null) {
       identifierTypeCache.put(updated.getNamespace(), updated.getPattern());
     }

@@ -19,8 +19,8 @@ public interface UrlAliasService {
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  default UrlAlias save(UrlAlias urlAlias) throws CudamiServiceException {
-    return save(urlAlias, false);
+  default void save(UrlAlias urlAlias) throws CudamiServiceException {
+    save(urlAlias, false);
   }
   /**
    * Create an UrlAlias in the database
@@ -30,7 +30,7 @@ public interface UrlAliasService {
    * @return the persisted UrlAlias with its generated UUID
    * @throws CudamiServiceException
    */
-  UrlAlias save(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
+  void save(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
 
   /**
    * Delete a single UrlAlias by its UUID
@@ -149,7 +149,7 @@ public interface UrlAliasService {
    * @return the updated UrlAlias
    * @throws CudamiServiceException
    */
-  UrlAlias update(UrlAlias urlAlias) throws CudamiServiceException;
+  void update(UrlAlias urlAlias) throws CudamiServiceException;
 
   /**
    * Validates the given localizedUrlAliases according to the following criteria:

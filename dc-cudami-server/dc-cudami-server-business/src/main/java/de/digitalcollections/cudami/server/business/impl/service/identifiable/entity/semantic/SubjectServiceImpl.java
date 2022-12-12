@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
@@ -32,13 +33,21 @@ public class SubjectServiceImpl implements SubjectService {
   }
 
   @Override
-  public Subject save(Subject subject) {
-    return repository.save(subject);
+  public void save(Subject subject) throws CudamiServiceException {
+    try {
+      repository.save(subject);
+    } catch (RepositoryException e) {
+      throw new CudamiServiceException("Cannot save subject " + subject.toString(), e);
+    }
   }
 
   @Override
-  public Subject update(Subject subject) {
-    return repository.update(subject);
+  public void update(Subject subject) throws CudamiServiceException {
+    try {
+      repository.update(subject);
+    } catch (RepositoryException e) {
+      throw new CudamiServiceException("Cannot update subject " + subject.toString(), e);
+    }
   }
 
   @Override

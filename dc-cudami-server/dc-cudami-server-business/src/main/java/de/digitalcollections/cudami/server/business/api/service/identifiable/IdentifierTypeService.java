@@ -24,9 +24,9 @@ public interface IdentifierTypeService {
 
   IdentifierType getByUuid(UUID uuid);
 
-  IdentifierType save(IdentifierType identifierType);
+  IdentifierType save(IdentifierType identifierType) throws CudamiServiceException;
 
-  IdentifierType update(IdentifierType identifierType);
+  IdentifierType update(IdentifierType identifierType) throws CudamiServiceException;
 
   Map<String, String> getIdentifierTypeCache();
 

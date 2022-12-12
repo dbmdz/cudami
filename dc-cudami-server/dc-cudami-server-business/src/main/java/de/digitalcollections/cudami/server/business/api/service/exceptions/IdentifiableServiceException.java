@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.exceptions;
 
-public class IdentifiableServiceException extends Exception {
+public class IdentifiableServiceException extends ServiceException {
 
   public IdentifiableServiceException(String message) {
     super(message);

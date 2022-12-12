@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.r
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
@@ -89,21 +90,21 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         digitalObjectUuid);
   }
 
-  private FileResource saveRenderingFileResource(FileResource renderingResource)
-      throws ValidationException, IdentifiableServiceException {
+  private void saveRenderingFileResource(FileResource renderingResource)
+      throws ValidationException, ServiceException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
-        return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
+        applicationFileResourceService.save((ApplicationFileResource) renderingResource);
       case "audio":
-        return audioFileResourceService.save((AudioFileResource) renderingResource);
+        audioFileResourceService.save((AudioFileResource) renderingResource);
       case "image":
-        return imageFileResourceService.save((ImageFileResource) renderingResource);
+        imageFileResourceService.save((ImageFileResource) renderingResource);
       case "text":
-        return textFileResourceService.save((TextFileResource) renderingResource);
+        textFileResourceService.save((TextFileResource) renderingResource);
       case "video":
-        return videoFileResourceService.save((VideoFileResource) renderingResource);
+        videoFileResourceService.save((VideoFileResource) renderingResource);
       default:
-        return fileResourceMetadataService.save(renderingResource);
+        fileResourceMetadataService.save(renderingResource);
     }
   }
 
@@ -130,14 +131,13 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       // first save rendering resources
       List<FileResource> savedRenderingResources = new ArrayList<>();
       for (FileResource renderingResource : renderingResources) {
-        FileResource savedRenderingResource = null;
         try {
-          savedRenderingResource = saveRenderingFileResource(renderingResource);
-        } catch (ValidationException | IdentifiableServiceException e) {
+          saveRenderingFileResource(renderingResource);
+        } catch (ValidationException | ServiceException e) {
           throw new CudamiServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
         }
-        savedRenderingResources.add(savedRenderingResource);
+        savedRenderingResources.add(renderingResource);
       }
 
       // Persist the new relations

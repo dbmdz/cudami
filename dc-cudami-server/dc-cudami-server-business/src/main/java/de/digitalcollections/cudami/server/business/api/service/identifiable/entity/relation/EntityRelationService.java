@@ -10,12 +10,13 @@ import java.util.UUID;
 
 public interface EntityRelationService {
 
-  default void addRelation(EntityRelation relation) {
+  default void addRelation(EntityRelation relation) throws CudamiServiceException {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
 
-  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid);
+  void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws CudamiServiceException;
 
   default void deleteBySubject(Entity subjectEntity) {
     deleteBySubject(subjectEntity.getUuid());
@@ -49,5 +50,5 @@ public interface EntityRelationService {
    * @param entityRelations a list of entity relations to persist
    * @return the persisted list of entity relations
    */
-  List<EntityRelation> save(List<EntityRelation> entityRelations) throws CudamiServiceException;
+  void save(List<EntityRelation> entityRelations) throws CudamiServiceException;
 }

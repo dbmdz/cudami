@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -177,13 +178,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage save(Webpage identifiable)
-      throws IdentifiableServiceException, ValidationException {
+  public void save(Webpage identifiable) throws ServiceException, ValidationException {
     if (identifiable.getLocalizedUrlAliases() != null
         && !identifiable.getLocalizedUrlAliases().isEmpty()) {
       validate(identifiable.getLocalizedUrlAliases());
     }
-    return super.save(identifiable);
+    super.save(identifiable);
   }
 
   @Override
@@ -199,10 +199,10 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   @Override
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     try {
       if (webpage.getUuid() == null) {
-        webpage = save(webpage);
+        save(webpage);
       }
       return ((WebpageRepository) repository)
           .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
@@ -213,13 +213,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage update(Webpage identifiable)
-      throws IdentifiableServiceException, ValidationException {
+  public void update(Webpage identifiable) throws ServiceException, ValidationException {
     if (identifiable.getLocalizedUrlAliases() != null
         && !identifiable.getLocalizedUrlAliases().isEmpty()) {
       validate(identifiable.getLocalizedUrlAliases());
     }
-    return super.update(identifiable);
+    super.update(identifiable);
   }
 
   @Override

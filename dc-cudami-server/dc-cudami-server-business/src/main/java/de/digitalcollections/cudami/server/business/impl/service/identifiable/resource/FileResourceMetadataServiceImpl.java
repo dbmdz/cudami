@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -109,8 +110,7 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource save(FileResource fileResource)
-      throws IdentifiableServiceException, ValidationException {
+  public void save(FileResource fileResource) throws ServiceException, ValidationException {
     if (fileResource.getLabel() == null && fileResource.getFilename() != null) {
       // set a default label = filename (an empty label violates constraint)
       fileResource.setLabel(
@@ -118,37 +118,38 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
               new Locale(localeService.getDefaultLanguage()), fileResource.getFilename()));
     }
     if (fileResource instanceof ApplicationFileResource) {
-      return applicationFileResourceService.save((ApplicationFileResource) fileResource);
+      applicationFileResourceService.save((ApplicationFileResource) fileResource);
     } else if (fileResource instanceof AudioFileResource) {
-      return audioFileResourceService.save((AudioFileResource) fileResource);
+      audioFileResourceService.save((AudioFileResource) fileResource);
     } else if (fileResource instanceof ImageFileResource) {
-      return imageFileResourceService.save((ImageFileResource) fileResource);
+      imageFileResourceService.save((ImageFileResource) fileResource);
     } else if (fileResource instanceof LinkedDataFileResource) {
-      return linkedDataFileResourceService.save((LinkedDataFileResource) fileResource);
+      linkedDataFileResourceService.save((LinkedDataFileResource) fileResource);
     } else if (fileResource instanceof TextFileResource) {
-      return textFileResourceService.save((TextFileResource) fileResource);
+      textFileResourceService.save((TextFileResource) fileResource);
     } else if (fileResource instanceof VideoFileResource) {
-      return videoFileResourceService.save((VideoFileResource) fileResource);
+      videoFileResourceService.save((VideoFileResource) fileResource);
+    } else {
+      super.save(fileResource);
     }
-    return super.save(fileResource);
   }
 
   @Override
-  public FileResource update(FileResource fileResource)
-      throws IdentifiableServiceException, ValidationException {
+  public void update(FileResource fileResource) throws ServiceException, ValidationException {
     if (fileResource instanceof ApplicationFileResource) {
-      return applicationFileResourceService.update((ApplicationFileResource) fileResource);
+      applicationFileResourceService.update((ApplicationFileResource) fileResource);
     } else if (fileResource instanceof AudioFileResource) {
-      return audioFileResourceService.update((AudioFileResource) fileResource);
+      audioFileResourceService.update((AudioFileResource) fileResource);
     } else if (fileResource instanceof ImageFileResource) {
-      return imageFileResourceService.update((ImageFileResource) fileResource);
+      imageFileResourceService.update((ImageFileResource) fileResource);
     } else if (fileResource instanceof LinkedDataFileResource) {
-      return linkedDataFileResourceService.update((LinkedDataFileResource) fileResource);
+      linkedDataFileResourceService.update((LinkedDataFileResource) fileResource);
     } else if (fileResource instanceof TextFileResource) {
-      return textFileResourceService.update((TextFileResource) fileResource);
+      textFileResourceService.update((TextFileResource) fileResource);
     } else if (fileResource instanceof VideoFileResource) {
-      return videoFileResourceService.update((VideoFileResource) fileResource);
+      videoFileResourceService.update((VideoFileResource) fileResource);
+    } else {
+      super.update(fileResource);
     }
-    return super.update(fileResource);
   }
 }

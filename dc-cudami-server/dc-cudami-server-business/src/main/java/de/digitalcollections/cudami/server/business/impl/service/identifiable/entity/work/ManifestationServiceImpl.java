@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -63,32 +64,26 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   }
 
   @Override
-  public Manifestation save(Manifestation manifestation)
-      throws IdentifiableServiceException, ValidationException {
-    Manifestation savedManifestation = super.save(manifestation);
+  public void save(Manifestation manifestation) throws ServiceException, ValidationException {
+    super.save(manifestation);
     try {
-      savedManifestation = persistEntityRelations(savedManifestation, true);
+      persistEntityRelations(manifestation, true);
     } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(
-          "Cannot save Manifestation=" + manifestation + ": " + e, e);
+      throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
-    return savedManifestation;
   }
 
   @Override
-  public Manifestation update(Manifestation manifestation)
-      throws IdentifiableServiceException, ValidationException {
-    Manifestation updatedManifestation = super.update(manifestation);
+  public void update(Manifestation manifestation) throws ServiceException, ValidationException {
+    super.update(manifestation);
     try {
-      updatedManifestation = persistEntityRelations(updatedManifestation, false);
+      persistEntityRelations(manifestation, false);
     } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(
-          "Cannot update Manifestation=" + manifestation + ": " + e, e);
+      throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }
-    return updatedManifestation;
   }
 
-  private Manifestation persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
+  private void persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
       throws CudamiServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the manifestation
@@ -105,9 +100,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
                   return r;
                 })
             .collect(Collectors.toList());
-    relations = entityRelationService.save(relations);
+    entityRelationService.save(relations);
     manifestation.setRelations(relations);
-
-    return manifestation;
   }
 }

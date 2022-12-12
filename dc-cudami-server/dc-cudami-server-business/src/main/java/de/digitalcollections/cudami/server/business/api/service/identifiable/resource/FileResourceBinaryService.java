@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -19,6 +20,6 @@ public interface FileResourceBinaryService {
 
   InputStream getInputStream(FileResource resource) throws IdentifiableServiceException;
 
-  FileResource save(FileResource fileResource, InputStream binaryData)
-      throws IdentifiableServiceException, ValidationException;
+  void save(FileResource fileResource, InputStream binaryData)
+      throws ValidationException, ServiceException;
 }
