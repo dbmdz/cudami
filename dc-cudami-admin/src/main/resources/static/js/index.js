@@ -74,15 +74,28 @@ function moveEditButtonToNavbar() {
   observer.observe(editButton)
 }
 
+function bindTabEvents() {
+  $('.nav-tabs a').on('shown.bs.tab', function (event) {
+    let targetNavItem = $(event.target).parent();
+    let targetNavTabs = $(targetNavItem).parent();
+
+    $(targetNavTabs).children(".nav-tab").removeClass("active");
+    $(targetNavItem).addClass("active");
+  });
+}
+
+/* v7 functions: */
+
 function addUserStatusChangeHandler(url) {
+  /* used in users/view.html */
   const listener = function (enabled) {
     return async function (_evt) {
       try {
         const response = await fetch(url, {
           body: JSON.stringify({
-                    'enabled': enabled,
-                    'objectType': 'USER'
-                  }),
+            'enabled': enabled,
+            'objectType': 'USER'
+          }),
           headers: {
             'Content-Type': 'application/json'
           },
@@ -106,18 +119,6 @@ function addUserStatusChangeHandler(url) {
     confirm.addEventListener('click', listener(enable));
   }
 }
-
-function bindTabEvents() {
-  $('.nav-tabs a').on('shown.bs.tab', function (event) {
-    let targetNavItem = $(event.target).parent();
-    let targetNavTabs = $(targetNavItem).parent();
-
-    $(targetNavTabs).children(".nav-tab").removeClass("active");
-    $(targetNavItem).addClass("active");
-  });
-}
-
-/* v7 functions: */
 
 function formatDate(date, locale, onlyDate = false) {
   if (!date) {

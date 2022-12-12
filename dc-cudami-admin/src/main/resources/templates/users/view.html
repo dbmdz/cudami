@@ -78,7 +78,7 @@
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
     <script th:inline="javascript">
-      $(addUserStatusChangeHandler(/*[[@{/api/users/{uuid}(uuid=${user.uuid})}]]*/))
+      $(addUserStatusChangeHandler(/*[[@{/api/users/{uuid}(uuid=${user.uuid})}]]*/));
     </script>
   </th:block>
 </body>
