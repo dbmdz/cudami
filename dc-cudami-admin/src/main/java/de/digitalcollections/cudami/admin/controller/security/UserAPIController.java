@@ -92,13 +92,12 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
     return ResponseEntity.ok(userDb);
   }
 
+  /* endpoint for addUserStatusChangeHandler in index.js */
   @PatchMapping("/api/users/{uuid}")
   public ResponseEntity setStatus(@PathVariable("uuid") UUID uuid, @RequestBody User user) {
     boolean successful = service.setStatus(uuid, user.isEnabled());
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.INTERNAL_SERVER_ERROR);
+    return new ResponseEntity<>(
+        successful, successful ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @PutMapping("/api/users/{uuid}")
