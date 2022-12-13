@@ -60,6 +60,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   private DigitalObjectLinkedDataFileResourceRepository
       digitalObjectLinkedDataFileResourceRepository;
 
+  @Override
   @BeforeEach
   public void beforeEach() throws Exception {
     super.beforeEach();
@@ -120,7 +121,6 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
     DigitalObject savedDigitalObject = createDeepCopy(digitalObject);
     savedDigitalObject.setUuid(UUID.randomUUID());
-    when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
     service.save(digitalObject);
 
@@ -190,8 +190,6 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .description(Locale.ENGLISH, "description")
             .renderingResource(renderingResource)
             .build();
-
-    when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
     service.save(digitalObject);
 

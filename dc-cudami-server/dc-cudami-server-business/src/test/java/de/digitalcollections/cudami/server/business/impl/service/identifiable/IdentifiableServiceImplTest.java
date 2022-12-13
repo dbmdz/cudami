@@ -33,6 +33,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -672,10 +673,17 @@ class IdentifiableServiceImplTest {
     Identifiable identifiableToUpdate = new Identifiable();
     identifiableToUpdate.setUuid(uuid);
     identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    // Even when the identifiable UUID of the identifier is null, the service fills it automatically
-    // with
-    // the UUID of the identifiable
-    identifiableToUpdate.setIdentifiers(Set.of(new Identifier(null, "namespace", "value")));
+
+    UUID identifierUuid = UUID.randomUUID();
+    Set<Identifier> missingIdentifiers =
+        new HashSet<>(
+            Set.of(
+                Identifier.builder()
+                    .uuid(identifierUuid)
+                    .namespace("namespace")
+                    .id("value")
+                    .build()));
+    identifiableToUpdate.setIdentifiers(missingIdentifiers);
 
     Identifier identifierToDelete = new Identifier(uuid, "other", "foo");
     Identifiable existingIdentifiable = new Identifiable();
@@ -687,20 +695,27 @@ class IdentifiableServiceImplTest {
     existingIdentifiableWithUpdatedIdentifiers.setUuid(uuid);
     existingIdentifiableWithUpdatedIdentifiers.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
     existingIdentifiableWithUpdatedIdentifiers.setIdentifiers(
-        Set.of(new Identifier(uuid, "namespace", "value")));
+        Set.of(
+            Identifier.builder().uuid(identifierUuid).namespace("namespace").id("value").build()));
 
     when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
         .thenReturn(existingIdentifiable)
         .thenReturn(existingIdentifiableWithUpdatedIdentifiers);
-    when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
-        .thenReturn(List.of(identifierToDelete));
+    when(identifierService.saveForIdentifiable(any(), any()))
+        .thenReturn(
+            Set.of(
+                Identifier.builder()
+                    .uuid(identifierUuid)
+                    .namespace("namespace")
+                    .id("value")
+                    .build()));
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
     service.update(identifiableToUpdate);
 
     assertThat(identifiableToUpdate.getIdentifiers()).hasSize(1);
     Identifier actualIdentifier = identifiableToUpdate.getIdentifiers().stream().findFirst().get();
-    assertThat(actualIdentifier.getIdentifiable()).isEqualTo(uuid);
+    assertThat(actualIdentifier.getUuid()).isEqualTo(identifierUuid);
     assertThat(actualIdentifier.getNamespace()).isEqualTo("namespace");
     assertThat(actualIdentifier.getId()).isEqualTo("value");
 
@@ -715,36 +730,36 @@ class IdentifiableServiceImplTest {
   void fillProvidedIdentifiers()
       throws CudamiServiceException, ValidationException, ServiceException {
     UUID uuid = UUID.randomUUID();
+    UUID[] identifierUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
     // The identifiable, which we want to update, carries one identifier, which is already
-    // present in the database (but when we provide it, we do not set the UUID of the identifiable)
-    // and another one, which is new
+    // present in the database and another one, which is new
+    Identifier existingIdentifier = new Identifier(uuid, "namespace1", "1");
+    existingIdentifier.setUuid(identifierUuids[0]);
+
     Identifiable identifiableToUpdate = new Identifiable();
     identifiableToUpdate.setUuid(uuid);
     identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    identifiableToUpdate.setIdentifiers(
-        Set.of(new Identifier(null, "namespace1", "1"), new Identifier(null, "namespace2", "1")));
+    identifiableToUpdate.addIdentifier(existingIdentifier);
+    identifiableToUpdate.addIdentifier(
+        Identifier.builder().namespace("namespace2").id("1").uuid(identifierUuids[1]).build());
 
     // The existing identifiable carries one identifier
     Identifiable existingIdentifiable = new Identifiable();
     existingIdentifiable.setUuid(uuid);
     existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    Identifier existingIdentifier = new Identifier(uuid, "namespace1", "1");
-    existingIdentifier.setUuid(UUID.randomUUID());
-    existingIdentifiable.setIdentifiers(Set.of(existingIdentifier));
+    existingIdentifiable.addIdentifier(existingIdentifier);
 
-    Identifiable existingIdentifiableWithUpdateUuids = new Identifiable();
-    existingIdentifiableWithUpdateUuids.setUuid(uuid);
-    existingIdentifiableWithUpdateUuids.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    existingIdentifiableWithUpdateUuids.setIdentifiers(
-        Set.of(existingIdentifier, new Identifier(uuid, "namespace2", "1")));
-
-    when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
-        .thenReturn(existingIdentifiable)
-        .thenReturn(existingIdentifiableWithUpdateUuids);
-    when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
-        .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
-    // FIXME when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
+    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
+    when(identifierService.saveForIdentifiable(any(), any()))
+        .thenReturn(
+            Set.of(
+                Identifier.builder()
+                    .uuid(identifierUuids[1])
+                    .namespace("namespace2")
+                    .id("1")
+                    .identifiable(uuid)
+                    .build()));
 
     service.update(identifiableToUpdate);
     List<Identifier> actualIdentifiers = new ArrayList<>(identifiableToUpdate.getIdentifiers());
