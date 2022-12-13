@@ -14,7 +14,7 @@ public interface IdentifierService {
 
   public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws CudamiServiceException;
 
-  public Identifier save(Identifier identifier) throws CudamiServiceException;
+  public void save(Identifier identifier) throws CudamiServiceException;
 
   public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers)
       throws CudamiServiceException;

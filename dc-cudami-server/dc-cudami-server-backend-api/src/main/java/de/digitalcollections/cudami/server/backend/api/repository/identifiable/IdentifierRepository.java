@@ -26,5 +26,5 @@ public interface IdentifierRepository {
 
   Identifier getByUuid(UUID identifierUuid) throws RepositoryException;
 
-  Identifier save(Identifier identifier) throws RepositoryException;
+  void save(Identifier identifier) throws RepositoryException;
 }

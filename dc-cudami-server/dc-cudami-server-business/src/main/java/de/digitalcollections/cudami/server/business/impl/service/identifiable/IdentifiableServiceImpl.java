@@ -408,7 +408,10 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
       }
 
       if (!missingIdentifiers.isEmpty()) {
-        identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
+        providedIdentifiers.removeAll(missingIdentifiers);
+        Set<Identifier> savedIdentifiers =
+            identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
+        providedIdentifiers.addAll(savedIdentifiers);
       }
     } catch (CudamiServiceException e) {
       LOGGER.error(

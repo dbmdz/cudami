@@ -58,9 +58,9 @@ public class IdentifierServiceImpl implements IdentifierService {
   }
 
   @Override
-  public Identifier save(Identifier identifier) throws CudamiServiceException {
+  public void save(Identifier identifier) throws CudamiServiceException {
     try {
-      return identifierRepository.save(identifier);
+      identifierRepository.save(identifier);
     } catch (RepositoryException e) {
       throw new CudamiServiceException(e);
     }
@@ -69,21 +69,20 @@ public class IdentifierServiceImpl implements IdentifierService {
   @Override
   public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers)
       throws CudamiServiceException {
-    Set<Identifier> savedIdentifiers = new HashSet<>(0);
-    if (identifiers != null) {
-      for (Identifier identifier : identifiers) {
-        try {
-          identifier.setIdentifiable(identifiableUuid);
-          Identifier savedIdentifier;
-          if (identifier.getUuid() == null) {
-            savedIdentifier = identifierRepository.save(identifier);
-          } else {
-            savedIdentifier = identifierRepository.getByUuid(identifier.getUuid());
-          }
-          savedIdentifiers.add(savedIdentifier);
-        } catch (RepositoryException e) {
-          throw new CudamiServiceException("Cannot save identifier " + identifier + ": " + e, e);
+    if (identifiers == null) return new HashSet<>(0);
+    Set<Identifier> savedIdentifiers = new HashSet<>(identifiers.size());
+    for (Identifier identifier : identifiers) {
+      try {
+        identifier.setIdentifiable(identifiableUuid);
+        if (identifier.getUuid() == null) {
+          identifierRepository.save(identifier);
+          savedIdentifiers.add(identifier);
+        } else {
+          Identifier dbIdentifier = identifierRepository.getByUuid(identifier.getUuid());
+          savedIdentifiers.add(dbIdentifier);
         }
+      } catch (RepositoryException e) {
+        throw new CudamiServiceException("Cannot save identifier " + identifier + ": " + e, e);
       }
     }
     return savedIdentifiers;

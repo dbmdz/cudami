@@ -171,7 +171,7 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
   }
 
   @Override
-  public Identifier save(Identifier identifier) throws RepositoryException {
+  public void save(Identifier identifier) throws RepositoryException {
     identifier.setUuid(UUID.randomUUID());
     identifier.setCreated(LocalDateTime.now());
     identifier.setLastModified(LocalDateTime.now());
@@ -184,17 +184,13 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
             + " )"
             + " VALUES ( "
             + SQL_INSERT_VALUES
-            + " )"
-            + " RETURNING *, identifier id";
+            + " )";
 
     try {
-      return dbi.withHandle(
-          h ->
-              h.createQuery(sql)
-                  .bindBean(identifier)
-                  .mapToBean(Identifier.class)
-                  .findOne()
-                  .orElse(null));
+      int affected = dbi.withHandle(h -> h.createUpdate(sql).bindBean(identifier).execute());
+      if (affected != 1)
+        throw new RepositoryException(
+            "Insert into table identifiers failed for %s".formatted(identifier));
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(
