@@ -30,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - for `Articles` list (to proof preview image rendering)
   - for `DigitalObjects` list (to proof fixing of too many tabs)
   - for `Collections` list
+- Switch language of displayed multilanguage data fields now using a select drop doen instead tabs
 
 ## [6.2.0](https://github.com/dbmdz/cudami/releases/tag/6.2.0) - 2022-11-25
 
