@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{predicates}: #{predicate} &quot;${predicate.value}&quot;|">...</title>
+    <title th:text="|#{page.title.predicates}: #{predicate} &quot;${predicate.value}&quot;|">...</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${predicate}">
@@ -12,7 +12,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="|#{predicate} &quot;${predicate.value}&quot;|">...</h1>
+            <h1 th:text="|#{predicate} &quot;*{value}&quot;|">...</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
@@ -28,49 +28,36 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid rows-striped">
-
-        <div class="row" th:if="${existingLanguages} and not ${#lists.isEmpty(existingLanguages)}">
-          <div class="col-sm-12">
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-tab" th:each="language,iter : ${existingLanguages}" th:classappend="${iter.index} == 0 ? active">
-                <a
-                  class="language-switcher nav-link"
-                  data-toggle="tab"
-                  role="tab"
-                  th:classappend="${iter.index} == 0 ? active"
-                  th:href="${'#' + language}"
-                  th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
-                  th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-                  >
-                  language
-                </a>
-              </li>
-            </ul>
-            <div class="tab-content">
-              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-                <div class="card">
-                  <div class="card-body bg-light">
-                    <div class="row">
-                      <div class="col-sm-12">
-                        <label class="font-weight-bold">
-                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${predicate.label}, ${language})"></th:block>
-                        </label>
-                        <th:block th:if="${predicate.description?.containsKey(language)}">
-                          <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${predicate.description}, ${language})"></div>
-                        </th:block>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+            <select name="locales" id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
           </div>
-        </div>
+        </th:block>
 
         <th:block th:insert="fragments/uniqueobject::renderFields(${predicate})"></th:block>
 
+        <hr/>
+
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.value}">Value</label></div>
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{description}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.value}">Value</label></div>
           <div class="col-md-9"><span th:text="*{value}">is_author_of</span></div>
         </div>
 
@@ -80,9 +67,10 @@
 
   <section layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
-    <script>
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
+    
+    <script type="text/javascript">
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

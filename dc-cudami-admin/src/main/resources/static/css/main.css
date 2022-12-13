@@ -42,6 +42,10 @@ a[href^="http"]:not(.no-external):after {
   background-color: #FFF;
 }
 
+div.multilanguage {
+  border-right: solid 5px #f7d093;
+}
+
 .error {
   color: rgb(220, 53, 69);
 }
@@ -55,11 +59,16 @@ a[href^="http"]:not(.no-external):after {
   color: rgb(220, 53, 69);
 }
 
-.global-action {
-  background-color: #fef5e7;
+label {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.language-selection {
+  background-color: #f7d093;
   border: solid 1px #ccc;
   margin-bottom: 1em;
-  padding: 1em;
+  padding: 0.5em;
   text-align: center;
 }
 .nav-tabs .nav-tab {

@@ -87,7 +87,10 @@ public class LicensesController {
   }
 
   @GetMapping("/licenses/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     License license = service.getByUuid(uuid);
     if (license == null) {
@@ -98,14 +101,18 @@ public class LicensesController {
     LocalizedText label = license.getLabel();
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
+    }
+
+    String dataLanguage = targetDataLanguage;
+    if (dataLanguage == null && localeService != null) {
+      dataLanguage = localeService.getDefaultLanguage().getLanguage();
     }
 
     model
         .addAttribute("license", license)
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("url", license.getUrl());
+        .addAttribute("dataLanguage", dataLanguage);
     return "licenses/view";
   }
 }

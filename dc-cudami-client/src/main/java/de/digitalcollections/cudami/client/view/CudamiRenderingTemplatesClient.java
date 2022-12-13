@@ -20,6 +20,6 @@ public class CudamiRenderingTemplatesClient extends CudamiRestClient<RenderingTe
   }
 
   public List<Locale> getLanguages() throws TechnicalException {
-    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
+    return doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 }

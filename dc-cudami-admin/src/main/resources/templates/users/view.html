@@ -59,19 +59,19 @@
         <hr>
         
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{username}">Username / Email</label></div>
+          <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>
           <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
         </div>
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
+          <div class="col-md-3"><label th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
           <div class="col-md-9"><span th:text="*{lastname}">Lastname</span>, <span th:text="*{firstname}">Firstname</span></div>
         </div>
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{roles}">Role(s)</label></div>
+          <div class="col-md-3"><label th:text="#{roles}">Role(s)</label></div>
           <div class="col-md-9"><th:block th:each="role,rowStat : *{roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></div>
         </div>
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{status}">Status</label></div>
+          <div class="col-md-3"><label th:text="#{status}">Status</label></div>
           <div class="col-md-9"><span th:text="#{${'tooltip.enabled.' + user.enabled}}">active</span></div>
         </div>
       </div>

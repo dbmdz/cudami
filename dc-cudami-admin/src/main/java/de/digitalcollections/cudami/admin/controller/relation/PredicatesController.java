@@ -246,7 +246,10 @@ public class PredicatesController extends AbstractController {
   }
 
   @GetMapping("/predicates/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     Predicate predicate = service.getByUuid(uuid);
     if (predicate == null) {
@@ -257,14 +260,19 @@ public class PredicatesController extends AbstractController {
     LocalizedText label = predicate.getLabel();
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
+      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
+    }
+
+    String dataLanguage = targetDataLanguage;
+    if (dataLanguage == null && localeService != null) {
+      dataLanguage = localeService.getDefaultLanguage().getLanguage();
     }
 
     model
         .addAttribute("predicate", predicate)
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("value", predicate.getValue());
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "predicates/view";
   }
 }
