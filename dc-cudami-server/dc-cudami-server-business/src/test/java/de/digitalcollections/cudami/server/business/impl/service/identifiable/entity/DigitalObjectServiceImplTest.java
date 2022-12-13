@@ -9,13 +9,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -24,6 +24,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -43,10 +44,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The DigitalObjectService")
-class DigitalObjectServiceImplTest {
+class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   private CollectionService collectionService;
-  private CudamiConfig cudamiConfig;
   private DigitalObjectServiceImpl service;
   private DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService;
   private DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
@@ -61,7 +61,8 @@ class DigitalObjectServiceImplTest {
       digitalObjectLinkedDataFileResourceRepository;
 
   @BeforeEach
-  public void beforeEach() throws CudamiServiceException {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     repo = mock(DigitalObjectRepository.class);
     collectionService = mock(CollectionService.class);
     digitalObjectLinkedDataFileResourceService =
@@ -77,11 +78,6 @@ class DigitalObjectServiceImplTest {
     urlAliasService = mock(UrlAliasService.class);
     digitalObjectLinkedDataFileResourceRepository =
         mock(DigitalObjectLinkedDataFileResourceRepository.class);
-
-    cudamiConfig = mock(CudamiConfig.class);
-    CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
-    when(cudamiConfigUrlAlias.getGenerationExcludes()).thenReturn(List.of("DigitalObject"));
-    when(cudamiConfig.getUrlAlias()).thenReturn(cudamiConfigUrlAlias);
 
     service =
         new DigitalObjectServiceImpl(
@@ -101,7 +97,7 @@ class DigitalObjectServiceImplTest {
   @Test
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
   void saveLinkedDataFileResources()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+      throws ValidationException, ServiceException, CudamiServiceException {
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
             .label(Locale.GERMAN, "Linked Data")
@@ -122,14 +118,13 @@ class DigitalObjectServiceImplTest {
             .linkedDataFileResource(linkedDataFileResource)
             .build();
 
-    DigitalObject savedDigitalObject = digitalObject;
+    DigitalObject savedDigitalObject = createDeepCopy(digitalObject);
     savedDigitalObject.setUuid(UUID.randomUUID());
-    when(repo.save(eq(digitalObject))).thenReturn(savedDigitalObject);
     when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
-    DigitalObject persisted = service.save(digitalObject);
+    service.save(digitalObject);
 
-    assertThat(persisted.getLinkedDataResources()).hasSize(1);
+    assertThat(digitalObject.getLinkedDataResources()).hasSize(1);
   }
 
   @Test
@@ -176,7 +171,7 @@ class DigitalObjectServiceImplTest {
   @Test
   @DisplayName("can save RenderingResources for a DigitalObject")
   void saveRenderingResources()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+      throws ValidationException, ServiceException, CudamiServiceException {
     FileResource renderingResource = new TextFileResource();
     renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
     renderingResource.setMimeType(MimeType.fromTypename("text/html"));
@@ -196,15 +191,12 @@ class DigitalObjectServiceImplTest {
             .renderingResource(renderingResource)
             .build();
 
-    DigitalObject savedDigitalObject = digitalObject;
-    savedDigitalObject.setUuid(UUID.randomUUID());
-    when(repo.save(eq(digitalObject))).thenReturn(savedDigitalObject);
     when(identifierService.save(eq(identifier))).thenReturn(identifier);
 
-    DigitalObject persisted = service.save(digitalObject);
+    service.save(digitalObject);
 
-    assertThat(persisted.getRenderingResources()).hasSize(1);
-    assertThat(persisted.getRenderingResources().get(0)).isEqualTo(renderingResource);
+    assertThat(digitalObject.getRenderingResources()).hasSize(1);
+    assertThat(digitalObject.getRenderingResources().get(0)).isEqualTo(renderingResource);
   }
 
   @Test
@@ -368,15 +360,14 @@ class DigitalObjectServiceImplTest {
 
   @Test
   @DisplayName("returns false when the given item is null")
-  public void addToNullItem()
-      throws ConflictException, IdentifiableServiceException, ValidationException {
+  public void addToNullItem() throws ConflictException, ServiceException, ValidationException {
     assertThat(service.addItemToDigitalObject(null, UUID.randomUUID())).isFalse();
   }
 
   @Test
   @DisplayName("returns false when the given uuid was not found")
   public void addNonexistingDigitalObjectToItem()
-      throws ConflictException, IdentifiableServiceException, ValidationException {
+      throws ConflictException, ServiceException, ValidationException {
     UUID uuid = UUID.randomUUID();
 
     when(service.getByUuid(eq(uuid))).thenReturn(null);
@@ -387,7 +378,7 @@ class DigitalObjectServiceImplTest {
   @Test
   @DisplayName("returns true if the digital object is already connected to the item")
   public void addExistingAndAlreadyConntectedDigitalObjectToItem()
-      throws ConflictException, IdentifiableServiceException, ValidationException {
+      throws ConflictException, ServiceException, ValidationException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =
         DigitalObject.builder().uuid(UUID.randomUUID()).item(item).build();
@@ -418,7 +409,7 @@ class DigitalObjectServiceImplTest {
   @Test
   @DisplayName("returns true when the digital object was successfully connected with the item")
   public void addExistingAndNotConntectedDigitalObjectToItem()
-      throws ConflictException, IdentifiableServiceException, ValidationException {
+      throws ConflictException, ServiceException, ValidationException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =
         DigitalObject.builder()

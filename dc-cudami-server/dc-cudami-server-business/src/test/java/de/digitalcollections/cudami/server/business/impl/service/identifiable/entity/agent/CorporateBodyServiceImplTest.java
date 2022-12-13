@@ -3,20 +3,21 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -27,7 +28,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The corporate body service")
-class CorporateBodyServiceImplTest {
+class CorporateBodyServiceImplTest extends AbstractServiceImplTest {
 
   private CorporateBodyServiceImpl corporateBodyService;
   private CorporateBodyRepository corporateBodyRepository;
@@ -35,22 +36,19 @@ class CorporateBodyServiceImplTest {
   private ImageFileResourceService imageFileResourceService;
   private IdentifierService identifierService;
   private UrlAliasService urlAliasService;
-  private CudamiConfig cudamiConfig;
 
   @BeforeEach
-  void setUp() throws IdentifiableServiceException, ValidationException {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     corporateBodyRepository = mock(CorporateBodyRepository.class);
-    when(corporateBodyRepository.save(any(CorporateBody.class))).thenReturn(new CorporateBody());
-    when(corporateBodyRepository.save(eq(null))).thenThrow(new NullPointerException());
+    doThrow(NullPointerException.class).when(corporateBodyRepository).save(eq(null));
 
     externalCorporateBodyRepository = mock(ExternalCorporateBodyRepository.class);
     imageFileResourceService = mock(ImageFileResourceService.class);
-    when(imageFileResourceService.save(eq(null))).thenThrow(new NullPointerException());
+    doThrow(NullPointerException.class).when(imageFileResourceService).save(eq(null));
 
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
-
-    cudamiConfig = mock(CudamiConfig.class);
 
     HookProperties hookProperties = mock(HookProperties.class);
 
@@ -70,8 +68,7 @@ class CorporateBodyServiceImplTest {
 
   @Test
   @DisplayName("persists preview image for saved and retrieved corporate body")
-  void savePreviewImage()
-      throws MalformedURLException, IdentifiableServiceException, ValidationException {
+  void savePreviewImage() throws MalformedURLException, ServiceException, ValidationException {
     CorporateBody corporateBody = mock(CorporateBody.class);
     ImageFileResource previewImageFileResource = mock(ImageFileResource.class);
     when(previewImageFileResource.getHttpBaseUrl()).thenReturn(new URL("file:///tmp/foo"));
@@ -84,7 +81,7 @@ class CorporateBodyServiceImplTest {
 
   @Test
   @DisplayName("can retrieve and save corporate bodies without preview image")
-  void saveWithoutPreviewImage() {
+  void saveWithoutPreviewImage() throws ServiceException {
     CorporateBody corporateBodyWithoutPreviewImage = new CorporateBody();
     when(externalCorporateBodyRepository.getByGndId(any(String.class)))
         .thenReturn(corporateBodyWithoutPreviewImage);
@@ -93,7 +90,7 @@ class CorporateBodyServiceImplTest {
 
   @Test
   @DisplayName("returns null when no corporate body was found")
-  void returnsNullForNullCorporateBody() {
+  void returnsNullForNullCorporateBody() throws ServiceException {
     when(externalCorporateBodyRepository.getByGndId(any(String.class))).thenReturn(null);
     assertThat(corporateBodyService.fetchAndSaveByGndId("12345")).isNull();
   }

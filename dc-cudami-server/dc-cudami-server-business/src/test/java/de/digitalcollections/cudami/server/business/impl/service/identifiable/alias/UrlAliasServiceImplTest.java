@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -12,11 +13,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.commons.web.SlugGenerator;
-import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -36,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 @DisplayName("The UrlAliasService implementation")
-class UrlAliasServiceImplTest {
+class UrlAliasServiceImplTest extends AbstractServiceImplTest {
 
   private LocaleService localeService;
 
@@ -44,6 +46,18 @@ class UrlAliasServiceImplTest {
   private UrlAliasServiceImpl service;
 
   private SlugGenerator slugGenerator;
+
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    super.beforeEach();
+    repo = mock(UrlAliasRepository.class);
+    localeService = mock(LocaleService.class);
+    when(localeService.getDefaultLanguage()).thenReturn("en");
+    when(localeService.getDefaultLocale()).thenReturn(Locale.ENGLISH);
+    slugGenerator = mock(SlugGenerator.class);
+    when(slugGenerator.generateSlug(any(String.class))).thenReturn("slug");
+    service = new UrlAliasServiceImpl(repo, slugGenerator, localeService);
+  }
 
   @DisplayName("can successfully validate an empty LocalizedUrlAlias")
   @Test
@@ -89,21 +103,10 @@ class UrlAliasServiceImplTest {
     service.validate(localizedUrlAliases);
   }
 
-  @BeforeEach
-  public void beforeEach() {
-    repo = mock(UrlAliasRepository.class);
-    localeService = mock(LocaleService.class);
-    when(localeService.getDefaultLanguage()).thenReturn("en");
-    when(localeService.getDefaultLocale()).thenReturn(Locale.ENGLISH);
-    slugGenerator = mock(SlugGenerator.class);
-    when(slugGenerator.generateSlug(any(String.class))).thenReturn("slug");
-    service = new UrlAliasServiceImpl(repo, slugGenerator, localeService);
-  }
-
   @DisplayName("checkPublication does not override an existing publication date")
   @Test
   public void checkPublicationDoesNotOverridePublicationDate()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+      throws CudamiServiceException, RepositoryException {
     UrlAlias urlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
@@ -120,7 +123,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("checkPublication does not set lastPublished primary is set to false")
   @Test
   public void checkPublicationLastPublishedNotSet()
-      throws UrlAliasRepositoryException, CudamiServiceException {
+      throws CudamiServiceException, RepositoryException {
     UrlAlias urlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
@@ -128,7 +131,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setLastPublished(publicationDate);
     when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
-    UrlAlias changedUrlAlias = deepCopy(urlAlias);
+    UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(false);
 
     LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
@@ -143,7 +146,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("checkPublication sets lastPublished to now when an alias becomes primary again")
   @Test
   public void checkPublicationSetLastPublishedAgain()
-      throws UrlAliasRepositoryException, CudamiServiceException {
+      throws CudamiServiceException, RepositoryException {
     UrlAlias urlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(false);
@@ -151,7 +154,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setLastPublished(publicationDate);
     when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
-    UrlAlias changedUrlAlias = deepCopy(urlAlias);
+    UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(true);
 
     LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
@@ -176,8 +179,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("checkPublication throws an exception when changing an already published urlalias")
   @Test
-  public void checkPublicationThrowsExceptionForAlreadyPublished()
-      throws UrlAliasRepositoryException, CudamiServiceException {
+  public void checkPublicationThrowsExceptionForAlreadyPublished() throws RepositoryException {
     UrlAlias urlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     urlAlias.setPrimary(true);
@@ -185,7 +187,7 @@ class UrlAliasServiceImplTest {
     urlAlias.setLastPublished(publicationDate);
     when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
 
-    UrlAlias changedUrlAlias = deepCopy(urlAlias);
+    UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setSlug("foo");
 
     assertThrows(
@@ -231,25 +233,9 @@ class UrlAliasServiceImplTest {
     return website;
   }
 
-  private UrlAlias deepCopy(UrlAlias urlAlias) {
-    UrlAlias copy = new UrlAlias();
-    copy.setPrimary(urlAlias.isPrimary());
-    copy.setTargetLanguage(urlAlias.getTargetLanguage());
-    copy.setUuid(urlAlias.getUuid());
-    copy.setCreated(urlAlias.getCreated());
-    copy.setWebsite(urlAlias.getWebsite());
-    copy.setLastPublished(urlAlias.getLastPublished());
-    copy.setSlug(urlAlias.getSlug());
-    copy.setTargetIdentifiableType(urlAlias.getTargetIdentifiableType());
-    copy.setTargetIdentifiableObjectType(urlAlias.getTargetIdentifiableObjectType());
-    copy.setTargetUuid(urlAlias.getTargetUuid());
-    return copy;
-  }
-
   @DisplayName("deleteForTarget with force deletes everything")
   @Test
-  public void deleteForTargetWithForce()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteForTargetWithForce() throws CudamiServiceException, RepositoryException {
     UUID targetUuid = UUID.randomUUID();
     LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
     targetLocalizedUrlAliases.add(
@@ -267,15 +253,14 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("deleteForTarget with unset uuid deletes nothing and returns false")
   @Test
-  public void deleteForTargetWithUuidNull()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteForTargetWithUuidNull() throws CudamiServiceException, RepositoryException {
     assertThat(service.deleteAllForTarget(null, true)).isFalse();
     verify(repo, never()).delete(any());
   }
 
   @DisplayName("returns false, when no single UrlAlias of a list could be deleted")
   @Test
-  public void deleteNoUrlAliasesAtAll() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteNoUrlAliasesAtAll() throws CudamiServiceException, RepositoryException {
     when(repo.delete(any(List.class))).thenReturn(0);
 
     assertThat(service.delete(List.of(UUID.randomUUID(), UUID.randomUUID()))).isFalse();
@@ -283,8 +268,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns false when trying to delete a nonexistant UrlAlias by its uuid")
   @Test
-  public void deleteNonexistantSingleUrlAlias()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteNonexistantSingleUrlAlias() throws CudamiServiceException, RepositoryException {
     when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
     assertThat(service.delete(UUID.randomUUID())).isFalse();
@@ -292,7 +276,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns true when an existant UrlAlias could be deleted")
   @Test
-  public void deleteSingleUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteSingleUrlAlias() throws CudamiServiceException, RepositoryException {
     when(repo.delete(any(List.class))).thenReturn(1);
 
     assertThat(service.delete(UUID.randomUUID())).isTrue();
@@ -300,10 +284,9 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns true, when at least one UrlAlias of a list could be deleted")
   @Test
-  public void deleteSomeUrlAliases() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void deleteSomeUrlAliases() throws CudamiServiceException, RepositoryException {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
-
     when(repo.delete(eq(List.of(uuid1, uuid2)))).thenReturn(1);
 
     assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
@@ -372,8 +355,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("retrieve primary links of a target as List<UrlAlias>")
   @Test
-  public void findPrimaryLinksForTarget()
-      throws UrlAliasRepositoryException, CudamiServiceException {
+  public void findPrimaryLinksForTarget() throws CudamiServiceException, RepositoryException {
     UUID targetUuid = UUID.randomUUID();
     UrlAlias ua1 = createUrlAlias("slug1", true, "de", true, targetUuid, null);
     UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, targetUuid, null);
@@ -386,7 +368,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("generates slugs with numeric suffix for default locale")
   @Test
   public void generateSlugWithNumericSuffixForDefaultLocale()
-      throws UrlAliasRepositoryException, CudamiServiceException {
+      throws CudamiServiceException, RepositoryException {
     String expected = "label-2";
     UUID websiteUuid = UUID.randomUUID();
 
@@ -400,8 +382,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("can generate a slug without suffix")
   @Test
-  public void generateSlugWithoutSuffix()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void generateSlugWithoutSuffix() throws CudamiServiceException, RepositoryException {
     String expected = "label";
     UUID websiteUuid = UUID.randomUUID();
 
@@ -414,8 +395,7 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "returns the generic primary link in all languages, when no website uuid is provided")
   @Test
-  public void genericPrimaryLinkForNoWebsite()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void genericPrimaryLinkForNoWebsite() throws CudamiServiceException, RepositoryException {
     LocalizedUrlAliases expectedLocalizedUrlAliases = new LocalizedUrlAliases();
     expectedLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
@@ -433,7 +413,7 @@ class UrlAliasServiceImplTest {
       "returns the generic primary link in demanded language, when no website uuid is provided")
   @Test
   public void genericPrimaryLinkForNoWebsiteRestrictedtoLanguage()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+      throws CudamiServiceException, RepositoryException {
 
     UrlAlias germanUrlAlias =
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
@@ -458,7 +438,7 @@ class UrlAliasServiceImplTest {
       "falls back to generic primary links when trying to get the primary links with a missing website uuid")
   @Test
   public void genericPrimaryLinksForPrimaryLinksWithMissingUuid()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+      throws CudamiServiceException, RepositoryException {
     UUID uuid = UUID.randomUUID();
     String slug = "hützligrütz";
 
@@ -499,7 +479,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when the repository throws an exception")
   @Test
-  public void raiseException() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void raiseException() throws RepositoryException {
     when(repo.getByUuid(any(UUID.class))).thenThrow(new NullPointerException("foo"));
 
     assertThrows(
@@ -527,9 +507,8 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when deleting leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenDeleteLeadsToAnException()
-      throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.delete(any(List.class))).thenThrow(new UrlAliasRepositoryException("foo"));
+  public void raiseExceptionWhenDeleteLeadsToAnException() throws RepositoryException {
+    doThrow(RepositoryException.class).when(repo).delete(any(List.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -541,8 +520,8 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "raises a ServiceException when finding an UrlAlias leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenFindLeadsToAnException() throws UrlAliasRepositoryException {
-    when(repo.find(any(PageRequest.class))).thenThrow(new NullPointerException("foo"));
+  public void raiseExceptionWhenFindLeadsToAnException() throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).find(any(PageRequest.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -555,8 +534,8 @@ class UrlAliasServiceImplTest {
       "raises a ServiceException when retriving LocalizedUrlAliases leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException()
-      throws UrlAliasRepositoryException {
-    when(repo.getAllForTarget(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+      throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).getAllForTarget(any(UUID.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -569,9 +548,10 @@ class UrlAliasServiceImplTest {
       "raises a ServiceException when retriving the primary links leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenRetrievingPrimaryLinksLeadsToAnException()
-      throws UrlAliasRepositoryException {
-    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class)))
-        .thenThrow(new NullPointerException("foo"));
+      throws RepositoryException {
+    doThrow(NullPointerException.class)
+        .when(repo)
+        .findPrimaryLinksForWebsite(any(UUID.class), any(String.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -582,9 +562,8 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when creating leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenSaveLeadsToAnException()
-      throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.save(any(UrlAlias.class))).thenThrow(new NullPointerException("foo"));
+  public void raiseExceptionWhenSaveLeadsToAnException() throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).save(any(UrlAlias.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -607,7 +586,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when trying to create an UrlAlias with existing UUID")
   @Test
-  public void raiseExceptionWhenSaveWithUuid() throws UrlAliasRepositoryException {
+  public void raiseExceptionWhenSaveWithUuid() throws RepositoryException {
     when(repo.getByUuid(any(UUID.class))).thenReturn(null);
     assertThrows(
         CudamiServiceException.class,
@@ -620,9 +599,8 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("raises a ServiceException when updating leads to an exception in the repository")
   @Test
-  public void raiseExceptionWhenUpdateLeadsToAnException()
-      throws CudamiServiceException, UrlAliasRepositoryException {
-    when(repo.getByUuid(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+  public void raiseExceptionWhenUpdateLeadsToAnException() throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).getByUuid(any(UUID.class));
 
     assertThrows(
         CudamiServiceException.class,
@@ -636,14 +614,13 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "raises a ServiceException when updating leads to an exception in the repository at persisting")
   @Test
-  public void raiseExceptionWhenUpdateLeadsToAnExceptionAtPersisting()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void raiseExceptionWhenUpdateLeadsToAnExceptionAtPersisting() throws RepositoryException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     expected.setLastPublished(null);
 
     when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(repo.update(any())).thenThrow(new NullPointerException("foo"));
+    doThrow(NullPointerException.class).when(repo).update(any());
 
     assertThrows(
         CudamiServiceException.class,
@@ -676,7 +653,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns an UrlAlias")
   @Test
-  public void readExisting() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void readExisting() throws CudamiServiceException, RepositoryException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
@@ -687,7 +664,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns null, when an nonexisting UrlAlias should be retrieved")
   @Test
-  public void readNonexisting() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void readNonexisting() throws CudamiServiceException, RepositoryException {
     when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
     assertThat(service.getByUuid(UUID.randomUUID())).isNull();
@@ -695,7 +672,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns null, an UrlAlias with uuid=null should be retrieved")
   @Test
-  public void readNull() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void readNull() throws CudamiServiceException, RepositoryException {
     when(repo.getByUuid(eq(null))).thenReturn(null);
 
     assertThat(service.getByUuid(null)).isNull();
@@ -802,8 +779,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("returns LocalizedUrlAliases for an UUID of an identifiable")
   @Test
-  public void returnLocalizedUrlAliases()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+  public void returnLocalizedUrlAliases() throws CudamiServiceException, RepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setUuid(UUID.randomUUID());
@@ -817,7 +793,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("can return primary links")
   @Test
-  public void returnPrimaryLinks() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void returnPrimaryLinks() throws CudamiServiceException, RepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
@@ -831,7 +807,7 @@ class UrlAliasServiceImplTest {
   @DisplayName("can return generic primary links")
   @Test
   public void returnPrimaryLinksWithoutWebsite()
-      throws CudamiServiceException, UrlAliasRepositoryException {
+      throws CudamiServiceException, RepositoryException {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
@@ -843,7 +819,7 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("can return a SearchPageResult")
   @Test
-  public void returnSearchPageResult() throws UrlAliasRepositoryException, CudamiServiceException {
+  public void returnSearchPageResult() throws RepositoryException, CudamiServiceException {
     PageResponse<LocalizedUrlAliases> expected = new PageResponse<>();
     LocalizedUrlAliases localizedUrlAlias = new LocalizedUrlAliases();
     localizedUrlAlias.add(
@@ -858,22 +834,25 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("creates and saves an UrlAlias and returns it with set UUID")
   @Test
-  public void saveUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void saveUrlAlias() throws CudamiServiceException {
     UrlAlias urlAlias =
         createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
-    UrlAlias expected = deepCopy(urlAlias);
+    UrlAlias expected = createDeepCopy(urlAlias);
     expected.setUuid(UUID.randomUUID());
 
-    when(repo.save(eq(urlAlias))).thenReturn(expected);
+    UrlAlias expectedForSave = createDeepCopy(expected);
+    service.save(urlAlias);
+    // We have to set the UUID field in the expectedForSave UrlAlias for later comparison
+    expectedForSave.setUuid(urlAlias.getUuid());
 
-    assertThat(service.save(urlAlias)).isEqualTo(expected);
+    assertThat(urlAlias).usingRecursiveComparison().isEqualTo(expectedForSave);
   }
 
   @DisplayName("throws an exception, when the query for existance of a slug leads to an exception")
   @Test
-  public void throwsExceptionWhenSlugQueryFails() throws UrlAliasRepositoryException {
+  public void throwsExceptionWhenSlugQueryFails() throws RepositoryException {
     when(repo.hasUrlAlias(any(String.class), any(UUID.class), any(Locale.class)))
-        .thenThrow(new UrlAliasRepositoryException("foo"));
+        .thenThrow(new RepositoryException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
@@ -885,12 +864,12 @@ class UrlAliasServiceImplTest {
   @DisplayName(
       "throws an exception, when the query for existance of a suffixed slug leads to an exception")
   @Test
-  public void throwsExceptionWhenSlugQueryForSuffixesFails() throws UrlAliasRepositoryException {
+  public void throwsExceptionWhenSlugQueryForSuffixesFails() throws RepositoryException {
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
     when(repo.hasUrlAlias(eq("label"), any(UUID.class), any(Locale.class))).thenReturn(true);
 
     when(repo.hasUrlAlias(eq("label-1"), any(UUID.class), any(Locale.class)))
-        .thenThrow(new UrlAliasRepositoryException("foo"));
+        .thenThrow(new RepositoryException("foo"));
 
     assertThrows(
         CudamiServiceException.class,
@@ -901,13 +880,16 @@ class UrlAliasServiceImplTest {
 
   @DisplayName("updates and returns an UrlAlias")
   @Test
-  public void updateUrlAlias() throws CudamiServiceException, UrlAliasRepositoryException {
+  public void updateUrlAlias() throws RepositoryException, CudamiServiceException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
     when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(repo.update(eq(expected))).thenReturn(expected);
 
-    assertThat(service.update(expected)).isEqualTo(expected);
+    UrlAlias expectedForUpdate = createDeepCopy(expected);
+
+    service.update(expected);
+
+    assertThat(expected).isEqualTo(expectedForUpdate);
   }
 }
