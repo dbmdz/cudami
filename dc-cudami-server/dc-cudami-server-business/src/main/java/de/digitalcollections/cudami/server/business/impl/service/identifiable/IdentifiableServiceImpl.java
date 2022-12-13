@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -375,6 +376,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     }
 
     I identifiableInDb = repository.getByUuid(identifiable.getUuid());
+    if (identifiableInDb == null) {
+      throw new ResourceNotFoundException(
+          "No "
+              + identifiable.getClass().getSimpleName()
+              + " found with uuid="
+              + identifiableInDb.getUuid());
+    }
 
     try {
       repository.update(identifiable);

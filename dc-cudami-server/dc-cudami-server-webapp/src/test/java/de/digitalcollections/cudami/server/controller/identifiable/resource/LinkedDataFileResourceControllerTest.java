@@ -135,8 +135,8 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .uri("http://foo.bar/bla.xml")
             .build();
 
-    when(linkedDataFileResourceService.save(any(LinkedDataFileResource.class)))
-        .thenReturn(expected);
+    // FIXME when(linkedDataFileResourceService.save(any(LinkedDataFileResource.class)))
+    // FIXME    .thenReturn(expected);
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -170,8 +170,8 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .uri("http://foo.bar/bla.xml")
             .build();
 
-    when(linkedDataFileResourceService.update(any(LinkedDataFileResource.class)))
-        .thenReturn(expected);
+    // FIXME when(linkedDataFileResourceService.update(any(LinkedDataFileResource.class)))
+    // FIXME    .thenReturn(expected);
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =

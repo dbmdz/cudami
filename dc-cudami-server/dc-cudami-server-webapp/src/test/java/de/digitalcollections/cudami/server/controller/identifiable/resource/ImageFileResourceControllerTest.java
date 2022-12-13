@@ -137,7 +137,21 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.save(any(ImageFileResource.class))).thenReturn(expected);
+    // FIXME when(imageFileResourceService.save(any(ImageFileResource.class))).thenReturn(expected);
+    // Das muss irgendwie mit doAnswer o.ä, gemocked werden, weil der Aufruf der void
+    // save-Methode das übergebene Argument ändert (auf "expected")
+
+    /*
+    Theorie:
+
+    doAnswer( invocation -> {
+      ImageFileResource savedObject = invocation.getArgument(0);
+      savedObject = expected;
+      return invocation;
+    }).when(imageFileResourceService).save(any(ImageFileResource.class));
+
+    Praxis: Läuft nicht
+     */
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -168,7 +182,8 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.update(any(ImageFileResource.class))).thenReturn(expected);
+    // FIXME
+    // when(imageFileResourceService.update(any(ImageFileResource.class))).thenReturn(expected);
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =

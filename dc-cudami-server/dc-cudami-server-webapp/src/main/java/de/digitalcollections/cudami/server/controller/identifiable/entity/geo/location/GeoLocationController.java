@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
@@ -187,8 +188,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       value = {"/v6/geolocations", "/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return geoLocationService.save(geoLocation);
+      throws ServiceException, ValidationException {
+    geoLocationService.save(geoLocation);
+    return geoLocation;
   }
 
   @Operation(summary = "update a geolocation")
@@ -202,8 +204,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, geoLocation.getUuid());
-    return geoLocationService.update(geoLocation);
+    geoLocationService.update(geoLocation);
+    return geoLocation;
   }
 }

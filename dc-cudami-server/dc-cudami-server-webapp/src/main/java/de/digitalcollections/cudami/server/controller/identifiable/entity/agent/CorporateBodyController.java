@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.agent
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
@@ -82,7 +83,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
               description = "GND-ID of the corporate body, e.g. <tt>2007744-0</tt>")
           @PathVariable("gndId")
           String gndId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
@@ -200,8 +201,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return corporateBodyService.save(corporateBody);
+      throws ServiceException, ValidationException {
+    corporateBodyService.save(corporateBody);
+    return corporateBody;
   }
 
   @Operation(summary = "Update a corporate body")
@@ -222,8 +224,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
           UUID uuid,
       @RequestBody CorporateBody corporateBody,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, corporateBody.getUuid());
-    return corporateBodyService.update(corporateBody);
+    corporateBodyService.update(corporateBody);
+    return corporateBody;
   }
 }

@@ -92,17 +92,20 @@ public class SubjectController {
   @PostMapping(
       value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject save(@RequestBody Subject subject, BindingResult errors) {
-    return service.save(subject);
+  public Subject save(@RequestBody Subject subject, BindingResult errors)
+      throws CudamiServiceException {
+    service.save(subject);
+    return subject;
   }
 
   @Operation(summary = "Update a subject")
   @PutMapping(
       value = {"/v6/subjects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject update(
-      @PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors) {
+  public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
+      throws CudamiServiceException {
     assert Objects.equals(uuid, subject.getUuid());
-    return service.update(subject);
+    service.update(subject);
+    return subject;
   }
 }

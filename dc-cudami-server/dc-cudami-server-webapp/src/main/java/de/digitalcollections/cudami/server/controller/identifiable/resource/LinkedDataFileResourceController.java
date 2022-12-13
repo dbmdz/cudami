@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
@@ -148,8 +149,9 @@ public class LinkedDataFileResourceController
       value = {"/v6/linkeddatafileresources", "/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource save(@RequestBody LinkedDataFileResource linkedDataFileResource)
-      throws IdentifiableServiceException, ValidationException {
-    return service.save(linkedDataFileResource);
+      throws ServiceException, ValidationException {
+    service.save(linkedDataFileResource);
+    return linkedDataFileResource;
   }
 
   @Operation(summary = "Update a linkedDataFileResource")
@@ -160,8 +162,9 @@ public class LinkedDataFileResourceController
       @PathVariable UUID uuid,
       @RequestBody LinkedDataFileResource linkedDataFileResource,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, linkedDataFileResource.getUuid());
-    return service.update(linkedDataFileResource);
+    service.update(linkedDataFileResource);
+    return linkedDataFileResource;
   }
 }

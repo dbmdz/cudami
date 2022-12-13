@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
@@ -123,8 +124,9 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       value = {"/v6/familynames", "/v5/familynames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return familyNameService.save(familyName);
+      throws ServiceException, ValidationException {
+    familyNameService.save(familyName);
+    return familyName;
   }
 
   @Operation(summary = "update a familyname")
@@ -133,8 +135,9 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, familyName.getUuid());
-    return familyNameService.update(familyName);
+    familyNameService.update(familyName);
+    return familyName;
   }
 }

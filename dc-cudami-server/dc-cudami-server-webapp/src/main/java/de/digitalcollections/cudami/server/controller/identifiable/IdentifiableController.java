@@ -117,7 +117,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
-      throws ResourceNotFoundException {
+      throws ResourceNotFoundException, IdentifiableServiceException {
     Identifiable identifiable = identifiableService.getByUuid(uuid);
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);

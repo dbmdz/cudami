@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -45,7 +45,7 @@ class CorporateBodyControllerTest extends BaseControllerTest {
         "abcd-e, false",
         "11489308X, true"
       })
-  void gndIdVerification(String gndId, boolean isValue) throws IdentifiableServiceException {
+  void gndIdVerification(String gndId, boolean isValue) throws ServiceException {
     if (isValue) {
       corporateBodyController.fetchAndSaveByGndId(gndId);
     } else {

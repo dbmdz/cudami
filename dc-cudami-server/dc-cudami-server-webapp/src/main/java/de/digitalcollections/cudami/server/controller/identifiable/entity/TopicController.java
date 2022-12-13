@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
@@ -386,8 +387,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       value = {"/v6/topics", "/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return topicService.save(topic);
+      throws ServiceException, ValidationException {
+    topicService.save(topic);
+    return topic;
   }
 
   @Operation(summary = "Save a newly created topic and add it to parent")
@@ -405,7 +407,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID parentTopicUuid,
       @RequestBody Topic topic,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return topicService.saveWithParent(topic, parentTopicUuid);
   }
 
@@ -446,8 +448,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, topic.getUuid());
-    return topicService.update(topic);
+    topicService.update(topic);
+    return topic;
   }
 }

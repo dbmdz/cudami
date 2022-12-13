@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -84,8 +85,10 @@ public class IdentifierTypeController {
         "/latest/identifiertypes"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors) {
-    return identifierTypeService.save(identifierType);
+  public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors)
+      throws CudamiServiceException {
+    identifierTypeService.save(identifierType);
+    return identifierType;
   }
 
   @Operation(summary = "update an identifier type")
@@ -98,8 +101,10 @@ public class IdentifierTypeController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType update(
-      @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors) {
+      @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors)
+      throws CudamiServiceException {
     assert Objects.equals(uuid, identifierType.getUuid());
-    return identifierTypeService.update(identifierType);
+    identifierTypeService.update(identifierType);
+    return identifierType;
   }
 }

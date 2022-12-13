@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.l
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
@@ -167,8 +168,9 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return humanSettlementService.save(humanSettlement);
+      throws ServiceException, ValidationException {
+    humanSettlementService.save(humanSettlement);
+    return humanSettlement;
   }
 
   @Operation(summary = "update a human settlement")
@@ -184,8 +186,9 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @PathVariable("uuid") UUID uuid,
       @RequestBody HumanSettlement humanSettlement,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
-    return humanSettlementService.update(humanSettlement);
+    humanSettlementService.update(humanSettlement);
+    return humanSettlement;
   }
 }

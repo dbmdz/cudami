@@ -51,14 +51,13 @@ public class UrlAliasController {
       return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    UrlAlias result;
     try {
-      result = urlAliasService.save(urlAlias);
+      urlAliasService.save(urlAlias);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(urlAlias, HttpStatus.OK);
   }
 
   @Operation(summary = "Delete an UrlAlias by uuid")
@@ -239,11 +238,11 @@ public class UrlAliasController {
 
     UrlAlias result;
     try {
-      result = urlAliasService.update(urlAlias);
+      urlAliasService.update(urlAlias);
     } catch (CudamiServiceException e) {
       throw new CudamiControllerException(e);
     }
 
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(urlAlias, HttpStatus.OK);
   }
 }

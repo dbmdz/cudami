@@ -75,7 +75,8 @@ public class EntityRelationController {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    return entityRelationService.save(entityRelations);
+    entityRelationService.save(entityRelations);
+    return entityRelations;
   }
 
   @Operation(summary = "Connect a list of entity pairs with a predicate each")
@@ -89,6 +90,7 @@ public class EntityRelationController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
       throws CudamiServiceException {
-    return entityRelationService.save(entityRelations);
+    entityRelationService.save(entityRelations);
+    return entityRelations;
   }
 }

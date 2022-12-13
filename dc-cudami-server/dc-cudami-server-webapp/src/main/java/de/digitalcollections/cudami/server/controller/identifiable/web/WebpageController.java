@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
@@ -285,7 +286,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebpage(
       @PathVariable UUID parentWebpageUuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return webpageService.saveWithParent(webpage, parentWebpageUuid);
   }
 
@@ -300,7 +301,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage saveWithParentWebsite(
       @PathVariable UUID parentWebsiteUuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     return webpageService.saveWithParentWebsite(webpage, parentWebsiteUuid);
   }
 
@@ -314,9 +315,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, webpage.getUuid());
-    return webpageService.update(webpage);
+    webpageService.update(webpage);
+    return webpage;
   }
 
   @Operation(summary = "Update the order of a webpage's children")

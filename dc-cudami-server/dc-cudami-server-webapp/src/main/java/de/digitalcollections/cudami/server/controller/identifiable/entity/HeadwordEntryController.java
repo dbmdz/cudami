@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
@@ -142,8 +143,9 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries", "/v5/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry save(@RequestBody HeadwordEntry headwordEntry, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return headwordEntryService.save(headwordEntry);
+      throws ServiceException, ValidationException {
+    headwordEntryService.save(headwordEntry);
+    return headwordEntry;
   }
 
   @Operation(summary = "Update an headwordentry")
@@ -152,8 +154,9 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry update(
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, headwordEntry.getUuid());
-    return headwordEntryService.update(headwordEntry);
+    headwordEntryService.update(headwordEntry);
+    return headwordEntry;
   }
 }

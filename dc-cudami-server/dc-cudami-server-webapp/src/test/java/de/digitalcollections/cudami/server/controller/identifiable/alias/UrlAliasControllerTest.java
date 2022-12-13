@@ -115,7 +115,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+    // FIXME when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
     String body =
         "{\n"
@@ -150,7 +150,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+    // FIXME when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
     String body =
         "{\n"

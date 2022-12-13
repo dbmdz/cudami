@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
@@ -68,7 +69,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
           @PathVariable
           UUID digitalObjectUuid)
-      throws ValidationException, ConflictException, IdentifiableServiceException {
+      throws ValidationException, ConflictException, ServiceException {
 
     Item item = itemService.getByUuid(uuid);
     boolean successful = digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
@@ -264,8 +265,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return itemService.save(item);
+      throws ServiceException, ValidationException {
+    itemService.save(item);
+    return item;
   }
 
   @Operation(summary = "update an item")
@@ -273,11 +275,12 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing item");
     }
 
-    return itemService.update(item);
+    itemService.update(item);
+    return item;
   }
 }

@@ -140,7 +140,8 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) {
+  public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid)
+      throws IdentifiableServiceException {
     Entity entity = entityService.getByUuid(uuid);
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
