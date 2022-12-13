@@ -9,6 +9,7 @@ import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.view.RenderingTemplate;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -96,25 +97,30 @@ public class RenderingTemplatesController extends AbstractController {
   @GetMapping("/renderingtemplates/{uuid}")
   public String view(
       @PathVariable UUID uuid,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
     RenderingTemplate renderingTemplate = service.getByUuid(uuid);
     if (renderingTemplate == null) {
       throw new ResourceNotFoundException();
     }
-    model.addAttribute("renderingTemplate", renderingTemplate);
 
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
-    model.addAttribute("existingLanguages", existingLanguages);
-
-    String language = itemLocale;
-    if (language == null && localeService != null) {
-      language = localeService.getDefaultLanguage().getLanguage();
+    List<Locale> existingLanguages = Collections.emptyList();
+    LocalizedText label = renderingTemplate.getLabel();
+    if (!CollectionUtils.isEmpty(label)) {
+      Locale displayLocale = LocaleContextHolder.getLocale();
+      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
     }
-    model.addAttribute("language", language);
+
+    String dataLanguage = targetDataLanguage;
+    if (dataLanguage == null && localeService != null) {
+      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    }
+
+    model
+        .addAttribute("renderingTemplate", renderingTemplate)
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
 
     return "renderingtemplates/view";
   }

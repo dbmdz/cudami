@@ -11,11 +11,9 @@
     <div class="content-header">
       <div class="container-fluid">
         <div class="row">
-          
           <div class="col-sm-6">
             <h1 th:text="|#{lbl.identifier_type} &quot;${identifierType.namespace}&quot;|">...</h1>
           </div>
-          
           <div class="col-sm-6">
             <div class="float-right">
               <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
@@ -32,16 +30,18 @@
 
         <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
 
+        <hr/>
+
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.label}">Label</label></div>
+          <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
           <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
         </div>
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.namespace}">Namespace</label></div>
+          <div class="col-md-3"><label th:text="#{lbl.namespace}">Namespace</label></div>
           <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
         </div>
         <div class="row">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.pattern}">Pattern</label></div>
+          <div class="col-md-3"><label th:text="#{lbl.pattern}">Pattern</label></div>
           <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
         </div>
 

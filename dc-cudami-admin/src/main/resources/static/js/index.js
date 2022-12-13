@@ -15,21 +15,6 @@ function activatePopovers() {
   $('[data-toggle="popover"]').popover()
 }
 
-function addLanguageChangeHandler() {
-  $('.language-switcher').on('click', function () {
-    // get the href attribute and cut off the leading hash to get the selected language
-    var selectedLanguage = $(this).attr('href').slice(1)
-    var editUrl = $('#edit-button').attr('href').split('?')
-    var urlParams =
-            editUrl.length > 1
-            ? new URLSearchParams(editUrl[1])
-            : new URLSearchParams('')
-    urlParams.set('activeLanguage', selectedLanguage)
-    editUrl = [editUrl[0], urlParams.toString()]
-    $('#edit-button, #sticky-edit-button').attr('href', editUrl.join('?'))
-  })
-}
-
 function appendQueryParameters() {
   var existingQueryParameters = window.location.search
   if (existingQueryParameters) {
@@ -44,47 +29,31 @@ function appendQueryParameters() {
   }
 }
 
-function moveEditButtonToNavbar() {
-  var navbar = document.querySelector('.navbar')
-  var editButton = document.getElementById('edit-button')
-  var editButtonInNavbar = document.createElement('li')
-  editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3')
-  editButtonInNavbar.innerHTML = `<a class="border border-white btn btn-primary btn-sm" id="sticky-edit-button">${editButton.innerText}</a>`
-  var observer = new IntersectionObserver(
-          (entry, _) => {
-    var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1
-    if (inView) {
-      editButton.classList.add('visible')
-      editButton.classList.remove('invisible')
-      editButtonInNavbar.remove()
-    } else {
-      editButton.classList.add('invisible')
-      editButton.classList.remove('visible')
-      editButtonInNavbar
-              .querySelector('a')
-              .setAttribute('href', editButton.getAttribute('href'))
-      navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar)
-    }
-  },
-          {
-            rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
-            threshold: 1,
-          },
-          )
-  observer.observe(editButton)
-}
+/* v7 functions: */
 
-function bindTabEvents() {
-  $('.nav-tabs a').on('shown.bs.tab', function (event) {
-    let targetNavItem = $(event.target).parent();
-    let targetNavTabs = $(targetNavItem).parent();
-
-    $(targetNavTabs).children(".nav-tab").removeClass("active");
-    $(targetNavItem).addClass("active");
+function addDataLanguageChangeHandler() {
+  $("#data-languages").change(function () {
+    var url = window.location.href.split('?')[0];
+    let dataLanguage = $("#data-languages").val();
+    window.location.href = url + '?dataLanguage=' + dataLanguage;
   });
 }
 
-/* v7 functions: */
+function addLanguageChangeHandler() {
+  /* used in view pages to switch language tabs */
+  $('.language-switcher').on('click', function () {
+    // get the href attribute and cut off the leading hash to get the selected language
+    var selectedLanguage = $(this).attr('href').slice(1);
+    var editUrl = $('#edit-button').attr('href').split('?');
+    var urlParams =
+            editUrl.length > 1
+            ? new URLSearchParams(editUrl[1])
+            : new URLSearchParams('');
+    urlParams.set('activeLanguage', selectedLanguage);
+    editUrl = [editUrl[0], urlParams.toString()];
+    $('#edit-button, #sticky-edit-button').attr('href', editUrl.join('?'));
+  });
+}
 
 function addUserStatusChangeHandler(url) {
   /* used in users/view.html */
@@ -120,7 +89,18 @@ function addUserStatusChangeHandler(url) {
   }
 }
 
+function bindTabEvents() {
+  $('.nav-tabs a').on('shown.bs.tab', function (event) {
+    let targetNavItem = $(event.target).parent();
+    let targetNavTabs = $(targetNavItem).parent();
+
+    $(targetNavTabs).children(".nav-tab").removeClass("active");
+    $(targetNavItem).addClass("active");
+  });
+}
+
 function formatDate(date, locale, onlyDate = false) {
+  /* used to output a date or date with time */
   if (!date) {
     return null;
   }
@@ -143,6 +123,7 @@ function formatDate(date, locale, onlyDate = false) {
 }
 
 function formatStringArray(value) {
+  /* used to output a list of strings as comma separated list */
   let html = '';
   for (var i = 0; i < value.length; i++) {
     html = html + value[i];
@@ -153,6 +134,38 @@ function formatStringArray(value) {
   return html;
 }
 
+function moveEditButtonToNavbar() {
+  /* used in view pages to move edit button to navbar if page is scrollable */
+  var navbar = document.querySelector('.navbar');
+  var editButton = document.getElementById('edit-button');
+  var editButtonInNavbar = document.createElement('li');
+  editButtonInNavbar.classList.add('border-left', 'ml-2', 'nav-item', 'pl-3');
+  editButtonInNavbar.innerHTML = `<a class="border border-white btn btn-primary btn-sm" id="sticky-edit-button">${editButton.innerText}</a>`;
+  var observer = new IntersectionObserver(
+          (entry, _) => {
+    var inView = entry[0].isIntersecting && entry[0].intersectionRatio >= 1;
+    if (inView) {
+      editButton.classList.add('visible');
+      editButton.classList.remove('invisible');
+      editButtonInNavbar.remove();
+    } else {
+      editButton.classList.add('invisible');
+      editButton.classList.remove('visible');
+      editButtonInNavbar
+              .querySelector('a')
+              .setAttribute('href', editButton.getAttribute('href'));
+      navbar.querySelector('.navbar-nav').appendChild(editButtonInNavbar);
+    }
+  },
+          {
+            rootMargin: `-${navbar.offsetHeight}px 0px 0px 0px`,
+            threshold: 1
+          }
+  );
+  observer.observe(editButton);
+}
+
 function prependErrorIcon(element) {
+  /* used in form pages to mark tabs with erroneous input */
   $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }

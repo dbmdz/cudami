@@ -5,12 +5,12 @@
 
   <th:block th:fragment="renderFields(uniqueObject)">
     <div class="row">
-      <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
+      <div class="col-md-3"><label th:text="#{id}">ID</label></div>
       <div class="col-md-9"><span th:text="${uniqueObject.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
     </div>
     <div class="row">
       <div class="col-md-3">
-        <label class="font-weight-bold mb-0">
+        <label>
           <span class="mr-1" th:text="#{created}"></span>
           /
           <span class="ml-1" th:text="#{last_modified}"></span>
@@ -28,7 +28,7 @@
     <section class="mb-3 rows-striped">
       <div class="row">
         <div class="col-md-3 mb-1">
-          <label class="font-weight-bold mb-0">
+          <label>
             <span class="mr-1" th:text="#{created}"></span>
             /
             <span class="ml-1" th:text="#{last_modified}"></span>

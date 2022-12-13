@@ -59,9 +59,9 @@
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
-                  <th data-field="acronym" data-sortable="true" th:text="#{lbl.acronym}">Acronym</th>
+                  <th data-field="acronym" data-sortable="true" data-formatter="formatAcronym" th:text="#{lbl.acronym}">Acronym</th>
                   <th data-field="url" data-sortable="true" data-formatter="formatUrl" th:text="#{lbl.url}">URL</th>
-                  
+
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
@@ -71,12 +71,12 @@
 
           </div>
         </div>
-        
-        
+
+
       </div>
     </div>
   </th:block>
-  
+
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
@@ -122,6 +122,14 @@
           }
         };
       }
+
+      function formatAcronym(value, row) {
+        /*[+
+         const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
+         +]*/
+        return '<a href="' + baseUrl + '">' + value + '</a>';
+      }
+
       function formatActions(value, row) {
         /*[+
          const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
@@ -131,17 +139,14 @@
           renderEditAction(baseUrl)
         ].join(' ');
       }
-      
+
       function formatLabel(value, row) {
         const itemLocale = $("#licenses-locales").val();
         return renderLocalizedText(value, itemLocale);
       }
-      
+
       function formatUrl(value, row) {
-        /*[+
-         const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
-         +]*/
-        return '<a href="' + baseUrl + '">' + value + '</a>';
+        return '<a href="' + value + '" target="_blank">' + value + '</a>';
       }
       /*]]>*/
     </script>

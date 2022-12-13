@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{licenses}: #{license} &quot;${url}&quot;|">...</title>
+    <title th:text="|#{page.title.licenses}: #{license} &quot;${url}&quot;|">...</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${license}">
@@ -26,64 +26,36 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+            <select name="locales" id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${license})"></th:block>
+
+        <hr/>
+
         <div class="row">
-          <div class="col-sm-12">
-            <div class="mb-3 rows-striped">
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
-                <div class="col-md-9"><span th:text="*{uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-              </div>
-            </div>
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
           </div>
         </div>
-
-        <th:block th:insert="fragments/uniqueobject::renderDates(${license})"></th:block>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <ul class="nav nav-tabs" role="tablist">
-              <li class="nav-item" th:each="language,iter : ${existingLanguages}">
-                <a
-                  class="language-switcher nav-link"
-                  data-toggle="tab"
-                  role="tab"
-                  th:classappend="${iter.index} == 0 ? active"
-                  th:href="${'#' + language}"
-                  th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
-                  th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-                >
-                  language
-                </a>
-              </li>
-            </ul>
-            <div class="tab-content">
-              <div th:each="language,iter : ${existingLanguages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-                <div class="card">
-                  <div class="card-body bg-light">
-                    <label class="font-weight-bold">
-                      <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${license.label}, ${language})"></th:block>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="row" th:if="*{url}">
+          <div class="col-md-3"><label th:text="#{url}">URL</label></div>
+          <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
         </div>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row" th:if="*{url}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{url}">URL</label></div>
-                <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
-              </div>
-              <div class="row" th:if="*{acronym}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{acronym}">...</label></div>
-                <div class="col-md-9"><span th:text="*{acronym}">...</span></div>
-              </div>
-            </div>
-          </div>
+        <div class="row" th:if="*{acronym}">
+          <div class="col-md-3"><label th:text="#{acronym}">...</label></div>
+          <div class="col-md-9"><span th:text="*{acronym}">...</span></div>
         </div>
       </div>
     </div>
@@ -91,9 +63,9 @@
 
   <section layout:fragment="beforeBodyEnds">
     <script>
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
-  </body>
+</body>
 </html>
