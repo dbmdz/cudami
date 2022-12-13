@@ -33,6 +33,7 @@ import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
 import de.digitalcollections.cudami.client.security.CudamiUsersClient;
 import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
+import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import de.digitalcollections.model.identifiable.Identifiable;
 import java.net.http.HttpClient;

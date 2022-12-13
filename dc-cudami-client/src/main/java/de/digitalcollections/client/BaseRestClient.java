@@ -184,8 +184,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("DELETE " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (InterruptedException | IOException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -307,8 +311,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("GET " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -322,8 +330,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("PATCH " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (InterruptedException | IOException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -338,8 +350,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("PATCH " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -460,8 +476,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (InterruptedException | IOException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -476,8 +496,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("POST " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }
@@ -554,8 +578,12 @@ public abstract class BaseRestClient<T extends Object> {
       if (statusCode >= 400) {
         throw HttpErrorDecoder.decode("PUT " + requestUrl, statusCode, response);
       }
-      final String body = response.body();
-      return body;
+      String body = response.body();
+      if (body == null || body.isBlank()) {
+        return null;
+      }
+      String result = mapper.readerFor(String.class).readValue(body);
+      return result;
     } catch (IOException | InterruptedException e) {
       throw new TechnicalException("Failed to retrieve response due to connection error", e);
     }

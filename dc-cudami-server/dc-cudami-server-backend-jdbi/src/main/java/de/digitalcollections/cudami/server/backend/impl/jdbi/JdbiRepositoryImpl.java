@@ -9,7 +9,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -174,7 +173,7 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   protected List<String> getSearchTermTemplates(String tableAlias, String originalSearchTerm) {
-    return Collections.EMPTY_LIST;
+    return new ArrayList<>(0);
   }
 
   public String getTableAlias() {

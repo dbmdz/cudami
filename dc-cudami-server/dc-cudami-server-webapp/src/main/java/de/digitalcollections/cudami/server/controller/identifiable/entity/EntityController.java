@@ -119,11 +119,9 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{refId:[0-9]+}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity getByRefId(@PathVariable long refId) {
+  public ResponseEntity<Entity> getByRefId(@PathVariable long refId) {
     Entity entity = entityService.getByRefId(refId);
-    if (entity == null) {
-      return null;
-    }
+    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     // routing should be done in frontend webapp (second call will be sent on entity type)
     //    EntityType entityType = entity.getEntityType();
     //    UUID uuid = entity.getUuid();
@@ -131,20 +129,20 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
     //      case PERSON:
     //        return personService.getByIdentifier(uuid);
     //    }
-    return entity;
   }
 
   @Operation(summary = "Get entity by uuid")
   @GetMapping(
       value = {
-        "/v6/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/entities/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Entity getByUuid(@PathVariable UUID uuid) throws IdentifiableServiceException {
-    return entityService.getByUuid(uuid);
+  public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) {
+    Entity entity = entityService.getByUuid(uuid);
+    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Find limited amount of random entites")
@@ -170,7 +168,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{uuid}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
+  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
     return entityService.getRelatedFileResources(uuid);
   }
 
@@ -183,7 +181,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/relations/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityRelation> getRelations(@PathVariable UUID uuid) {
+  public List<EntityRelation> getRelations(@PathVariable UUID uuid) {
     return entityRelationService.getBySubject(uuid);
   }
 }

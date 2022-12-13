@@ -77,10 +77,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get all geo locations")
@@ -167,7 +166,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
     } else {
       result = geoLocationService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all geolocations")

@@ -8,25 +8,144 @@
     <title th:text="#{licenses}">Licenses</title>
   </head>
   <body>
-    <th:block layout:fragment="content">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <div id="list"></div>
-              <script th:src="@{/js/license-list.bundle.js}"></script>
-              <script th:inline="javascript">
-                LicenseList({
-                  apiContextPath: /*[[@{/}]]*/ '',
-                  existingLanguages: /*[[${existingLanguages}]]*/ [],
-                  id: "list",
-                  uiLocale: /*[[${#locale.language}]]*/ ''
-                });
-              </script>
-            </div>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.licenses}">Licenses</h1>
+            <hr>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col">
+
+            <div id="toolbar-licenses">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+                <select name="locales" id="licenses-locales">
+                  <th:block th:each="locale : ${existingLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
+            </div>
+            <table id="table-licenses"
+                   data-toggle="table"
+                   th:data-url="@{/api/licenses}"
+                   th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
+                   data-buttons="buttons"
+                   data-cookie="true"
+                   data-cookie-id-table="table-licenses"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="url"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-licenses"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="acronym" data-sortable="true" th:text="#{lbl.acronym}">Acronym</th>
+                  <th data-field="url" data-sortable="true" data-formatter="formatUrl" th:text="#{lbl.url}">URL</th>
+                  
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+        
+        
       </div>
-    </th:block>
-  </body>
+    </div>
+  </th:block>
+  
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      const $table = $('#table-licenses');
+
+      window.ajaxOptions = {
+        beforeSend: function (jqXHR, settings) {
+          let itemLocale = $("#licenses-locales").val();
+          settings.url = settings.url + '&itemLocale=' + itemLocale;
+        }
+      };
+
+      $(function () {
+        $("#licenses-locales").change(function () {
+          $table.bootstrapTable('refresh');
+        });
+      });
+
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function buttons() {
+        /*[+
+         const baseUrl = [[@{'/licenses'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new';
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl)
+        ].join(' ');
+      }
+      
+      function formatLabel(value, row) {
+        const itemLocale = $("#licenses-locales").val();
+        return renderLocalizedText(value, itemLocale);
+      }
+      
+      function formatUrl(value, row) {
+        /*[+
+         const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
+         +]*/
+        return '<a href="' + baseUrl + '">' + value + '</a>';
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+  </th:block>
+</body>
 </html>

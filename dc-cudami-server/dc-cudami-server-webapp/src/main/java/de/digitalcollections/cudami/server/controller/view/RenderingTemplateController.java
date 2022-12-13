@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,8 +60,9 @@ public class RenderingTemplateController {
         "/latest/renderingtemplates/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public RenderingTemplate getByUuid(@PathVariable UUID uuid) {
-    return renderingTemplateService.getByUuid(uuid);
+  public ResponseEntity<RenderingTemplate> getByUuid(@PathVariable UUID uuid) {
+    RenderingTemplate result = renderingTemplateService.getByUuid(uuid);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all rendering templates")

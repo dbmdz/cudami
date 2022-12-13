@@ -1,10 +1,14 @@
 package de.digitalcollections.cudami.server.controller.advice;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.model.validation.ValidationException;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -34,9 +38,12 @@ public class ExceptionAdvice {
   @ExceptionHandler(UsernameNotFoundException.class)
   public void handleNotFound() {}
 
-  @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
   @ExceptionHandler(ValidationException.class)
-  public void handleValidationException(ValidationException exception) {
-    LOGGER.error("Validation error: ", exception);
+  public ResponseEntity<Object> handleValidationException(ValidationException exception) {
+    Map<String, Object> body = new LinkedHashMap<>(2);
+    body.put("timestamp", new Date());
+    body.put("errors", exception.getErrors());
+
+    return new ResponseEntity<>(body, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 }

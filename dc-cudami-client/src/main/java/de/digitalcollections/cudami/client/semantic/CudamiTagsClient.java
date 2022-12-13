@@ -1,7 +1,11 @@
-package de.digitalcollections.cudami.client;
+package de.digitalcollections.cudami.client.semantic;
+
+import static de.digitalcollections.cudami.client.CudamiRestClient.API_VERSION_PREFIX;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.semantic.Tag;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +33,11 @@ public class CudamiTagsClient extends CudamiRestClient<Tag> {
     String encodedNamespaceAndId =
         Base64.encodeBase64URLSafeString(namespaceAndId.getBytes(StandardCharsets.UTF_8));
 
-    return doGetRequestForObject(
-        String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+    try {
+      return doGetRequestForObject(
+          String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 }

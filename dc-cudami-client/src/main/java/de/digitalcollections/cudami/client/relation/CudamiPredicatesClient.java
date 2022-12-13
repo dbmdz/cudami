@@ -3,11 +3,15 @@ package de.digitalcollections.cudami.client.relation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 
 public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
 
@@ -15,8 +19,31 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
     super(http, serverUrl, Predicate.class, mapper, API_VERSION_PREFIX + "/predicates");
   }
 
+  @Override
+  // FIXME: delete this method to use overridden method as soon as we proceed to breaking V7
+  // API-Version
+  public PageResponse<Predicate> find(PageRequest pageRequest) throws TechnicalException {
+    return doGetRequestForPagedObjectList(baseEndpoint + "/paged", pageRequest);
+  }
+
+  @Override
+  // FIXME: delete this method to use overridden method as soon as we proceed to breaking V7
+  // API-Version
   public List<Predicate> getAll() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint, Predicate.class);
+    return doGetRequestForObjectList(baseEndpoint);
+  }
+
+  public Predicate getByValue(String value) throws TechnicalException {
+    try {
+      return doGetRequestForObject(
+          String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
+  }
+
+  public List<Locale> getLanguages() throws TechnicalException {
+    return this.doGetRequestForObjectList(baseEndpoint + "/languages", Locale.class);
   }
 
   public Predicate update(Predicate predicate) throws TechnicalException {
@@ -30,10 +57,5 @@ public class CudamiPredicatesClient extends CudamiRestClient<Predicate> {
     }
 
     return super.update(predicate.getUuid(), predicate);
-  }
-
-  public Predicate getByValue(String value) throws TechnicalException {
-    return doGetRequestForObject(
-        String.format("%s/%s", baseEndpoint, URLEncoder.encode(value, StandardCharsets.UTF_8)));
   }
 }

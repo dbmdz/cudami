@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,8 +54,10 @@ public class IdentifierTypeController {
   @GetMapping(
       value = {"/v6/identifiertypes/namespace/{namespace}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public IdentifierType getByNamespace(@PathVariable String namespace) {
-    return identifierTypeService.getByNamespace(namespace);
+  public ResponseEntity<IdentifierType> getByNamespace(@PathVariable String namespace) {
+    IdentifierType identifierType = identifierTypeService.getByNamespace(namespace);
+    return new ResponseEntity<>(
+        identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get identifier type by uuid")
@@ -65,8 +69,10 @@ public class IdentifierTypeController {
         "/latest/identifiertypes/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public IdentifierType getByUuid(@PathVariable UUID uuid) {
-    return identifierTypeService.getByUuid(uuid);
+  public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) {
+    IdentifierType identifierType = identifierTypeService.getByUuid(uuid);
+    return new ResponseEntity<>(
+        identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "save a newly created identifier type")

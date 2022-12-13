@@ -39,6 +39,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 @DisplayName("The Identifiable Service")
 class IdentifiableServiceImplTest {
@@ -60,7 +61,10 @@ class IdentifiableServiceImplTest {
     when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
     identifierService = mock(IdentifierService.class);
     CudamiConfig.UrlAlias urlAliasConfig = new CudamiConfig.UrlAlias(List.of("DigitalObject"), 0);
-    CudamiConfig cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000, null);
+
+    CudamiConfig cudamiConfig = Mockito.mock(CudamiConfig.class);
+    when(cudamiConfig.getOffsetForAlternativePaging()).thenReturn(5000);
+    when(cudamiConfig.getUrlAlias()).thenReturn(urlAliasConfig);
 
     LocaleService localeService = mock(LocaleService.class);
 
@@ -122,7 +126,7 @@ class IdentifiableServiceImplTest {
   public void exceptionOnSaveWhenRepoFails() {
     when(repo.save(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
 
-    var identifiable = Identifiable.builder().label("label").build();
+    Identifiable identifiable = Identifiable.builder().label("label").build();
     assertThrows(
         IdentifiableServiceException.class,
         () -> {
@@ -177,7 +181,7 @@ class IdentifiableServiceImplTest {
   public void exceptionOnUpdateWhenRepoFails() {
     when(repo.update(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
 
-    var identifiable = Identifiable.builder().label("label").build();
+    Identifiable identifiable = Identifiable.builder().label("label").build();
     assertThrows(
         IdentifiableServiceException.class,
         () -> {

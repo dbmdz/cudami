@@ -1,5 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.database.config;
 
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.commons.jdbi.DcCommonsJdbiPlugin;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
@@ -12,6 +14,7 @@ import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -93,7 +96,8 @@ public class SpringConfigBackendTestDatabase {
   @Bean
   @Primary
   CudamiConfig testCudamiConfig() {
-    var cudamiConfig = new CudamiConfig(null, null, 5000, null);
+    CudamiConfig cudamiConfig = Mockito.mock(CudamiConfig.class);
+    when(cudamiConfig.getOffsetForAlternativePaging()).thenReturn(5000);
     return cudamiConfig;
   }
 }

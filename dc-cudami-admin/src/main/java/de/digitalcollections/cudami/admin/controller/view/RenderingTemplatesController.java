@@ -5,11 +5,8 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.LinkedHashSet;
@@ -20,19 +17,13 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for rendering template management pages. */
 @Controller
@@ -55,12 +46,6 @@ public class RenderingTemplatesController extends AbstractController {
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
     return "renderingtemplates/create";
-  }
-
-  @GetMapping("/api/renderingtemplates/new")
-  @ResponseBody
-  public RenderingTemplate createModel() throws TechnicalException {
-    return service.create();
   }
 
   @GetMapping("/renderingtemplates/{uuid}/edit")
@@ -94,34 +79,12 @@ public class RenderingTemplatesController extends AbstractController {
     return "renderingtemplates/edit";
   }
 
-  @GetMapping("/api/renderingtemplates")
-  @ResponseBody
-  public PageResponse<RenderingTemplate> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
-  }
-
-  @GetMapping("/api/renderingtemplates/{uuid}")
-  @ResponseBody
-  public RenderingTemplate getByUuid(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
-    Locale locale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        this.languageSortingHelper.sortLanguages(locale, this.service.getLanguages()));
+    Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
     return "renderingtemplates/list";
   }
 
@@ -130,25 +93,29 @@ public class RenderingTemplatesController extends AbstractController {
     return "renderingtemplates";
   }
 
-  @PostMapping("/api/renderingtemplates")
-  public ResponseEntity save(@RequestBody RenderingTemplate template) {
-    try {
-      RenderingTemplate templateDb = service.save(template);
-      return ResponseEntity.status(HttpStatus.CREATED).body(templateDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save rendering template: ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+  @GetMapping("/renderingtemplates/{uuid}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "itemLocale", required = false) String itemLocale,
+      Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    RenderingTemplate renderingTemplate = service.getByUuid(uuid);
+    if (renderingTemplate == null) {
+      throw new ResourceNotFoundException();
     }
-  }
+    model.addAttribute("renderingTemplate", renderingTemplate);
 
-  @PutMapping("/api/renderingtemplates/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody RenderingTemplate template) {
-    try {
-      RenderingTemplate templateDb = service.update(uuid, template);
-      return ResponseEntity.ok(templateDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot update rendering template with uuid={}", uuid, e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String language = itemLocale;
+    if (language == null && localeService != null) {
+      language = localeService.getDefaultLanguage().getLanguage();
     }
+    model.addAttribute("language", language);
+
+    return "renderingtemplates/view";
   }
 }

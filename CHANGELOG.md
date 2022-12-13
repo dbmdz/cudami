@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- Add GUI for Predicates (CRUD) in administration section
+  - for table using https://bootstrap-table.com/
+  - for wysiwyg editor using prosemirror + https://tiptap.dev/
+  - for forms Spring MVC
+  - for dynamic (modals, etc.) jQuery
+- Added table sorting to `Articles`, `DigitalObjects`, `Collections`
+- Added dropdown to select number of rows per page in table lists on `Articles`, `DigitalObjects`, `Collections`
+- Added status storing of new tables (navigating back to list shows list in last status)
+- Added highlighting of searched term in result lists in new table lists on `Articles`, `DigitalObjects`, `Collections`
+
 ### Changed
 
 - WEMI part: Manifestations
@@ -13,12 +25,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
 - UrlAlias uses `Locale.toLanguageTag()` explicitly to always retrieve a language, even for `Locale.ROOT` i.e. `und`
+- Split some controller into API and "not-API"-Controllers to make GUI and REST-methods more visible
+- Lists (using Bootstrap-Table component)
+  - replacing language tabs with dropdown on new lists pages
+  - for `Articles` list (to proof preview image rendering)
+  - for `DigitalObjects` list (to proof fixing of too many tabs)
+  - for `Collections` list
 
 ### Fixed
 
 - UrlAlias does actively ignore any script of the target's locale
 - **SQL migration** (can be **long running**) replaces every emtpy string key in the labels (that comes from `Locale.ROOT` as language)
 by `"und"`
+
+## [6.2.0](https://github.com/dbmdz/cudami/releases/tag/6.2.0) - 2022-11-25
+
+### Added
+
+- Add parameter `fill-wemi` to return a hierarchically (in direction `Item` -> `Manifestation` -> `Work`) filled `DigitalObject` (currently only with the `Item` data)
 
 ## [6.1.4](https://github.com/dbmdz/cudami/releases/tag/6.1.4) - 2022-11-07
 

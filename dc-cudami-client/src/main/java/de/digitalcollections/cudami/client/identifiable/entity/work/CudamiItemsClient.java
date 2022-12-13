@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.client.identifiable.entity.work;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -21,17 +22,23 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
     super(http, serverUrl, Item.class, mapper, API_VERSION_PREFIX + "/items");
   }
 
-  public Boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) throws TechnicalException {
-    return (Boolean)
-        doPostRequestForObject(
-            String.format("%s/%s/digitalobjects/%s", baseEndpoint, itemUuid, digitalObjectUuid),
-            Boolean.class);
+  public boolean addDigitalObject(UUID itemUuid, UUID digitalObjectUuid) throws TechnicalException {
+    try {
+      doPostRequestForObject(
+          String.format("%s/%s/digitalobjects/%s", baseEndpoint, itemUuid, digitalObjectUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public boolean addWork(UUID itemUuid, UUID workUuid) throws TechnicalException {
-    return (boolean)
-        doPostRequestForObject(
-            String.format("%s/%s/works/%s", baseEndpoint, itemUuid, workUuid), Boolean.class);
+    try {
+      doPostRequestForObject(String.format("%s/%s/works/%s", baseEndpoint, itemUuid, workUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public PageResponse<DigitalObject> findDigitalObjects(UUID uuid, PageRequest pageRequest)

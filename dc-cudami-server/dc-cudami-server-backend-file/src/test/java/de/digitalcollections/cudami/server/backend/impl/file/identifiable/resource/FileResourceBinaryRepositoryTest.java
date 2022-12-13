@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import java.io.IOException;
@@ -22,7 +24,9 @@ public class FileResourceBinaryRepositoryTest {
   @BeforeAll
   public static void setUp() {
     ResourceLoader rl = Mockito.mock(ResourceLoader.class);
-    repository = new FileResourceBinaryRepositoryImpl(FOLDER_PATH, null, null, rl);
+    CudamiConfig cudamiConfig = Mockito.mock(CudamiConfig.class);
+    when(cudamiConfig.getRepositoryFolderPath()).thenReturn(FOLDER_PATH);
+    repository = new FileResourceBinaryRepositoryImpl(cudamiConfig, null, null, rl);
   }
 
   @Test

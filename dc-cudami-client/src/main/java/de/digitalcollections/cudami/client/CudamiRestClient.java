@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.client.BaseRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
@@ -32,7 +33,10 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
   }
 
   public void deleteByUuid(UUID uuid) throws TechnicalException {
-    doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid));
+    try {
+      doDeleteRequestForString(String.format("%s/%s", baseEndpoint, uuid));
+    } catch (ResourceNotFoundException e) {
+    }
   }
 
   public PageResponse<T> find(PageRequest pageRequest) throws TechnicalException {
@@ -44,7 +48,11 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
   }
 
   public T getByUuid(UUID uuid) throws TechnicalException {
-    return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
+    try {
+      return doGetRequestForObject(String.format("%s/%s", baseEndpoint, uuid));
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public T save(T object) throws TechnicalException {

@@ -134,13 +134,13 @@ public class LinkedDataFileResourceController
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws IdentifiableServiceException {
-    LinkedDataFileResource linkedDataFileResource;
+    LinkedDataFileResource result;
     if (pLocale == null) {
-      linkedDataFileResource = service.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      linkedDataFileResource = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(linkedDataFileResource, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created linkedDataFileResource")

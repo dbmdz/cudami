@@ -63,7 +63,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public boolean addDigitalObject(
+  public ResponseEntity addDigitalObject(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
           @PathVariable
@@ -71,17 +71,23 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throws ValidationException, ConflictException, IdentifiableServiceException {
 
     Item item = itemService.getByUuid(uuid);
-    return digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
+    boolean successful = digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Add work to an item")
   @PostMapping(
       value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public boolean addWork(
+  public ResponseEntity addWork(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {
-    return itemService.addWork(uuid, workUuid);
+    boolean successful = itemService.addWork(uuid, workUuid);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "count all items")
@@ -105,10 +111,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "get all items")

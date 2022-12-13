@@ -1,0 +1,86 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="|#{page.title.rendering_templates}: #{lbl.rendering_template} &quot;${renderingTemplate.name}&quot;|">...</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content" th:object="${renderingTemplate}">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row">
+
+          <div class="col-sm-6">
+            <h1 th:text="|#{lbl.rendering_template} &quot;${renderingTemplate.name}&quot;|">...</h1>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="float-right">
+              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+            </div>
+          </div>
+        </div>
+        <hr/>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div id="itemLocaleSwitcher" class="global-action">
+            <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
+            <select name="locales" id="rendering_templates-locales">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.label}">Label</label></div>
+              <div class="col-md-9">
+                <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${language})"></th:block>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.description}">Abstract</label></div>
+              <div class="col-md-9">
+                <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{description}, ${language})"></th:block>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${renderingTemplate})"></th:block>
+
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.name}">Name</label></div>
+          <div class="col-md-9"><span th:text="*{name}">cool template</span></div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+
+  <section layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      $(function () {
+        $("#rendering_templates-locales").change(function () {
+          var url = window.location.href.split('?')[0];
+          let itemLocale = $("#rendering_templates-locales").val();
+          window.location.href = url + '?itemLocale=' + itemLocale;
+        });
+      });
+    </script>
+  </section>
+</body>
+</html>

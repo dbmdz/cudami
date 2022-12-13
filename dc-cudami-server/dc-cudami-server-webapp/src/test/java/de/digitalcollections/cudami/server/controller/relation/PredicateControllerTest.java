@@ -60,7 +60,7 @@ class PredicateControllerTest extends BaseControllerTest {
     String jsonBody =
         "{\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {" + "\"\": \"bar\"" + "}}";
 
-    when(predicateService.save(any(Predicate.class))).thenReturn(predicate);
+    when(predicateService.saveOrUpdate(any(Predicate.class))).thenReturn(predicate);
 
     // Yes, it really works with put!
     testPutJson("/v6/predicates/foo", jsonBody, "/v6/relation/predicates/predicates_response.json");
@@ -84,7 +84,7 @@ class PredicateControllerTest extends BaseControllerTest {
     // We update a predicate without UUID
     String jsonBody =
         "{\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {" + "\"\": \"bar\"" + "}}";
-    when(predicateService.save(any(Predicate.class))).thenReturn(predicate);
+    when(predicateService.saveOrUpdate(any(Predicate.class))).thenReturn(predicate);
 
     testPutJson("/v6/predicates/foo", jsonBody, "/v6/relation/predicates/predicates_response.json");
   }
@@ -107,7 +107,7 @@ class PredicateControllerTest extends BaseControllerTest {
             + "\",\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {"
             + "\"\": \"bar\""
             + "}}";
-    when(predicateService.save(any(Predicate.class))).thenReturn(predicate);
+    when(predicateService.update(any(Predicate.class))).thenReturn(predicate);
 
     testPutJson(
         "/v6/predicates/" + uuid, jsonBody, "/v6/relation/predicates/predicates_response.json");

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,7 +75,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       throws CudamiControllerException {
 
     try {
-      if (getByUuid(uuid) == null) {
+      if (identifiableService.getByUuid(uuid) == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
@@ -88,7 +89,6 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     }
   }
 
-  @Override
   @Operation(
       summary = "Get an identifiable by namespace and id",
       description =
@@ -101,6 +101,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables/identifier/**"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<Identifiable> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -115,7 +116,10 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Identifiable getByUuid(@PathVariable UUID uuid) throws IdentifiableServiceException {
-    return identifiableService.getByUuid(uuid);
+  public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
+      throws ResourceNotFoundException {
+    Identifiable identifiable = identifiableService.getByUuid(uuid);
+    return new ResponseEntity<>(
+        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 }

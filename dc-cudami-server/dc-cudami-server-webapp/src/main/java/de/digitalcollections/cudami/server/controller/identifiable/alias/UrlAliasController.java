@@ -4,6 +4,7 @@ import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -63,8 +64,8 @@ public class UrlAliasController {
   @Operation(summary = "Delete an UrlAlias by uuid")
   @DeleteMapping(
       value = {
-        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       })
   public ResponseEntity<Void> delete(
       @Parameter(
@@ -80,11 +81,9 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (!isDeleted) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return isDeleted
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -118,9 +117,9 @@ public class UrlAliasController {
   @Operation(summary = "Get a slug for language and label and, if given, website_uuid")
   @GetMapping(
       value = {
-        "/v6/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/slug/{pLocale}/{label}/{website_uuid:" + ParameterHelper.UUID_PATTERN + "}",
         "/v6/urlaliases/slug/{pLocale}/{label}",
-        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/urlaliases/slug/{pLocale}/{label}/{website_uuid:" + ParameterHelper.UUID_PATTERN + "}",
         "/v5/urlaliases/slug/{pLocale}/{label}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -149,18 +148,15 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(JSONObject.quote(result), HttpStatus.OK);
+    return new ResponseEntity<>(
+        JSONObject.quote(result), result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get an UrlAlias by uuid")
   @GetMapping(
       value = {
-        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> getByUuid(
@@ -178,11 +174,7 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -190,9 +182,9 @@ public class UrlAliasController {
           "Get the primary LocalizedUrlAliases for a given website uuid (null if empty) and slug, and optionally filtered by a locale")
   @GetMapping(
       value = {
-        "/v6/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v6/urlaliases/primary/{slug}/{website_uuid:" + ParameterHelper.UUID_PATTERN + "}",
         "/v6/urlaliases/primary/{slug}",
-        "/v5/urlaliases/primary/{slug}/{website_uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/v5/urlaliases/primary/{slug}/{website_uuid:" + ParameterHelper.UUID_PATTERN + "}",
         "/v5/urlaliases/primary/{slug}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -220,18 +212,14 @@ public class UrlAliasController {
       throw new CudamiControllerException(e);
     }
 
-    if (result == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "update an UrlAlias")
   @PutMapping(
       value = {
-        "/v6/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/urlaliases/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> update(

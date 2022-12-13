@@ -89,7 +89,8 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("email", "firstname", "lastname"));
+    return new ArrayList<>(
+        Arrays.asList("created", "email", "firstname", "lastname", "lastModified"));
   }
 
   @Override

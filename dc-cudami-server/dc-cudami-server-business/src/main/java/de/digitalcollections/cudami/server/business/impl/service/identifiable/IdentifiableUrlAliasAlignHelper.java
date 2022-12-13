@@ -259,7 +259,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // there are only primary aliases: conflicting ones in DB must be unset
       // conflicting aliases: equal websiteUuid & targetLanguage
       LocalizedUrlAliases urlAliasesToUpdate = actualIdentifiable.getLocalizedUrlAliases();
-      // only primary aliases (as the var name suggests)
+      // only primary aliases (as the variable name suggests)
       List<UrlAlias> allPrimariesFromDb =
           getPrimaryUrlAliases(identifiableInDatabase.getLocalizedUrlAliases(), null);
       // now we check whether any primary from the DB conflict with the new ones

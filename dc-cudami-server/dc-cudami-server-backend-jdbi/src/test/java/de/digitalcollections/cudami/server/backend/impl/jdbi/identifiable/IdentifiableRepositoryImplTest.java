@@ -204,9 +204,9 @@ class IdentifiableRepositoryImplTest
   @Test
   @DisplayName("test string splitting method")
   void testSplitter() {
-    var in =
+    String in =
         "A funny text with comma, a hyphen-separated word (unusual in English though) and some other stuff...";
-    final var expected =
+    final String[] expected =
         new String[] {
           "hyphen",
           "separated",
@@ -231,7 +231,7 @@ class IdentifiableRepositoryImplTest
     assertThat(out).containsExactly(expected);
 
     in = "\"Here we have quotes and a word-with-two hyphens!\"";
-    final var expected1 =
+    final String[] expected1 =
         new String[] {
           "word",
           "with",
@@ -249,12 +249,12 @@ class IdentifiableRepositoryImplTest
     assertThat(out).containsExactly(expected1);
 
     in = "something easy";
-    final var expected2 = new String[] {"something", "easy"};
+    final String[] expected2 = new String[] {"something", "easy"};
     out = IdentifiableRepository.splitToArray(in);
     assertThat(out).containsExactly(expected2);
 
     in = "one";
-    final var expected3 = new String[] {"one"};
+    final String[] expected3 = new String[] {"one"};
     out = IdentifiableRepository.splitToArray(in);
     assertThat(out).containsExactly(expected3);
   }
@@ -289,9 +289,9 @@ class IdentifiableRepositoryImplTest
     String[] expected = {
       "bayerische", "staatsbibliothek", "münchen", "bavarian", "state", "library", "munich"
     };
-    var label = new LocalizedText(Locale.GERMAN, "Bayerische Staatsbibliothek, München");
+    LocalizedText label = new LocalizedText(Locale.GERMAN, "Bayerische Staatsbibliothek, München");
     label.put(Locale.ENGLISH, "Bavarian State Library, Munich");
-    var actual = repo.splitToArray(label);
+    String[] actual = repo.splitToArray(label);
     assertThat(actual).containsExactly(expected);
   }
 
@@ -333,7 +333,7 @@ class IdentifiableRepositoryImplTest
             });
 
     // test update method
-    var label = new LocalizedText();
+    LocalizedText label = new LocalizedText();
     label.setText(Locale.ENGLISH, "An English label, no. 1");
     label.setText(Locale.GERMAN, "Ein deutsches Label, nr. 2");
     digitalObject.setLabel(label);

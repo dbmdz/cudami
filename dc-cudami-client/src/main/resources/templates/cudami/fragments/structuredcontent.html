@@ -160,10 +160,10 @@
         </th:block>
         <th:block th:unless="${mark.type} == 'link'">
           <th:block th:switch="${mark.type}">
-            <th:block th:case="'strikethrough'" th:utext="'<s>'"></th:block>
-            <th:block th:case="'subscript'" th:utext="'<sub>'"></th:block>
-            <th:block th:case="'superscript'" th:utext="'<sup>'"></th:block>
-            <th:block th:case="'underline'" th:utext="'<u>'"></th:block>
+            <th:block th:case="'strikethrough'" th:utext="'<s'"></th:block>
+            <th:block th:case="'subscript'" th:utext="'<sub'"></th:block>
+            <th:block th:case="'superscript'" th:utext="'<sup'"></th:block>
+            <th:block th:case="'underline'" th:utext="'<u'"></th:block>
             <th:block th:case="*" th:utext="'<' + ${mark.type}"></th:block>
             <th:block th:if="${mark.attributes}">
               <th:block th:each="attribute, iter : ${mark.attributes.entrySet()}">

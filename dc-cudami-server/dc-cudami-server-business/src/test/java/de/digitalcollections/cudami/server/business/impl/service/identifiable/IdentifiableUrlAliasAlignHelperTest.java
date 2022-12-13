@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 @DisplayName("Identifiable-UrlAlias-Align-Helper tests")
 public class IdentifiableUrlAliasAlignHelperTest {
@@ -45,7 +46,9 @@ public class IdentifiableUrlAliasAlignHelperTest {
   public void setup() {
     CudamiConfig.UrlAlias urlAliasConfig =
         new CudamiConfig.UrlAlias(List.of(IdentifiableObjectType.DIGITAL_OBJECT.toString()), 0);
-    cudamiConfig = new CudamiConfig(null, urlAliasConfig, 5000, null);
+    cudamiConfig = Mockito.mock(CudamiConfig.class);
+    when(cudamiConfig.getOffsetForAlternativePaging()).thenReturn(5000);
+    when(cudamiConfig.getUrlAlias()).thenReturn(urlAliasConfig);
 
     slugGeneratorService = mock(IdentifiableUrlAliasAlignHelper.SlugGeneratorService.class);
   }
@@ -829,7 +832,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   private LocalizedUrlAliases createAliases(UUID target, SlugPrimaryTuple... slugTuples) {
     LocalizedUrlAliases aliases = new LocalizedUrlAliases();
-    for (var tuple : slugTuples) {
+    for (SlugPrimaryTuple tuple : slugTuples) {
       UrlAlias alias = new UrlAlias();
       alias.setSlug(tuple.slug);
       alias.setPrimary(tuple.isPrimary);

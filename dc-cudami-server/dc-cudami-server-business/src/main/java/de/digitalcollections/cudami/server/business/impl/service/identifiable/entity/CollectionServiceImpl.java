@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Service;
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
 public class CollectionServiceImpl extends EntityServiceImpl<Collection>
-    implements CollectionService {
+    implements CollectionService, ManagedContentService<Collection> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionServiceImpl.class);
 
@@ -81,19 +82,26 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
-    return find(pageRequest);
+    PageResponse<Collection> pageResponse = find(pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
   public PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest);
+    PageResponse<Collection> pageResponse = findChildren(uuid, pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
   public PageResponse<Collection> findChildren(UUID nodeUuid, PageRequest pageRequest) {
-    return ((NodeRepository<Collection>) repository).findChildren(nodeUuid, pageRequest);
+    PageResponse<Collection> pageResponse =
+        ((NodeRepository<Collection>) repository).findChildren(nodeUuid, pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
@@ -110,7 +118,10 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
     setDefaultSorting(pageRequest);
-    return ((NodeRepository<Collection>) repository).findRootNodes(pageRequest);
+    PageResponse<Collection> pageResponse =
+        ((NodeRepository<Collection>) repository).findRootNodes(pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
@@ -120,6 +131,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
         ((CollectionRepository) repository).getByUuidAndFiltering(uuid, filtering);
     if (collection != null) {
       collection.setChildren(getActiveChildren(uuid));
+      setPublicationStatus(collection);
     }
     return collection;
   }
@@ -127,7 +139,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public Collection getActive(UUID uuid, Locale pLocale) {
     Collection collection = getActive(uuid);
-    return reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
+    collection = reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
+    setPublicationStatus(collection);
+    return collection;
   }
 
   @Override
@@ -135,7 +149,9 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     Filtering filtering = filteringForActive();
     PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
-    return findChildren(uuid, pageRequest).getContent();
+    List<Collection> children = findChildren(uuid, pageRequest).getContent();
+    setPublicationStatus(children);
+    return children;
   }
 
   @Override
@@ -145,17 +161,23 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public List<Collection> getChildren(UUID nodeUuid) {
-    return ((NodeRepository<Collection>) repository).getChildren(nodeUuid);
+    List<Collection> children = ((NodeRepository<Collection>) repository).getChildren(nodeUuid);
+    setPublicationStatus(children);
+    return children;
   }
 
   @Override
   public Collection getParent(UUID nodeUuid) {
-    return ((NodeRepository<Collection>) repository).getParent(nodeUuid);
+    Collection parent = ((NodeRepository<Collection>) repository).getParent(nodeUuid);
+    setPublicationStatus(parent);
+    return parent;
   }
 
   @Override
   public List<Collection> getParents(UUID uuid) {
-    return ((CollectionRepository) repository).getParents(uuid);
+    List<Collection> parents = ((CollectionRepository) repository).getParents(uuid);
+    setPublicationStatus(parents);
+    return parents;
   }
 
   @Override
@@ -183,7 +205,10 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   public Collection saveWithParent(UUID childUuid, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      return ((CollectionRepository) repository).saveWithParent(childUuid, parentUuid);
+      Collection collection =
+          ((CollectionRepository) repository).saveWithParent(childUuid, parentUuid);
+      setPublicationStatus(collection);
+      return collection;
     } catch (Exception e) {
       LOGGER.error("Cannot save collection " + childUuid + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -195,11 +220,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     return ((CollectionRepository) repository).setDigitalObjects(collectionUuid, digitalObjects);
   }
 
-  @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
-    return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
-  }
-
   /**
    * Only for testing purposes
    *
@@ -207,5 +227,10 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
    */
   protected void setNodeRepository(NodeRepository<Collection> nodeRepository) {
     repository = nodeRepository;
+  }
+
+  @Override
+  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
+    return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
   }
 }

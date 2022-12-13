@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -68,8 +69,8 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
   @Operation(summary = "Get all headwordentries by headword")
   @GetMapping(
       value = {
-        "/v6/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/headwordentries/headword/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/headwordentries/headword/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/headwordentries/headword/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<HeadwordEntry> getByHeadword(
@@ -99,8 +100,8 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
   @Operation(summary = "Get an headwordentry")
   @GetMapping(
       value = {
-        "/v6/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/headwordentries/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HeadwordEntry> getByUuid(
@@ -124,7 +125,8 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
     } else {
       headwordEntry = headwordEntryService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(headwordEntry, HttpStatus.OK);
+    return new ResponseEntity<>(
+        headwordEntry, headwordEntry != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all headwordentries")

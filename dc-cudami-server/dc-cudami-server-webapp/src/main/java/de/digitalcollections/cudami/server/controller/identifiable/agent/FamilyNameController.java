@@ -70,6 +70,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
   @GetMapping(
       value = {"/v6/familynames/identifier/**", "/v5/familynames/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Override
   public ResponseEntity<FamilyName> getByIdentifier(HttpServletRequest request)
       throws IdentifiableServiceException, ValidationException {
     return super.getByIdentifier(request);
@@ -114,7 +115,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
     } else {
       result = familyNameService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, HttpStatus.OK);
+    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "save a newly created family")

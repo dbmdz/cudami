@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.client.identifiable.entity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -53,9 +54,13 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
   }
 
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) throws TechnicalException {
-    return (BreadcrumbNavigation)
-        doGetRequestForObject(
-            String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
+    try {
+      return (BreadcrumbNavigation)
+          doGetRequestForObject(
+              String.format("%s/%s/breadcrumb", baseEndpoint, uuid), BreadcrumbNavigation.class);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Topic> getChildren(UUID uuid) throws TechnicalException {
@@ -89,14 +94,22 @@ public class CudamiTopicsClient extends CudamiEntitiesClient<Topic> {
   }
 
   public boolean removeChild(UUID parentUuid, UUID childUuid) throws TechnicalException {
-    return Boolean.parseBoolean(
-        doDeleteRequestForString(
-            String.format("%s/%s/children/%s", baseEndpoint, parentUuid, childUuid)));
+    try {
+      doDeleteRequestForString(
+          String.format("%s/%s/children/%s", baseEndpoint, parentUuid, childUuid));
+    } catch (ResourceNotFoundException e) {
+      return false;
+    }
+    return true;
   }
 
   public Topic saveWithParentTopic(Topic subtopic, UUID parentTopicUuid) throws TechnicalException {
-    return doPostRequestForObject(
-        String.format("%s/%s/subtopic", baseEndpoint, parentTopicUuid), subtopic);
+    try {
+      return doPostRequestForObject(
+          String.format("%s/%s/subtopic", baseEndpoint, parentTopicUuid), subtopic);
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   public List<Entity> setEntities(UUID uuid, List entities) throws TechnicalException {

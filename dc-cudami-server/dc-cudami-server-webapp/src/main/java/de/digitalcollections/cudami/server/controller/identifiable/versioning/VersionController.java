@@ -6,7 +6,9 @@ import de.digitalcollections.model.identifiable.versioning.Version;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +35,9 @@ public class VersionController {
         "/latest/versions/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Version getByUuid(@PathVariable UUID uuid) {
-    return versionService.getByUuid(uuid);
+  public ResponseEntity<Version> getByUuid(@PathVariable UUID uuid) {
+    Version version = versionService.getByUuid(uuid);
+    return new ResponseEntity<>(version, version != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Update the version status")

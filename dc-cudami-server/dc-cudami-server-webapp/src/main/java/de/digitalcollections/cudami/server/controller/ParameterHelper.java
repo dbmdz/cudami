@@ -9,6 +9,9 @@ import org.apache.commons.lang3.tuple.Triple;
 /** Extract parameters from a HttpServletRequest */
 public class ParameterHelper {
 
+  public static final String UUID_PATTERN =
+      "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
+
   /**
    * Extract a pair of strings from the path of an HttpRequest, separated by a (the first) colon.
    *

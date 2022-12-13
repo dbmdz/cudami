@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Ident
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -57,10 +58,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     } catch (IdentifiableServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
+    return successful
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @Override
@@ -76,7 +76,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
         "/v3/corporatebodies/gnd/{gndId}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public CorporateBody fetchAndSaveByGndId(
+  public ResponseEntity<CorporateBody> fetchAndSaveByGndId(
       @Parameter(
               example = "",
               description = "GND-ID of the corporate body, e.g. <tt>2007744-0</tt>")
@@ -86,7 +86,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
-    return corporateBodyService.fetchAndSaveByGndId(gndId);
+    CorporateBody corporateBody = corporateBodyService.fetchAndSaveByGndId(gndId);
+    return new ResponseEntity<>(
+        corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get all corporate bodies")
@@ -133,19 +135,21 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
         "/latest/corporatebodies/{refId:[0-9]+}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public CorporateBody getByRefId(
+  public ResponseEntity<CorporateBody> getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
       throws IdentifiableServiceException {
-    return corporateBodyService.getByRefId(refId);
+    CorporateBody corporateBody = corporateBodyService.getByRefId(refId);
+    return new ResponseEntity<>(
+        corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a corporate body by uuid")
   @GetMapping(
       value = {
-        "/v6/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v5/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/v2/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
-        "/latest/corporatebodies/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
+        "/v6/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CorporateBody> getByUuid(
@@ -169,7 +173,8 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     } else {
       corporateBody = corporateBodyService.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(corporateBody, HttpStatus.OK);
+    return new ResponseEntity<>(
+        corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all corporatebodies")
