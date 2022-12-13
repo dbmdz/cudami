@@ -74,36 +74,6 @@ function moveEditButtonToNavbar() {
   observer.observe(editButton)
 }
 
-function addUserStatusChangeHandler(url) {
-  const listener = function (enabled) {
-    return async function (_evt) {
-      try {
-        const response = await fetch(url, {
-          body: JSON.stringify({enabled}),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'PATCH',
-        })
-        if (!response.ok) {
-          throw new Error('Error during change of user status')
-        }
-        window.location.reload()
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  }
-  const btn = document.querySelector('input.user-status-toggle')
-  const confirm = document.querySelector('a#confirm')
-  const enable = btn.dataset.enable === 'true'
-  if (enable) {
-    btn.addEventListener('click', listener(enable))
-  } else {
-    confirm.addEventListener('click', listener(enable))
-  }
-}
-
 function bindTabEvents() {
   $('.nav-tabs a').on('shown.bs.tab', function (event) {
     let targetNavItem = $(event.target).parent();
@@ -112,6 +82,42 @@ function bindTabEvents() {
     $(targetNavTabs).children(".nav-tab").removeClass("active");
     $(targetNavItem).addClass("active");
   });
+}
+
+/* v7 functions: */
+
+function addUserStatusChangeHandler(url) {
+  /* used in users/view.html */
+  const listener = function (enabled) {
+    return async function (_evt) {
+      try {
+        const response = await fetch(url, {
+          body: JSON.stringify({
+            'enabled': enabled,
+            'objectType': 'USER'
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'PATCH'
+        });
+        if (!response.ok) {
+          throw new Error('Error during change of user status');
+        }
+        window.location.reload();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  };
+  const btn = document.querySelector('input.user-status-toggle');
+  const confirm = document.querySelector('a#confirm');
+  const enable = btn.dataset.enable === 'true';
+  if (enable) {
+    btn.addEventListener('click', listener(enable));
+  } else {
+    confirm.addEventListener('click', listener(enable));
+  }
 }
 
 function formatDate(date, locale, onlyDate = false) {

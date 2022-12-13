@@ -98,9 +98,9 @@ a[href^="http"]:not(.no-external):after {
 .rows-striped > .row:nth-of-type(even) {
   background-color: #FCFCFC;
 }
-/*.rows-striped .row:nth-of-type(odd) {
-  background: #FFFFFF;
-}*/
+.rows-striped .row:nth-of-type(odd) {
+  background: transparent;
+}
 
 .bootstrap-table .fixed-table-container .table thead th {
   padding-right: 0.5em;
