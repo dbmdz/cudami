@@ -5,13 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -24,7 +24,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The CollectionService")
-class CollectionServiceImplTest {
+class CollectionServiceImplTest extends AbstractServiceImplTest {
 
   private CollectionServiceImpl collectionService;
   private CollectionRepository collectionRepository;
@@ -32,7 +32,6 @@ class CollectionServiceImplTest {
   private UrlAliasService urlAliasService;
   private HookProperties hookProperties;
   private LocaleService localeService;
-  private CudamiConfig cudamiConfig;
 
   @BeforeEach
   public void beforeEach() {
@@ -41,7 +40,6 @@ class CollectionServiceImplTest {
     urlAliasService = mock(UrlAliasService.class);
     hookProperties = mock(HookProperties.class);
     localeService = mock(LocaleService.class);
-    cudamiConfig = mock(CudamiConfig.class);
     collectionService =
         new CollectionServiceImpl(
             collectionRepository,

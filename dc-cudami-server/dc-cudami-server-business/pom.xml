@@ -36,6 +36,11 @@
       <artifactId>dc-model</artifactId>
     </dependency>
     <dependency>
+      <groupId>de.digitalcollections.model</groupId>
+      <artifactId>dc-model-jackson</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
     </dependency>

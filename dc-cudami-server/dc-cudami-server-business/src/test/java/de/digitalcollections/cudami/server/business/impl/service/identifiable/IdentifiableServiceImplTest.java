@@ -13,11 +13,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.api.repository.exceptions.UrlAliasRepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -119,8 +120,8 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
-  public void exceptionOnSaveWhenRepoFails() {
-    when(repo.save(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
+  public void exceptionOnSaveWhenRepoFails() throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).save(any(Identifiable.class));
 
     var identifiable = Identifiable.builder().label("label").build();
     assertThrows(
@@ -134,12 +135,11 @@ class IdentifiableServiceImplTest {
       "throws an Exception to trigger a rollback on save, when creating and saving an UrlAlias fails")
   @Test
   public void exceptionOnSaveWhenSavingUrlAliasFails() throws CudamiServiceException {
-    when(urlAliasService.save(any(UrlAlias.class))).thenThrow(new CudamiServiceException("boo"));
+    doThrow(CudamiServiceException.class).when(urlAliasService).save(any(UrlAlias.class));
 
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
 
-    when(repo.save(any(Identifiable.class))).thenReturn(identifiable);
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setPrimary(true);
     urlAlias.setSlug("label");
@@ -154,18 +154,16 @@ class IdentifiableServiceImplTest {
   @DisplayName("can save Identifiables without UrlAliases and creates an UrlAlias for them")
   @Test
   public void saveIdentifiableWithoutUrlAliases()
-      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
+      throws ServiceException, CudamiServiceException, ValidationException, RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
 
-    when(repo.save(any(Identifiable.class))).thenReturn(identifiable);
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setPrimary(true);
     urlAlias.setSlug("label");
-    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(urlAlias);
 
-    Identifiable actual = service.save(identifiable);
-    assertThat(actual).isNotNull();
+    service.save(identifiable);
+    assertThat(identifiable).isNotNull();
 
     verify(repo, times(1)).save(any(Identifiable.class));
     verify(urlAliasService, times(1)).save(any(UrlAlias.class));
@@ -174,8 +172,8 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an Exception to trigger a rollback on update, when updating in the repo fails")
   @Test
-  public void exceptionOnUpdateWhenRepoFails() {
-    when(repo.update(any(Identifiable.class))).thenThrow(new NullPointerException("boo"));
+  public void exceptionOnUpdateWhenRepoFails() throws RepositoryException {
+    doThrow(NullPointerException.class).when(repo).update(any(Identifiable.class));
 
     var identifiable = Identifiable.builder().label("label").build();
     assertThrows(
@@ -189,7 +187,7 @@ class IdentifiableServiceImplTest {
       "deletes all connected UrlAliases on an identifiable as first step when updating an identifiable")
   @Test
   public void deleteUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
+      throws ServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -207,7 +205,6 @@ class IdentifiableServiceImplTest {
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
     when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
@@ -217,7 +214,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("updates existing UrlAliases on an identifiable, when updating it")
   @Test
   public void updateExistingUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
+      throws ServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -233,7 +230,6 @@ class IdentifiableServiceImplTest {
     urlAlias.setTargetUuid(targetUuid);
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
     when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiable);
 
     service.update(identifiable);
@@ -244,7 +240,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("creates missing UrlAliases on an identifiable, when updating it")
   @Test
   public void createMissingUrlAliasesOnUpdate()
-      throws IdentifiableServiceException, CudamiServiceException, ValidationException {
+      throws ServiceException, CudamiServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -255,7 +251,6 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "oldlabel"));
 
     when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
 
     service.update(identifiable);
 
@@ -300,7 +295,6 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
     when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
-    when(repo.update(identifiable)).thenReturn(identifiable);
 
     when(urlAliasService.getPrimaryUrlAliasesForTarget(any())).thenReturn(new ArrayList<>());
     doThrow(new ValidationException("no way!"))
@@ -349,7 +343,6 @@ class IdentifiableServiceImplTest {
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
     when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
-    when(repo.update(identifiable)).thenReturn(identifiable);
 
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
@@ -365,7 +358,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("allows two primary entries for different (website,target,language) tuples")
   @Test
   public void allowMultiplePrimariesForDifferentTuples()
-      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+      throws CudamiServiceException, ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     Website website = new Website();
@@ -396,9 +389,6 @@ class IdentifiableServiceImplTest {
     LocalizedText label = new LocalizedText(Locale.forLanguageTag("de"), "label");
     label.setText(Locale.forLanguageTag("en"), "label");
     identifiable.setLabel(label);
-
-    when(repo.update(identifiable)).thenReturn(identifiable);
-
     Identifiable identifiableInDb = new Identifiable();
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "label"));
@@ -411,7 +401,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("update Identifiable w/o localizedUrlAliases")
   @Test
   public void updateWithoutUrlAliases()
-      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+      throws CudamiServiceException, ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -458,9 +448,8 @@ class IdentifiableServiceImplTest {
     expected.setLabel(label);
     expected.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
-
-    assertThat(service.update(identifiable)).isEqualTo(expected);
+    service.update(identifiable);
+    assertThat(identifiable).isEqualTo(expected);
     verify(urlAliasService, never()).save(any(), eq(true));
     verify(urlAliasService, times(2)).update(any());
   }
@@ -468,7 +457,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("update Identifiable with different primary localizedUrlAliases only")
   @Test
   public void updateWithPrimaryUrlAliasesOnly()
-      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+      throws CudamiServiceException, ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB (should be unset)
@@ -527,7 +516,6 @@ class IdentifiableServiceImplTest {
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
     verify(urlAliasService, times(2)).save(any(), eq(true));
@@ -544,7 +532,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("update Identifiable with only one different primary UrlAlias")
   @Test
   public void updateWithOnePrimaryUrlAliasOnly()
-      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+      throws CudamiServiceException, ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB
@@ -597,7 +585,6 @@ class IdentifiableServiceImplTest {
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
     verify(urlAliasService, times(1)).save(any(), eq(true));
@@ -613,7 +600,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("update Identifiable with new language and primary UrlAlias")
   @Test
   public void updateWithAdditionalLanguage()
-      throws CudamiServiceException, IdentifiableServiceException, ValidationException {
+      throws CudamiServiceException, ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB
@@ -665,7 +652,6 @@ class IdentifiableServiceImplTest {
     identifiable.setLabel(label);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.update(eq(identifiable))).thenReturn(identifiable);
     service.update(identifiable);
 
     verify(urlAliasService, times(1)).save(eq(secondPrimaryUrlAlias), eq(true));
@@ -676,12 +662,15 @@ class IdentifiableServiceImplTest {
   @DisplayName("Filters out non-provided identifiers on update")
   @Test
   void updateRemovedNonProvidedIdentifiers()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+      throws ValidationException, ServiceException, CudamiServiceException {
     UUID uuid = UUID.randomUUID();
 
     Identifiable identifiableToUpdate = new Identifiable();
     identifiableToUpdate.setUuid(uuid);
     identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
+    // Even when the identifiable UUID of the identifier is null, the service fills it automatically
+    // with
+    // the UUID of the identifiable
     identifiableToUpdate.setIdentifiers(Set.of(new Identifier(null, "namespace", "value")));
 
     Identifier identifierToDelete = new Identifier(uuid, "other", "foo");
@@ -701,13 +690,12 @@ class IdentifiableServiceImplTest {
         .thenReturn(existingIdentifiableWithUpdatedIdentifiers);
     when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(List.of(identifierToDelete));
-    when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
-    Identifiable actual = service.update(identifiableToUpdate);
+    service.update(identifiableToUpdate);
 
-    assertThat(actual.getIdentifiers()).hasSize(1);
-    Identifier actualIdentifier = actual.getIdentifiers().stream().findFirst().get();
+    assertThat(identifiableToUpdate.getIdentifiers()).hasSize(1);
+    Identifier actualIdentifier = identifiableToUpdate.getIdentifiers().stream().findFirst().get();
     assertThat(actualIdentifier.getIdentifiable()).isEqualTo(uuid);
     assertThat(actualIdentifier.getNamespace()).isEqualTo("namespace");
     assertThat(actualIdentifier.getId()).isEqualTo("value");
@@ -721,9 +709,8 @@ class IdentifiableServiceImplTest {
       "fills the provided identifiers with the missing values, obtained from the existing identifiers, where present")
   @Test
   void fillProvidedIdentifiers()
-      throws CudamiServiceException, ValidationException, IdentifiableServiceException {
+      throws CudamiServiceException, ValidationException, ServiceException {
     UUID uuid = UUID.randomUUID();
-
     // The identifiable, which we want to update, carries one identifier, which is already
     // present in the database (but when we provide it, we do not set the UUID of the identifiable)
     // and another one, which is new
@@ -752,11 +739,11 @@ class IdentifiableServiceImplTest {
         .thenReturn(existingIdentifiableWithUpdateUuids);
     when(identifierService.findByIdentifiable(eq(existingIdentifiable.getUuid())))
         .thenReturn(new ArrayList(existingIdentifiable.getIdentifiers()));
-    when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
+    // FIXME when(repo.update(eq(identifiableToUpdate))).thenReturn(identifiableToUpdate);
     when(urlAliasService.getLocalizedUrlAliases(any(UUID.class))).thenReturn(null);
 
-    Identifiable actual = service.update(identifiableToUpdate);
-    List<Identifier> actualIdentifiers = new ArrayList<>(actual.getIdentifiers());
+    service.update(identifiableToUpdate);
+    List<Identifier> actualIdentifiers = new ArrayList<>(identifiableToUpdate.getIdentifiers());
     // We sort the identifiers, for easier validation
     Collections.sort(
         actualIdentifiers,
@@ -818,8 +805,7 @@ class IdentifiableServiceImplTest {
       "does not generate duplicates for identical slugs for identical languages but different scripts")
   @Test
   public void avoidDuplicatesForDifferentScripts()
-      throws UrlAliasRepositoryException, ValidationException, IdentifiableServiceException,
-          CudamiServiceException {
+      throws ValidationException, CudamiServiceException, ServiceException {
     LocalizedText personName =
         LocalizedText.builder()
             .text(LOCALE_UND_LATN, "Yu ji shan ren")
@@ -827,15 +813,12 @@ class IdentifiableServiceImplTest {
             .build();
     Person person = Person.builder().name(personName).label(personName).build();
 
-    // Mock the services in a way, that they return exactly what they got as argument
-    when(urlAliasService.save(any(UrlAlias.class))).thenAnswer(i -> i.getArguments()[0]);
-    when(repo.save(any(Person.class))).thenAnswer(i -> i.getArguments()[0]);
     when(urlAliasService.generateSlug(any(), any(String.class), eq(null)))
         .thenReturn("yu-ji-shan-ren");
 
-    Person actual = (Person) service.save(person);
+    service.save(person);
 
-    LocalizedUrlAliases actualLocalizedUrlAliases = actual.getLocalizedUrlAliases();
+    LocalizedUrlAliases actualLocalizedUrlAliases = person.getLocalizedUrlAliases();
     List<UrlAlias> actualUrlAliases = actualLocalizedUrlAliases.flatten();
 
     assertThat(actualUrlAliases).hasSize(1);
