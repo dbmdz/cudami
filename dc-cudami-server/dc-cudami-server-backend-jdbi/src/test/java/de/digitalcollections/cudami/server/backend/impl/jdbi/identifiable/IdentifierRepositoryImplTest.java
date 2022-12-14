@@ -95,14 +95,13 @@ class IdentifierRepositoryImplTest {
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
 
     repo.save(identifier);
-    Identifier persisted = repo.getByUuid(identifier.getUuid());
 
-    UUID identifierUuid = persisted.getUuid();
+    UUID identifierUuid = identifier.getUuid();
     assertThat(identifierUuid).isNotNull();
 
     // Retrieve it by its uuid - it must be the same as what was returned before at persisting
     Identifier actual = repo.getByUuid(identifierUuid);
-    assertThat(actual).isEqualTo(persisted);
+    assertThat(actual).isEqualTo(identifier);
   }
 
   private void saveIdentifiable(UUID uuid) throws RepositoryException {

@@ -16,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @WebMvcTest(WebpageHtmlController.class)
 public class WebpageHtmlControllerTest extends BaseWebpageControllerTest {
 
+  private static final boolean IGNORE_WHITESPACES = true;
+
   @MockBean protected WebpageService webpageService;
 
   @DisplayName("returns a webpage in v1 HTML format for UUID")
