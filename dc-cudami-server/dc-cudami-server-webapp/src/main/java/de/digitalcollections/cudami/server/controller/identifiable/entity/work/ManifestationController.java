@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -64,7 +63,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     boolean successful;
     try {
       successful = service.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -95,7 +94,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Manifestation> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -116,7 +115,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Manifestation result;
     if (pLocale == null) {

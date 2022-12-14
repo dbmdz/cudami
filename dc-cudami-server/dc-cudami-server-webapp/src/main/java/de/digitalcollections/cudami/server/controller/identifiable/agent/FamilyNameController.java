@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -73,7 +72,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<FamilyName> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -85,7 +84,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -109,7 +108,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     FamilyName result;
     if (pLocale == null) {
       result = familyNameService.getByUuid(uuid);

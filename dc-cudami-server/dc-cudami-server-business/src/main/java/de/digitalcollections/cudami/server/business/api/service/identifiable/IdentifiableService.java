@@ -1,8 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -72,11 +70,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   long count();
 
-  default boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+  default boolean delete(UUID uuid) throws ConflictException, ServiceException {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  boolean delete(List<UUID> uuids) throws ConflictException, IdentifiableServiceException;
+  boolean delete(List<UUID> uuids) throws ConflictException, ServiceException;
 
   PageResponse<I> find(PageRequest pageRequest);
 
@@ -101,11 +99,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   I getByIdentifier(Identifier identifier);
 
-  I getByIdentifier(String namespace, String id) throws IdentifiableServiceException;
+  I getByIdentifier(String namespace, String id) throws ServiceException;
 
-  I getByUuid(UUID uuid) throws IdentifiableServiceException;
+  I getByUuid(UUID uuid) throws ServiceException;
 
-  I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException;
+  I getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException;
 
   List<Locale> getLanguages();
 
@@ -167,5 +165,5 @@ public interface IdentifiableService<I extends Identifiable> {
 
   void update(I identifiable) throws ServiceException, ValidationException;
 
-  void validate(I identifiable) throws CudamiServiceException, ValidationException;
+  void validate(I identifiable) throws ServiceException, ValidationException;
 }

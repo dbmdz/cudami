@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -84,7 +83,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
 
     try {
       return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
   }
@@ -103,7 +102,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Identifiable> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -117,7 +116,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
-      throws ResourceNotFoundException, IdentifiableServiceException {
+      throws ResourceNotFoundException, ServiceException {
     Identifiable identifiable = identifiableService.getByUuid(uuid);
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);

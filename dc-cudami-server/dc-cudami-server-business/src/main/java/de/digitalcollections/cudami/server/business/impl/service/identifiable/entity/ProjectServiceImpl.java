@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
@@ -47,7 +47,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+  public boolean delete(UUID uuid) throws ConflictException, ServiceException {
     List<DigitalObject> digitalObjects =
         findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
             .getContent();

@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
@@ -42,7 +42,7 @@ public class ArticleServiceImpl extends EntityServiceImpl<Article> implements Ar
   }
 
   @Override
-  public Article getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  public Article getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
     Article article = super.getByUuidAndLocale(uuid, locale);
     if (article == null) {
       return null;

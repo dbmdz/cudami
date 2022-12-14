@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -123,7 +122,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
     try {
       super.save(entity);
       sendNotification("save", "POST", entity.getUuid(), entity.getEntityType());
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error("Cannot save entity " + entity + ": ", e);
       throw e;
     }
@@ -179,7 +178,7 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
     try {
       super.update(entity);
       sendNotification("update", "PUT", entity.getUuid(), entity.getEntityType());
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error("Cannot update identifiable " + entity + ": ", e);
       throw e;
     }

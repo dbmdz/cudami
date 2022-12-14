@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -10,13 +10,13 @@ import java.util.UUID;
 
 public interface EntityRelationService {
 
-  default void addRelation(EntityRelation relation) throws CudamiServiceException {
+  default void addRelation(EntityRelation relation) throws ServiceException {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
 
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
-      throws CudamiServiceException;
+      throws ServiceException;
 
   default void deleteBySubject(Entity subjectEntity) {
     deleteBySubject(subjectEntity.getUuid());
@@ -50,5 +50,5 @@ public interface EntityRelationService {
    * @param entityRelations a list of entity relations to persist
    * @return the persisted list of entity relations
    */
-  void save(List<EntityRelation> entityRelations) throws CudamiServiceException;
+  void save(List<EntityRelation> entityRelations) throws ServiceException;
 }

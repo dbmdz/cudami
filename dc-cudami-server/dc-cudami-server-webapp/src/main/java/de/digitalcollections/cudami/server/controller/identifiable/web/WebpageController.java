@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.web;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -109,7 +108,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -180,7 +179,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @Parameter(name = "active", description = "If set, object will only be returned if active")
           @RequestParam(name = "active", required = false)
           String active)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
@@ -238,7 +237,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     return webpageService.getParent(uuid);
   }
 
@@ -271,7 +270,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
                   "UUID of the webpage, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     return webpageService.getWebsite(uuid);
   }
 

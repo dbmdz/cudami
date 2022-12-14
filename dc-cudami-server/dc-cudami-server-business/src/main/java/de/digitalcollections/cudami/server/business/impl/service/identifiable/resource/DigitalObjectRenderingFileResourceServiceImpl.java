@@ -2,8 +2,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
@@ -67,7 +65,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   private boolean deleteRenderingResource(FileResource renderingResource)
-      throws IdentifiableServiceException, ConflictException {
+      throws ServiceException, ConflictException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
         return applicationFileResourceService.delete(renderingResource.getUuid());
@@ -110,15 +108,15 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) throws CudamiServiceException {
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws ServiceException {
 
     // Remove the old rendering resources, if present
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObjectUuid);
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
         deleteRenderingResource(existingRenderingResource);
-      } catch (ConflictException | IdentifiableServiceException e) {
-        throw new CudamiServiceException(
+      } catch (ConflictException | ServiceException e) {
+        throw new ServiceException(
             "Cannot remove existing rendering resource=" + existingRenderingResource + ": " + e, e);
       }
     }
@@ -134,7 +132,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         try {
           saveRenderingFileResource(renderingResource);
         } catch (ValidationException | ServiceException e) {
-          throw new CudamiServiceException(
+          throw new ServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
         }
         savedRenderingResources.add(renderingResource);
@@ -149,7 +147,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   @Override
-  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws ServiceException {
     List<FileResource> renderingFileResources = getRenderingFileResources(digitalObjectUuid);
     if (renderingFileResources == null || renderingFileResources.isEmpty()) {
       return;
@@ -161,7 +159,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         int amountDeletedRelations =
             digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
         if (amountDeletedRelations != 1) {
-          throw new CudamiServiceException(
+          throw new ServiceException(
               "Could not delete relation for RenderingFileResource="
                   + renderingFileResource
                   + " for DigitalObject with uuid="
@@ -174,8 +172,8 @@ public class DigitalObjectRenderingFileResourceServiceImpl
             == 0) {
           deleteRenderingResource(renderingFileResource);
         }
-      } catch (ConflictException | IdentifiableServiceException e) {
-        throw new CudamiServiceException(
+      } catch (ConflictException | ServiceException e) {
+        throw new ServiceException(
             "Cannot delete RenderingFileResource="
                 + renderingFileResource
                 + " for DigitalObject with uuid="

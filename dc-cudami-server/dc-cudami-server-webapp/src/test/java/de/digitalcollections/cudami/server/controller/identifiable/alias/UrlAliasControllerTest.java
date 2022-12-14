@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -344,7 +344,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @Test
   public void exceptionOnSlugGeneration() throws Exception {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
-        .thenThrow(new CudamiServiceException("foo"));
+        .thenThrow(new ServiceException("foo"));
 
     testInternalError("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
   }

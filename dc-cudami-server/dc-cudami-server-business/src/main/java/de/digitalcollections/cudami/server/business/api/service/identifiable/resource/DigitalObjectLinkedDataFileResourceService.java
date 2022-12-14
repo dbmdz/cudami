@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.List;
@@ -29,5 +28,5 @@ public interface DigitalObjectLinkedDataFileResourceService {
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
       throws ServiceException;
 
-  void deleteLinkedDataFileResources(UUID digitalObjectUuid) throws CudamiServiceException;
+  void deleteLinkedDataFileResources(UUID digitalObjectUuid) throws ServiceException;
 }

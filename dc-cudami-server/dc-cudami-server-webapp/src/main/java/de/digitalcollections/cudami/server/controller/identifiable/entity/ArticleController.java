@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
@@ -90,7 +89,7 @@ public class ArticleController {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Article article;
     if (pLocale == null) {

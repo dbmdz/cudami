@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.semantic;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
@@ -21,6 +21,5 @@ public interface TagService {
 
   PageResponse<Tag> find(PageRequest pageRequest);
 
-  Tag getByTypeAndIdentifier(String type, String namespace, String id)
-      throws CudamiServiceException;
+  Tag getByTypeAndIdentifier(String type, String namespace, String id) throws ServiceException;
 }

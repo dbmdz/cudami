@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
@@ -47,8 +47,7 @@ public class HeadwordEntryServiceImpl extends EntityServiceImpl<HeadwordEntry>
   }
 
   @Override
-  public HeadwordEntry getByUuidAndLocale(UUID uuid, Locale locale)
-      throws IdentifiableServiceException {
+  public HeadwordEntry getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
     HeadwordEntry headwordEntry = super.getByUuidAndLocale(uuid, locale);
     if (headwordEntry == null) {
       return null;

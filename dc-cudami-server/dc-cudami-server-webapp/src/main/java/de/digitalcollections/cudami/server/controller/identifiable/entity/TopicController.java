@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -70,7 +69,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID parentTopicUuid,
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     boolean successful = topicService.addChild(parentTopicUuid, subtopicUuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
@@ -217,7 +216,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
           @PathVariable
           long refId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Topic topic = topicService.getByRefId(refId);
     return getByUuid(topic.getUuid(), null);
   }
@@ -243,7 +242,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Topic topic;
     if (pLocale == null) {
       topic = topicService.getByUuid(uuid);

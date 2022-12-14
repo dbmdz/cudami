@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -63,7 +62,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
     boolean successful;
     try {
       successful = humanSettlementService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -102,7 +101,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HumanSettlement> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -119,7 +118,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -147,7 +146,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
                   "Desired locale, e.g. <tt>de</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     HumanSettlement result;
     if (pLocale == null) {

@@ -13,8 +13,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -97,8 +95,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("can save LinkedDataFileResources for a DigitalObject")
-  void saveLinkedDataFileResources()
-      throws ValidationException, ServiceException, CudamiServiceException {
+  void saveLinkedDataFileResources() throws ValidationException, ServiceException {
     LinkedDataFileResource linkedDataFileResource =
         LinkedDataFileResource.builder()
             .label(Locale.GERMAN, "Linked Data")
@@ -129,7 +126,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("fills LinkedDataResources for a retrieved DigitalObject by uuid")
-  void fillLinkedDataResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
+  void fillLinkedDataResourcesForGetByUuidAndLocale() throws ServiceException {
     UUID uuid = UUID.randomUUID();
 
     DigitalObject persistedDigitalObject =
@@ -170,8 +167,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("can save RenderingResources for a DigitalObject")
-  void saveRenderingResources()
-      throws ValidationException, ServiceException, CudamiServiceException {
+  void saveRenderingResources() throws ValidationException, ServiceException {
     FileResource renderingResource = new TextFileResource();
     renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
     renderingResource.setMimeType(MimeType.fromTypename("text/html"));
@@ -199,7 +195,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("fills RenderingResources for a retrieved DigitalObject by uuid and locale")
-  void fillRenderingResourcesForGetByUuidAndLocale() throws IdentifiableServiceException {
+  void fillRenderingResourcesForGetByUuidAndLocale() throws ServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()
@@ -230,7 +226,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName(
       "fills RenderingResources for a retrieved DigitalObject by identifier (id and namespace)")
-  void fillRenderingResourceForGetByIdentfier() throws IdentifiableServiceException {
+  void fillRenderingResourceForGetByIdentfier() throws ServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()
@@ -263,7 +259,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("fills RenderingResources for a retrieved DigitalObject by uuid")
-  void fillRenderingResourceForGetByUUID() throws IdentifiableServiceException {
+  void fillRenderingResourceForGetByUUID() throws ServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()
@@ -293,7 +289,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("fills RenderingResources for a retrieved DigitalObject by refId")
-  void fillRenderingResourceForGetByRefId() throws IdentifiableServiceException {
+  void fillRenderingResourceForGetByRefId() throws ServiceException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()
@@ -327,8 +323,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName(
       "deletes RenderingResources and LinkedDataFileResources of a DigitalObject, when the DigitalObject is delete")
-  void deleteRenderingAndLinkedDataFileResources()
-      throws CudamiServiceException, IdentifiableServiceException, ConflictException {
+  void deleteRenderingAndLinkedDataFileResources() throws ServiceException, ConflictException {
     UUID uuid = UUID.randomUUID();
     DigitalObject persistedDigitalObject =
         DigitalObject.builder()
@@ -389,8 +384,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName(
       "throws ConflictException if the digital object is already connected to another item")
-  public void addExistingButOtherwiseConntectedDigitalObjectToItem()
-      throws IdentifiableServiceException {
+  public void addExistingButOtherwiseConntectedDigitalObjectToItem() throws ServiceException {
     Item item = Item.builder().uuid(UUID.randomUUID()).build();
     Item otherItem = Item.builder().uuid(UUID.randomUUID()).build();
     DigitalObject digitalObject =

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -88,7 +87,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Work> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -105,7 +104,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -132,7 +131,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Work result;
     if (pLocale == null) {

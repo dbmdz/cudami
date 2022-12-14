@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
@@ -25,7 +25,7 @@ public class IdentifierServiceImplTest {
   private IdentifierTypeService identifierTypeService;
 
   @BeforeEach
-  public void beforeEach() throws CudamiServiceException {
+  public void beforeEach() throws ServiceException {
     repo = mock(IdentifierRepository.class);
     identifierTypeService = mock(IdentifierTypeService.class);
     service = new IdentifierServiceImpl(repo, identifierTypeService);
@@ -43,7 +43,7 @@ public class IdentifierServiceImplTest {
 
   @DisplayName("Validation succeeds if all conditions are met after an update of the cache")
   @Test
-  public void validationSuccessAfterUpdate() throws CudamiServiceException {
+  public void validationSuccessAfterUpdate() throws ServiceException {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace1", "id1"));
     when(identifierTypeService.updateIdentifierTypeCache())
         .thenReturn(Map.of("namespace1", "id1", "namespace2", "id2"));
@@ -55,7 +55,7 @@ public class IdentifierServiceImplTest {
 
   @DisplayName("Validation fails if the namespace is not found")
   @Test
-  public void validationFailureNamespace() throws CudamiServiceException {
+  public void validationFailureNamespace() throws ServiceException {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
@@ -68,7 +68,7 @@ public class IdentifierServiceImplTest {
 
   @DisplayName("Validation fails if the id does not match the pattern")
   @Test
-  public void validationFailurePattern() throws CudamiServiceException {
+  public void validationFailurePattern() throws ServiceException {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
@@ -81,7 +81,7 @@ public class IdentifierServiceImplTest {
 
   @DisplayName("Validation fails, if the id is null")
   @Test
-  public void validationFailureNullId() throws CudamiServiceException {
+  public void validationFailureNullId() throws ServiceException {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 

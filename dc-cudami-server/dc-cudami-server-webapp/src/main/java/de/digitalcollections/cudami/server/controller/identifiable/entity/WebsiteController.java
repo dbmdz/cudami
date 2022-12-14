@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -196,7 +195,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException, IdentifiableServiceException {
+      throws JsonProcessingException, ServiceException {
     Website website = websiteService.getByUuid(uuid);
     return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

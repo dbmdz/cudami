@@ -1,7 +1,5 @@
 package de.digitalcollections.cudami.server.controller.relation;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.PredicatesServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -112,7 +110,7 @@ public class PredicateController {
       value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate save(@Valid @RequestBody Predicate predicate, BindingResult bindingResult)
-      throws IdentifiableServiceException, ServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     if (bindingResult.hasErrors()) {
       ValidationException validationException = new ValidationException("validation error");
       bindingResult
@@ -143,7 +141,7 @@ public class PredicateController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("valueOrUuid") String valueOrUuid, @NotNull @RequestBody Predicate predicate)
-      throws PredicatesServiceException {
+      throws ServiceException {
 
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);

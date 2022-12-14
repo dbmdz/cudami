@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.v
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.versioning.VersionRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.versioning.VersionService;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -22,8 +22,7 @@ public class VersionServiceImpl implements VersionService {
   @Autowired private VersionRepository repository;
 
   @Override
-  public Version create(String instanceKey, String instanceVersionkey)
-      throws CudamiServiceException {
+  public Version create(String instanceKey, String instanceVersionkey) throws ServiceException {
     Version version = new Version();
     version.setInstanceVersionKey(instanceVersionkey);
     version.setInstanceKey(instanceKey);
@@ -32,8 +31,7 @@ public class VersionServiceImpl implements VersionService {
     try {
       repository.save(version);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(
-          "Cannot save newly created version " + version.toString(), e);
+      throw new ServiceException("Cannot save newly created version " + version.toString(), e);
     }
     return version;
   }
@@ -60,23 +58,23 @@ public class VersionServiceImpl implements VersionService {
   }
 
   @Override
-  public void save(Version version) throws CudamiServiceException {
+  public void save(Version version) throws ServiceException {
     try {
       repository.save(version);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException("Cannot save version " + version.toString(), e);
+      throw new ServiceException("Cannot save version " + version.toString(), e);
     }
   }
 
   @Override
-  public void update(Version version) throws ValidationException, CudamiServiceException {
+  public void update(Version version) throws ValidationException, ServiceException {
     if (version == null || version.getUuid() == null || version.getStatus() == null) {
       throw new ValidationException("Version must have a uuid and a status: " + version);
     }
     try {
       repository.update(version);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException("Cannot update version " + version.toString(), e);
+      throw new ServiceException("Cannot update version " + version.toString(), e);
     }
   }
 }

@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -91,7 +90,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<ImageFileResource> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -112,7 +111,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     ImageFileResource result;
     if (pLocale == null) {
       result = service.getByUuid(uuid);

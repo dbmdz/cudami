@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -75,7 +74,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
   //  @Override
-  //  public Webpage getByIdentifier(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  //  public Webpage getByIdentifier(UUID uuid, Locale locale) throws ServiceException {
   //    Webpage webpage = super.getByIdentifier(uuid, locale);
   //    if (webpage == null) {
   //      return null;
@@ -187,13 +186,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage saveWithParent(UUID childUuid, UUID parentUuid)
-      throws IdentifiableServiceException {
+  public Webpage saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
     try {
       return ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + childUuid + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 
@@ -206,9 +204,9 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       }
       return ((WebpageRepository) repository)
           .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
-    } catch (IdentifiableServiceException | ValidationException e) {
+    } catch (ServiceException | ValidationException e) {
       LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 

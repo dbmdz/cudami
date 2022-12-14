@@ -1,8 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -42,8 +40,7 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
-  DigitalObject getByIdentifierWithWEMI(String namespace, String id)
-      throws IdentifiableServiceException;
+  DigitalObject getByIdentifierWithWEMI(String namespace, String id) throws ServiceException;
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
@@ -79,14 +76,14 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
 
   default List<FileResource> getRenderingResources(DigitalObject digitalObject)
-      throws CudamiServiceException {
+      throws ServiceException {
     return getRenderingResources(digitalObject.getUuid());
   }
 
-  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
+  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws ServiceException;
 
   default List<FileResource> setFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) throws CudamiServiceException {
+      DigitalObject digitalObject, List<FileResource> fileResources) throws ServiceException {
     if (fileResources == null) {
       return null;
     }
@@ -94,7 +91,7 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources)
-      throws CudamiServiceException;
+      throws ServiceException;
 
   default List<LinkedDataFileResource> setLinkedDataFileResources(
       DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
@@ -111,7 +108,7 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   default List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (renderingFileResources == null) {
       return null;
     }
@@ -119,6 +116,5 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources)
-      throws CudamiServiceException;
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources) throws ServiceException;
 }

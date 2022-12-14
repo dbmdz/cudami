@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.alias;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -17,9 +17,9 @@ public interface UrlAliasService {
    *
    * @param urlAlias the UrlAlias (with yet empty UUID)
    * @return the persisted UrlAlias with its generated UUID
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  default void save(UrlAlias urlAlias) throws CudamiServiceException {
+  default void save(UrlAlias urlAlias) throws ServiceException {
     save(urlAlias, false);
   }
   /**
@@ -28,9 +28,9 @@ public interface UrlAliasService {
    * @param urlAlias the UrlAlias (with yet empty UUID)
    * @param force if true, do not validate
    * @return the persisted UrlAlias with its generated UUID
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  void save(UrlAlias urlAlias, boolean force) throws CudamiServiceException;
+  void save(UrlAlias urlAlias, boolean force) throws ServiceException;
 
   /**
    * Delete a single UrlAlias by its UUID
@@ -38,9 +38,9 @@ public interface UrlAliasService {
    * @param uuid the UUID
    * @return true if the UrlAliases existed and could be deleted or false, it it did not exist and
    *     thus could not be deleted
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
-  default boolean delete(UUID uuid) throws CudamiServiceException {
+  default boolean delete(UUID uuid) throws ServiceException {
     return delete(List.of(uuid));
   }
 
@@ -50,9 +50,9 @@ public interface UrlAliasService {
    * @param uuids a List of UUIDs
    * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  boolean delete(List<UUID> uuids) throws CudamiServiceException;
+  boolean delete(List<UUID> uuids) throws ServiceException;
 
   /**
    * Delete all UrlAliases targetting the passed UUID except those that have already been published.
@@ -60,9 +60,9 @@ public interface UrlAliasService {
    * @param uuid the {@code targetUuid} whose UrlAliases should be deleted
    * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  default boolean deleteAllForTarget(UUID uuid) throws CudamiServiceException {
+  default boolean deleteAllForTarget(UUID uuid) throws ServiceException {
     return deleteAllForTarget(uuid, false);
   }
 
@@ -73,27 +73,27 @@ public interface UrlAliasService {
    * @param force if {@code true} remove published ones as well
    * @return true if at least one UrlAlias existed and could be deleted or false, if no UrlAlias
    *     existed at all and thus nothing could be deleted
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException;
+  boolean deleteAllForTarget(UUID uuid, boolean force) throws ServiceException;
 
   /**
    * Find UrlAliases
    *
    * @param pageRequest the PageRequest
    * @return a SearchPageResponse with the found LocalizedUrlAliases as paged content
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
-  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws CudamiServiceException;
+  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws ServiceException;
 
   /**
    * Returns the LocalizedUrlAliases for an identifiable, identified by its UUID
    *
    * @param uuid the UUID of the identifiable
    * @return the LocalizedUrlAliases, if found, or null
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
-  LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws CudamiServiceException;
+  LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws ServiceException;
 
   /**
    * Returns the primary Links (one per language) as LocalizedUrlAliases for a given slug for a
@@ -105,19 +105,19 @@ public interface UrlAliasService {
    * @param slug the slug (=relative path)
    * @param pLocale the locale for which the result is filtered. Optional.
    * @return LocalizedUrlAliases, if a primary link exists; otherwise: null.
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
   LocalizedUrlAliases getPrimaryUrlAliases(UUID websiteUuid, String slug, Locale pLocale)
-      throws CudamiServiceException;
+      throws ServiceException;
 
   /**
    * Returns all primary links of the passed target identifiable.
    *
    * @param targetUuid UUID of the identifiable that the primaries should be found for
    * @return {@code List}, not {@code null}
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
-  List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws CudamiServiceException;
+  List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws ServiceException;
 
   /**
    * Generates a not yet existing slug for the provided label, language and websiteUuid. If the
@@ -131,25 +131,25 @@ public interface UrlAliasService {
    * @param websiteUuid The uuid of the website, for which the slug is generated. If not set, the
    *     UUID of the default website is used
    * @return slug as String, or null, if no website under the provided websiteUuid exists
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws CudamiServiceException;
+  String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws ServiceException;
   /**
    * Retrieve one UrlAlias by its UUID
    *
    * @param uuid the UUID
    * @return the UrlAlias or null
-   * @throws CudamiServiceException in case of an error
+   * @throws ServiceException in case of an error
    */
-  UrlAlias getByUuid(UUID uuid) throws CudamiServiceException;
+  UrlAlias getByUuid(UUID uuid) throws ServiceException;
   /**
    * Updates an UrlAlias in the database
    *
    * @param urlAlias the UrlAlias (with set UUID)
    * @return the updated UrlAlias
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
-  void update(UrlAlias urlAlias) throws CudamiServiceException;
+  void update(UrlAlias urlAlias) throws ServiceException;
 
   /**
    * Validates the given localizedUrlAliases according to the following criteria:

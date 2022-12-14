@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
@@ -48,7 +47,7 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
   }
 
   @Override
-  public void deleteLinkedDataFileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+  public void deleteLinkedDataFileResources(UUID digitalObjectUuid) throws ServiceException {
     List<LinkedDataFileResource> linkedDataFileResources =
         getLinkedDataFileResources(digitalObjectUuid);
     if (linkedDataFileResources == null || linkedDataFileResources.isEmpty()) {
@@ -60,7 +59,7 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
         // Delete the relation
         int amountDeletedRelations = repository.delete(linkedDataFileResource.getUuid());
         if (amountDeletedRelations != 1) {
-          throw new CudamiServiceException(
+          throw new ServiceException(
               "Could not delete relation for LinkedDataFileResource="
                   + linkedDataFileResource
                   + " for DigitalObject with uuid="
@@ -72,7 +71,7 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
           linkedDataFileResourceService.delete(linkedDataFileResource.getUuid());
         }
       } catch (Exception e) {
-        throw new CudamiServiceException(
+        throw new ServiceException(
             "Cannot delete LinkedDataFileResource="
                 + linkedDataFileResource
                 + " for DigitalObject with uuid="

@@ -12,8 +12,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -45,6 +44,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
 
+  @Override
   @BeforeEach
   public void beforeEach() {
     repo = mock(WebpageRepository.class);
@@ -213,7 +213,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.save(webpage);
         });
@@ -223,8 +223,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName("does not allow empty UrlAliases at update")
   public void updateWithEmptyUrlAliases()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException,
-          RepositoryException {
+      throws ValidationException, ServiceException, RepositoryException {
     UUID webpageUuid = UUID.randomUUID();
 
     // in DB
@@ -241,7 +240,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     dummyWebsite.setUuid(UUID.randomUUID());
     dummyAlias.setWebsite(dummyWebsite);
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.update(webpage);
         });

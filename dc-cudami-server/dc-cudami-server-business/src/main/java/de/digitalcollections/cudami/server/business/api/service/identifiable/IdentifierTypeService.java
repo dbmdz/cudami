@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -24,11 +24,11 @@ public interface IdentifierTypeService {
 
   IdentifierType getByUuid(UUID uuid);
 
-  IdentifierType save(IdentifierType identifierType) throws CudamiServiceException;
+  IdentifierType save(IdentifierType identifierType) throws ServiceException;
 
-  IdentifierType update(IdentifierType identifierType) throws CudamiServiceException;
+  IdentifierType update(IdentifierType identifierType) throws ServiceException;
 
   Map<String, String> getIdentifierTypeCache();
 
-  Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException;
+  Map<String, String> updateIdentifierTypeCache() throws ServiceException;
 }

@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -69,8 +68,7 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
     try {
       repository.save(corporateBody);
     } catch (RepositoryException e) {
-      throw new IdentifiableServiceException(
-          "Cannot save CorporateBody: " + corporateBody.toString(), e);
+      throw new ServiceException("Cannot save CorporateBody: " + corporateBody.toString(), e);
     }
     return corporateBody;
   }

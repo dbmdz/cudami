@@ -7,7 +7,7 @@ import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -48,7 +48,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     this.localeService = localeService;
   }
 
-  protected void checkPublication(UrlAlias urlAlias) throws CudamiServiceException {
+  protected void checkPublication(UrlAlias urlAlias) throws ServiceException {
     if (urlAlias.getLastPublished() != null) {
       if (urlAlias.getUuid() != null) {
         UrlAlias publishedAlias = getByUuid(urlAlias.getUuid());
@@ -62,7 +62,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
         publishedAlias.setLastPublished(urlAlias.getLastPublished());
         if (!urlAlias.equals(publishedAlias)) {
           // there are more changes than permitted
-          throw new CudamiServiceException(
+          throw new ServiceException(
               String.format(
                   "Error: Attempt to change an already published Alias. UUID: %s",
                   urlAlias.getUuid()));
@@ -75,17 +75,17 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) throws CudamiServiceException {
+  public boolean delete(List<UUID> uuids) throws ServiceException {
     try {
       return repository.delete(uuids) > 0;
     } catch (RepositoryException e) {
-      throw new CudamiServiceException("Cannot delete UrlAliases by uuids: " + e, e);
+      throw new ServiceException("Cannot delete UrlAliases by uuids: " + e, e);
     }
   }
 
   @Override
-  @Transactional(rollbackFor = {RuntimeException.class, CudamiServiceException.class})
-  public boolean deleteAllForTarget(UUID uuid, boolean force) throws CudamiServiceException {
+  @Transactional(rollbackFor = {RuntimeException.class, ServiceException.class})
+  public boolean deleteAllForTarget(UUID uuid, boolean force) throws ServiceException {
     if (uuid == null) {
       return false;
     }
@@ -127,19 +127,18 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
-      throws CudamiServiceException {
+  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws ServiceException {
     try {
       return repository.find(pageRequest);
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Cannot find LocalizedUrlAliases with pageRequest=" + pageRequest + ": " + e, e);
     }
   }
 
   @Override
   public String generateSlug(Locale pLocale, String label, UUID websiteUuid)
-      throws CudamiServiceException {
+      throws ServiceException {
 
     String slug = slugGenerator.generateSlug(label);
 
@@ -148,7 +147,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
         return slug;
       }
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Cannot check, if UrlAliases for websiteUuid="
               + websiteUuid
               + ", slug="
@@ -168,7 +167,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           return numericalSuffixedSlug;
         }
       } catch (Exception e) {
-        throw new CudamiServiceException(
+        throw new ServiceException(
             "Cannot check, if UrlAliases for websiteUuid="
                 + websiteUuid
                 + ", slug="
@@ -184,7 +183,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public UrlAlias getByUuid(UUID uuid) throws CudamiServiceException {
+  public UrlAlias getByUuid(UUID uuid) throws ServiceException {
     if (uuid == null) {
       return null;
     }
@@ -192,25 +191,25 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     try {
       return repository.getByUuid(uuid);
     } catch (Exception e) {
-      throw new CudamiServiceException("Cannot find an UrlAlias with uuid=" + uuid + ": " + e, e);
+      throw new ServiceException("Cannot find an UrlAlias with uuid=" + uuid + ": " + e, e);
     }
   }
 
   @Override
-  public LocalizedUrlAliases getLocalizedUrlAliases(UUID targetUuid) throws CudamiServiceException {
+  public LocalizedUrlAliases getLocalizedUrlAliases(UUID targetUuid) throws ServiceException {
     try {
       return repository.getAllForTarget(targetUuid);
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Cannot find LocalizedUrlAliases for identifiable with uuid=" + targetUuid + ": " + e, e);
     }
   }
 
   @Override
   public LocalizedUrlAliases getPrimaryUrlAliases(UUID websiteUuid, String slug, Locale pLocale)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (slug == null || slug.isBlank()) {
-      throw new CudamiServiceException("Missing or empty slug");
+      throw new ServiceException("Missing or empty slug");
     }
 
     try {
@@ -235,15 +234,14 @@ public class UrlAliasServiceImpl implements UrlAliasService {
 
       return localizedUrlAliases;
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Could not find mainLink for websiteUuid=" + websiteUuid + ", slug=" + slug + ": " + e,
           e);
     }
   }
 
   @Override
-  public List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid)
-      throws CudamiServiceException {
+  public List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws ServiceException {
     try {
       LocalizedUrlAliases localizedUrlAliases = repository.getAllForTarget(targetUuid);
       if (localizedUrlAliases == null) {
@@ -253,7 +251,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
           .filter(ua -> ua.isPrimary())
           .collect(Collectors.toList());
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           String.format(
               "Cannot find all UrlAliases of a specific target. targetUuid='%s'.", targetUuid),
           e);
@@ -274,36 +272,36 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public void save(UrlAlias urlAlias, boolean force) throws CudamiServiceException {
+  public void save(UrlAlias urlAlias, boolean force) throws ServiceException {
     if (urlAlias == null) {
-      throw new CudamiServiceException("Cannot create an empty UrlAlias");
+      throw new ServiceException("Cannot create an empty UrlAlias");
     }
     if (!force && urlAlias.getUuid() != null) {
-      throw new CudamiServiceException("Cannot create an UrlAlias, when its UUID is already set!");
+      throw new ServiceException("Cannot create an UrlAlias, when its UUID is already set!");
     }
 
     this.checkPublication(urlAlias);
     try {
       repository.save(urlAlias);
     } catch (Exception e) {
-      throw new CudamiServiceException("Cannot save urlAlias: " + e, e);
+      throw new ServiceException("Cannot save urlAlias: " + e, e);
     }
   }
 
   @Override
-  public void update(UrlAlias urlAlias) throws CudamiServiceException {
+  public void update(UrlAlias urlAlias) throws ServiceException {
     if (urlAlias == null) {
-      throw new CudamiServiceException("Cannot update an empty UrlAlias");
+      throw new ServiceException("Cannot update an empty UrlAlias");
     }
     if (urlAlias.getUuid() == null) {
-      throw new CudamiServiceException("Cannot update an UrlAlias with empty UUID");
+      throw new ServiceException("Cannot update an UrlAlias with empty UUID");
     }
 
     checkPublication(urlAlias);
     try {
       repository.update(urlAlias);
     } catch (Exception e) {
-      throw new CudamiServiceException("Cannot update urlAlias: " + e, e);
+      throw new ServiceException("Cannot update urlAlias: " + e, e);
     }
   }
 

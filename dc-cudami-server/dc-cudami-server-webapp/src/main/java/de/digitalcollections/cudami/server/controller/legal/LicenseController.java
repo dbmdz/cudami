@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -178,8 +177,7 @@ public class LicenseController {
   @PostMapping(
       value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License save(@RequestBody License license, BindingResult errors)
-      throws IdentifiableServiceException, ServiceException {
+  public License save(@RequestBody License license, BindingResult errors) throws ServiceException {
     return service.save(license);
   }
 
@@ -191,7 +189,7 @@ public class LicenseController {
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid,
       @RequestBody License license,
       BindingResult errors)
-      throws IdentifiableServiceException, ServiceException {
+      throws ServiceException {
     assert Objects.equals(uuid, license.getUuid());
     return service.update(license);
   }

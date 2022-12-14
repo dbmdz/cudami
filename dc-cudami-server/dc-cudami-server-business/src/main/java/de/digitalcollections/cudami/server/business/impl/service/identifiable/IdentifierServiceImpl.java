@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
@@ -30,45 +30,45 @@ public class IdentifierServiceImpl implements IdentifierService {
   }
 
   @Override
-  public void delete(Set<Identifier> identifiers) throws CudamiServiceException {
+  public void delete(Set<Identifier> identifiers) throws ServiceException {
     try {
       List<UUID> uuids = identifiers.stream().map(i -> i.getUuid()).collect(Collectors.toList());
       identifierRepository.delete(uuids);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(e);
+      throw new ServiceException(e);
     }
   }
 
   @Override
-  public int deleteByIdentifiable(UUID identifiableUuid) throws CudamiServiceException {
+  public int deleteByIdentifiable(UUID identifiableUuid) throws ServiceException {
     try {
       return identifierRepository.deleteByIdentifiable(identifiableUuid);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(e);
+      throw new ServiceException(e);
     }
   }
 
   @Override
-  public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws CudamiServiceException {
+  public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws ServiceException {
     try {
       return identifierRepository.findByIdentifiable(uuidIdentifiable);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(e);
+      throw new ServiceException(e);
     }
   }
 
   @Override
-  public void save(Identifier identifier) throws CudamiServiceException {
+  public void save(Identifier identifier) throws ServiceException {
     try {
       identifierRepository.save(identifier);
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(e);
+      throw new ServiceException(e);
     }
   }
 
   @Override
   public Set<Identifier> saveForIdentifiable(UUID identifiableUuid, Set<Identifier> identifiers)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (identifiers == null) return new HashSet<>(0);
     Set<Identifier> savedIdentifiers = new HashSet<>(identifiers.size());
     for (Identifier identifier : identifiers) {
@@ -82,15 +82,14 @@ public class IdentifierServiceImpl implements IdentifierService {
           savedIdentifiers.add(dbIdentifier);
         }
       } catch (RepositoryException e) {
-        throw new CudamiServiceException("Cannot save identifier " + identifier + ": " + e, e);
+        throw new ServiceException("Cannot save identifier " + identifier + ": " + e, e);
       }
     }
     return savedIdentifiers;
   }
 
   @Override
-  public void validate(Set<Identifier> identifiers)
-      throws ValidationException, CudamiServiceException {
+  public void validate(Set<Identifier> identifiers) throws ValidationException, ServiceException {
     Map<String, String> identifierTypes = identifierTypeService.getIdentifierTypeCache();
     List<String> namespacesNotFound = new ArrayList<>(0);
     List<String> idsNotMatchingPattern = new ArrayList<>(0);

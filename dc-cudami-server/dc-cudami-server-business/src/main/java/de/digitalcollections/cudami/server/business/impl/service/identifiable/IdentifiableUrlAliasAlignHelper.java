@@ -5,7 +5,7 @@ import static de.digitalcollections.cudami.server.backend.api.repository.identif
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -48,21 +48,20 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
    * @param identifiableInDatabase the existing object saved in storage prior to any update
    * @param cudamiConfig
    * @param slugGeneratorService slug generator method
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
   public static <I extends Identifiable> void alignForUpdate(
       I actualIdentifiable,
       I identifiableInDatabase,
       CudamiConfig cudamiConfig,
       SlugGeneratorService slugGeneratorService)
-      throws CudamiServiceException {
+      throws ServiceException {
 
     if (actualIdentifiable == null
         || identifiableInDatabase == null
         || cudamiConfig == null
         || slugGeneratorService == null) {
-      throw new CudamiServiceException(
-          "Missing argument. Every parameter must be passed (not null).");
+      throw new ServiceException("Missing argument. Every parameter must be passed (not null).");
     }
 
     IdentifiableUrlAliasAlignHelper<I> inst =
@@ -73,7 +72,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       inst.alignLabelUpdate();
       inst.ensureDefaultAliasesExist();
     } catch (RuntimeException e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Uncaught error in IdentifiableUrlAliasAlignHelper::alignForUpdate.", e);
     }
   }
@@ -86,15 +85,14 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
    * @param actualIdentifiable the (new) identifiable
    * @param cudamiConfig
    * @param slugGeneratorService slug generator method
-   * @throws CudamiServiceException
+   * @throws ServiceException
    */
   public static <I extends Identifiable> void checkDefaultAliases(
       I actualIdentifiable, CudamiConfig cudamiConfig, SlugGeneratorService slugGeneratorService)
-      throws CudamiServiceException {
+      throws ServiceException {
 
     if (actualIdentifiable == null || cudamiConfig == null || slugGeneratorService == null) {
-      throw new CudamiServiceException(
-          "Missing argument. Every parameter must be passed (not null).");
+      throw new ServiceException("Missing argument. Every parameter must be passed (not null).");
     }
 
     IdentifiableUrlAliasAlignHelper<I> inst =
@@ -103,12 +101,12 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     try {
       inst.ensureDefaultAliasesExist();
     } catch (RuntimeException e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "Uncaught error in IdentifiableUrlAliasAlignHelper::checkDefaultAliases.", e);
     }
   }
 
-  private void alignLabelUpdate() throws CudamiServiceException {
+  private void alignLabelUpdate() throws ServiceException {
     if (checkIdentifiableExcluded() || identifiableInDatabase == null) {
       return;
     }
@@ -177,10 +175,10 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   }
 
   public static <I extends Identifiable> boolean checkIdentifiableExcluded(
-      I actualIdentifiable, CudamiConfig cudamiConfig) throws CudamiServiceException {
+      I actualIdentifiable, CudamiConfig cudamiConfig) throws ServiceException {
 
     if (actualIdentifiable == null || cudamiConfig == null) {
-      throw new CudamiServiceException("Actual Identifiable and cudami config must not be null!");
+      throw new ServiceException("Actual Identifiable and cudami config must not be null!");
     }
 
     IdentifiableUrlAliasAlignHelper<I> inst =
@@ -188,7 +186,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
     return inst.checkIdentifiableExcluded();
   }
 
-  private void ensureDefaultAliasesExist() throws CudamiServiceException {
+  private void ensureDefaultAliasesExist() throws ServiceException {
     if (checkIdentifiableExcluded()) {
       return;
     }
@@ -231,8 +229,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
           String labelText = actualIdentifiable.getLabel().getText(labelLang);
           String slug = slugGeneratorService.apply(urlAliasLang, labelText, null);
           defaultAlias.setSlug(slug);
-        } catch (CudamiServiceException e) {
-          throw new CudamiServiceException("An error occured during slug generation.", e);
+        } catch (ServiceException e) {
+          throw new ServiceException("An error occured during slug generation.", e);
         }
         urlAliases.add(defaultAlias);
       }
@@ -240,7 +238,7 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // check that a primary alias exists for this language (again w/o script), even for webpages
       if (urlAliases.get(urlAliasLang) == null
           || !urlAliases.get(urlAliasLang).stream().anyMatch(alias -> alias.isPrimary())) {
-        throw new CudamiServiceException(
+        throw new ServiceException(
             String.format(
                 "There is not any primary alias for language '%s' (%s) of identifiable '%s'.",
                 urlAliasLang, labelLang, actualIdentifiable.getUuid()));
@@ -326,6 +324,6 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   // We do not want to have any services in this class but we need the slug generator.
   // It can easyly be passed into a parameter of this functional interface type.
   public interface SlugGeneratorService {
-    String apply(Locale locale, String label, UUID website) throws CudamiServiceException;
+    String apply(Locale locale, String label, UUID website) throws ServiceException;
   }
 }

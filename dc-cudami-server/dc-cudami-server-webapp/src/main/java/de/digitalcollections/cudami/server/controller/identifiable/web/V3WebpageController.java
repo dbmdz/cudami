@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -94,7 +94,7 @@ public class V3WebpageController {
               schema = @Schema(implementation = Boolean.class))
           @RequestParam(name = "active", required = false)
           String active)
-      throws IdentifiableServiceException, JsonProcessingException {
+      throws ServiceException, JsonProcessingException {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
@@ -166,7 +166,7 @@ public class V3WebpageController {
               schema = @Schema(implementation = Boolean.class))
           @RequestParam(name = "active", required = false)
           String active)
-      throws IdentifiableServiceException, IOException {
+      throws ServiceException, IOException {
 
     return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 

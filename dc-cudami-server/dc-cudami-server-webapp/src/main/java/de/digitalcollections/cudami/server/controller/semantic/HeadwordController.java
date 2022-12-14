@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.semantic;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -203,7 +202,7 @@ public class HeadwordController {
       value = {"/v6/headwords", "/v5/headwords"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword save(@RequestBody Headword headword, BindingResult errors)
-      throws IdentifiableServiceException, ServiceException {
+      throws ServiceException {
     return headwordService.save(headword);
   }
 
@@ -238,7 +237,7 @@ public class HeadwordController {
           UUID uuid,
       @RequestBody Headword headword,
       BindingResult errors)
-      throws IdentifiableServiceException, ServiceException {
+      throws ServiceException {
     assert Objects.equals(uuid, headword.getUuid());
     return headwordService.update(headword);
   }

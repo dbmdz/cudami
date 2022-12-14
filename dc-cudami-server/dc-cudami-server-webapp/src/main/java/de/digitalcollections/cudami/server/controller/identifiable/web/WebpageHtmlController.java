@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.web;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.view.RenderingHints;
@@ -55,7 +55,7 @@ public class WebpageHtmlController {
           @RequestParam(name = "renderLabel", required = false, defaultValue = "true")
           String renderLabel,
       Model model)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Webpage webpage;
     if (pLocale == null) {
       webpage = webpageService.getByUuid(uuid);

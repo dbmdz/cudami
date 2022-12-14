@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -86,7 +86,7 @@ public class IdentifierTypeController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors)
-      throws CudamiServiceException {
+      throws ServiceException {
     identifierTypeService.save(identifierType);
     return identifierType;
   }
@@ -102,7 +102,7 @@ public class IdentifierTypeController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors)
-      throws CudamiServiceException {
+      throws ServiceException {
     assert Objects.equals(uuid, identifierType.getUuid());
     identifierTypeService.update(identifierType);
     return identifierType;

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
 import com.github.openjson.JSONObject;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -53,7 +53,7 @@ public class UrlAliasController {
 
     try {
       urlAliasService.save(urlAlias);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -76,7 +76,7 @@ public class UrlAliasController {
     boolean isDeleted;
     try {
       isDeleted = urlAliasService.delete(uuid);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -106,7 +106,7 @@ public class UrlAliasController {
     PageResponse<LocalizedUrlAliases> result;
     try {
       result = urlAliasService.find(pageRequest);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -143,7 +143,7 @@ public class UrlAliasController {
     String result;
     try {
       result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -169,7 +169,7 @@ public class UrlAliasController {
     UrlAlias result;
     try {
       result = urlAliasService.getByUuid(uuid);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -207,7 +207,7 @@ public class UrlAliasController {
     LocalizedUrlAliases result;
     try {
       result = urlAliasService.getPrimaryUrlAliases(websiteUuid, slug, pLocale);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 
@@ -239,7 +239,7 @@ public class UrlAliasController {
     UrlAlias result;
     try {
       urlAliasService.update(urlAlias);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
 

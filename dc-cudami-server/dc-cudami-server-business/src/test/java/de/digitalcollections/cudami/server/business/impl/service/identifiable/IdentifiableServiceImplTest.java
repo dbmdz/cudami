@@ -16,8 +16,6 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -57,7 +55,7 @@ class IdentifiableServiceImplTest {
   private IdentifierService identifierService;
 
   @BeforeEach
-  public void beforeEach() throws CudamiServiceException {
+  public void beforeEach() throws ServiceException {
     repo = mock(IdentifiableRepository.class);
     urlAliasService = mock(UrlAliasService.class);
     when(urlAliasService.generateSlug(any(), eq("label"), eq(null))).thenReturn("label");
@@ -98,8 +96,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("deletes UrlAliases, too")
   @Test
-  public void deleteIncludesUrlAliaess()
-      throws IdentifiableServiceException, CudamiServiceException {
+  public void deleteIncludesUrlAliases() throws ServiceException {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
     List<UUID> uuids = List.of(uuid1, uuid2);
@@ -113,11 +110,11 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an exception to trigger the rollback, when an exception during deletion happens")
   @Test
-  public void throwExceptionWhenDeletionFails() throws CudamiServiceException {
+  public void throwExceptionWhenDeletionFails() throws ServiceException {
     when(urlAliasService.deleteAllForTarget(any(UUID.class), eq(true)))
-        .thenThrow(new CudamiServiceException("boo"));
+        .thenThrow(new ServiceException("boo"));
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.delete(List.of(UUID.randomUUID()));
         });
@@ -130,7 +127,7 @@ class IdentifiableServiceImplTest {
 
     Identifiable identifiable = Identifiable.builder().label("label").build();
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.save(identifiable);
         });
@@ -139,8 +136,8 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an Exception to trigger a rollback on save, when creating and saving an UrlAlias fails")
   @Test
-  public void exceptionOnSaveWhenSavingUrlAliasFails() throws CudamiServiceException {
-    doThrow(CudamiServiceException.class).when(urlAliasService).save(any(UrlAlias.class));
+  public void exceptionOnSaveWhenSavingUrlAliasFails() throws ServiceException {
+    doThrow(ServiceException.class).when(urlAliasService).save(any(UrlAlias.class));
 
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
@@ -150,7 +147,7 @@ class IdentifiableServiceImplTest {
     urlAlias.setSlug("label");
 
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.save(identifiable);
         });
@@ -159,7 +156,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("can save Identifiables without UrlAliases and creates an UrlAlias for them")
   @Test
   public void saveIdentifiableWithoutUrlAliases()
-      throws ServiceException, CudamiServiceException, ValidationException, RepositoryException {
+      throws ServiceException, ValidationException, RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
 
@@ -182,7 +179,7 @@ class IdentifiableServiceImplTest {
 
     Identifiable identifiable = Identifiable.builder().label("label").build();
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.update(identifiable);
         });
@@ -191,8 +188,7 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "deletes all connected UrlAliases on an identifiable as first step when updating an identifiable")
   @Test
-  public void deleteUrlAliasesOnUpdate()
-      throws ServiceException, CudamiServiceException, ValidationException {
+  public void deleteUrlAliasesOnUpdate() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -218,8 +214,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("updates existing UrlAliases on an identifiable, when updating it")
   @Test
-  public void updateExistingUrlAliasesOnUpdate()
-      throws ServiceException, CudamiServiceException, ValidationException {
+  public void updateExistingUrlAliasesOnUpdate() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -244,8 +239,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("creates missing UrlAliases on an identifiable, when updating it")
   @Test
-  public void createMissingUrlAliasesOnUpdate()
-      throws ServiceException, CudamiServiceException, ValidationException {
+  public void createMissingUrlAliasesOnUpdate() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -265,8 +259,7 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "throws an exception, when two primary entries for the same (website,target,language) tuple are set")
   @Test
-  public void exceptionOnMultiplePrimaryEntries()
-      throws CudamiServiceException, ValidationException {
+  public void exceptionOnMultiplePrimaryEntries() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     Website website = new Website();
@@ -317,7 +310,7 @@ class IdentifiableServiceImplTest {
       "throws an exception, when two primary entries for the same (null,target,language) tuple are set")
   @Test
   public void exceptionOnMultiplePrimaryEntriesBasedOnSlug()
-      throws CudamiServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -363,7 +356,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("allows two primary entries for different (website,target,language) tuples")
   @Test
   public void allowMultiplePrimariesForDifferentTuples()
-      throws CudamiServiceException, ServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     Website website = new Website();
@@ -405,8 +398,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("update Identifiable w/o localizedUrlAliases")
   @Test
-  public void updateWithoutUrlAliases()
-      throws CudamiServiceException, ServiceException, ValidationException {
+  public void updateWithoutUrlAliases() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -461,8 +453,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("update Identifiable with different primary localizedUrlAliases only")
   @Test
-  public void updateWithPrimaryUrlAliasesOnly()
-      throws CudamiServiceException, ServiceException, ValidationException {
+  public void updateWithPrimaryUrlAliasesOnly() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB (should be unset)
@@ -536,8 +527,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("update Identifiable with only one different primary UrlAlias")
   @Test
-  public void updateWithOnePrimaryUrlAliasOnly()
-      throws CudamiServiceException, ServiceException, ValidationException {
+  public void updateWithOnePrimaryUrlAliasOnly() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB
@@ -604,8 +594,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("update Identifiable with new language and primary UrlAlias")
   @Test
-  public void updateWithAdditionalLanguage()
-      throws CudamiServiceException, ServiceException, ValidationException {
+  public void updateWithAdditionalLanguage() throws ServiceException, ValidationException {
     UUID targetUuid = UUID.randomUUID();
 
     // in DB
@@ -666,8 +655,7 @@ class IdentifiableServiceImplTest {
 
   @DisplayName("Filters out non-provided identifiers on update")
   @Test
-  void updateRemovedNonProvidedIdentifiers()
-      throws ValidationException, ServiceException, CudamiServiceException {
+  void updateRemovedNonProvidedIdentifiers() throws ValidationException, ServiceException {
     UUID uuid = UUID.randomUUID();
 
     Identifiable identifiableToUpdate = new Identifiable();
@@ -727,8 +715,7 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "fills the provided identifiers with the missing values, obtained from the existing identifiers, where present")
   @Test
-  void fillProvidedIdentifiers()
-      throws CudamiServiceException, ValidationException, ServiceException {
+  void fillProvidedIdentifiers() throws ValidationException, ServiceException {
     UUID uuid = UUID.randomUUID();
     UUID[] identifierUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
     // The identifiable, which we want to update, carries one identifier, which is already
@@ -823,8 +810,7 @@ class IdentifiableServiceImplTest {
   @DisplayName(
       "does not generate duplicates for identical slugs for identical languages but different scripts")
   @Test
-  public void avoidDuplicatesForDifferentScripts()
-      throws ValidationException, CudamiServiceException, ServiceException {
+  public void avoidDuplicatesForDifferentScripts() throws ValidationException, ServiceException {
     LocalizedText personName =
         LocalizedText.builder()
             .text(LOCALE_UND_LATN, "Yu ji shan ren")

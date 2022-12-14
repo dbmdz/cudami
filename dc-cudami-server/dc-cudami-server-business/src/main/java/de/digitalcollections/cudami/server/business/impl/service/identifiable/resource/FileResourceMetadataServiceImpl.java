@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -75,20 +74,18 @@ public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<Fil
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id)
-      throws IdentifiableServiceException {
+  public FileResource getByIdentifier(String namespace, String id) throws ServiceException {
     FileResource fileResource = repository.getByIdentifier(namespace, id);
     return getTypeSpecific(fileResource);
   }
 
   @Override
-  public FileResource getByUuid(UUID uuid) throws IdentifiableServiceException {
+  public FileResource getByUuid(UUID uuid) throws ServiceException {
     FileResource fileResource = repository.getByUuid(uuid);
     return getTypeSpecific(fileResource);
   }
 
-  private FileResource getTypeSpecific(FileResource fileResource)
-      throws IdentifiableServiceException {
+  private FileResource getTypeSpecific(FileResource fileResource) throws ServiceException {
     if (fileResource == null) {
       return null;
     }

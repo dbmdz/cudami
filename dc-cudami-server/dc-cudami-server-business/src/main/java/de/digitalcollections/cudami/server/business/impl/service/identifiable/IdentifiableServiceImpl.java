@@ -3,8 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -83,35 +81,28 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public boolean delete(List<UUID> uuids) throws IdentifiableServiceException {
+  public boolean delete(List<UUID> uuids) throws ServiceException {
     for (UUID uuid : uuids) {
       try {
         deleteIdentifiers(uuid);
-      } catch (CudamiServiceException e) {
-        throw new IdentifiableServiceException("Error while removing Identifiers. Rollback.", e);
+      } catch (ServiceException e) {
+        throw new ServiceException("Error while removing Identifiers. Rollback.", e);
       }
       try {
         urlAliasService.deleteAllForTarget(uuid, true);
-      } catch (CudamiServiceException e) {
-        throw new IdentifiableServiceException("Error while removing UrlAliases. Rollback.", e);
+      } catch (ServiceException e) {
+        throw new ServiceException("Error while removing UrlAliases. Rollback.", e);
       }
     }
     return repository.delete(uuids);
   }
 
-  private boolean deleteIdentifiers(UUID identifiableUuid) throws CudamiServiceException {
-    I identifiable;
-    try {
-      identifiable = getByUuid(identifiableUuid);
-    } catch (IdentifiableServiceException e) {
-      throw new CudamiServiceException(e);
-    }
+  private boolean deleteIdentifiers(UUID identifiableUuid) throws ServiceException {
+    I identifiable = getByUuid(identifiableUuid);
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
-
     identifierService.delete(identifiable.getIdentifiers());
-
     return true;
   }
 
@@ -231,17 +222,17 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   }
 
   @Override
-  public I getByIdentifier(String namespace, String id) throws IdentifiableServiceException {
+  public I getByIdentifier(String namespace, String id) throws ServiceException {
     return repository.getByIdentifier(namespace, id);
   }
 
   @Override
-  public I getByUuid(UUID uuid) throws IdentifiableServiceException {
+  public I getByUuid(UUID uuid) throws ServiceException {
     return repository.getByUuid(uuid);
   }
 
   @Override
-  public I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  public I getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
     // getByIdentifier identifiable with all translations:
     I identifiable = getByUuid(uuid);
     return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
@@ -298,30 +289,24 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public void save(I identifiable) throws ServiceException, ValidationException {
-    try {
-      validate(identifiable);
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(e.getMessage());
-    }
-
+    validate(identifiable);
     try {
       repository.save(identifiable);
     } catch (Exception e) {
-      throw new IdentifiableServiceException(
-          "Cannot save identifiable " + identifiable + ": " + e, e);
+      throw new ServiceException("Cannot save identifiable " + identifiable + ": " + e, e);
     }
 
     try {
       identifiable.setIdentifiers(
           identifierService.saveForIdentifiable(
               identifiable.getUuid(), identifiable.getIdentifiers()));
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error(
           String.format(
               "Cannot save Identifiers %s: %s for %s",
               identifiable.getIdentifiers(), e.getMessage(), identifiable),
           e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw e;
     }
 
     try {
@@ -341,9 +326,9 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
         }
         identifiable.setLocalizedUrlAliases(savedUrlAliases);
       }
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw e;
     }
   }
 
@@ -369,11 +354,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
 
   @Override
   public void update(I identifiable) throws ServiceException, ValidationException {
-    try {
-      validate(identifiable);
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(e.getMessage());
-    }
+    validate(identifiable);
 
     I identifiableInDb = repository.getByUuid(identifiable.getUuid());
     if (identifiableInDb == null) {
@@ -387,8 +368,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
     try {
       repository.update(identifiable);
     } catch (Exception e) {
-      throw new IdentifiableServiceException(
-          "Cannot update identifiable " + identifiable + ": " + e, e);
+      throw new ServiceException("Cannot update identifiable " + identifiable + ": " + e, e);
     }
 
     try {
@@ -413,13 +393,13 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
             identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
         providedIdentifiers.addAll(savedIdentifiers);
       }
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error(
           String.format(
               "Cannot save Identifiers %s: %s for %s",
               identifiable.getIdentifiers(), e.getMessage(), identifiable),
           e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw e;
     }
     try {
       // If we do not want any UrlAliases for this kind of identifiable, we return early
@@ -450,21 +430,21 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
           }
         }
       }
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       LOGGER.error("Error while updating URL aliases for " + identifiable, e);
-      throw new IdentifiableServiceException(e.getMessage(), e);
+      throw e;
     }
   }
 
   @Override
-  public void validate(I identifiable) throws CudamiServiceException, ValidationException {
+  public void validate(I identifiable) throws ServiceException, ValidationException {
     if (identifiable.getLabel() == null || identifiable.getLabel().isEmpty()) {
       throw new ValidationException("Missing label");
     }
 
     try {
       identifierService.validate(identifiable.getIdentifiers());
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new ValidationException("Cannot validate: " + e, e);
     }
   }

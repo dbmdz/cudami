@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -134,7 +133,7 @@ public class LinkedDataFileResourceController
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     LinkedDataFileResource result;
     if (pLocale == null) {
       result = service.getByUuid(uuid);

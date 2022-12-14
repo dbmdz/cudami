@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -56,7 +55,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     boolean successful;
     try {
       successful = corporateBodyService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -123,7 +122,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CorporateBody> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -138,7 +137,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CorporateBody> getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     CorporateBody corporateBody = corporateBodyService.getByRefId(refId);
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -166,7 +165,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     CorporateBody corporateBody;
     if (pLocale == null) {

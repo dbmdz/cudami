@@ -3,8 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -46,7 +44,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   }
 
   @Override
-  public Manifestation getByUuid(UUID uuid) throws IdentifiableServiceException {
+  public Manifestation getByUuid(UUID uuid) throws ServiceException {
     Manifestation manifestation = super.getByUuid(uuid);
     return manifestation;
   }
@@ -68,7 +66,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.save(manifestation);
     try {
       persistEntityRelations(manifestation, true);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
   }
@@ -78,13 +76,13 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.update(manifestation);
     try {
       persistEntityRelations(manifestation, false);
-    } catch (CudamiServiceException e) {
+    } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }
   }
 
   private void persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the manifestation
       // If yes, delete them

@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -55,7 +55,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("does not guarantee URLAliases for some entity types")
   @Test
-  public void noUrlAliasesForSomeEntityTypes() throws CudamiServiceException {
+  public void noUrlAliasesForSomeEntityTypes() throws ServiceException {
     DigitalObject identifiable = new DigitalObject();
     identifiable.setLabel("label");
     IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
@@ -65,7 +65,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("can create an LocalizedUrlAlias, when it's missing")
   @Test
-  public void createLocalizedUrlAliasWhenMissing() throws CudamiServiceException {
+  public void createLocalizedUrlAliasWhenMissing() throws ServiceException {
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
     when(slugGeneratorService.apply(any(), any(), any())).thenReturn("label");
@@ -79,7 +79,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("sets all required attribute of a created default UrlAlias")
   @Test
-  public void fillsAttributeOnCreatedDefaultUrlAlias() throws CudamiServiceException {
+  public void fillsAttributeOnCreatedDefaultUrlAlias() throws ServiceException {
     when(slugGeneratorService.apply(any(Locale.class), any(String.class), eq(null)))
         .thenReturn("hallo-welt");
 
@@ -106,7 +106,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("does not create a default UrlAliases for a webpage")
   @Test
-  public void noDefaultUrlAliasCreationForWebpage() throws CudamiServiceException {
+  public void noDefaultUrlAliasCreationForWebpage() throws ServiceException {
     UUID expectedTargetUuid = UUID.randomUUID();
 
     Identifiable identifiable = new Webpage();
@@ -114,7 +114,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
     identifiable.setUuid(expectedTargetUuid);
 
     assertThrows(
-        CudamiServiceException.class,
+        ServiceException.class,
         () -> {
           IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
               identifiable, cudamiConfig, slugGeneratorService);
@@ -125,7 +125,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("adds an url alias for a certain language, when it's missing")
   @Test
-  public void addUrlAliasWhenMissingInLanguage() throws CudamiServiceException {
+  public void addUrlAliasWhenMissingInLanguage() throws ServiceException {
     when(slugGeneratorService.apply(eq(Locale.GERMAN), any(String.class), eq(null)))
         .thenReturn("hallo-welt");
     when(slugGeneratorService.apply(eq(Locale.ENGLISH), any(String.class), eq(null)))
@@ -161,7 +161,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
   @DisplayName(
       "avoids creating an UrlAlias, when slug and languare are the same and only script differs")
   @Test
-  public void doesNotAddUrlAliasWhenOnlyScriptDiffers() throws CudamiServiceException {
+  public void doesNotAddUrlAliasWhenOnlyScriptDiffers() throws ServiceException {
     when(slugGeneratorService.apply(eq(LOCALE_UND), eq("Yu ji shan ren"), eq(null)))
         .thenReturn("yu-ji-shan-ren");
 
@@ -206,7 +206,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
     entity.setLocalizedUrlAliases(localizedUrlALiases);
 
     assertThrows(
-        CudamiServiceException.class,
+        ServiceException.class,
         () -> {
           IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
               entity, cudamiConfig, slugGeneratorService);
@@ -215,15 +215,15 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("throws an Exception, when slug generation fails")
   @Test
-  public void failingSlugGeneration() throws CudamiServiceException {
+  public void failingSlugGeneration() throws ServiceException {
     when(slugGeneratorService.apply(any(Locale.class), any(String.class), eq(null)))
-        .thenThrow(new CudamiServiceException("boo"));
+        .thenThrow(new ServiceException("boo"));
 
     Identifiable identifiable = new Identifiable();
     identifiable.setLabel("label");
 
     assertThrows(
-        CudamiServiceException.class,
+        ServiceException.class,
         () -> {
           IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
               identifiable, cudamiConfig, slugGeneratorService);
@@ -232,7 +232,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("if there are not any aliases then fetch them from object of db")
   @Test
-  public void fetchAliasesfromSavedObject() throws CudamiServiceException {
+  public void fetchAliasesfromSavedObject() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     Identifiable dbIdent = new Identifiable();
@@ -258,7 +258,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("if there are only different primary aliases then unset existing ones - 2 vs. 2")
   @Test
-  public void unsetExistingPrimaries() throws CudamiServiceException {
+  public void unsetExistingPrimaries() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -310,7 +310,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("if there are only different primary aliases then unset existing ones - 1 vs. 2")
   @Test
-  public void unsetExistingPrimary() throws CudamiServiceException {
+  public void unsetExistingPrimary() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -360,7 +360,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("2 existing aliases + 1 new alias")
   @Test
-  public void addNewAlias() throws CudamiServiceException {
+  public void addNewAlias() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -419,7 +419,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("2 existing aliases + 1 new alias, primary too")
   @Test
-  public void addPrimaryAlias() throws CudamiServiceException {
+  public void addPrimaryAlias() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -478,7 +478,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("2 existing aliases, no changes")
   @Test
-  public void doNothingIfNoChanges() throws CudamiServiceException {
+  public void doNothingIfNoChanges() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -532,7 +532,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("2 existing aliases, 1 label changed")
   @Test
-  public void labelChanged() throws CudamiServiceException {
+  public void labelChanged() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -594,7 +594,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("2 existing aliases, 1 label changed + new alias already passed")
   @Test
-  public void labelChangedWithNewAlias() throws CudamiServiceException {
+  public void labelChangedWithNewAlias() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -658,7 +658,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
   @DisplayName(
       "3 existing aliases, 1 label changed + new alias already passed but invalid primary states")
   @Test
-  public void labelChangedWithNewAliasInvalidPrimaries() throws CudamiServiceException {
+  public void labelChangedWithNewAliasInvalidPrimaries() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -731,7 +731,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("1 existing alias, 1 new label -> automatically create new alias")
   @Test
-  public void addLabel() throws CudamiServiceException {
+  public void addLabel() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
@@ -781,7 +781,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
 
   @DisplayName("1 existing alias, 1 new label + fitting alias")
   @Test
-  public void addLabelAndAlias() throws CudamiServiceException {
+  public void addLabelAndAlias() throws ServiceException {
     UUID targetUuid = UUID.randomUUID();
 
     // DB
