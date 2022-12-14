@@ -3,22 +3,40 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
-  <th:block th:fragment="renderIdentifiers(identifiable, hasRefId)">
-    <section class="mb-3 rows-striped">
-      <div class="row mb-1">
-        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
-        <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-      </div>
-      <div class="row mb-1" th:if="${hasRefId}">
-        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
-        <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
-      </div>
-      <div class="row mb-1">
-        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
-        <div class="col-md-9" id="identifiers-list"></div>
-      </div>
-    </section>
+  <th:block th:fragment="renderIdentifiers(identifiers)">
+    <th:block th:each="identifier,iter : ${identifiers}">
+      <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
+    </th:block>
   </th:block>
+
+  <th:block th:fragment="renderTags(tags, language)">
+    <th:block th:each="tag,iter : ${tags}">
+      <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
+    </th:block>
+  </th:block>
+
+  <th:block th:fragment="renderUrlAliases(aliases, language)">
+    <th:block th:if="${aliases}">
+
+    </th:block>
+  </th:block>
+
+  <!--  <th:block th:fragment="renderIdentifiers(identifiable, hasRefId)">
+      <section class="mb-3 rows-striped">
+        <div class="row mb-1">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
+          <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+        </div>
+        <div class="row mb-1" th:if="${hasRefId}">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
+          <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
+        </div>
+        <div class="row mb-1">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
+          <div class="col-md-9" id="identifiers-list"></div>
+        </div>
+      </section>
+    </th:block>-->
 
   <th:block th:fragment="renderLocalizedTeaser(identifiable, languages, hasLongText)">
     <ul class="nav nav-tabs" role="tablist">
@@ -31,7 +49,7 @@
           th:href="${'#' + language}"
           th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
           th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-        >
+          >
           language
         </a>
       </li>
@@ -72,14 +90,15 @@
         <script th:src="@{/js/url-aliases-list.bundle.js}"></script>
         <script th:inline="javascript">
           UrlAliasesList({
-            id: /*[[${'list-of-url-aliases-' + language}]]*/,
-            uiLocale: /*[[${#locale.language}]]*/,
-            urlAliases: /*[[${identifiable.localizedUrlAliases.get(language)}]]*/,
+          id: /*[[${'list-of-url-aliases-' + language}]]*/
+                  ,
+                  uiLocale: /*[[${#locale.language}]]*/,
+                  urlAliases: /*[[${identifiable.localizedUrlAliases.get(language)}]]*/,
           });
         </script>
       </div>
     </div>
 
   </th:block>
-  </body>
+</body>
 </html>

@@ -25,10 +25,10 @@
             <div id="toolbar-rendering_templates">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="rendering_templates-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="rendering_templates-languages">
                   <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -85,13 +85,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#rendering_templates-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#rendering_templates-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#rendering_templates-locales").change(function () {
+        $("#rendering_templates-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -134,8 +134,8 @@
       }
 
       function formatLocalizedText(value, row) {
-        const itemLocale = $("#rendering_templates-locales").val();
-        return renderLocalizedText(value, itemLocale);
+        const dataLanguage = $("#rendering_templates-languages").val();
+        return renderLocalizedText(value, dataLanguage);
       }
       function formatName(value, row) {
         /*[+

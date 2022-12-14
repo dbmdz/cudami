@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{websites}: #{website} &quot;${website.url}&quot;|">Websites: Website "http://www.example.de/"</title>
+    <title th:text="|#{page.title.websites}: #{website} &quot;${website.url}&quot;|">Websites: Website "http://www.example.de/"</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${website}">
@@ -26,27 +26,143 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiers(${website}, true)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderDates(${website})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${website})"></th:block>
+
+        <hr/>
 
         <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${website}, ${existingLanguages}, false)"></th:block>
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.preview_image}">Preview Image</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="fragments/text::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.url_aliases}">URL Aliases</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="fragments/identifiable::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.tags}">Tags</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="fragments/identifiable::renderTags(*{tags}, ${dataLanguage})"></th:block>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.identifiers}">Identifiers</label></div>
+          <div class="col-md-9">
+            <th:block th:insert="fragments/identifiable::renderIdentifiers(*{identifiers})"></th:block>
           </div>
         </div>
 
+        <hr/>
+
         <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{url}">URL</label></div>
-                <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
-              </div>
+          <div class="col-md-3"><label th:text="#{lbl.ref_id}">Reference ID</label></div>
+          <div class="col-md-9" th:text="*{refId}">4711</div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.nav_date}">Navigation date / temporal placement</label></div>
+          <div class="col-md-9"><span th:with="df=#{date.format},date=*{navDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 multilanguage"><label th:text="#{lbl.notes}">Notes</label></div>
+          <div class="col-md-9">
+            <ul class="list-group">
+              <th:block th:each="localizedNote : *{notes}">
+                <li th:if="${localizedNote.get(dataLanguage)}" class="list-group-item"><th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${localizedNote}, ${dataLanguage})"></th:block></li>
+              </th:block>
+            </ul>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.url}">URL</label></div>
+          <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.registration_date}">registered at</label></div>
+          <div class="col-md-9"><span th:with="df=#{date.format},date=*{registrationDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
+        </div>
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.root_webpages}">Root webpages</label></div>
+          <div class="col-md-9">
+            <div id="toolbar-webpages">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">TODOXXXXXXXXXXXXXXXXXXXXXXXXX
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="webpages-languages">
+                  <th:block th:each="locale : ${existingLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
             </div>
+            <table id="table-webpages"
+                   data-toggle="table"
+                   th:data-url="@{/api/websites}"TODOXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                   th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
+                   data-buttons="buttons"
+                   data-cookie="true"
+                   data-cookie-id-table="table-websites"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="label"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-websites"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="url" data-sortable="true" data-formatter="formatUrl" th:text="#{lbl.url}">URL</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
           </div>
         </div>
+
 
         <div class="mt-3 row">
           <div class="col-sm-12">
@@ -58,29 +174,8 @@
   </th:block>
   <section layout:fragment="beforeBodyEnds">
     <script>
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
-    </script>
-    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${website.identifiers}]]*/ []
-      });
-      IdentifiableList({
-      apiContextPath: /*[[@{/}]]*/ '',
-              enableChangeOfOrder: true,
-              existingLanguages: /*[[${existingWebpageLanguages}]]*/,
-      id: "webpage-list",
-              parentType: "website",
-              parentUuid: /*[[${website.uuid}]]*/,
-      showEdit: true,
-              showNew: true,
-              type: "webpage",
-              uiLocale: /*[[${#locale.language}]]*/
-      });
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

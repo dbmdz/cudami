@@ -25,10 +25,10 @@
             <div id="toolbar-corporate_bodies">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="corporate_bodies-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="corporate_bodies-languages">
                   <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -84,13 +84,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#corporate_bodies-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#corporate_bodies-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#corporate_bodies-locales").change(function () {
+        $("#corporate_bodies-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -140,8 +140,8 @@
         /*[+
          const baseUrl = [[@{'/corporatebodies'}]] + '/' + row.uuid;
          +]*/
-        const itemLocale = $("#corporate_bodies-locales").val();
-        return renderLabel(baseUrl, value, itemLocale);
+        const dataLanguage = $("#corporate_bodies-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
       }
 
       function formatPreviewImage(value, row) {

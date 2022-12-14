@@ -99,7 +99,7 @@ function bindTabEvents() {
   });
 }
 
-function formatDate(date, locale, onlyDate = false) {
+function formatDate(date, language, onlyDate = false) {
   /* used to output a date or date with time */
   if (!date) {
     return null;
@@ -112,9 +112,9 @@ function formatDate(date, locale, onlyDate = false) {
     year: 'numeric'
   };
   if (onlyDate) {
-    return dateToFormat.toLocaleDateString(locale, options)
+    return dateToFormat.toLocaleDateString(language, options)
   }
-  return dateToFormat.toLocaleString(locale, {
+  return dateToFormat.toLocaleString(language, {
     ...options,
     hour: '2-digit',
     minute: '2-digit',

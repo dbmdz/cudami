@@ -25,8 +25,8 @@
             <div id="toolbar-projects">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="projects-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="projects-languages">
                   <th:block th:each="locale : ${existingLanguages}">
                     <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
                   </th:block>
@@ -84,13 +84,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#projects-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#projects-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#projects-locales").change(function () {
+        $("#projects-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -140,8 +140,8 @@
         /*[+
          const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
          +]*/
-        const itemLocale = $("#projects-locales").val();
-        return renderLabel(baseUrl, value, itemLocale);
+        const dataLanguage = $("#projects-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
       }
 
       function formatPreviewImage(value, row) {

@@ -58,11 +58,11 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageResponse<Topic> pageResponse =
         service.findTopTopics(
-            createPageRequest(sort, order, itemLocale, localeService, offset, limit, searchTerm));
+            createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm));
     return new BTResponse<>(pageResponse);
   }
 

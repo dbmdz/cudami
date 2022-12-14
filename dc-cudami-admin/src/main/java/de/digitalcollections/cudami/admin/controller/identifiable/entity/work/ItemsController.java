@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 /** Controller for item management pages. */
 @Controller
-public class ItemsController {
+public class ItemsController extends AbstractPagingAndSortingController<Item> {
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiItemsClient service;
@@ -32,10 +33,13 @@ public class ItemsController {
 
   @GetMapping("/items")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "items/list";
   }
 

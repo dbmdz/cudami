@@ -8,15 +8,15 @@
       /*<![CDATA[*/
       function renderDate(value, row) {
         /*[+
-         const locale = [[${#locale.getLanguage()}]];
+         const language = [[${#locale.getLanguage()}]];
          +]*/
-        return formatDate(value, locale, true);
+        return formatDate(value, language, true);
       }
       function renderDateTime(value, row) {
         /*[+
-         const locale = [[${#locale.getLanguage()}]];
+         const language = [[${#locale.getLanguage()}]];
          +]*/
-        return formatDate(value, locale);
+        return formatDate(value, language);
       }
       function renderDeleteAction(baseUrl, itemType, itemId) {
         /*[+
@@ -47,14 +47,14 @@
         }
         return html;
       }
-      function renderLabel(baseUrl, value, locale) {
-        return '<a href="' + baseUrl + '">' + renderLocalizedText(value, locale) + '</a>';
+      function renderLabel(baseUrl, value, language) {
+        return '<a href="' + baseUrl + '">' + renderLocalizedText(value, language) + '</a>';
       }
-      function renderLocalizedText(value, locale) {
+      function renderLocalizedText(value, language) {
         if (value === undefined) {
           return "";
         }
-        return [value[locale]];
+        return [value[language]];
       }
       function renderPreviewImage(previewImage, width, tooltipNoPreviewImage) {
         let html = '<figure class="mb-0 mx-auto" style="max-width: ' + width + 'px;">';

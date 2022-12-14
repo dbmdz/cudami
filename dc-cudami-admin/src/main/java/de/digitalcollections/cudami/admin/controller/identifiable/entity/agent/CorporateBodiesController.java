@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for CorporateBody management pages. */
 @Controller
-public class CorporateBodiesController extends AbstractController {
+public class CorporateBodiesController extends AbstractPagingAndSortingController<CorporateBody> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
@@ -68,10 +68,13 @@ public class CorporateBodiesController extends AbstractController {
 
   @GetMapping("/corporatebodies")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "corporatebodies/list";
   }
 

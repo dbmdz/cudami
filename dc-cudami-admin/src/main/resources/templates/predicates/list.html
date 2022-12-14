@@ -25,10 +25,10 @@
             <div id="toolbar-predicates">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="predicates-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="predicates-languages">
                   <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -81,13 +81,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#predicates-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#predicates-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#predicates-locales").change(function () {
+        $("#predicates-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -124,7 +124,6 @@
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
          const itemType = [[#{lbl.predicate.inline}]];
          +]*/
-        const itemLocale = $("#digitalobjects-locales").val();
         const itemId = row.value;
         return [
           renderViewAction(baseUrl),
@@ -137,8 +136,8 @@
         /*[+
          const baseUrl = [[@{'/predicates'}]] + '/' + row.uuid;
          +]*/
-        const itemLocale = $("#predicates-locales").val();
-        return renderLabel(baseUrl, value, itemLocale);
+        const dataLanguage = $("#predicates-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
       }
       /*]]>*/
     </script>

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.legal;
 
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for license management pages. */
 @Controller
-public class LicensesController {
+public class LicensesController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
 
@@ -75,9 +76,13 @@ public class LicensesController {
 
   @GetMapping("/licenses")
   public String list(Model model) throws TechnicalException {
-    Locale locale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages", languageSortingHelper.sortLanguages(locale, service.getLanguages()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "licenses/list";
   }
 
