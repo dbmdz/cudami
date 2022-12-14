@@ -3,10 +3,12 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -20,6 +22,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
@@ -148,5 +151,23 @@ class DigitalObjectControllerTest extends BaseControllerTest {
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
     verify(digitalObjectService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+  }
+
+  @DisplayName("throws a 404 exception, when update of a not yet existing resource is attempted")
+  @Test
+  public void updatingANonExistingResource() throws Exception {
+    doThrow(ResourceNotFoundException.class)
+        .when(digitalObjectService)
+        .update(any(DigitalObject.class));
+
+    String jsonBody =
+        """
+        {
+          "identifiableObjectType" : "DIGITAL_OBJECT",
+          "uuid" : "39427eac-a6ff-444d-9d2b-3673a8a0a53a"
+        }
+        """;
+
+    testPutJsonWithState("/v6/digitalobjects/39427eac-a6ff-444d-9d2b-3673a8a0a53a", jsonBody, 404);
   }
 }
