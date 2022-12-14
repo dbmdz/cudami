@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.server.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -232,19 +234,36 @@ public abstract class BaseControllerTest {
   /**
    * Check, if the HTML result from a GET request to the given path matches the contents of a HTML
    * file, which lies in src/test/resources under the identically constructed path ( and a .html
-   * suffix of the file name)
+   * suffix of the file name).
+   *
+   * <p>Empty title attributes on a link are ignored!
    *
    * @param path the path of the HTTP GET request and of the HTML file, against which the validation
    *     is made (the file gets a .html suffix)
    * @throws Exception in case of an error
    */
   protected void testHtml(String path) throws Exception {
-    mockMvc
-        .perform(get(path))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(ContentType.TEXT_HTML.getMimeType() + ";charset=UTF-8"))
-        .andExpect(content().string(getHtmlFromFileResource(path)));
+    String actual = mockMvc.perform(get(path)).andReturn().getResponse().getContentAsString();
+    String expected = getHtmlFromFileResource(path);
+
+    Document actualDocument = Jsoup.parse(actual).normalise();
+    removeEmptyTitleAttributes(actualDocument);
+    Document expectedDocument = Jsoup.parse(expected).normalise();
+    removeEmptyTitleAttributes(expectedDocument);
+
+    assertThat(actualDocument.html()).isEqualTo(expectedDocument.html());
+  }
+
+  private void removeEmptyTitleAttributes(Document document) {
+    document
+        .select("a")
+        .forEach(
+            l -> {
+              String titleAttribute = l.attr("title");
+              if (titleAttribute.isEmpty()) {
+                l.removeAttr("title");
+              }
+            });
   }
 
   /**
