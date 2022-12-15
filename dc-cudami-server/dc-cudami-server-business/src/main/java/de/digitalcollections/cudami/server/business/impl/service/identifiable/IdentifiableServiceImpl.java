@@ -362,7 +362,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
           "No "
               + identifiable.getClass().getSimpleName()
               + " found with uuid="
-              + identifiableInDb.getUuid());
+              + identifiable.getUuid());
     }
 
     try {
