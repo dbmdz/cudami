@@ -34,6 +34,7 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,7 +160,7 @@ class ManifestationRepositoryImplTest
 
     var actual = repo.getByUuid(manifestation.getUuid());
     assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
-    assertThat(actual.getTitles()).size().isEqualTo(3);
+    assertThat(actual.getTitles()).size().isEqualTo(4);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
     assertThat(actual.getParents()).isNull();
   }
@@ -199,8 +200,7 @@ class ManifestationRepositoryImplTest
             .expressionType(ExpressionType.builder().mainType("BOOK").subType("PRINT").build())
             .language(Locale.GERMAN)
             .mediaType("BOOK")
-            .title(titles.get(0))
-            .title(titles.get(1))
+            .titles(titles)
             .subject(subject)
             .parent(new RelationSpecification<Manifestation>("The child's title", null, parent))
             .publicationInfo(
@@ -244,17 +244,25 @@ class ManifestationRepositoryImplTest
 
   private List<Title> prepareTitles() {
     List<Title> titles =
-        List.of(
-            Title.builder()
-                .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
-                .titleType(new TitleType("main", "main"))
-                .textLocaleOfOriginalScript(Locale.GERMAN)
-                .textLocaleOfOriginalScript(Locale.ENGLISH)
-                .build(),
-            Title.builder()
-                .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
-                .titleType(new TitleType("main", "sub"))
-                .build());
+        new ArrayList<>(
+            List.of(
+                Title.builder()
+                    .text(new LocalizedText(Locale.GERMAN, "Ein deutscher Titel"))
+                    .titleType(new TitleType("main", "main"))
+                    .textLocaleOfOriginalScript(Locale.GERMAN)
+                    .textLocaleOfOriginalScript(Locale.ENGLISH)
+                    .build(),
+                Title.builder()
+                    .text(new LocalizedText(Locale.GERMAN, "Untertitel"))
+                    .titleType(new TitleType("main", "sub"))
+                    .build(),
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(
+                        new LocalizedText(
+                            Locale.forLanguageTag("und-Latn"),
+                            "Illustrierter Sonntag : das Blatt des gesunden Menschenverstandes. 1929 ## 31.03.1929"))
+                    .build()));
     return titles;
   }
 }
