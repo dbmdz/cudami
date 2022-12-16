@@ -35,6 +35,7 @@ import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -262,6 +263,7 @@ class ManifestationRepositoryImplTest
                         new LocalizedText(
                             Locale.forLanguageTag("und-Latn"),
                             "Illustrierter Sonntag : das Blatt des gesunden Menschenverstandes. 1929 ## 31.03.1929"))
+                    .textLocalesOfOriginalScripts(Collections.emptySet())
                     .build()));
     return titles;
   }

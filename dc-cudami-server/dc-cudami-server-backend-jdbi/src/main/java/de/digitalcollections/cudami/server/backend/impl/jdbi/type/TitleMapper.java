@@ -7,6 +7,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.text.LocalizedText;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -35,7 +36,7 @@ public class TitleMapper implements ColumnMapper<Title> {
     // ("(MAIN,MAIN)","{""de"": ""Ein deutscher Titel""}","{de,en}")
     Matcher valueParts =
         Pattern.compile(
-                "^[(]\\p{Punct}*?(?<titletype>[(].+?[)])\\p{Punct}*?,\\p{Punct}*?(?<text>[{].+?[}])\\p{Punct}*?,(\\p{Punct}*?[{](?<orig>[\\w,_-]+)[}]\\p{Punct}*?)?[)]$",
+                "^[(]\\p{Punct}*?(?<titletype>[(].+?[)])\\p{Punct}*?,\\p{Punct}*?(?<text>[{].+?[}])\\p{Punct}*?,(\\p{Punct}*?(?<orig>[{][\\w,_-]*[}])\\p{Punct}*?)?[)]$",
                 Pattern.UNICODE_CHARACTER_CLASS)
             .matcher(value);
     if (!valueParts.find()) {
@@ -52,11 +53,17 @@ public class TitleMapper implements ColumnMapper<Title> {
       e.printStackTrace();
     }
     Set<Locale> localesOfOriginalScripts = null;
-    if (StringUtils.hasText(valueParts.group("orig"))) {
-      localesOfOriginalScripts =
-          Stream.of(valueParts.group("orig").split(","))
-              .map(s -> Locale.forLanguageTag(s))
-              .collect(Collectors.toSet());
+    if (valueParts.group("orig") != null) {
+      String origs = valueParts.group("orig").replaceFirst("^\\{", "").replaceFirst("\\}$", "");
+      if (StringUtils.hasText(origs)) {
+        localesOfOriginalScripts =
+            Stream.of(origs.split(","))
+                .map(s -> Locale.forLanguageTag(s))
+                .collect(Collectors.toSet());
+      } else {
+        // if an empty set is saved then an empty set will be returned
+        localesOfOriginalScripts = new HashSet<>();
+      }
     }
     return new Title(titleText, localesOfOriginalScripts, titleType);
   }
