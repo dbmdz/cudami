@@ -8,18 +8,14 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesCli
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.text.LocalizedText;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -97,31 +93,21 @@ public class WebsitesController extends AbstractPagingAndSortingController<Websi
     if (website == null) {
       throw new ResourceNotFoundException();
     }
-    Locale displayLocale = LocaleContextHolder.getLocale();
 
-    List<Locale> existingLanguages = Collections.emptyList();
-    LocalizedText label = website.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
-    }
-
-    String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
-    }
-
-    List<Locale> existingWebpageLanguages =
-        website.getRootPages().stream()
-            .flatMap(child -> child.getLabel().getLocales().stream())
-            .collect(Collectors.toList());
-    existingWebpageLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, existingWebpageLanguages);
-
+    List<Locale> existingLanguages =
+        getExistingLanguages(website.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("dataLanguage", dataLanguage)
+        .addAttribute("dataLanguage", dataLanguage);
+
+    List<Locale> existingWebpageLanguages =
+        getExistingLanguagesFromIdentifiables(website.getRootPages(), languageSortingHelper);
+    model
         .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
-        .addAttribute("website", website);
+        .addAttribute("dataLanguageWebpages", getDataLanguage(null, localeService));
+
+    model.addAttribute("website", website);
     return "websites/view";
   }
 }

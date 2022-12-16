@@ -116,23 +116,23 @@
           <div class="col-md-9">
             <div id="toolbar-webpages">
               <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">TODOXXXXXXXXXXXXXXXXXXXXXXXXX
+              <th:block th:if="${not #lists.isEmpty(existingWebpageLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
                 <select id="webpages-languages">
-                  <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+                  <th:block th:each="locale : ${existingWebpageLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageWebpages)}">English</option>
                   </th:block>
                 </select>
               </th:block>
             </div>
-            <table id="table-webpages"
+            <table id="table-website-webpages"
                    data-toggle="table"
-                   th:data-url="@{/api/websites}"TODOXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                   th:data-url="@{/api/websites/__${website.uuid}__/webpages}"
                    th:data-locale="${#locale}"
                    data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsWebpages"
                    data-cookie="true"
-                   data-cookie-id-table="table-websites"
+                   data-cookie-id-table="table-website-webpages"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
@@ -145,16 +145,15 @@
                    data-side-pagination="server"
                    data-sort-name="label"
                    data-sort-order="asc"
-                   data-toolbar="#toolbar-websites"
+                   data-toolbar="#toolbar-webpages"
                    data-unique-id="uuid">
               <thead>
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
-                  <th data-field="url" data-sortable="true" data-formatter="formatUrl" th:text="#{lbl.url}">URL</th>
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="label" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
                   <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
@@ -163,20 +162,86 @@
           </div>
         </div>
 
-
-        <div class="mt-3 row">
-          <div class="col-sm-12">
-            <div id="webpage-list"></div>
-          </div>
-        </div>
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
-    <script>
+    <script type="text/javascript">
       $(addDataLanguageChangeHandler());
       $(moveEditButtonToNavbar());
+
+      const $table = $('#table-website-webpages');
+
+      window.ajaxOptions = {
+        beforeSend: function (jqXHR, settings) {
+          let dataLanguage = $("#webpages-languages").val();
+          settings.url = settings.url + '&dataLanguageWebpages=' + dataLanguage;
+        }
+      };
+
+      $(function () {
+        $("#webpages-languages").change(function () {
+          $table.bootstrapTable('refresh');
+        });
+      });
+
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
     </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function buttonsWebpages() {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         const websiteUuid = [[${website.uuid}]]
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new?parentType=website&parentUuid=' + websiteUuid;
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
+
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl)
+        ].join(' ');
+      }
+
+      function formatLabel(value, row) {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#webpages-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
+
+      function formatPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = row.previewImage;
+        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
+      }
+      /*]]>*/
+    </script>
+
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
   </section>
 </body>
 </html>
