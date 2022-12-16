@@ -91,18 +91,13 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   private void saveRenderingFileResource(FileResource renderingResource)
       throws ValidationException, ServiceException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
-      case "application":
-        applicationFileResourceService.save((ApplicationFileResource) renderingResource);
-      case "audio":
-        audioFileResourceService.save((AudioFileResource) renderingResource);
-      case "image":
-        imageFileResourceService.save((ImageFileResource) renderingResource);
-      case "text":
-        textFileResourceService.save((TextFileResource) renderingResource);
-      case "video":
-        videoFileResourceService.save((VideoFileResource) renderingResource);
-      default:
-        fileResourceMetadataService.save(renderingResource);
+      case "application" -> applicationFileResourceService.save(
+          (ApplicationFileResource) renderingResource);
+      case "audio" -> audioFileResourceService.save((AudioFileResource) renderingResource);
+      case "image" -> imageFileResourceService.save((ImageFileResource) renderingResource);
+      case "text" -> textFileResourceService.save((TextFileResource) renderingResource);
+      case "video" -> videoFileResourceService.save((VideoFileResource) renderingResource);
+      default -> fileResourceMetadataService.save(renderingResource);
     }
   }
 
