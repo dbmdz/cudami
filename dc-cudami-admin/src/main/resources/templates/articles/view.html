@@ -29,7 +29,7 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiers(${article}, true)"></th:block>
+        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${article}, true)"></th:block>
 
         <th:block th:insert="fragments/uniqueobject::renderDates(${article})"></th:block>
 
