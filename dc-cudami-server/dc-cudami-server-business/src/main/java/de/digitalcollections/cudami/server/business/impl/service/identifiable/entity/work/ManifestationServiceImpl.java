@@ -81,7 +81,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     }
   }
 
-  private void persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
+  protected void persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
       throws ServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the manifestation
@@ -94,7 +94,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
         manifestation.getRelations().stream()
             .map(
                 r -> {
-                  r.setObject(manifestation);
+                  r.setObject(Manifestation.builder().uuid(manifestation.getUuid()).build());
                   return r;
                 })
             .collect(Collectors.toList());
