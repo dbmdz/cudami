@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -30,7 +31,8 @@ import org.springframework.stereotype.Service;
 /** Service for Webpage handling. */
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService {
+public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
+    implements WebpageService, ManagedContentService<Webpage> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 
@@ -58,18 +60,27 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   @Override
   public PageResponse<Webpage> findChildren(UUID uuid, PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
+    PageResponse<Webpage> pageResponse =
+        ((NodeRepository<Webpage>) repository).findChildren(uuid, pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
   public PageResponse<Webpage> findRootNodes(PageRequest pageRequest) {
-    return ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
+    PageResponse<Webpage> pageResponse =
+        ((NodeRepository<Webpage>) repository).findRootNodes(pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
   public PageResponse<Webpage> findRootWebpagesForWebsite(
       UUID websiteUuid, PageRequest pageRequest) {
-    return ((WebpageRepository) repository).findRootWebpagesForWebsite(websiteUuid, pageRequest);
+    PageResponse<Webpage> pageResponse =
+        ((WebpageRepository) repository).findRootWebpagesForWebsite(websiteUuid, pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
@@ -96,13 +107,16 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
     if (webpage != null) {
       webpage.setChildren(getActiveChildren(uuid));
     }
+    setPublicationStatus(webpage);
     return webpage;
   }
 
   @Override
   public Webpage getActive(UUID uuid, Locale pLocale) {
     Webpage webpage = getActive(uuid);
-    return reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
+    webpage = reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
+    setPublicationStatus(webpage);
+    return webpage;
   }
 
   @Override
@@ -116,9 +130,12 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   @Override
   public List<Webpage> getActiveChildrenTree(UUID uuid) {
     List<Webpage> webpages = getActiveChildren(uuid);
-    return webpages.stream()
-        .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
-        .collect(Collectors.toList());
+    List<Webpage> list =
+        webpages.stream()
+            .peek(w -> w.setChildren(getActiveChildrenTree(w.getUuid())))
+            .collect(Collectors.toList());
+    setPublicationStatus(list);
+    return list;
   }
 
   @Override
@@ -128,35 +145,48 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
 
   @Override
   public List<Webpage> getChildren(Webpage webpage) {
-    return ((NodeRepository<Webpage>) repository).getChildren(webpage);
+    List<Webpage> children = ((NodeRepository<Webpage>) repository).getChildren(webpage);
+    setPublicationStatus(children);
+    return children;
   }
 
   @Override
   public List<Webpage> getChildren(UUID uuid) {
-    return ((NodeRepository<Webpage>) repository).getChildren(uuid);
+    List<Webpage> children = ((NodeRepository<Webpage>) repository).getChildren(uuid);
+    setPublicationStatus(children);
+    return children;
   }
 
   @Override
   public List<Webpage> getChildrenTree(UUID uuid) {
     List<Webpage> webpages = getChildren(uuid);
-    return webpages.stream()
-        .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
-        .collect(Collectors.toList());
+    List<Webpage> list =
+        webpages.stream()
+            .peek(w -> w.setChildren(getChildrenTree(w.getUuid())))
+            .collect(Collectors.toList());
+    setPublicationStatus(list);
+    return list;
   }
 
   @Override
   public Webpage getParent(UUID webpageUuid) {
-    return ((NodeRepository<Webpage>) repository).getParent(webpageUuid);
+    Webpage parent = ((NodeRepository<Webpage>) repository).getParent(webpageUuid);
+    setPublicationStatus(parent);
+    return parent;
   }
 
   @Override
   public List<Webpage> getParents(UUID uuid) {
-    return ((NodeRepository<Webpage>) repository).getParents(uuid);
+    List<Webpage> parents = ((NodeRepository<Webpage>) repository).getParents(uuid);
+    setPublicationStatus(parents);
+    return parents;
   }
 
   @Override
   public List<Locale> getRootNodesLanguages() {
-    return ((NodeRepository<Webpage>) repository).getRootNodesLanguages();
+    List<Locale> rootNodesLanguages =
+        ((NodeRepository<Webpage>) repository).getRootNodesLanguages();
+    return rootNodesLanguages;
   }
 
   @Override
@@ -177,20 +207,23 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage save(Webpage identifiable)
-      throws IdentifiableServiceException, ValidationException {
-    if (identifiable.getLocalizedUrlAliases() != null
-        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
-      validate(identifiable.getLocalizedUrlAliases());
+  public Webpage save(Webpage webpage) throws IdentifiableServiceException, ValidationException {
+    if (webpage.getLocalizedUrlAliases() != null && !webpage.getLocalizedUrlAliases().isEmpty()) {
+      validate(webpage.getLocalizedUrlAliases());
     }
-    return super.save(identifiable);
+    webpage = super.save(webpage);
+    setPublicationStatus(webpage);
+    return webpage;
   }
 
   @Override
   public Webpage saveWithParent(UUID childUuid, UUID parentUuid)
       throws IdentifiableServiceException {
     try {
-      return ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
+      Webpage webpage =
+          ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
+      setPublicationStatus(webpage);
+      return webpage;
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + childUuid + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -204,8 +237,11 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
       if (webpage.getUuid() == null) {
         webpage = save(webpage);
       }
-      return ((WebpageRepository) repository)
-          .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
+      webpage =
+          ((WebpageRepository) repository)
+              .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
+      setPublicationStatus(webpage);
+      return webpage;
     } catch (IdentifiableServiceException | ValidationException e) {
       LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
       throw new IdentifiableServiceException(e.getMessage());
@@ -213,13 +249,13 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> impleme
   }
 
   @Override
-  public Webpage update(Webpage identifiable)
-      throws IdentifiableServiceException, ValidationException {
-    if (identifiable.getLocalizedUrlAliases() != null
-        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
-      validate(identifiable.getLocalizedUrlAliases());
+  public Webpage update(Webpage webpage) throws IdentifiableServiceException, ValidationException {
+    if (webpage.getLocalizedUrlAliases() != null && !webpage.getLocalizedUrlAliases().isEmpty()) {
+      validate(webpage.getLocalizedUrlAliases());
     }
-    return super.update(identifiable);
+    webpage = super.update(webpage);
+    setPublicationStatus(webpage);
+    return webpage;
   }
 
   @Override

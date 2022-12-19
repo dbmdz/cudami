@@ -6,6 +6,13 @@
   <th:block th:fragment="data-formatter">
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      function renderBoolean(value, row) {
+        if (value === true) {
+          return '<i class="fas fa-check text-success"></i>';
+        } else {
+          return '<i class="fas fa-times text-danger"></i>';
+        }
+      }
       function renderDate(value, row) {
         /*[+
          const language = [[${#locale.getLanguage()}]];
