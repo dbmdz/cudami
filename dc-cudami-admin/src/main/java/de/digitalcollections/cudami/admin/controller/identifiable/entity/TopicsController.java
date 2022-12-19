@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for topics management pages. */
 @Controller
-public class TopicsController extends AbstractController {
+public class TopicsController extends AbstractPagingAndSortingController<Topic> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
@@ -76,10 +76,13 @@ public class TopicsController extends AbstractController {
 
   @GetMapping("/topics")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfTopTopics()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguagesOfTopTopics(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "topics/list";
   }
 

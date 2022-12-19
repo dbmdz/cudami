@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -10,7 +10,6 @@ import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedText;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -35,7 +34,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Controller for predicate management pages. */
 @Controller
 @SessionAttributes(value = {"predicate"})
-public class PredicatesController extends AbstractController {
+public class PredicatesController extends AbstractPagingAndSortingController<Predicate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
@@ -132,11 +131,13 @@ public class PredicatesController extends AbstractController {
 
   @GetMapping("/predicates")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("defaultLanguage", localeService.getDefaultLanguage());
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "predicates/list";
   }
 
@@ -255,18 +256,9 @@ public class PredicatesController extends AbstractController {
     if (predicate == null) {
       throw new ResourceNotFoundException();
     }
-
-    List<Locale> existingLanguages = Collections.emptyList();
-    LocalizedText label = predicate.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
-    }
-
-    String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
-    }
+    List<Locale> existingLanguages =
+        getExistingLanguages(predicate.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
 
     model
         .addAttribute("predicate", predicate)

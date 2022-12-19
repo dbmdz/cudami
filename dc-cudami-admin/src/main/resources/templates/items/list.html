@@ -25,10 +25,10 @@
             <div id="toolbar-items">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="items-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="items-languages">
                   <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -82,13 +82,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#items-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#items-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#items-locales").change(function () {
+        $("#items-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -117,8 +117,8 @@
         /*[+
          const baseUrl = [[@{'/items'}]] + '/' + row.uuid;
          +]*/
-        const itemLocale = $("#items-locales").val();
-        return renderLabel(baseUrl, value, itemLocale);
+        const dataLanguage = $("#items-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
       }
 
       function formatPreviewImage(value, row) {

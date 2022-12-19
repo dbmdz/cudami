@@ -59,23 +59,29 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Website> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, itemLocale);
+        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/websites/{uuid}/webpages")
   @ResponseBody
-  public PageResponse<Webpage> findRootpages(
+  public BTResponse<Webpage> findRootpages(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguageWebpages", required = false) String dataLanguageWebpages)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findRootWebpages(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(
+            sort, order, dataLanguageWebpages, localeService, offset, limit, searchTerm);
+    PageResponse<Webpage> pageResponse = service.findRootWebpages(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/websites/{uuid}")

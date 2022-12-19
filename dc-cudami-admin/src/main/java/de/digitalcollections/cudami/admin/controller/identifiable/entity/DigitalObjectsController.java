@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 /** Controller for digital objects management pages. */
 @Controller
-public class DigitalObjectsController extends AbstractController {
+public class DigitalObjectsController extends AbstractPagingAndSortingController<DigitalObject> {
 
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
@@ -35,11 +35,13 @@ public class DigitalObjectsController extends AbstractController {
 
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("defaultLanguage", localeService.getDefaultLanguage());
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "digitalobjects/list";
   }
 

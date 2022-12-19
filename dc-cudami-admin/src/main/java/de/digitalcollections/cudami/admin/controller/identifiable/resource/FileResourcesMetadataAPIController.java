@@ -63,28 +63,11 @@ public class FileResourcesMetadataAPIController
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<FileResource> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, itemLocale);
+        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
-  }
-
-  @GetMapping("/api/fileresources/{uuid}")
-  @ResponseBody
-  public FileResource getByUuid(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
-  @PostMapping("/api/fileresources")
-  public ResponseEntity save(@RequestBody FileResource fileResource) {
-    try {
-      FileResource fileResourceDb = service.save(fileResource);
-      return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save fileresource: ", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
   }
 
   @GetMapping("/api/fileresources/type/{type}")
@@ -102,6 +85,23 @@ public class FileResourcesMetadataAPIController
       pageRequest.setSorting(sorting);
     }
     return service.findByType(pageRequest, type);
+  }
+
+  @GetMapping("/api/fileresources/{uuid}")
+  @ResponseBody
+  public FileResource getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+    return service.getByUuid(uuid);
+  }
+
+  @PostMapping("/api/fileresources")
+  public ResponseEntity save(@RequestBody FileResource fileResource) {
+    try {
+      FileResource fileResourceDb = service.save(fileResource);
+      return ResponseEntity.status(HttpStatus.CREATED).body(fileResourceDb);
+    } catch (TechnicalException e) {
+      LOGGER.error("Cannot save fileresource: ", e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
   }
 
   @PutMapping("/api/fileresources/{uuid}")

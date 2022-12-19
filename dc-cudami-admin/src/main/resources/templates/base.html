@@ -199,19 +199,35 @@
               <li class="nav-item menu-open">
                 <a href="#" class="nav-link">
                   <p>
-                    <span th:text="#{production}">Production</span>
+                    <span th:text="#{menu.works_and_derivates}">Works and Derivates</span>
                     <i class="right fas fa-angle-left"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a class="nav-link"
-                       th:classappend="${menu == 'articles'} ? active"
-                       th:href="@{/articles}"
-                       th:title="#{articles}"
+                       th:classappend="${menu == 'works'} ? active"
+                       th:href="@{/works}"
+                       th:title="#{works}"
                        >
-                      <i class="far fa-newspaper nav-icon"></i>
-                      <p th:text="#{articles}">Articles</p>
+                      <i class="fas fa-lightbulb nav-icon"></i>
+                      <p th:text="#{works}">Works</p>
+                    </a>
+                  </li>
+                  <!--<li class="nav-item">
+                    <a th:href="@{/manifestations}" th:title="#{manifestations}" class="nav-link">
+                      <i class="fas fa-layer-group nav-icon"></i>
+                      <p th:text="#{manifestations}">Manifestations</p>
+                    </a>
+                  </li>-->
+                  <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${menu == 'items'} ? active"
+                       th:href="@{/items}"
+                       th:title="#{items}"
+                       >
+                      <i class="fas fa-cube nav-icon"></i>
+                      <p th:text="#{items}">Items</p>
                     </a>
                   </li>
                   <li class="nav-item">
@@ -226,12 +242,12 @@
                   </li>
                   <li class="nav-item">
                     <a class="nav-link"
-                       th:classappend="${menu == 'projects'} ? active"
-                       th:href="@{/projects}"
-                       th:title="#{digitization_projects}"
+                       th:classappend="${menu == 'articles'} ? active"
+                       th:href="@{/articles}"
+                       th:title="#{articles}"
                        >
-                      <i class="fas fa-industry nav-icon"></i>
-                      <p th:text="#{digitization_projects}">(Digitization-)Projects</p>
+                      <i class="far fa-newspaper nav-icon"></i>
+                      <p th:text="#{articles}">Articles</p>
                     </a>
                   </li>
                 </ul>
@@ -240,23 +256,32 @@
               <li class="nav-item menu-open">
                 <a href="#" class="nav-link">
                   <p>
-                    <span th:text="#{objects}">Objects</span>
+                    <span th:text="#{menu.stock_development}">Stock Development</span>
                     <i class="right fas fa-angle-left"></i>
                   </p>
                 </a>
                 <ul class="nav nav-treeview">
-                  <!--<li class="nav-item">
-                    <a th:href="@{/manifestations}" th:title="#{manifestations}" class="nav-link">
-                      <i class="fas fa-layer-group nav-icon"></i>
-                      <p th:text="#{manifestations}">Manifestations</p>
+                  <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${menu == 'projects'} ? active"
+                       th:href="@{/projects}"
+                       th:title="#{digitization_projects}"
+                       >
+                      <i class="fas fa-industry nav-icon"></i>
+                      <p th:text="#{menu.digitization_projects}">Digitization-Projects</p>
                     </a>
                   </li>
-                  <li class="nav-item">
-                    <a th:href="@{/expressions}" th:title="#{expressions}" class="nav-link">
-                      <i class="far fa-comment-dots nav-icon"></i>
-                      <p th:text="#{expressions}">Expressions</p>
-                    </a>
-                  </li>-->
+                </ul>
+              </li>
+              
+              <li class="nav-item menu-open">
+                <a href="#" class="nav-link">
+                  <p>
+                    <span th:text="#{menu.contextual_objects}">Contextual Objects</span>
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a class="nav-link"
                        th:classappend="${menu == 'persons'} ? active"
@@ -285,26 +310,6 @@
                        >
                       <i class="fas fa-map-marker-alt nav-icon"></i>
                       <p th:text="#{geolocations}">Geolocations</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link"
-                       th:classappend="${menu == 'works'} ? active"
-                       th:href="@{/works}"
-                       th:title="#{works}"
-                       >
-                      <i class="fas fa-lightbulb nav-icon"></i>
-                      <p th:text="#{works}">Works</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link"
-                       th:classappend="${menu == 'items'} ? active"
-                       th:href="@{/items}"
-                       th:title="#{items}"
-                       >
-                      <i class="fas fa-cube nav-icon"></i>
-                      <p th:text="#{items}">Items</p>
                     </a>
                   </li>
                 </ul>

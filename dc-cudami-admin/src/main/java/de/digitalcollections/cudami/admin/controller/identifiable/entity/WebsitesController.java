@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -11,7 +11,6 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for website management pages. */
 @Controller
-public class WebsitesController extends AbstractController {
+public class WebsitesController extends AbstractPagingAndSortingController<Website> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
@@ -69,10 +68,13 @@ public class WebsitesController extends AbstractController {
 
   @GetMapping("/websites")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "websites/list";
   }
 
@@ -82,25 +84,30 @@ public class WebsitesController extends AbstractController {
   }
 
   @GetMapping("/websites/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Website website = service.getByUuid(uuid);
     if (website == null) {
       throw new ResourceNotFoundException();
     }
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, website.getLabel().getLocales());
-    List<Locale> existingWebpageLanguages =
-        website.getRootPages().stream()
-            .flatMap(child -> child.getLabel().getLocales().stream())
-            .collect(Collectors.toList());
+        getExistingLanguages(website.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute(
-            "existingWebpageLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingWebpageLanguages))
-        .addAttribute("website", website);
+        .addAttribute("dataLanguage", dataLanguage);
+
+    List<Locale> existingWebpageLanguages =
+        getExistingLanguagesFromIdentifiables(website.getRootPages(), languageSortingHelper);
+    model
+        .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
+        .addAttribute("dataLanguageWebpages", getDataLanguage(null, localeService));
+
+    model.addAttribute("website", website);
     return "websites/view";
   }
 }

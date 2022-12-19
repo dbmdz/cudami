@@ -38,10 +38,10 @@ public class WorksAPIController extends AbstractPagingAndSortingController<Work>
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Work> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, itemLocale);
+        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 }

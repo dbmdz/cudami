@@ -25,10 +25,10 @@
             <div id="toolbar-licenses">
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                <select name="locales" id="licenses-locales">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="licenses-languages">
                   <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -85,13 +85,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#licenses-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#licenses-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#licenses-locales").change(function () {
+        $("#licenses-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -141,8 +141,8 @@
       }
 
       function formatLabel(value, row) {
-        const itemLocale = $("#licenses-locales").val();
-        return renderLocalizedText(value, itemLocale);
+        const dataLanguage = $("#licenses-languages").val();
+        return renderLocalizedText(value, dataLanguage);
       }
 
       function formatUrl(value, row) {

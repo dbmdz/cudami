@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -28,7 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for rendering template management pages. */
 @Controller
-public class RenderingTemplatesController extends AbstractController {
+public class RenderingTemplatesController
+    extends AbstractPagingAndSortingController<RenderingTemplate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
@@ -82,10 +83,13 @@ public class RenderingTemplatesController extends AbstractController {
 
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
-    Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages());
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
     model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "renderingtemplates/list";
   }
 

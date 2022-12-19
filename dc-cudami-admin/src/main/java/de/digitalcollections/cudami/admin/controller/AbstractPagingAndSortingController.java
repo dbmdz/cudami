@@ -1,16 +1,25 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.util.CollectionUtils;
 
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     extends AbstractController {
@@ -19,7 +28,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   protected PageRequest createPageRequest(
       String sort,
       String order,
-      String itemLocale,
+      String dataLanguage,
       CudamiLocalesClient localeService,
       int offset,
       int limit,
@@ -29,10 +38,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     if (sort != null && order != null) {
       Order sortingOrder;
       if ("label".equals(sort)) {
-        String language = itemLocale;
-        if (language == null && localeService != null) {
-          language = localeService.getDefaultLanguage().getLanguage();
-        }
+        String language = getDataLanguage(dataLanguage, localeService);
         sortingOrder =
             Order.builder()
                 .property("label")
@@ -63,12 +69,56 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       String searchTerm,
       String sort,
       String order,
-      String itemLocale)
+      String dataLanguage)
       throws TechnicalException {
 
     PageRequest pageRequest =
-        createPageRequest(sort, order, itemLocale, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<T> pageResponse = service.find(pageRequest);
     return pageResponse;
+  }
+
+  protected String getDataLanguage(String targetDataLanguage, CudamiLocalesClient localeService)
+      throws TechnicalException {
+    String dataLanguage = targetDataLanguage;
+    if (dataLanguage == null && localeService != null) {
+      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    }
+    return dataLanguage;
+  }
+
+  protected List<Locale> getExistingLanguages(
+      LocalizedText localizedText, LanguageSortingHelper languageSortingHelper) {
+    List<Locale> existingLanguages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(localizedText)) {
+      existingLanguages =
+          languageSortingHelper.sortLanguages(
+              LocaleContextHolder.getLocale(), localizedText.getLocales());
+    }
+    return existingLanguages;
+  }
+
+  protected List<Locale> getExistingLanguages(
+      List<Locale> locales, LanguageSortingHelper languageSortingHelper) {
+    List<Locale> existingLanguages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(locales)) {
+      existingLanguages =
+          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), locales);
+    }
+    return existingLanguages;
+  }
+
+  protected List<Locale> getExistingLanguagesFromIdentifiables(
+      List<? extends Identifiable> identifiables, LanguageSortingHelper languageSortingHelper) {
+    List<Locale> existingLanguages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(identifiables)) {
+      existingLanguages =
+          identifiables.stream()
+              .flatMap(child -> child.getLabel().getLocales().stream())
+              .collect(Collectors.toList());
+      existingLanguages =
+          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
+    }
+    return existingLanguages;
   }
 }

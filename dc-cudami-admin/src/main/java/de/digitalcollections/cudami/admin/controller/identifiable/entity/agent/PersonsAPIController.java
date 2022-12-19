@@ -58,10 +58,10 @@ public class PersonsAPIController extends AbstractPagingAndSortingController<Per
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "itemLocale", required = false) String itemLocale)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Person> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, itemLocale);
+        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

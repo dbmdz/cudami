@@ -27,10 +27,10 @@
               <div id="toolbar-fileresources">
                 <!-- TODO it always contains "und" undefined language? -->
                 <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                  <span th:text="#{lbl.itemlocale}">Show language dependent values in</span>&nbsp;
-                  <select name="locales" id="fileresources-locales">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select id="fileresources-languages">
                     <th:block th:each="locale : ${existingLanguages}">
-                      <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, defaultLanguage)}">English</option>
+                      <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
                     </th:block>
                   </select>
                 </th:block>
@@ -88,13 +88,13 @@
 
       window.ajaxOptions = {
         beforeSend: function (jqXHR, settings) {
-          let itemLocale = $("#fileresources-locales").val();
-          settings.url = settings.url + '&itemLocale=' + itemLocale;
+          let dataLanguage = $("#fileresources-languages").val();
+          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
         }
       };
 
       $(function () {
-        $("#fileresources-locales").change(function () {
+        $("#fileresources-languages").change(function () {
           $table.bootstrapTable('refresh');
         });
       });
@@ -144,8 +144,8 @@
         /*[+
          const baseUrl = [[@{'/fileresources'}]] + '/' + row.uuid;
          +]*/
-        const itemLocale = $("#fileresources-locales").val();
-        return renderLabel(baseUrl, value, itemLocale);
+        const dataLanguage = $("#fileresources-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
       }
 
       function formatPreviewImage(value, row) {

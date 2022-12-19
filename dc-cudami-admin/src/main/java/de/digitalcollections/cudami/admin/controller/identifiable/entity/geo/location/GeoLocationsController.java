@@ -1,8 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -21,24 +22,29 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 /** Controller for GeoLocations management pages. */
 @Controller
-public class GeoLocationsController extends AbstractController {
+public class GeoLocationsController extends AbstractPagingAndSortingController<GeoLocation> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
   private final LanguageSortingHelper languageSortingHelper;
+  private final CudamiLocalesClient localeService;
   private final CudamiGeoLocationsClient service;
 
   public GeoLocationsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
+    this.localeService = client.forLocales();
     this.service = client.forGeoLocations();
   }
 
   @GetMapping("/geolocations")
   public String list(Model model) throws TechnicalException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    model.addAttribute(
-        "existingLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguages()));
+    List<Locale> existingLanguages =
+        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    model.addAttribute("existingLanguages", existingLanguages);
+
+    String dataLanguage = getDataLanguage(null, localeService);
+    model.addAttribute("dataLanguage", dataLanguage);
+
     return "geolocations/list";
   }
 

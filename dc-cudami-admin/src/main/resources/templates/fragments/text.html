@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="renderLocalizedStructuredContent(localizedStructuredContent, language)">
+    <th:block th:if="${localizedStructuredContent}">
+      <th:block th:if="${language}" th:with="structuredContent=${localizedStructuredContent.get(#locale.forLanguageTag(language))}">
+        <th:block th:if="${structuredContent}">
+          <th:block th:insert="cudami/fragments/structuredcontent::renderContentBlocks(${structuredContent.contentBlocks})"></th:block>
+        </th:block>
+      </th:block>
+    </th:block>
+  </th:block>
+
+  <th:block th:fragment="renderLocalizedText(localizedText, language)">
+    <th:block th:if="${localizedText}">
+      <th:block th:if="${language}">
+        <th:block th:utext="${localizedText.getText(#locale.forLanguageTag(language))}">...</th:block>
+      </th:block>
+    </th:block>
+  </th:block>
+
+</body>
+</html>
