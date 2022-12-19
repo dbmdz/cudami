@@ -17,7 +17,15 @@
 
   <th:block th:fragment="renderUrlAliases(aliases, language)">
     <th:block th:if="${aliases}">
-      TODO rendering in fragments/identifiable.html
+      <ul class="list-group">
+      <th:block th:with="urlAliases=${aliases.get(#locale.forLanguageTag(language))}">
+        <li th:each="urlAlias : ${urlAliases}" class="list-group-item d-flex justify-content-between">
+          <span th:text="|/${urlAlias.slug}|">/slug</span>
+          <small th:if="${urlAlias.primary}" th:text="#{primaryAlias}">Primary URL</small>
+          <small th:if="${urlAlias.lastPublished != null}" th:with="df=#{date.format}" th:text="#{last_published(__${#temporals.format(urlAlias.lastPublished, df)}__)}">01.01.2023</small>
+        </li>
+      </ul>
+      </th:block>
     </th:block>
   </th:block>
 
