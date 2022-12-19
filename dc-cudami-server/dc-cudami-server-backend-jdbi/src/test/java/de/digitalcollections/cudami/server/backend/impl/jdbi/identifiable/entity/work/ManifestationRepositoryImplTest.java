@@ -26,6 +26,8 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
@@ -164,6 +166,22 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getTitles()).size().isEqualTo(4);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
     assertThat(actual.getParents()).isNull();
+  }
+
+  @Test
+  @DisplayName("2.0. Find any manifestation")
+  void testFind() throws RepositoryException {
+    Subject subject = ensurePersistedSubject();
+    Manifestation parent = ensurePersistedParentManifestation();
+    List<Title> titles = prepareTitles();
+    Manifestation manifestation = prepareManifestation(subject, parent, titles);
+    repo.save(manifestation);
+
+    PageResponse<Manifestation> actual = repo.find(new PageRequest(0, 10));
+    assertThat(actual.getTotalElements()).isEqualTo(2);
+    assertThat(actual.getContent()).size().isEqualTo(2);
+    assertThat(actual.getContent().stream().map(m -> m.getUuid()).toList())
+        .contains(manifestation.getUuid(), parent.getUuid());
   }
 
   // -------------------------------------------------------------------

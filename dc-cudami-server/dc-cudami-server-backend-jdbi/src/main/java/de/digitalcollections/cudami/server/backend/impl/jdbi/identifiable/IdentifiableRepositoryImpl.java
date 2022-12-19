@@ -728,7 +728,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
-            + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
+            + (sqlSelectAllFieldsJoins != null ? " " + sqlSelectAllFieldsJoins : "")
             + " LEFT JOIN "
             + IdentifierRepositoryImpl.TABLE_NAME
             + " AS "
