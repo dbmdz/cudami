@@ -40,7 +40,7 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiers(${topic}, true)"></th:block>
+        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${topic}, true)"></th:block>
 
         <th:block th:insert="fragments/uniqueobject::renderDates(${topic})"></th:block>
 

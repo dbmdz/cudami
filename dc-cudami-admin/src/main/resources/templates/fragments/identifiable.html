@@ -17,26 +17,26 @@
 
   <th:block th:fragment="renderUrlAliases(aliases, language)">
     <th:block th:if="${aliases}">
-TODO rendering in fragments/identifiable.html
+      TODO rendering in fragments/identifiable.html
     </th:block>
   </th:block>
 
-  <!--  <th:block th:fragment="renderIdentifiers(identifiable, hasRefId)">
-      <section class="mb-3 rows-striped">
-        <div class="row mb-1">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
-          <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-        </div>
-        <div class="row mb-1" th:if="${hasRefId}">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
-          <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
-        </div>
-        <div class="row mb-1">
-          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
-          <div class="col-md-9" id="identifiers-list"></div>
-        </div>
-      </section>
-    </th:block>-->
+  <th:block th:fragment="renderIdentifiersAndRefId(identifiable, hasRefId)">
+    <section class="mb-3 rows-striped">
+      <div class="row mb-1">
+        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
+        <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+      </div>
+      <div class="row mb-1" th:if="${hasRefId}">
+        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
+        <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
+      </div>
+      <div class="row mb-1">
+        <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
+        <div class="col-md-9" id="identifiers-list"></div>
+      </div>
+    </section>
+  </th:block>
 
   <th:block th:fragment="renderLocalizedTeaser(identifiable, languages, hasLongText)">
     <ul class="nav nav-tabs" role="tablist">

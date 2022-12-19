@@ -43,7 +43,7 @@
     <!-- Main content -->
     <div class="content">
       <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiers(${webpage}, false)"></th:block>
+        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${webpage}, false)"></th:block>
 
         <th:block th:insert="fragments/uniqueobject::renderDates(${webpage})"></th:block>
 
