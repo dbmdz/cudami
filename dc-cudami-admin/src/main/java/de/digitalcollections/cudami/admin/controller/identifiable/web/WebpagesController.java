@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
-import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -11,33 +11,24 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /** Controller for webpage management pages. */
 @Controller
-public class WebpagesController extends AbstractController {
+public class WebpagesController extends AbstractPagingAndSortingController<Webpage> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
 
@@ -72,12 +63,6 @@ public class WebpagesController extends AbstractController {
     return "webpages/create";
   }
 
-  @GetMapping("/api/webpages/new")
-  @ResponseBody
-  public Webpage create() throws TechnicalException {
-    return service.create();
-  }
-
   @GetMapping("/webpages/{uuid}/edit")
   public String edit(
       @PathVariable UUID uuid,
@@ -106,24 +91,6 @@ public class WebpagesController extends AbstractController {
     return "webpages/edit";
   }
 
-  @GetMapping("/api/webpages/{uuid}/webpages")
-  @ResponseBody
-  public PageResponse<Webpage> findSubpages(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubpages(uuid, pageRequest);
-  }
-
-  @GetMapping("/api/webpages/{uuid}")
-  @ResponseBody
-  public Webpage getByUuid(@PathVariable UUID uuid) throws TechnicalException {
-    return service.getByUuid(uuid);
-  }
-
   private Website getWebsite(UUID uuid, String parentType) throws TechnicalException {
     if (parentType == null || "webpage".equals(parentType.toLowerCase())) {
       return service.getWebsite(uuid);
@@ -138,80 +105,38 @@ public class WebpagesController extends AbstractController {
     return "webpages";
   }
 
-  @PostMapping("/api/webpages")
-  public ResponseEntity save(
-      @RequestBody Webpage webpage,
-      @RequestParam("parentType") String parentType,
-      @RequestParam("parentUuid") UUID parentUuid) {
-    try {
-      Webpage webpageDb = null;
-      if (parentType.equals("website")) {
-        webpageDb = service.saveWithParentWebsite(webpage, parentUuid);
-      } else {
-        webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
-      }
-      return ResponseEntity.status(HttpStatus.CREATED).body(webpageDb);
-    } catch (TechnicalException e) {
-      if (parentType.equals("website")) {
-        LOGGER.error("Cannot save top-level webpage: ", e);
-      } else if (parentType.equals("webpage")) {
-        LOGGER.error("Cannot save webpage: ", e);
-      }
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-  }
-
-  @PutMapping("/api/webpages/{uuid}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) {
-    try {
-      Webpage webpageDb = service.update(uuid, webpage);
-      return ResponseEntity.ok(webpageDb);
-    } catch (TechnicalException e) {
-      LOGGER.error("Cannot save webpage with uuid={}", uuid, e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-    }
-  }
-
-  @PutMapping("/api/webpages/{uuid}/webpages")
-  public ResponseEntity updateSubpagesOrder(
-      @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws TechnicalException {
-    boolean successful = service.updateChildrenOrder(uuid, subpages);
-    if (successful) {
-      return new ResponseEntity<>(successful, HttpStatus.OK);
-    }
-    return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
-  }
-
   @GetMapping("/webpages/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = service.getByUuid(uuid);
     if (webpage == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
-    List<Locale> existingSubpageLanguages =
-        webpage.getChildren().stream()
-            .flatMap(child -> child.getLabel().getLocales().stream())
-            .collect(Collectors.toList());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute(
-        "existingSubpageLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, existingSubpageLanguages));
     model.addAttribute("webpage", webpage);
+
+    List<Locale> existingLanguages =
+        getExistingLanguages(webpage.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
+    List<Locale> existingSubpageLanguages =
+        getExistingLanguagesFromIdentifiables(webpage.getChildren(), languageSortingHelper);
+    model
+        .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
+        .addAttribute("dataLanguageSubpages", getDataLanguage(null, localeService));
 
     List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
-
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
-    // it is
-    // handled individually
+    // it is handled individually
     breadcrumbs.removeIf(n -> n.getTargetId() == null);
     model.addAttribute("breadcrumbs", breadcrumbs);
 
