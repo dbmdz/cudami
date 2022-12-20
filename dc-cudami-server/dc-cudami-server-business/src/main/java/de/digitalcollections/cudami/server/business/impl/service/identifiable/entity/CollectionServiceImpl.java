@@ -7,10 +7,12 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -79,6 +81,20 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public PageResponse<Collection> find(PageRequest pageRequest) {
+    PageResponse<Collection> pageResponse = super.find(pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
+  }
+
+  @Override
+  public List<Collection> find(String searchTerm, int maxResults) {
+    List<Collection> collections = super.find(searchTerm, maxResults);
+    setPublicationStatus(collections);
+    return collections;
+  }
+
+  @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
@@ -92,6 +108,15 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     PageResponse<Collection> pageResponse = findChildren(uuid, pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
+  }
+
+  @Override
+  public PageResponse<Collection> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial) {
+    PageResponse<Collection> pageResponse =
+        super.findByLanguageAndInitial(pageRequest, language, initial);
     setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
@@ -155,8 +180,58 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public List<Collection> getAllFull() {
+    List<Collection> collections = super.getAllFull();
+    setPublicationStatus(collections);
+    return collections;
+  }
+
+  @Override
+  public List<Collection> getAllReduced() {
+    List<Collection> collections = super.getAllReduced();
+    setPublicationStatus(collections);
+    return collections;
+  }
+
+  @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
     return ((NodeRepository<Collection>) repository).getBreadcrumbNavigation(nodeUuid);
+  }
+
+  @Override
+  public Collection getByIdentifier(Identifier identifier) {
+    Collection collection = super.getByIdentifier(identifier);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByIdentifier(String namespace, String id) {
+    Collection collection = super.getByIdentifier(namespace, id);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByRefId(long refId) {
+    Collection collection = super.getByRefId(refId);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByUuid(UUID uuid) {
+    Collection collection = super.getByUuid(uuid);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByUuidAndLocale(UUID uuid, Locale locale)
+      throws IdentifiableServiceException {
+    Collection collection = super.getByUuidAndLocale(uuid, locale);
+    setPublicationStatus(collection);
+    return collection;
   }
 
   @Override
@@ -181,6 +256,13 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
+  public List<Collection> getRandom(int count) {
+    List<Collection> collections = super.getRandom(count);
+    setPublicationStatus(collections);
+    return collections;
+  }
+
+  @Override
   public List<Locale> getRootNodesLanguages() {
     return ((NodeRepository<Collection>) repository).getRootNodesLanguages();
   }
@@ -199,6 +281,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   @Override
   public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject) {
     return ((CollectionRepository) repository).removeDigitalObjectFromAllCollections(digitalObject);
+  }
+
+  @Override
+  public Collection save(Collection entity)
+      throws IdentifiableServiceException, ValidationException {
+    Collection collection = super.save(entity);
+    setPublicationStatus(collection);
+    return collection;
   }
 
   @Override
@@ -227,6 +317,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
    */
   protected void setNodeRepository(NodeRepository<Collection> nodeRepository) {
     repository = nodeRepository;
+  }
+
+  @Override
+  public Collection update(Collection entity)
+      throws IdentifiableServiceException, ValidationException {
+    Collection collection = super.update(entity);
+    setPublicationStatus(collection);
+    return collection;
   }
 
   @Override

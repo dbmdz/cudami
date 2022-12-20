@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -52,10 +53,33 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
   }
 
   @Override
+  public PageResponse<Webpage> find(PageRequest pageRequest) {
+    PageResponse<Webpage> pageResponse = super.find(pageRequest);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
+  }
+
+  @Override
+  public List<Webpage> find(String searchTerm, int maxResults) {
+    List<Webpage> webpages = super.find(searchTerm, maxResults);
+    setPublicationStatus(webpages);
+    return webpages;
+  }
+
+  @Override
   public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
     return findChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<Webpage> findByLanguageAndInitial(
+      PageRequest pageRequest, String language, String initial) {
+    PageResponse<Webpage> pageResponse =
+        super.findByLanguageAndInitial(pageRequest, language, initial);
+    setPublicationStatus(pageResponse.getContent());
+    return pageResponse;
   }
 
   @Override
@@ -83,23 +107,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
     return pageResponse;
   }
 
-  // TODO: test if webpages work as expected (using now IdentifiableServiceImpl logic)
-  //  @Override
-  //  public Webpage getByIdentifier(UUID uuid, Locale locale) throws IdentifiableServiceException {
-  //    Webpage webpage = super.getByIdentifier(uuid, locale);
-  //    if (webpage == null) {
-  //      return null;
-  //    }
-  //
-  //    // getByIdentifier the already filtered language to compare with
-  //    Locale fLocale = webpage.getLabel().entrySet().iterator().next().getKey();
-  //    // filter out not requested translations of fields not already filtered
-  //    if (webpage.getText() != null) {
-  //      webpage.getText().entrySet().removeIf((Map.Entry entry) ->
-  // !entry.getKey().equals(fLocale));
-  //    }
-  //    return webpage;
-  //  }
   @Override
   public Webpage getActive(UUID uuid) {
     Filtering filtering = filteringForActive();
@@ -139,8 +146,50 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
   }
 
   @Override
+  public List<Webpage> getAllFull() {
+    List<Webpage> webpages = super.getAllFull();
+    setPublicationStatus(webpages);
+    return webpages;
+  }
+
+  @Override
+  public List<Webpage> getAllReduced() {
+    List<Webpage> webpages = super.getAllReduced();
+    setPublicationStatus(webpages);
+    return webpages;
+  }
+
+  @Override
   public BreadcrumbNavigation getBreadcrumbNavigation(UUID uuid) {
     return ((NodeRepository<Webpage>) repository).getBreadcrumbNavigation(uuid);
+  }
+
+  @Override
+  public Webpage getByIdentifier(Identifier identifier) {
+    Webpage webpage = super.getByIdentifier(identifier);
+    setPublicationStatus(webpage);
+    return webpage;
+  }
+
+  @Override
+  public Webpage getByIdentifier(String namespace, String id) {
+    Webpage webpage = super.getByIdentifier(namespace, id);
+    setPublicationStatus(webpage);
+    return webpage;
+  }
+
+  @Override
+  public Webpage getByUuid(UUID uuid) {
+    Webpage webpage = super.getByUuid(uuid);
+    setPublicationStatus(webpage);
+    return webpage;
+  }
+
+  @Override
+  public Webpage getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+    Webpage webpage = super.getByUuidAndLocale(uuid, locale);
+    setPublicationStatus(webpage);
+    return webpage;
   }
 
   @Override
