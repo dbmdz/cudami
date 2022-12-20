@@ -3,13 +3,34 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
+  <th:block th:fragment="renderFields(entity)" th:object="${entity}">
+    <div class="row">
+      <div class="col-md-3"><label th:text="#{lbl.ref_id}">Reference ID</label></div>
+      <div class="col-md-9" th:text="*{refId}">4711</div>
+    </div>
+    <div class="row">
+      <div class="col-md-3"><label th:text="#{lbl.nav_date}">Navigation date / temporal placement</label></div>
+      <div class="col-md-9"><span th:with="df=#{date.format},date=*{navDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 multilanguage"><label th:text="#{lbl.notes}">Notes</label></div>
+      <div class="col-md-9">
+        <ul class="list-group">
+          <th:block th:each="localizedNote : *{notes}">
+            <li th:if="${localizedNote.get(#locale.forLanguageTag(language))}" class="list-group-item"><th:block th:insert="fragments/text::renderLocalizedStructuredContent(${localizedNote}, ${dataLanguage})"></th:block></li>
+          </th:block>
+        </ul>
+      </div>
+    </div>
+  </th:block>
+
   <th:block th:fragment="renderNotes(notes)">
     <h2 th:text="#{notes}">Notes</h2>
     <th:block
       th:each="localizedNote,iter : ${notes}"
       th:insert="::renderLocalizedNote(localizedNote, idx)"
       th:with="idx=${iter.index}"
-    ></th:block>
+      ></th:block>
   </th:block>
 
   <th:block th:fragment="renderLocalizedNote(localizedNote, idx)">
@@ -23,7 +44,7 @@
           th:href="${'#note-' + idx + '-' + note.key}"
           th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
           th:with="languageToDisplay=${note.key.getDisplayName(#locale)}"
-        >
+          >
           language
         </a>
       </li>
@@ -39,5 +60,5 @@
     </div>
   </th:block>
 
-  </body>
+</body>
 </html>
