@@ -98,11 +98,11 @@
          const tooltipNoLongerPublished = [[#{tooltip.no_longer_published}]];
          +]*/
         if (value === 'NOT_YET_PUBLISHED') {
-          return '<span class="badge badge-pill badge-warning" title="' + tooltipNotYetPublished + '">&nbsp;</span>';
+          return '<i aria-hidden="true" class="fa fa-circle text-warning" title="' + tooltipNotYetPublished + '"></i>';
         } else if (value === 'PUBLISHED') {
-          return '<span class="badge badge-pill badge-success" title="' + tooltipPublished + '">&nbsp;</span>';
+          return '<i aria-hidden="true" class="fa fa-circle text-success" title="' + tooltipPublished + '"></i>';
         } else if (value === 'NO_LONGER_PUBLISHED') {
-          return '<span class="badge badge-pill badge-danger" title="' + tooltipNoLongerPublished + '">&nbsp;</span>';
+          return '<i aria-hidden="true" class="fa fa-circle text-danger" title="' + tooltipNoLongerPublished + '"></i>';
         }
         return value;
       }
