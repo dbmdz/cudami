@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+  <th:block th:fragment="renderFields(managedContent)" th:object="${managedContent}">
+    <div class="row">
+      <div class="col-md-3">
+        <label th:text="#{publicationStatus}">Publication status</label>
+        <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
+          <i class="fas fa-question-circle"></i>
+        </button>
+      </div>
+      <div class="align-items-center col-md-9 d-flex">
+        <th:block th:if="${managedContent.publicationStatus.name()} == 'NOT_YET_PUBLISHED'">
+          <i aria-hidden="true" class="fa fa-circle text-warning pr-1" th:title="#{tooltip.not_yet_published}"></i>
+        </th:block>
+        <th:block th:if="${managedContent.publicationStatus.name()} == 'PUBLISHED'">
+          <i aria-hidden="true" class="fa fa-circle text-success pr-1" title="#{tooltip.published}"></i>
+        </th:block>
+        <th:block th:if="${managedContent.publicationStatus.name()} == 'NO_LONGER_PUBLISHED'">
+          <i aria-hidden="true" class="fa fa-circle text-danger pr-1" title="#{tooltip.no_longer_published}"></i>
+        </th:block>
+
+        <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
+          (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
+        </th:block>
+      </div>
+    </div>
+  </th:block>
+</body>
+</html>

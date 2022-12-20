@@ -64,29 +64,8 @@
 
         <hr/>
 
-        <div class="row">
-          <div class="col-md-3">
-            <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
-            <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
-              <i class="fas fa-question-circle"></i>
-            </button>
-          </div>
-          <div class="align-items-center col-md-9 d-flex" th:with="now=${T(java.time.LocalDate).now()}">
-            <th:block th:if="${webpage.publicationStart}  == null OR  ${webpage.publicationStart.compareTo(now)} > 0">
-              <i aria-hidden="true" class="fa fa-circle pr-1 text-warning"></i>
-            </th:block>
-            <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} == null OR ${webpage.publicationEnd.compareTo(now)} > 0)">
-              <i aria-hidden="true" class="fa fa-circle pr-1 text-success"></i>
-            </th:block>
-            <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} != null AND ${webpage.publicationEnd.compareTo(now)} <= 0)">
-              <i aria-hidden="true" class="fa fa-circle pr-1 text-danger"></i>
-            </th:block>
+        <th:block th:insert="fragments/managedcontent::renderFields(${webpage})"></th:block>
 
-            <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
-              (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
-            </th:block>
-          </div>
-        </div>
         <div class="row">
           <div class="col-md-3"><label class="font-weight-bold" th:text="#{in_page_navigation}">...</label></div>
           <div class="align-items-center col-md-9 d-flex"
