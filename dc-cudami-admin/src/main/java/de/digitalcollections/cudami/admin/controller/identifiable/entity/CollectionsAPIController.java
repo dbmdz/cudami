@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -47,7 +48,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     this.service = client.forCollections();
   }
 
-  @PostMapping("/api/collections/{uuid}/digitalobjects")
+  @PostMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
@@ -102,7 +103,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.find(pageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}/digitalobjects")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public BTResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
@@ -119,7 +120,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/collections/{uuid}/collections")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
   @ResponseBody
   public BTResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
@@ -166,8 +167,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.getByRefId(refId);
   }
 
-  @GetMapping(
-      "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Collection getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -215,7 +215,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     }
   }
 
-  @PutMapping("/api/collections/{uuid}")
+  @PutMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection) {
     try {
       Collection collectionDb = service.update(uuid, collection);

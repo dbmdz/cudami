@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -48,7 +49,7 @@ public class ItemsController extends AbstractPagingAndSortingController<Item> {
     return "items";
   }
 
-  @GetMapping("/items/{uuid}")
+  @GetMapping("/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Item item = service.getByUuid(uuid);

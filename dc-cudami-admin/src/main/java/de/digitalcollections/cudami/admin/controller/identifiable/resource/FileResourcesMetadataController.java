@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -46,7 +47,7 @@ public class FileResourcesMetadataController
     return "fileresources/create";
   }
 
-  @GetMapping("/fileresources/{uuid}/edit")
+  @GetMapping("/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -86,7 +87,7 @@ public class FileResourcesMetadataController
     return "fileresources";
   }
 
-  @GetMapping(value = "/fileresources/{uuid}")
+  @GetMapping(value = "/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();

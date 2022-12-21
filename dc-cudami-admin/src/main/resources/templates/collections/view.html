@@ -57,12 +57,10 @@
 
         <th:block th:insert="fragments/uniqueobject::renderFields(${collection})"></th:block>
 
-        <hr/>
-
         <th:block th:insert="fragments/identifiable::renderFields(${collection})"></th:block>
 
-        <hr/>
-
+        <th:block th:insert="fragments/entity::renderFields(${collection})"></th:block>
+        
         <th:block th:insert="fragments/managedcontent::renderFields(${collection})"></th:block>
 
         <hr/>

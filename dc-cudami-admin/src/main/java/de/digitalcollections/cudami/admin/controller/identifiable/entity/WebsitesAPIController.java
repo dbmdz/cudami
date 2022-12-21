@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -66,7 +67,7 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/websites/{uuid}/webpages")
+  @GetMapping("/api/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   @ResponseBody
   public BTResponse<Webpage> findRootpages(
       @PathVariable UUID uuid,
@@ -83,7 +84,7 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/websites/{uuid}")
+  @GetMapping("/api/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Website getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -100,7 +101,7 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
     }
   }
 
-  @PutMapping("/api/websites/{uuid}")
+  @PutMapping("/api/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Website website) {
     try {
       Website websiteDb = service.update(uuid, website);
@@ -111,7 +112,7 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
     }
   }
 
-  @PutMapping("/api/websites/{uuid}/webpages")
+  @PutMapping("/api/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   public ResponseEntity updateRootPagesOrder(
       @PathVariable UUID uuid, @RequestBody List<Webpage> rootPages) throws TechnicalException {
     boolean successful = service.updateRootWebpagesOrder(uuid, rootPages);

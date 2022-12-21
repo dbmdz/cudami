@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.view;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -66,7 +67,7 @@ public class RenderingTemplatesAPIController
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/renderingtemplates/{uuid}")
+  @GetMapping("/api/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public RenderingTemplate getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -83,7 +84,7 @@ public class RenderingTemplatesAPIController
     }
   }
 
-  @PutMapping("/api/renderingtemplates/{uuid}")
+  @PutMapping("/api/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody RenderingTemplate template) {
     try {
       RenderingTemplate templateDb = service.update(uuid, template);

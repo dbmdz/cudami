@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -87,7 +88,7 @@ public class FileResourcesMetadataAPIController
     return service.findByType(pageRequest, type);
   }
 
-  @GetMapping("/api/fileresources/{uuid}")
+  @GetMapping("/api/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public FileResource getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -104,7 +105,7 @@ public class FileResourcesMetadataAPIController
     }
   }
 
-  @PutMapping("/api/fileresources/{uuid}")
+  @PutMapping("/api/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FileResource fileResource) {
     try {
       FileResource fileResourceDb = service.update(uuid, fileResource);

@@ -52,7 +52,7 @@ public class CollectionsController extends AbstractPagingAndSortingController<Co
     return "collections/create";
   }
 
-  @GetMapping("/collections/{uuid}/edit")
+  @GetMapping("/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,

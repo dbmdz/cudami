@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -56,7 +57,7 @@ public class DigitalObjectsAPIController extends AbstractPagingAndSortingControl
   }
 
   @GetMapping(
-      value = "/api/digitalobjects/{uuid}/collections",
+      value = "/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public PageResponse<Collection> getAssociatedCollections(
@@ -70,7 +71,7 @@ public class DigitalObjectsAPIController extends AbstractPagingAndSortingControl
   }
 
   @GetMapping(
-      value = "/api/digitalobjects/{uuid}/projects",
+      value = "/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
   public PageResponse<Project> getAssociatedProjects(
@@ -96,14 +97,13 @@ public class DigitalObjectsAPIController extends AbstractPagingAndSortingControl
     return service.getByRefId(refId);
   }
 
-  @GetMapping(
-      "/api/digitalobjects/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @GetMapping("/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public DigitalObject getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @GetMapping("/api/digitalobjects/{uuid}/digitalobjects")
+  @GetMapping("/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> getContainedDigitalObjects(
       @PathVariable UUID uuid,

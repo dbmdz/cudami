@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -60,7 +61,7 @@ public class ArticlesAPIController extends AbstractPagingAndSortingController<Ar
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/articles/{uuid}")
+  @GetMapping("/api/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Article getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -77,7 +78,7 @@ public class ArticlesAPIController extends AbstractPagingAndSortingController<Ar
     }
   }
 
-  @PutMapping("/api/articles/{uuid}")
+  @PutMapping("/api/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Article article) {
     try {
       Article articleDb = service.update(uuid, article);

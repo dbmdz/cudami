@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.alias;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.alias.CudamiUrlAliasClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -25,7 +26,7 @@ public class UrlAliasesAPIController extends AbstractController {
   @GetMapping(
       produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8",
       value = {
-        "/api/urlaliases/slug/{pLocale}/{label}/{websiteUuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}",
+        "/api/urlaliases/slug/{pLocale}/{label}/{websiteUuid:" + ParameterHelper.UUID_PATTERN + "}",
         "/api/urlaliases/slug/{pLocale}/{label}"
       })
   @ResponseBody

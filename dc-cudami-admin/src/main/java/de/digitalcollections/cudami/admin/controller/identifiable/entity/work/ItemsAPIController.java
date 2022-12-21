@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -49,7 +50,7 @@ public class ItemsAPIController extends AbstractPagingAndSortingController<Item>
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/items/{uuid}/digitalobjects")
+  @GetMapping("/api/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,

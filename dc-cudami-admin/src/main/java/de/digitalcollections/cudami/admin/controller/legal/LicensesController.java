@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -46,7 +47,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
     return "licenses/create";
   }
 
-  @GetMapping("/licenses/{uuid}/edit")
+  @GetMapping("/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -91,7 +92,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
     return "licenses";
   }
 
-  @GetMapping("/licenses/{uuid}")
+  @GetMapping("/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(
       @PathVariable UUID uuid,
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,

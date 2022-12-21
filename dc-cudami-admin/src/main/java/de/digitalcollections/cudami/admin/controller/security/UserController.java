@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.security;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.security.Role;
@@ -41,7 +42,7 @@ public class UserController extends AbstractController {
     this.service = service;
   }
 
-  @GetMapping("/users/{uuid}/activate")
+  @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/activate")
   public String activate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
       throws TechnicalException {
@@ -63,7 +64,7 @@ public class UserController extends AbstractController {
     return "users/create";
   }
 
-  @GetMapping("/users/{uuid}/deactivate")
+  @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/deactivate")
   public String deactivate(
       @PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
       throws TechnicalException {
@@ -80,7 +81,7 @@ public class UserController extends AbstractController {
     return "redirect:/users";
   }
 
-  @GetMapping("/users/{uuid}/edit")
+  @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws ServiceException {
     model.addAttribute("user", service.getByUuid(uuid));
     return "users/edit";
@@ -141,7 +142,7 @@ public class UserController extends AbstractController {
     return "redirect:/";
   }
 
-  @GetMapping("/users/{uuid}")
+  @GetMapping("/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws ResourceNotFoundException, ServiceException {
     User user = service.getByUuid(uuid);

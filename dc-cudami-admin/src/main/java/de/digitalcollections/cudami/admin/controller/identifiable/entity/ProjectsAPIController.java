@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -45,7 +46,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     this.service = client.forProjects();
   }
 
-  @PostMapping("/api/projects/{uuid}/digitalobjects")
+  @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
@@ -78,13 +79,13 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/projects/{uuid}")
+  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Project getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @GetMapping("/api/projects/{uuid}/digitalobjects")
+  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public PageResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
@@ -119,7 +120,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     }
   }
 
-  @PutMapping("/api/projects/{uuid}")
+  @PutMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Project project) {
     try {
       Project projectDb = service.update(uuid, project);

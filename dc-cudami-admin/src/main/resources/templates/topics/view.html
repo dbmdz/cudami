@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{topics}: #{topic}|">Topics: Topic</title>
+    <title th:text="|#{page.title.topics}: #{topic}|">Topics: Topic</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${topic}">
@@ -23,6 +23,7 @@
             </ol>
           </div>
         </div>
+        
         <div class="row">
           <div class="col-sm-6">
             <h1 th:text="#{topic}">Topic</h1>
@@ -39,17 +40,27 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${topic}, true)"></th:block>
-
-        <th:block th:insert="fragments/uniqueobject::renderDates(${topic})"></th:block>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${topic}, ${existingLanguages}, false)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
           </div>
-        </div>
+        </th:block>
 
+        <th:block th:insert="fragments/uniqueobject::renderFields(${topic})"></th:block>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${topic})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${topic})"></th:block>
+        
+        <hr/>
+        
         <div class="mt-3 row">
           <div class="col-sm-12">
             <div id="subtopic-list"></div>

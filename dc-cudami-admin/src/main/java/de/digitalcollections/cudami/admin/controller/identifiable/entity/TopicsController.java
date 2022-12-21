@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -52,7 +53,7 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
     return "topics/create";
   }
 
-  @GetMapping("/topics/{uuid}/edit")
+  @GetMapping("/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -91,8 +92,7 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
     return "topics";
   }
 
-  @GetMapping(
-      "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @GetMapping("/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     final Locale displayLocale = LocaleContextHolder.getLocale();

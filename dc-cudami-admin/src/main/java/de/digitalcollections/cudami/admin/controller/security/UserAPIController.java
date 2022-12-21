@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.security;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -68,7 +69,7 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/users/{uuid}")
+  @GetMapping("/api/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public User getByUuid(@PathVariable UUID uuid) throws ServiceException {
     return this.service.getByUuid(uuid);
@@ -93,14 +94,14 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
   }
 
   /* endpoint for addUserStatusChangeHandler in index.js */
-  @PatchMapping("/api/users/{uuid}")
+  @PatchMapping("/api/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity setStatus(@PathVariable("uuid") UUID uuid, @RequestBody User user) {
     boolean successful = service.setStatus(uuid, user.isEnabled());
     return new ResponseEntity<>(
         successful, successful ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  @PutMapping("/api/users/{uuid}")
+  @PutMapping("/api/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(
       @PathVariable UUID uuid,
       @RequestParam(name = "pwd1", required = false) String password1,

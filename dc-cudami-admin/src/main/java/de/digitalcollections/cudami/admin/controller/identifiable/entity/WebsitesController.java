@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -43,7 +44,7 @@ public class WebsitesController extends AbstractPagingAndSortingController<Websi
     return "websites/create";
   }
 
-  @GetMapping("/websites/{uuid}/edit")
+  @GetMapping("/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -83,7 +84,7 @@ public class WebsitesController extends AbstractPagingAndSortingController<Websi
     return "websites";
   }
 
-  @GetMapping("/websites/{uuid}")
+  @GetMapping("/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(
       @PathVariable UUID uuid,
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -45,7 +46,7 @@ public class PersonsController extends AbstractPagingAndSortingController<Person
     return "persons/create";
   }
 
-  @GetMapping("/persons/{uuid}/edit")
+  @GetMapping("/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -84,7 +85,7 @@ public class PersonsController extends AbstractPagingAndSortingController<Person
     return "persons";
   }
 
-  @GetMapping("/persons/{uuid}")
+  @GetMapping("/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Person person = service.getByUuid(uuid);
