@@ -116,7 +116,7 @@ public class IdentifiableServiceImpl<I extends Identifiable> implements Identifi
   protected void filterBySplitField(
       PageResponse<I> pageResponse,
       FilterCriterion<String> filter,
-      Function<Identifiable, Optional<LocalizedText>> retrieveField) {
+      Function<I, Optional<LocalizedText>> retrieveField) {
     if (!pageResponse.hasContent()) {
       return;
     }
