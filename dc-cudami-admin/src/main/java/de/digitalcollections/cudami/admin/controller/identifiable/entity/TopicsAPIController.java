@@ -69,24 +69,36 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
 
   @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/topics")
   @ResponseBody
-  public PageResponse<Topic> findSubtopic(
+  public BTResponse<Topic> findSubtopic(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubtopics(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Topic> pageResponse = service.findSubtopics(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities")
   @ResponseBody
-  public PageResponse<Entity> findAttachedEntites(
+  public BTResponse<Entity> findRelatedEntities(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    return this.service.findEntities(uuid, new PageRequest(pageNumber, pageSize));
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Entity> pageResponse = service.findEntities(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
@@ -97,12 +109,19 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
 
   @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources")
   @ResponseBody
-  public PageResponse<FileResource> findRelatedFileResources(
+  public BTResponse<FileResource> findRelatedFileResources(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    return this.service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<FileResource> pageResponse = service.findFileResources(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @PostMapping("/api/topics")

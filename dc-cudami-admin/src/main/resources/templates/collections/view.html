@@ -197,7 +197,7 @@
   </th:block>
 
   <section layout:fragment="beforeBodyEnds">
-    <script>
+    <script type="text/javascript">
       $(addDataLanguageChangeHandler());
       $(moveEditButtonToNavbar());
 
@@ -236,14 +236,14 @@
          const baseUrl = [[@{'/collections'}]];
          const textAdd = [[#{btn.add}]];
          const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         const collectionUuid = [[${collection.uuid}]]
+         const parentUuid = [[${collection.uuid}]]
          +]*/
         return {
           btnAdd: {
             text: textAdd,
             icon: 'fa-plus',
             event: function () {
-              location.href = baseUrl + '/new?parentType=collection&parentUuid=' + collectionUuid;
+              location.href = baseUrl + '/new?parentType=collection&parentUuid=' + parentUuid;
             },
             attributes: {
               title: tooltipAdd

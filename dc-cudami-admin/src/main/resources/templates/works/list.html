@@ -99,7 +99,12 @@
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       function formatActionsWorks(value, row) {
-        return '';
+        /*[+
+         const baseUrl = [[@{'/works'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
       }
 
       function formatLabelWorks(value, row) {

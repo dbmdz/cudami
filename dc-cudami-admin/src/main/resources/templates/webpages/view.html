@@ -181,14 +181,14 @@
          const baseUrl = [[@{'/webpages'}]];
          const textAdd = [[#{btn.add}]];
          const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         const webpageUuid = [[${webpage.uuid}]]
+         const parentUuid = [[${webpage.uuid}]]
          +]*/
         return {
           btnAdd: {
             text: textAdd,
             icon: 'fa-plus',
             event: function () {
-              location.href = baseUrl + '/new?parentType=webpage&parentUuid=' + webpageUuid;
+              location.href = baseUrl + '/new?parentType=webpage&parentUuid=' + parentUuid;
             },
             attributes: {
               title: tooltipAdd

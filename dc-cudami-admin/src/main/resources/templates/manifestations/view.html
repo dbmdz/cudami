@@ -4,19 +4,19 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{page.title.licenses}: #{license} &quot;${url}&quot;|">...</title>
+    <title th:text="|#{page.title.manifestations}: #{manifestation}|">Manifestations: Manifestation</title>
   </head>
   <body>
-  <th:block layout:fragment="content" th:object="${license}">
+  <th:block layout:fragment="content" th:object="${manifestation}">
     <div class="content-header">
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="|#{license} &quot;*{url}&quot;|">...</h1>
+            <h1 th:text="#{manifestation}">Manifestation</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
-              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+<!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
             </div>
           </div>
         </div>
@@ -39,32 +39,23 @@
           </div>
         </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${license})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${manifestation})"></th:block>
 
+        <th:block th:insert="fragments/identifiable::renderFields(${manifestation})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${manifestation})"></th:block>
+        
         <hr/>
 
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
-          </div>
-        </div>
-        <div class="row" th:if="*{url}">
-          <div class="col-md-3"><label th:text="#{url}">URL</label></div>
-          <div class="col-md-9"><a th:href="*{url}" th:text="*{url}" target="_blank">http://www.example.de/</a></div>
-        </div>
-        <div class="row" th:if="*{acronym}">
-          <div class="col-md-3"><label th:text="#{acronym}">...</label></div>
-          <div class="col-md-9"><span th:text="*{acronym}">...</span></div>
-        </div>
+        <!-- TODO: manifestation fields -->
+
       </div>
     </div>
   </th:block>
-
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
-      $(moveEditButtonToNavbar());
+//      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>
