@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.TagRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implements TagRepository {
 
   public static final String TABLE_NAME = "tags";
   public static final String TABLE_ALIAS = "tags";
