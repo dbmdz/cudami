@@ -94,7 +94,7 @@ class SubjectServiceImplTest {
                             .build())
                     .build())
             .build();
-    PageResponse<Subject> expectedPageResponse =
+    PageResponse<Subject> pageResponse =
         PageResponse.builder()
             .withContent(
                 List.of(
@@ -107,9 +107,67 @@ class SubjectServiceImplTest {
                         .label(new LocalizedText(Locale.forLanguageTag("de"), "Altertum"))
                         .build()))
             .build();
-    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(expectedPageResponse);
+    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(pageResponse);
 
     PageResponse<Subject> actual = subjectService.find(expectedPageRequest);
+
+    PageResponse<Subject> expectedPageResponse =
+        PageResponse.builder()
+            .withContent(
+                List.of(
+                    Subject.builder()
+                        .label(
+                            new LocalizedText(
+                                Locale.forLanguageTag("und-Latn"), "Antike und Altertum"))
+                        .build()))
+            .build();
+
+    assertThat(actual).isEqualTo(expectedPageResponse);
+  }
+
+  @DisplayName("can find 'like' subjects with partially matching contents")
+  @Test
+  public void findLikeWithPartiallyMatchingContents() {
+    PageRequest expectedPageRequest =
+        PageRequest.builder()
+            .pageSize(25)
+            .pageNumber(0)
+            .filtering(
+                Filtering.builder()
+                    .add(
+                        FilterCriterion.builder()
+                            .withExpression("label.und-latn")
+                            .contains("Altertum")
+                            .build())
+                    .build())
+            .build();
+    PageResponse<Subject> pageResponse =
+        PageResponse.builder()
+            .withContent(
+                List.of(
+                    Subject.builder()
+                        .label(
+                            new LocalizedText(
+                                Locale.forLanguageTag("und-Latn"), "Antike und Altertum"))
+                        .build(),
+                    Subject.builder()
+                        .label(new LocalizedText(Locale.forLanguageTag("de"), "Altertum"))
+                        .build()))
+            .build();
+    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(pageResponse);
+
+    PageResponse<Subject> actual = subjectService.find(expectedPageRequest);
+
+    PageResponse<Subject> expectedPageResponse =
+        PageResponse.builder()
+            .withContent(
+                List.of(
+                    Subject.builder()
+                        .label(
+                            new LocalizedText(
+                                Locale.forLanguageTag("und-Latn"), "Antike und Altertum"))
+                        .build()))
+            .build();
 
     assertThat(actual).isEqualTo(expectedPageResponse);
   }

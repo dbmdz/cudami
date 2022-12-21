@@ -22,7 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class UniqueObjectServiceImpl<U extends UniqueObject, R extends UniqueObjectRepository<U>>
+public abstract class UniqueObjectServiceImpl<
+        U extends UniqueObject, R extends UniqueObjectRepository<U>>
     implements UniqueObjectService<U> {
 
   protected R repository;
@@ -61,9 +62,9 @@ public class UniqueObjectServiceImpl<U extends UniqueObject, R extends UniqueObj
       List<U> filteredContent =
           pageResponse.getContent().parallelStream()
               .filter(
-                  identifiable -> {
+                  uniqueObject -> {
                     String text =
-                        retrieveField.apply(identifiable).orElse(new LocalizedText()).get(language);
+                        retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
                     if (text == null) {
                       return false;
                     }
@@ -110,10 +111,7 @@ public class UniqueObjectServiceImpl<U extends UniqueObject, R extends UniqueObj
       filterBySplitField(
           response,
           nameFilter,
-          i ->
-              i instanceof NamedEntity
-                  ? Optional.ofNullable(((NamedEntity) i).getName())
-                  : Optional.empty());
+          i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
     }
     // TODO: what happens if all entries have been removed by the filter?
     return response;
@@ -128,7 +126,5 @@ public class UniqueObjectServiceImpl<U extends UniqueObject, R extends UniqueObj
     }
   }
 
-  protected Function<U, Optional<LocalizedText>> extractLabelFunction() {
-    return null;
-  }
+  protected abstract Function<U, Optional<LocalizedText>> extractLabelFunction();
 }
