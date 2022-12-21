@@ -4,22 +4,25 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class SubjectServiceImpl implements SubjectService {
-
-  private final SubjectRepository repository;
+public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, SubjectRepository>
+    implements SubjectService {
 
   public SubjectServiceImpl(SubjectRepository repository) {
-    this.repository = repository;
+    super(repository);
   }
 
   @Override
@@ -56,8 +59,13 @@ public class SubjectServiceImpl implements SubjectService {
   }
 
   @Override
+  protected Function<Subject, Optional<LocalizedText>> extractLabelFunction() {
+    return s -> Optional.ofNullable(s.getLabel());
+  }
+
+  @Override
   public PageResponse<Subject> find(PageRequest pageRequest) {
-    return repository.find(pageRequest);
+    return super.find(pageRequest);
   }
 
   @Override

@@ -18,7 +18,8 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class VideoFileResourceServiceImpl extends IdentifiableServiceImpl<VideoFileResource>
+public class VideoFileResourceServiceImpl
+    extends IdentifiableServiceImpl<VideoFileResource, VideoFileResourceRepository>
     implements VideoFileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(VideoFileResourceServiceImpl.class);

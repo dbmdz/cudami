@@ -219,15 +219,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     return ((CollectionRepository) repository).setDigitalObjects(collectionUuid, digitalObjects);
   }
 
-  /**
-   * Only for testing purposes
-   *
-   * @param nodeRepository The NodeRepository
-   */
-  protected void setNodeRepository(NodeRepository<Collection> nodeRepository) {
-    repository = nodeRepository;
-  }
-
   @Override
   public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
     return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
