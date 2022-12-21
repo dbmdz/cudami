@@ -43,64 +43,12 @@
 
         <hr/>
 
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.preview_image}">Preview Image</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)"></th:block>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="fragments/text::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})"></th:block>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.url_aliases}">URL Aliases</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="fragments/identifiable::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})"></th:block>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.tags}">Tags</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="fragments/identifiable::renderTags(*{tags}, ${dataLanguage})"></th:block>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.identifiers}">Identifiers</label></div>
-          <div class="col-md-9">
-            <th:block th:insert="fragments/identifiable::renderIdentifiers(*{identifiers})"></th:block>
-          </div>
-        </div>
+        <th:block th:insert="fragments/identifiable::renderFields(${website})"></th:block>
 
         <hr/>
 
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.ref_id}">Reference ID</label></div>
-          <div class="col-md-9" th:text="*{refId}">4711</div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.nav_date}">Navigation date / temporal placement</label></div>
-          <div class="col-md-9"><span th:with="df=#{date.format},date=*{navDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 multilanguage"><label th:text="#{lbl.notes}">Notes</label></div>
-          <div class="col-md-9">
-            <ul class="list-group">
-              <th:block th:each="localizedNote : *{notes}">
-                <li th:if="${localizedNote.get(dataLanguage)}" class="list-group-item"><th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${localizedNote}, ${dataLanguage})"></th:block></li>
-              </th:block>
-            </ul>
-          </div>
-        </div>
-
+        <th:block th:insert="fragments/entity::renderFields(${website})"></th:block>
+        
         <hr/>
 
         <div class="row">
@@ -111,6 +59,7 @@
           <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.registration_date}">registered at</label></div>
           <div class="col-md-9"><span th:with="df=#{date.format},date=*{registrationDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span></div>
         </div>
+        
         <div class="row">
           <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.root_webpages}">Root webpages</label></div>
           <div class="col-md-9">

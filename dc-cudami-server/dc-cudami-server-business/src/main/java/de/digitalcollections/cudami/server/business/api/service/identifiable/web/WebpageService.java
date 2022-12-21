@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.web;
 
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -14,7 +15,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 /** Service for Webpage. */
-public interface WebpageService extends NodeService<Webpage> {
+public interface WebpageService extends NodeService<Webpage>, ManagedContentService<Webpage> {
 
   default Filtering filteringForActive() {
     // business logic that defines, what "active" means

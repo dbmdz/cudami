@@ -55,23 +55,8 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="rows-striped">
-              <div class="row">
-                <div class="col-md-3">
-                  <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
-                  <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
-                    <i class="fas fa-question-circle"></i>
-                  </button>
-                </div>
-                <div class="col-md-9" th:with="now=${T(java.time.LocalDate).now()}">
-                  <th:block th:if="${collection.publicationStart}  == null OR  ${collection.publicationStart.compareTo(now)} > 0"><span class="badge badge-pill badge-warning">&nbsp;</span></th:block>
-                  <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} == null OR ${collection.publicationEnd.compareTo(now)} > 0)"><span class="badge badge-pill badge-success">&nbsp;</span></th:block>
-                  <th:block th:if="(${collection.publicationStart} != null AND ${collection.publicationStart.compareTo(now)} <= 0) AND (${collection.publicationEnd} != null AND ${collection.publicationEnd.compareTo(now)} <= 0)"><span class="badge badge-pill badge-danger">&nbsp;</span></th:block>
-
-                  <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
-                    (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
-                  </th:block>
-                </div>
-              </div>
+              <th:block th:insert="fragments/managedcontent::renderFields(${collection})"></th:block>
+              
               <div class="row" th:if="${not #lists.isEmpty(parents)}">
                 <div class="col-md-3"><label class="font-weight-bold" th:text="#{parent_collections}">Parent collections</label></div>
                 <div class="col-md-9">

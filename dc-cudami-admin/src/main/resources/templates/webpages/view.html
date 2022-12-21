@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{webpages}: #{webpage}|">...</title>
+    <title th:text="|#{page.title.webpages}: #{webpage}|">...</title>
     <!-- Custom styles for this template -->
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
@@ -26,6 +26,7 @@
             </ol>
           </div>
         </div>
+
         <div class="row">
           <div class="col-sm-6">
             <h1 th:text="#{webpage}">Webpage</h1>
@@ -42,97 +43,194 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${webpage}, false)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderDates(${webpage})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${webpage})"></th:block>
+
+        <hr/>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${webpage})"></th:block>
+
+        <hr/>
+
+        <th:block th:insert="fragments/managedcontent::renderFields(${webpage})"></th:block>
 
         <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${webpage}, ${existingLanguages}, true)"></th:block>
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{in_page_navigation}">...</label></div>
+          <div class="align-items-center col-md-9 d-flex"
+               th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
+            <i aria-hidden="true" class="fa fa-check text-success"></i>
+          </div>
+          <div class="align-items-center col-md-9 d-flex"
+               th:if="*{renderingHints != null} AND *{not renderingHints.showInPageNavigation}">
+            <i aria-hidden="true" class="fa fa-times text-danger"></i>
           </div>
         </div>
-
         <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row">
-                <div class="col-md-3">
-                  <label class="font-weight-bold" th:text="#{publicationStatus}">Publication status</label>
-                  <button class="btn btn-link" data-html="true" data-placement="bottom" data-toggle="popover" data-trigger="focus" th:attr="data-content=#{tooltip_publication_status}" id="publication_status_tooltip" type="button">
-                    <i class="fas fa-question-circle"></i>
-                  </button>
-                </div>
-                <div class="align-items-center col-md-9 d-flex" th:with="now=${T(java.time.LocalDate).now()}">
-                  <th:block th:if="${webpage.publicationStart}  == null OR  ${webpage.publicationStart.compareTo(now)} > 0">
-                    <i aria-hidden="true" class="fa fa-circle pr-1 text-warning"></i>
-                  </th:block>
-                  <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} == null OR ${webpage.publicationEnd.compareTo(now)} > 0)">
-                    <i aria-hidden="true" class="fa fa-circle pr-1 text-success"></i>
-                  </th:block>
-                  <th:block th:if="(${webpage.publicationStart} != null AND ${webpage.publicationStart.compareTo(now)} <= 0) AND (${webpage.publicationEnd} != null AND ${webpage.publicationEnd.compareTo(now)} <= 0)">
-                    <i aria-hidden="true" class="fa fa-circle pr-1 text-danger"></i>
-                  </th:block>
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{rendering_template}">...</label></div>
+          <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
+        </div>
 
-                  <th:block th:if="*{publicationStart} != null OR *{publicationEnd} != null">
-                    (<span th:with="df=#{date.format},pubStart=*{publicationStart}" th:text="${#temporals.format(pubStart,df)}">01.01.2000</span>&nbsp;<span th:text="#{to}">to</span>&nbsp;<span th:with="df=#{date.format},pubEnd=*{publicationEnd}" th:text="${#temporals.format(pubEnd,df)}">01.01.2000</span>)
-                  </th:block>
+        <th:block th:if="${webpage.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
+          <div class="row mb-1">
+            <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{lbl.text}">Long text</label></div>
+            <div class="col-md-9">
+              <div class="card">
+                <div class="card-body">
+                  <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${webpage.text}, ${dataLanguage})"></th:block>
                 </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{in_page_navigation}">...</label></div>
-                <div class="align-items-center col-md-9 d-flex"
-                     th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
-                  <i aria-hidden="true" class="fa fa-check text-success"></i>
-                </div>
-                <div class="align-items-center col-md-9 d-flex"
-                     th:if="*{renderingHints != null} AND *{not renderingHints.showInPageNavigation}">
-                  <i aria-hidden="true" class="fa fa-times text-danger"></i>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{rendering_template}">...</label></div>
-                <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
               </div>
             </div>
           </div>
-        </div>
+        </th:block>
 
-        <div class="mt-3 row">
-          <div class="col-sm-12">
-            <div id="subpage-list"></div>
+        <div class="row">
+          <div class="col-md-3"><label class="font-weight-bold" th:text="#{lbl.sub_webpages}">Sub webpages</label></div>
+          <div class="col-md-9">
+            <div id="toolbar-sub-webpages">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingSubpageLanguages)}">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="subpages-languages">
+                  <th:block th:each="locale : ${existingSubpageLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageSubpages)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
+            </div>
+            <table id="table-sub-webpages"
+                   data-toggle="table"
+                   th:data-url="@{/api/webpages/__${webpage.uuid}__/webpages}"
+                   th:data-locale="${#locale}"
+                   data-ajax-options="ajaxOptions"
+                   data-buttons="buttonsWebpages"
+                   data-cookie="true"
+                   data-cookie-id-table="table-sub-webpages"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="label"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-sub-webpages"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+                  <th data-field="renderingHints.showInPageNavigation" data-formatter="renderBoolean" data-halign="center" data-align="center" th:text="#{lbl.in_page-navigation}">In page navigation</th>
+                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
+                  <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
+                  <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
           </div>
         </div>
+
       </div>
     </div>
   </th:block>
 
   <section layout:fragment="beforeBodyEnds">
-    <script>
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
-    </script>
-    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${webpage.identifiers}]]*/ []
+    <script type="text/javascript">
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
+
+      const $table = $('#table-sub-webpages');
+
+      window.ajaxOptions = {
+        beforeSend: function (jqXHR, settings) {
+          let dataLanguage = $("#subpages-languages").val();
+          settings.url = settings.url + '&dataLanguageSubpages=' + dataLanguage;
+        }
+      };
+
+      $(function () {
+        $("#subpages-languages").change(function () {
+          $table.bootstrapTable('refresh');
+        });
       });
-      IdentifiableList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        enableChangeOfOrder: true,
-        existingLanguages: /*[[${existingSubpageLanguages}]]*/,
-        id: "subpage-list",
-        parentType: "webpage",
-        parentUuid: /*[[${webpage.uuid}]]*/,
-        showEdit: true,
-        showNew: true,
-        type: "webpage",
-        uiLocale: /*[[${#locale.language}]]*/
-      });
+
+      function formatRowNumber(value, row, index) {
+        return renderRowNumber($table, index);
+      }
     </script>
+    
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function buttonsWebpages() {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]];
+         const textAdd = [[#{btn.add}]];
+         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+         const webpageUuid = [[${webpage.uuid}]]
+         +]*/
+        return {
+          btnAdd: {
+            text: textAdd,
+            icon: 'fa-plus',
+            event: function () {
+              location.href = baseUrl + '/new?parentType=webpage&parentUuid=' + webpageUuid;
+            },
+            attributes: {
+              title: tooltipAdd
+            }
+          }
+        };
+      }
+
+      function formatActions(value, row) {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl)
+        ].join(' ');
+      }
+
+      function formatLabel(value, row) {
+        /*[+
+         const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#subpages-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
+
+      function formatPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = row.previewImage;
+        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
+      }
+      /*]]>*/
+    </script>
+
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
   </section>
 </body>
 </html>

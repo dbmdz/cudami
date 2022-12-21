@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.NodeService;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -12,7 +13,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public interface CollectionService extends NodeService<Collection>, EntityService<Collection> {
+public interface CollectionService
+    extends NodeService<Collection>, EntityService<Collection>, ManagedContentService<Collection> {
 
   default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
