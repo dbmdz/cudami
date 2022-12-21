@@ -75,11 +75,10 @@ public class WebsitesAPIController extends AbstractPagingAndSortingController<We
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguageWebpages", required = false) String dataLanguageWebpages)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(
-            sort, order, dataLanguageWebpages, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<Webpage> pageResponse = service.findRootWebpages(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

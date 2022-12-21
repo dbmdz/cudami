@@ -37,13 +37,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/renderingtemplates}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsRenderingTemplates"
                    data-cookie="true"
                    data-cookie-id-table="table-rendering_templates"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsRenderingTemplates"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -57,15 +57,15 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLocalizedText" th:text="#{lbl.label}">Label</th>
-                  <th data-field="description" data-formatter="formatLocalizedText" th:text="#{lbl.description}">Description</th>
+                  <th data-field="index" data-formatter="formatRowNumberRenderingTemplates" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLocalizedTextRenderingTemplates" th:text="#{lbl.label}">Label</th>
+                  <th data-field="description" data-formatter="formatLocalizedTextRenderingTemplates" th:text="#{lbl.description}">Description</th>
                   
-                  <th data-field="name" data-sortable="true" data-formatter="formatName" th:text="#{lbl.name}">Name</th>
+                  <th data-field="name" data-sortable="true" data-formatter="formatNameRenderingTemplates" th:text="#{lbl.name}">Name</th>
 
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsRenderingTemplates" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -81,29 +81,26 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-rendering_templates');
-
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#rendering_templates-languages").val();
-          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
-        }
-      };
-
       $(function () {
         $("#rendering_templates-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-rendering_templates').bootstrapTable('refresh');
         });
       });
 
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberRenderingTemplates(value, row, index) {
+        return renderRowNumber($('#table-rendering_templates'), index);
+      }
+      
+      function queryParamsRenderingTemplates(params) {
+        let dataLanguage = $("#rendering_templates-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsRenderingTemplates() {
         /*[+
          const baseUrl = [[@{'/renderingtemplates'}]];
          const textAdd = [[#{btn.add}]];
@@ -123,7 +120,7 @@
         };
       }
 
-      function formatActions(value, row) {
+      function formatActionsRenderingTemplates(value, row) {
         /*[+
          const baseUrl = [[@{'/renderingtemplates'}]] + '/' + row.uuid;
          +]*/
@@ -133,11 +130,12 @@
         ].join(' ');
       }
 
-      function formatLocalizedText(value, row) {
+      function formatLocalizedTextRenderingTemplates(value, row) {
         const dataLanguage = $("#rendering_templates-languages").val();
         return renderLocalizedText(value, dataLanguage);
       }
-      function formatName(value, row) {
+      
+      function formatNameRenderingTemplates(value, row) {
         /*[+
          const baseUrl = [[@{'/renderingtemplates'}]] + '/' + row.uuid;
          +]*/

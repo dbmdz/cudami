@@ -29,13 +29,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/users}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsUsers"
                    data-cookie="true"
                    data-cookie-id-table="table-users"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -49,16 +49,16 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="index" data-formatter="formatRowNumberUsers" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="lastname" data-sortable="true" th:text="#{lbl.lastname}">Lastname</th>
                   <th data-field="firstname" data-sortable="true" th:text="#{lbl.firstname}">Firstname</th>
-                  <th data-field="email" data-sortable="true" data-formatter="formatUsername" th:text="#{lbl.username}">Username / Email</th>
+                  <th data-field="email" data-sortable="true" data-formatter="formatUsernameUsers" th:text="#{lbl.username}">Username / Email</th>
                   <th data-field="roles" data-formatter="renderStringArray" th:text="#{lbl.roles}">Role(s)</th>
-                  <th data-field="enabled" data-formatter="formatStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+                  <th data-field="enabled" data-formatter="renderStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
 
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsUsers" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -74,19 +74,14 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-users');
-
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
-      }
-      function formatStatus(value, row, index) {
-        return renderStatus(value);
+      function formatRowNumberUsers(value, row, index) {
+        return renderRowNumber($('#table-users'), index);
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsUsers() {
         /*[+
          const baseUrl = [[@{'/users'}]];
          const textAdd = [[#{btn.add}]];
@@ -105,7 +100,8 @@
           }
         };
       }
-      function formatActions(value, row) {
+      
+      function formatActionsUsers(value, row) {
         /*[+
          const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
          const itemType = [[#{lbl.collection.inline}]];
@@ -114,16 +110,18 @@
         return [
           renderViewAction(baseUrl),
           renderEditAction(baseUrl),
-          renderStatusAction(baseUrl, itemType, itemId, row.enabled)
+          renderStatusActionUser(baseUrl, itemType, itemId, row.enabled)
         ].join(' ');
       }
-      function formatUsername(value, row) {
+      
+      function formatUsernameUsers(value, row) {
         /*[+
          const baseUrl = [[@{'/users'}]] + '/' + row.uuid;
          +]*/
         return '<a href="' + baseUrl + '">' + value + '</a>';
       }
-      function renderStatusAction(baseUrl, itemType, itemId, enabled) {
+      
+      function renderStatusActionUser(baseUrl, itemType, itemId, enabled) {
         /*[+
          const modalDeactivateMessage = `[(#{modal.msg.confirm_user_deactivation})]`;
          const modalDeactivateTitle = [[#{modal.title.warning}]];

@@ -104,26 +104,36 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
 
   @GetMapping("/api/collections/{uuid}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> findDigitalObjects(
+  public BTResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findDigitalObjects(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/collections/{uuid}/collections")
   @ResponseBody
-  public PageResponse<Collection> findSubcollections(
+  public BTResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubcollections(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Collection> pageResponse = service.findSubcollections(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @SuppressFBWarnings

@@ -78,13 +78,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/websites/__${website.uuid}__/webpages}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
                    data-buttons="buttonsWebpages"
                    data-cookie="true"
                    data-cookie-id-table="table-website-webpages"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsWebpages"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -98,16 +98,16 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="index" data-formatter="formatRowNumberWebpages" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                   <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
                   <th data-field="renderingHints.showInPageNavigation" data-formatter="renderBoolean" data-halign="center" data-align="center" th:text="#{lbl.in_page-navigation}">In page navigation</th>
-                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-formatter="formatLabelWebpages" th:text="#{lbl.label}">Label</th>
                   <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
                   <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
                   <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsWebpages" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -123,23 +123,20 @@
       $(addDataLanguageChangeHandler());
       $(moveEditButtonToNavbar());
 
-      const $table = $('#table-website-webpages');
-
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#webpages-languages").val();
-          settings.url = settings.url + '&dataLanguageWebpages=' + dataLanguage;
-        }
-      };
-
       $(function () {
         $("#webpages-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-website-webpages').bootstrapTable('refresh');
         });
       });
 
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberWebpages(value, row, index) {
+        return renderRowNumber($('#table-website-webpages'), index);
+      }
+      
+      function queryParamsWebpages(params) {
+        let dataLanguage = $("#webpages-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
@@ -166,7 +163,7 @@
         };
       }
 
-      function formatActions(value, row) {
+      function formatActionsWebpages(value, row) {
         /*[+
          const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
          +]*/
@@ -176,20 +173,12 @@
         ].join(' ');
       }
 
-      function formatLabel(value, row) {
+      function formatLabelWebpages(value, row) {
         /*[+
          const baseUrl = [[@{'/webpages'}]] + '/' + row.uuid;
          +]*/
         const dataLanguage = $("#webpages-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
-      }
-
-      function formatPreviewImage(value, row) {
-        /*[+
-         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
-         +]*/
-        let previewImage = row.previewImage;
-        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>

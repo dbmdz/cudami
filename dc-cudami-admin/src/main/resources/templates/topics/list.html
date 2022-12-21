@@ -37,13 +37,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/topics}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsTopics"
                    data-cookie="true"
                    data-cookie-id-table="table-topics"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsTopics"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -57,13 +57,13 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="index" data-formatter="formatRowNumberTopics" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelTopics" th:text="#{lbl.label}">Label</th>
 
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsTopics" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -79,29 +79,26 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-topics');
-
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#topics-languages").val();
-          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
-        }
-      };
-
       $(function () {
         $("#topics-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-topics').bootstrapTable('refresh');
         });
       });
 
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberTopics(value, row, index) {
+        return renderRowNumber($('#table-topics'), index);
+      }
+      
+      function queryParamsTopics(params) {
+        let dataLanguage = $("#topics-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsTopics() {
         /*[+
          const baseUrl = [[@{'/topics'}]];
          const textAdd = [[#{btn.add}]];
@@ -121,7 +118,7 @@
         };
       }
 
-      function formatActions(value, row) {
+      function formatActionsTopics(value, row) {
         /*[+
          const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
          +]*/
@@ -131,20 +128,12 @@
         ].join(' ');
       }
 
-      function formatLabel(value, row) {
+      function formatLabelTopics(value, row) {
         /*[+
          const baseUrl = [[@{'/topics'}]] + '/' + row.uuid;
          +]*/
         const dataLanguage = $("#topics-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
-      }
-
-      function formatPreviewImage(value, row) {
-        /*[+
-         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
-         +]*/
-        let previewImage = row.previewImage;
-        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>

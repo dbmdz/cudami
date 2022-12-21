@@ -37,13 +37,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/corporatebodies}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsCorporateBodies"
                    data-cookie="true"
                    data-cookie-id-table="table-corporate_bodies"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsCorporateBodies"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -57,14 +57,14 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
-                  <th data-field="identifiers" data-sortable="false" data-formatter="formatIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                  <th data-field="index" data-formatter="formatRowNumberCorporateBodies" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelCorporateBodies" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
                   
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsCorporateBodies" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -80,29 +80,26 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-corporate_bodies');
-
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#corporate_bodies-languages").val();
-          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
-        }
-      };
-
       $(function () {
         $("#corporate_bodies-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-corporate_bodies').bootstrapTable('refresh');
         });
       });
 
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberCorporateBodies(value, row, index) {
+        return renderRowNumber($('#table-corporate_bodies'), index);
+      }
+      
+      function queryParamsCorporateBodies(params) {
+        let dataLanguage = $("#corporate_bodies-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsCorporateBodies() {
         /*[+
          const baseUrl = [[@{'/corporatebodies'}]];
          const textAdd = [[#{btn.add}]];
@@ -122,7 +119,7 @@
         };
       }
 
-      function formatActions(value, row) {
+      function formatActionsCorporateBodies(value, row) {
         /*[+
          const baseUrl = [[@{'/corporatebodies'}]] + '/' + row.uuid;
          +]*/
@@ -131,25 +128,13 @@
           renderEditAction(baseUrl)
         ].join(' ');
       }
-      
-      function formatIdentifiers(value, row) {
-        return renderIdentifiers(value);
-      }
 
-      function formatLabel(value, row) {
+      function formatLabelCorporateBodies(value, row) {
         /*[+
          const baseUrl = [[@{'/corporatebodies'}]] + '/' + row.uuid;
          +]*/
         const dataLanguage = $("#corporate_bodies-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
-      }
-
-      function formatPreviewImage(value, row) {
-        /*[+
-         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
-         +]*/
-        let previewImage = row.previewImage;
-        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>
