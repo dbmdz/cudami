@@ -67,7 +67,7 @@ class IdentifiableRepositoryImplTest
 
     this.repo.save(identifiable);
 
-    Identifiable actual = this.repo.getByUuid(identifiable.getUuid());
+    Identifiable actual = (Identifiable) this.repo.getByUuid(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
   }
 
@@ -137,7 +137,7 @@ class IdentifiableRepositoryImplTest
     assertThat(identifiable.getLastModified()).isNotNull();
     assertThat(identifiable.getUuid()).isNotNull();
 
-    Identifiable persisted = repo.getByUuid(identifiable.getUuid());
+    Identifiable persisted = (Identifiable) repo.getByUuid(identifiable.getUuid());
     assertThat(identifiable).isEqualToComparingFieldByField(persisted);
   }
 
@@ -171,7 +171,7 @@ class IdentifiableRepositoryImplTest
 
     // Finally, we ensure that the Identifiable, with which the update method
     // works is identical to the Identificable, which is persisted in the database
-    Identifiable persisted = repo.getByUuid(identifiable.getUuid());
+    Identifiable persisted = (Identifiable) repo.getByUuid(identifiable.getUuid());
     assertThat(identifiable).isEqualToComparingFieldByField(persisted);
   }
 
