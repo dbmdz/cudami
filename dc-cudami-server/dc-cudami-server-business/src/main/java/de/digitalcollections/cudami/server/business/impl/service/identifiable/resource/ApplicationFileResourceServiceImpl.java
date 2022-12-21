@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
 public class ApplicationFileResourceServiceImpl
-    extends IdentifiableServiceImpl<ApplicationFileResource>
+    extends IdentifiableServiceImpl<ApplicationFileResource, ApplicationFileResourceRepository>
     implements ApplicationFileResourceService {
 
   private static final Logger LOGGER =

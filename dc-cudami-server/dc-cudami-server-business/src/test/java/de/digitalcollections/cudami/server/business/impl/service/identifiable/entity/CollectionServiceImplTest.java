@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
@@ -55,11 +54,8 @@ class CollectionServiceImplTest extends AbstractServiceImplTest {
   public void execeptionOnDeletionOfCollectionWithChildren() {
     PageResponse<Collection> pageResponse = mock(PageResponse.class);
     when(pageResponse.getTotalElements()).thenReturn(1l);
-    NodeRepository<Collection> nodeRepository = mock(NodeRepository.class);
-    when(nodeRepository.findChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionRepository.findChildren(any(UUID.class), any(PageRequest.class)))
         .thenReturn(pageResponse);
-    collectionService.setNodeRepository(nodeRepository);
-
     assertThrows(ConflictException.class, () -> collectionService.delete(UUID.randomUUID()));
   }
 

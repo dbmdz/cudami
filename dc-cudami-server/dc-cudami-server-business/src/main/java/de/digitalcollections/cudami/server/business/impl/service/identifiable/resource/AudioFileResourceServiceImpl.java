@@ -18,7 +18,8 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class AudioFileResourceServiceImpl extends IdentifiableServiceImpl<AudioFileResource>
+public class AudioFileResourceServiceImpl
+    extends IdentifiableServiceImpl<AudioFileResource, AudioFileResourceRepository>
     implements AudioFileResourceService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AudioFileResourceServiceImpl.class);

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class GivenNameServiceImpl extends IdentifiableServiceImpl<GivenName>
+public class GivenNameServiceImpl extends IdentifiableServiceImpl<GivenName, GivenNameRepository>
     implements GivenNameService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GivenNameServiceImpl.class);

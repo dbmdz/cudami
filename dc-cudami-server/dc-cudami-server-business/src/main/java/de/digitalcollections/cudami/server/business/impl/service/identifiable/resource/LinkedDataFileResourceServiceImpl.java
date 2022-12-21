@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
 public class LinkedDataFileResourceServiceImpl
-    extends IdentifiableServiceImpl<LinkedDataFileResource>
+    extends IdentifiableServiceImpl<LinkedDataFileResource, LinkedDataFileResourceRepository>
     implements LinkedDataFileResourceService {
 
   private static final Logger LOGGER =

@@ -306,15 +306,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     return ((CollectionRepository) repository).setDigitalObjects(collectionUuid, digitalObjects);
   }
 
-  /**
-   * Only for testing purposes
-   *
-   * @param nodeRepository The NodeRepository
-   */
-  protected void setNodeRepository(NodeRepository<Collection> nodeRepository) {
-    repository = nodeRepository;
-  }
-
   @Override
   public void update(Collection entity) throws ServiceException, ValidationException {
     super.update(entity);
