@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.TagRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Tag;
@@ -21,16 +21,16 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implements TagRepository {
 
   public static final String TABLE_NAME = "tags";
   public static final String TABLE_ALIAS = "tags";
   public static final String MAPPING_PREFIX = "tags";
 
   public static final String SQL_INSERT_FIELDS =
-      " uuid, label, namespace, id, type, created, last_modified";
+      " uuid, label, namespace, id, type, created, last_modified, split_label";
   public static final String SQL_INSERT_VALUES =
-      " :uuid, :label::JSONB, :namespace, :id, :type, :created, :lastModified";
+      " :uuid, :label::JSONB, :namespace, :id, :type, :created, :lastModified, :split_label";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
           " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.namespace as %2$s_namespace, %1$s.id as %2$s_id, %1$s.type as %2$s_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
@@ -80,7 +80,13 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
 
     Tag result =
         dbi.withHandle(
-            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
+            h ->
+                h.createQuery(sql)
+                    .bindBean(tag)
+                    .bind("split_label", splitToArray(tag.getLabel()))
+                    .mapToBean(Tag.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 
@@ -91,11 +97,17 @@ public class TagRepositoryImpl extends JdbiRepositoryImpl implements TagReposito
     final String sql =
         "UPDATE "
             + tableName
-            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, type=:type WHERE uuid=:uuid RETURNING *";
+            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, type=:type, split_label=:split_label WHERE uuid=:uuid RETURNING *";
 
     Tag result =
         dbi.withHandle(
-            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
+            h ->
+                h.createQuery(sql)
+                    .bindBean(tag)
+                    .bind("split_label", splitToArray(tag.getLabel()))
+                    .mapToBean(Tag.class)
+                    .findOne()
+                    .orElse(null));
     return result;
   }
 

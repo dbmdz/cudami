@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service;
 /** Service for Webpage handling. */
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage> implements WebpageService {
+public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, WebpageRepository>
+    implements WebpageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpageServiceImpl.class);
 

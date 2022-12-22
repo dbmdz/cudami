@@ -32,7 +32,8 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service("fileResourceMetadataService")
-public class FileResourceMetadataServiceImpl extends IdentifiableServiceImpl<FileResource>
+public class FileResourceMetadataServiceImpl
+    extends IdentifiableServiceImpl<FileResource, FileResourceMetadataRepository<FileResource>>
     implements FileResourceMetadataService<FileResource> {
 
   private static final Logger LOGGER =

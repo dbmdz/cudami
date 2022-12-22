@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public interface IdentifiableService<I extends Identifiable> {
+public interface IdentifiableService<I extends Identifiable> extends UniqueObjectService<I> {
 
   default void addRelatedEntity(I identifiable, Entity entity) {
     if (identifiable == null || entity == null) {
@@ -75,8 +76,6 @@ public interface IdentifiableService<I extends Identifiable> {
   }
 
   boolean delete(List<UUID> uuids) throws ConflictException, ServiceException;
-
-  PageResponse<I> find(PageRequest pageRequest);
 
   List<I> find(String searchTerm, int maxResults);
 

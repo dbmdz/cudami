@@ -6,7 +6,7 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
@@ -41,8 +41,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -56,8 +54,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepositoryImpl
-    implements IdentifiableRepository<I> {
+public class IdentifiableRepositoryImpl<I extends Identifiable>
+    extends UniqueObjectRepositoryImpl<I> implements IdentifiableRepository<I> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableRepositoryImpl.class);
 
@@ -645,47 +643,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return "uuid";
   }
 
-  @Override
-  protected String getWhereClause(
-      FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
-      throws IllegalArgumentException, UnsupportedOperationException {
-    Matcher labelOrName = Pattern.compile("^(label|name)").matcher(fc.getExpression());
-    if (labelOrName.find()) {
-      if (!(fc.getValue() instanceof String)) {
-        throw new IllegalArgumentException("Value of label must be a string!");
-      }
-      String value = (String) fc.getValue();
-      switch (fc.getOperation()) {
-        case CONTAINS:
-          if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
-            throw new IllegalArgumentException(
-                "Filtering by label and by name are mutually exclusive!");
-          }
-          argumentMappings.put(
-              SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-              IdentifiableRepository.splitToArray(value));
-          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
-              tableAlias, "split_" + labelOrName.group(1));
-        case EQUALS:
-          if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
-            throw new IllegalArgumentException(
-                "Filtering by label and by name are mutually exclusive!");
-          }
-          Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
-          String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
-          argumentMappings.put(
-              SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
-          return SearchTermTemplates.JSONB_PATH.renderTemplate(
-              tableAlias, labelOrName.group(1), language);
-        default:
-          throw new UnsupportedOperationException(
-              "Filtering by label only supports CONTAINS (to be preferred) or EQUALS operator!");
-      }
-    }
-
-    return super.getWhereClause(fc, argumentMappings, criterionCount);
-  }
-
   /**
    * After save and update the returned fields (declared in {@link
    * #getReturnedFieldsOnInsertUpdate()}) can be processed here.
@@ -991,18 +948,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
           preparedBatch.execute();
         });
     return getRelatedFileResources(identifiableUuid);
-  }
-
-  protected String[] splitToArray(LocalizedText localizedText) {
-    if (localizedText == null) {
-      return new String[0];
-    }
-    List<String> splitLabels =
-        localizedText.values().stream()
-            .map(text -> IdentifiableRepository.splitToArray(text))
-            .flatMap(Arrays::stream)
-            .collect(Collectors.toList());
-    return splitLabels.toArray(new String[splitLabels.size()]);
   }
 
   @Override

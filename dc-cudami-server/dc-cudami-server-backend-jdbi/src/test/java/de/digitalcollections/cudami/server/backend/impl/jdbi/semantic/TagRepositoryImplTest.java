@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -203,6 +204,56 @@ class TagRepositoryImplTest {
 
     Tag foundTag = repo.getByTypeAndIdentifier("type", "tag-namespace", "tag-id8");
     assertThat(foundTag).isEqualTo(savedTag);
+  }
+
+  @DisplayName("can find 'like' by label")
+  @Test
+  void findByLabel() throws RepositoryException {
+    Tag savedTag =
+        ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Testtag1", null, null, "type");
+    ensureSavedTag(Locale.GERMAN, "Testtag2", null, null, "type");
+
+    PageResponse<Tag> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(2)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("label.und-Latn")
+                                .contains("Testtag1")
+                                .build())
+                        .build())
+                .build());
+
+    assertThat(pageResponse.getContent()).containsExactly(savedTag);
+  }
+
+  @DisplayName("can find exact by label")
+  @Test
+  void findExactByLabel() throws RepositoryException {
+    Tag savedTag =
+        ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Karl Ranseier", null, null, "type");
+    ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Hans Dampf", null, null, "type");
+
+    PageResponse<Tag> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(2)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("label.und-Latn")
+                                .isEquals("\"Karl Ranseier\"")
+                                .build())
+                        .build())
+                .build());
+
+    assertThat(pageResponse.getContent()).containsExactly(savedTag);
   }
 
   // ------------------------------------------------------------------------------------------
