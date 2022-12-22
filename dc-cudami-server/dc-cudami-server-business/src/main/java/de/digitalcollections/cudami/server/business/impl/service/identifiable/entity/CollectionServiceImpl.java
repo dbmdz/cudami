@@ -227,8 +227,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getByUuidAndLocale(UUID uuid, Locale locale)
-      throws ServiceException {
+  public Collection getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
     Collection collection = super.getByUuidAndLocale(uuid, locale);
     setPublicationStatus(collection);
     return collection;
@@ -284,8 +283,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public void save(Collection entity)
-      throws ServiceException, ValidationException {
+  public void save(Collection entity) throws ServiceException, ValidationException {
     super.save(entity);
     setPublicationStatus(entity);
   }
@@ -318,8 +316,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public void update(Collection entity)
-      throws ServiceException, ValidationException {
+  public void update(Collection entity) throws ServiceException, ValidationException {
     super.update(entity);
     setPublicationStatus(entity);
   }
