@@ -164,7 +164,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
             + tableAlias
             + " left join unnest(subj.identifiers) as "
             + tableAlias
-            + "_identifier on true ";
+            + "_identifier on true";
     StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
     String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
     addFiltering(pageRequest, commonSqlBuilder, argumentMappings);

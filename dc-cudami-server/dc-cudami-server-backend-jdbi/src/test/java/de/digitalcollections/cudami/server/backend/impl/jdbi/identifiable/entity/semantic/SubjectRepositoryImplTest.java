@@ -238,6 +238,31 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
     assertThat(pageResponse.getContent()).containsExactly(savedSubject);
   }
 
+  @DisplayName("can find exact by label")
+  @Test
+  void findExactByLabel() throws RepositoryException {
+    Subject savedSubject =
+        ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Karl Ranseier", null, null, "type");
+    ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Hans Dampf", null, null, "type");
+
+    PageResponse<Subject> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(2)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("label.und-Latn")
+                                .isEquals("\"Karl Ranseier\"")
+                                .build())
+                        .build())
+                .build());
+
+    assertThat(pageResponse.getContent()).containsExactly(savedSubject);
+  }
+
   // ------------------------------------------------------
 
   private Subject ensureSavedSubject(

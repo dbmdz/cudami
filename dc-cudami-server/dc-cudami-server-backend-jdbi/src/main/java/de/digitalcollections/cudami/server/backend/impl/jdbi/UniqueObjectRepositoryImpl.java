@@ -49,7 +49,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject> extends
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
-    Matcher labelOrName = Pattern.compile("^(label|name)").matcher(fc.getExpression());
+    Matcher labelOrName = Pattern.compile("^(label|name)\\b").matcher(fc.getExpression());
     if (labelOrName.find()) {
       if (!(fc.getValue() instanceof String)) {
         throw new IllegalArgumentException("Value of label must be a string!");
@@ -72,7 +72,8 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject> extends
                 "Filtering by label and by name are mutually exclusive!");
           }
           Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
-          String language = matchLanguage.find() ? matchLanguage.group(1) : "**";
+          String language =
+              matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
           argumentMappings.put(
               SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
           return SearchTermTemplates.JSONB_PATH.renderTemplate(
