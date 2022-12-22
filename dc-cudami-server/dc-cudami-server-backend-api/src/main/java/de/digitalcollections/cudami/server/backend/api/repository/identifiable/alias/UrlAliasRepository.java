@@ -145,7 +145,6 @@ public interface UrlAliasRepository {
    * Save an {@code UrlAlias} object.
    *
    * @param urlAlias the object to save
-   * @return the newly created dataset or {@code null}
    * @throws RepositoryException
    */
   void save(UrlAlias urlAlias) throws RepositoryException;
@@ -154,7 +153,6 @@ public interface UrlAliasRepository {
    * Update an existing object.
    *
    * @param urlAlias the existing object with changed properties
-   * @return the updated dataset or {@code null}
    * @throws RepositoryException
    */
   void update(UrlAlias urlAlias) throws RepositoryException;

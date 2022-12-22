@@ -55,7 +55,6 @@ public interface EntityRelationRepository {
    * Persists a list of EntityRelations
    *
    * @param entityRelations list of entity-predicate-entity relations to be persisted
-   * @return list of persisted EntityRelations
    * @throws RepositoryException in case of an error, e.g. a referenced predicate does not yet exist
    */
   void save(List<EntityRelation> entityRelations) throws RepositoryException;
