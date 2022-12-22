@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -17,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for item management pages. */
 @Controller
@@ -48,25 +50,32 @@ public class ItemsController extends AbstractPagingAndSortingController<Item> {
     return "items";
   }
 
-  @GetMapping("/items/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     Item item = service.getByUuid(uuid);
     if (item == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("item", item);
+
+    List<Locale> existingLanguages = getExistingLanguages(item.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, item.getLabel().getLocales());
     List<Locale> existingDigitalObjectLanguages =
         languageSortingHelper.sortLanguages(
             displayLocale, service.getLanguagesOfDigitalObjects(uuid));
     model
-        .addAttribute("defaultLanguage", localeService.getDefaultLanguage().getLanguage())
-        .addAttribute("item", item)
-        .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages);
+        .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages)
+        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+
     return "items/view";
   }
 }

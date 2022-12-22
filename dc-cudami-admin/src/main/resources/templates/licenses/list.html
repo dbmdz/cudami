@@ -37,13 +37,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/licenses}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsLicenses"
                    data-cookie="true"
                    data-cookie-id-table="table-licenses"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsLicenses"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -57,14 +57,14 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
-                  <th data-field="acronym" data-sortable="true" data-formatter="formatAcronym" th:text="#{lbl.acronym}">Acronym</th>
-                  <th data-field="url" data-sortable="true" data-formatter="formatUrl" th:text="#{lbl.url}">URL</th>
+                  <th data-field="index" data-formatter="formatRowNumberLicenses" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelLicenses" th:text="#{lbl.label}">Label</th>
+                  <th data-field="acronym" data-sortable="true" data-formatter="formatAcronymLicenses" th:text="#{lbl.acronym}">Acronym</th>
+                  <th data-field="url" data-sortable="true" data-formatter="renderExternalLink" th:text="#{lbl.url}">URL</th>
 
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsLicenses" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -81,29 +81,26 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-licenses');
-
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#licenses-languages").val();
-          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
-        }
-      };
-
       $(function () {
         $("#licenses-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-licenses').bootstrapTable('refresh');
         });
       });
 
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberLicenses(value, row, index) {
+        return renderRowNumber($('#table-licenses'), index);
+      }
+      
+      function queryParamsLicenses(params) {
+        let dataLanguage = $("#licenses-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsLicenses() {
         /*[+
          const baseUrl = [[@{'/licenses'}]];
          const textAdd = [[#{btn.add}]];
@@ -123,14 +120,14 @@
         };
       }
 
-      function formatAcronym(value, row) {
+      function formatAcronymLicenses(value, row) {
         /*[+
          const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
          +]*/
         return '<a href="' + baseUrl + '">' + value + '</a>';
       }
 
-      function formatActions(value, row) {
+      function formatActionsLicenses(value, row) {
         /*[+
          const baseUrl = [[@{'/licenses'}]] + '/' + row.uuid;
          +]*/
@@ -140,13 +137,9 @@
         ].join(' ');
       }
 
-      function formatLabel(value, row) {
+      function formatLabelLicenses(value, row) {
         const dataLanguage = $("#licenses-languages").val();
         return renderLocalizedText(value, dataLanguage);
-      }
-
-      function formatUrl(value, row) {
-        return '<a href="' + value + '" target="_blank">' + value + '</a>';
       }
       /*]]>*/
     </script>

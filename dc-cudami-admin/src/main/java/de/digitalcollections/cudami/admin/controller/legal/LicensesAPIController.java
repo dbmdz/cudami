@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -63,7 +64,7 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/licenses/{uuid}")
+  @GetMapping("/api/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public License getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -80,7 +81,7 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
     }
   }
 
-  @PutMapping("/api/licenses/{uuid}")
+  @PutMapping("/api/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody License license) {
     try {
       License licenseDb = service.update(uuid, license);

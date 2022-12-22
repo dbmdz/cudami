@@ -13,6 +13,9 @@
           return '<i class="fas fa-times text-danger"></i>';
         }
       }
+      function renderBytesize(value, row, index) {
+        return filesize(value, {base: 2, round: 0, standard: "jedec"});
+      }
       function renderDate(value, row) {
         /*[+
          const language = [[${#locale.getLanguage()}]];
@@ -45,7 +48,10 @@
          +]*/
         return '<a href="' + baseUrl + '/edit" title="' + tooltipEdit + '"><i class="fa fa-edit"></i></a>';
       }
-      function renderIdentifiers(value) {
+      function renderExternalLink(value, row) {
+        return '<a href="' + value + '" target="_blank">' + value + '</a>';
+      }
+      function renderIdentifiers(value, row) {
         let html = '';
         var arrayLength = value.length;
         for (let i = 0; i < arrayLength; i++) {
@@ -63,8 +69,14 @@
         }
         return [value[language]];
       }
-      function renderPreviewImage(previewImage, width, tooltipNoPreviewImage) {
+      function renderPreviewImage(value, row) {
+        /*[+
+         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
+         +]*/
+        let previewImage = value;
+        let width = 30;
         let html = '<figure class="mb-0 mx-auto" style="max-width: ' + width + 'px;">';
+
         if (previewImage === undefined) {
           html += '<img alt="--" title="' + tooltipNoPreviewImage + '" class="img-fluid mw-100" src="/images/no-image.png"/>';
         } else {
@@ -111,7 +123,7 @@
         let pageSize = table.bootstrapTable('getOptions').pageSize;
         return ((pageNumber - 1) * pageSize) + index + 1;
       }
-      function renderStatus(value) {
+      function renderStatus(value, row) {
         /*[+
          const tooltipEnabled = [[#{tooltip.enabled.true}]];
          const tooltipDisabled = [[#{tooltip.enabled.false}]];

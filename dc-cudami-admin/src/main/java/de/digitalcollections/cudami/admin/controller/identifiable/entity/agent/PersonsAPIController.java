@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -65,7 +66,7 @@ public class PersonsAPIController extends AbstractPagingAndSortingController<Per
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/persons/{uuid}")
+  @GetMapping("/api/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Person getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -82,7 +83,7 @@ public class PersonsAPIController extends AbstractPagingAndSortingController<Per
     }
   }
 
-  @PutMapping("/api/persons/{uuid}")
+  @PutMapping("/api/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Person person) {
     try {
       Person personDb = service.update(uuid, person);

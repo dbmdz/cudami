@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -49,15 +50,21 @@ public class ItemsAPIController extends AbstractPagingAndSortingController<Item>
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/items/{uuid}/digitalobjects")
+  @GetMapping("/api/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> findDigitalObjects(
+  public BTResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findDigitalObjects(uuid, pageRequest);
+    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
+    PageRequest pageRequest =
+        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 }

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -66,42 +67,61 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/topics/{uuid}/topics")
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/topics")
   @ResponseBody
-  public PageResponse<Topic> findSubtopic(
+  public BTResponse<Topic> findSubtopic(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubtopics(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Topic> pageResponse = service.findSubtopics(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/topics/{uuid}/entities")
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities")
   @ResponseBody
-  public PageResponse<Entity> findAttachedEntites(
+  public BTResponse<Entity> findRelatedEntities(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    return this.service.findEntities(uuid, new PageRequest(pageNumber, pageSize));
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Entity> pageResponse = service.findEntities(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/topics/{uuid}")
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Topic getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @GetMapping("/api/topics/{uuid}/fileresources")
+  @GetMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources")
   @ResponseBody
-  public PageResponse<FileResource> findRelatedFileResources(
+  public BTResponse<FileResource> findRelatedFileResources(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    return this.service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<FileResource> pageResponse = service.findFileResources(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @PostMapping("/api/topics")
@@ -122,7 +142,7 @@ public class TopicsAPIController extends AbstractPagingAndSortingController<Topi
     }
   }
 
-  @PutMapping("/api/topics/{uuid}")
+  @PutMapping("/api/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Topic topic) {
     try {
       Topic topicDb = service.update(uuid, topic);

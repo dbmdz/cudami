@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -12,6 +13,8 @@ import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.UUID;
@@ -45,7 +48,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     this.service = client.forProjects();
   }
 
-  @PostMapping("/api/projects/{uuid}/digitalobjects")
+  @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
@@ -78,22 +81,38 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/projects/{uuid}")
+  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Project getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @GetMapping("/api/projects/{uuid}/digitalobjects")
+  @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> findDigitalObjects(
+  public BTResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findDigitalObjects(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+
+    if ("label".equals(sort)) {
+      if (dataLanguage == null) {
+        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+      }
+      Sorting sorting =
+          Sorting.builder()
+              .order(Order.builder().property("label").subProperty(dataLanguage).build())
+              .build();
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
@@ -119,7 +138,7 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     }
   }
 
-  @PutMapping("/api/projects/{uuid}")
+  @PutMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Project project) {
     try {
       Project projectDb = service.update(uuid, project);

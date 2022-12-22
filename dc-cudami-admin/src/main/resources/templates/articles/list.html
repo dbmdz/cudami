@@ -37,13 +37,13 @@
                    data-toggle="table"
                    th:data-url="@{/api/articles}"
                    th:data-locale="${#locale}"
-                   data-ajax-options="ajaxOptions"
-                   data-buttons="buttons"
+                   data-buttons="buttonsArticles"
                    data-cookie="true"
                    data-cookie-id-table="table-articles"
                    data-id-field="uuid"
                    data-pagination="true"
                    data-pagination-v-align="both"
+                   data-query-params="queryParamsArticles"
                    data-search="true"
                    data-search-highlight="true"
                    data-search-on-enter-key="true"
@@ -57,12 +57,12 @@
                    data-unique-id="uuid">
               <thead>
                 <tr>
-                  <th data-field="index" data-formatter="formatRowNumber" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="formatPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabel" th:text="#{lbl.label}">Label</th>
+                  <th data-field="index" data-formatter="formatRowNumberArticles" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelArticles" th:text="#{lbl.label}">Label</th>
                   <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                   <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActions" th:text="#{lbl.actions}">Actions</th>
+                  <th data-field="actions" data-formatter="formatActionsArticles" th:text="#{lbl.actions}">Actions</th>
                 </tr>
               </thead>
             </table>
@@ -77,29 +77,26 @@
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
     <script type="text/javascript">
-      const $table = $('#table-articles');
-      
-      window.ajaxOptions = {
-        beforeSend: function (jqXHR, settings) {
-          let dataLanguage = $("#articles-languages").val();
-          settings.url = settings.url + '&dataLanguage=' + dataLanguage;
-        }
-      };
-      
       $(function () {
         $("#articles-languages").change(function () {
-          $table.bootstrapTable('refresh');
+          $('#table-articles').bootstrapTable('refresh');
         });
       });
       
-      function formatRowNumber(value, row, index) {
-        return renderRowNumber($table, index);
+      function formatRowNumberArticles(value, row, index) {
+        return renderRowNumber($('#table-articles'), index);
+      }
+      
+      function queryParamsArticles(params) {
+        let dataLanguage = $("#articles-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
       }
     </script>
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
-      function buttons() {
+      function buttonsArticles() {
         /*[+
          const baseUrl = [[@{'/articles'}]];
          const textAdd = [[#{btn.add}]];
@@ -119,7 +116,7 @@
         };
       }
       
-      function formatActions(value, row) {
+      function formatActionsArticles(value, row) {
         /*[+
          const baseUrl = [[@{'/articles'}]] + '/' + row.uuid;
          const itemType = [[#{lbl.article.inline}]];
@@ -133,20 +130,12 @@
         ].join(' ');
       }
       
-      function formatLabel(value, row) {
+      function formatLabelArticles(value, row) {
         /*[+
          const baseUrl = [[@{'/articles'}]] + '/' + row.uuid;
          +]*/
         const dataLanguage = $('#articles-languages').val();
         return renderLabel(baseUrl, value, dataLanguage);
-      }
-      
-      function formatPreviewImage(value, row) {
-        /*[+
-         const tooltipNoPreviewImage = [[#{tooltip.no_preview_image}]];
-         +]*/
-        let previewImage = row.previewImage;
-        return renderPreviewImage(previewImage, 30, tooltipNoPreviewImage);
       }
       /*]]>*/
     </script>

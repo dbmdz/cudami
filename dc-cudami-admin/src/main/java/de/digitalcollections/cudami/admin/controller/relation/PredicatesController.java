@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.relation;
 
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -74,7 +75,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     return "predicates/create-or-edit";
   }
 
-  @GetMapping("/predicates/{uuid}/delete")
+  @GetMapping("/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}/delete")
   public String delete(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
       throws TechnicalException {
     service.deleteByUuid(uuid);
@@ -84,7 +85,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     return "redirect:/predicates";
   }
 
-  @GetMapping("/predicates/{uuid}/edit")
+  @GetMapping("/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -246,7 +247,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     labelNotBlankValidator.validate(predicate.getLabel(), results);
   }
 
-  @GetMapping("/predicates/{uuid}")
+  @GetMapping("/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(
       @PathVariable UUID uuid,
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,

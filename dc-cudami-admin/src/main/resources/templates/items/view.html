@@ -4,23 +4,20 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{items}: #{item}|">...</title>
+    <title th:text="|#{page.title.items}: #{item}|">Items: Item</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${item}">
     <div class="content-header">
       <div class="container-fluid">
         <div class="row">
-          <div class="col-12">
-            <ol class="breadcrumb hidden-xs-down">
-              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-              <li class="breadcrumb-item"><a th:href="@{/items}" th:text="#{items}">...</a></li>
-            </ol>
-          </div>
-        </div>
-        <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="|#{item}|">...</h1>
+            <h1 th:text="#{item}">Item</h1>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+            </div>
           </div>
         </div>
         <hr/>
@@ -29,78 +26,118 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${item}, true)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderDates(${item})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${item})"></th:block>
 
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${item}, ${existingLanguages}, false)"></th:block>
+        <th:block th:insert="fragments/identifiable::renderFields(${item})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${item})"></th:block>
+
+        <hr/>
+
+        <div class="row" th:if="*{partOfItem?.uuid}">
+          <div class="col-md-3"><label th:text="#{lbl.parent_item}">Parent item</label></div>
+          <div class="col-md-9" th:with="partOfItem=*{partOfItem}">
+            <a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="${partOfItem.label?.getText(dataLanguage)} ?: ${partOfItem.uuid}">item label</a>
           </div>
         </div>
-
         <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row" th:if="*{partOfItem?.uuid}">
-                <div class="col-md-3">
-                  <label class="font-weight-bold" th:text="#{parent_item}">...</label>
-                </div>
-                <div class="col-md-9" th:with="partOfItem=*{partOfItem}">
-                  <a th:href="@{/items/{uuid}(uuid=*{partOfItem.uuid})}" th:text="${partOfItem.label?.getText(defaultLanguage)} ?: ${partOfItem.uuid}">...</a>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{exemplifies_manifestation}">...</label></div>
-                <div class="col-md-9">
-                  <div th:switch="*{exemplifiesManifestation}">
-                    <i th:case="true" class="fas fa-check text-success"></i>
-                    <i th:case="false" class="fas fa-times text-danger"></i>
-                    <i th:case="*" class="fas fa-question-circle"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-3">
-                  <label class="font-weight-bold" th:text="#{holders}">...</label>
-                </div>
-                <div class="col-md-9" th:with="holders=*{holders}">
-                  <ul class="mb-0 list-inline" th:if="${holders} and not ${#lists.isEmpty(holders)}">
-                    <li class="list-inline-item" th:each="holder : ${holders}">
-                      <span class="border border-dark p-2 badge badge-light badge-pill" th:switch="${holder.identifiableObjectType.name()}">
-                        <a
-                          th:case="'CORPORATE_BODY'"
-                          th:href="@{/corporatebodies/{uuid}(uuid=${holder.uuid})}"
-                          th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
-                        >
-                          ...
-                        </a>
-                        <a
-                          th:case="'PERSON'"
-                          th:href="@{/persons/{uuid}(uuid=${holder.uuid})}"
-                          th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
-                        >
-                          ...
-                        </a>
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <div class="col-md-3"><label th:text="#{lbl.exemplifies_manifestation}">Item of a manifestation</label></div>
+          <div class="col-md-9">
+            <div th:switch="*{exemplifiesManifestation}">
+              <i th:case="true" class="fas fa-check text-success"></i>
+              <i th:case="false" class="fas fa-times text-danger"></i>
+              <i th:case="*" class="fas fa-question-circle"></i>
             </div>
           </div>
         </div>
-
-        <div class="mt-3 row" th:if="*{notes}">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/entity::renderNotes(*{notes})"></th:block>
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.holders}">Holding institutions</label>
+          </div>
+          <div class="col-md-9" th:with="holders=*{holders}">
+            <ul class="mb-0 list-inline" th:if="${holders} and not ${#lists.isEmpty(holders)}">
+              <li class="list-inline-item" th:each="holder : ${holders}">
+                <span class="border border-dark p-2 badge badge-light badge-pill" th:switch="${holder.identifiableObjectType.name()}">
+                  <a
+                    th:case="'CORPORATE_BODY'"
+                    th:href="@{/corporatebodies/{uuid}(uuid=${holder.uuid})}"
+                    th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
+                    >
+                    ...
+                  </a>
+                  <a
+                    th:case="'PERSON'"
+                    th:href="@{/persons/{uuid}(uuid=${holder.uuid})}"
+                    th:text="${holder.label?.getText(defaultLanguage)} ?: ${holder.uuid}"
+                    >
+                    ...
+                  </a>
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div class="mt-3 row">
-          <div class="col-sm-12">
-            <div id="digitalobjects-list"></div>
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.digital_objects}">Digital objects</label></div>
+          <div class="col-md-9">
+            <div id="toolbar-digitalobjects">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select id="digitalobjects-languages">
+                  <th:block th:each="locale : ${existingDigitalObjectsLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageDigitalObjects)}">English</option>
+                  </th:block>
+                </select>
+              </th:block>
+            </div>
+            <table id="table-digitalobjects"
+                   data-toggle="table"
+                   th:data-url="@{/api/items/__${item.uuid}__/digitalobjects}"
+                   th:data-locale="${#locale}"
+
+                   data-cookie="true"
+                   data-cookie-id-table="table-digitalobjects"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-query-params="queryParamsDigitalObjects"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="label"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-digitalobjects"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberDigitalObjects" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelDigitalObjects" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActionsDigitalObjects" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
           </div>
         </div>
 
@@ -108,27 +145,51 @@
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
-    <script>
-      addLanguageChangeHandler()
-    </script>
-    <script th:src="@{/js/identifiable-list.bundle.js}"></script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${item.identifiers}]]*/ []
+    <script type="text/javascript">
+      $(addDataLanguageChangeHandler());
+//      $(moveEditButtonToNavbar());
+      
+      $(function () {
+        $("#digitalobjects-languages").change(function () {
+          $('#table-digitalobjects').bootstrapTable('refresh');
+        });
       });
-      IdentifiableList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        existingLanguages: /*[[${existingDigitalObjectLanguages}]]*/ [],
-        id: "digitalobjects-list",
-        parentType: "item",
-        parentUuid: /*[[${item.uuid}]]*/ '',
-        type: "digitalObject",
-        uiLocale: /*[[${#locale.language}]]*/ ''
-      });
+
+      function formatRowNumberDigitalObjects(value, row, index) {
+        return renderRowNumber($('#table-digitalobjects'), index);
+      }
+      
+      function queryParamsDigitalObjects(params) {
+        let dataLanguage = $("#digitalobjects-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
+      }
     </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatActionsDigitalObjects(value, row) {
+        /*[+
+         const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+         const itemType = [[#{lbl.digital_object.inline}]];
+         +]*/
+        const dataLanguage = $("#digitalobjects-languages").val();
+        const itemId = renderLocalizedText(row.label, dataLanguage);
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+      
+      function formatLabelDigitalObjects(value, row) {
+        /*[+
+         const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#digitalobjects-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
   </section>
 </body>
 </html>

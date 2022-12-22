@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -13,7 +14,6 @@ import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -52,7 +52,7 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
     return "topics/create";
   }
 
-  @GetMapping("/topics/{uuid}/edit")
+  @GetMapping("/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -91,36 +91,44 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
     return "topics";
   }
 
-  @GetMapping(
-      "/topics/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.getByUuid(uuid);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingLanguages =
-        this.languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
-    List<Locale> existingSubtopicLanguages =
-        topic.getChildren().stream()
-            .flatMap(child -> child.getLabel().getLocales().stream())
-            .collect(Collectors.toList());
-    List<Locale> existingEntityLanguages = this.service.getLanguagesOfEntities(uuid);
-    List<Locale> existingFileResourceLanguages = this.service.getLanguagesOfFileResources(uuid);
+    model.addAttribute("topic", topic);
 
+    List<Locale> existingLanguages = getExistingLanguages(topic.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
+    List<Locale> existingSubtopicsLanguages =
+        getExistingLanguagesFromIdentifiables(topic.getChildren(), languageSortingHelper);
+    model
+        .addAttribute("existingSubtopicsLanguages", existingSubtopicsLanguages)
+        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, localeService));
+
+    final Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingEntitiesLanguages = service.getLanguagesOfEntities(uuid);
+    model
         .addAttribute(
-            "existingSubtopicLanguages",
-            this.languageSortingHelper.sortLanguages(displayLocale, existingSubtopicLanguages))
-        .addAttribute("topic", topic)
+            "existingEntitiesLanguages",
+            languageSortingHelper.sortLanguages(displayLocale, existingEntitiesLanguages))
+        .addAttribute("dataLanguageEntities", getDataLanguage(null, localeService));
+
+    List<Locale> existingFileResourcesLanguages = service.getLanguagesOfFileResources(uuid);
+    model
         .addAttribute(
-            "existingEntityLanguages",
-            this.languageSortingHelper.sortLanguages(displayLocale, existingEntityLanguages))
-        .addAttribute(
-            "existingFileResourceLanguages",
-            this.languageSortingHelper.sortLanguages(displayLocale, existingFileResourceLanguages));
+            "existingFileResourcesLanguages",
+            languageSortingHelper.sortLanguages(displayLocale, existingFileResourcesLanguages))
+        .addAttribute("dataLanguageFileResources", getDataLanguage(null, localeService));
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
@@ -130,12 +138,15 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
   }
 
   @GetMapping("/topics/{refId:[0-9]+}")
-  public String viewByRefId(@PathVariable long refId, Model model)
+  public String viewByRefId(
+      @PathVariable long refId,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     Topic topic = service.getByRefId(refId);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }
-    return view(topic.getUuid(), model);
+    return view(topic.getUuid(), targetDataLanguage, model);
   }
 }

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -8,7 +9,6 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesCli
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -44,7 +44,7 @@ public class ArticlesController extends AbstractPagingAndSortingController<Artic
     return "articles/create";
   }
 
-  @GetMapping("/articles/{uuid}/edit")
+  @GetMapping("/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -83,21 +83,28 @@ public class ArticlesController extends AbstractPagingAndSortingController<Artic
     return "articles";
   }
 
-  @GetMapping("/articles/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = service.getByUuid(uuid);
     if (article == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("article", article);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(article.getUuid());
+        getExistingLanguages(article.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
-        .addAttribute("article", article)
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("relatedFileResources", relatedFileResources);
+        .addAttribute("dataLanguage", dataLanguage);
+
+    //    model
+    //            .addAttribute("relatedFileResources", relatedFileResources);
+
     return "articles/view";
   }
 }

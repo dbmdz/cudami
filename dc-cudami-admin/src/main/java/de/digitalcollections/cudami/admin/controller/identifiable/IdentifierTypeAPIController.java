@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
@@ -58,7 +59,7 @@ public class IdentifierTypeAPIController
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/identifiertypes/{uuid}")
+  @GetMapping("/api/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public IdentifierType getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -75,7 +76,7 @@ public class IdentifierTypeAPIController
     }
   }
 
-  @PutMapping("/api/identifiertypes/{uuid}")
+  @PutMapping("/api/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType) {
     try {

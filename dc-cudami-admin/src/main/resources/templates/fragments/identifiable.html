@@ -43,13 +43,13 @@
   </th:block>
 
   <th:block th:fragment="renderIdentifiers(identifiers)">
-    <th:block th:each="identifier,iter : ${identifiers}">
+    <th:block th:each="identifier,iter : ${identifiers}" th:object="${identifier}">
       <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
     </th:block>
   </th:block>
 
   <th:block th:fragment="renderTags(tags, language)">
-    <th:block th:each="tag,iter : ${tags}">
+    <th:block th:each="tag,iter : ${tags}" th:object="${tag}">
       <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
     </th:block>
   </th:block>

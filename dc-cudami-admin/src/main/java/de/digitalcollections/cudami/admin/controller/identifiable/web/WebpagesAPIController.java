@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -50,7 +51,7 @@ public class WebpagesAPIController extends AbstractPagingAndSortingController<We
     return service.create();
   }
 
-  @GetMapping("/api/webpages/{uuid}/webpages")
+  @GetMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   @ResponseBody
   public BTResponse<Webpage> findSubpages(
       @PathVariable UUID uuid,
@@ -59,16 +60,15 @@ public class WebpagesAPIController extends AbstractPagingAndSortingController<We
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguageSubpages", required = false) String dataLanguageSubpages)
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(
-            sort, order, dataLanguageSubpages, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<Webpage> pageResponse = service.findSubpages(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/webpages/{uuid}")
+  @GetMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Webpage getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -97,7 +97,7 @@ public class WebpagesAPIController extends AbstractPagingAndSortingController<We
     }
   }
 
-  @PutMapping("/api/webpages/{uuid}")
+  @PutMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Webpage webpage) {
     try {
       Webpage webpageDb = service.update(uuid, webpage);
@@ -108,7 +108,7 @@ public class WebpagesAPIController extends AbstractPagingAndSortingController<We
     }
   }
 
-  @PutMapping("/api/webpages/{uuid}/webpages")
+  @PutMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   public ResponseEntity updateSubpagesOrder(
       @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws TechnicalException {
     boolean successful = service.updateChildrenOrder(uuid, subpages);

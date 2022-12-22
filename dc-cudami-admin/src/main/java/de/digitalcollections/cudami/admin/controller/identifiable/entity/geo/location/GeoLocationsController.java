@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -13,12 +14,12 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for GeoLocations management pages. */
 @Controller
@@ -53,19 +54,25 @@ public class GeoLocationsController extends AbstractPagingAndSortingController<G
     return "geolocations";
   }
 
-  @GetMapping("/geolocations/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     GeoLocation geoLocation = service.getByUuid(uuid);
     if (geoLocation == null) {
       throw new ResourceNotFoundException();
     }
-    Locale displayLocale = LocaleContextHolder.getLocale();
+    model.addAttribute("geoLocation", geoLocation);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, geoLocation.getLabel().getLocales());
+        getExistingLanguages(geoLocation.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("geoLocation", geoLocation);
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "geolocations/view";
   }
 }

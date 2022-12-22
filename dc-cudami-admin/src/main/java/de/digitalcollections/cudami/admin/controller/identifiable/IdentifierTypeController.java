@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -37,7 +38,7 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes/create";
   }
 
-  @GetMapping("/identifiertypes/{uuid}/edit")
+  @GetMapping("/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     IdentifierType identifierType = service.getByUuid(uuid);
@@ -54,7 +55,7 @@ public class IdentifierTypeController extends AbstractController {
     return "identifiertypes/list";
   }
 
-  @GetMapping("/identifiertypes/{uuid}")
+  @GetMapping("/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(@PathVariable UUID uuid, Model model)
       throws TechnicalException, ResourceNotFoundException {
     IdentifierType identifierType = service.getByUuid(uuid);

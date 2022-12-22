@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -13,7 +14,6 @@ import de.digitalcollections.model.view.BreadcrumbNode;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -52,7 +52,7 @@ public class CollectionsController extends AbstractPagingAndSortingController<Co
     return "collections/create";
   }
 
-  @GetMapping("/collections/{uuid}/edit")
+  @GetMapping("/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -91,27 +91,30 @@ public class CollectionsController extends AbstractPagingAndSortingController<Co
     return "collections";
   }
 
-  @GetMapping(
-      "/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.getByUuid(uuid);
     if (collection == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
-    List<Locale> existingSubcollectionLanguages =
-        collection.getChildren().stream()
-            .flatMap(child -> child.getLabel().getLocales().stream())
-            .collect(Collectors.toList());
-
-    model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute(
-        "existingSubcollectionLanguages",
-        languageSortingHelper.sortLanguages(displayLocale, existingSubcollectionLanguages));
     model.addAttribute("collection", collection);
+
+    List<Locale> existingLanguages =
+        getExistingLanguages(collection.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
+    List<Locale> existingSubcollectionsLanguages =
+        getExistingLanguagesFromIdentifiables(collection.getChildren(), languageSortingHelper);
+    model
+        .addAttribute("existingSubcollectionsLanguages", existingSubcollectionsLanguages)
+        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, localeService));
 
     List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);
@@ -124,12 +127,15 @@ public class CollectionsController extends AbstractPagingAndSortingController<Co
   }
 
   @GetMapping("/collections/{refId:[0-9]+}")
-  public String viewByRefId(@PathVariable long refId, Model model)
+  public String viewByRefId(
+      @PathVariable long refId,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     Collection collection = service.getByRefId(refId);
     if (collection == null) {
       throw new ResourceNotFoundException();
     }
-    return view(collection.getUuid(), model);
+    return view(collection.getUuid(), targetDataLanguage, model);
   }
 }

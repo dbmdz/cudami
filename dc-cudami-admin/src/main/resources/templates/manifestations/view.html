@@ -4,19 +4,19 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{page.title.persons}: #{person}|">Persons: Person</title>
+    <title th:text="|#{page.title.manifestations}: #{manifestation}|">Manifestations: Manifestation</title>
   </head>
   <body>
-  <th:block layout:fragment="content" th:object="${person}">
+  <th:block layout:fragment="content" th:object="${manifestation}">
     <div class="content-header">
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="#{lbl.person}">Person</h1>
+            <h1 th:text="#{manifestation}">Manifestation</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
-              <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+<!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
             </div>
           </div>
         </div>
@@ -39,13 +39,15 @@
           </div>
         </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${person})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${manifestation})"></th:block>
 
-        <th:block th:insert="fragments/identifiable::renderFields(${person})"></th:block>
+        <th:block th:insert="fragments/identifiable::renderFields(${manifestation})"></th:block>
 
-        <th:block th:insert="fragments/entity::renderFields(${person})"></th:block>
-
+        <th:block th:insert="fragments/entity::renderFields(${manifestation})"></th:block>
+        
         <hr/>
+
+        <!-- TODO: manifestation fields -->
 
       </div>
     </div>

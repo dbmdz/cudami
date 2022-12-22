@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
@@ -44,7 +45,7 @@ public class CorporateBodiesController extends AbstractPagingAndSortingControlle
     return "corporatebodies/create";
   }
 
-  @GetMapping("/corporatebodies/{uuid}/edit")
+  @GetMapping("/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
@@ -83,19 +84,25 @@ public class CorporateBodiesController extends AbstractPagingAndSortingControlle
     return "corporatebodies";
   }
 
-  @GetMapping("/corporatebodies/{uuid}")
-  public String view(@PathVariable UUID uuid, Model model)
+  @GetMapping("/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     CorporateBody corporateBody = service.getByUuid(uuid);
     if (corporateBody == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("corporateBody", corporateBody);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
+        getExistingLanguages(corporateBody.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
-        .addAttribute("corporateBody", corporateBody)
-        .addAttribute("existingLanguages", existingLanguages);
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "corporatebodies/view";
   }
 }

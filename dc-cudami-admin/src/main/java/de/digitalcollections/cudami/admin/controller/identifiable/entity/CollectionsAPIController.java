@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -47,7 +48,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     this.service = client.forCollections();
   }
 
-  @PostMapping("/api/collections/{uuid}/digitalobjects")
+  @PostMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
@@ -102,28 +103,38 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.find(pageRequest);
   }
 
-  @GetMapping("/api/collections/{uuid}/digitalobjects")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
-  public PageResponse<DigitalObject> findDigitalObjects(
+  public BTResponse<DigitalObject> findDigitalObjects(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findDigitalObjects(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/collections/{uuid}/collections")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
   @ResponseBody
-  public PageResponse<Collection> findSubcollections(
+  public BTResponse<Collection> findSubcollections(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findSubcollections(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Collection> pageResponse = service.findSubcollections(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @SuppressFBWarnings
@@ -156,8 +167,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.getByRefId(refId);
   }
 
-  @GetMapping(
-      "/api/collections/{uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
+  @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
   public Collection getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
@@ -205,7 +215,7 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     }
   }
 
-  @PutMapping("/api/collections/{uuid}")
+  @PutMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public ResponseEntity update(@PathVariable UUID uuid, @RequestBody Collection collection) {
     try {
       Collection collectionDb = service.update(uuid, collection);
