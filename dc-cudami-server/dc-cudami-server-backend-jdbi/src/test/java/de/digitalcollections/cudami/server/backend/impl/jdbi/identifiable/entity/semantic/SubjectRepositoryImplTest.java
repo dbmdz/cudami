@@ -213,6 +213,56 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
     assertThat(foundSubject).isEqualTo(savedSubject);
   }
 
+  @DisplayName("can find 'like' by label")
+  @Test
+  void findByLabel() throws RepositoryException {
+    Subject savedSubject =
+        ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Testsubject1", null, null, "type");
+    ensureSavedSubject(Locale.GERMAN, "Testsubject2", null, null, "type");
+
+    PageResponse<Subject> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(2)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("label.und-Latn")
+                                .contains("Testsubject1")
+                                .build())
+                        .build())
+                .build());
+
+    assertThat(pageResponse.getContent()).containsExactly(savedSubject);
+  }
+
+  @DisplayName("can find exact by label")
+  @Test
+  void findExactByLabel() throws RepositoryException {
+    Subject savedSubject =
+        ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Karl Ranseier", null, null, "type");
+    ensureSavedSubject(Locale.forLanguageTag("und-Latn"), "Hans Dampf", null, null, "type");
+
+    PageResponse<Subject> pageResponse =
+        repo.find(
+            PageRequest.builder()
+                .pageNumber(0)
+                .pageSize(2)
+                .filtering(
+                    Filtering.builder()
+                        .add(
+                            FilterCriterion.builder()
+                                .withExpression("label.und-Latn")
+                                .isEquals("\"Karl Ranseier\"")
+                                .build())
+                        .build())
+                .build());
+
+    assertThat(pageResponse.getContent()).containsExactly(savedSubject);
+  }
+
   // ------------------------------------------------------
 
   private Subject ensureSavedSubject(
@@ -224,9 +274,12 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                 labelLocale != null && labelText != null
                     ? new LocalizedText(labelLocale, labelText)
                     : null)
-            .identifier(Identifier.builder().namespace(namespace).id(id).build())
             .type(type)
             .build();
+
+    if ((namespace != null) && (id != null)) {
+      subject.setIdentifiers(Set.of(Identifier.builder().namespace(namespace).id(id).build()));
+    }
 
     repo.save(subject);
     return subject;

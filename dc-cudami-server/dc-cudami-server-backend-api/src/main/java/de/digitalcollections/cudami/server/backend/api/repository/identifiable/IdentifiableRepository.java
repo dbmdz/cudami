@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public interface IdentifiableRepository<I extends Identifiable> {
+public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
 
   static String[] splitToArray(String term) {
     term = term.toLowerCase();
@@ -72,8 +72,6 @@ public interface IdentifiableRepository<I extends Identifiable> {
 
   boolean delete(List<UUID> uuids);
 
-  PageResponse<I> find(PageRequest pageRequest);
-
   default List<I> find(String searchTerm, int maxResults) {
     PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
     PageResponse<I> response = find(request);
@@ -98,12 +96,6 @@ public interface IdentifiableRepository<I extends Identifiable> {
       PageRequest pageRequest, String language, String initial);
 
   I getByIdentifier(Identifier identifier);
-
-  default I getByUuid(UUID uuid) {
-    return getByUuidAndFiltering(uuid, null);
-  }
-
-  I getByUuidAndFiltering(UUID uuid, Filtering filtering);
 
   default I getByIdentifier(String namespace, String id) {
     return getByIdentifier(new Identifier(null, namespace, id));

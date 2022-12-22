@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -7,7 +8,7 @@ import de.digitalcollections.model.semantic.Subject;
 import java.util.List;
 import java.util.UUID;
 
-public interface SubjectService {
+public interface SubjectService extends UniqueObjectService<Subject> {
 
   long count();
 

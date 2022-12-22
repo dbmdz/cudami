@@ -1,16 +1,17 @@
 package de.digitalcollections.cudami.server.controller.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Tag controller")
-public class TagController {
+public class TagController extends AbstractUniqueObjectController<Tag> {
 
   private final TagService service;
 
@@ -45,13 +46,10 @@ public class TagController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
   @Operation(
@@ -101,5 +99,10 @@ public class TagController {
   public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors) {
     assert Objects.equals(uuid, tag.getUuid());
     return service.update(tag);
+  }
+
+  @Override
+  protected UniqueObjectService<Tag> getService() {
+    return service;
   }
 }
