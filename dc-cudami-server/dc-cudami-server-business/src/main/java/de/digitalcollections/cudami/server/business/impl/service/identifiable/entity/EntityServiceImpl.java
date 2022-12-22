@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -118,12 +118,11 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public E save(E entity) throws IdentifiableServiceException, ValidationException {
+  public void save(E entity) throws ServiceException, ValidationException {
     try {
-      E entityDb = super.save(entity);
-      sendNotification("save", "POST", entityDb.getUuid(), entityDb.getEntityType());
-      return entityDb;
-    } catch (IdentifiableServiceException e) {
+      super.save(entity);
+      sendNotification("save", "POST", entity.getUuid(), entity.getEntityType());
+    } catch (ServiceException e) {
       LOGGER.error("Cannot save entity " + entity + ": ", e);
       throw e;
     }
@@ -175,12 +174,11 @@ public class EntityServiceImpl<E extends Entity> extends IdentifiableServiceImpl
   }
 
   @Override
-  public E update(E entity) throws IdentifiableServiceException, ValidationException {
+  public void update(E entity) throws ServiceException, ValidationException {
     try {
-      E entityDb = super.update(entity);
-      sendNotification("update", "PUT", entityDb.getUuid(), entityDb.getEntityType());
-      return entityDb;
-    } catch (IdentifiableServiceException e) {
+      super.update(entity);
+      sendNotification("update", "PUT", entity.getUuid(), entity.getEntityType());
+    } catch (ServiceException e) {
       LOGGER.error("Cannot update identifiable " + entity + ": ", e);
       throw e;
     }

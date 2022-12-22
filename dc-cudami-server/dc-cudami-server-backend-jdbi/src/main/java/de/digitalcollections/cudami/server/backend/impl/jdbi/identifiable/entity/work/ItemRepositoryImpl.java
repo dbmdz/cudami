@@ -1,11 +1,15 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Family;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
@@ -13,6 +17,9 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -134,6 +142,50 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return true;
   }
 
+  private <A extends Agent> A buildDerivedHolderInstance(Agent agent, Class<A> derivedClazz) {
+    if (agent == null || derivedClazz == null) return null;
+    try {
+      A derivedInst = derivedClazz.getConstructor().newInstance();
+      // collect all the public setters of the new instance
+      List<Method> derivedInstSetters =
+          Stream.of(derivedInst.getClass().getMethods())
+              .filter(m -> m.getName().startsWith("set"))
+              .collect(Collectors.toList());
+      // go through all the public getters of the passed Agent...
+      for (Method agentGetter : agent.getClass().getMethods()) {
+        if (!agentGetter.getName().startsWith("get")) continue;
+        Type returnType = agentGetter.getGenericReturnType();
+        // ...find the corresponding setter of the new object...
+        Method[] setters =
+            derivedInstSetters.stream()
+                .filter(
+                    derivSetter ->
+                        derivSetter
+                                .getName()
+                                .equals(agentGetter.getName().replaceFirst("^get", "set"))
+                            && derivSetter.getParameterCount() == 1
+                            && derivSetter
+                                .getParameters()[0]
+                                .getParameterizedType()
+                                .equals(returnType))
+                .toArray(i -> new Method[i]);
+        if (setters.length != 1) continue;
+        // ...and invoke this setter with the getter's returned value
+        setters[0].invoke(derivedInst, agentGetter.invoke(agent));
+      }
+      return derivedInst;
+    } catch (InstantiationException
+        | IllegalAccessException
+        | IllegalArgumentException
+        | InvocationTargetException
+        | NoSuchMethodException
+        | SecurityException e) {
+      LOGGER.error(
+          "Error while building the derived holder instance, reflection threw an exception", e);
+      return null;
+    }
+  }
+
   @Override
   protected void extendReducedIdentifiable(Item identifiable, RowView rowView) {
     super.extendReducedIdentifiable(identifiable, rowView);
@@ -141,6 +193,16 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     Agent holder = null;
     if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
       holder = rowView.getRow(Agent.class);
+      Agent exactholder =
+          switch (holder.getIdentifiableObjectType()) {
+            case CORPORATE_BODY -> buildDerivedHolderInstance(holder, CorporateBody.class);
+            case PERSON -> buildDerivedHolderInstance(holder, Person.class);
+            case FAMILY -> buildDerivedHolderInstance(holder, Family.class);
+            default -> null;
+          };
+      if (exactholder != null) {
+        holder = exactholder;
+      }
     }
 
     UUID partOfItemUuid = rowView.getColumn(MAPPING_PREFIX + "_part_of_item_uuid", UUID.class);
@@ -293,20 +355,16 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public Item save(Item item) {
+  public void save(Item item) throws RepositoryException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.save(item, bindings);
-    Item result = getByUuid(item.getUuid());
-    return result;
   }
 
   @Override
-  public Item update(Item item) {
+  public void update(Item item) throws RepositoryException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
-    Item result = getByUuid(item.getUuid());
-    return result;
   }
 }

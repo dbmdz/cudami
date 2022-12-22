@@ -8,6 +8,7 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Locale;
@@ -16,11 +17,13 @@ import java.util.UUID;
 
 public class TestModelFixture {
 
-  public static DigitalObject createDigitalObject(
-      Map<Locale, String> labelMap, Map<Locale, String> descriptionMap) {
-    DigitalObject digitalObject = new DigitalObject();
+  public static <E extends Entity> E createEntity(
+      Class<E> cls, Map<Locale, String> labelMap, Map<Locale, String> descriptionMap)
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
+    E entity = cls.getConstructor().newInstance();
     LocalizedText labelText = createLocalizedText(labelMap);
-    digitalObject.setLabel(labelText);
+    entity.setLabel(labelText);
 
     LocalizedStructuredContent descriptionContent = new LocalizedStructuredContent();
     for (Map.Entry<Locale, String> entry : descriptionMap.entrySet()) {
@@ -29,16 +32,25 @@ public class TestModelFixture {
       structuredContent.addContentBlock(paragraph);
       descriptionContent.put(entry.getKey(), structuredContent);
     }
-    digitalObject.setDescription(descriptionContent);
+    entity.setDescription(descriptionContent);
 
-    return digitalObject;
+    return entity;
+  }
+
+  public static DigitalObject createDigitalObject(
+      Map<Locale, String> labelMap, Map<Locale, String> descriptionMap)
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
+    return createEntity(DigitalObject.class, labelMap, descriptionMap);
   }
 
   public static EntityRelation createEntityRelation(
-      Map<Locale, String> subjectLabels, Map<Locale, String> objectLabels, String predicate) {
-    Entity subject = createDigitalObject(subjectLabels, Map.of());
+      Map<Locale, String> subjectLabels, Map<Locale, String> objectLabels, String predicate)
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException {
+    Entity subject = createEntity(Entity.class, subjectLabels, Map.of());
     subject.setUuid(UUID.randomUUID());
-    Entity object = createDigitalObject(objectLabels, Map.of());
+    Entity object = createEntity(Entity.class, objectLabels, Map.of());
     object.setUuid(UUID.randomUUID());
     return new EntityRelation(subject, predicate, object);
   }

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
@@ -55,7 +55,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     boolean successful;
     try {
       successful = corporateBodyService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -82,7 +82,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
               description = "GND-ID of the corporate body, e.g. <tt>2007744-0</tt>")
           @PathVariable("gndId")
           String gndId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
@@ -122,7 +122,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CorporateBody> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -137,7 +137,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<CorporateBody> getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     CorporateBody corporateBody = corporateBodyService.getByRefId(refId);
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -165,7 +165,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     CorporateBody corporateBody;
     if (pLocale == null) {
@@ -200,8 +200,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return corporateBodyService.save(corporateBody);
+      throws ServiceException, ValidationException {
+    corporateBodyService.save(corporateBody);
+    return corporateBody;
   }
 
   @Operation(summary = "Update a corporate body")
@@ -222,8 +223,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
           UUID uuid,
       @RequestBody CorporateBody corporateBody,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, corporateBody.getUuid());
-    return corporateBodyService.update(corporateBody);
+    corporateBodyService.update(corporateBody);
+    return corporateBody;
   }
 }

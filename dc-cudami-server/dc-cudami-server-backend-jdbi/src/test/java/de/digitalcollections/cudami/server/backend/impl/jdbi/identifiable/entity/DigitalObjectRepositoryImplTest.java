@@ -2,10 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
@@ -39,6 +38,7 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -47,35 +47,23 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {DigitalObjectRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The DigitalObject Repository")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DigitalObjectRepositoryImplTest {
-
-  DigitalObjectRepositoryImpl repo;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-
-  @Autowired Jdbi jdbi;
+class DigitalObjectRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<DigitalObjectRepositoryImpl> {
 
   @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
@@ -88,13 +76,13 @@ class DigitalObjectRepositoryImplTest {
 
   @Autowired private TagRepositoryImpl tagRepository;
 
-  @Autowired CudamiConfig cudamiConfig;
-
   @Autowired private EntityRepositoryImpl<GeoLocation> geoLocationEntityRepositoryImpl;
 
   @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
 
   @Autowired private IdentifierRepositoryImpl identifierRepositoryImpl;
+
+  @Autowired private LicenseRepositoryImpl licenseRepository;
 
   @Autowired private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepository;
 
@@ -124,14 +112,8 @@ class DigitalObjectRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  }
-
-  @Test
   @DisplayName("can save and retrieve a DigitalObject with its directly embedded resources")
-  void saveDigitalObject() {
+  void saveDigitalObject() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -161,8 +143,8 @@ class DigitalObjectRepositoryImplTest {
             .geoLocation(creationPlace)
             .build();
 
-    DigitalObject parent =
-        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
 
     Tag tag =
         tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
@@ -180,32 +162,42 @@ class DigitalObjectRepositoryImplTest {
             .build();
 
     // The "save" method internally retrieves the object by findOne
-    DigitalObject actual = repo.save(digitalObject);
+    repo.save(digitalObject);
 
-    assertThat(actual.getLabel().getText(Locale.GERMAN)).isEqualTo("deutschsprachiges Label");
-    assertThat(actual.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
+    assertThat(digitalObject.getLabel().getText(Locale.GERMAN))
+        .isEqualTo("deutschsprachiges Label");
+    assertThat(digitalObject.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
     Paragraph paragraphDe =
-        (Paragraph) actual.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
+        (Paragraph) digitalObject.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
     assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
 
-    assertThat(actual.getLicense()).isEqualTo(digitalObject.getLicense());
+    assertThat(digitalObject.getLicense()).isEqualTo(EXISTING_LICENSE);
 
-    assertThat(actual.getCreationInfo().getCreator()).isEqualTo(creator);
-    assertThat(actual.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
+    assertThat(digitalObject.getCreationInfo().getCreator()).isEqualTo(creator);
+    assertThat(digitalObject.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
         .isEqualTo("2022-02-25");
-    assertThat(actual.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
+    assertThat(digitalObject.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
 
-    assertThat(actual.getParent()).isNotNull();
-    assertThat(actual.getParent().getUuid()).isEqualTo(parent.getUuid());
-    assertThat(actual.getParent().getLabel()).isEqualTo(parent.getLabel());
+    assertThat(digitalObject.getParent()).isNotNull();
+    assertThat(digitalObject.getParent().getUuid()).isEqualTo(parent.getUuid());
+    assertThat(digitalObject.getParent().getLabel()).isEqualTo(parent.getLabel());
 
-    assertThat(actual.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
+    assertThat(digitalObject.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
         .containsExactly(tag.getUuid());
+
+    // Verify, that the method-persisted DigitalObject is the same, which is in the database
+    // Since some embeeded resource are not competely filled, we have to fill them explicitly
+    DigitalObject persisted = repo.getByUuid(digitalObject.getUuid());
+    if (persisted.getLicense() != null) {
+      persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
+    }
+
+    assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
   }
 
   @Test
   @DisplayName("returns the reduced DigitalObject without any creation info and embedded resources")
-  void returnReduced() {
+  void returnReduced() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
 
     // The "save" method internally retrieves the object by findOne
@@ -232,10 +224,22 @@ class DigitalObjectRepositoryImplTest {
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              repo.save(
-                  TestModelFixture.createDigitalObject(
-                      Map.of(Locale.GERMAN, "de labeltest" + i, Locale.ENGLISH, "en labeltest" + i),
-                      Map.of(Locale.GERMAN, "de desctest" + i, Locale.ENGLISH, "en desctest" + i)));
+              try {
+                repo.save(
+                    TestModelFixture.createDigitalObject(
+                        Map.of(
+                            Locale.GERMAN, "de labeltest" + i, Locale.ENGLISH, "en labeltest" + i),
+                        Map.of(
+                            Locale.GERMAN, "de desctest" + i, Locale.ENGLISH, "en desctest" + i)));
+              } catch (InstantiationException
+                  | IllegalAccessException
+                  | IllegalArgumentException
+                  | InvocationTargetException
+                  | NoSuchMethodException
+                  | SecurityException e) {
+              } catch (RepositoryException e) {
+                throw new RuntimeException(e);
+              }
             });
 
     String query = "test";
@@ -261,11 +265,13 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @DisplayName("can filter by the parent uuid")
-  void filterByParentUuid() {
+  void filterByParentUuid()
+      throws InstantiationException, IllegalAccessException, IllegalArgumentException,
+          InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     // Insert the parent DigitalObject
     DigitalObject parent =
         TestModelFixture.createDigitalObject(Map.of(Locale.GERMAN, "Parent"), Map.of());
-    parent = repo.save(parent);
+    repo.save(parent);
 
     // Insert the ADO
     DigitalObject ado =
@@ -295,19 +301,20 @@ class DigitalObjectRepositoryImplTest {
   void returnIdentifiers() throws RepositoryException {
     // Step1: Create the DigitalObject
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
-    DigitalObject persisted = repo.save(digitalObject);
+    repo.save(digitalObject);
 
     // Step2: Create the identifiers and connect with with the DigitalObject
-    Identifier identifier1 =
-        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace1", "1"));
-    Identifier identifier2 =
-        identifierRepositoryImpl.save(new Identifier(persisted.getUuid(), "namespace2", "2"));
+    Identifier identifier1 = new Identifier(digitalObject.getUuid(), "namespace1", "1");
+    identifierRepositoryImpl.save(identifier1);
+    Identifier identifier2 = new Identifier(digitalObject.getUuid(), "namespace2", "2");
+    identifierRepositoryImpl.save(identifier2);
 
     // Step3: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
         DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
-    DigitalObject otherPersisted = repo.save(otherDigitalObject);
-    identifierRepositoryImpl.save(new Identifier(otherPersisted.getUuid(), "namespace1", "other"));
+    repo.save(otherDigitalObject);
+    identifierRepositoryImpl.save(
+        new Identifier(otherDigitalObject.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
@@ -327,7 +334,7 @@ class DigitalObjectRepositoryImplTest {
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
-    digitalObject = repo.save(digitalObject);
+    repo.save(digitalObject);
     identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));
 
     DigitalObject actual = repo.getByIdentifier(new Identifier(null, "namespace", "key"));
@@ -341,7 +348,7 @@ class DigitalObjectRepositoryImplTest {
 
   @Test
   @DisplayName("save item UUID with digital object and retrieve it properly")
-  void saveAndRetrieveItemUuid() {
+  void saveAndRetrieveItemUuid() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
     Item item =
         Item.builder()
@@ -350,43 +357,117 @@ class DigitalObjectRepositoryImplTest {
             .identifier("mdz-sig", "Signatur")
             .title(Locale.GERMAN, "Ein Buchtitel")
             .build();
-    Item savedItem = itemRepository.save(item);
-    assertThat(savedItem.getUuid()).isNotNull();
+    itemRepository.save(item);
+    assertThat(item.getUuid()).isNotNull();
 
-    digitalObject.setItem(savedItem);
-    DigitalObject savedDigitalObject = repo.save(digitalObject);
-    assertThat(savedDigitalObject.getUuid()).isNotNull();
-    assertThat(savedDigitalObject.getItem().getUuid()).isEqualTo(savedItem.getUuid());
-    DigitalObject retrieved = repo.getByUuid(savedDigitalObject.getUuid());
-    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(savedItem.getUuid()).build());
+    digitalObject.setItem(item);
+    repo.save(digitalObject);
+    assertThat(digitalObject.getUuid()).isNotNull();
+    assertThat(digitalObject.getItem().getUuid()).isEqualTo(item.getUuid());
+    DigitalObject retrieved = repo.getByUuid(digitalObject.getUuid());
+    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(item.getUuid()).build());
   }
 
   @Test
   @Order(Integer.MAX_VALUE)
-  @DisplayName("")
-  void returnLanguages() {
+  @DisplayName("can return all label languages")
+  void returnLanguages() throws RepositoryException {
+    repo.save(DigitalObject.builder().label(Locale.GERMAN, "Test").build());
+    repo.save(DigitalObject.builder().label(Locale.ENGLISH, "Test").build());
+
     List<Locale> allLanguages = repo.getLanguages();
     assertThat(allLanguages).containsAll(List.of(Locale.GERMAN, Locale.ENGLISH));
 
     DigitalObject digitalObject = buildDigitalObject();
     LocalizedText label = digitalObject.getLabel();
     label.put(Locale.KOREAN, "테스트");
-    digitalObject = repo.save(digitalObject);
+    repo.save(digitalObject);
     List<Locale> languagesOfContainedDigitalObjects =
         repo.getLanguagesOfContainedDigitalObjects(digitalObject.getParent().getUuid());
     assertThat(languagesOfContainedDigitalObjects)
         .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
+  @Test
+  @DisplayName("can update a DigitalObject iwht its directly embedded resources")
+  void update() throws RepositoryException {
+    // Insert a license with uuid
+    ensureLicense(EXISTING_LICENSE);
+
+    // Insert a corporate body with UUID
+    CorporateBody creator =
+        CorporateBody.builder()
+            .uuid(UUID.randomUUID())
+            .label(Locale.GERMAN, "Körperschaft")
+            .label(Locale.ENGLISH, "Corporate Body")
+            .build();
+    CorporateBodyRepositoryImpl corporateBodyRepository =
+        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+    corporateBodyRepository.save(creator);
+
+    // Insert a geolocation with UUID
+    GeoLocation creationPlace =
+        GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
+    GeoLocationRepositoryImpl geoLocationRepository =
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+    geoLocationRepository.save(creationPlace);
+
+    // Build a CreationInfo object with the formerly persisted contents
+    CreationInfo creationInfo =
+        CreationInfo.builder()
+            .creator(creator)
+            .date("2022-02-25")
+            .geoLocation(creationPlace)
+            .build();
+
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
+
+    Tag tag =
+        tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
+
+    DigitalObject digitalObject =
+        DigitalObject.builder()
+            .label(Locale.GERMAN, "deutschsprachiges Label")
+            .label(Locale.ENGLISH, "english label")
+            .description(Locale.GERMAN, "Beschreibung")
+            .description(Locale.ENGLISH, "description")
+            .license(EXISTING_LICENSE)
+            .creationInfo(creationInfo)
+            .parent(parent)
+            .tag(tag)
+            .refId(42)
+            .build();
+
+    repo.save(digitalObject);
+
+    digitalObject.setNumberOfBinaryResources(200);
+    DigitalObject beforeUpdate = createDeepCopy(digitalObject);
+
+    repo.update(digitalObject);
+    assertThat(digitalObject.getLastModified()).isNotEqualTo(beforeUpdate.getLastModified());
+
+    beforeUpdate.setLastModified(digitalObject.getLastModified());
+    assertThat(digitalObject).isEqualToComparingFieldByField(beforeUpdate);
+
+    // Verify, that the method-persisted DigitalObject is the same, which is in the database
+    // Since some embeeded resource are not competely filled, we have to fill them explicitly
+    DigitalObject persisted = repo.getByUuid(digitalObject.getUuid());
+    if (persisted.getLicense() != null) {
+      persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
+    }
+
+    assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
+  }
+
   // -----------------------------------------------------------------
   private void ensureLicense(License license) {
-    LicenseRepositoryImpl licenseRepository = new LicenseRepositoryImpl(jdbi, cudamiConfig);
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }
   }
 
-  private DigitalObject buildDigitalObject() {
+  private DigitalObject buildDigitalObject() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);
 
@@ -441,8 +522,8 @@ class DigitalObjectRepositoryImplTest {
             .build();
 
     // Build a parent DigitalObject, save and retrieve it
-    DigitalObject parent =
-        repo.save(DigitalObject.builder().label(Locale.GERMAN, "Parent").build());
+    DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
+    repo.save(parent);
 
     DigitalObject digitalObject =
         DigitalObject.builder()

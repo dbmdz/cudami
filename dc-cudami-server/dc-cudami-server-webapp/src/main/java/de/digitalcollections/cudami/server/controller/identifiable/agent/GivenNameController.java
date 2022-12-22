@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.agent;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.GivenNameService;
@@ -72,7 +72,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<GivenName> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -84,7 +84,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -107,7 +107,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     GivenName result;
     if (pLocale == null) {
@@ -123,8 +123,9 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       value = {"/v6/givennames", "/v5/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return givenNameService.save(givenName);
+      throws ServiceException, ValidationException {
+    givenNameService.save(givenName);
+    return givenName;
   }
 
   @Operation(summary = "update a givenname")
@@ -133,8 +134,9 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, givenName.getUuid());
-    return givenNameService.update(givenName);
+    givenNameService.update(givenName);
+    return givenName;
   }
 }

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
@@ -81,7 +81,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
     boolean successful;
     try {
       successful = personService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -174,7 +174,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Person> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -191,7 +191,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -219,7 +219,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Person result;
     if (pLocale == null) {
@@ -240,7 +240,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     return personService.getDigitalObjects(uuid);
   }
 
@@ -266,7 +266,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
         "/latest/persons/{uuid}/works"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws IdentifiableServiceException {
+  public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
     return personService.getWorks(uuid);
   }
 
@@ -275,8 +275,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       value = {"/v6/persons", "/v5/persons", "/v2/persons", "/latest/persons"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return personService.save(person);
+      throws ServiceException, ValidationException {
+    personService.save(person);
+    return person;
   }
 
   @Operation(summary = "update a person")
@@ -290,8 +291,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, person.getUuid());
-    return personService.update(person);
+    personService.update(person);
+    return person;
   }
 }

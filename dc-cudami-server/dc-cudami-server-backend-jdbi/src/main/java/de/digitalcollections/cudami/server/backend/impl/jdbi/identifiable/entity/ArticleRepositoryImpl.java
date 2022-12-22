@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Article;
@@ -186,15 +187,12 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article save(Article article) {
+  public void save(Article article) throws RepositoryException {
     super.save(article);
 
     // save creators
     List<Agent> creators = article.getCreators();
     setCreatorsList(article, creators);
-
-    Article result = getByUuid(article.getUuid());
-    return result;
   }
 
   private void setCreatorsList(Article article, List<Agent> creators) {
@@ -227,14 +225,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article update(Article article) {
+  public void update(Article article) throws RepositoryException {
     super.update(article);
 
     // save creators
     List<Agent> creators = article.getCreators();
     setCreatorsList(article, creators);
-
-    Article result = getByUuid(article.getUuid());
-    return result;
   }
 }

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.HeadwordEntryService;
@@ -80,7 +80,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
                   "UUID of the headword, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     return headwordEntryService.getByHeadword(uuid);
   }
 
@@ -93,7 +93,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries/identifier/**", "/v5/headwordentries/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HeadwordEntry> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -117,7 +117,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     HeadwordEntry headwordEntry;
     if (pLocale == null) {
@@ -142,8 +142,9 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries", "/v5/headwordentries"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry save(@RequestBody HeadwordEntry headwordEntry, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return headwordEntryService.save(headwordEntry);
+      throws ServiceException, ValidationException {
+    headwordEntryService.save(headwordEntry);
+    return headwordEntry;
   }
 
   @Operation(summary = "Update an headwordentry")
@@ -152,8 +153,9 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry update(
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, headwordEntry.getUuid());
-    return headwordEntryService.update(headwordEntry);
+    headwordEntryService.update(headwordEntry);
+    return headwordEntry;
   }
 }

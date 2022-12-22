@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
@@ -69,7 +69,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID parentTopicUuid,
       @Parameter(name = "subtopicUuid", description = "The uuid of the subtopic") @PathVariable
           UUID subtopicUuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     boolean successful = topicService.addChild(parentTopicUuid, subtopicUuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
@@ -216,7 +216,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @Parameter(name = "refId", example = "", description = "refId of the topic, e.g. <tt>42</tt>")
           @PathVariable
           long refId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Topic topic = topicService.getByRefId(refId);
     return getByUuid(topic.getUuid(), null);
   }
@@ -242,7 +242,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Topic topic;
     if (pLocale == null) {
       topic = topicService.getByUuid(uuid);
@@ -386,8 +386,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       value = {"/v6/topics", "/v5/topics", "/v2/topics", "/latest/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return topicService.save(topic);
+      throws ServiceException, ValidationException {
+    topicService.save(topic);
+    return topic;
   }
 
   @Operation(summary = "Save a newly created topic and add it to parent")
@@ -405,7 +406,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID parentTopicUuid,
       @RequestBody Topic topic,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return topicService.saveWithParent(topic, parentTopicUuid);
   }
 
@@ -446,8 +447,9 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, topic.getUuid());
-    return topicService.update(topic);
+    topicService.update(topic);
+    return topic;
   }
 }

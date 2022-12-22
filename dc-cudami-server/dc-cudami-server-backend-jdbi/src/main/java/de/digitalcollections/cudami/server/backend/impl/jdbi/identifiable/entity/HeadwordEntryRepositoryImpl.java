@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -47,26 +48,24 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   public static final String TABLE_ALIAS = "he";
   public static final String TABLE_NAME = "headwordentries";
 
-  private static BiFunction<Map<UUID, HeadwordEntry>, RowView, Map<UUID, HeadwordEntry>>
-      createAdditionalReduceRowsBiFunction() {
-    return (map, rowView) -> {
-      // entity should be already in map, as we here just add additional data
-      HeadwordEntry headwordEntry =
-          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  private static BiConsumer<Map<UUID, HeadwordEntry>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
+      (map, rowView) -> {
+        // entity should be already in map, as we here just add additional data
+        HeadwordEntry headwordEntry =
+            map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        UUID headwordUuid =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-        String label =
-            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
-        final Headword headword = new Headword();
-        headword.setUuid(headwordUuid);
-        headword.setLabel(label);
-        headwordEntry.setHeadword(headword);
-      }
-      return map;
-    };
-  }
+        if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+            != null) {
+          UUID headwordUuid =
+              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+          String label =
+              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
+          final Headword headword = new Headword();
+          headword.setUuid(headwordUuid);
+          headword.setLabel(label);
+          headwordEntry.setHeadword(headword);
+        }
+      };
 
   @Override
   public String getSqlInsertFields() {
@@ -118,7 +117,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         MAPPING_PREFIX,
         HeadwordEntry.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction(),
+        ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
@@ -235,7 +234,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry save(HeadwordEntry headwordEntry) {
+  public void save(HeadwordEntry headwordEntry) throws RepositoryException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {
@@ -247,9 +246,6 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
     setCreatorsList(headwordEntry, creators);
-
-    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
-    return result;
   }
 
   private void setCreatorsList(HeadwordEntry headwordEntry, List<Agent> creators) {
@@ -282,7 +278,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry update(HeadwordEntry headwordEntry) {
+  public void update(HeadwordEntry headwordEntry) throws RepositoryException {
     Map<String, Object> bindings = new HashMap<>();
     UUID headwordUuid = null;
     if (headwordEntry.getHeadword() != null) {
@@ -294,8 +290,5 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     // save creators
     List<Agent> creators = headwordEntry.getCreators();
     setCreatorsList(headwordEntry, creators);
-
-    HeadwordEntry result = getByUuid(headwordEntry.getUuid());
-    return result;
   }
 }

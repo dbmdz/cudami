@@ -4,6 +4,7 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,13 +132,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
         + ", tags_uuids=:tags_uuids::UUID[]";
   }
 
+  /**
+   * On insert or update these fields will be returned to be processed by {@link
+   * #insertUpdateCallback(Identifiable, Map)}.
+   *
+   * @return modifiable list of fields, please do not return null
+   */
+  protected List<String> getReturnedFieldsOnInsertUpdate() {
+    return new ArrayList<>(0);
+  }
+
   /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
-  public BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction =
-      (map, rowView) -> {
-        return map;
-      };
-  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> basicReduceRowsBiFunction;
-  public final BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> fullReduceRowsBiFunction;
+  public BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer = (map, rowView) -> {};
+  public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
+  public final BiConsumer<Map<UUID, I>, RowView> fullReduceRowsBiConsumer;
   protected final Class<? extends Identifiable> identifiableImplClass;
   protected final String sqlSelectAllFieldsJoins;
 
@@ -194,7 +203,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
@@ -208,15 +217,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // set basic reduce rows bifunction for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
     // currently there is no difference to full, except that we do not want tags in reduced selects.
-    this.basicReduceRowsBiFunction = createReduceRowsBiFunction(true, true, false);
+    this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, false);
 
     // set full reduce rows bifunction for full selects (find one)
-    this.fullReduceRowsBiFunction = createReduceRowsBiFunction(true, true, true);
+    this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, true);
 
     // for detailes select (only used in find one, not lists): if additional objects should be
     // "joined" into instance, set bi function for doing this:
-    if (additionalReduceRowsBiFunction != null) {
-      this.additionalReduceRowsBiFunction = additionalReduceRowsBiFunction;
+    if (additionalReduceRowsBiConsumer != null) {
+      this.additionalReduceRowsBiConsumer = additionalReduceRowsBiConsumer;
     }
 
     this.identifiableImplClass = identifiableImplClass;
@@ -277,7 +286,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 
-  private BiFunction<Map<UUID, I>, RowView, Map<UUID, I>> createReduceRowsBiFunction(
+  private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(
       boolean withIdentifiers, boolean withPreviewImage, boolean withTags) {
     return (map, rowView) -> {
       I identifiable =
@@ -336,8 +345,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
       }
 
       extendReducedIdentifiable(identifiable, rowView);
-
-      return map;
     };
   }
 
@@ -679,6 +686,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     return super.getWhereClause(fc, argumentMappings, criterionCount);
   }
 
+  /**
+   * After save and update the returned fields (declared in {@link
+   * #getReturnedFieldsOnInsertUpdate()}) can be processed here.
+   *
+   * @param identifiable the object that was passed to save/update
+   * @param returnedFields returned fields in a map of column names to values
+   */
+  protected void insertUpdateCallback(I identifiable, Map<String, Object> returnedFields) {
+    // can be implemented in derived classes
+  }
+
   @Override
   public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
     long total =
@@ -710,7 +728,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
-            + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
+            + (sqlSelectAllFieldsJoins != null ? " " + sqlSelectAllFieldsJoins : "")
             + " LEFT JOIN "
             + IdentifierRepositoryImpl.TABLE_NAME
             + " AS "
@@ -754,7 +772,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                   .bindMap(argumentMappings)
                   .reduceRows(
                       (Map<UUID, I> map, RowView rowView) -> {
-                        basicReduceRowsBiFunction.apply(map, rowView);
+                        basicReduceRowsBiConsumer.accept(map, rowView);
                       })
                   .collect(Collectors.toList());
             });
@@ -839,20 +857,39 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
                         .bindMap(bindMap)
                         .reduceRows(
                             (Map<UUID, I> map, RowView rowView) -> {
-                              fullReduceRowsBiFunction.apply(map, rowView);
-                              additionalReduceRowsBiFunction.apply(map, rowView);
+                              fullReduceRowsBiConsumer.accept(map, rowView);
+                              additionalReduceRowsBiConsumer.accept(map, rowView);
                             }))
             .findFirst()
             .orElse(null);
     return result;
   }
 
-  @Override
-  public I save(I identifiable, Map<String, Object> bindings) {
-    return save(identifiable, bindings, null);
+  private void execInsertUpdate(
+      final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback) {
+    // because of a significant difference in execution duration it makes sense to distinguish here
+    if (withCallback) {
+      Map<String, Object> returnedFields =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(sql)
+                      .bindMap(bindings)
+                      .bindBean(identifiable)
+                      .mapToMap()
+                      .findOne()
+                      .orElse(Collections.emptyMap()));
+      insertUpdateCallback(identifiable, returnedFields);
+    } else {
+      dbi.withHandle(h -> h.createUpdate(sql).bindMap(bindings).bindBean(identifiable).execute());
+    }
   }
 
-  public I save(
+  @Override
+  public void save(I identifiable, Map<String, Object> bindings) throws RepositoryException {
+    save(identifiable, bindings, null);
+  }
+
+  public void save(
       I identifiable,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -877,8 +914,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     if (identifiable.getLastModified() == null) {
       identifiable.setLastModified(LocalDateTime.now());
     }
-
-    final String finalSql;
+    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
     String sql =
         "INSERT INTO "
             + tableName
@@ -886,19 +922,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
             + getSqlInsertFields()
             + ") VALUES ("
             + getSqlInsertValues()
-            + ")";
+            + ")"
+            + (hasReturningStmt
+                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
+                : "");
     if (sqlModifier != null) {
-      finalSql = sqlModifier.apply(sql, bindings);
-    } else {
-      finalSql = sql;
+      sql = sqlModifier.apply(sql, bindings);
     }
-
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
-
-    dbi.withHandle(
-        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
-
-    return identifiable;
+    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
   }
 
   @Override
@@ -985,11 +1016,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
   }
 
   @Override
-  public I update(I identifiable, Map<String, Object> bindings) {
-    return update(identifiable, bindings, null);
+  public void update(I identifiable, Map<String, Object> bindings) throws RepositoryException {
+    update(identifiable, bindings, null);
   }
 
-  public I update(
+  public void update(
       I identifiable,
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier) {
@@ -1007,19 +1038,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable> extends JdbiRepo
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
 
-    final String finalSql;
-    String sql = "UPDATE " + tableName + " SET" + getSqlUpdateFieldValues() + " WHERE uuid=:uuid";
+    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
+    String sql =
+        "UPDATE "
+            + tableName
+            + " SET"
+            + getSqlUpdateFieldValues()
+            + " WHERE uuid=:uuid"
+            + (hasReturningStmt
+                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
+                : "");
 
     if (sqlModifier != null) {
-      finalSql = sqlModifier.apply(sql, bindings);
-    } else {
-      finalSql = sql;
+      sql = sqlModifier.apply(sql, bindings);
     }
-
-    final Map<String, Object> finalBindings = new HashMap<>(bindings);
-    dbi.withHandle(
-        h -> h.createUpdate(finalSql).bindMap(finalBindings).bindBean(identifiable).execute());
-
-    return identifiable;
+    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
   }
 }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.versioning;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.versioning.VersionService;
 import de.digitalcollections.model.identifiable.versioning.Version;
@@ -50,7 +51,8 @@ public class VersionController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)
-      throws ValidationException {
-    return versionService.update(version);
+      throws ValidationException, ServiceException {
+    versionService.update(version);
+    return version;
   }
 }

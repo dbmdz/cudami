@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
@@ -62,7 +62,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
     boolean successful;
     try {
       successful = humanSettlementService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -101,7 +101,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<HumanSettlement> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -118,7 +118,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -146,7 +146,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
                   "Desired locale, e.g. <tt>de</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     HumanSettlement result;
     if (pLocale == null) {
@@ -167,8 +167,9 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return humanSettlementService.save(humanSettlement);
+      throws ServiceException, ValidationException {
+    humanSettlementService.save(humanSettlement);
+    return humanSettlement;
   }
 
   @Operation(summary = "update a human settlement")
@@ -184,8 +185,9 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @PathVariable("uuid") UUID uuid,
       @RequestBody HumanSettlement humanSettlement,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
-    return humanSettlementService.update(humanSettlement);
+    humanSettlementService.update(humanSettlement);
+    return humanSettlement;
   }
 }

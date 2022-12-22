@@ -7,6 +7,9 @@ import de.digitalcollections.commons.jdbi.JsonbListArgumentFactory;
 import de.digitalcollections.commons.jdbi.JsonbListColumnMapperFactory;
 import de.digitalcollections.model.geo.CoordinateLocation;
 import de.digitalcollections.model.identifiable.entity.CustomAttributes;
+import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.TimeValueRange;
@@ -37,6 +40,9 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerArgument(
         new JsonbListArgumentFactory<>(LocalizedStructuredContent.class, objectMapper));
     db.registerArgument(new JsonbArgumentFactory<>(TimeValueRange.class, objectMapper));
+    db.registerArgument(new JsonbArgumentFactory<>(PublicationInfo.class, objectMapper));
+    db.registerArgument(new JsonbArgumentFactory<>(ProductionInfo.class, objectMapper));
+    db.registerArgument(new JsonbArgumentFactory<>(DistributionInfo.class, objectMapper));
 
     // column mapper
     db.registerColumnMapper(new JsonbColumnMapperFactory(CoordinateLocation.class, objectMapper));
@@ -51,5 +57,8 @@ public class JsonbJdbiPlugin implements JdbiPlugin {
     db.registerColumnMapper(
         new JsonbListColumnMapperFactory(LocalizedStructuredContent.class, objectMapper));
     db.registerColumnMapper(new JsonbColumnMapperFactory(TimeValueRange.class, objectMapper));
+    db.registerColumnMapper(new JsonbColumnMapperFactory(PublicationInfo.class, objectMapper));
+    db.registerColumnMapper(new JsonbColumnMapperFactory(ProductionInfo.class, objectMapper));
+    db.registerColumnMapper(new JsonbColumnMapperFactory(DistributionInfo.class, objectMapper));
   }
 }

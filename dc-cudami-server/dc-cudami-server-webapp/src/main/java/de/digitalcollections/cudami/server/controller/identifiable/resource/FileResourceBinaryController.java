@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -70,7 +70,7 @@ public class FileResourceBinaryController {
           fileResource.setFilename(originalFilename);
           LOGGER.info("filename = " + fileResource.getFilename());
 
-          fileResource = binaryService.save(fileResource, stream);
+          binaryService.save(fileResource, stream);
           LOGGER.info(
               "saved file '"
                   + fileResource.getUri().toString()
@@ -81,7 +81,7 @@ public class FileResourceBinaryController {
           stream.close();
         }
       }
-    } catch (IOException | IdentifiableServiceException ex) {
+    } catch (IOException | ServiceException ex) {
       LOGGER.error("Error getting binary data from uploaded file", ex);
     } finally {
       if (stream != null) {

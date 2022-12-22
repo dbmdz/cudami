@@ -156,20 +156,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public Website save(Website website) {
-    super.save(website);
-    Website result = getByUuid(website.getUuid());
-    return result;
-  }
-
-  @Override
-  public Website update(Website website) {
-    super.update(website);
-    Website result = getByUuid(website.getUuid());
-    return result;
-  }
-
-  @Override
   public boolean updateRootWebpagesOrder(UUID websiteUuid, List<Webpage> rootPages) {
     if (websiteUuid == null || rootPages == null) {
       return false;

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resou
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
@@ -58,7 +59,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
   @DisplayName("can delete a list of RenderingResources by their uuids")
   @Test
-  void delete() {
+  void delete() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -67,7 +68,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the RenderingFileResource
     TextFileResource renderingFileResource =
@@ -76,10 +77,9 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    TextFileResource persistedRenderingResource =
-        textFileResourceMetadataRepository.save(renderingFileResource);
+    textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(persistedRenderingResource));
+    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
     List<FileResource> persisted = repo.getRenderingFileResources(digitalObject.getUuid());
 
     repo.delete(persisted.stream().map(FileResource::getUuid).collect(Collectors.toList()));
@@ -98,7 +98,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
   @DisplayName(
       "can count the number of entries for a provided LinkedDataFileResource uuid when entries exist")
   @Test
-  void countMoreThanZero() {
+  void countMoreThanZero() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -107,7 +107,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the RenderingFileResource
     TextFileResource renderingFileResource =
@@ -116,10 +116,9 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    TextFileResource persistedRenderingResource =
-        textFileResourceMetadataRepository.save(renderingFileResource);
+    textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(persistedRenderingResource));
+    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
 
     assertThat(repo.countDigitalObjectsForResource(renderingFileResource.getUuid())).isEqualTo(1);
   }
@@ -138,7 +137,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
 
   @DisplayName("returns the number of deleted items")
   @Test
-  void deletionReturnsNumberOfDeletedItems() {
+  void deletionReturnsNumberOfDeletedItems() throws RepositoryException {
     // Persist the DigitalObject
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -147,7 +146,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    digitalObject = digitalObjectRepository.save(digitalObject);
+    digitalObjectRepository.save(digitalObject);
 
     // Persist the RenderingFileResource
     TextFileResource renderingFileResource =
@@ -156,10 +155,9 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .filename("blubb.xml") // required!!
             .mimeType(MimeType.MIME_APPLICATION_XML)
             .build();
-    TextFileResource persistedRenderingResource =
-        textFileResourceMetadataRepository.save(renderingFileResource);
+    textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(persistedRenderingResource));
+    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
 
     assertThat(repo.delete(renderingFileResource.getUuid())).isEqualTo(1);
   }

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
@@ -90,7 +90,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<ImageFileResource> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -111,7 +111,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     ImageFileResource result;
     if (pLocale == null) {
       result = service.getByUuid(uuid);
@@ -126,8 +126,9 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       value = {"/v6/imagefileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ImageFileResource save(@RequestBody ImageFileResource imageFileResource)
-      throws IdentifiableServiceException, ValidationException {
-    return service.save(imageFileResource);
+      throws ServiceException, ValidationException {
+    service.save(imageFileResource);
+    return imageFileResource;
   }
 
   @Operation(summary = "Update an ImageFileResource")
@@ -136,8 +137,9 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ImageFileResource update(
       @PathVariable UUID uuid, @RequestBody ImageFileResource imageFileResource)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, imageFileResource.getUuid());
-    return service.update(imageFileResource);
+    service.update(imageFileResource);
+    return imageFileResource;
   }
 }

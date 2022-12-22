@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -49,57 +50,54 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
           + " LEFT JOIN givennames AS gn ON gn.uuid = pg.givenname_uuid";
   public static final String TABLE_NAME = "persons";
 
-  private static BiFunction<Map<UUID, Person>, RowView, Map<UUID, Person>>
-      createAdditionalReduceRowsBiFunction() {
-    return (map, rowView) -> {
-      // entity should be already in map, as we here just add additional data
-      Person person = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  private static final BiConsumer<Map<UUID, Person>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
+      (map, rowView) -> {
+        // entity should be already in map, as we here just add additional data
+        Person person = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
 
-      if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
-        UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
-        Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
-        LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
-        GeoLocationType geoLocationType =
-            rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfBirth = new GeoLocation();
-        placeOfBirth.setUuid(glBirthUuid);
-        placeOfBirth.setRefId(glRefId);
-        placeOfBirth.setLabel(label);
-        placeOfBirth.setGeoLocationType(geoLocationType);
-        person.setPlaceOfBirth(placeOfBirth);
-      }
-
-      if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
-        UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
-        Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
-        LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
-        GeoLocationType geoLocationType =
-            rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
-        final GeoLocation placeOfDeath = new GeoLocation();
-        placeOfDeath.setUuid(glDeathUuid);
-        placeOfDeath.setRefId(glRefId);
-        placeOfDeath.setLabel(label);
-        placeOfDeath.setGeoLocationType(geoLocationType);
-        person.setPlaceOfDeath(placeOfDeath);
-      }
-
-      try {
-        if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-            != null) {
-          person.getFamilyNames().add(rowView.getRow(FamilyName.class));
+        if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
+          UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);
+          Long glRefId = rowView.getColumn("glbirth_refid", Long.class);
+          LocalizedText label = rowView.getColumn("glbirth_label", LocalizedText.class);
+          GeoLocationType geoLocationType =
+              rowView.getColumn("glbirth_geoLocationType", GeoLocationType.class);
+          final GeoLocation placeOfBirth = new GeoLocation();
+          placeOfBirth.setUuid(glBirthUuid);
+          placeOfBirth.setRefId(glRefId);
+          placeOfBirth.setLabel(label);
+          placeOfBirth.setGeoLocationType(geoLocationType);
+          person.setPlaceOfBirth(placeOfBirth);
         }
-        if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-            != null) {
-          person.getGivenNames().add(rowView.getRow(GivenName.class));
+
+        if (rowView.getColumn("gldeath_uuid", UUID.class) != null) {
+          UUID glDeathUuid = rowView.getColumn("gldeath_uuid", UUID.class);
+          Long glRefId = rowView.getColumn("gldeath_refid", Long.class);
+          LocalizedText label = rowView.getColumn("gldeath_label", LocalizedText.class);
+          GeoLocationType geoLocationType =
+              rowView.getColumn("gldeath_geoLocationType", GeoLocationType.class);
+          final GeoLocation placeOfDeath = new GeoLocation();
+          placeOfDeath.setUuid(glDeathUuid);
+          placeOfDeath.setRefId(glRefId);
+          placeOfDeath.setLabel(label);
+          placeOfDeath.setGeoLocationType(geoLocationType);
+          person.setPlaceOfDeath(placeOfDeath);
         }
-      } catch (Exception e) {
-        // TODO to avoid this, some boolean params has to be given to function, if fields should
-        // exist.
-        LOGGER.debug("No family name or given name in rowview. Skipping.");
-      }
-      return map;
-    };
-  }
+
+        try {
+          if (rowView.getColumn(FamilyNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+              != null) {
+            person.getFamilyNames().add(rowView.getRow(FamilyName.class));
+          }
+          if (rowView.getColumn(GivenNameRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+              != null) {
+            person.getGivenNames().add(rowView.getRow(GivenName.class));
+          }
+        } catch (Exception e) {
+          // TODO to avoid this, some boolean params has to be given to function, if fields should
+          // exist.
+          LOGGER.debug("No family name or given name in rowview. Skipping.");
+        }
+      };
 
   @Override
   public String getSqlInsertFields() {
@@ -188,7 +186,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
         MAPPING_PREFIX,
         Person.class,
         SQL_FULL_FIELDS_JOINS,
-        createAdditionalReduceRowsBiFunction(),
+        ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
@@ -311,7 +309,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public Person save(Person person) {
+  public void save(Person person) throws RepositoryException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
@@ -327,8 +325,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
     // save family names
     List<FamilyName> familyNames = person.getFamilyNames();
     setRelatedFamilyNames(familyNames, person);
-    Person result = getByUuid(person.getUuid());
-    return result;
   }
 
   private void setRelatedFamilyNames(List<FamilyName> familyNames, Person person) {
@@ -376,7 +372,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
-  public Person update(Person person) {
+  public void update(Person person) throws RepositoryException {
     final UUID locationOfBirthUuid =
         person.getPlaceOfBirth() == null ? null : person.getPlaceOfBirth().getUuid();
     final UUID locationOfDeathUuid =
@@ -404,7 +400,5 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
                 .bind("uuid", person.getUuid())
                 .execute());
     setRelatedFamilyNames(familyNames, person);
-    Person result = getByUuid(person.getUuid());
-    return result;
   }
 }

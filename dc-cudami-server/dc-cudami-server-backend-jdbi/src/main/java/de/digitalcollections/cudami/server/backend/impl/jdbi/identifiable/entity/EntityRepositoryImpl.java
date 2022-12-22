@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -158,7 +160,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, E>, RowView, Map<UUID, E>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, E>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
         dbi,
@@ -167,7 +169,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         mappingPrefix,
         entityImplClass,
         sqlSelectAllFieldsJoins,
-        additionalReduceRowsBiFunction,
+        additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }
 
@@ -266,14 +268,30 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E save(E entity, Map<String, Object> bindings) {
+  protected List<String> getReturnedFieldsOnInsertUpdate() {
+    var fields = super.getReturnedFieldsOnInsertUpdate();
+    fields.add("refid");
+    return fields;
+  }
+
+  @Override
+  protected void insertUpdateCallback(E identifiable, Map<String, Object> returnedFields) {
+    super.insertUpdateCallback(identifiable, returnedFields);
+    identifiable.setRefId(Long.parseLong(returnedFields.getOrDefault("refid", 0).toString()));
+  }
+
+  @Override
+  public void save(
+      E entity,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.save(entity, bindings);
+    super.save(entity, bindings, sqlModifier);
   }
 
   @Override
@@ -307,13 +325,21 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E update(E entity, Map<String, Object> bindings) {
+  public void update(E entity, Map<String, Object> bindings) throws RepositoryException {
+    update(entity, bindings, null);
+  }
+
+  @Override
+  public void update(
+      E entity,
+      Map<String, Object> bindings,
+      BiFunction<String, Map<String, Object>, String> sqlModifier) {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
     if (isRepoForNamedEntity()) {
       bindings.put("split_name", splitToArray(((NamedEntity) entity).getName()));
     }
-    return super.update(entity, bindings);
+    super.update(entity, bindings, sqlModifier);
   }
 }

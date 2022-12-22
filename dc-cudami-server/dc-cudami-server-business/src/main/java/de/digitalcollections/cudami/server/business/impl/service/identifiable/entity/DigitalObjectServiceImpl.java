@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -79,7 +78,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public boolean addItemToDigitalObject(Item item, UUID digitalObjectUuid)
-      throws ConflictException, ValidationException, IdentifiableServiceException {
+      throws ConflictException, ValidationException, ServiceException {
     // If the item does not exist, return false
     if (item == null) {
       return false;
@@ -118,7 +117,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public boolean delete(UUID uuid) throws IdentifiableServiceException, ConflictException {
+  public boolean delete(UUID uuid) throws ServiceException, ConflictException {
     // Check for existance. If not given, return false.
     DigitalObject existingDigitalObject = getByUuid(uuid);
     if (existingDigitalObject == null) {
@@ -137,8 +136,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     // Remove LinkedDataFileResources (relation, and, if possible, resource)
     try {
       deleteLinkedDatafileResources(existingDigitalObject.getUuid());
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(
+    } catch (ServiceException e) {
+      throw new ServiceException(
           "Cannot remove LinkedDataFileResource from digitalObject with uuid="
               + existingDigitalObject.getUuid()
               + ": "
@@ -149,8 +148,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     // Remove RenderingResources (relation, and, if possible, resource)
     try {
       deleteRenderingResource(existingDigitalObject.getUuid());
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException(
+    } catch (ServiceException e) {
+      throw new ServiceException(
           "Cannot remove RenderingFileResource from digitalObject with uuid="
               + existingDigitalObject.getUuid()
               + ": "
@@ -161,11 +160,11 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     return super.delete(uuid);
   }
 
-  private void deleteRenderingResource(UUID digitalObjectUuid) throws CudamiServiceException {
+  private void deleteRenderingResource(UUID digitalObjectUuid) throws ServiceException {
     digitalObjectRenderingFileResourceService.deleteRenderingFileResources(digitalObjectUuid);
   }
 
-  private void deleteLinkedDatafileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+  private void deleteLinkedDatafileResources(UUID digitalObjectUuid) throws ServiceException {
     digitalObjectLinkedDataFileResourceService.deleteLinkedDataFileResources(digitalObjectUuid);
   }
 
@@ -174,9 +173,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     ((DigitalObjectRepository) repository).deleteFileResources(digitalObjectUuid);
   }
 
-  private DigitalObject fillDigitalObject(DigitalObject digitalObject) {
+  private void fillDigitalObject(DigitalObject digitalObject) {
     if (digitalObject == null) {
-      return null;
+      return;
     }
 
     // Look for linked data file resources. If they exist, fill the DigitalObject
@@ -191,8 +190,6 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     if (renderingResources != null && !renderingResources.isEmpty()) {
       digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
     }
-
-    return digitalObject;
   }
 
   @Override
@@ -215,7 +212,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public DigitalObject getByIdentifier(Identifier identifier) {
-    return fillDigitalObject(super.getByIdentifier(identifier));
+    DigitalObject digitalObject = super.getByIdentifier(identifier);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
   }
 
   @Override
@@ -225,7 +224,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject getByIdentifierWithWEMI(String namespace, String id) {
+  public DigitalObject getByIdentifierWithWEMI(String namespace, String id)
+      throws ServiceException {
     DigitalObject digitalObject = getByIdentifier(namespace, id);
     if (digitalObject == null) {
       return null;
@@ -246,18 +246,23 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public DigitalObject getByRefId(long refId) {
-    return fillDigitalObject(super.getByRefId(refId));
+    DigitalObject digitalObject = super.getByRefId(refId);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
   }
 
   @Override
-  public DigitalObject getByUuid(UUID uuid) {
-    return fillDigitalObject(super.getByUuid(uuid));
+  public DigitalObject getByUuid(UUID uuid) throws ServiceException {
+    DigitalObject digitalObject = super.getByUuid(uuid);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
   }
 
   @Override
-  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale)
-      throws IdentifiableServiceException {
-    return fillDigitalObject(super.getByUuidAndLocale(uuid, locale));
+  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
+    DigitalObject digitalObject = super.getByUuidAndLocale(uuid, locale);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
   }
 
   @Override
@@ -306,7 +311,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     if (digitalObjects == null || digitalObjects.isEmpty()) {
       return digitalObjects;
     }
-    return digitalObjects.stream().map(this::fillDigitalObject).collect(Collectors.toList());
+    digitalObjects.stream().forEach(this::fillDigitalObject);
+    return digitalObjects;
   }
 
   @Override
@@ -316,19 +322,18 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> getRenderingResources(DigitalObject digitalObject)
-      throws CudamiServiceException {
+      throws ServiceException {
     return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObject);
   }
 
   @Override
-  public DigitalObject save(DigitalObject digitalObject)
-      throws IdentifiableServiceException, ValidationException {
+  public void save(DigitalObject digitalObject) throws ServiceException, ValidationException {
     // Keep the resources for later saving, because the repository save
     // method returns the DigitalObject with empty fields there!
     final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
     final List<FileResource> renderingResources = digitalObject.getRenderingResources();
 
-    digitalObject = super.save(digitalObject);
+    super.save(digitalObject);
 
     // save the linked data resources
     setLinkedDataFileResources(digitalObject, linkedDataResources);
@@ -336,31 +341,34 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     // save the rendering resources
     try {
       setRenderingFileResources(digitalObject, renderingResources);
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
+    } catch (ServiceException e) {
+      throw new ServiceException("Cannot update DigitalObject: " + e, e);
     }
-
-    return fillDigitalObject(digitalObject);
+    fillDigitalObject(digitalObject);
   }
 
   @Override
   public List<FileResource> setFileResources(
-      UUID digitalObjectUuid, List<FileResource> fileResources) {
-    return ((DigitalObjectRepository) repository)
-        .setFileResources(digitalObjectUuid, fileResources);
+      UUID digitalObjectUuid, List<FileResource> fileResources) throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository)
+          .setFileResources(digitalObjectUuid, fileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot set file resources", e);
+    }
   }
 
   @Override
   public List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources) {
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
+      throws ServiceException {
     return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
         digitalObjectUuid, linkedDataFileResources);
   }
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources)
-      throws CudamiServiceException {
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources) throws ServiceException {
     return digitalObjectRenderingFileResourceService.setRenderingFileResources(
         digitalObjectUuid, renderingFileResources);
   }
@@ -368,20 +376,19 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   @Override
   public List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
-      throws CudamiServiceException {
+      throws ServiceException {
     return digitalObjectRenderingFileResourceService.setRenderingFileResources(
         digitalObject, renderingFileResources);
   }
 
   @Override
-  public DigitalObject update(DigitalObject digitalObject)
-      throws IdentifiableServiceException, ValidationException {
+  public void update(DigitalObject digitalObject) throws ValidationException, ServiceException {
     // Keep the resources for later saving, because the repository save
     // method returns the DigitalObject with empty fields there!
     final List<LinkedDataFileResource> linkedDataResources = digitalObject.getLinkedDataResources();
     final List<FileResource> renderingResources = digitalObject.getRenderingResources();
 
-    digitalObject = super.update(digitalObject);
+    super.update(digitalObject);
 
     // save the linked data resources
     setLinkedDataFileResources(digitalObject, linkedDataResources);
@@ -389,10 +396,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     // save the rendering resources
     try {
       setRenderingFileResources(digitalObject, renderingResources);
-    } catch (CudamiServiceException e) {
-      throw new IdentifiableServiceException("Cannot update DigitalObject: " + e, e);
+    } catch (ServiceException e) {
+      throw new ServiceException("Cannot update DigitalObject: " + e, e);
     }
-
-    return fillDigitalObject(digitalObject);
+    fillDigitalObject(digitalObject);
   }
 }

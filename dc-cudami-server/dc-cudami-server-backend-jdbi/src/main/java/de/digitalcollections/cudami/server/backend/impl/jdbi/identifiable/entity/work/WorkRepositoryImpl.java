@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
@@ -174,15 +175,12 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   @Override
-  public W save(W work) {
+  public void save(W work) throws RepositoryException {
     super.save(work);
 
     // save creators
     List<Agent> creators = work.getCreators();
     setCreatorsList(work, creators);
-
-    W result = getByUuid(work.getUuid());
-    return result;
   }
 
   private void setCreatorsList(W work, List<Agent> creators) {
@@ -215,14 +213,11 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   @Override
-  public W update(W work) {
+  public void update(W work) throws RepositoryException {
     super.update(work);
 
     // save creators
     List<Agent> creators = work.getCreators();
     setCreatorsList(work, creators);
-
-    W result = getByUuid(work.getUuid());
-    return result;
   }
 }

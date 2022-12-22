@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
@@ -13,14 +13,13 @@ public interface SubjectService {
 
   Subject getByUuid(UUID uuid);
 
-  Subject save(Subject subject);
+  void save(Subject subject) throws ServiceException;
 
-  Subject update(Subject subject);
+  void update(Subject subject) throws ServiceException;
 
   boolean delete(List<UUID> uuids);
 
   PageResponse<Subject> find(PageRequest pageRequest);
 
-  Subject getByTypeAndIdentifier(String type, String namespace, String id)
-      throws CudamiServiceException;
+  Subject getByTypeAndIdentifier(String type, String namespace, String id) throws ServiceException;
 }

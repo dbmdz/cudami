@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -135,8 +137,9 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .uri("http://foo.bar/bla.xml")
             .build();
 
-    when(linkedDataFileResourceService.save(any(LinkedDataFileResource.class)))
-        .thenReturn(expected);
+    doAnswer(invocation -> replaceFirstArgumentData(expected, invocation))
+        .when(linkedDataFileResourceService)
+        .save(any(LinkedDataFileResource.class));
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -170,8 +173,9 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .uri("http://foo.bar/bla.xml")
             .build();
 
-    when(linkedDataFileResourceService.update(any(LinkedDataFileResource.class)))
-        .thenReturn(expected);
+    doAnswer(invocation -> replaceFirstArgumentData(expected, invocation))
+        .when(linkedDataFileResourceService)
+        .update(any(LinkedDataFileResource.class));
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -190,5 +194,19 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
 
     testPutJson(
         path, body, "/v5/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012.json");
+  }
+
+  // ------------------------------------------------------------
+  private static Object replaceFirstArgumentData(
+      LinkedDataFileResource expected, InvocationOnMock invocation) {
+    Object[] args = invocation.getArguments();
+    ((LinkedDataFileResource) args[0]).setUuid(expected.getUuid());
+    ((LinkedDataFileResource) args[0]).setLabel(expected.getLabel());
+    ((LinkedDataFileResource) args[0]).setLastModified(expected.getLastModified());
+    ((LinkedDataFileResource) args[0]).setUri(expected.getUri());
+    ((LinkedDataFileResource) args[0]).setContext(expected.getContext());
+    ((LinkedDataFileResource) args[0])
+        .setPreviewImageRenderingHints(expected.getPreviewImageRenderingHints());
+    return null;
   }
 }

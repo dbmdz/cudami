@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
@@ -74,7 +74,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
     boolean successful;
     try {
       successful = geoLocationService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -113,7 +113,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -130,7 +130,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -158,7 +158,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     GeoLocation result;
     if (pLocale == null) {
@@ -187,8 +187,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       value = {"/v6/geolocations", "/v5/geolocations", "/v2/geolocations", "/latest/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return geoLocationService.save(geoLocation);
+      throws ServiceException, ValidationException {
+    geoLocationService.save(geoLocation);
+    return geoLocation;
   }
 
   @Operation(summary = "update a geolocation")
@@ -202,8 +203,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, geoLocation.getUuid());
-    return geoLocationService.update(geoLocation);
+    geoLocationService.update(geoLocation);
+    return geoLocation;
   }
 }

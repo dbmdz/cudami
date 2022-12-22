@@ -171,7 +171,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType save(IdentifierType identifierType) {
+  public IdentifierType save(IdentifierType identifierType) throws RepositoryException {
     identifierType.setUuid(UUID.randomUUID());
     identifierType.setCreated(LocalDateTime.now());
     identifierType.setLastModified(LocalDateTime.now());
@@ -209,7 +209,7 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public IdentifierType update(IdentifierType identifierType) {
+  public IdentifierType update(IdentifierType identifierType) throws RepositoryException {
     identifierType.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert): uuid
     final String sql =

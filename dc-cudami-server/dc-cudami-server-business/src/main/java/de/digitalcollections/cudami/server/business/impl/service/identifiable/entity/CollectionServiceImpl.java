@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -61,7 +61,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+  public boolean delete(UUID uuid) throws ConflictException, ServiceException {
     long amountChildrenCollections =
         findChildren(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
             .getTotalElements();
@@ -206,7 +206,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getByIdentifier(String namespace, String id) {
+  public Collection getByIdentifier(String namespace, String id) throws ServiceException {
     Collection collection = super.getByIdentifier(namespace, id);
     setPublicationStatus(collection);
     return collection;
@@ -220,7 +220,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getByUuid(UUID uuid) {
+  public Collection getByUuid(UUID uuid) throws ServiceException {
     Collection collection = super.getByUuid(uuid);
     setPublicationStatus(collection);
     return collection;
@@ -228,7 +228,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
 
   @Override
   public Collection getByUuidAndLocale(UUID uuid, Locale locale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Collection collection = super.getByUuidAndLocale(uuid, locale);
     setPublicationStatus(collection);
     return collection;
@@ -284,16 +284,14 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection save(Collection entity)
-      throws IdentifiableServiceException, ValidationException {
-    Collection collection = super.save(entity);
-    setPublicationStatus(collection);
-    return collection;
+  public void save(Collection entity)
+      throws ServiceException, ValidationException {
+    super.save(entity);
+    setPublicationStatus(entity);
   }
 
   @Override
-  public Collection saveWithParent(UUID childUuid, UUID parentUuid)
-      throws IdentifiableServiceException {
+  public Collection saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
     try {
       Collection collection =
           ((CollectionRepository) repository).saveWithParent(childUuid, parentUuid);
@@ -301,7 +299,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       return collection;
     } catch (Exception e) {
       LOGGER.error("Cannot save collection " + childUuid + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 
@@ -320,11 +318,10 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection update(Collection entity)
-      throws IdentifiableServiceException, ValidationException {
-    Collection collection = super.update(entity);
-    setPublicationStatus(collection);
-    return collection;
+  public void update(Collection entity)
+      throws ServiceException, ValidationException {
+    super.update(entity);
+    setPublicationStatus(entity);
   }
 
   @Override

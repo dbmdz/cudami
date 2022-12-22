@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,7 +95,7 @@ public class V2WebpageController {
               schema = @Schema(implementation = Locale.class))
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException, JsonProcessingException {
+      throws ServiceException, JsonProcessingException {
     Webpage webpage = loadWebpage(pLocale, uuid);
     if (webpage == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -120,7 +120,7 @@ public class V2WebpageController {
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 
-  private Webpage loadWebpage(Locale pLocale, UUID uuid) throws IdentifiableServiceException {
+  private Webpage loadWebpage(Locale pLocale, UUID uuid) throws ServiceException {
     Webpage webpage;
     if (pLocale == null) {
       webpage = webpageService.getByUuid(uuid);

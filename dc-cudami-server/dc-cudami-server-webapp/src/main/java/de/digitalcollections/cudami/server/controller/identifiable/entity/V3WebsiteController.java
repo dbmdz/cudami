@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -71,7 +72,7 @@ public class V3WebsiteController {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     Website website = websiteService.getByUuid(uuid);
 
     if (website == null) {

@@ -1,8 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -71,11 +70,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   long count();
 
-  default boolean delete(UUID uuid) throws ConflictException, IdentifiableServiceException {
+  default boolean delete(UUID uuid) throws ConflictException, ServiceException {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  boolean delete(List<UUID> uuids) throws ConflictException, IdentifiableServiceException;
+  boolean delete(List<UUID> uuids) throws ConflictException, ServiceException;
 
   PageResponse<I> find(PageRequest pageRequest);
 
@@ -100,11 +99,11 @@ public interface IdentifiableService<I extends Identifiable> {
 
   I getByIdentifier(Identifier identifier);
 
-  I getByIdentifier(String namespace, String id);
+  I getByIdentifier(String namespace, String id) throws ServiceException;
 
-  I getByUuid(UUID uuid);
+  I getByUuid(UUID uuid) throws ServiceException;
 
-  I getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException;
+  I getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException;
 
   List<Locale> getLanguages();
 
@@ -126,7 +125,7 @@ public interface IdentifiableService<I extends Identifiable> {
 
   List<FileResource> getRelatedFileResources(UUID identifiableUuid);
 
-  I save(I identifiable) throws IdentifiableServiceException, ValidationException;
+  void save(I identifiable) throws ValidationException, ServiceException;
 
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
@@ -164,7 +163,7 @@ public interface IdentifiableService<I extends Identifiable> {
   List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources);
 
-  I update(I identifiable) throws IdentifiableServiceException, ValidationException;
+  void update(I identifiable) throws ServiceException, ValidationException;
 
-  void validate(I identifiable) throws CudamiServiceException, ValidationException;
+  void validate(I identifiable) throws ServiceException, ValidationException;
 }

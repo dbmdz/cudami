@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
@@ -87,7 +87,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Work> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -104,7 +104,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -131,7 +131,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Work result;
     if (pLocale == null) {
@@ -184,8 +184,9 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return workService.save(work);
+      throws ServiceException, ValidationException {
+    workService.save(work);
+    return work;
   }
 
   @Operation(summary = "update a work")
@@ -193,11 +194,12 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/{uuid}", "/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing work");
     }
 
-    return workService.update(work);
+    workService.update(work);
+    return work;
   }
 }

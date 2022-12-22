@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
@@ -195,7 +195,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     Website website = websiteService.getByUuid(uuid);
     return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -232,8 +232,9 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       value = {"/v6/websites", "/v5/websites", "/v2/websites", "/latest/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return websiteService.save(website);
+      throws ServiceException, ValidationException {
+    websiteService.save(website);
+    return website;
   }
 
   @Operation(
@@ -266,9 +267,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           UUID uuid,
       @RequestBody Website website,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, website.getUuid());
-    return websiteService.update(website);
+    websiteService.update(website);
+    return website;
   }
 
   @Operation(

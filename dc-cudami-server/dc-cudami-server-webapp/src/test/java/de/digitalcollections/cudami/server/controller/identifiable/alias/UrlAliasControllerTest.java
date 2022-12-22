@@ -2,9 +2,10 @@ package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -115,7 +117,10 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+
+    doAnswer(invocation -> replaceFirstArgumentData(expectedUrlAlias, invocation))
+        .when(urlAliasService)
+        .save(any(UrlAlias.class));
 
     String body =
         "{\n"
@@ -150,7 +155,10 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.update(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
+
+    doAnswer(invocation -> replaceFirstArgumentData(expectedUrlAlias, invocation))
+        .when(urlAliasService)
+        .update(any(UrlAlias.class));
 
     String body =
         "{\n"
@@ -344,7 +352,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @Test
   public void exceptionOnSlugGeneration() throws Exception {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
-        .thenThrow(new CudamiServiceException("foo"));
+        .thenThrow(new ServiceException("foo"));
 
     testInternalError("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
   }
@@ -375,5 +383,14 @@ class UrlAliasControllerTest extends BaseControllerTest {
         .thenReturn("hurz");
 
     testGetJsonString("/v5/urlaliases/slug/de_DE/label", "\"hurz\"");
+  }
+
+  // ------------------------------------------------------------
+  private static Object replaceFirstArgumentData(UrlAlias expected, InvocationOnMock invocation) {
+    Object[] args = invocation.getArguments();
+    ((UrlAlias) args[0]).setUuid(expected.getUuid());
+    ((UrlAlias) args[0]).setPrimary(expected.isPrimary());
+    ((UrlAlias) args[0]).setWebsite(expected.getWebsite());
+    return null;
   }
 }

@@ -2,10 +2,11 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -22,41 +23,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.IntStream;
-import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = IdentifiableRepositoryImpl.class)
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
 @DisplayName("The Identifiable Repository")
-@Sql(scripts = "classpath:cleanup_database.sql")
-class IdentifiableRepositoryImplTest {
-
-  IdentifiableRepositoryImpl repo;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-  @Autowired Jdbi jdbi;
-  @Autowired CudamiConfig cudamiConfig;
+class IdentifiableRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
 
   @BeforeEach
   public void beforeEach() {
     repo = new IdentifiableRepositoryImpl(jdbi, cudamiConfig);
-  }
-
-  @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
   }
 
   private DigitalObject createDigitalObjectWithLabels(String label) {
@@ -77,7 +57,7 @@ class IdentifiableRepositoryImplTest {
 
   @Test
   @DisplayName("retrieve one digital object")
-  void testGetByUuid() {
+  void testGetByUuid() throws RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
     identifiable.setCreated(LocalDateTime.now());
@@ -85,7 +65,7 @@ class IdentifiableRepositoryImplTest {
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
 
-    identifiable = this.repo.save(identifiable);
+    this.repo.save(identifiable);
 
     Identifiable actual = this.repo.getByUuid(identifiable.getUuid());
     assertThat(actual).isEqualTo(identifiable);
@@ -138,20 +118,61 @@ class IdentifiableRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("saves a DigitalObject and fills uuid and timestamps")
-  void testSave() {
-    DigitalObject digitalObject = new DigitalObject();
-    digitalObject.setLabel("Test");
-    assertThat(digitalObject.getCreated()).isNull();
-    assertThat(digitalObject.getLastModified()).isNull();
-    assertThat(digitalObject.getUuid()).isNull();
+  @DisplayName("saves an Identifiable and fills uuid and timestamps")
+  void testSave() throws RepositoryException {
+    Identifiable identifiable =
+        Identifiable.builder()
+            .type(IdentifiableType.ENTITY)
+            .identifiableObjectType(IdentifiableObjectType.IDENTIFIABLE)
+            .label(Locale.GERMAN, "Test")
+            .build();
 
-    DigitalObject actual = (DigitalObject) repo.save(digitalObject);
+    assertThat(identifiable.getCreated()).isNull();
+    assertThat(identifiable.getLastModified()).isNull();
+    assertThat(identifiable.getUuid()).isNull();
 
-    assertThat(actual).isEqualTo(digitalObject);
-    assertThat(actual.getCreated()).isNotNull();
-    assertThat(actual.getLastModified()).isNotNull();
-    assertThat(actual.getUuid()).isNotNull();
+    repo.save(identifiable);
+
+    assertThat(identifiable.getCreated()).isNotNull();
+    assertThat(identifiable.getLastModified()).isNotNull();
+    assertThat(identifiable.getUuid()).isNotNull();
+
+    Identifiable persisted = repo.getByUuid(identifiable.getUuid());
+    assertThat(identifiable).isEqualToComparingFieldByField(persisted);
+  }
+
+  @DisplayName("can update and return an Identifiable with updated lastModified timestamp")
+  @Test
+  public void testUpdate() throws RepositoryException {
+    Identifiable identifiable =
+        Identifiable.builder()
+            .type(IdentifiableType.ENTITY)
+            .identifiableObjectType(IdentifiableObjectType.IDENTIFIABLE)
+            .label(Locale.GERMAN, "Test")
+            .build();
+    repo.save(identifiable);
+
+    Identifiable beforeUpdate = createDeepCopy(identifiable);
+
+    LocalDateTime timestampBeforeUpdate = LocalDateTime.now();
+    repo.update(identifiable);
+    LocalDateTime timestampAfterUpdate = LocalDateTime.now();
+
+    // The last modified timestamp must be modified and must be between the time before and
+    // after the uodate
+    assertThat(identifiable.getLastModified()).isAfter(timestampBeforeUpdate);
+    assertThat(identifiable.getLastModified()).isBefore(timestampAfterUpdate);
+
+    // Now, we verify, if the rest if the same. To enable the assertion, we just set
+    // the last modified timestamp to the value before the update and check for
+    // equality of the updated and the to-be-updated object
+    beforeUpdate.setLastModified(identifiable.getLastModified());
+    assertThat(identifiable).isEqualToComparingFieldByField(beforeUpdate);
+
+    // Finally, we ensure that the Identifiable, with which the update method
+    // works is identical to the Identificable, which is persisted in the database
+    Identifiable persisted = repo.getByUuid(identifiable.getUuid());
+    assertThat(identifiable).isEqualToComparingFieldByField(persisted);
   }
 
   @Test
@@ -161,7 +182,11 @@ class IdentifiableRepositoryImplTest {
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              repo.save(createDigitalObjectWithLabels("test" + i));
+              try {
+                repo.save(createDigitalObjectWithLabels("test" + i));
+              } catch (RepositoryException e) {
+                throw new RuntimeException(e);
+              }
             });
 
     String searchTerm = "test";
@@ -272,21 +297,21 @@ class IdentifiableRepositoryImplTest {
 
   @Test
   @DisplayName("save and update `split_label`")
-  void testSaveUpdateOfSplitLabel() {
+  void testSaveUpdateOfSplitLabel() throws RepositoryException {
     // test save method
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setLabel(
         new LocalizedText(Locale.ENGLISH, "1 not so short Label to check the Label-Splitting"));
 
-    DigitalObject savedDigitalObject = (DigitalObject) repo.save(digitalObject);
-    assertThat(savedDigitalObject.getUuid()).isNotNull();
+    repo.save(digitalObject);
+    assertThat(digitalObject.getUuid()).isNotNull();
 
     String[] splitLabelDb =
         jdbi.withHandle(
             h ->
                 h.select(
                         "select split_label from identifiables where uuid = ?;",
-                        savedDigitalObject.getUuid())
+                        digitalObject.getUuid())
                     .mapTo(String[].class)
                     .findOne()
                     .orElse(null));
@@ -311,15 +336,15 @@ class IdentifiableRepositoryImplTest {
     LocalizedText label = new LocalizedText();
     label.setText(Locale.ENGLISH, "An English label, no. 1");
     label.setText(Locale.GERMAN, "Ein deutsches Label, nr. 2");
-    savedDigitalObject.setLabel(label);
-    repo.update(savedDigitalObject);
+    digitalObject.setLabel(label);
+    repo.update(digitalObject);
 
     String[] splitLabelUpdated =
         jdbi.withHandle(
             h ->
                 h.select(
                         "select split_label from identifiables where uuid = ?;",
-                        savedDigitalObject.getUuid())
+                        digitalObject.getUuid())
                     .mapTo(String[].class)
                     .findOne()
                     .orElse(null));

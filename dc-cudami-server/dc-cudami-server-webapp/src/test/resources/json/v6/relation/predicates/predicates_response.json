@@ -2,7 +2,7 @@
   "objectType": "PREDICATE",
   "uuid": "bb5885f6-fd24-48e9-99f6-1f1a49d239bf",
   "label": {
-    "": "bar"
+   "und": "bar"
   },
   "value": "foo"
 }

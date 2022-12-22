@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.semantic;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -63,7 +62,7 @@ public class TagController {
       value = {"/v6/tags/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Tag> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException, CudamiServiceException {
+      throws ValidationException, ServiceException {
     Triple<String, String, String> typeNamespaceId =
         ParameterHelper.extractTripleOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
     if (typeNamespaceId.getLeft().isBlank()

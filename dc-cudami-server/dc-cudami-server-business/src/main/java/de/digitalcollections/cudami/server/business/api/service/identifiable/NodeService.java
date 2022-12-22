@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -113,12 +113,11 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
    * @param child newly created child node to be saved
    * @param parentUuid parent node the new node is child of
    * @return saved child node
-   * @throws IdentifiableServiceException if saving fails
+   * @throws ServiceException if saving fails
    */
-  default N saveWithParent(N child, UUID parentUuid)
-      throws IdentifiableServiceException, ValidationException {
+  default N saveWithParent(N child, UUID parentUuid) throws ServiceException, ValidationException {
     if (child.getUuid() == null) {
-      child = save(child);
+      save(child);
     }
     return saveWithParent(child.getUuid(), parentUuid);
   }
@@ -127,9 +126,9 @@ public interface NodeService<N extends Identifiable> extends IdentifiableService
    * @param childUuid UUID of newly created child node
    * @param parentUuid parent node the new node is child of
    * @return saved child node
-   * @throws IdentifiableServiceException if saving fails
+   * @throws ServiceException if saving fails
    */
-  N saveWithParent(UUID childUuid, UUID parentUuid) throws IdentifiableServiceException;
+  N saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException;
 
   boolean updateChildrenOrder(UUID parentUuid, List<N> children);
 }

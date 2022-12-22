@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
@@ -97,7 +97,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     Pair<String, String> namespaceAndId =
         ParameterHelper.extractPairOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
     if (namespaceAndId.getLeft().isBlank()
@@ -140,7 +140,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) {
+  public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) throws ServiceException {
     Entity entity = entityService.getByUuid(uuid);
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

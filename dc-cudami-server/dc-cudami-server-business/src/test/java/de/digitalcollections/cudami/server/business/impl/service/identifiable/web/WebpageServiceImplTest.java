@@ -9,14 +9,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.model.identifiable.Node;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The webservice implementation")
-class WebpageServiceImplTest {
+class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   WebpageServiceImpl service;
 
@@ -41,19 +41,15 @@ class WebpageServiceImplTest {
 
   IdentifierService identifierService;
   UrlAliasService urlAliasService;
-  CudamiConfig cudamiConfig;
 
   private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
 
+  @Override
   @BeforeEach
   public void beforeEach() {
     repo = mock(WebpageRepository.class);
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
-    cudamiConfig = mock(CudamiConfig.class);
-    CudamiConfig.UrlAlias cudamiConfigUrlAlias = mock(CudamiConfig.UrlAlias.class);
-    when(cudamiConfigUrlAlias.getGenerationExcludes()).thenReturn(List.of("DigitalObject"));
-    when(cudamiConfig.getUrlAlias()).thenReturn(cudamiConfigUrlAlias);
 
     LocaleService localeService = mock(LocaleService.class);
 
@@ -213,13 +209,11 @@ class WebpageServiceImplTest {
 
   @Test
   @DisplayName("does not allow empty UrlAliases at save")
-  public void saveWithEmptyUrlAliases()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+  public void saveWithEmptyUrlAliases() throws RepositoryException {
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
-    when(repo.save(eq(webpage))).thenReturn(webpage);
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.save(webpage);
         });
@@ -229,7 +223,7 @@ class WebpageServiceImplTest {
   @Test
   @DisplayName("does not allow empty UrlAliases at update")
   public void updateWithEmptyUrlAliases()
-      throws ValidationException, IdentifiableServiceException, CudamiServiceException {
+      throws ValidationException, ServiceException, RepositoryException {
     UUID webpageUuid = UUID.randomUUID();
 
     // in DB
@@ -241,14 +235,12 @@ class WebpageServiceImplTest {
     Webpage webpage = new Webpage();
     webpage.setLabel("test");
     webpage.setUuid(webpageUuid);
-    when(repo.update(eq(webpage))).thenReturn(webpage);
     UrlAlias dummyAlias = new UrlAlias();
     Website dummyWebsite = new Website();
     dummyWebsite.setUuid(UUID.randomUUID());
     dummyAlias.setWebsite(dummyWebsite);
-    when(urlAliasService.save(any(UrlAlias.class))).thenReturn(dummyAlias);
     assertThrows(
-        IdentifiableServiceException.class,
+        ServiceException.class,
         () -> {
           service.update(webpage);
         });

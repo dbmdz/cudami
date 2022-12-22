@@ -2,8 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -17,35 +17,20 @@ import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.Set;
-import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {SubjectRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
-@Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Subject Repository")
-class SubjectRepositoryImplTest {
+class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
 
   SubjectRepositoryImpl repo;
-
-  @Autowired CudamiConfig cudamiConfig;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-
-  @Autowired Jdbi jdbi;
 
   @Autowired DbIdentifierMapper dbIdentifierMapper;
 
@@ -62,7 +47,7 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can save and retrieve by uuid")
   @Test
-  void saveAndRetrieveByUuid() {
+  void saveAndRetrieveByUuid() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     final Identifier identifier1 = Identifier.builder().namespace("name,space1").id("id1").build();
     final Identifier identifier2 = Identifier.builder().namespace("namespace2").id("id2").build();
@@ -74,22 +59,22 @@ class SubjectRepositoryImplTest {
             .identifier(identifier2)
             .build();
 
-    Subject savedSubject = repo.save(subject);
-    assertThat(savedSubject.getUuid()).isNotNull();
-    assertThat(savedSubject.getCreated()).isNotNull();
-    assertThat(savedSubject.getLastModified()).isNotNull();
-    assertThat(savedSubject.getType()).isEqualTo("test");
-    assertThat(savedSubject.getLabel()).isEqualTo(label);
-    assertThat(savedSubject.getIdentifiers()).containsExactlyInAnyOrder(identifier1, identifier2);
+    repo.save(subject);
+    assertThat(subject.getUuid()).isNotNull();
+    assertThat(subject.getCreated()).isNotNull();
+    assertThat(subject.getLastModified()).isNotNull();
+    assertThat(subject.getType()).isEqualTo("test");
+    assertThat(subject.getLabel()).isEqualTo(label);
+    assertThat(subject.getIdentifiers()).containsExactlyInAnyOrder(identifier1, identifier2);
 
-    Subject retrievedSubject = repo.getByUuid(savedSubject.getUuid());
+    Subject retrievedSubject = repo.getByUuid(subject.getUuid());
 
-    assertThat(retrievedSubject).isEqualTo(savedSubject);
+    assertThat(retrievedSubject).isEqualTo(subject);
   }
 
   @DisplayName("can save and successfully delete")
   @Test
-  void saveAndDelete() {
+  void saveAndDelete() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "sbject-namespace", "subject-id2", "type");
     boolean success = repo.delete(savedSubject.getUuid());
@@ -104,34 +89,30 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can save and update")
   @Test
-  void saveAndUpdate() {
-    Subject savedSubject =
+  void saveAndUpdate() throws RepositoryException {
+    Subject subject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id3", "type");
-    Identifier savedSubjectIdentifier =
-        savedSubject.getIdentifiers().stream().findFirst().orElse(null);
+    Identifier savedSubjectIdentifier = subject.getIdentifiers().stream().findFirst().orElse(null);
 
-    Subject subjectToUpdate =
-        Subject.builder()
-            .label(new LocalizedText(Locale.GERMAN, "different label"))
-            .type(savedSubject.getType())
-            .uuid(savedSubject.getUuid())
-            .created(savedSubject.getCreated())
-            .identifiers(
-                Set.of(
-                    Identifier.builder()
-                        .namespace(savedSubjectIdentifier.getNamespace())
-                        .id("subject-id3other")
-                        .build()))
-            .build();
+    subject.setLabel(new LocalizedText(Locale.GERMAN, "different label"));
+    subject.setIdentifiers(
+        Set.of(
+            Identifier.builder()
+                .namespace(savedSubjectIdentifier.getNamespace())
+                .id("subject-id3other")
+                .build()));
 
-    Subject updatedSubject = repo.update(subjectToUpdate);
+    Subject beforeUpdate = createDeepCopy(subject);
 
-    assertThat(updatedSubject).isEqualTo(subjectToUpdate);
+    repo.update(subject);
+
+    beforeUpdate.setLastModified(subject.getLastModified());
+    assertThat(subject).isEqualTo(beforeUpdate);
   }
 
   @DisplayName("can retrieve all subjects with paging")
   @Test
-  void findAllPaged() {
+  void findAllPaged() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id4", "type");
 
@@ -142,7 +123,7 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can retrieve all subjects with sorting")
   @Test
-  void findAllPagedAndSorted() {
+  void findAllPagedAndSorted() throws RepositoryException {
     Subject savedSubject1 =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id5b", "type-b");
     Subject savedSubject2 =
@@ -163,7 +144,7 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can retrieve subjects with filtering")
   @Test
-  void findFiltered() {
+  void findFiltered() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id6", "type");
 
@@ -196,7 +177,7 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
-  void noMatches() {
+  void noMatches() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "subject-namespace", "subject-id7", "type");
 
@@ -224,7 +205,7 @@ class SubjectRepositoryImplTest {
 
   @DisplayName("can return by type, namespace and id")
   @Test
-  void getByTypeAndIdentifier() {
+  void getByTypeAndIdentifier() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(null, null, "subject-namespace", "subject-id8", "type");
 
@@ -235,7 +216,8 @@ class SubjectRepositoryImplTest {
   // ------------------------------------------------------
 
   private Subject ensureSavedSubject(
-      Locale labelLocale, String labelText, String namespace, String id, String type) {
+      Locale labelLocale, String labelText, String namespace, String id, String type)
+      throws RepositoryException {
     Subject subject =
         Subject.builder()
             .label(
@@ -246,6 +228,7 @@ class SubjectRepositoryImplTest {
             .type(type)
             .build();
 
-    return repo.save(subject);
+    repo.save(subject);
+    return subject;
   }
 }

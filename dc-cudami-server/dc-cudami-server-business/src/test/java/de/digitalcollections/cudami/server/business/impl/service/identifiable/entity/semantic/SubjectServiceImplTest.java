@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,14 +24,14 @@ class SubjectServiceImplTest {
   }
 
   @DisplayName(
-      "throws a CudamiServiceException at getByTypeAndIdentifier when an exception happens in the repository")
+      "throws a ServiceException at getByTypeAndIdentifier when an exception happens in the repository")
   @Test
   public void testCudamiServiceExceptionAtGetByTypeAndIdentifier() {
     when(subjectRepository.getByTypeAndIdentifier(any(), any(), any()))
         .thenThrow(new NullPointerException("boo"));
 
     assertThrows(
-        CudamiServiceException.class,
+        ServiceException.class,
         () -> subjectService.getByTypeAndIdentifier("type", "namespace", "id"));
   }
 }

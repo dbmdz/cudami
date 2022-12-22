@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -70,12 +70,13 @@ public class EntityRelationController {
   List<EntityRelation> saveEntityRelationsForSubject(
       @PathVariable("subjectuuid") UUID subjectUuid,
       @RequestBody List<EntityRelation> entityRelations)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (!subjectUuid.equals(entityRelations.get(0).getSubject().getUuid())) {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    return entityRelationService.save(entityRelations);
+    entityRelationService.save(entityRelations);
+    return entityRelations;
   }
 
   @Operation(summary = "Connect a list of entity pairs with a predicate each")
@@ -88,7 +89,8 @@ public class EntityRelationController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
-      throws CudamiServiceException {
-    return entityRelationService.save(entityRelations);
+      throws ServiceException {
+    entityRelationService.save(entityRelations);
+    return entityRelations;
   }
 }

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
@@ -68,7 +68,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @Parameter(name = "digitalObjectUuid", description = "UUID of the digital object")
           @PathVariable
           UUID digitalObjectUuid)
-      throws ValidationException, ConflictException, IdentifiableServiceException {
+      throws ValidationException, ConflictException, ServiceException {
 
     Item item = itemService.getByUuid(uuid);
     boolean successful = digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
@@ -108,7 +108,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     boolean successful;
     try {
       successful = itemService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -172,7 +172,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Item> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -189,7 +189,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "namespace", required = true) String namespace,
       @RequestParam(name = "id", required = true) String id,
       HttpServletRequest request)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     URI newLocation =
         URI.create(request.getRequestURI().concat(String.format("/%s:%s", namespace, id)));
     return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(newLocation).build();
@@ -211,7 +211,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Item result;
     if (pLocale == null) {
@@ -264,8 +264,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items", "/v5/items", "/v2/items", "/latest/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return itemService.save(item);
+      throws ServiceException, ValidationException {
+    itemService.save(item);
+    return item;
   }
 
   @Operation(summary = "update an item")
@@ -273,11 +274,12 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing item");
     }
 
-    return itemService.update(item);
+    itemService.update(item);
+    return item;
   }
 }

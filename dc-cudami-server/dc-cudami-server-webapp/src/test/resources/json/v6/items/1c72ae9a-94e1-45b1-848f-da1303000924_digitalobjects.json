@@ -6,7 +6,7 @@
       "identifiableObjectType": "DIGITAL_OBJECT",
       "identifiers": [],
       "label": {
-        "": "Hello"
+        "und": "Hello"
       },
       "type": "ENTITY",
       "refId": 0,

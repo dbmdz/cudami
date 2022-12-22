@@ -57,7 +57,8 @@ class IdentifierRepositoryImplTest {
     saveIdentifiable(identifiableUuid);
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
 
-    Identifier persisted = repo.save(identifier);
+    repo.save(identifier);
+    Identifier persisted = repo.getByUuid(identifier.getUuid());
     assertThat(persisted.getUuid()).isNotNull();
     assertThat(persisted.getIdentifiable()).isEqualTo(identifiableUuid);
     assertThat(persisted.getNamespace()).isEqualTo("namespace");
@@ -75,8 +76,10 @@ class IdentifierRepositoryImplTest {
   void identifiersForIdentifiable() throws RepositoryException {
     UUID identifiableUuid = UUID.randomUUID();
     saveIdentifiable(identifiableUuid);
-    Identifier identifier1 = repo.save(new Identifier(identifiableUuid, "namespace", "1"));
-    Identifier identifier2 = repo.save(new Identifier(identifiableUuid, "namespace", "2"));
+    Identifier identifier1 = new Identifier(identifiableUuid, "namespace", "1");
+    Identifier identifier2 = new Identifier(identifiableUuid, "namespace", "2");
+    repo.save(identifier1);
+    repo.save(identifier2);
 
     List<Identifier> actual = repo.findByIdentifiable(identifiableUuid);
     assertThat(actual).hasSize(2);
@@ -91,17 +94,17 @@ class IdentifierRepositoryImplTest {
     saveIdentifiable(identifiableUuid);
     Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
 
-    Identifier persisted = repo.save(identifier);
+    repo.save(identifier);
 
-    UUID identifierUuid = persisted.getUuid();
+    UUID identifierUuid = identifier.getUuid();
     assertThat(identifierUuid).isNotNull();
 
     // Retrieve it by its uuid - it must be the same as what was returned before at persisting
     Identifier actual = repo.getByUuid(identifierUuid);
-    assertThat(actual).isEqualTo(persisted);
+    assertThat(actual).isEqualTo(identifier);
   }
 
-  private void saveIdentifiable(UUID uuid) {
+  private void saveIdentifiable(UUID uuid) throws RepositoryException {
     Webpage webpage =
         Webpage.builder()
             .label(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -137,7 +139,9 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.save(any(ImageFileResource.class))).thenReturn(expected);
+    doAnswer(invocation -> replaceFirstArgumentData(expected, invocation))
+        .when(imageFileResourceService)
+        .save(any(ImageFileResource.class));
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -168,7 +172,9 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             .filename("baz.jpg")
             .build();
 
-    when(imageFileResourceService.update(any(ImageFileResource.class))).thenReturn(expected);
+    doAnswer(invocation -> replaceFirstArgumentData(expected, invocation))
+        .when(imageFileResourceService)
+        .update(any(ImageFileResource.class));
 
     // The body is the serialized LinkedDataFileResource to be persisted
     String body =
@@ -216,5 +222,18 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
     verify(imageFileResourceService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+  }
+
+  // ------------------------------------------------------------
+  private static Object replaceFirstArgumentData(
+      ImageFileResource expected, InvocationOnMock invocation) {
+    Object[] args = invocation.getArguments();
+    ((ImageFileResource) args[0]).setUuid(expected.getUuid());
+    ((ImageFileResource) args[0]).setLabel(expected.getLabel());
+    ((ImageFileResource) args[0]).setLastModified(expected.getLastModified());
+    ((ImageFileResource) args[0]).setUri(expected.getUri());
+    ((ImageFileResource) args[0])
+        .setPreviewImageRenderingHints(expected.getPreviewImageRenderingHints());
+    return null;
   }
 }

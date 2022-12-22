@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - POST/PUT/PATCH-Requests require the attribute `objectType` in the JSON body. If it is missing, it is heuristically set
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
+- UrlAlias uses `Locale.toLanguageTag()` explicitly to always retrieve a language, even for `Locale.ROOT` i.e. `und`
 - Split some controller into API and "not-API"-Controllers to make GUI and REST-methods more visible
 - Lists (using Bootstrap-Table component)
   - replacing language tabs with dropdown on new lists pages
@@ -31,6 +32,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - for `DigitalObjects` list (to proof fixing of too many tabs)
   - for `Collections` list
 - Switch language of displayed multilanguage data fields now using a select drop down instead of tabs
+
+### Fixed
+
+- UrlAlias does actively ignore any script of the target's locale
+- **SQL migration** (can be **long running**) replaces every emtpy string key in the labels (that comes from `Locale.ROOT` as language)
+by `"und"`
 
 ## [6.2.0](https://github.com/dbmdz/cudami/releases/tag/6.2.0) - 2022-11-25
 

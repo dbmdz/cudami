@@ -10,8 +10,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.file.MimeType;
@@ -39,7 +38,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
   private VideoFileResourceServiceImpl videoFileResourceService;
 
   @BeforeEach
-  public void beforeEach() throws CudamiServiceException {
+  public void beforeEach() throws ServiceException {
     applicationFileResourceService = mock(ApplicationFileResourceServiceImpl.class);
     audioFileResourceService = mock(AudioFileResourceServiceImpl.class);
     fileResourceMetadataService = mock(FileResourceMetadataService.class);
@@ -62,8 +61,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
   @DisplayName("can delete resource and relation, when the resource is not referenced elsewhere")
   @Test
-  public void deleteResourceAndRelation()
-      throws CudamiServiceException, IdentifiableServiceException, ConflictException {
+  public void deleteResourceAndRelation() throws ServiceException, ConflictException {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =
@@ -86,8 +84,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
   @DisplayName("can delete relation only, when the resource is referenced elsewhere")
   @Test
-  public void deleteOnlyRelation()
-      throws CudamiServiceException, IdentifiableServiceException, ConflictException {
+  public void deleteOnlyRelation() throws ServiceException, ConflictException {
     UUID uuid = UUID.randomUUID();
     DigitalObject digitalObject = DigitalObject.builder().uuid(uuid).label("Label").build();
     TextFileResource renderingFileResource =

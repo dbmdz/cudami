@@ -18,6 +18,7 @@ cudami:
       - INST
       - MEETING
       - PERSON
+      - TIME
       - TITLE
       - TOPIC
 

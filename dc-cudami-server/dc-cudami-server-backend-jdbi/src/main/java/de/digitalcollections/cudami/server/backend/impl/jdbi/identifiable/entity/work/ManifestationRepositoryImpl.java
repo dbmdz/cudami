@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
@@ -9,13 +10,18 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRange
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +33,7 @@ import java.util.function.BiFunction;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
+import org.jdbi.v3.core.statement.PreparedBatch;
 import org.springframework.stereotype.Repository;
 
 @SuppressFBWarnings(
@@ -35,18 +42,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestation>
     implements ManifestationRepository {
-
-  /* THIS IS STILL A BIG TODO!
-   *
-   * - ArgumentMapper for
-   *
-   *   - Publication ✓
-   *   - Title ✓
-   *   - MainSubType ✓
-   *   - DateRange ✓
-   *
-   * - remove involvements trigger ✓
-   */
 
   public static final String TABLE_NAME = "manifestations";
   public static final String TABLE_ALIAS = "mf";
@@ -57,46 +52,59 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @Override
   public String getSqlInsertFields() {
     return super.getSqlInsertFields()
-        + ", composition, dimensions, expressiontypes"
-        + ", language, manifestationtype, manufacturingtype"
-        + ", mediatypes, otherlanguages"
-        + ", publishingdatepresentation, publishingdaterange, publishing_timevaluerange"
-        + ", scale, subjects_uuids, version"
-        + ", work, titles";
+        + """
+        , composition, dimensions, expressiontypes,
+        language, manifestationtype, manufacturingtype,
+        mediatypes, otherlanguages,
+        scale, subjects_uuids, version,
+        work, titles,
+        publication_info, publication_nav_date,
+        production_info, production_nav_date,
+        distribution_info, distribution_nav_date
+        """;
   }
 
   @Override
   public String getSqlInsertValues() {
     return super.getSqlInsertValues()
-        + ", :composition, :dimensions, :expressionTypes::mainsubtype[]"
-        + ", :language, :manifestationType, :manufacturingType"
-        + ", :mediaTypes::varchar[], :otherLanguages::varchar[]"
-        + ", :publishingDatePresentation, :publishingDateRange::daterange, :publishingTimeValueRange::jsonb"
-        + ", :scale, :subjects_uuids::UUID[], :version"
-        + ", :work?.uuid, {{titles}}";
+        + """
+        , :composition, :dimensions, :expressionTypes::mainsubtype[],
+        :language, :manifestationType, :manufacturingType,
+        :mediaTypes::varchar[], :otherLanguages::varchar[],
+        :scale, :subjects_uuids::UUID[], :version,
+        :work?.uuid, {{titles}},
+        :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
+        :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
+        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange
+        """;
   }
 
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
-        + "composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[], "
-        + "language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType, "
-        + "mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[], "
-        + "publishingdatepresentation=:publishingDatePresentation, publishingdaterange=:publishingDateRange::daterange, "
-        + "publishing_timevaluerange=:publishingTimeValueRange::jsonb, scale=:scale, "
-        + "subjects_uuids=:subjects_uuids::UUID[], version=:version, "
-        + "work=:work?.uuid, titles={{titles}}";
+        + """
+        , composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[],
+        language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType,
+        mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[],
+        scale=:scale, subjects_uuids=:subjects_uuids::UUID[], version=:version,
+        work=:work?.uuid, titles={{titles}},
+        publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
+        production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
+        distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange
+        """;
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + String.format(
-            """
-            , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
-            %1$s.publishingdatepresentation %2$s_publishingDatePresentation, %1$s.publishingdaterange %2$s_publishingDateRange,
-            %1$s.publishing_timevaluerange %2$s_publishingTimeValueRange, %1$s.scale %2$s_scale, %1$s.version %2$s_version, """,
-            tableAlias, mappingPrefix)
+        + """
+          , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
+          %1$s.scale %2$s_scale, %1$s.version %2$s_version,
+          %1$s.publication_info %2$s_publicationInfo, %1$s.production_info %2$s_productionInfo,
+          %1$s.distribution_info %2$s_distributionInfo,
+          """
+            .formatted(tableAlias, mappingPrefix)
+        // subjects
         + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
@@ -113,12 +121,13 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + """
             mms.title parent_title, mms.sortKey parent_sortKey,
             parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
+            parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
+            parent.identifiable_objecttype parent_identifiableObjectType,
             """
-            .formatted(tableAlias)
         // relations
-        // %1$s.additional_predicates %2$s_additionalPredicates,
         + """
           %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
+          %1$s.additional_predicates %2$s_additionalPredicates,
           max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
             .formatted(
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
@@ -161,14 +170,32 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         MAPPING_PREFIX,
         Manifestation.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
+        ManifestationRepositoryImpl::additionalReduceRowsBiConsumer,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerArrayType(expressionTypeMapper);
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
-    dbi.registerColumnMapper(dateRangeMapper);
-    dbi.registerColumnMapper(titleMapper);
+    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
+    dbi.registerColumnMapper(Title.class, titleMapper);
 
     this.entityRepository = entityRepository;
+  }
+
+  protected static void additionalReduceRowsBiConsumer(
+      Map<UUID, Manifestation> map, RowView rowView) {
+    Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+    // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
+
+    // subjects
+    UUID subjectUuid =
+        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+    if (subjectUuid != null
+        && (manifestation.getSubjects() == null
+            || !manifestation.getSubjects().stream()
+                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+      Subject subject = rowView.getRow(Subject.class);
+      manifestation.addSubject(subject);
+    }
   }
 
   private BiFunction<String, Map<String, Object>, String> buildTitleSql(
@@ -222,11 +249,17 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             Manifestation.builder()
                 .uuid(parentUuid)
                 .label(rowView.getColumn("parent_label", LocalizedText.class))
-                .titles(
-                    rowView.getColumn(
-                        "parent_titles",
-                        new GenericType<List<Title>>() {})) // TODO could this work??
+                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
                 .manifestationType(rowView.getColumn("parent_manifestationType", String.class))
+                .refId(rowView.getColumn("parent_refId", Integer.class))
+                .notes(
+                    rowView.getColumn(
+                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+                .created(rowView.getColumn("parent_created", LocalDateTime.class))
+                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+                .identifiableObjectType(
+                    rowView.getColumn(
+                        "parent_identifiableObjectType", IdentifiableObjectType.class))
                 .build();
         manifestation
             .getParents()
@@ -242,9 +275,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     // relations
     UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
     if (entityUuid != null) {
-      if (manifestation.getRelations() == null) {
+      if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
         int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityRelation> relations = new Vector<>(maxIndex);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
         relations.setSize(maxIndex);
         manifestation.setRelations(relations);
       }
@@ -254,7 +287,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       if (!manifestation.getRelations().stream()
           .anyMatch(
               relation ->
-                  Objects.equals(entityUuid, relation.getSubject().getUuid())
+                  relation != null
+                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
                       && Objects.equals(relationPredicate, relation.getPredicate()))) {
         Entity relatedEntity = rowView.getRow(Entity.class);
         manifestation
@@ -272,27 +306,65 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                     .build());
       }
     }
+  }
 
-    // subjects
-    // TODO
+  private void saveParents(Manifestation manifestation) {
+    if (manifestation == null) return;
+    /* - subject (subject_uuid) is the parent (superior manifestation)
+     * - object (object_uuid) is the child, i.e. this manifestation parameter
+     */
+    dbi.useHandle(
+        h ->
+            h.createUpdate("DELETE FROM manifestation_manifestations WHERE object_uuid = :uuid")
+                .bind("uuid", manifestation.getUuid())
+                .execute());
+
+    if (manifestation.getParents() == null || manifestation.getParents().isEmpty()) return;
+
+    dbi.useHandle(
+        h -> {
+          PreparedBatch batch =
+              h.prepareBatch(
+                  """
+          INSERT INTO manifestation_manifestations (
+            subject_uuid, object_uuid, title, sortkey
+          ) VALUES (
+            :subject, :object, :title, :sortkey
+          )""");
+          for (RelationSpecification<Manifestation> parent : manifestation.getParents()) {
+            if (parent.getSubject() == null || parent.getSubject().getUuid() == null) continue;
+
+            batch
+                .bind("object", manifestation.getUuid())
+                .bind("subject", parent.getSubject().getUuid())
+                .bind("title", parent.getTitle())
+                .bind("sortkey", parent.getSortKey())
+                .add();
+          }
+          batch.execute();
+        });
   }
 
   @Override
-  public Manifestation save(Manifestation manifestation, Map<String, Object> bindings) {
+  public void save(Manifestation manifestation, Map<String, Object> bindings)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    return super.save(manifestation, bindings, buildTitleSql(manifestation));
+    super.save(manifestation, bindings, buildTitleSql(manifestation));
+    saveParents(manifestation);
   }
 
   @Override
-  public Manifestation update(Manifestation manifestation, Map<String, Object> bindings) {
+  public void update(Manifestation manifestation, Map<String, Object> bindings)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
-    return super.update(manifestation, bindings, buildTitleSql(manifestation));
+    super.update(manifestation, bindings, buildTitleSql(manifestation));
+    saveParents(manifestation);
   }
 
   @Override
@@ -311,11 +383,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       case "manufacturingType":
       case "mediaTypes":
       case "otherLanguages":
-      case "publishingDatePresentation":
-      case "publishingDateRange":
         return modelProperty.toLowerCase();
-      case "publishingTimeValueRange":
-        return "publishing_timevaluerange";
       default:
         return super.getColumnName(modelProperty);
     }

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
@@ -187,7 +187,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     boolean successful;
     try {
       successful = collectionService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -352,7 +352,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Collection> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -368,7 +368,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       @Parameter(example = "", description = "refId of the collection, e.g. <tt>42</tt>")
           @PathVariable
           long refId)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Collection collection = collectionService.getByRefId(refId);
     return getByUuid(collection.getUuid(), null, null);
   }
@@ -398,7 +398,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       @Parameter(name = "active", description = "If set, object will only be returned if active")
           @RequestParam(name = "active", required = false)
           String active)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     Collection collection;
     if (active != null) {
       if (pLocale == null) {
@@ -517,8 +517,9 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       value = {"/v6/collections", "/v5/collections", "/v2/collections", "/latest/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return collectionService.save(collection);
+      throws ServiceException, ValidationException {
+    collectionService.save(collection);
+    return collection;
   }
 
   @Operation(summary = "Save existing digital objects into an existing collection")
@@ -558,7 +559,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           @PathVariable
           UUID parentUuid,
       @RequestBody Collection collection)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return collectionService.saveWithParent(collection, parentUuid);
   }
 
@@ -573,8 +574,9 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, collection.getUuid());
-    return collectionService.update(collection);
+    collectionService.update(collection);
+    return collection;
   }
 }

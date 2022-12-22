@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
@@ -63,7 +63,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     boolean successful;
     try {
       successful = service.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -94,7 +94,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<Manifestation> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -115,7 +115,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
 
     Manifestation result;
     if (pLocale == null) {
@@ -139,8 +139,9 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       value = {"/v6/manifestations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Manifestation save(@RequestBody Manifestation manifestation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return service.save(manifestation);
+      throws ServiceException, ValidationException {
+    service.save(manifestation);
+    return manifestation;
   }
 
   @Operation(summary = "update an manifestation")
@@ -149,11 +150,12 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Manifestation update(
       @PathVariable UUID uuid, @RequestBody Manifestation manifestation, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     if (uuid == null || manifestation == null || !uuid.equals(manifestation.getUuid())) {
       throw new IllegalArgumentException("UUID mismatch of new and existing manifestation");
     }
 
-    return service.update(manifestation);
+    service.update(manifestation);
+    return manifestation;
   }
 }

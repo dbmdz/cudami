@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.advice;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
 import de.digitalcollections.model.validation.ValidationException;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -35,7 +36,7 @@ public class ExceptionAdvice {
   public void handleHttpMediaTypeNotAcceptableException() {}
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  @ExceptionHandler(UsernameNotFoundException.class)
+  @ExceptionHandler(value = {ResourceNotFoundException.class, UsernameNotFoundException.class})
   public void handleNotFound() {}
 
   @ExceptionHandler(ValidationException.class)

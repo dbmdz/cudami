@@ -272,8 +272,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public FileResource save(FileResource fileResource, InputStream binaryData)
-      throws TechnicalException {
+  public void save(FileResource fileResource, InputStream binaryData) throws TechnicalException {
     Assert.notNull(fileResource, "fileResource must not be null");
     Assert.notNull(binaryData, "binaryData must not be null");
 
@@ -302,26 +301,28 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       long size = IOUtils.copyLarge(binaryData, new FileOutputStream(Paths.get(uri).toFile()));
       fileResource.setSizeInBytes(size);
 
-      if (fileResource instanceof ImageFileResource) {
-        ImageFileResource imageFileResource = (ImageFileResource) fileResource;
-        setImageProperties(imageFileResource);
-        setIiifProperties(imageFileResource);
-      } else if (fileResource instanceof VideoFileResource) {
-        VideoFileResource videoFileResource = (VideoFileResource) fileResource;
-        setVideoProperties(videoFileResource);
-      }
+      fillAttributes(fileResource);
     } catch (IOException ex) {
       String msg = "Error writing binary data of fileresource " + fileResource.getUuid().toString();
       throw new TechnicalException(msg, ex);
     }
-    return fileResource;
+  }
+
+  protected void fillAttributes(FileResource fileResource) throws IOException {
+    if (fileResource instanceof ImageFileResource) {
+      ImageFileResource imageFileResource = (ImageFileResource) fileResource;
+      setImageProperties(imageFileResource);
+      setIiifProperties(imageFileResource);
+    } else if (fileResource instanceof VideoFileResource) {
+      VideoFileResource videoFileResource = (VideoFileResource) fileResource;
+      setVideoProperties(videoFileResource);
+    }
   }
 
   @Override
-  public FileResource save(FileResource resource, String input, Charset charset)
-      throws TechnicalException {
+  public void save(FileResource resource, String input, Charset charset) throws TechnicalException {
     try (InputStream in = new ReaderInputStream(new StringReader(input), charset)) {
-      return save(resource, in);
+      save(resource, in);
     } catch (IOException ex) {
       String msg = "Could not write data to uri " + String.valueOf(resource.getUri());
       LOGGER.error(msg, ex);

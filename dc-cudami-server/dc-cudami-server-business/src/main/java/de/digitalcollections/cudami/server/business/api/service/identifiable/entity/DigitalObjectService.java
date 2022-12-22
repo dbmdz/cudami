@@ -1,8 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -21,7 +20,7 @@ import java.util.UUID;
 public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   boolean addItemToDigitalObject(Item item, UUID digitalObjectUuid)
-      throws ConflictException, ValidationException, IdentifiableServiceException;
+      throws ConflictException, ValidationException, ServiceException;
 
   void deleteFileResources(UUID digitalObjectUuid);
 
@@ -41,7 +40,7 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
-  DigitalObject getByIdentifierWithWEMI(String namespace, String id);
+  DigitalObject getByIdentifierWithWEMI(String namespace, String id) throws ServiceException;
 
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
@@ -77,24 +76,26 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid);
 
   default List<FileResource> getRenderingResources(DigitalObject digitalObject)
-      throws CudamiServiceException {
+      throws ServiceException {
     return getRenderingResources(digitalObject.getUuid());
   }
 
-  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws CudamiServiceException;
+  List<FileResource> getRenderingResources(UUID digitalObjectUuid) throws ServiceException;
 
   default List<FileResource> setFileResources(
-      DigitalObject digitalObject, List<FileResource> fileResources) {
+      DigitalObject digitalObject, List<FileResource> fileResources) throws ServiceException {
     if (fileResources == null) {
       return null;
     }
     return setFileResources(digitalObject.getUuid(), fileResources);
   }
 
-  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources);
+  List<FileResource> setFileResources(UUID digitalObjectUuid, List<FileResource> fileResources)
+      throws ServiceException;
 
   default List<LinkedDataFileResource> setLinkedDataFileResources(
-      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources) {
+      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
+      throws ServiceException {
     if (linkedDataFileResources == null) {
       return null;
     }
@@ -102,11 +103,12 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources);
+      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
+      throws ServiceException;
 
   default List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingFileResources)
-      throws CudamiServiceException {
+      throws ServiceException {
     if (renderingFileResources == null) {
       return null;
     }
@@ -114,6 +116,5 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   }
 
   List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources)
-      throws CudamiServiceException;
+      UUID digitalObjectUuid, List<FileResource> renderingFileResources) throws ServiceException;
 }

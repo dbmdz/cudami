@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
@@ -12,9 +13,9 @@ public interface SubjectRepository {
 
   Subject getByUuid(UUID uuid);
 
-  Subject save(Subject subject);
+  void save(Subject subject) throws RepositoryException;
 
-  Subject update(Subject subject);
+  void update(Subject subject) throws RepositoryException;
 
   default boolean delete(UUID uuid) {
     return delete(List.of(uuid));

@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -157,7 +157,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       produces = MediaType.APPLICATION_JSON_VALUE)
   @Override
   public ResponseEntity<FileResource> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
   }
 
@@ -183,7 +183,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
                   "Desired locale, e.g. <tt>de_DE</tt>. If unset, contents in all languages will be returned")
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     FileResource result;
     if (pLocale == null) {
       result = metadataService.getByUuid(uuid);
@@ -216,8 +216,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
-      throws IdentifiableServiceException, ValidationException {
-    return metadataService.save(fileResource);
+      throws ServiceException, ValidationException {
+    metadataService.save(fileResource);
+    return fileResource;
   }
 
   @Operation(summary = "Update a fileresource")
@@ -231,8 +232,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, fileResource.getUuid());
-    return metadataService.update(fileResource);
+    metadataService.update(fileResource);
+    return fileResource;
   }
 }

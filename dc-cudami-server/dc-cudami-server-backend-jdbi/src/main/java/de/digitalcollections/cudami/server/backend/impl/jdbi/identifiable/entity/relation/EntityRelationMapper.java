@@ -1,58 +1,50 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
-import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
-import de.digitalcollections.model.text.LocalizedStructuredContent;
-import de.digitalcollections.model.text.LocalizedText;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
-import org.jdbi.v3.core.config.ConfigRegistry;
-import org.jdbi.v3.core.mapper.ColumnMapper;
-import org.jdbi.v3.core.mapper.ColumnMappers;
-import org.jdbi.v3.core.mapper.NoSuchMapperException;
+import java.util.stream.Collectors;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public class EntityRelationMapper<E extends Entity> implements RowMapper<EntityRelation> {
+public class EntityRelationMapper<E extends Entity> {
 
-  private final E subjectEntity;
+  private final EntityRepository<E> entityRepository;
 
-  public EntityRelationMapper(E subjectEntity) {
-    this.subjectEntity = subjectEntity;
+  public EntityRelationMapper(EntityRepository<E> entityRepository) {
+    this.entityRepository = entityRepository;
   }
 
-  @Override
-  public EntityRelation map(ResultSet rs, StatementContext ctx) throws SQLException {
-    ConfigRegistry config = ctx.getConfig();
-    ColumnMappers columnMappers = config.get(ColumnMappers.class);
-    ColumnMapper<LocalizedStructuredContent> lscMapper =
-        columnMappers
-            .findFor(LocalizedStructuredContent.class)
-            .orElseThrow(() -> new NoSuchMapperException("LocalizedStructuredContent"));
-    ColumnMapper<LocalizedText> ltMapper =
-        columnMappers
-            .findFor(LocalizedText.class)
-            .orElseThrow(() -> new NoSuchMapperException("LocalizedText"));
+  public RowMapper<EntityRelation> getMapper(final E subjectEntity) {
+    return (ResultSet rs, StatementContext ctx) -> {
+      String subjectUuid = rs.getString("rel_subject");
+      String predicate = rs.getString("rel_predicate");
+      String objectUuid = rs.getString("rel_object");
+      String[] additionalPredicates =
+          rs.getArray("rel_addpredicates") != null
+              ? (String[]) rs.getArray("rel_addpredicates").getArray()
+              : new String[0];
 
-    EntityRelation result = new EntityRelation();
+      Entity subject = subjectEntity;
+      if (subjectEntity == null) {
+        subject = entityRepository.getByUuid(UUID.fromString(subjectUuid));
+      }
+      Entity object = entityRepository.getByUuid(UUID.fromString(objectUuid));
 
-    result.setSubject(subjectEntity);
-    result.setPredicate(rs.getString("predicate"));
+      EntityRelation result = new EntityRelation();
 
-    Entity objectEntity = new Entity();
-    objectEntity.setCreated(rs.getTimestamp("created").toLocalDateTime());
-    objectEntity.setDescription(lscMapper.map(rs, "description", ctx));
-    objectEntity.setIdentifiableObjectType(
-        IdentifiableObjectType.valueOf(rs.getString("identifiable_objecttype")));
-    objectEntity.setLabel(ltMapper.map(rs, "label", ctx));
-    objectEntity.setLastModified(rs.getTimestamp("last_modified").toLocalDateTime());
-    //    objectEntity.setType(IdentifiableType.valueOf(rs.getString("identifiable_type"))); // set
-    // in constructor
-    objectEntity.setUuid(rs.getObject("uuid", UUID.class));
+      result.setSubject(subject);
+      result.setPredicate(predicate);
+      result.setObject(object);
+      result.setAdditionalPredicates(
+          additionalPredicates.length > 0
+              ? Arrays.stream(additionalPredicates).collect(Collectors.toList())
+              : null);
 
-    result.setObject(objectEntity);
-    return result;
+      return result;
+    };
   }
 }

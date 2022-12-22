@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
@@ -83,7 +83,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     boolean successful;
     try {
       successful = digitalObjectService.delete(uuid);
-    } catch (IdentifiableServiceException e) {
+    } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return successful
@@ -163,7 +163,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   public ResponseEntity<DigitalObject> getByIdentifier(
       HttpServletRequest request,
       @RequestParam(name = "fill-wemi", required = false, defaultValue = "false") boolean fillWemi)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
 
     Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
 
@@ -196,7 +196,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) {
+  public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
     DigitalObject digitalObject = digitalObjectService.getByUuid(uuid);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -327,8 +327,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
-    return digitalObjectService.save(digitalObject);
+      throws ServiceException, ValidationException {
+    digitalObjectService.save(digitalObject);
+    return digitalObject;
   }
 
   @Operation(summary = "Save list of fileresources for a given digital object")
@@ -343,7 +344,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   public List<FileResource> setFileResources(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
           UUID uuid,
-      @RequestBody List<FileResource> fileResources) {
+      @RequestBody List<FileResource> fileResources)
+      throws ServiceException {
     return digitalObjectService.setFileResources(uuid, fileResources);
   }
 
@@ -361,8 +363,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestBody DigitalObject digitalObject,
       BindingResult errors)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, digitalObject.getUuid());
-    return digitalObjectService.update(digitalObject);
+    digitalObjectService.update(digitalObject);
+    return digitalObject;
   }
 }

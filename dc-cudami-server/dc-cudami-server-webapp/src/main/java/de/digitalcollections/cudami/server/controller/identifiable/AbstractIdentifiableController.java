@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 public abstract class AbstractIdentifiableController<T extends Identifiable> {
 
   public ResponseEntity<T> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException {
+      throws ServiceException, ValidationException {
     Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
 
     T identifiable =

@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String tableAlias,
       String mappingPrefix,
       String sqlSelectAllFieldsJoins,
-      BiFunction<Map<UUID, F>, RowView, Map<UUID, F>> additionalReduceRowsBiFunction,
+      BiConsumer<Map<UUID, F>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
         dbi,
@@ -121,7 +121,7 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         mappingPrefix,
         FileResource.class,
         sqlSelectAllFieldsJoins,
-        additionalReduceRowsBiFunction,
+        additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }
 
@@ -165,13 +165,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   }
 
   @Override
-  public F save(F fileResource) {
-    super.save(fileResource);
-    F result = getByUuid(fileResource.getUuid());
-    return result;
-  }
-
-  @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "filename":
@@ -180,12 +173,5 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       default:
         return super.supportsCaseSensitivityForProperty(modelProperty);
     }
-  }
-
-  @Override
-  public F update(F fileResource) {
-    super.update(fileResource);
-    F result = getByUuid(fileResource.getUuid());
-    return result;
   }
 }

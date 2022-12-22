@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -35,64 +35,62 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   }
 
   @Override
-  public void assertReadability(FileResource resource) throws IdentifiableServiceException {
+  public void assertReadability(FileResource resource) throws ServiceException {
     try {
       binaryRepository.assertReadability(resource);
     } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new IdentifiableServiceException(
-          "File resource " + resource.getUri() + " not readable.", ex);
+      throw new ServiceException("File resource " + resource.getUri() + " not readable.", ex);
     }
   }
 
   @Override
-  public FileResource find(String uuid, MimeType mimeType) throws IdentifiableServiceException {
+  public FileResource find(String uuid, MimeType mimeType) throws ServiceException {
     try {
       return binaryRepository.find(uuid, mimeType);
     } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new IdentifiableServiceException("File resource " + uuid + " not found.", ex);
+      throw new ServiceException("File resource " + uuid + " not found.", ex);
     }
   }
 
   @Override
-  public byte[] getAsBytes(FileResource resource) throws IdentifiableServiceException {
+  public byte[] getAsBytes(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getAsBytes(resource);
     } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new IdentifiableServiceException(
+      throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as bytes.", ex);
     }
   }
 
   @Override
-  public Document getAsDocument(FileResource resource) throws IdentifiableServiceException {
+  public Document getAsDocument(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getAsDocument(resource);
     } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new IdentifiableServiceException(
+      throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as document.", ex);
     }
   }
 
   @Override
-  public InputStream getInputStream(FileResource resource) throws IdentifiableServiceException {
+  public InputStream getInputStream(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getInputStream(resource);
     } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new IdentifiableServiceException(
+      throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as inputstream.", ex);
     }
   }
 
   @Override
-  public FileResource save(FileResource fileResource, InputStream binaryData)
-      throws IdentifiableServiceException, ValidationException {
+  public void save(FileResource fileResource, InputStream binaryData)
+      throws ServiceException, ValidationException {
     try {
-      fileResource = binaryRepository.save(fileResource, binaryData);
-      fileResource = metadataService.save(fileResource);
-      return fileResource;
+      binaryRepository.save(fileResource, binaryData);
+      metadataService.save(fileResource);
     } catch (TechnicalException e) {
       LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 }

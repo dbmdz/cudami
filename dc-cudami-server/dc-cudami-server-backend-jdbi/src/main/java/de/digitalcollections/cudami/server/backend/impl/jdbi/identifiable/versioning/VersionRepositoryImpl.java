@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.versioning;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.versioning.VersionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.model.identifiable.versioning.Version;
@@ -75,7 +76,7 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  public Version save(Version version) {
+  public void save(Version version) throws RepositoryException {
     version.setUuid(UUID.randomUUID());
     version.setCreated(new Date());
 
@@ -83,19 +84,9 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
         "INSERT INTO "
             + tableName
             + "(uuid, version_value, type_key, instance_key, instance_version_key, description, created, status) "
-            + "VALUES (:uuid, :versionValue, :typeKey, :instanceKey, :instanceVersionKey, :description, :created, :status)"
-            + " RETURNING *";
+            + "VALUES (:uuid, :versionValue, :typeKey, :instanceKey, :instanceVersionKey, :description, :created, :status)";
 
-    Version result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(version)
-                    .mapToBean(Version.class)
-                    .findOne()
-                    .orElse(null));
-
-    return result;
+    dbi.useHandle(h -> h.createUpdate(sql).bindBean(version).execute());
   }
 
   @Override
@@ -104,20 +95,10 @@ public class VersionRepositoryImpl extends JdbiRepositoryImpl implements Version
   }
 
   @Override
-  public Version update(Version version) {
+  public void update(Version version) throws RepositoryException {
     // digitalObject.setLastModified(LocalDateTime.now());
-    final String sql =
-        "UPDATE " + tableName + " SET status=:status WHERE uuid=:uuid" + " RETURNING *";
+    final String sql = "UPDATE " + tableName + " SET status=:status WHERE uuid=:uuid";
 
-    Version result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(version)
-                    .mapToBean(Version.class)
-                    .findOne()
-                    .orElse(null));
-
-    return result;
+    dbi.useHandle(h -> h.createUpdate(sql).bindBean(version).execute());
   }
 }

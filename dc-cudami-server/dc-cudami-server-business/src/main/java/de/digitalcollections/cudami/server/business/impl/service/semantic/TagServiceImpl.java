@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.semantic;
 
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.TagRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -53,11 +53,11 @@ public class TagServiceImpl implements TagService {
 
   @Override
   public Tag getByTypeAndIdentifier(String type, String namespace, String id)
-      throws CudamiServiceException {
+      throws ServiceException {
     try {
       return repository.getByTypeAndIdentifier(type, namespace, id);
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
     }
   }

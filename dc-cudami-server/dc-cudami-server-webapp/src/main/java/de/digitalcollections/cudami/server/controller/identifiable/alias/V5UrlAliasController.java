@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -57,7 +57,7 @@ public class V5UrlAliasController {
       PageResponse<LocalizedUrlAliases> pageResponse = urlAliasService.find(pageRequest);
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
-    } catch (CudamiServiceException | JsonProcessingException e) {
+    } catch (ServiceException | JsonProcessingException e) {
       throw new CudamiControllerException(e);
     }
   }

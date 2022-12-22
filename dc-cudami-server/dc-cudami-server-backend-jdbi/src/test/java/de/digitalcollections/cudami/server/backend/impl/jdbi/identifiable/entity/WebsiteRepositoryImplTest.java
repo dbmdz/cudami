@@ -2,10 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.web.WebpageRepositoryImpl;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
@@ -13,37 +12,22 @@ import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Text;
 import java.util.List;
 import java.util.Locale;
-import org.jdbi.v3.core.Jdbi;
+import java.util.function.Function;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.containers.PostgreSQLContainer;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = WebEnvironment.MOCK,
     classes = {WebsiteRepositoryImpl.class})
-@ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
-@Sql(scripts = "classpath:cleanup_database.sql")
 @DisplayName("The Website Repository")
-class WebsiteRepositoryImplTest {
-
-  WebsiteRepositoryImpl repo;
-
-  @Autowired CudamiConfig cudamiConfig;
-
-  @Autowired PostgreSQLContainer postgreSQLContainer;
-
+class WebsiteRepositoryImplTest
+    extends AbstractIdentifiableRepositoryImplTest<WebsiteRepositoryImpl> {
   @Autowired WebpageRepositoryImpl webpageRepository;
-
-  @Autowired Jdbi jdbi;
 
   @BeforeEach
   public void beforeEach() {
@@ -51,32 +35,56 @@ class WebsiteRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("is testable")
-  void containerIsUpAndRunning() {
-    assertThat(postgreSQLContainer.isRunning()).isTrue();
-  }
-
-  @Test
-  @DisplayName("can save and retrieve a website")
-  void saveWebsite() {
+  @DisplayName("can save a website")
+  void saveWebsite() throws RepositoryException {
+    Webpage webpage = Webpage.builder().label("webpage").build();
+    webpageRepository.save(webpage);
     Website website =
         Website.builder()
             .label(Locale.GERMAN, "Digitale Sammlungen")
             .url("https://www.digitale-sammlungen.de")
             .registrationDate("2022-05-04")
-            .rootPages(List.of(Webpage.builder().build()))
+            .rootPages(List.of(webpage))
             .build();
+    repo.save(website);
+    webpageRepository.saveWithParentWebsite(webpage.getUuid(), website.getUuid());
 
-    Website actual = repo.save(website);
+    Assertions.assertThat(website.getUuid()).isNotNull();
+    Assertions.assertThat(website.getCreated()).isNotNull();
+    Assertions.assertThat(website.getLastModified()).isNotNull();
 
-    assertThat(actual.getEntityType()).isEqualTo(EntityType.WEBSITE);
-    assertThat(actual.getUuid()).isNotNull();
+    Website actual = repo.getByUuid(website.getUuid());
+    assertThat(actual).isEqualToComparingFieldByField(website);
+  }
+
+  @Test
+  @DisplayName("can update a website")
+  void testUpdate() throws RepositoryException {
+    Webpage webpage1 = Webpage.builder().label("webpage1").build();
+    webpageRepository.save(webpage1);
+    Webpage webpage2 = Webpage.builder().label("webpage2").build();
+    webpageRepository.save(webpage2);
+
+    Website website =
+        Website.builder()
+            .label(Locale.GERMAN, "Digitale Sammlungen")
+            .url("https://www.digitale-sammlungen.de")
+            .registrationDate("2022-05-04")
+            .rootPages(List.of(webpage1))
+            .build();
+    repo.save(website);
+
+    website.setRootPages(List.of(webpage1, webpage2));
+
+    Website beforeUpdate = createDeepCopy(website);
+    updateAndAssertUpdatedLastModifiedTimestamp(website);
+    assertInDatabaseIsEqualToUpdateable(website, beforeUpdate, Function.identity());
   }
 
   @Test
   @DisplayName("save a website with notes")
-  void saveWebsiteWithNotes() {
-    StructuredContent noteContent1 = new StructuredContent();
+  void saveWebsiteWithNotes() throws RepositoryException {
+    var noteContent1 = new StructuredContent();
     noteContent1.addContentBlock(new Text("eine Bemerkung"));
     LocalizedStructuredContent note1 = new LocalizedStructuredContent();
     note1.put(Locale.GERMAN, noteContent1);
@@ -95,9 +103,9 @@ class WebsiteRepositoryImplTest {
             .note(note2)
             .build();
 
-    Website actual = repo.save(website);
+    repo.save(website);
 
-    assertThat(actual.getNotes()).isEqualTo(website.getNotes());
-    assertThat(actual.getUuid()).isNotNull();
+    assertThat(website.getNotes()).isEqualTo(website.getNotes());
+    assertThat(website.getUuid()).isNotNull();
   }
 }

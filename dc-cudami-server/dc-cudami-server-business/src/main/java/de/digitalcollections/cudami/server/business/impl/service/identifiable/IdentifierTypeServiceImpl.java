@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -25,8 +25,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   private Map<String, String> identifierTypeCache;
 
   @Autowired
-  public IdentifierTypeServiceImpl(IdentifierTypeRepository repository)
-      throws CudamiServiceException {
+  public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) throws ServiceException {
     this.repository = repository;
     updateIdentifierTypeCache();
   }
@@ -63,8 +62,13 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType save(IdentifierType identifierType) {
-    IdentifierType saved = repository.save(identifierType);
+  public IdentifierType save(IdentifierType identifierType) throws ServiceException {
+    IdentifierType saved;
+    try {
+      saved = repository.save(identifierType);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot save IdentifierType: " + identifierType.toString(), e);
+    }
     if (saved != null) {
       identifierTypeCache.put(saved.getNamespace(), saved.getPattern());
     }
@@ -79,8 +83,13 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public IdentifierType update(IdentifierType identifierType) {
-    IdentifierType updated = repository.update(identifierType);
+  public IdentifierType update(IdentifierType identifierType) throws ServiceException {
+    IdentifierType updated;
+    try {
+      updated = repository.update(identifierType);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot update IdentifierType: " + identifierType.toString(), e);
+    }
     if (updated != null) {
       identifierTypeCache.put(updated.getNamespace(), updated.getPattern());
     }
@@ -88,7 +97,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
   }
 
   @Override
-  public Map<String, String> updateIdentifierTypeCache() throws CudamiServiceException {
+  public Map<String, String> updateIdentifierTypeCache() throws ServiceException {
     try {
       identifierTypeCache =
           repository.findAll().stream()
@@ -96,7 +105,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
                   Collectors.toConcurrentMap(
                       IdentifierType::getNamespace, IdentifierType::getPattern));
     } catch (RepositoryException e) {
-      throw new CudamiServiceException(e);
+      throw new ServiceException(e);
     }
     return identifierTypeCache;
   }

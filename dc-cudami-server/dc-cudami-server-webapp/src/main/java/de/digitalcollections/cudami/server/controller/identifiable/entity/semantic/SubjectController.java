@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.semantic;
 
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -64,7 +63,7 @@ public class SubjectController {
       value = {"/v6/subjects/identifier/**"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Subject> getByIdentifier(HttpServletRequest request)
-      throws IdentifiableServiceException, ValidationException, CudamiServiceException {
+      throws ValidationException, ServiceException {
     Triple<String, String, String> typeNamespaceId =
         ParameterHelper.extractTripleOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
     if (typeNamespaceId.getLeft().isBlank()
@@ -92,17 +91,19 @@ public class SubjectController {
   @PostMapping(
       value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject save(@RequestBody Subject subject, BindingResult errors) {
-    return service.save(subject);
+  public Subject save(@RequestBody Subject subject, BindingResult errors) throws ServiceException {
+    service.save(subject);
+    return subject;
   }
 
   @Operation(summary = "Update a subject")
   @PutMapping(
       value = {"/v6/subjects/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject update(
-      @PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors) {
+  public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
+      throws ServiceException {
     assert Objects.equals(uuid, subject.getUuid());
-    return service.update(subject);
+    service.update(subject);
+    return subject;
   }
 }

@@ -2,8 +2,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.r
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ApplicationFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.AudioFileResourceService;
@@ -66,7 +65,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   private boolean deleteRenderingResource(FileResource renderingResource)
-      throws IdentifiableServiceException, ConflictException {
+      throws ServiceException, ConflictException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
         return applicationFileResourceService.delete(renderingResource.getUuid());
@@ -89,35 +88,30 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         digitalObjectUuid);
   }
 
-  private FileResource saveRenderingFileResource(FileResource renderingResource)
-      throws ValidationException, IdentifiableServiceException {
+  private void saveRenderingFileResource(FileResource renderingResource)
+      throws ValidationException, ServiceException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
-      case "application":
-        return applicationFileResourceService.save((ApplicationFileResource) renderingResource);
-      case "audio":
-        return audioFileResourceService.save((AudioFileResource) renderingResource);
-      case "image":
-        return imageFileResourceService.save((ImageFileResource) renderingResource);
-      case "text":
-        return textFileResourceService.save((TextFileResource) renderingResource);
-      case "video":
-        return videoFileResourceService.save((VideoFileResource) renderingResource);
-      default:
-        return fileResourceMetadataService.save(renderingResource);
+      case "application" -> applicationFileResourceService.save(
+          (ApplicationFileResource) renderingResource);
+      case "audio" -> audioFileResourceService.save((AudioFileResource) renderingResource);
+      case "image" -> imageFileResourceService.save((ImageFileResource) renderingResource);
+      case "text" -> textFileResourceService.save((TextFileResource) renderingResource);
+      case "video" -> videoFileResourceService.save((VideoFileResource) renderingResource);
+      default -> fileResourceMetadataService.save(renderingResource);
     }
   }
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) throws CudamiServiceException {
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws ServiceException {
 
     // Remove the old rendering resources, if present
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObjectUuid);
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
         deleteRenderingResource(existingRenderingResource);
-      } catch (ConflictException | IdentifiableServiceException e) {
-        throw new CudamiServiceException(
+      } catch (ConflictException | ServiceException e) {
+        throw new ServiceException(
             "Cannot remove existing rendering resource=" + existingRenderingResource + ": " + e, e);
       }
     }
@@ -130,14 +124,13 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       // first save rendering resources
       List<FileResource> savedRenderingResources = new ArrayList<>();
       for (FileResource renderingResource : renderingResources) {
-        FileResource savedRenderingResource = null;
         try {
-          savedRenderingResource = saveRenderingFileResource(renderingResource);
-        } catch (ValidationException | IdentifiableServiceException e) {
-          throw new CudamiServiceException(
+          saveRenderingFileResource(renderingResource);
+        } catch (ValidationException | ServiceException e) {
+          throw new ServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
         }
-        savedRenderingResources.add(savedRenderingResource);
+        savedRenderingResources.add(renderingResource);
       }
 
       // Persist the new relations
@@ -149,7 +142,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
   }
 
   @Override
-  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws CudamiServiceException {
+  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws ServiceException {
     List<FileResource> renderingFileResources = getRenderingFileResources(digitalObjectUuid);
     if (renderingFileResources == null || renderingFileResources.isEmpty()) {
       return;
@@ -161,7 +154,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         int amountDeletedRelations =
             digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
         if (amountDeletedRelations != 1) {
-          throw new CudamiServiceException(
+          throw new ServiceException(
               "Could not delete relation for RenderingFileResource="
                   + renderingFileResource
                   + " for DigitalObject with uuid="
@@ -174,8 +167,8 @@ public class DigitalObjectRenderingFileResourceServiceImpl
             == 0) {
           deleteRenderingResource(renderingFileResource);
         }
-      } catch (ConflictException | IdentifiableServiceException e) {
-        throw new CudamiServiceException(
+      } catch (ConflictException | ServiceException e) {
+        throw new ServiceException(
             "Cannot delete RenderingFileResource="
                 + renderingFileResource
                 + " for DigitalObject with uuid="

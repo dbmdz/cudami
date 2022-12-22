@@ -1,7 +1,8 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.semantic;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.CudamiServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -32,13 +33,21 @@ public class SubjectServiceImpl implements SubjectService {
   }
 
   @Override
-  public Subject save(Subject subject) {
-    return repository.save(subject);
+  public void save(Subject subject) throws ServiceException {
+    try {
+      repository.save(subject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot save subject " + subject.toString(), e);
+    }
   }
 
   @Override
-  public Subject update(Subject subject) {
-    return repository.update(subject);
+  public void update(Subject subject) throws ServiceException {
+    try {
+      repository.update(subject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot update subject " + subject.toString(), e);
+    }
   }
 
   @Override
@@ -53,11 +62,11 @@ public class SubjectServiceImpl implements SubjectService {
 
   @Override
   public Subject getByTypeAndIdentifier(String type, String namespace, String id)
-      throws CudamiServiceException {
+      throws ServiceException {
     try {
       return repository.getByTypeAndIdentifier(type, namespace, id);
     } catch (Exception e) {
-      throw new CudamiServiceException(
+      throw new ServiceException(
           "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
     }
   }

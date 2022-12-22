@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -172,21 +172,21 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
   }
 
   @Override
-  public Webpage getByIdentifier(String namespace, String id) {
+  public Webpage getByIdentifier(String namespace, String id) throws ServiceException {
     Webpage webpage = super.getByIdentifier(namespace, id);
     setPublicationStatus(webpage);
     return webpage;
   }
 
   @Override
-  public Webpage getByUuid(UUID uuid) {
+  public Webpage getByUuid(UUID uuid) throws ServiceException {
     Webpage webpage = super.getByUuid(uuid);
     setPublicationStatus(webpage);
     return webpage;
   }
 
   @Override
-  public Webpage getByUuidAndLocale(UUID uuid, Locale locale) throws IdentifiableServiceException {
+  public Webpage getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
     Webpage webpage = super.getByUuidAndLocale(uuid, locale);
     setPublicationStatus(webpage);
     return webpage;
@@ -256,18 +256,17 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
   }
 
   @Override
-  public Webpage save(Webpage webpage) throws IdentifiableServiceException, ValidationException {
-    if (webpage.getLocalizedUrlAliases() != null && !webpage.getLocalizedUrlAliases().isEmpty()) {
-      validate(webpage.getLocalizedUrlAliases());
+  public void save(Webpage identifiable) throws ServiceException, ValidationException {
+    if (identifiable.getLocalizedUrlAliases() != null
+        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
+      validate(identifiable.getLocalizedUrlAliases());
     }
-    webpage = super.save(webpage);
-    setPublicationStatus(webpage);
-    return webpage;
+    super.save(identifiable);
+    setPublicationStatus(identifiable);
   }
 
   @Override
-  public Webpage saveWithParent(UUID childUuid, UUID parentUuid)
-      throws IdentifiableServiceException {
+  public Webpage saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
     try {
       Webpage webpage =
           ((NodeRepository<Webpage>) repository).saveWithParent(childUuid, parentUuid);
@@ -275,36 +274,36 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage>
       return webpage;
     } catch (Exception e) {
       LOGGER.error("Cannot save webpage " + childUuid + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 
   @Override
   public Webpage saveWithParentWebsite(Webpage webpage, UUID parentWebsiteUuid)
-      throws IdentifiableServiceException {
+      throws ServiceException {
     try {
       if (webpage.getUuid() == null) {
-        webpage = save(webpage);
+        save(webpage);
       }
       webpage =
           ((WebpageRepository) repository)
               .saveWithParentWebsite(webpage.getUuid(), parentWebsiteUuid);
       setPublicationStatus(webpage);
       return webpage;
-    } catch (IdentifiableServiceException | ValidationException e) {
+    } catch (ServiceException | ValidationException e) {
       LOGGER.error("Cannot save top-level webpage " + webpage + ": ", e);
-      throw new IdentifiableServiceException(e.getMessage());
+      throw new ServiceException(e.getMessage());
     }
   }
 
   @Override
-  public Webpage update(Webpage webpage) throws IdentifiableServiceException, ValidationException {
-    if (webpage.getLocalizedUrlAliases() != null && !webpage.getLocalizedUrlAliases().isEmpty()) {
-      validate(webpage.getLocalizedUrlAliases());
+  public void update(Webpage identifiable) throws ServiceException, ValidationException {
+    if (identifiable.getLocalizedUrlAliases() != null
+        && !identifiable.getLocalizedUrlAliases().isEmpty()) {
+      validate(identifiable.getLocalizedUrlAliases());
     }
-    webpage = super.update(webpage);
-    setPublicationStatus(webpage);
-    return webpage;
+    super.update(identifiable);
+    setPublicationStatus(identifiable);
   }
 
   @Override

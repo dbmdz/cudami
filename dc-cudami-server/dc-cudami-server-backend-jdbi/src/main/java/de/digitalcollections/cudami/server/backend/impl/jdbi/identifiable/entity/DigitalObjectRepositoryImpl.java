@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -60,8 +61,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + ".uuid";
   public static final String TABLE_NAME = "digitalobjects";
 
-  private static final BiFunction<Map<UUID, DigitalObject>, RowView, Map<UUID, DigitalObject>>
-      ADDITIONAL_REDUCE_ROWS_BIFUNCTION =
+  private static final BiConsumer<Map<UUID, DigitalObject>, RowView>
+      ADDITIONAL_REDUCE_ROWS_BICONSUMER =
           (map, rowView) -> {
             DigitalObject digitalObject =
                 map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
@@ -110,8 +111,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             if (itemUuid != null) {
               digitalObject.setItem(Item.builder().uuid(itemUuid).build());
             }
-
-            return map;
           };
 
   @Override
@@ -241,7 +240,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         MAPPING_PREFIX,
         DigitalObject.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
-        ADDITIONAL_REDUCE_ROWS_BIFUNCTION,
+        ADDITIONAL_REDUCE_ROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -571,11 +570,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObject save(DigitalObject digitalObject) {
+  public void save(DigitalObject digitalObject) throws RepositoryException {
     super.save(digitalObject);
-
-    DigitalObject result = getByUuid(digitalObject.getUuid());
-    return result;
   }
 
   // --------- repository setters for testing purposes only ----------------------
@@ -598,7 +594,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   @Override
   public List<FileResource> setFileResources(
-      UUID digitalObjectUuid, List<FileResource> fileResources) {
+      UUID digitalObjectUuid, List<FileResource> fileResources) throws RepositoryException {
 
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -612,7 +608,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       // first save fileresources
       for (FileResource fileResource : fileResources) {
         if (fileResource.getUuid() == null) {
-          fileResourceMetadataRepositoryImpl.save(fileResource);
+          try {
+            fileResourceMetadataRepositoryImpl.save(fileResource);
+          } catch (RepositoryException e) {
+            throw new RepositoryException("File resource cannot be saved properly!", e);
+          }
         }
       }
 
@@ -655,10 +655,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public DigitalObject update(DigitalObject digitalObject) {
+  public void update(DigitalObject digitalObject) throws RepositoryException {
     super.update(digitalObject);
-
-    DigitalObject result = getByUuid(digitalObject.getUuid());
-    return result;
   }
 }

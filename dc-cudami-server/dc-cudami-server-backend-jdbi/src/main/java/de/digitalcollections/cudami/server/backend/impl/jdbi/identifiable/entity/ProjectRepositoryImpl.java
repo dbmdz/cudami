@@ -191,13 +191,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public Project save(Project project) {
-    super.save(project);
-    Project result = getByUuid(project.getUuid());
-    return result;
-  }
-
-  @Override
   public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
@@ -225,12 +218,5 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
       return true;
     }
     return false;
-  }
-
-  @Override
-  public Project update(Project project) {
-    super.update(project);
-    Project result = getByUuid(project.getUuid());
-    return result;
   }
 }

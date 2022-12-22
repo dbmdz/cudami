@@ -1,10 +1,11 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.ExternalCorporateBodyRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.IdentifiableServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
@@ -12,7 +13,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
   }
 
   @Override
-  public CorporateBody fetchAndSaveByGndId(String gndId) {
+  public CorporateBody fetchAndSaveByGndId(String gndId) throws ServiceException {
     CorporateBody corporateBody = externalRepository.getByGndId(gndId);
     if (corporateBody == null) {
       return null;
@@ -56,10 +56,8 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
 
     if (corporateBody.getPreviewImage() != null) {
       try {
-        ImageFileResource previewImage =
-            imageFileResourceService.save(corporateBody.getPreviewImage());
-        corporateBody.setPreviewImage(previewImage);
-      } catch (IdentifiableServiceException | ValidationException ex) {
+        imageFileResourceService.save(corporateBody.getPreviewImage());
+      } catch (ServiceException | ValidationException ex) {
         LOGGER.warn(
             "Can not save previewImage of corporate body: "
                 + corporateBody.getLabel().getText()
@@ -67,6 +65,11 @@ public class CorporateBodyServiceImpl extends AgentServiceImpl<CorporateBody>
                 + gndId);
       }
     }
-    return repository.save(corporateBody);
+    try {
+      repository.save(corporateBody);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Cannot save CorporateBody: " + corporateBody.toString(), e);
+    }
+    return corporateBody;
   }
 }
