@@ -1,6 +1,7 @@
 -- see V12.03.00
 
 ALTER TABLE subjects ADD COLUMN IF NOT EXISTS split_label TEXT[];
+ALTER TABLE tags ADD COLUMN IF NOT EXISTS split_label TEXT[];
 
 
 CREATE FUNCTION label_splitting (lbl jsonb) RETURNS TEXT[]
@@ -28,10 +29,12 @@ END;
 $function$;
 
 UPDATE subjects SET split_label = label_splitting("label") WHERE split_label IS NULL;
+UPDATE tags SET split_label = label_splitting("label") WHERE split_label IS NULL;
 
 DROP FUNCTION label_splitting;
 
 -- we only create indexes that are really necessary, and this one shall be neccessary
 CREATE INDEX IF NOT EXISTS idx_subjects_split_label ON subjects USING GIN (split_label);
+CREATE INDEX IF NOT EXISTS idx_tags_split_label ON tags USING GIN (split_label);
 
 ANALYZE;
