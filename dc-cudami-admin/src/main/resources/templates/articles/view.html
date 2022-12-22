@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{articles}: #{article}|">Articles: Article</title>
+    <title th:text="|#{page.title.articles}: #{article}|">Articles: Article</title>
     <!-- Custom styles for this template -->
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
@@ -28,31 +28,48 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${article}, true)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderDates(${article})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${article})"></th:block>
 
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${article}, ${existingLanguages}, true)"></th:block>
+        <th:block th:insert="fragments/identifiable::renderFields(${article})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${article})"></th:block>
+
+        <hr/>
+
+        <div class="row mb-1">
+          <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
+          <div class="col-md-9">
+            <th:block th:if="${article.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
+              <div class="card">
+                <div class="card-body">
+                  <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${article.text}, ${dataLanguage})"></th:block>
+                </div>
+              </div>
+            </th:block>
           </div>
         </div>
+
       </div>
     </div>
   </th:block>
+
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
-    </script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${article.identifiers}]]*/ []
-      });
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

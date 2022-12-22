@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{geolocations}: #{geolocation}|">...</title>
+    <title th:text="|#{page.title.geolocations}: #{lbl.geolocation}|">Geolocations: Location</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${geoLocation}">
@@ -12,7 +12,12 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="#{geolocation}">...</h1>
+            <h1 th:text="#{lbl.geolocation}">Location</h1>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-right">
+            <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
           </div>
         </div>
         <hr/>
@@ -21,28 +26,35 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${geoLocation}, true)"></th:block>
-
-        <th:block th:insert="fragments/uniqueobject::renderDates(${geoLocation})"></th:block>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${geoLocation}, ${existingLanguages}, false)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
           </div>
-        </div>
+        </th:block>
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${geoLocation})"></th:block>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${geoLocation})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${geoLocation})"></th:block>
+
+        <hr/>
+        
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${geoLocation.identifiers}]]*/ []
-      });
+    <script type="text/javascript">
+      $(addDataLanguageChangeHandler());
+//      $(moveEditButtonToNavbar());
     </script>
   </section>
-  </body>
+</body>
 </html>

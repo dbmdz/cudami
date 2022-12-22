@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{fileresources}: #{file} &quot;${fileresource.filename}&quot;|">Files: File "image001.jpg"</title>
+    <title th:text="|#{page.title.fileresources}: #{lbl.file} &quot;${fileresource.filename}&quot;|">Files: File "image001.jpg"</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${fileresource}">
@@ -12,7 +12,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="|#{file} &quot;*{filename}&quot;|">File "image001.jpg"</h1>
+            <h1 th:text="|#{lbl.file} &quot;*{filename}&quot;|">File "image001.jpg"</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
@@ -26,58 +26,57 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${fileresource}, false)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
+          </div>
+        </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderDates(${fileresource})"></th:block>
+        <th:block th:insert="fragments/uniqueobject::renderFields(${fileresource})"></th:block>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${fileresource})"></th:block>
+
+        <hr/>
 
         <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${fileresource}, ${existingLanguages}, false)"></th:block>
-          </div>
+          <div class="col-md-3"><label th:text="#{lbl.filename}">Filename</label></div>
+          <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
         </div>
-
+        
         <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{filename}">Filename</label></div>
-                <div class="col-md-9"><span th:text="*{filename}">image001.jpg</span></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{mimetype}">Mimetype</label></div>
-                <div class="col-md-9"><span th:text="*{mimeType.getTypeName()}">image/jpeg</span></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{fileResourceType}">Type</label></div>
-                <div class="col-md-9"><span th:text="*{fileResourceType}">VIDEO</span></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{filesize}">Filesize</label></div>
-                <div class="col-md-9"><span th:text="${@fileHelper.bytesToSize(fileresource.sizeInBytes)}"></span></div>
-              </div>
-              <div class="row">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{uri}">URI</label></div>
-                <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
-              </div>
-            </div>
-          </div>
+          <div class="col-md-3"><label th:text="#{lbl.mimetype}">Mimetype</label></div>
+          <div class="col-md-9"><span th:text="*{mimeType.getTypeName()}">image/jpeg</span></div>
         </div>
+        
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.fileresource_type}">Type</label></div>
+          <div class="col-md-9"><span th:text="*{fileResourceType}">VIDEO</span></div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.filesize}">Filesize</label></div>
+          <div class="col-md-9"><span th:text="${@fileHelper.bytesToSize(fileresource.sizeInBytes)}"></span></div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3"><label th:text="#{lbl.uri}">URI</label></div>
+          <div class="col-md-9"><span th:text="*{uri}">file:///home/ralf/cudami/fileResources/application/undefined/114f/998e/57a8/4f9a/a45b/59c6/7d5f/0f70/114f998e-57a8-4f9a-a45b-59c67d5f0f70</span></div>
+        </div>
+        
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
-    </script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${fileresource.identifiers}]]*/ []
-      });
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

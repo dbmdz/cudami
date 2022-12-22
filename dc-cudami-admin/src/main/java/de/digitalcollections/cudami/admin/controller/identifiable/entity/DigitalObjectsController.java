@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for digital objects management pages. */
 @Controller
@@ -52,32 +53,49 @@ public class DigitalObjectsController extends AbstractPagingAndSortingController
   }
 
   @GetMapping("/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     DigitalObject digitalObject = service.getByUuid(uuid);
     if (digitalObject == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("digitalObject", digitalObject);
+
+    List<Locale> existingLanguages =
+        getExistingLanguages(digitalObject.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, digitalObject.getLabel().getLocales());
-    List<Locale> existingCollectionLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfCollections(uuid));
-    List<Locale> existingProjectLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfProjects(uuid));
-    List<Locale> existingContainedDigitalObjectLanguages =
-        languageSortingHelper.sortLanguages(
-            displayLocale, service.getLanguagesOfContainedDigitalObjects(uuid));
 
+    List<Locale> existingCollectionsLanguages = service.getLanguagesOfCollections(uuid);
     model
-        .addAttribute("defaultLanguage", localeService.getDefaultLanguage().getLanguage())
-        .addAttribute("digitalObject", digitalObject)
-        .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("existingCollectionLanguages", existingCollectionLanguages)
         .addAttribute(
-            "existingContainedDigitalObjectLanguages", existingContainedDigitalObjectLanguages)
-        .addAttribute("existingProjectLanguages", existingProjectLanguages);
+            "existingCollectionsLanguages",
+            languageSortingHelper.sortLanguages(displayLocale, existingCollectionsLanguages))
+        .addAttribute("dataLanguageCollections", getDataLanguage(null, localeService));
+
+    List<Locale> existingProjectsLanguages = service.getLanguagesOfProjects(uuid);
+    model
+        .addAttribute(
+            "existingProjectsLanguages",
+            languageSortingHelper.sortLanguages(displayLocale, existingProjectsLanguages))
+        .addAttribute("dataLanguageProjects", getDataLanguage(null, localeService));
+
+    List<Locale> existingContainedDigitalObjectsLanguages =
+        service.getLanguagesOfContainedDigitalObjects(uuid);
+    model
+        .addAttribute(
+            "existingDigitalObjectsLanguages",
+            languageSortingHelper.sortLanguages(
+                displayLocale, existingContainedDigitalObjectsLanguages))
+        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+
     return "digitalobjects/view";
   }
 }

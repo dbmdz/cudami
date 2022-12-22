@@ -85,18 +85,24 @@ public class CorporateBodiesController extends AbstractPagingAndSortingControlle
   }
 
   @GetMapping("/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     CorporateBody corporateBody = service.getByUuid(uuid);
     if (corporateBody == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("corporateBody", corporateBody);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
+        getExistingLanguages(corporateBody.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
-        .addAttribute("corporateBody", corporateBody)
-        .addAttribute("existingLanguages", existingLanguages);
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "corporatebodies/view";
   }
 }

@@ -95,11 +95,11 @@
           <div class="col-md-9">
             <div id="toolbar-digitalobjects">
               <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
                 <select id="digitalobjects-languages">
-                  <th:block th:each="locale : ${existingLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+                  <th:block th:each="locale : ${existingDigitalObjectsLanguages}">
+                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageDigitalObjects)}">English</option>
                   </th:block>
                 </select>
               </th:block>
@@ -122,8 +122,8 @@
                    data-show-search-button="true"
                    data-show-search-clear-button="true"
                    data-side-pagination="server"
-                   data-sort-name="lastModified"
-                   data-sort-order="desc"
+                   data-sort-name="label"
+                   data-sort-order="asc"
                    data-toolbar="#toolbar-digitalobjects"
                    data-unique-id="uuid">
               <thead>

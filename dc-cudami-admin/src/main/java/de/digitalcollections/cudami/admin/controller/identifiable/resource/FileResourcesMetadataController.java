@@ -88,18 +88,24 @@ public class FileResourcesMetadataController
   }
 
   @GetMapping(value = "/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource resource = service.getByUuid(uuid);
     if (resource == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("fileresource", resource);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, resource.getLabel().getLocales());
+        getExistingLanguages(resource.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
-        .addAttribute("fileresource", resource);
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "fileresources/view";
   }
 }

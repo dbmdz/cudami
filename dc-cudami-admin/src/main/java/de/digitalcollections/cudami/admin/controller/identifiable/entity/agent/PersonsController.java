@@ -86,16 +86,23 @@ public class PersonsController extends AbstractPagingAndSortingController<Person
   }
 
   @GetMapping("/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
     Person person = service.getByUuid(uuid);
     if (person == null) {
       throw new ResourceNotFoundException();
     }
-    Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
-    model.addAttribute("existingLanguages", existingLanguages).addAttribute("person", person);
+    model.addAttribute("person", person);
+
+    List<Locale> existingLanguages = getExistingLanguages(person.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
     return "persons/view";
   }
 }

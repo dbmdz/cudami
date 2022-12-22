@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{persons}: #{person}|">...</title>
+    <title th:text="|#{page.title.persons}: #{person}|">Persons: Person</title>
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${person}">
@@ -12,7 +12,12 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="#{person}">...</h1>
+            <h1 th:text="#{lbl.person}">Person</h1>
+          </div>
+          <div class="col-sm-6">
+            <div class="float-right">
+              <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+            </div>
           </div>
         </div>
         <hr/>
@@ -21,27 +26,34 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${person}, true)"></th:block>
-
-        <th:block th:insert="fragments/uniqueobject::renderDates(${person})"></th:block>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${person}, ${existingLanguages}, false)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
           </div>
-        </div>
+        </th:block>
+
+        <th:block th:insert="fragments/uniqueobject::renderFields(${person})"></th:block>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${person})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${person})"></th:block>
+
+        <hr/>
+
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${person.identifiers}]]*/ []
-      });
+    <script type="text/javascript">
+      $(addDataLanguageChangeHandler());
+//      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

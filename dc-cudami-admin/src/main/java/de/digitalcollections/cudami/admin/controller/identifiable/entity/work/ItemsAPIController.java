@@ -61,8 +61,9 @@ public class ItemsAPIController extends AbstractPagingAndSortingController<Item>
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
+    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

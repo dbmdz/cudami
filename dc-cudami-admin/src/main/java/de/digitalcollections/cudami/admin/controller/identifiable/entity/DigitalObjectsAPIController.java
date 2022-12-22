@@ -60,28 +60,89 @@ public class DigitalObjectsAPIController extends AbstractPagingAndSortingControl
       value = "/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public PageResponse<Collection> getAssociatedCollections(
+  public BTResponse<Collection> findAssociatedCollections(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findCollections(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+
+    if ("label".equals(sort)) {
+      if (dataLanguage == null) {
+        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+      }
+      Sorting sorting =
+          Sorting.builder()
+              .order(Order.builder().property("label").subProperty(dataLanguage).build())
+              .build();
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<Collection> pageResponse = service.findCollections(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping(
       value = "/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public PageResponse<Project> getAssociatedProjects(
+  public BTResponse<Project> findAssociatedProjects(
       @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    return service.findProjects(uuid, pageRequest);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+
+    if ("label".equals(sort)) {
+      if (dataLanguage == null) {
+        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+      }
+      Sorting sorting =
+          Sorting.builder()
+              .order(Order.builder().property("label").subProperty(dataLanguage).build())
+              .build();
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<Project> pageResponse = service.findProjects(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
+  }
+
+  @GetMapping("/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
+  @ResponseBody
+  public BTResponse<DigitalObject> findContainedDigitalObjects(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+
+    if ("label".equals(sort)) {
+      if (dataLanguage == null) {
+        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+      }
+      Sorting sorting =
+          Sorting.builder()
+              .order(Order.builder().property("label").subProperty(dataLanguage).build())
+              .build();
+      pageRequest.setSorting(sorting);
+    }
+    PageResponse<DigitalObject> pageResponse =
+        service.getAllForParent(DigitalObject.builder().uuid(uuid).build(), pageRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/digitalobjects/identifier/{namespace}:{id}")
@@ -101,30 +162,5 @@ public class DigitalObjectsAPIController extends AbstractPagingAndSortingControl
   @ResponseBody
   public DigitalObject getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
-  }
-
-  @GetMapping("/api/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
-  @ResponseBody
-  public PageResponse<DigitalObject> getContainedDigitalObjects(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws TechnicalException {
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber(pageNumber)
-            .pageSize(pageSize)
-            .searchTerm(searchTerm)
-            .sorting(
-                Sorting.builder()
-                    .order(
-                        Order.builder()
-                            .property("label")
-                            .subProperty(localeService.getDefaultLanguage().getLanguage())
-                            .build())
-                    .build())
-            .build();
-    return service.getAllForParent(DigitalObject.builder().uuid(uuid).build(), pageRequest);
   }
 }

@@ -84,16 +84,33 @@ public class ProjectsController extends AbstractPagingAndSortingController<Proje
   }
 
   @GetMapping("/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(@PathVariable UUID uuid, Model model)
+  public String view(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
+      Model model)
       throws TechnicalException, ResourceNotFoundException {
-    final Locale displayLocale = LocaleContextHolder.getLocale();
     Project project = service.getByUuid(uuid);
     if (project == null) {
       throw new ResourceNotFoundException();
     }
+    model.addAttribute("project", project);
+
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, project.getLabel().getLocales());
-    model.addAttribute("existingLanguages", existingLanguages).addAttribute("project", project);
+        getExistingLanguages(project.getLabel(), languageSortingHelper);
+    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    model
+        .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("dataLanguage", dataLanguage);
+
+    // FIXME: missing endpoint for languages of digital objects
+    //    Locale displayLocale = LocaleContextHolder.getLocale();
+    //    List<Locale> existingDigitalObjectLanguages =
+    //        languageSortingHelper.sortLanguages(
+    //            displayLocale, service.getLanguagesOfDigitalObjects(uuid));
+    //    model
+    //        .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages)
+    //        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+
     return "projects/view";
   }
 }

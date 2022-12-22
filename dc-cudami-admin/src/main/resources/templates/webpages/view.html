@@ -63,7 +63,7 @@
         <th:block th:insert="fragments/managedcontent::renderFields(${webpage})"></th:block>
 
         <hr/>
-        
+
         <div class="row">
           <div class="col-md-3"><label th:text="#{in_page_navigation}">In page navigation</label></div>
           <div class="align-items-center col-md-9 d-flex"
@@ -80,18 +80,18 @@
           <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
         </div>
 
-        <th:block th:if="${webpage.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
-          <div class="row mb-1">
-            <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
-            <div class="col-md-9">
+        <div class="row mb-1">
+          <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
+          <div class="col-md-9">
+            <th:block th:if="${webpage.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
               <div class="card">
                 <div class="card-body">
                   <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${webpage.text}, ${dataLanguage})"></th:block>
                 </div>
               </div>
-            </div>
+            </th:block>
           </div>
-        </th:block>
+        </div>
 
         <div class="row">
           <div class="col-md-3"><label th:text="#{lbl.sub_webpages}">Sub webpages</label></div>
@@ -132,10 +132,10 @@
               <thead>
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumberWebpages" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
                   <th data-field="renderingHints.showInPageNavigation" data-formatter="renderBoolean" data-halign="center" data-align="center" th:text="#{lbl.in_page-navigation}">In page navigation</th>
                   <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
                   <th data-field="label" data-formatter="formatLabelWebpages" th:text="#{lbl.label}">Label</th>
+                  <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
                   <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
                   <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
                   <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
@@ -166,14 +166,14 @@
       function formatRowNumberWebpages(value, row, index) {
         return renderRowNumber($('#table-sub-webpages'), index);
       }
-      
+
       function queryParamsWebpages(params) {
         let dataLanguage = $("#subpages-languages").val();
         params.dataLanguage = dataLanguage;
         return params;
       }
     </script>
-    
+
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       function buttonsWebpages() {

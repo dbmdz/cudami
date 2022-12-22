@@ -4,7 +4,7 @@
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
   <head>
-    <title th:text="|#{corporateBodies}: #{corporateBody}|">Corporate bodies: Corporate body</title>
+    <title th:text="|#{page.title.corporateBodies}: #{corporateBody}|">Corporate bodies: Corporate body</title>
     <!-- Custom styles for this template -->
     <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
   </head>
@@ -14,7 +14,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-6">
-            <h1 th:text="#{corporateBody}">Corporate body</h1>
+            <h1 th:text="#{lbl.corporate_body}">Corporate body</h1>
           </div>
           <div class="col-sm-6">
             <div class="float-right">
@@ -28,42 +28,39 @@
 
     <!-- Main content -->
     <div class="content">
-      <div class="container-fluid">
-        <th:block th:insert="fragments/identifiable::renderIdentifiersAndRefId(${corporateBody}, true)"></th:block>
-
-        <th:block th:insert="fragments/uniqueobject::renderDates(${corporateBody})"></th:block>
-
-        <div class="row">
-          <div class="col-sm-12">
-            <th:block th:insert="fragments/identifiable::renderLocalizedTeaser(${corporateBody}, ${existingLanguages}, true)"></th:block>
+      <div class="container-fluid rows-striped">
+        <!-- TODO it always contains "und" undefined language? -->
+        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+          <div class="language-selection">
+            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+            <select id="data-languages">
+              <th:block th:each="locale : ${existingLanguages}">
+                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
+              </th:block>
+            </select>
           </div>
-        </div>
+        </th:block>
 
+        <th:block th:insert="fragments/uniqueobject::renderFields(${corporateBody})"></th:block>
+
+        <th:block th:insert="fragments/identifiable::renderFields(${corporateBody})"></th:block>
+
+        <th:block th:insert="fragments/entity::renderFields(${corporateBody})"></th:block>
+
+        <hr/>
+        
         <div class="row">
-          <div class="col-sm-12">
-            <div class="rows-striped">
-              <div class="row" th:if="*{homepageUrl}">
-                <div class="col-md-3"><label class="font-weight-bold" th:text="#{homepage}">Homepage</label></div>
-                <div class="col-md-9"><a th:href="*{homepageUrl}" th:text="*{homepageUrl}" target="_blank">http://www.example.de/</a></div>
-              </div>
-            </div>
-          </div>
+          <div class="col-md-3"><label th:text="#{lbl.homepage}">Homepage</label></div>
+          <div class="col-md-9"><a th:if="*{homepageUrl}" th:href="*{homepageUrl}" th:text="*{homepageUrl}" target="_blank">http://www.example.de/</a></div>
         </div>
+        
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
-      addLanguageChangeHandler()
-      moveEditButtonToNavbar()
-    </script>
-    <script th:src="@{/js/identifier-list.bundle.js}"></script>
-    <script th:inline="javascript">
-      IdentifierList({
-        apiContextPath: /*[[@{/}]]*/ '',
-        id: "identifiers-list",
-        identifiers: /*[[${corporateBody.identifiers}]]*/ []
-      });
+      $(addDataLanguageChangeHandler());
+      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>
