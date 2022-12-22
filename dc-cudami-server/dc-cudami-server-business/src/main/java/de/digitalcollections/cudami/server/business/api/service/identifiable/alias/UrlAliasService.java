@@ -16,7 +16,6 @@ public interface UrlAliasService {
    * Create an UrlAlias in the database (with validation)
    *
    * @param urlAlias the UrlAlias (with yet empty UUID)
-   * @return the persisted UrlAlias with its generated UUID
    * @throws ServiceException
    */
   default void save(UrlAlias urlAlias) throws ServiceException {
@@ -27,7 +26,6 @@ public interface UrlAliasService {
    *
    * @param urlAlias the UrlAlias (with yet empty UUID)
    * @param force if true, do not validate
-   * @return the persisted UrlAlias with its generated UUID
    * @throws ServiceException
    */
   void save(UrlAlias urlAlias, boolean force) throws ServiceException;
@@ -146,7 +144,6 @@ public interface UrlAliasService {
    * Updates an UrlAlias in the database
    *
    * @param urlAlias the UrlAlias (with set UUID)
-   * @return the updated UrlAlias
    * @throws ServiceException
    */
   void update(UrlAlias urlAlias) throws ServiceException;

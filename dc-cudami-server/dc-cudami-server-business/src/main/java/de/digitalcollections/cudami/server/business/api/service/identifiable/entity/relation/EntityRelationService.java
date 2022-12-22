@@ -48,7 +48,6 @@ public interface EntityRelationService {
    * Save (means create or update) a list of entity relations. This method is idempotent.
    *
    * @param entityRelations a list of entity relations to persist
-   * @return the persisted list of entity relations
    */
   void save(List<EntityRelation> entityRelations) throws ServiceException;
 }
