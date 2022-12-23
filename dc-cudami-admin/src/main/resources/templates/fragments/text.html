@@ -3,6 +3,14 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
   <body>
 
+    <th:block th:fragment="renderAllLocalizedStructuredContent(localizedStructuredContent)">
+    <th:block th:if="${localizedStructuredContent}">
+      <th:block th:each="entry : ${localizedStructuredContent}">
+        <th:block th:insert="cudami/fragments/structuredcontent::renderContentBlocks(${entry.value.contentBlocks})"></th:block>
+      </th:block>
+    </th:block>
+  </th:block>
+  
   <th:block th:fragment="renderLocalizedStructuredContent(localizedStructuredContent, language)">
     <th:block th:if="${localizedStructuredContent}">
       <th:block th:if="${language}" th:with="structuredContent=${localizedStructuredContent.get(#locale.forLanguageTag(language))}">

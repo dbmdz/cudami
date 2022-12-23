@@ -17,7 +17,7 @@
       <div class="col-md-9">
         <ul class="list-group">
           <th:block th:each="localizedNote : *{notes}">
-            <li th:if="${localizedNote.get(#locale.forLanguageTag(language))}" class="list-group-item"><th:block th:insert="fragments/text::renderLocalizedStructuredContent(${localizedNote}, ${dataLanguage})"></th:block></li>
+            <li class="list-group-item"><th:block th:insert="fragments/text::renderAllLocalizedStructuredContent(${localizedNote})"></th:block></li>
           </th:block>
         </ul>
       </div>
