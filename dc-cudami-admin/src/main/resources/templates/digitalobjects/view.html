@@ -368,8 +368,7 @@
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
          +]*/
         return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
+          renderViewAction(baseUrl)
         ].join(' ');
       }
       function formatActionsProjects(value, row) {
@@ -377,7 +376,8 @@
          const baseUrl = [[@{'/projects'}]] + '/' + row.uuid;
          +]*/
         return [
-          renderViewAction(baseUrl)
+          renderViewAction(baseUrl),
+          renderEditAction(baseUrl)
         ].join(' ');
       }
 
