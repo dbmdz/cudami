@@ -42,6 +42,36 @@ a[href^="http"]:not(.no-external):after {
   background-color: #FFF;
 }
 
+#content-header {
+  background-color: #f4f6f9;
+  border-bottom: solid 1px #AAA;
+  margin-bottom: 1em !important;
+  overflow: hidden;
+  padding: 10px 0px;
+  width: 100%;
+  z-index: 1000;
+  
+  position: fixed;
+  top: 48px;
+}
+#content-header h1 {
+  font-size: 1.7em;
+}
+@media only screen and (max-width: 991px) {
+  #content-header {
+    padding-right: 30px;
+  }
+}
+@media only screen and (min-width: 991px) {
+  #content-header {
+    padding-right: 280px;
+  }
+}
+
+#content-body {
+  padding-top: 70px;
+}
+
 div.multilanguage {
   border-right: solid 5px #C6E2FF;
 }

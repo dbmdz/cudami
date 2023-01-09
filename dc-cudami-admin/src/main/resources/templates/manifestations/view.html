@@ -8,50 +8,47 @@
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${manifestation}">
-    <div class="content-header">
+    <div class="content">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-6">
-            <h1 th:text="#{lbl.manifestation}">Manifestation</h1>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-<!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+        <div id="content-header">
+          <div class="row">
+            <div class="col-sm-6">
+              <h1 th:text="#{lbl.manifestation}">Manifestation</h1>
+            </div>
+            <div class="col-sm-6">
+              <div class="float-right">
+                <!--              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>-->
+              </div>
             </div>
           </div>
         </div>
-        <hr/>
-      </div>
-    </div>
 
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid rows-striped">
-        <!-- TODO it always contains "und" undefined language? -->
-        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-          <div class="language-selection">
-            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-            <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-          </div>
-        </th:block>
+        <div id="content-body" class="rows-striped">
+          <!-- TODO it always contains "und" undefined language? -->
+          <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+            <div class="language-selection">
+              <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+              <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+            </div>
+          </th:block>
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${manifestation})"></th:block>
+          <th:block th:insert="fragments/uniqueobject::renderFields(${manifestation})"></th:block>
 
-        <th:block th:insert="fragments/identifiable::renderFields(${manifestation})"></th:block>
+          <th:block th:insert="fragments/identifiable::renderFields(${manifestation})"></th:block>
 
-        <th:block th:insert="fragments/entity::renderFields(${manifestation})"></th:block>
-        
-        <hr/>
+          <th:block th:insert="fragments/entity::renderFields(${manifestation})"></th:block>
 
-        <!-- TODO: manifestation fields -->
+          <hr/>
 
+          <!-- TODO: manifestation fields -->
+
+        </div>
       </div>
     </div>
   </th:block>
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
-//      $(moveEditButtonToNavbar());
     </script>
   </section>
 </body>

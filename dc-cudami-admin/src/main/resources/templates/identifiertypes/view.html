@@ -8,43 +8,41 @@
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${identifierType}">
-    <div class="content-header">
+    <div class="content">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-6">
-            <h1 th:text="|#{lbl.identifier_type} &quot;*{namespace}&quot;|">...</h1>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+        <div id="content-header">
+          <div class="row">
+            <div class="col-sm-6">
+              <h1 th:text="|#{lbl.identifier_type} &quot;*{namespace}&quot;|">...</h1>
+            </div>
+            <div class="col-sm-6">
+              <div class="float-right">
+                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+              </div>
             </div>
           </div>
         </div>
-        <hr/>
-      </div>
-    </div>
 
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid rows-striped">
+        <div id="content-body" class="rows-striped">
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
+          <th:block th:insert="fragments/uniqueobject::renderFields(${identifierType})"></th:block>
 
-        <hr/>
+          <hr/>
 
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
-          <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.label}">Label</label></div>
+            <div class="col-md-9"><span th:text="*{label}">bla bla</span></div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.namespace}">Namespace</label></div>
+            <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.pattern}">Pattern</label></div>
+            <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
+          </div>
+
         </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.namespace}">Namespace</label></div>
-          <div class="col-md-9"><span th:text="*{namespace}">gnd</span></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.pattern}">Pattern</label></div>
-          <div class="col-md-9"><span th:text="*{pattern}">xyz[0-9]*</span></div>
-        </div>
-
       </div>
     </div>
   </th:block>
