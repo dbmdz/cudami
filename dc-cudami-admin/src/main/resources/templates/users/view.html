@@ -8,75 +8,74 @@
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${user}">
-    <div class="content-header">
+    <div class="content">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-8">
-            <h1 th:text="|#{user} &quot;*{email}&quot;|">User "email@email.de"</h1>
-          </div>
-          <div class="col-sm-4">
-            <div class="float-right">
-              <input
-                class="btn btn-danger user-status-toggle"
-                th:if="*{enabled}"
-                th:title="#{tooltip_deactivate_user}"
-                th:value="#{btn_deactivate_user}"
-                type="button"
-                data:enable="false"
-                data:message="#{msg.confirm_user_deactivation(*{email})}"
-                data:title="#{title_warning}"
-                data-target="#confirmYesNoDialog"
-                data-toggle="modal"
-                />
-              <input
-                class="btn btn-success user-status-toggle"
-                th:unless="*{enabled}"
-                th:title="#{tooltip_activate_user}"
-                th:value="#{btn_activate_user}"
-                type="button"
-                data:enable="true"
-                />
-              <a
-                class="btn btn-primary ml-1"
-                th:href="@{*{uuid} + '/edit'}"
-                th:text="#{edit}"
-                >
-                edit
-              </a>
+        <div id="content-header">
+          <div class="row">
+            <div class="col-sm-8">
+              <h1 th:text="|#{user} &quot;*{email}&quot;|">User "email@email.de"</h1>
+            </div>
+            <div class="col-sm-4">
+              <div class="float-right">
+                <input
+                  class="btn btn-danger user-status-toggle"
+                  th:if="*{enabled}"
+                  th:title="#{tooltip_deactivate_user}"
+                  th:value="#{btn_deactivate_user}"
+                  type="button"
+                  data:enable="false"
+                  data:message="#{msg.confirm_user_deactivation(*{email})}"
+                  data:title="#{title_warning}"
+                  data-target="#confirmYesNoDialog"
+                  data-toggle="modal"
+                  />
+                <input
+                  class="btn btn-success user-status-toggle"
+                  th:unless="*{enabled}"
+                  th:title="#{tooltip_activate_user}"
+                  th:value="#{btn_activate_user}"
+                  type="button"
+                  data:enable="true"
+                  />
+                <a
+                  class="btn btn-primary ml-1"
+                  th:href="@{*{uuid} + '/edit'}"
+                  th:text="#{edit}"
+                  >
+                  edit
+                </a>
+              </div>
             </div>
           </div>
         </div>
-        <hr/>
-      </div>
-    </div>
 
-    <!-- Main content -->
-    <div class="content">
-      <div class="container-fluid rows-striped">
+        <div id="content-body" class="rows-striped">
 
-        <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
+          <th:block th:insert="fragments/uniqueobject::renderFields(${user})"></th:block>
 
-        <hr>
-        
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>
-          <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
-          <div class="col-md-9"><span th:text="*{lastname}">Lastname</span>, <span th:text="*{firstname}">Firstname</span></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{roles}">Role(s)</label></div>
-          <div class="col-md-9"><th:block th:each="role,rowStat : *{roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{status}">Status</label></div>
-          <div class="col-md-9"><span th:text="#{${'tooltip.enabled.' + user.enabled}}">active</span></div>
+          <hr>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{username}">Username / Email</label></div>
+            <div class="col-md-9"><span th:text="*{email}">email@email.de</span></div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="|#{lastname}, #{firstname}">Lastname, Firstname</label></div>
+            <div class="col-md-9"><span th:text="*{lastname}">Lastname</span>, <span th:text="*{firstname}">Firstname</span></div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{roles}">Role(s)</label></div>
+            <div class="col-md-9"><th:block th:each="role,rowStat : *{roles}"><span th:text="${role.name()}">ROLE_CONTENT_MANAGER</span><span th:unless="${rowStat.last}">, </span></th:block></div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{status}">Status</label></div>
+            <div class="col-md-9"><span th:text="#{${'tooltip.enabled.' + user.enabled}}">active</span></div>
+          </div>
         </div>
       </div>
     </div>
   </th:block>
+
   <th:block layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
     <script th:inline="javascript">

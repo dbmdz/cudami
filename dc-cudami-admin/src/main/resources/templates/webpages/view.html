@@ -10,136 +10,134 @@
   </head>
   <body>
   <th:block layout:fragment="content" th:object="${webpage}">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-12">
-            <ol class="breadcrumb hidden-xs-down">
-              <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-              <li class="breadcrumb-item"><a th:href="@{/websites}" th:text="#{websites}">Websites</a></li>
-              <li class="breadcrumb-item"><a th:href="@{|/websites/${website.uuid}|}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${website.label}, ${locale})">Website x</th:block></a></li>
-              <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
-                <th:block th:each="breadcrumb : ${breadcrumbs}">
-                  <li class="breadcrumb-item"><a th:href="@{/webpages/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
-                </th:block>
-              </th:block>
-            </ol>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-sm-6">
-            <h1 th:text="#{webpage}">Webpage</h1>
-          </div>
-          <div class="col-sm-6">
-            <div class="float-right">
-              <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
-            </div>
-          </div>
-        </div>
-        <hr/>
-      </div>
-    </div>
-
-    <!-- Main content -->
     <div class="content">
-      <div class="container-fluid rows-striped">
-        <!-- TODO it always contains "und" undefined language? -->
-        <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-          <div class="language-selection">
-            <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-            <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-          </div>
-        </th:block>
-
-        <th:block th:insert="fragments/uniqueobject::renderFields(${webpage})"></th:block>
-
-        <th:block th:insert="fragments/identifiable::renderFields(${webpage})"></th:block>
-
-        <th:block th:insert="fragments/managedcontent::renderFields(${webpage})"></th:block>
-
-        <hr/>
-
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{in_page_navigation}">In page navigation</label></div>
-          <div class="align-items-center col-md-9 d-flex"
-               th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
-            <i aria-hidden="true" class="fa fa-check text-success"></i>
-          </div>
-          <div class="align-items-center col-md-9 d-flex"
-               th:if="*{renderingHints != null} AND *{not renderingHints.showInPageNavigation}">
-            <i aria-hidden="true" class="fa fa-times text-danger"></i>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.rendering_template}">Design template</label></div>
-          <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
-        </div>
-
-        <div class="row mb-1">
-          <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
-          <div class="col-md-9">
-            <th:block th:if="${webpage.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
-              <div class="card">
-                <div class="card-body">
-                  <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${webpage.text}, ${dataLanguage})"></th:block>
-                </div>
+      <div class="container-fluid">
+        <div id="content-header">
+          <div class="row">
+            <div class="col-sm-6">
+              <h1 th:text="#{webpage}">Webpage</h1>
+            </div>
+            <div class="col-sm-6">
+              <div class="float-right">
+                <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
               </div>
-            </th:block>
+            </div>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-3"><label th:text="#{lbl.sub_webpages}">Sub webpages</label></div>
-          <div class="col-md-9">
-            <div id="toolbar-sub-webpages">
-              <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingSubpageLanguages)}">
-                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('subpages-languages', ${existingSubpageLanguages}, ${dataLanguageSubpages})">English</select>
+        <div id="content-body" class="rows-striped">
+          <div class="row">
+            <div class="col-12">
+              <ol class="breadcrumb hidden-xs-down">
+                <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/websites}" th:text="#{websites}">Websites</a></li>
+                <li class="breadcrumb-item"><a th:href="@{|/websites/${website.uuid}|}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${website.label}, ${locale})">Website x</th:block></a></li>
+                <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+                  <th:block th:each="breadcrumb : ${breadcrumbs}">
+                    <li class="breadcrumb-item"><a th:href="@{/webpages/} + ${breadcrumb.targetId}"><th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
+                  </th:block>
+                </th:block>
+              </ol>
+            </div>
+          </div>
+
+          <!-- TODO it always contains "und" undefined language? -->
+          <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+            <div class="language-selection">
+              <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+              <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+            </div>
+          </th:block>
+
+          <th:block th:insert="fragments/uniqueobject::renderFields(${webpage})"></th:block>
+
+          <th:block th:insert="fragments/identifiable::renderFields(${webpage})"></th:block>
+
+          <th:block th:insert="fragments/managedcontent::renderFields(${webpage})"></th:block>
+
+          <hr/>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{in_page_navigation}">In page navigation</label></div>
+            <div class="align-items-center col-md-9 d-flex"
+                 th:if="*{renderingHints == null} OR *{renderingHints.showInPageNavigation}">
+              <i aria-hidden="true" class="fa fa-check text-success"></i>
+            </div>
+            <div class="align-items-center col-md-9 d-flex"
+                 th:if="*{renderingHints != null} AND *{not renderingHints.showInPageNavigation}">
+              <i aria-hidden="true" class="fa fa-times text-danger"></i>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.rendering_template}">Design template</label></div>
+            <div class="col-md-9"><span th:text="*{renderingHints?.templateName} ?: '--'">-</span></div>
+          </div>
+
+          <div class="row mb-1">
+            <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
+            <div class="col-md-9">
+              <th:block th:if="${webpage.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
+                <div class="card">
+                  <div class="card-body">
+                    <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${webpage.text}, ${dataLanguage})"></th:block>
+                  </div>
+                </div>
               </th:block>
             </div>
-            <table id="table-sub-webpages"
-                   data-toggle="table"
-                   th:data-url="@{/api/webpages/__${webpage.uuid}__/webpages}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsWebpages"
-                   data-cookie="true"
-                   data-cookie-id-table="table-sub-webpages"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   data-query-params="queryParamsWebpages"
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="label"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-sub-webpages"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberWebpages" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-formatter="formatLabelWebpages" th:text="#{lbl.label}">Label</th>
-                  <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
-                  <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
-                  <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
-                  <th data-field="renderingHints.showInPageNavigation" data-formatter="renderBoolean" data-halign="center" data-align="center" th:text="#{lbl.in_page-navigation}">In page navigation</th>
-                  <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsWebpages" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
-        </div>
 
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.sub_webpages}">Sub webpages</label></div>
+            <div class="col-md-9">
+              <div id="toolbar-sub-webpages">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingSubpageLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('subpages-languages', ${existingSubpageLanguages}, ${dataLanguageSubpages})">English</select>
+                </th:block>
+              </div>
+              <table id="table-sub-webpages"
+                     data-toggle="table"
+                     th:data-url="@{/api/webpages/__${webpage.uuid}__/webpages}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsWebpages"
+                     data-cookie="true"
+                     data-cookie-id-table="table-sub-webpages"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsWebpages"
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-sub-webpages"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberWebpages" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                    <th data-field="label" data-formatter="formatLabelWebpages" th:text="#{lbl.label}">Label</th>
+                    <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+                    <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
+                    <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
+                    <th data-field="renderingHints.showInPageNavigation" data-formatter="renderBoolean" data-halign="center" data-align="center" th:text="#{lbl.in_page-navigation}">In page navigation</th>
+                    <th data-field="lastModified" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsWebpages" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   </th:block>
@@ -147,7 +145,6 @@
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
-      $(moveEditButtonToNavbar());
 
       $(function () {
         $("#subpages-languages").change(function () {
