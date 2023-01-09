@@ -31,11 +31,7 @@
         <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
           <div class="language-selection">
             <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-            <select id="data-languages">
-              <th:block th:each="locale : ${existingLanguages}">
-                <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguage)}">English</option>
-              </th:block>
-            </select>
+            <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
           </div>
         </th:block>
 
@@ -157,11 +153,7 @@
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select id="digitalobjects-languages">
-                  <th:block th:each="locale : ${existingDigitalObjectsLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageDigitalObjects)}">English</option>
-                  </th:block>
-                </select>
+                <select th:replace="fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})">English</select>
               </th:block>
             </div>
             <table id="table-digitalobjects"
@@ -208,11 +200,7 @@
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingCollectionsLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select id="collections-languages">
-                  <th:block th:each="locale : ${existingCollectionsLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageCollections)}">English</option>
-                  </th:block>
-                </select>
+                <select th:replace="fragments/components/select-language-dropdown::render('collections-languages', ${existingCollectionsLanguages}, ${dataLanguageCollections})">English</select>
               </th:block>
             </div>
             <table id="table-collections"
@@ -261,11 +249,7 @@
               <!-- TODO it always contains "und" undefined language? -->
               <th:block th:if="${not #lists.isEmpty(existingProjectsLanguages)}">
                 <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select id="projects-languages">
-                  <th:block th:each="locale : ${existingProjectsLanguages}">
-                    <option th:value="${locale.language}" th:text="${locale.getDisplayLanguage(#locale)}" th:selected="${#strings.equals(locale.language, dataLanguageProjects)}">English</option>
-                  </th:block>
-                </select>
+                <select th:replace="fragments/components/select-language-dropdown::render('projects-languages', ${existingProjectsLanguages}, ${dataLanguageProjects})">English</select>
               </th:block>
             </div>
             <table id="table-projects"

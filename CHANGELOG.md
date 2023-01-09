@@ -31,7 +31,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
   - for `Articles` list (to proof preview image rendering)
   - for `DigitalObjects` list (to proof fixing of too many tabs)
   - for `Collections` list
-- Switch language of displayed multilanguage data fields now using a select drop down instead of tabs
+- Locale handling:
+  - Switch language of displayed multilanguage data fields now using a select drop down instead of tabs in view and list pages
+  - Switch language of displayed multilanguage data fields now also handling languages with script
 
 ### Fixed
 
