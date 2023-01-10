@@ -6,7 +6,7 @@
   <th:block th:fragment="render(id, existingLanguages, dataLanguage)">
     <select th:id="${id}">
       <th:block th:each="locale : ${existingLanguages}">
-        <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayLanguage(#locale)} + (${locale.getDisplayScript(#locale) != ''} ? ' (' + ${locale.getDisplayScript(#locale)} + ')' : '')" th:selected="${#strings.equals(locale.toLanguageTag(), dataLanguage)}">English</option>
+        <option th:value="${locale.toLanguageTag()}" th:text="(${locale.getDisplayLanguage(#locale) != ''} ?  ${locale.getDisplayLanguage(#locale)} : #{language_not_specified}) + (${locale.getDisplayScript(#locale) != ''} ? ' (' + ${locale.getDisplayScript(#locale)} + ')' : '')" th:selected="${#strings.equals(locale.toLanguageTag(), dataLanguage)}">English</option>
       </th:block>
     </select>
   </th:block>
