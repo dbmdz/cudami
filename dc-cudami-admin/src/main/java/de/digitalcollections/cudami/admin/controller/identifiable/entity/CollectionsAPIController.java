@@ -103,6 +103,9 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.find(pageRequest);
   }
 
+  /*
+  Used in templates/collections/view.html
+  */
   @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public BTResponse<DigitalObject> findDigitalObjects(
@@ -120,6 +123,9 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return new BTResponse<>(pageResponse);
   }
 
+  /*
+  Used in templates/collections/view.html
+  */
   @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
   @ResponseBody
   public BTResponse<Collection> findSubcollections(
@@ -137,6 +143,9 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return new BTResponse<>(pageResponse);
   }
 
+  /*
+  Used in templates/collections/list.html
+  */
   @SuppressFBWarnings
   @GetMapping("/api/collections")
   @ResponseBody
@@ -173,6 +182,9 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return service.getByUuid(uuid);
   }
 
+  /*
+  Used in templates/collections/view.html
+  */
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(
