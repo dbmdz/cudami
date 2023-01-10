@@ -59,9 +59,15 @@
       <ul class="list-group">
         <th:block th:with="urlAliases=${aliases.get(#locale.forLanguageTag(language))}">
           <li th:each="urlAlias : ${urlAliases}" class="list-group-item d-flex justify-content-between py-1 align-items-center">
+          <th:block th:if="${website}">
+            <!--/* If ${website} is in model, prefix url alias with website url */-->
+            <span th:text="|${website.url}${#strings.endsWith(website.url,'/') ? '' : '/'}${urlAlias.slug}|">https://www.example.org/slug</span>
+          </th:block>
+          <th:block th:unless="${website}">
             <span th:text="|/${urlAlias.slug}|">/slug</span>
-            <small th:if="${urlAlias.primary}" th:text="#{primaryAlias}">Primary URL</small>
-            <small th:if="${urlAlias.lastPublished != null}" th:with="df=#{date.format}" th:text="#{last_published(__${#temporals.format(urlAlias.lastPublished, df)}__)}">01.01.2023</small>
+          </th:block>
+          <small th:if="${urlAlias.primary}" th:text="#{primaryAlias}">Primary URL</small>
+          <small th:if="${urlAlias.lastPublished != null}" th:with="df=#{date.format}" th:text="#{last_published(__${#temporals.format(urlAlias.lastPublished, df)}__)}">01.01.2023</small>
           </li>
       </ul>
     </th:block>
