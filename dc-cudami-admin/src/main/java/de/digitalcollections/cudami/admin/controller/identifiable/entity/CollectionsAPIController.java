@@ -197,6 +197,9 @@ public class CollectionsAPIController extends AbstractPagingAndSortingController
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
+  /*
+  Used in templates/collections/view.html
+  */
   @DeleteMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
