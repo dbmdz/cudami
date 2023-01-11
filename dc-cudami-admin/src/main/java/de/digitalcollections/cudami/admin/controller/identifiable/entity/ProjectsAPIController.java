@@ -65,6 +65,9 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     return service.create();
   }
 
+  /*
+  Used in templates/projects/list.html
+  */
   @SuppressFBWarnings
   @GetMapping("/api/projects")
   @ResponseBody
@@ -87,6 +90,9 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     return service.getByUuid(uuid);
   }
 
+  /*
+  Used in templates/projects/view.html
+  */
   @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public BTResponse<DigitalObject> findDigitalObjects(
@@ -115,6 +121,9 @@ public class ProjectsAPIController extends AbstractPagingAndSortingController<Pr
     return new BTResponse<>(pageResponse);
   }
 
+  /*
+  Used in templates/projects/view.html
+  */
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(

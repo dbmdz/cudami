@@ -58,6 +58,14 @@
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.digital_objects}">Digital objects</label></div>
             <div class="col-md-9">
+              <div id="alert-digitalobjects" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+                <span th:utext="#{alert.success.digitalobject_removed_from_project}">The digital object has been removed successfully from the project.</span>
+                
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              
               <div id="toolbar-digitalobjects">
                 <!-- TODO it always contains "und" undefined language? -->
                 <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
@@ -107,6 +115,8 @@
   </th:block>
 
   <section layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
+    
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
 
@@ -134,7 +144,8 @@
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
          +]*/
         return [
-          renderViewAction(baseUrl)
+          renderViewAction(baseUrl),
+          renderRemoveDigitalObjectAction(row)
         ].join(' ');
       }
 
@@ -144,6 +155,47 @@
          +]*/
         const dataLanguage = $("#digitalobjects-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
+      }
+      
+      function renderRemoveDigitalObjectAction(row) {
+        /*[+
+         const tooltipRemove = [[#{tooltip.remove_from_project}]];
+         +]*/
+        return "<a title=\"" + tooltipRemove + "\" href=\"javascript:removeDigitalObjectDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+      }
+      
+      function removeDigitalObjectDialog(uuid) {
+        const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
+        const label = row.label[Object.keys(row.label)[0]];
+        /*[+
+         const modalTitle = [[#{modal.title.warning}]];
+         const modalMessage = `[(#{modal.msg.confirm_remove_digitalobject_from_project})]`;
+         +]*/
+
+        const modalDialog = $('#confirmYesNoDialog');
+        $(modalDialog).find('.modal-title').text(modalTitle);
+        $(modalDialog).find('.modal-body').html(modalMessage);
+        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeDigitalObject('" + uuid + "');");
+        $('#confirmYesNoDialog').modal('show');
+      }
+      
+      function removeDigitalObject(uuid) {
+        /*[+
+         const apiUrl = [[@{'/api/projects/__${project.uuid}__/digitalobjects/'}]] + uuid;
+         const errorMessage = [[#{error.technical_error}]];
+         +]*/
+
+        $('#confirmYesNoDialog').modal('hide');
+
+        $.ajax({type: "DELETE", url: apiUrl,
+          success: function () {
+            $('#alert-digitalobjects').removeClass("d-none");
+            $('#table-digitalobjects').bootstrapTable('refresh');
+          },
+          error: function () {
+            alert(errorMessage);
+          }
+        });
       }
       /*]]>*/
     </script>
