@@ -131,12 +131,15 @@ public class ItemRepositoryImplTest
     repo.save(item);
     Item retrievedItem = repo.getByUuid(item.getUuid());
     // do not expect too much ;-)
-    item.setPartOfItem(Item.builder().uuid(enclosingItem.getUuid()).build());
+    item.setPartOfItem(
+        Item.builder().uuid(enclosingItem.getUuid()).label(enclosingItem.getLabel()).build());
     assertThat(item).isEqualTo(retrievedItem);
     assertThat(retrievedItem.getHolders().size()).isEqualTo(1);
     assertThat(retrievedItem.getHolders().get(0)).isEqualTo(holder0);
     assertThat(retrievedItem.getPartOfItem()).isNotNull();
     assertThat(retrievedItem.getPartOfItem().getUuid()).isEqualTo(enclosingItem.getUuid());
+    assertThat(retrievedItem.getPartOfItem().getLabel()).isNotNull();
+    assertThat(retrievedItem.getPartOfItem().getLabel()).isEqualTo(enclosingItem.getLabel());
   }
 
   @Test

@@ -17,6 +17,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -62,17 +63,19 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".exemplifies_manifestation "
-        + mappingPrefix
-        + "_exemplifies_manifestation";
+        + """
+          , %1$s.exemplifies_manifestation %2$s_exemplifies_manifestation,
+          poi.label poi_label
+          """
+            .formatted(tableAlias, mappingPrefix);
   }
 
   public static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      String.format(
-          " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids) ",
-          AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_ALIAS);
+      """
+          LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%4$s.holder_uuids)
+          LEFT JOIN %3$s poi ON %4$s.part_of_item = poi.uuid
+          """
+          .formatted(AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_NAME, TABLE_ALIAS);
 
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
@@ -114,10 +117,23 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         MAPPING_PREFIX,
         Item.class,
         SQL_SELECT_ALL_FIELDS_JOINS,
+        ItemRepositoryImpl::additionalReduceRows,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.workRepositoryImpl = workRepositoryImpl;
     this.agentRepository = agentRepository;
+  }
+
+  private static void additionalReduceRows(Map<UUID, Item> map, RowView rowView) {
+    // must not be null; otherwise something went wrong earlier
+    Item item = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+    // the super item is created and filled with its UUID in extendReducedIdentifiable
+    // if there is none then we will not do anything
+    if (item.getPartOfItem() != null) {
+      if (item.getPartOfItem().getLabel() != null) return;
+      LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
+      item.getPartOfItem().setLabel(partOfItemLabel);
+    }
   }
 
   @Override

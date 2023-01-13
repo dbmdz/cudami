@@ -727,10 +727,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
               return handle
                   .createQuery(sql)
                   .bindMap(argumentMappings)
-                  .reduceRows(
-                      (Map<UUID, I> map, RowView rowView) -> {
-                        basicReduceRowsBiConsumer.accept(map, rowView);
-                      })
+                  .reduceRows(basicReduceRowsBiConsumer)
                   .collect(Collectors.toList());
             });
     return result;
@@ -771,8 +768,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
                 + tableAlias
-                + " "
-                + (sqlSelectAllFieldsJoins != null ? sqlSelectAllFieldsJoins : "")
+                + (sqlSelectAllFieldsJoins != null ? " " + sqlSelectAllFieldsJoins : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME
                 + " AS "
