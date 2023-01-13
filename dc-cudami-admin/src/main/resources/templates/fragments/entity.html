@@ -60,5 +60,42 @@
     </div>
   </th:block>
 
+  <th:block th:fragment="renderAgent(agent)">
+    <th:block th:if="${(agent != null)}">
+      <span th:switch="${agent.identifiableObjectType?.name()}">
+        <a
+            th:case="'CORPORATE_BODY'"
+            th:href="@{/corporatebodies/__${agent.uuid}__}"
+            th:text="${agent.label?.getText(defaultLanguage)} ?: ${agent.uuid}"
+        >
+          corporate body label
+        </a>
+        <a
+            th:case="'PERSON'"
+            th:href="@{/persons/{uuid}(uuid=${agent.uuid})}"
+            th:text="${agent.label?.getText(defaultLanguage)} ?: ${agent.uuid}"
+        >
+          person label
+        </a>
+        <span th:case="*" th:text="${agent.label?.getText(defaultLanguage)} ?: ${agent.uuid}">agent label</span>
+      </span>
+    </th:block>
+  </th:block>
+
+  <th:block th:fragment="renderGeolocation(geolocation)">
+    <th:block th:if="${(geolocation != null)}">
+      <span th:switch="${geolocation.identifiableObjectType?.name()}">
+        <a
+            th:case="'HUMAN_SETTLEMENT'"
+            th:href="@{/geolocations/{uuid}(uuid=${geolocation.uuid})}"
+            th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}"
+        >
+          human settlement label
+        </a>
+        <span th:case="*" th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}">geolocation label</span>
+      </span>
+    </th:block>
+  </th:block>
+
 </body>
 </html>
