@@ -60,6 +60,27 @@
               <th:block th:insert="~{:: displayPublishingInfo(${manifestation.distributionInfo})}">...</th:block>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.mediatypes}">Media types</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:text="${manifestation.mediaTypes}">...</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.manufacturingtype}">Manufacturing type</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:text="${manifestation.manufacturingType}">...</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.manifestationtype}">Manifestation type</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:text="${manifestation.manifestationType}">...</span>
+            </div>
+          </div>
           <!-- TODO: manifestation fields -->
 
         </div>
