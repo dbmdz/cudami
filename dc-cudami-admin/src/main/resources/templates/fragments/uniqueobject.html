@@ -43,5 +43,26 @@
     </section>
   </th:block>
 
+  <th:block th:fragment="renderTimeValueRange(timeValueRange)">
+    [
+    <span th:if="${timeValueRange.start}" th:insert="~{:: renderTimeValue(${timeValueRange.start})}">...</span>
+    -
+    <span th:if="${timeValueRange.end}" th:insert="~{:: renderTimeValue(${timeValueRange.end})}">...</span>
+    ]
+  </th:block>
+
+  <th:block th:fragment="renderTimeValue(timeValue)">
+    <span th:switch="${timeValue.precision}" th:with="year=${#strings.toString(timeValue.year)}">
+      <span th:case="0" th:text="'*'"></span>
+      <span th:case="6" th:text="#{timevalue.format.millennium(${#strings.substring(year,0,1)})}"></span>
+      <span th:case="7" th:text="#{timevalue.format.century(${#strings.substring(year,0,2)})}"></span>
+      <span th:case="8" th:text="#{timevalue.format.decade(${#strings.substring(year,0,3)})}"></span>
+      <span th:case="9" th:text="${year}"></span>
+      <span th:case="10" th:text="#{timevalue.format.month(${year},${timeValue.month})}"></span>
+      <span th:case="11" th:text="#{timevalue.format.day(${year},${timeValue.month},${timeValue.day})}"></span>
+      <span th:case="*" th:text="${timeValue}"></span>
+    </span>
+  </th:block>
+
 </body>
 </html>

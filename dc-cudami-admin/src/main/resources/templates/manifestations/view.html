@@ -28,24 +28,73 @@
           <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
             <div class="language-selection">
               <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-              <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+              <select th:replace="~{fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})}">English</select>
             </div>
           </th:block>
 
-          <th:block th:insert="fragments/uniqueobject::renderFields(${manifestation})"></th:block>
+          <th:block th:insert="~{fragments/uniqueobject::renderFields(${manifestation})}"></th:block>
 
-          <th:block th:insert="fragments/identifiable::renderFields(${manifestation})"></th:block>
+          <th:block th:insert="~{fragments/identifiable::renderFields(${manifestation})}"></th:block>
 
-          <th:block th:insert="fragments/entity::renderFields(${manifestation})"></th:block>
+          <th:block th:insert="~{fragments/entity::renderFields(${manifestation})}"></th:block>
 
           <hr/>
 
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.productioninfo}">Production info</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.productionInfo})}">...</th:block>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.publicationinfo}">Publication info</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.publicationInfo})}">...</th:block>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.distributioninfo}">Distribution info</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:insert="~{:: displayPublishingInfo(${manifestation.distributionInfo})}">...</th:block>
+            </div>
+          </div>
           <!-- TODO: manifestation fields -->
 
         </div>
       </div>
     </div>
   </th:block>
+
+  <div th:fragment="displayPublishingInfo(publishingInfo)" th:with="show_data = ${(publishingInfo != null && !publishingInfo.isEmpty())}">
+    <th:block th:if="${show_data}">
+      <div th:if="${(publishingInfo.datePresentation != null || publishingInfo.navDateRange != null || publishingInfo.timeValueRange != null)}">
+        <span th:text="${publishingInfo.datePresentation}">...</span>
+        <span th:if="${publishingInfo.navDateRange}" th:with="navDateRange=${publishingInfo.navDateRange}">
+          (<span th:with="df=#{date.format},date=${navDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+          -
+          <span th:with="df=#{date.format},date=${navDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+         )</span>&nbsp;
+        <th:block th:if="${(publishingInfo.timeValueRange != null)}" th:insert="~{fragments/uniqueobject :: renderTimeValueRange(${publishingInfo.timeValueRange})}">...</th:block>
+      </div>
+      <div th:each="publisher: ${publishingInfo.publishers}">
+        <th:block th:with="agent=${publisher.agent}">
+          <th:block th:if="${agent}" th:insert="~{fragments/entity::renderAgent(${agent})}"></th:block>
+          <span th:if="${agent}" th:text="': '">:</span>
+        </th:block>
+        <th:block th:if="${publisher.datePresentation}">
+          (<span th:text="${publisher.datePresentation}">...</span>)&nbsp;
+        </th:block>
+        <span th:each="humanSettlement, iterStat: ${publisher.locations}">
+          <th:block th:insert="~{fragments/entity::renderGeolocation(${humanSettlement})}"></th:block>
+          <span th:text="${!iterStat.last ? ', ' : ''}">,</span>
+        </span>
+      </div>
+    </th:block>
+    <th:block th:unless="${show_data}">-</th:block>
+  </div>
+
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
