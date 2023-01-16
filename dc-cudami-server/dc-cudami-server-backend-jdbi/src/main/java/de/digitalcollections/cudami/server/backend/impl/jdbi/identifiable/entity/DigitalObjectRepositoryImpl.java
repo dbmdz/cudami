@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.GeoLocationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.ItemRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.LinkedDataFileResourceRepositoryImpl;
@@ -24,6 +25,7 @@ import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +48,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
+  public static final String TABLE_NAME = "digitalobjects";
   public static final String MAPPING_PREFIX = "do";
   public static final String TABLE_ALIAS = "d";
 
@@ -58,8 +61,10 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
           + TABLE_ALIAS
           + ".license_uuid = "
           + LicenseRepositoryImpl.TABLE_ALIAS
-          + ".uuid";
-  public static final String TABLE_NAME = "digitalobjects";
+          + ".uuid"
+          + " LEFT JOIN %1$s %2$s ON %2$s.uuid = %3$s.item_uuid"
+              .formatted(
+                  ItemRepositoryImpl.TABLE_NAME, ItemRepositoryImpl.TABLE_ALIAS, TABLE_ALIAS);
 
   private static final BiConsumer<Map<UUID, DigitalObject>, RowView>
       ADDITIONAL_REDUCE_ROWS_BICONSUMER =
@@ -106,10 +111,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
               digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
             }
 
-            // set item UUID only
+            // set item UUID and label only
             UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
+            LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
             if (itemUuid != null) {
-              digitalObject.setItem(Item.builder().uuid(itemUuid).build());
+              digitalObject.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
             }
           };
 
@@ -186,16 +192,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".parent_uuid "
-        + mappingPrefix
-        + "_parent_uuid"
-        + ", "
-        + tableAlias
-        + ".item_uuid "
-        + mappingPrefix
-        + "_item_uuid";
+        + """
+          , %1$s.parent_uuid %2$s_parent_uuid,
+          %1$s.item_uuid %2$s_item_uuid,
+          %3$s.label item_label"""
+            .formatted(tableAlias, mappingPrefix, ItemRepositoryImpl.TABLE_ALIAS);
   }
 
   @Override
