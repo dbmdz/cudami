@@ -365,7 +365,8 @@ class DigitalObjectRepositoryImplTest
     assertThat(digitalObject.getUuid()).isNotNull();
     assertThat(digitalObject.getItem().getUuid()).isEqualTo(item.getUuid());
     DigitalObject retrieved = repo.getByUuid(digitalObject.getUuid());
-    assertThat(retrieved.getItem()).isEqualTo(Item.builder().uuid(item.getUuid()).build());
+    assertThat(retrieved.getItem())
+        .isEqualTo(Item.builder().uuid(item.getUuid()).label(item.getLabel()).build());
   }
 
   @Test
