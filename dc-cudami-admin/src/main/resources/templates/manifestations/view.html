@@ -101,6 +101,30 @@
               </th:block>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
+            <div class="align-items-center col-md-9 d-flex" th:text="${manifestation.language}"></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.other_languages}">Other languages</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:each="language, iterStat: ${manifestation.otherLanguages}">
+                <div th:text="${language}">...</div>
+                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+              </th:block>
+            </div>
+          </div>
+
+          <th:block th:each="title: ${manifestation.titles}">
+            <div class="row">
+              <div class="col-md-3"><label th:text="${#messages.msgOrNull('lbl.title.' + #strings.toLowerCase(title.titleType.getMainType()) + '.' + #strings.toLowerCase(title.titleType.getSubType()))}">title label</label></div>
+              <div class="align-items-center col-md-9 d-flex">
+                <div th:text="${title.text?.getText(dataLanguage)} ?: ${title.text}">...</div>
+              </div>
+            </div>
+          </th:block>
           <!-- TODO: manifestation fields -->
 
         </div>
