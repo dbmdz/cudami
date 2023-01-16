@@ -49,11 +49,14 @@
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.exemplifies_manifestation}">Item of a manifestation</label></div>
             <div class="col-md-9">
-              <div th:switch="*{exemplifiesManifestation}">
+              <span th:switch="*{exemplifiesManifestation}">
                 <i th:case="true" class="fas fa-check text-success"></i>
                 <i th:case="false" class="fas fa-times text-danger"></i>
                 <i th:case="*" class="fas fa-question-circle"></i>
-              </div>
+              </span>
+              <span th:with="manifestation=*{manifestation}">
+                &nbsp;<a th:href="@{/manifestations/{uuid}(uuid=${manifestation.uuid})}" th:text="${manifestation.label?.getText(dataLanguage)} ?: ${manifestation.uuid}">manifestation label</a>
+              </span>
             </div>
           </div>
           <div class="row">

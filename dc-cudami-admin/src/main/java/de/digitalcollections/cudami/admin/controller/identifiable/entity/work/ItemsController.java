@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -26,11 +27,13 @@ public class ItemsController extends AbstractPagingAndSortingController<Item> {
   private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiItemsClient service;
+  private final CudamiManifestationsClient manifestationsService;
 
   public ItemsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     this.languageSortingHelper = languageSortingHelper;
     this.localeService = client.forLocales();
     this.service = client.forItems();
+    this.manifestationsService = client.forManifestations();
   }
 
   @GetMapping("/items")
@@ -60,6 +63,11 @@ public class ItemsController extends AbstractPagingAndSortingController<Item> {
     if (item == null) {
       throw new ResourceNotFoundException();
     }
+
+    if (item.getManifestation() != null) {
+      item.setManifestation(manifestationsService.getByUuid(item.getManifestation().getUuid()));
+    }
+
     model.addAttribute("item", item);
 
     List<Locale> existingLanguages = getExistingLanguages(item.getLabel(), languageSortingHelper);
