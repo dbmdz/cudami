@@ -81,6 +81,26 @@
               <span th:text="${manifestation.manifestationType}">...</span>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.subjects}">Subjects</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:each="subject, iterStat: ${manifestation.subjects}">
+                <a th:href="@{/subjects/{uuid}(uuid=${subject.uuid})}" th:text="${subject.label?.getText(dataLanguage)} ?: ${subject.uuid}">subject label</a>
+                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+              </th:block>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.tags}">Tags</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <th:block th:each="tag, iterStat: ${manifestation.tags}">
+                <a th:href="@{/tags/{uuid}(uuid=${tag.uuid})}" th:text="${tag.label?.getText(dataLanguage)} ?: ${tag.uuid}">tag label</a>
+                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+              </th:block>
+            </div>
+          </div>
           <!-- TODO: manifestation fields -->
 
         </div>
