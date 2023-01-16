@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -135,6 +136,10 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getParents())
         .containsExactlyInAnyOrder(
             new RelationSpecification<Manifestation>("The child's title", null, parent));
+    assertThat(manifestation.getProductionInfo().getPublishers())
+        .allSatisfy(publisher -> assertThat(publisher.getAgent().getUuid()).isNotNull());
+    assertThat(manifestation.getPublicationInfo().getPublishers())
+        .allSatisfy(publisher -> assertThat(publisher.getAgent().getUuid()).isNotNull());
     assertThat(actual.getProductionInfo()).isEqualTo(manifestation.getProductionInfo());
     assertThat(actual.getPublicationInfo()).isEqualTo(manifestation.getPublicationInfo());
   }
@@ -228,6 +233,7 @@ class ManifestationRepositoryImplTest
                         Publisher.builder()
                             .agent(
                                 Agent.builder()
+                                    .uuid(UUID.randomUUID())
                                     .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
                                     .build())
                             .build())
@@ -240,6 +246,7 @@ class ManifestationRepositoryImplTest
                         Publisher.builder()
                             .agent(
                                 Agent.builder()
+                                    .uuid(UUID.randomUUID())
                                     .name(new LocalizedText(Locale.ENGLISH, "Producer"))
                                     .build())
                             .build())
