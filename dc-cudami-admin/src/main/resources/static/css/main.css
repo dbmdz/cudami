@@ -36,7 +36,9 @@ a[href^="http"]:not(.no-external):after {
 .alert i {
   margin-right: 10px;
 }
-
+.badge {
+  font-size: 90%;
+}
 .bootstrap-table table.table{
   background-color: #FFF;
 }
