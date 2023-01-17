@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head lang="en">
+    <meta charset="UTF-8"></meta>
+    <title></title>
+  </head>
+  <body>
+  <th:block th:fragment="render">
+    <div class="modal fade" id="selectCollectionDialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" th:text="#{modal.title.move_collection}">Move sub collection into collection</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="row">
+                <label for="inputType" class="form-label col-sm-2 pt-1" th:text="#{lbl.target_collection}">Password</label>
+                <div class="input-group col-sm-10">
+                  <select class="form-select" id="inputValueType">
+                    <option value="label" selected th:text="#{lbl.label}">Label</option>
+                    <option value="refId" th:text="#{lbl.ref_id}">Reference ID</option>
+                    <option value="identifier" th:text="#{lbl.identifier}">Identifier</option>
+                    <option value="uuid" th:text="#{lbl.uuid}">UUID</option>
+                  </select>
+                  <input type="text" aria-label="User input" name="userInput" class="form-control">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
+            <a class="btn btn-primary" id="confirm" th:text="#{btn.move}">Move</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+
+      const inputValueTypeComponent = $("#inputValueType");
+      alert($(inputValueTypeComponent).val());
+
+      /*]]>*/
+    </script>
+  </th:block>
+</body>
+</html>

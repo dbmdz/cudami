@@ -85,12 +85,12 @@
             <div class="col-md-9">
               <div id="alert-subcollections" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
                 <span th:utext="#{alert.success.subcollection_removed_from_collection}">The sub collection has been removed successfully from the collection.</span>
-                
+
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              
+
               <div id="toolbar-sub-collections">
                 <!-- TODO it always contains "und" undefined language? -->
                 <th:block th:if="${not #lists.isEmpty(existingSubcollectionsLanguages)}">
@@ -143,7 +143,7 @@
             <div class="col-md-9">
               <div id="alert-digitalobjects" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
                 <span th:utext="#{alert.success.digitalobject_removed_from_collection}">The digital object has been removed successfully from the collection.</span>
-                
+
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -200,6 +200,7 @@
 
   <section layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
+    <div th:replace="fragments/modals/select-collection :: render"></div>
 
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
@@ -262,6 +263,7 @@
         return [
           renderViewAction(baseUrl),
           renderEditAction(baseUrl),
+          renderMoveSubcollectionAction(row),
           renderRemoveSubcollectionAction(row)
         ].join(' ');
       }
@@ -290,18 +292,40 @@
         return renderLabel(baseUrl, value, dataLanguage);
       }
 
+      function moveSubcollectionDialog(uuid) {
+        const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
+        const label = row.label[Object.keys(row.label)[0]];
+        /*[+
+         const modalTitle = [[#{modal.title.warning}]];
+         const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
+         +]*/
+
+        const modalDialog = $('#selectCollectionDialog');
+//        $(modalDialog).find('.modal-title').text(modalTitle);
+//        $(modalDialog).find('.modal-body').html(modalMessage);
+//        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
+        $(modalDialog).modal('show');
+      }
+
+      function renderMoveSubcollectionAction(row) {
+        /*[+
+         const tooltip = [[#{tooltip.move_subcollection_to_collection}]];
+         +]*/
+        return "<a title=\"" + tooltip + "\" href=\"javascript:moveSubcollectionDialog('" + row.uuid + "');\"><i class='fas fa-exchange-alt'></i></a>";
+      }
       function renderRemoveDigitalObjectAction(row) {
         /*[+
-         const tooltipRemove = [[#{tooltip.remove_from_collection}]];
+         const tooltip = [[#{tooltip.remove_from_collection}]];
          +]*/
-        return "<a title=\"" + tooltipRemove + "\" href=\"javascript:removeDigitalObjectDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+        return "<a title=\"" + tooltip + "\" href=\"javascript:removeDigitalObjectDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
       }
       function renderRemoveSubcollectionAction(row) {
         /*[+
-         const tooltipRemove = [[#{tooltip.remove_from_collection}]];
+         const tooltip = [[#{tooltip.remove_from_collection}]];
          +]*/
-        return "<a title=\"" + tooltipRemove + "\" href=\"javascript:removeSubcollectionDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+        return "<a title=\"" + tooltip + "\" href=\"javascript:removeSubcollectionDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
       }
+
       function removeDigitalObjectDialog(uuid) {
         const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
         const label = row.label[Object.keys(row.label)[0]];
@@ -314,7 +338,7 @@
         $(modalDialog).find('.modal-title').text(modalTitle);
         $(modalDialog).find('.modal-body').html(modalMessage);
         $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeDigitalObject('" + uuid + "');");
-        $('#confirmYesNoDialog').modal('show');
+        $(modalDialog).modal('show');
       }
       function removeSubcollectionDialog(uuid) {
         const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
@@ -328,7 +352,7 @@
         $(modalDialog).find('.modal-title').text(modalTitle);
         $(modalDialog).find('.modal-body').html(modalMessage);
         $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
-        $('#confirmYesNoDialog').modal('show');
+        $(modalDialog).modal('show');
       }
       function removeDigitalObject(uuid) {
         /*[+
