@@ -182,7 +182,44 @@
               <br th:if="${!iterStat.last}"/>
             </div>
           </div>
-          <!-- TODO: manifestation fields -->
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.child_manifestations}">Child manifestations</label></div>
+            <div class="col-md-9">
+              <table id="table-childmanifestations"
+                     data-toggle="table"
+                     th:data-url="@{/api/manifestations/__${manifestation.uuid}__/children}"
+                     th:data-locale="${#locale}"
+
+                     data-cookie="true"
+                     data-cookie-id-table="table-childmanifestations"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsChildManifestations"
+                     data-search="false"
+                     data-search-highlight="false"
+                     data-search-on-enter-key="false"
+                     data-server-sort="true"
+                     data-show-search-button="false"
+                     data-show-search-clear-button="false"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-childmanifestations"
+                     data-unique-id="uuid">
+                <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberChildManifestations" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="sortkey" data-formatter="formatSortKeyChildManifestations" th:text="#{lbl.sortkey}">Sortkey</th>
+                  <th data-field="title" data-formatter="formatTitleChildManifestations" th:text="#{lbl.title}">Title</th>
+                  <th data-field="actions" data-formatter="formatActionsChildManifestations" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
 
         </div>
       </div>
@@ -220,7 +257,44 @@
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
+
+      function formatRowNumberChildManifestations(value, row, index) {
+        return renderRowNumber($('#table-childmanifestations'), index);
+      }
+
+      function queryParamsChildManifestations(params) {
+        let dataLanguage = $("#childmanifestations-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
+      }
     </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatTitleChildManifestations(value, row) {
+        /*[+
+         const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
+         +]*/
+
+        return '<a href="' + baseUrl + '">' + value+ '</a>';
+      }
+
+      function formatSortKeyChildManifestations(value, row) {
+        return value;
+      }
+
+      function formatActionsChildManifestations(value, row) {
+        /*[+
+         const baseUrl = [[@{'/manifestations'}]] + '/' + row.object.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+      /*]]>*/
+    </script>
+
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
   </section>
 </body>
 </html>

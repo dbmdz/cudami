@@ -28,6 +28,8 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -416,16 +418,17 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @SuppressWarnings("unchecked")
   private <P extends PublishingInfo> P reducePublisher(P publishingInfo)
       throws RepositoryException {
-    if (publishingInfo == null) return null;
+    if (publishingInfo == null)
+      return null;
     P result;
     try {
       result = (P) publishingInfo.getClass().getConstructor().newInstance();
     } catch (InstantiationException
-        | IllegalAccessException
-        | IllegalArgumentException
-        | InvocationTargetException
-        | NoSuchMethodException
-        | SecurityException e) {
+             | IllegalAccessException
+             | IllegalArgumentException
+             | InvocationTargetException
+             | NoSuchMethodException
+             | SecurityException e) {
       throw new RepositoryException("PublishingInfo cannot be instantiated", e);
     }
 
@@ -446,11 +449,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                     try {
                       agent = publ.getAgent().getClass().getConstructor().newInstance();
                     } catch (InstantiationException
-                        | IllegalAccessException
-                        | IllegalArgumentException
-                        | InvocationTargetException
-                        | NoSuchMethodException
-                        | SecurityException e) {
+                             | IllegalAccessException
+                             | IllegalArgumentException
+                             | InvocationTargetException
+                             | NoSuchMethodException
+                             | SecurityException e) {
                       agent = new Agent();
                     }
                     agent.setUuid(publ.getAgent().getUuid());
@@ -473,6 +476,51 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .toList();
     result.setPublishers(publishers);
     return result;
+  }
+
+  @Override
+  public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
+    final String doTableName = "manifestation_manifestations";
+    final String doTableAlias = "mms";
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + doTableName
+                + " AS "
+                + doTableAlias
+                + " INNER JOIN "
+                + tableName
+                + " "
+                + tableAlias
+                + " ON "
+                + doTableAlias
+                + ".object_uuid = "
+                + tableAlias
+                + ".uuid"
+                + " WHERE "
+                + doTableAlias
+                + ".subject_uuid = :subject_uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("subject_uuid", uuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Manifestation> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   private void saveParents(Manifestation manifestation) {

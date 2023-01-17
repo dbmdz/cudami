@@ -14,6 +14,8 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +43,11 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
         localeService,
         cudamiConfig);
     this.entityRelationService = entityRealationService;
+  }
+
+  @Override
+  public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
+    return ((ManifestationRepository) repository).findChildren(uuid, pageRequest);
   }
 
   @Override
