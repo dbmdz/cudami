@@ -8,8 +8,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -94,6 +96,24 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
         labelTerm,
         labelLanguage,
         Pair.of("parent.uuid", parentUuidFilterCriterion));
+  }
+
+  @Operation(summary = "Find all children of a manifestation")
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> findSubcollections(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.findChildren(uuid, pageRequest);
   }
 
   @Operation(

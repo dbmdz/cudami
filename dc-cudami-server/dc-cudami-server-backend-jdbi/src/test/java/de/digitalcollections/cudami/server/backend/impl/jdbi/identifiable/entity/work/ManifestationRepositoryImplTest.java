@@ -205,6 +205,59 @@ class ManifestationRepositoryImplTest
         .contains(manifestation.getUuid(), parent.getUuid());
   }
 
+  @Test
+  @DisplayName("can find children")
+  public void findChildren() throws RepositoryException {
+    Manifestation parent =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Parent")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Parent"))
+                    .build())
+            .build();
+    repo.save(parent);
+
+    Manifestation child1 =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Child 1")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Child 1"))
+                    .build())
+            .parent(
+                RelationSpecification.<Manifestation>builder()
+                    .sortKey("sortkey-1")
+                    .title("title 1")
+                    .subject(parent)
+                    .build())
+            .build();
+    repo.save(child1);
+
+    Manifestation child2 =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Child 2")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Child 2"))
+                    .build())
+            .parent(
+                RelationSpecification.<Manifestation>builder()
+                    .sortKey("sortkey-2")
+                    .title("title 2")
+                    .subject(parent)
+                    .build())
+            .build();
+    repo.save(child2);
+
+    PageResponse<Manifestation> actual =
+        repo.findChildren(parent.getUuid(), new PageRequest(0, 10));
+    assertThat(actual.getContent()).containsExactlyInAnyOrder(child1, child2);
+  }
+
   // -------------------------------------------------------------------
   private Manifestation ensurePersistedParentManifestation() throws RepositoryException {
     var noteText = new StructuredContent();
