@@ -125,9 +125,9 @@
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.relations}">Relations</label></div>
-            <div class="align-items-center col-md-9 d-flex">
+            <div class="align-items-center col-md-9">
               <th:block th:each="relation, iterStat: ${manifestation.relations}">
-                <p>
+                <div>
                   <span th:with="subject=${relation.subject}" th:switch="${subject.identifiableObjectType.name.toUpperCase()}">
                     <th:block th:case="'AGENT'" th:insert="~{fragments/entity::renderAgent(${subject})}"></th:block>
                     <th:block th:case="'PERSON'" th:insert="~{fragments/entity::renderAgent(${subject})}"></th:block>
@@ -136,14 +136,13 @@
                     <th:block th:case="'GEOLOCATION'" th:insert="~{fragments/entity::renderGeolocation(${subject})}"></th:block>
                   </span>
                   &nbsp;
-                  <span class="border border-dark p-2 badge badge-light badge-pill mr-2">
+                  <span class="border border-dark p-2 badge badge-light mr-2">
                     <a th:href="@{/predicates/{predicate}(predicate=${relation.predicate})}" th:text="${relation.predicate}">predicate</a>
                   </span>
                   <th:block th:each="additionalPredicate: ${relation.additionalPredicates}">
-                    <span class="border border-dark p-1 badge badge-light badge-pill mr-2" th:text="${additionalPredicate}"></span>
+                    <span class="border border-dark p-2 badge badge-light mr-2" th:text="${additionalPredicate}"></span>
                   </th:block>
-                </p>
-                <br th:if="${!iterStat.last}"/>
+                </div>
               </th:block>
             </div>
           </div>
