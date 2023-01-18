@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -29,19 +28,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for webpage management pages. */
 @Controller
-public class WebpagesController extends AbstractPagingAndSortingController<Webpage> {
+public class WebpagesController
+    extends AbstractIdentifiablesController<Webpage, CudamiWebpagesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
-
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiWebpagesClient service;
   private final CudamiWebsitesClient websiteService;
 
   public WebpagesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forWebpages();
+    super(client.forWebpages(), languageSortingHelper, client.forLocales());
     this.websiteService = client.forWebsites();
   }
 
@@ -118,15 +112,14 @@ public class WebpagesController extends AbstractPagingAndSortingController<Webpa
     }
     model.addAttribute("webpage", webpage);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(webpage.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(webpage);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubpageLanguages =
-        getExistingLanguagesFromIdentifiables(webpage.getChildren(), languageSortingHelper);
+        getExistingLanguagesFromIdentifiables(webpage.getChildren());
     model
         .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
         .addAttribute("dataLanguageSubpages", getDataLanguage(null, localeService));

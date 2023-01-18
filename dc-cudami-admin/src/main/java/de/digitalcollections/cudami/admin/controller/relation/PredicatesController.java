@@ -40,7 +40,6 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
   private final LabelNotBlankValidator labelNotBlankValidator;
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final MessageSource messageSource;
   private final CudamiPredicatesClient service;
@@ -50,8 +49,8 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
       LanguageSortingHelper languageSortingHelper,
       CudamiClient client,
       LabelNotBlankValidator labelNotBlankValidator) {
+    super(languageSortingHelper);
     this.labelNotBlankValidator = labelNotBlankValidator;
-    this.languageSortingHelper = languageSortingHelper;
     this.localeService = client.forLocales();
     this.messageSource = messageSource;
     this.service = client.forPredicates();
@@ -132,8 +131,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
 
   @GetMapping("/predicates")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);
@@ -258,7 +256,9 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
       throw new ResourceNotFoundException();
     }
     List<Locale> existingLanguages =
-        getExistingLanguages(predicate.getLabel(), languageSortingHelper);
+        predicate.getLabel() != null
+            ? getExistingLanguagesForLocales(predicate.getLabel().getLocales())
+            : List.of();
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
 
     model

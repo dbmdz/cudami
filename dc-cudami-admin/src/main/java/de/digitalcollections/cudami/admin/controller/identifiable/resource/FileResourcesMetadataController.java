@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -25,20 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Controller for resource management pages. */
 @Controller
 public class FileResourcesMetadataController
-    extends AbstractPagingAndSortingController<FileResource> {
+    extends AbstractIdentifiablesController<FileResource, CudamiFileResourcesMetadataClient> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiFileResourcesMetadataClient service;
-
   public FileResourcesMetadataController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forFileResourcesMetadata();
+    super(client.forFileResourcesMetadata(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping(value = "/fileresources/new")
@@ -72,9 +65,7 @@ public class FileResourcesMetadataController
 
   @GetMapping("/fileresources")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -99,8 +90,7 @@ public class FileResourcesMetadataController
     }
     model.addAttribute("fileresource", resource);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(resource.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(resource);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)

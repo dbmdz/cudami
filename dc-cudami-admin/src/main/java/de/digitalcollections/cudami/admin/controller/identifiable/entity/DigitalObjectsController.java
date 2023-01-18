@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -22,24 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for digital objects management pages. */
 @Controller
-public class DigitalObjectsController extends AbstractPagingAndSortingController<DigitalObject> {
-
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiDigitalObjectsClient service;
+public class DigitalObjectsController
+    extends AbstractIdentifiablesController<DigitalObject, CudamiDigitalObjectsClient> {
 
   public DigitalObjectsController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forDigitalObjects();
+    super(client.forDigitalObjects(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -64,8 +56,7 @@ public class DigitalObjectsController extends AbstractPagingAndSortingController
     }
     model.addAttribute("digitalObject", digitalObject);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(digitalObject.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(digitalObject);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)

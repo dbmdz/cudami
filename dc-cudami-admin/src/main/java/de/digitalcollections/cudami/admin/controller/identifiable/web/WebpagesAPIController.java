@@ -1,11 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -29,19 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for webpage management pages. */
 @RestController
-public class WebpagesAPIController extends AbstractPagingAndSortingController<Webpage> {
+public class WebpagesAPIController
+    extends AbstractIdentifiablesController<Webpage, CudamiWebpagesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesAPIController.class);
-
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiWebpagesClient service;
   private final CudamiWebsitesClient websiteService;
 
   public WebpagesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forWebpages();
+    super(client.forWebpages(), languageSortingHelper, client.forLocales());
     this.websiteService = client.forWebsites();
   }
 

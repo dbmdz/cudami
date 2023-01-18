@@ -34,13 +34,12 @@ public class RenderingTemplatesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
   public RenderingTemplatesController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
+    super(languageSortingHelper);
     this.localeService = client.forLocales();
     this.service = client.forRenderingTemplates();
   }
@@ -84,8 +83,7 @@ public class RenderingTemplatesController
 
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);

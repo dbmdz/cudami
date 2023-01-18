@@ -34,13 +34,12 @@ public class RenderingTemplatesAPIController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(RenderingTemplatesAPIController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
   public RenderingTemplatesAPIController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
+    super(languageSortingHelper);
     this.localeService = client.forLocales();
     this.service = client.forRenderingTemplates();
   }

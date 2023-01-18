@@ -30,13 +30,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LicensesController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
-
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
   public LicensesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
+    super(languageSortingHelper);
     this.localeService = client.forLocales();
     this.service = client.forLicenses();
   }
@@ -77,8 +75,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
 
   @GetMapping("/licenses")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);

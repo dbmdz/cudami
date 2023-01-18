@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -23,25 +22,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for GeoLocations management pages. */
 @Controller
-public class GeoLocationsController extends AbstractPagingAndSortingController<GeoLocation> {
+public class GeoLocationsController
+    extends AbstractIdentifiablesController<GeoLocation, CudamiGeoLocationsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiGeoLocationsClient service;
-
   public GeoLocationsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forGeoLocations();
+    super(client.forGeoLocations(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/geolocations")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -66,8 +58,7 @@ public class GeoLocationsController extends AbstractPagingAndSortingController<G
     }
     model.addAttribute("geoLocation", geoLocation);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(geoLocation.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(geoLocation);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
