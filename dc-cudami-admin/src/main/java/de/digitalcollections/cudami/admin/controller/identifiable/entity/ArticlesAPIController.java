@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Article;
@@ -26,16 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Articles" endpoints (API). */
 @RestController
-public class ArticlesAPIController extends AbstractPagingAndSortingController<Article> {
+public class ArticlesAPIController
+    extends AbstractIdentifiablesController<Article, CudamiArticlesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesAPIController.class);
 
-  private final CudamiLocalesClient localeService;
-  private final CudamiArticlesClient service;
-
-  public ArticlesAPIController(CudamiClient client) {
-    this.localeService = client.forLocales();
-    this.service = client.forArticles();
+  public ArticlesAPIController(CudamiClient client, LanguageSortingHelper languageSortingHelper) {
+    super(client.forArticles(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/api/articles/new")

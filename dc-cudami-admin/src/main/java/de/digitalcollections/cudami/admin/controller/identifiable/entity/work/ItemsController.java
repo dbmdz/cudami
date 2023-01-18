@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -23,24 +22,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for item management pages. */
 @Controller
-public class ItemsController extends AbstractPagingAndSortingController<Item> {
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiItemsClient service;
+public class ItemsController extends AbstractIdentifiablesController<Item, CudamiItemsClient> {
   private final CudamiManifestationsClient manifestationsService;
 
   public ItemsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forItems();
+    super(client.forItems(), languageSortingHelper, client.forLocales());
     this.manifestationsService = client.forManifestations();
   }
 
   @GetMapping("/items")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -70,7 +62,7 @@ public class ItemsController extends AbstractPagingAndSortingController<Item> {
 
     model.addAttribute("item", item);
 
-    List<Locale> existingLanguages = getExistingLanguages(item.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(item);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)

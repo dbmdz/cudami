@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,19 +23,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for CorporateBody management pages. */
 @Controller
-public class CorporateBodiesController extends AbstractPagingAndSortingController<CorporateBody> {
+public class CorporateBodiesController
+    extends AbstractIdentifiablesController<CorporateBody, CudamiCorporateBodiesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiCorporateBodiesClient service;
-
   public CorporateBodiesController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forCorporateBodies();
+    super(client.forCorporateBodies(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/corporatebodies/new")
@@ -69,9 +63,7 @@ public class CorporateBodiesController extends AbstractPagingAndSortingControlle
 
   @GetMapping("/corporatebodies")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -96,8 +88,7 @@ public class CorporateBodiesController extends AbstractPagingAndSortingControlle
     }
     model.addAttribute("corporateBody", corporateBody);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(corporateBody.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(corporateBody);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)

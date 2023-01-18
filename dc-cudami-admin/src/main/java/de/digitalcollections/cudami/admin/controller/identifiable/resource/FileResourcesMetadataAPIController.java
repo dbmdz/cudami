@@ -1,12 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -33,20 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "FileResources" endpoints (API). */
 @RestController
 public class FileResourcesMetadataAPIController
-    extends AbstractPagingAndSortingController<FileResource> {
+    extends AbstractIdentifiablesController<FileResource, CudamiFileResourcesMetadataClient> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataAPIController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiFileResourcesMetadataClient service;
-
   public FileResourcesMetadataAPIController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forFileResourcesMetadata();
+    super(client.forFileResourcesMetadata(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/api/fileresources/new")

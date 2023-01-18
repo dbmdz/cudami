@@ -64,21 +64,21 @@
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.mediatypes}">Media types</label></div>
             <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.mediaTypes}">...</span>
+              <th:block th:insert="~{::renderMediaTypes(${manifestation.mediaTypes})}">...</th:block>
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.manufacturingtype}">Manufacturing type</label></div>
             <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.manufacturingType}">...</span>
+              <span th:with="manufacturingType=${#messages.msgOrNull('manufacturingtype.' + manifestation.manufacturingType)}" th:text="${manufacturingType != null ? manufacturingType : manifestation.manufacturingType}">...</span>
             </div>
           </div>
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.manifestationtype}">Manifestation type</label></div>
             <div class="align-items-center col-md-9 d-flex">
-              <span th:text="${manifestation.manifestationType}">...</span>
+              <span th:with="manifestationType=${#messages.msgOrNull('manifestationtype.' + #strings.toLowerCase(manifestation.manifestationType))}" th:text="${manifestationType != null ? manifestationType : manifestation.manifestationType}">...</span>
             </div>
           </div>
 
@@ -107,17 +107,7 @@
             <div class="col-md-3"><label th:text="#{lbl.subjects}">Subjects</label></div>
             <div class="align-items-center col-md-9 d-flex">
               <th:block th:each="subject, iterStat: ${manifestation.subjects}">
-                <a th:href="@{/subjects/{uuid}(uuid=${subject.uuid})}" th:text="${subject.label?.getText(dataLanguage)} ?: ${subject.uuid}">subject label</a>
-                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
-              </th:block>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.tags}">Tags</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:each="tag, iterStat: ${manifestation.tags}">
-                <a th:href="@{/tags/{uuid}(uuid=${tag.uuid})}" th:text="${tag.label?.getText(dataLanguage)} ?: ${tag.uuid}">tag label</a>
+                <a th:href="@{/subjects/{uuid}(uuid=${subject.uuid})}" th:text="${(subject.label?.getText(dataLanguage) ?: subject.uuid)}">subject label</a>
                 <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
               </th:block>
             </div>
@@ -149,20 +139,15 @@
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:text="${manifestation.language}"></div>
+            <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(manifestation.otherLanguages)}" >...</div>
           </div>
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.other_languages}">Other languages</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:each="language, iterStat: ${manifestation.otherLanguages}">
-                <div th:text="${language}">...</div>
-                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
-              </th:block>
-            </div>
+            <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(manifestation.otherLanguages)}" >...</div>
           </div>
 
-          <th:block th:each="title: ${manifestation.titles}">
+          <th:block th:each="title: ${#lists.sort(manifestation.titles)}">
             <div class="row">
               <div class="col-md-3" th:with="labelkey=${#strings.toLowerCase(title.titleType.getMainType()) + '.' + #strings.toLowerCase(title.titleType.getSubType())}">
                 <label th:with="label=${#messages.msgOrNull('lbl.title.' + labelkey)}" th:text="${label != null ? label : labelkey}">title label</label></div>
@@ -211,7 +196,7 @@
                 <thead>
                 <tr>
                   <th data-field="index" data-formatter="formatRowNumberChildManifestations" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="sortkey" data-formatter="formatSortKeyChildManifestations" th:text="#{lbl.sortkey}">Sortkey</th>
+                  <th data-field="sortKey" data-formatter="formatSortKeyChildManifestations" th:text="#{lbl.sortkey}">Sortkey</th>
                   <th data-field="title" data-formatter="formatTitleChildManifestations" th:text="#{lbl.title}">Title</th>
                   <th data-field="actions" data-formatter="formatActionsChildManifestations" th:text="#{lbl.actions}">Actions</th>
                 </tr>
@@ -225,6 +210,13 @@
       </div>
     </div>
   </th:block>
+
+  <div th:fragment="renderMediaTypes(mediaTypes)">
+    <div th:each="mediaTypeKey, iterStat: ${mediaTypes}">
+      <span th:with="mediaType=${#messages.msgOrNull('mediatype.' + mediaTypeKey)}" th:text="${mediaType != null ? mediaType : mediaTypeKey}">...</span>
+      <span th:if="${!iterStat.last ? ',&nbsp;' : ''}"></span>
+    </div>
+  </div>
 
   <div th:fragment="displayPublishingInfo(publishingInfo)" th:with="show_data = ${(publishingInfo != null && !publishingInfo.isEmpty())}">
     <th:block th:if="${show_data}">

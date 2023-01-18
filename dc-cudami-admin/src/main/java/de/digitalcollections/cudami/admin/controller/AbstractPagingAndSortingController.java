@@ -6,23 +6,26 @@ import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.CollectionUtils;
 
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     extends AbstractController {
+
+  protected final LanguageSortingHelper languageSortingHelper;
+
+  protected AbstractPagingAndSortingController(LanguageSortingHelper languageSortingHelper) {
+    this.languageSortingHelper = languageSortingHelper;
+  }
 
   @SuppressFBWarnings
   protected PageRequest createPageRequest(
@@ -87,6 +90,8 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     return dataLanguage;
   }
 
+  // Weg!
+  /*
   protected List<Locale> getExistingLanguages(
       LocalizedText localizedText, LanguageSortingHelper languageSortingHelper) {
     List<Locale> existingLanguages = Collections.emptyList();
@@ -97,9 +102,9 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     }
     return existingLanguages;
   }
+  */
 
-  protected List<Locale> getExistingLanguages(
-      List<Locale> locales, LanguageSortingHelper languageSortingHelper) {
+  protected List<Locale> getExistingLanguagesForLocales(List<Locale> locales) {
     List<Locale> existingLanguages = Collections.emptyList();
     if (!CollectionUtils.isEmpty(locales)) {
       existingLanguages =
@@ -108,17 +113,6 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     return existingLanguages;
   }
 
-  protected List<Locale> getExistingLanguagesFromIdentifiables(
-      List<? extends Identifiable> identifiables, LanguageSortingHelper languageSortingHelper) {
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(identifiables)) {
-      existingLanguages =
-          identifiables.stream()
-              .flatMap(child -> child.getLabel().getLocales().stream())
-              .collect(Collectors.toList());
-      existingLanguages =
-          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
-    }
-    return existingLanguages;
-  }
+  // Erweitern auf mehrere Felder (aktuell: Label + Description)
+
 }

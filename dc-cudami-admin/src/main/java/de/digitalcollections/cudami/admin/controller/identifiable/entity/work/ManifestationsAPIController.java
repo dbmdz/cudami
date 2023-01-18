@@ -1,13 +1,12 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.InvertedRelationSpecification;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -25,17 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Manifestations" endpoints (API). */
 @RestController
-public class ManifestationsAPIController extends AbstractPagingAndSortingController<Manifestation> {
-
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiManifestationsClient service;
+public class ManifestationsAPIController
+    extends AbstractIdentifiablesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsAPIController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forManifestations();
+    super(client.forManifestations(), languageSortingHelper, client.forLocales());
   }
 
   @SuppressFBWarnings

@@ -1,12 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiItemsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -23,15 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Items" endpoints (API). */
 @RestController
-public class ItemsAPIController extends AbstractPagingAndSortingController<Item> {
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiItemsClient service;
+public class ItemsAPIController extends AbstractIdentifiablesController<Item, CudamiItemsClient> {
 
   public ItemsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forItems();
+    super(client.forItems(), languageSortingHelper, client.forLocales());
   }
 
   @SuppressFBWarnings

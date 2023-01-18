@@ -31,13 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class LicensesAPIController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesAPIController.class);
-
-  private final LanguageSortingHelper languageSortingHelper;
   private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
   public LicensesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
+    super(languageSortingHelper);
     this.localeService = client.forLocales();
     this.service = client.forLicenses();
   }

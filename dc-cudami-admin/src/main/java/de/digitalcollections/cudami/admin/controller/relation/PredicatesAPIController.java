@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.admin.controller.relation;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
@@ -25,7 +26,8 @@ public class PredicatesAPIController extends AbstractPagingAndSortingController<
   private final CudamiLocalesClient localeService;
   private final CudamiPredicatesClient service;
 
-  public PredicatesAPIController(CudamiClient client) {
+  public PredicatesAPIController(CudamiClient client, LanguageSortingHelper languageSortingHelper) {
+    super(languageSortingHelper);
     this.localeService = client.forLocales();
     this.service = client.forPredicates();
   }

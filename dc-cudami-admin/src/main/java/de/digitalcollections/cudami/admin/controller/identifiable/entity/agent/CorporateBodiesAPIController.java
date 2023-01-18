@@ -1,12 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -29,19 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "CorporateBodies" endpoints (API). */
 @RestController
 public class CorporateBodiesAPIController
-    extends AbstractPagingAndSortingController<CorporateBody> {
+    extends AbstractIdentifiablesController<CorporateBody, CudamiCorporateBodiesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesAPIController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiCorporateBodiesClient service;
-
   public CorporateBodiesAPIController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forCorporateBodies();
+    super(client.forCorporateBodies(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/api/corporatebodies/new")

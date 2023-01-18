@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,18 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for website management pages. */
 @Controller
-public class WebsitesController extends AbstractPagingAndSortingController<Website> {
+public class WebsitesController
+    extends AbstractIdentifiablesController<Website, CudamiWebsitesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiWebsitesClient service;
-
   public WebsitesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forWebsites();
+    super(client.forWebsites(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/websites/new")
@@ -69,9 +63,7 @@ public class WebsitesController extends AbstractPagingAndSortingController<Websi
 
   @GetMapping("/websites")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -95,15 +87,14 @@ public class WebsitesController extends AbstractPagingAndSortingController<Websi
       throw new ResourceNotFoundException();
     }
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(website.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(website);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingWebpageLanguages =
-        getExistingLanguagesFromIdentifiables(website.getRootPages(), languageSortingHelper);
+        getExistingLanguagesFromIdentifiables(website.getRootPages());
     model
         .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
         .addAttribute("dataLanguageWebpages", getDataLanguage(null, localeService));

@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,18 +23,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for articles management pages. */
 @Controller
-public class ArticlesController extends AbstractPagingAndSortingController<Article> {
+public class ArticlesController
+    extends AbstractIdentifiablesController<Article, CudamiArticlesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiArticlesClient service;
-
   public ArticlesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forArticles();
+    super(client.forArticles(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/articles/new")
@@ -68,9 +62,7 @@ public class ArticlesController extends AbstractPagingAndSortingController<Artic
 
   @GetMapping("/articles")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguages(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -95,8 +87,7 @@ public class ArticlesController extends AbstractPagingAndSortingController<Artic
     }
     model.addAttribute("article", article);
 
-    List<Locale> existingLanguages =
-        getExistingLanguages(article.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(article);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)

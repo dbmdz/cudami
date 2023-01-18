@@ -1,10 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -26,18 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for topics management pages. */
 @Controller
-public class TopicsController extends AbstractPagingAndSortingController<Topic> {
+public class TopicsController extends AbstractIdentifiablesController<Topic, CudamiTopicsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
-  private final LanguageSortingHelper languageSortingHelper;
-  private final CudamiLocalesClient localeService;
-  private final CudamiTopicsClient service;
-
   public TopicsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    this.languageSortingHelper = languageSortingHelper;
-    this.localeService = client.forLocales();
-    this.service = client.forTopics();
+    super(client.forTopics(), languageSortingHelper, client.forLocales());
   }
 
   @GetMapping("/topics/new")
@@ -76,9 +69,8 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
 
   @GetMapping("/topics")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        getExistingLanguages(service.getLanguagesOfTopTopics(), languageSortingHelper);
-    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute(
+        "existingLanguages", getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -103,14 +95,14 @@ public class TopicsController extends AbstractPagingAndSortingController<Topic> 
     }
     model.addAttribute("topic", topic);
 
-    List<Locale> existingLanguages = getExistingLanguages(topic.getLabel(), languageSortingHelper);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(topic);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubtopicsLanguages =
-        getExistingLanguagesFromIdentifiables(topic.getChildren(), languageSortingHelper);
+        getExistingLanguagesFromIdentifiables(topic.getChildren());
     model
         .addAttribute("existingSubtopicsLanguages", existingSubtopicsLanguages)
         .addAttribute("dataLanguageSubtopics", getDataLanguage(null, localeService));
