@@ -35,7 +35,9 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Tag;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.StructuredContent;
 import de.digitalcollections.model.text.contentblock.Paragraph;
 import de.digitalcollections.model.text.contentblock.Text;
 import java.lang.reflect.InvocationTargetException;
@@ -149,6 +151,12 @@ class DigitalObjectRepositoryImplTest
     Tag tag =
         tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
 
+    var noteText = new Text("a note to a digital object");
+    var noteContent = new StructuredContent();
+    var note = new LocalizedStructuredContent();
+    noteContent.addContentBlock(noteText);
+    note.put(Locale.forLanguageTag("und"), noteContent);
+
     DigitalObject digitalObject =
         DigitalObject.builder()
             .label(Locale.GERMAN, "deutschsprachiges Label")
@@ -159,31 +167,10 @@ class DigitalObjectRepositoryImplTest
             .creationInfo(creationInfo)
             .parent(parent)
             .tag(tag)
+            .note(note)
             .build();
 
-    // The "save" method internally retrieves the object by findOne
     repo.save(digitalObject);
-
-    assertThat(digitalObject.getLabel().getText(Locale.GERMAN))
-        .isEqualTo("deutschsprachiges Label");
-    assertThat(digitalObject.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
-    Paragraph paragraphDe =
-        (Paragraph) digitalObject.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
-    assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
-
-    assertThat(digitalObject.getLicense()).isEqualTo(EXISTING_LICENSE);
-
-    assertThat(digitalObject.getCreationInfo().getCreator()).isEqualTo(creator);
-    assertThat(digitalObject.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
-        .isEqualTo("2022-02-25");
-    assertThat(digitalObject.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
-
-    assertThat(digitalObject.getParent()).isNotNull();
-    assertThat(digitalObject.getParent().getUuid()).isEqualTo(parent.getUuid());
-    assertThat(digitalObject.getParent().getLabel()).isEqualTo(parent.getLabel());
-
-    assertThat(digitalObject.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
-        .containsExactly(tag.getUuid());
 
     // Verify, that the method-persisted DigitalObject is the same, which is in the database
     // Since some embeeded resource are not competely filled, we have to fill them explicitly
@@ -192,7 +179,27 @@ class DigitalObjectRepositoryImplTest
       persisted.setLicense(licenseRepository.getByUuid(persisted.getLicense().getUuid()));
     }
 
-    assertThat(digitalObject).isEqualToComparingFieldByField(persisted);
+    assertThat(persisted).isEqualToComparingFieldByField(digitalObject);
+    assertThat(persisted.getLabel().getText(Locale.GERMAN)).isEqualTo("deutschsprachiges Label");
+    assertThat(persisted.getLabel().getText(Locale.ENGLISH)).isEqualTo("english label");
+    Paragraph paragraphDe =
+        (Paragraph) persisted.getDescription().get(Locale.GERMAN).getContentBlocks().get(0);
+    assertThat(((Text) paragraphDe.getContentBlocks().get(0)).getText()).isEqualTo("Beschreibung");
+
+    assertThat(persisted.getLicense()).isEqualTo(EXISTING_LICENSE);
+
+    assertThat(persisted.getCreationInfo().getCreator()).isEqualTo(creator);
+    assertThat(persisted.getCreationInfo().getDate().format(DateTimeFormatter.ISO_DATE))
+        .isEqualTo("2022-02-25");
+    assertThat(persisted.getCreationInfo().getGeoLocation()).isEqualTo(creationPlace);
+
+    assertThat(persisted.getParent()).isNotNull();
+    assertThat(persisted.getParent().getUuid()).isEqualTo(parent.getUuid());
+    assertThat(persisted.getParent().getLabel()).isEqualTo(parent.getLabel());
+
+    assertThat(persisted.getTags().stream().map(Tag::getUuid).collect(Collectors.toList()))
+        .containsExactly(tag.getUuid());
+    assertThat(persisted.getNotes()).isNotEmpty().isEqualTo(digitalObject.getNotes());
   }
 
   @Test
