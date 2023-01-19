@@ -164,6 +164,7 @@ class ManifestationRepositoryImplTest
                 .titleType(new TitleType("MAIN", "MAIN"))
                 .build());
     manifestation.setParents(null);
+    manifestation.setNavDate(LocalDate.now());
     repo.update(manifestation);
 
     var actual = repo.getByUuid(manifestation.getUuid());
@@ -171,6 +172,8 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getTitles()).size().isEqualTo(4);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
     assertThat(actual.getParents()).isNull();
+    assertThat(actual.getNavDate()).isNotNull();
+    assertThat(actual.getNavDate()).isEqualTo(manifestation.getNavDate());
   }
 
   @Test
@@ -253,6 +256,7 @@ class ManifestationRepositoryImplTest
                     .navDateRange(
                         new LocalDateRange(LocalDate.of(2019, 10, 1), LocalDate.of(2020, 6, 30)))
                     .build())
+            .navDate("2020-01-01")
             .build();
     return manifestation;
   }

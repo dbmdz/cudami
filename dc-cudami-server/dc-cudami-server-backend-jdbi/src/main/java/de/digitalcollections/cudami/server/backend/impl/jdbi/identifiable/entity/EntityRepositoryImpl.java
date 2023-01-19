@@ -94,7 +94,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
     return super.getSqlUpdateFieldValues()
-        + ", custom_attrs=:customAttributes::JSONB, notes=:notes::JSONB"
+        + ", custom_attrs=:customAttributes::JSONB, navdate=:navDate, notes=:notes::JSONB"
         + (isRepoForNamedEntity()
             ? ", name=:name::JSONB, name_locales_original_scripts=:nameLocalesOfOriginalScripts::varchar[], split_name=:split_name::varchar[]"
             : "");
