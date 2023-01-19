@@ -90,20 +90,6 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     return dataLanguage;
   }
 
-  // Weg!
-  /*
-  protected List<Locale> getExistingLanguages(
-      LocalizedText localizedText, LanguageSortingHelper languageSortingHelper) {
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(localizedText)) {
-      existingLanguages =
-          languageSortingHelper.sortLanguages(
-              LocaleContextHolder.getLocale(), localizedText.getLocales());
-    }
-    return existingLanguages;
-  }
-  */
-
   protected List<Locale> getExistingLanguagesForLocales(List<Locale> locales) {
     List<Locale> existingLanguages = Collections.emptyList();
     if (!CollectionUtils.isEmpty(locales)) {
@@ -112,7 +98,4 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     }
     return existingLanguages;
   }
-
-  // Erweitern auf mehrere Felder (aktuell: Label + Description)
-
 }
