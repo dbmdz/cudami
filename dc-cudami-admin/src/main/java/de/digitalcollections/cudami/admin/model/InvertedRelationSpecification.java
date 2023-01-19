@@ -1,12 +1,14 @@
 package de.digitalcollections.cudami.admin.model;
 
 import de.digitalcollections.model.UniqueObject;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 
 /**
  * While the RelationSpecification of dc-model is object-centric, this inverted
  * RelationSpecification is subject-centric.
  */
+@SuppressFBWarnings
 public class InvertedRelationSpecification<U extends UniqueObject> {
 
   private String title;
