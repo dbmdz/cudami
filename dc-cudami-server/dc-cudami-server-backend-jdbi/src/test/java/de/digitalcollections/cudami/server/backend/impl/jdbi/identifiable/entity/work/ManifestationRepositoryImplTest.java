@@ -3,13 +3,15 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
@@ -18,6 +20,8 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
@@ -40,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -56,8 +59,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class ManifestationRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<ManifestationRepositoryImpl> {
 
-  @Autowired CorporateBodyRepository corporateBodyRepository;
-  @Autowired HumanSettlementRepository humanSettlementRepository;
+  @Autowired CorporateBodyRepositoryImpl corporateBodyRepository;
+  @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired PredicateRepository predicateRepository;
   @Autowired EntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
@@ -65,6 +68,8 @@ class ManifestationRepositoryImplTest
   @Autowired LocalDateRangeMapper localDateRangeMapper;
   @Autowired TitleMapper titleMapper;
   @Autowired EntityRepositoryImpl<Entity> entityRepository;
+  @Autowired PersonRepositoryImpl personRepository;
+  @Autowired AgentRepositoryImpl<Agent> agentRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -75,7 +80,9 @@ class ManifestationRepositoryImplTest
             expressionTypeMapper,
             localDateRangeMapper,
             titleMapper,
-            entityRepository);
+            entityRepository,
+            agentRepository,
+            humanSettlementRepository);
   }
 
   @Test
@@ -142,6 +149,12 @@ class ManifestationRepositoryImplTest
         .allSatisfy(publisher -> assertThat(publisher.getAgent().getUuid()).isNotNull());
     assertThat(actual.getProductionInfo()).isEqualTo(manifestation.getProductionInfo());
     assertThat(actual.getPublicationInfo()).isEqualTo(manifestation.getPublicationInfo());
+    assertThat(actual.getPublicationInfo().getPublishers()).size().isEqualTo(1);
+    assertThat(actual.getPublicationInfo().getPublishers().get(0).getAgent())
+        .isExactlyInstanceOf(CorporateBody.class);
+    assertThat(actual.getProductionInfo().getPublishers()).size().isEqualTo(1);
+    assertThat(actual.getProductionInfo().getPublishers().get(0).getAgent())
+        .isExactlyInstanceOf(Person.class);
   }
 
   @Test
@@ -219,7 +232,34 @@ class ManifestationRepositoryImplTest
   }
 
   private Manifestation prepareManifestation(
-      Subject subject, Manifestation parent, List<Title> titles) {
+      Subject subject, Manifestation parent, List<Title> titles) throws RepositoryException {
+    CorporateBody publisherAgent =
+        CorporateBody.builder()
+            .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
+            .label(new LocalizedText(Locale.ENGLISH, "Publisher label"))
+            .build();
+    corporateBodyRepository.save(publisherAgent);
+    Person productionAgent =
+        Person.builder()
+            .name(new LocalizedText(Locale.ENGLISH, "Producer"))
+            .label(new LocalizedText(Locale.ENGLISH, "Producer label"))
+            .build();
+    personRepository.save(productionAgent);
+    HumanSettlement publicationPlace1 =
+        HumanSettlement.builder()
+            .name(new LocalizedText(Locale.forLanguageTag("und-Latn"), "München"))
+            .label(Locale.forLanguageTag("und-Latn"), "München")
+            .build();
+    humanSettlementRepository.save(publicationPlace1);
+    assertThat(publicationPlace1.getRefId()).isGreaterThan(0);
+    HumanSettlement publicationPlace2 =
+        HumanSettlement.builder()
+            .name(new LocalizedText(Locale.forLanguageTag("de-Latn"), "Berlin"))
+            .label(Locale.forLanguageTag("de-Latn"), "Berlin")
+            .build();
+    humanSettlementRepository.save(publicationPlace2);
+    assertThat(publicationPlace2.getRefId()).isGreaterThan(0);
+
     Manifestation manifestation =
         Manifestation.builder()
             .label(Locale.GERMAN, "ein Label")
@@ -234,25 +274,16 @@ class ManifestationRepositoryImplTest
                 PublicationInfo.builder()
                     .publisher(
                         Publisher.builder()
-                            .agent(
-                                Agent.builder()
-                                    .uuid(UUID.randomUUID())
-                                    .name(new LocalizedText(Locale.ENGLISH, "Publisher"))
-                                    .build())
+                            .agent(publisherAgent)
+                            .location(publicationPlace1)
+                            .location(publicationPlace2)
                             .build())
                     .navDateRange(
                         new LocalDateRange(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 12, 31)))
                     .build())
             .productionInfo(
                 ProductionInfo.builder()
-                    .publisher(
-                        Publisher.builder()
-                            .agent(
-                                Agent.builder()
-                                    .uuid(UUID.randomUUID())
-                                    .name(new LocalizedText(Locale.ENGLISH, "Producer"))
-                                    .build())
-                            .build())
+                    .publisher(Publisher.builder().agent(productionAgent).build())
                     .navDateRange(
                         new LocalDateRange(LocalDate.of(2019, 10, 1), LocalDate.of(2020, 6, 30)))
                     .build())

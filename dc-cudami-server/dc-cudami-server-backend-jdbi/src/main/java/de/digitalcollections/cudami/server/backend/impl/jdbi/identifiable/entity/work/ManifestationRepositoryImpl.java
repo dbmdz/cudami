@@ -4,6 +4,8 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
@@ -12,8 +14,18 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.entity.agent.Family;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
+import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
+import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
+import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Title;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.semantic.Subject;
@@ -21,12 +33,14 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.time.LocalDateRange;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.function.BiFunction;
@@ -48,6 +62,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public static final String MAPPING_PREFIX = "mf";
 
   private EntityRepositoryImpl<Entity> entityRepository;
+  private AgentRepositoryImpl<Agent> agentRepository;
+  private HumanSettlementRepositoryImpl humanSettlementRepository;
 
   @Override
   public String getSqlInsertFields() {
@@ -105,7 +121,12 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
           """
             .formatted(tableAlias, mappingPrefix)
         // subjects
-        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
+        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS
+        // publishers
+        + ", %s, %s"
+            .formatted(
+                agentRepository.getSqlSelectReducedFields(),
+                humanSettlementRepository.getSqlSelectReducedFields());
   }
 
   @Override
@@ -146,6 +167,16 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
       ) ON %5$s.object_uuid = %1$s.uuid
+      LEFT JOIN %8$s %9$s ON %9$s.uuid IN (
+          select (a->>'uuid')::UUID from jsonb_path_query(jsonb_build_array(
+              %1$s.publication_info, %1$s.production_info, %1$s.distribution_info
+          ),
+          '$[*].publishers[*].agent') agent(a))
+      LEFT JOIN %10$s %11$s ON %11$s.uuid IN (
+          select (a->>'uuid')::UUID from jsonb_path_query(jsonb_build_array(
+              %1$s.publication_info, %1$s.production_info, %1$s.distribution_info
+          ),
+          '$[*].publishers[*].locations[*]') humansettlement(a))
       """
           .formatted(
               TABLE_ALIAS,
@@ -154,7 +185,12 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
               /*4-5*/ EntityRelationRepositoryImpl.TABLE_NAME,
               EntityRelationRepositoryImpl.TABLE_ALIAS,
               /*6-7*/ EntityRepositoryImpl.TABLE_NAME,
-              EntityRepositoryImpl.TABLE_ALIAS);
+              EntityRepositoryImpl.TABLE_ALIAS,
+              /*8-9 Publisher agents*/
+              AgentRepositoryImpl.TABLE_NAME,
+              AgentRepositoryImpl.TABLE_ALIAS,
+              /*10-11 Publisher locations*/ HumanSettlementRepositoryImpl.TABLE_NAME,
+              HumanSettlementRepositoryImpl.TABLE_ALIAS);
 
   public ManifestationRepositoryImpl(
       Jdbi jdbi,
@@ -162,7 +198,9 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       ExpressionTypeMapper expressionTypeMapper,
       LocalDateRangeMapper dateRangeMapper,
       TitleMapper titleMapper,
-      EntityRepositoryImpl<Entity> entityRepository) {
+      EntityRepositoryImpl<Entity> entityRepository,
+      AgentRepositoryImpl<Agent> agentRepository,
+      HumanSettlementRepositoryImpl humanSettlementRepository) {
     super(
         jdbi,
         TABLE_NAME,
@@ -179,6 +217,49 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     dbi.registerColumnMapper(Title.class, titleMapper);
 
     this.entityRepository = entityRepository;
+    this.agentRepository = agentRepository;
+    this.humanSettlementRepository = humanSettlementRepository;
+  }
+
+  private static void fillPublishers(
+      List<Publisher> publishers, final Agent publAgent, final HumanSettlement publPlace) {
+    if (publishers == null || publishers.isEmpty()) return;
+    // agent
+    if (publAgent != null) {
+      publishers.parallelStream()
+          .filter(
+              p ->
+                  p != null
+                      && p.getAgent() != null
+                      && publAgent.getUuid().equals(p.getAgent().getUuid())
+                      // only "empty" objects are needed, i.e. those w/o created and last_modified
+                      && !(p.getAgent().getCreated() != null
+                          || p.getAgent().getLastModified() != null))
+          .forEach(p -> p.setAgent(publAgent));
+    }
+
+    // locations
+    if (publPlace != null) {
+      // list in list is so much fun
+      publishers.parallelStream()
+          .filter(p -> p != null && p.getLocations() != null && !p.getLocations().isEmpty())
+          .map(Publisher::getLocations)
+          // now we have a stream of List<HumanSettlement>
+          .forEach(
+              settlements -> {
+                Optional<HumanSettlement> old =
+                    settlements.parallelStream()
+                        .filter(
+                            s ->
+                                s != null
+                                    && publPlace.getUuid().equals(s.getUuid())
+                                    && !(s.getCreated() != null || s.getLastModified() != null))
+                        .findAny();
+                if (old.isPresent()) {
+                  settlements.replaceAll(s -> Objects.equals(s, old.get()) ? publPlace : s);
+                }
+              });
+    }
   }
 
   protected static void additionalReduceRowsBiConsumer(
@@ -196,6 +277,30 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Subject subject = rowView.getRow(Subject.class);
       manifestation.addSubject(subject);
     }
+
+    // publishers
+    Agent publAgent = null;
+    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      Agent ag = rowView.getRow(Agent.class);
+      publAgent =
+          switch (ag.getIdentifiableObjectType()) {
+            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
+            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
+            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
+            default -> ag;
+          };
+    }
+    HumanSettlement publPlace =
+        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+                != null
+            ? rowView.getRow(HumanSettlement.class)
+            : null;
+    if (manifestation.getDistributionInfo() != null)
+      fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getProductionInfo() != null)
+      fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
+    if (manifestation.getPublicationInfo() != null)
+      fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
   }
 
   private BiFunction<String, Map<String, Object>, String> buildTitleSql(
@@ -308,6 +413,67 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private <P extends PublishingInfo> P reducePublisher(P publishingInfo)
+      throws RepositoryException {
+    if (publishingInfo == null) return null;
+    P result;
+    try {
+      result = (P) publishingInfo.getClass().getConstructor().newInstance();
+    } catch (InstantiationException
+        | IllegalAccessException
+        | IllegalArgumentException
+        | InvocationTargetException
+        | NoSuchMethodException
+        | SecurityException e) {
+      throw new RepositoryException("PublishingInfo cannot be instantiated", e);
+    }
+
+    result.setDatePresentation(publishingInfo.getDatePresentation());
+    result.setNavDateRange(publishingInfo.getNavDateRange());
+    result.setTimeValueRange(publishingInfo.getTimeValueRange());
+    List<Publisher> publishers =
+        publishingInfo.getPublishers().stream()
+            .filter(publ -> publ != null)
+            .map(
+                publ -> {
+                  Publisher publisher = new Publisher();
+                  publisher.setDatePresentation(publ.getDatePresentation());
+                  if (publ.getAgent() != null) {
+                    // substitute the agent
+                    Agent agent;
+                    try {
+                      agent = publ.getAgent().getClass().getConstructor().newInstance();
+                    } catch (InstantiationException
+                        | IllegalAccessException
+                        | IllegalArgumentException
+                        | InvocationTargetException
+                        | NoSuchMethodException
+                        | SecurityException e) {
+                      agent = new Agent();
+                    }
+                    agent.setUuid(publ.getAgent().getUuid());
+                    publisher.setAgent(agent);
+                  }
+                  if (publ.getLocations() != null && !publ.getLocations().isEmpty()) {
+                    // substitute the locations
+                    List<HumanSettlement> locations =
+                        publ.getLocations().stream()
+                            .filter(
+                                settlement -> settlement != null && settlement.getUuid() != null)
+                            .<HumanSettlement>map(
+                                settlement ->
+                                    HumanSettlement.builder().uuid(settlement.getUuid()).build())
+                            .toList();
+                    publisher.setLocations(locations);
+                  }
+                  return publisher;
+                })
+            .toList();
+    result.setPublishers(publishers);
+    return result;
+  }
+
   private void saveParents(Manifestation manifestation) {
     if (manifestation == null) return;
     /* - subject (subject_uuid) is the parent (superior manifestation)
@@ -352,8 +518,20 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
+
+    DistributionInfo distributionInfo = manifestation.getDistributionInfo();
+    manifestation.setDistributionInfo(reducePublisher(distributionInfo));
+    ProductionInfo productionInfo = manifestation.getProductionInfo();
+    manifestation.setProductionInfo(reducePublisher(productionInfo));
+    PublicationInfo publicationInfo = manifestation.getPublicationInfo();
+    manifestation.setPublicationInfo(reducePublisher(publicationInfo));
+
     super.save(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
+
+    manifestation.setDistributionInfo(distributionInfo);
+    manifestation.setProductionInfo(productionInfo);
+    manifestation.setPublicationInfo(publicationInfo);
   }
 
   @Override
@@ -363,8 +541,20 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       bindings = new HashMap<>(2);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
+
+    DistributionInfo distributionInfo = manifestation.getDistributionInfo();
+    manifestation.setDistributionInfo(reducePublisher(distributionInfo));
+    ProductionInfo productionInfo = manifestation.getProductionInfo();
+    manifestation.setProductionInfo(reducePublisher(productionInfo));
+    PublicationInfo publicationInfo = manifestation.getPublicationInfo();
+    manifestation.setPublicationInfo(reducePublisher(publicationInfo));
+
     super.update(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
+
+    manifestation.setDistributionInfo(distributionInfo);
+    manifestation.setProductionInfo(productionInfo);
+    manifestation.setPublicationInfo(publicationInfo);
   }
 
   @Override
