@@ -18,9 +18,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -158,50 +154,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return true;
   }
 
-  private <A extends Agent> A buildDerivedHolderInstance(Agent agent, Class<A> derivedClazz) {
-    if (agent == null || derivedClazz == null) return null;
-    try {
-      A derivedInst = derivedClazz.getConstructor().newInstance();
-      // collect all the public setters of the new instance
-      List<Method> derivedInstSetters =
-          Stream.of(derivedInst.getClass().getMethods())
-              .filter(m -> m.getName().startsWith("set"))
-              .collect(Collectors.toList());
-      // go through all the public getters of the passed Agent...
-      for (Method agentGetter : agent.getClass().getMethods()) {
-        if (!agentGetter.getName().startsWith("get")) continue;
-        Type returnType = agentGetter.getGenericReturnType();
-        // ...find the corresponding setter of the new object...
-        Method[] setters =
-            derivedInstSetters.stream()
-                .filter(
-                    derivSetter ->
-                        derivSetter
-                                .getName()
-                                .equals(agentGetter.getName().replaceFirst("^get", "set"))
-                            && derivSetter.getParameterCount() == 1
-                            && derivSetter
-                                .getParameters()[0]
-                                .getParameterizedType()
-                                .equals(returnType))
-                .toArray(i -> new Method[i]);
-        if (setters.length != 1) continue;
-        // ...and invoke this setter with the getter's returned value
-        setters[0].invoke(derivedInst, agentGetter.invoke(agent));
-      }
-      return derivedInst;
-    } catch (InstantiationException
-        | IllegalAccessException
-        | IllegalArgumentException
-        | InvocationTargetException
-        | NoSuchMethodException
-        | SecurityException e) {
-      LOGGER.error(
-          "Error while building the derived holder instance, reflection threw an exception", e);
-      return null;
-    }
-  }
-
   @Override
   protected void extendReducedIdentifiable(Item identifiable, RowView rowView) {
     super.extendReducedIdentifiable(identifiable, rowView);
@@ -211,9 +163,9 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       holder = rowView.getRow(Agent.class);
       Agent exactholder =
           switch (holder.getIdentifiableObjectType()) {
-            case CORPORATE_BODY -> buildDerivedHolderInstance(holder, CorporateBody.class);
-            case PERSON -> buildDerivedHolderInstance(holder, Person.class);
-            case FAMILY -> buildDerivedHolderInstance(holder, Family.class);
+            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(holder, CorporateBody.class);
+            case PERSON -> DerivedAgentBuildHelper.build(holder, Person.class);
+            case FAMILY -> DerivedAgentBuildHelper.build(holder, Family.class);
             default -> null;
           };
       if (exactholder != null) {
