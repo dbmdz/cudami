@@ -434,7 +434,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     result.setTimeValueRange(publishingInfo.getTimeValueRange());
     List<Publisher> publishers =
         publishingInfo.getPublishers().stream()
-            .filter(publ -> publ != null)
+            .filter(Objects::nonNull)
             .map(
                 publ -> {
                   Publisher publisher = new Publisher();
