@@ -47,7 +47,7 @@ public class TitleMapper implements ColumnMapper<Title> {
     try {
       titleText =
           objectMapper.readValue(
-              valueParts.group("text").replaceAll("\"{2,}", "\""), LocalizedText.class);
+              valueParts.group("text").replaceAll("([\\\\\"]){2}", "$1"), LocalizedText.class);
     } catch (JsonProcessingException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

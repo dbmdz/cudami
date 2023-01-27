@@ -182,7 +182,7 @@ class ManifestationRepositoryImplTest
 
     var actual = repo.getByUuid(manifestation.getUuid());
     assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
-    assertThat(actual.getTitles()).size().isEqualTo(4);
+    assertThat(actual.getTitles()).size().isEqualTo(5);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
     assertThat(actual.getParents()).isNull();
     assertThat(actual.getNavDate()).isNotNull();
@@ -324,6 +324,13 @@ class ManifestationRepositoryImplTest
                             Locale.forLanguageTag("und-Latn"),
                             "Illustrierter Sonntag : das Blatt des gesunden Menschenverstandes. 1929 ## 31.03.1929"))
                     .textLocalesOfOriginalScripts(Collections.emptySet())
+                    .build(),
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(
+                        new LocalizedText(
+                            Locale.forLanguageTag("de-Latn"),
+                            "Allegorien von Schrift, Stimme und Musik in Thomas Manns \"Doktor Faustus\""))
                     .build()));
     return titles;
   }
