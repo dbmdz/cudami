@@ -432,6 +432,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     result.setDatePresentation(publishingInfo.getDatePresentation());
     result.setNavDateRange(publishingInfo.getNavDateRange());
     result.setTimeValueRange(publishingInfo.getTimeValueRange());
+    if (publishingInfo.getPublishers() == null) return result;
     List<Publisher> publishers =
         publishingInfo.getPublishers().stream()
             .filter(Objects::nonNull)
