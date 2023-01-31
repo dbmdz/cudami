@@ -192,11 +192,6 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-core</artifactId>
-        <version>9.8.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
         <version>5.9.1</version>
@@ -207,17 +202,6 @@
         <artifactId>mockito-core</artifactId>
         <version>4.9.0</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.passay</groupId>
-        <artifactId>passay</artifactId>
-        <version>1.6.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.5.1</version>
-        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
