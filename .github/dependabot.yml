@@ -1,13 +1,13 @@
 version: 2
 updates:
   - directory: "/"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 25
     package-ecosystem: maven
     schedule:
       interval: daily
       time: "04:00"
   - directory: "/dc-cudami-editor"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 25
     package-ecosystem: npm
     schedule:
       interval: daily
