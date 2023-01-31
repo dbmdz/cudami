@@ -1,4 +1,4 @@
-version: '3'
+name: cudami-repository
 services:
   database:
     image: postgres:12.2
