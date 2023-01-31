@@ -63,7 +63,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.19.1",
     "@babel/plugin-transform-runtime": "^7.19.6",
-    "@fisker/prettier-config": "^5.0.6",
+    "@fisker/prettier-config": "^5.0.7",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.15",
