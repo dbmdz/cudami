@@ -23,21 +23,22 @@ public class FragmentsController {
     return "fragments/forms/label-description-form";
   }
 
-  public static final String getDisplayLanguages(Collection<Locale> locales) {
+  public static final String getDisplayLanguages(Locale displayLocale, Collection<Locale> locales) {
     if (locales == null || locales.isEmpty()) {
       return "";
     }
     return locales.stream()
         .map(
             l ->
-                l.getDisplayLanguage()
-                    + ((l.getDisplayScript() != null && l.getDisplayScript().length() > 0)
-                        ? " (" + l.getDisplayScript() + ")"
+                l.getDisplayLanguage(displayLocale)
+                    + ((l.getDisplayScript(displayLocale) != null
+                            && l.getDisplayScript().length() > 0)
+                        ? " (" + l.getDisplayScript(displayLocale) + ")"
                         : ""))
         .collect(Collectors.joining(", "));
   }
 
-  public static final String getDisplayLanguage(Locale locale) {
-    return getDisplayLanguages(Set.of(locale));
+  public static final String getDisplayLanguage(Locale displayLocale, Locale locale) {
+    return getDisplayLanguages(displayLocale, Set.of(locale));
   }
 }
