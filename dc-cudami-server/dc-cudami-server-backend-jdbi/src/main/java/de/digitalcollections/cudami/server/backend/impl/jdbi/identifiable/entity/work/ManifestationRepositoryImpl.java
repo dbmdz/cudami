@@ -418,17 +418,16 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   @SuppressWarnings("unchecked")
   private <P extends PublishingInfo> P reducePublisher(P publishingInfo)
       throws RepositoryException {
-    if (publishingInfo == null)
-      return null;
+    if (publishingInfo == null) return null;
     P result;
     try {
       result = (P) publishingInfo.getClass().getConstructor().newInstance();
     } catch (InstantiationException
-             | IllegalAccessException
-             | IllegalArgumentException
-             | InvocationTargetException
-             | NoSuchMethodException
-             | SecurityException e) {
+        | IllegalAccessException
+        | IllegalArgumentException
+        | InvocationTargetException
+        | NoSuchMethodException
+        | SecurityException e) {
       throw new RepositoryException("PublishingInfo cannot be instantiated", e);
     }
 
@@ -449,11 +448,11 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                     try {
                       agent = publ.getAgent().getClass().getConstructor().newInstance();
                     } catch (InstantiationException
-                             | IllegalAccessException
-                             | IllegalArgumentException
-                             | InvocationTargetException
-                             | NoSuchMethodException
-                             | SecurityException e) {
+                        | IllegalAccessException
+                        | IllegalArgumentException
+                        | InvocationTargetException
+                        | NoSuchMethodException
+                        | SecurityException e) {
                       agent = new Agent();
                     }
                     agent.setUuid(publ.getAgent().getUuid());
