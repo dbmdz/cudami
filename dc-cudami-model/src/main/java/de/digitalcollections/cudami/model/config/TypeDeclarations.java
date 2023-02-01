@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.digitalcollections.model.MainSubType;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
+import de.digitalcollections.model.text.TitleType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;

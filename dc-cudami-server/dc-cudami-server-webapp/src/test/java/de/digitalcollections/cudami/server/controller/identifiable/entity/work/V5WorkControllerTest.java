@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The V5 WorkController")
 class V5WorkControllerTest extends BaseControllerTest {
 
-  @MockBean private WorkService<Work> workService;
+  @MockBean private WorkService workService;
 
   @DisplayName("shall return a paged list of works")
   @ParameterizedTest

@@ -27,8 +27,6 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
-import de.digitalcollections.model.identifiable.entity.manifestation.Title;
-import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -37,6 +35,8 @@ import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
+import de.digitalcollections.model.text.Title;
+import de.digitalcollections.model.text.TitleType;
 import de.digitalcollections.model.text.contentblock.Text;
 import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDate;

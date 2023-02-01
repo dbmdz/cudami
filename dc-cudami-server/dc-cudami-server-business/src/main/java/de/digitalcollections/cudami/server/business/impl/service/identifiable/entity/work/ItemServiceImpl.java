@@ -64,4 +64,9 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   public Set<Work> getWorks(UUID itemUuid) {
     return ((ItemRepository) repository).getWorks(itemUuid);
   }
+
+  @Override
+  public List<Item> getItemsForWork(UUID workUuid) {
+    return ((ItemRepository) repository).getItemsForWork(workUuid);
+  }
 }

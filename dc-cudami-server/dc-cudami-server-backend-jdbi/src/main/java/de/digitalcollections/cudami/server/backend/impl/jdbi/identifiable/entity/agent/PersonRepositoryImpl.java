@@ -174,7 +174,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final FamilyNameRepositoryImpl familyNameRepositoryImpl;
   private final GivenNameRepositoryImpl givenNameRepositoryImpl;
-  private final WorkRepositoryImpl<Work> workRepositoryImpl;
+  private final WorkRepositoryImpl workRepositoryImpl;
 
   @Autowired
   public PersonRepositoryImpl(
@@ -182,7 +182,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       FamilyNameRepositoryImpl familyNameRepositoryImpl,
       GivenNameRepositoryImpl givenNameRepositoryImpl,
-      WorkRepositoryImpl<Work> workRepositoryImpl,
+      WorkRepositoryImpl workRepositoryImpl,
       CudamiConfig cudamiConfig) {
     super(
         dbi,

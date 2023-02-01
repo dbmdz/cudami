@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +19,12 @@ import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
 @Service
-public class WorkServiceImpl<W extends Work> extends EntityServiceImpl<W>
-    implements WorkService<W> {
+public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkServiceImpl.class);
 
   public WorkServiceImpl(
-      @Qualifier("workRepository") WorkRepository<W> repository,
+      @Qualifier("workRepository") WorkRepository repository,
       IdentifierService identifierService,
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
@@ -44,10 +42,5 @@ public class WorkServiceImpl<W extends Work> extends EntityServiceImpl<W>
   @Override
   public List<Agent> getCreators(UUID workUuid) {
     return ((WorkRepository) repository).getCreators(workUuid);
-  }
-
-  @Override
-  public List<Item> getItems(UUID workUuid) {
-    return ((WorkRepository) repository).getItems(workUuid);
   }
 }

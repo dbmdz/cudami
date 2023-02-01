@@ -27,7 +27,7 @@ public class V5WorkController {
   private final WorkService workService;
   private final ObjectMapper objectMapper;
 
-  public V5WorkController(WorkService<Work> workService, ObjectMapper objectMapper) {
+  public V5WorkController(WorkService workService, ObjectMapper objectMapper) {
     this.workService = workService;
     this.objectMapper = objectMapper;
   }

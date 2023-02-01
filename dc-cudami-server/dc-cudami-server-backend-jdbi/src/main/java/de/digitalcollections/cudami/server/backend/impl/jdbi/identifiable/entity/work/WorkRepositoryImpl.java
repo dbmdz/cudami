@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
@@ -23,8 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository("workRepository")
-public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
-    implements WorkRepository<W> {
+public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements WorkRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkRepositoryImpl.class);
 
@@ -64,13 +62,11 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   private final AgentRepositoryImpl<Agent> agentRepositoryImpl;
-  private final ItemRepositoryImpl itemRepositoryImpl;
 
   @Autowired
   public WorkRepositoryImpl(
       Jdbi dbi,
       @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepositoryImpl,
-      ItemRepositoryImpl itemRepositoryImpl,
       CudamiConfig cudamiConfig) {
     this(
         dbi,
@@ -79,7 +75,6 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
         MAPPING_PREFIX,
         Work.class,
         agentRepositoryImpl,
-        itemRepositoryImpl,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -90,16 +85,14 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
       String mappingPrefix,
       Class<? extends Work> workImplClass,
       AgentRepositoryImpl<Agent> agentRepositoryImpl,
-      ItemRepositoryImpl itemRepositoryImpl,
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, workImplClass, offsetForAlternativePaging);
     this.agentRepositoryImpl = agentRepositoryImpl;
-    this.itemRepositoryImpl = itemRepositoryImpl;
   }
 
   @Override
-  public W getByIdentifier(Identifier identifier) {
-    W work = super.getByIdentifier(identifier);
+  public Work getByIdentifier(Identifier identifier) {
+    Work work = super.getByIdentifier(identifier);
 
     if (work != null) {
       List<Agent> creators = getCreators(work.getUuid());
@@ -109,8 +102,8 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   @Override
-  public W getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    W work = super.getByUuidAndFiltering(uuid, filtering);
+  public Work getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    Work work = super.getByUuidAndFiltering(uuid, filtering);
 
     if (work != null) {
       List<Agent> creators = getCreators(uuid);
@@ -148,34 +141,7 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   @Override
-  public List<Item> getItems(UUID workUuid) {
-    final String itTableAlias = itemRepositoryImpl.getTableAlias();
-    final String itTableName = itemRepositoryImpl.getTableName();
-
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT iw.sortindex AS idx, * FROM "
-                + itTableName
-                + " AS "
-                + itTableAlias
-                + " LEFT JOIN item_works AS iw ON "
-                + itTableAlias
-                + ".uuid = iw.item_uuid"
-                + " WHERE iw.work_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", workUuid);
-    List<Item> result =
-        itemRepositoryImpl.retrieveList(
-            itemRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            "ORDER BY idx ASC");
-    return result;
-  }
-
-  @Override
-  public void save(W work) throws RepositoryException {
+  public void save(Work work) throws RepositoryException {
     super.save(work);
 
     // save creators
@@ -183,7 +149,7 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
     setCreatorsList(work, creators);
   }
 
-  private void setCreatorsList(W work, List<Agent> creators) {
+  private void setCreatorsList(Work work, List<Agent> creators) {
     UUID workUuid = work.getUuid();
 
     // as we store the whole list new: delete old entries
@@ -213,7 +179,7 @@ public class WorkRepositoryImpl<W extends Work> extends EntityRepositoryImpl<W>
   }
 
   @Override
-  public void update(W work) throws RepositoryException {
+  public void update(Work work) throws RepositoryException {
     super.update(work);
 
     // save creators

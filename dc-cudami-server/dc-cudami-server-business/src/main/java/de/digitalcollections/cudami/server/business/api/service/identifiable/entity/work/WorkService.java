@@ -2,14 +2,11 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.UUID;
 
-public interface WorkService<W extends Work> extends EntityService<W> {
+public interface WorkService extends EntityService<Work> {
 
   List<Agent> getCreators(UUID workUuid);
-
-  List<Item> getItems(UUID uuid);
 }
