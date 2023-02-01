@@ -144,11 +144,13 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   public void save(Work work) throws RepositoryException {
     super.save(work);
 
+    // FIXME Entfernen!
     // save creators
     List<Agent> creators = work.getCreators();
     setCreatorsList(work, creators);
   }
 
+  // FIXME: Entfernen!
   private void setCreatorsList(Work work, List<Agent> creators) {
     UUID workUuid = work.getUuid();
 
