@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.type;
 
 import de.digitalcollections.model.MainSubType;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
-import de.digitalcollections.model.identifiable.entity.manifestation.TitleType;
+import de.digitalcollections.model.text.TitleType;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.work;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
@@ -40,10 +41,12 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
-  private final WorkService<Work> workService;
+  private final WorkService workService;
+  private final ItemService itemService;
 
-  public WorkController(WorkService<Work> workService) {
+  public WorkController(WorkService workService, ItemService itemService) {
     this.workService = workService;
+    this.itemService = itemService;
   }
 
   @Override
@@ -165,7 +168,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Item> getItems(@PathVariable UUID uuid) {
-    return workService.getItems(uuid);
+    return itemService.getItemsForWork(uuid);
   }
 
   @Operation(

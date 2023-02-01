@@ -21,4 +21,6 @@ public interface ItemRepository extends EntityRepository<Item> {
   List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
 
   Set<Work> getWorks(UUID itemUuid);
+
+  List<Item> getItemsForWork(UUID workUuid);
 }

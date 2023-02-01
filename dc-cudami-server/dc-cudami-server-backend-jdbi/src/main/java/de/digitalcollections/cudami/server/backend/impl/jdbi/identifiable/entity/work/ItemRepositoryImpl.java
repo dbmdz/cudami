@@ -345,4 +345,24 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
   }
+
+  @Override
+  public List<Item> getItemsForWork(UUID workUuid) {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT iw.sortindex AS idx, * FROM "
+                + getTableName()
+                + " AS "
+                + getTableAlias()
+                + " LEFT JOIN item_works AS iw ON "
+                + getTableAlias()
+                + ".uuid = iw.item_uuid"
+                + " WHERE iw.work_uuid = :uuid"
+                + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
+    List<Item> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, "ORDER BY idx ASC");
+    return result;
+  }
 }
