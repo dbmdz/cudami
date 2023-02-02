@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
@@ -48,9 +49,11 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
   private final PersonService personService;
+  private final WorkService workService;
 
-  public PersonController(PersonService personService) {
+  public PersonController(PersonService personService, WorkService workService) {
     this.personService = personService;
+    this.workService = workService;
   }
 
   @Override
@@ -267,7 +270,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
-    return personService.getWorks(uuid);
+    return workService.getForPersons(uuid);
   }
 
   @Operation(summary = "save a newly created person")

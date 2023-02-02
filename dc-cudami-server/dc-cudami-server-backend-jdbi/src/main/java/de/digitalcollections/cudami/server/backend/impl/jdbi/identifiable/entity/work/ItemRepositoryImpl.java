@@ -13,7 +13,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -23,9 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
@@ -269,67 +266,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             + String.format(" WHERE %s.item_uuid = :uuid;", doTableAlias);
     return this.dbi.withHandle(
         h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
-  }
-
-  @Override
-  public Set<Work> getWorks(UUID itemUuid) {
-    final String wTableAlias = workRepositoryImpl.getTableAlias();
-    final String wTableName = workRepositoryImpl.getTableName();
-
-    // Note: if getting list of all participating persons to work is wanted,
-    // this code fragment may help as entry point:
-    /*
-    " e.uuid e_uuid, e.label e_label, e.refid e_refId"
-    + LEFT JOIN work_creators as wc on w.uuid = wc.work_uuid
-    " LEFT JOIN entities as e on e.uuid = wc.agent_uuid"
-    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-    if (rowView.getColumn("e_uuid", UUID.class) != null) {
-      EntityImpl agent = rowView.getRow(EntityImpl.class);
-      UUID agentUuid = agent.getUuid();
-      List<Agent> creators = work.getCreators();
-      boolean contained = false;
-      for (Agent creator : creators) {
-        if (agentUuid.equals(creator.getUuid())) {
-          contained = true;
-        }
-      }
-      if (!contained) {
-        // FIXME: not only persons! use entityType to disambiguate!
-        Person person = new PersonImpl();
-        person.setLabel(agent.getLabel());
-        person.setRefId(agent.getRefId());
-        person.setUuid(agent.getUuid());
-        work.getCreators().add(person);
-      }
-    }
-     */
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT iw.sortindex AS idx, * FROM "
-                + wTableName
-                + " AS "
-                + wTableAlias
-                + " LEFT JOIN item_works AS iw ON "
-                + wTableAlias
-                + ".uuid = iw.work_uuid"
-                + " WHERE iw.item_uuid = :uuid"
-                + " ORDER BY iw.sortindex ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", itemUuid);
-    List<Work> result =
-        workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            "ORDER BY idx ASC");
-    return result.stream()
-        .map(
-            w -> {
-              List<Agent> creators = workRepositoryImpl.getCreators(w.getUuid());
-              w.setCreators(creators);
-              return w;
-            })
-        .collect(Collectors.toSet());
   }
 
   @Override
