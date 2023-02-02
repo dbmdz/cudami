@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -49,10 +50,13 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   private final DigitalObjectService digitalObjectService;
   private final ItemService itemService;
+  private final WorkService workService;
 
-  public ItemController(DigitalObjectService digitalObjectService, ItemService itemService) {
+  public ItemController(
+      DigitalObjectService digitalObjectService, ItemService itemService, WorkService workService) {
     this.digitalObjectService = digitalObjectService;
     this.itemService = itemService;
+    this.workService = workService;
   }
 
   @Operation(summary = "Add digital object to an item")
@@ -256,7 +260,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return itemService.getWorks(uuid);
+    return workService.getForItem(uuid);
   }
 
   @Operation(summary = "save a newly created item")

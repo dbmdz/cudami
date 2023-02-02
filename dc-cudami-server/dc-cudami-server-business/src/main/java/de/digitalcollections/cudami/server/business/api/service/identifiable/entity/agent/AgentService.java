@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,4 +20,6 @@ public interface AgentService<A extends Agent> extends EntityService<A> {
   }
 
   Set<Work> getWorks(UUID uuidAgent);
+
+  List<Agent> getCreatorsForWork(UUID uuid);
 }

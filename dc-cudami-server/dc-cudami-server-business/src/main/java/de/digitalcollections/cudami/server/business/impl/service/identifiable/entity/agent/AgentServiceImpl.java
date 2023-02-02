@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -50,5 +51,18 @@ public class AgentServiceImpl<A extends Agent> extends EntityServiceImpl<A>
   @Override
   public Set<Work> getWorks(UUID uuidAgent) {
     return ((AgentRepository<A>) repository).getWorks(uuidAgent);
+  }
+
+  @Override
+  public Set<Work> getWorks(A agent) {
+    if (agent == null) {
+      return null;
+    }
+    return ((AgentRepository<A>) repository).getWorks(agent.getUuid());
+  }
+
+  @Override
+  public List<Agent> getCreatorsForWork(UUID uuid) {
+    return null;
   }
 }

@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Changed
 
-- WEMI part: Manifestations
+- WEMI parts: Manifestations, Works
 - POST/PUT/PATCH-Requests require the attribute `objectType` in the JSON body. If it is missing, it is heuristically set
 - Labels of Identifiables must not be empty
 - **Breaking**: Changed runtime dependency from JRE11 to JRE17
@@ -40,6 +40,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - UrlAlias does actively ignore any script of the target's locale
 - **SQL migration** (can be **long running**) replaces every emtpy string key in the labels (that comes from `Locale.ROOT` as language)
 by `"und"`
+
+### Removed
+
+- **Breaking** Due to model changes, the tables `item_works` and `work_creators` are removed and their contents, if ever used, are lost.
 
 ## [6.2.1](https://github.com/dbmdz/cudami/releases/tag/6.2.1) - 2023-02-10
 

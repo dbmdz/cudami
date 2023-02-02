@@ -10,12 +10,10 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
-import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +56,6 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   @Override
   public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) {
     return ((ItemRepository) repository).getLanguagesOfDigitalObjects(uuid);
-  }
-
-  @Override
-  public Set<Work> getWorks(UUID itemUuid) {
-    return ((ItemRepository) repository).getWorks(itemUuid);
   }
 
   @Override

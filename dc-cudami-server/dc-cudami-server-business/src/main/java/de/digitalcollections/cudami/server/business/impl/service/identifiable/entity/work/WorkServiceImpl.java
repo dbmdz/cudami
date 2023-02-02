@@ -8,9 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,14 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   }
 
   @Override
-  public List<Agent> getCreators(UUID workUuid) {
-    return ((WorkRepository) repository).getCreators(workUuid);
+  public Set<Work> getForItem(UUID itemUuid) {
+    // FIXME
+    return null;
+  }
+
+  @Override
+  public Set<Work> getForPersons(UUID uuid) {
+    // FIXME
+    return null;
   }
 }
