@@ -330,7 +330,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         }
         if (identifiable.getLocalizedUrlAliases() == null) {
           identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
-        } else {
+        } else if (!identifiable.getLocalizedUrlAliases().containsUrlAlias(urlAlias)) {
           identifiable.getLocalizedUrlAliases().add(urlAlias);
         }
       }
