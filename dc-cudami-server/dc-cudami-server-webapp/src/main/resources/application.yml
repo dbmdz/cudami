@@ -55,6 +55,7 @@ spring:
     # see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
     hikari:
       maximum-pool-size: 25
+      connection-init-sql: "set random_page_cost = 2;"
   flyway:
     baseline-on-migrate: true
     enabled: true

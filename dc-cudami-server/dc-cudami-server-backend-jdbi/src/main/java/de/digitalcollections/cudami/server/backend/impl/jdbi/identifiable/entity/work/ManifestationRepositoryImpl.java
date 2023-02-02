@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
@@ -78,7 +79,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         work, titles,
         publication_info, publication_nav_date,
         production_info, production_nav_date,
-        distribution_info, distribution_nav_date
+        distribution_info, distribution_nav_date,
+        publishing_info_agent_uuids, publishing_info_locations_uuids
         """;
   }
 
@@ -93,7 +95,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         :work?.uuid, {{titles}},
         :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
         :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
-        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange
+        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange,
+        :publishingInfoAgentUuids, :publishingInfoLocationsUuids
         """;
   }
 
@@ -108,7 +111,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         work=:work?.uuid, titles={{titles}},
         publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
         production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
-        distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange
+        distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange,
+        publishing_info_agent_uuids=:publishingInfoAgentUuids, publishing_info_locations_uuids=:publishingInfoLocationsUuids
         """;
   }
 
@@ -169,16 +173,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
       ) ON %5$s.object_uuid = %1$s.uuid
-      LEFT JOIN %8$s %9$s ON %9$s.uuid IN (
-          select (a->>'uuid')::UUID from jsonb_path_query(jsonb_build_array(
-              %1$s.publication_info, %1$s.production_info, %1$s.distribution_info
-          ),
-          '$[*].publishers[*].agent') agent(a))
-      LEFT JOIN %10$s %11$s ON %11$s.uuid IN (
-          select (a->>'uuid')::UUID from jsonb_path_query(jsonb_build_array(
-              %1$s.publication_info, %1$s.production_info, %1$s.distribution_info
-          ),
-          '$[*].publishers[*].locations[*]') humansettlement(a))
+      LEFT JOIN %8$s %9$s ON %9$s.uuid = ANY(%1$s.publishing_info_agent_uuids)
+      LEFT JOIN %10$s %11$s ON %11$s.uuid = ANY(%1$s.publishing_info_locations_uuids)
       """
           .formatted(
               TABLE_ALIAS,
@@ -559,11 +555,40 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         });
   }
 
+  private void setPublishingInfoBindings(
+      Map<String, Object> bindings, PublishingInfo... publishingInfos) {
+    if (bindings == null || publishingInfos.length < 1) return;
+    bindings.put(
+        "publishingInfoAgentUuids",
+        extractUuids(
+            Stream.of(publishingInfos)
+                .filter(pinfo -> Objects.nonNull(pinfo) && Objects.nonNull(pinfo.getPublishers()))
+                .map(p -> p.getPublishers().stream())
+                .flatMap(s -> s)
+                .filter(
+                    publisher ->
+                        Objects.nonNull(publisher) && Objects.nonNull(publisher.getAgent()))
+                .map(Publisher::getAgent)
+                .toList()));
+    bindings.put(
+        "publishingInfoLocationsUuids",
+        extractUuids(
+            Stream.of(publishingInfos)
+                .filter(pinfo -> Objects.nonNull(pinfo) && Objects.nonNull(pinfo.getPublishers()))
+                .map(p -> p.getPublishers().stream())
+                .flatMap(s -> s)
+                .filter(
+                    publisher ->
+                        Objects.nonNull(publisher) && Objects.nonNull(publisher.getLocations()))
+                .flatMap(publisher -> publisher.getLocations().stream())
+                .toList()));
+  }
+
   @Override
   public void save(Manifestation manifestation, Map<String, Object> bindings)
       throws RepositoryException {
     if (bindings == null) {
-      bindings = new HashMap<>(2);
+      bindings = new HashMap<>(3);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
 
@@ -574,6 +599,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     PublicationInfo publicationInfo = manifestation.getPublicationInfo();
     manifestation.setPublicationInfo(reducePublisher(publicationInfo));
 
+    setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
     super.save(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
 
@@ -586,7 +612,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   public void update(Manifestation manifestation, Map<String, Object> bindings)
       throws RepositoryException {
     if (bindings == null) {
-      bindings = new HashMap<>(2);
+      bindings = new HashMap<>(3);
     }
     bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
 
@@ -597,6 +623,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     PublicationInfo publicationInfo = manifestation.getPublicationInfo();
     manifestation.setPublicationInfo(reducePublisher(publicationInfo));
 
+    setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
     super.update(manifestation, bindings, buildTitleSql(manifestation));
     saveParents(manifestation);
 
