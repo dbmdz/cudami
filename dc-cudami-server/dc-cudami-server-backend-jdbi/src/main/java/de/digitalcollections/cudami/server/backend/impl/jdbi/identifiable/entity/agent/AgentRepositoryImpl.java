@@ -37,7 +37,6 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
         MAPPING_PREFIX,
         Agent.class,
         null,
-        null,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
@@ -47,7 +46,6 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
       String tableAlias,
       String mappingPrefix,
       Class<? extends Agent> agentImplClass,
-      String sqlSelectAllFieldsJoins,
       BiConsumer<Map<UUID, A>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
@@ -56,7 +54,6 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
         tableAlias,
         mappingPrefix,
         agentImplClass,
-        sqlSelectAllFieldsJoins,
         additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }

@@ -37,16 +37,20 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntryRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "he";
-  private static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      " LEFT JOIN "
-          + HeadwordRepositoryImpl.TABLE_NAME
-          + " AS "
-          + HeadwordRepositoryImpl.TABLE_ALIAS
-          + " ON "
-          + HeadwordRepositoryImpl.TABLE_ALIAS
-          + ".uuid = he.headword";
   public static final String TABLE_ALIAS = "he";
   public static final String TABLE_NAME = "headwordentries";
+
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + " LEFT JOIN "
+        + HeadwordRepositoryImpl.TABLE_NAME
+        + " AS "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + " ON "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".uuid = he.headword";
+  }
 
   private static BiConsumer<Map<UUID, HeadwordEntry>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
       (map, rowView) -> {
@@ -116,7 +120,6 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         TABLE_ALIAS,
         MAPPING_PREFIX,
         HeadwordEntry.class,
-        SQL_SELECT_ALL_FIELDS_JOINS,
         ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;

@@ -333,7 +333,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                     .build())
             .build();
 
-    Webpage result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
+    Webpage result = retrieveOne(getSqlSelectReducedFields(), filtering, sqlAdditionalJoins);
 
     return result;
   }

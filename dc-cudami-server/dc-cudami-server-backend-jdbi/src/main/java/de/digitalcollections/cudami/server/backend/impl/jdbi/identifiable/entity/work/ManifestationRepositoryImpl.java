@@ -136,6 +136,26 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
+        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
+        LEFT JOIN %6$s %7$s ON %7$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
+        """
+            .formatted(
+                tableAlias,
+                /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
+                SubjectRepositoryImpl.TABLE_ALIAS,
+                /*4-5 Publisher agents*/
+                AgentRepositoryImpl.TABLE_NAME,
+                AgentRepositoryImpl.TABLE_ALIAS,
+                /*6-7 Publisher locations*/
+                HumanSettlementRepositoryImpl.TABLE_NAME,
+                HumanSettlementRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
@@ -163,32 +183,25 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         + entityRepository.getSqlSelectReducedFields();
   }
 
-  public static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      """
-      LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + """
       LEFT JOIN (
         manifestation_manifestations mms INNER JOIN manifestations parent
         ON parent.uuid = mms.subject_uuid
       ) ON mms.object_uuid = %1$s.uuid
       LEFT JOIN (
-        %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
-      ) ON %5$s.object_uuid = %1$s.uuid
-      LEFT JOIN %8$s %9$s ON %9$s.uuid = ANY(%1$s.publishing_info_agent_uuids)
-      LEFT JOIN %10$s %11$s ON %11$s.uuid = ANY(%1$s.publishing_info_locations_uuids)
+        %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
+      ) ON %3$s.object_uuid = %1$s.uuid
       """
-          .formatted(
-              TABLE_ALIAS,
-              /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
-              SubjectRepositoryImpl.TABLE_ALIAS,
-              /*4-5*/ EntityRelationRepositoryImpl.TABLE_NAME,
-              EntityRelationRepositoryImpl.TABLE_ALIAS,
-              /*6-7*/ EntityRepositoryImpl.TABLE_NAME,
-              EntityRepositoryImpl.TABLE_ALIAS,
-              /*8-9 Publisher agents*/
-              AgentRepositoryImpl.TABLE_NAME,
-              AgentRepositoryImpl.TABLE_ALIAS,
-              /*10-11 Publisher locations*/ HumanSettlementRepositoryImpl.TABLE_NAME,
-              HumanSettlementRepositoryImpl.TABLE_ALIAS);
+            .formatted(
+                tableAlias,
+                /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
+                EntityRelationRepositoryImpl.TABLE_ALIAS,
+                /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
+                EntityRepositoryImpl.TABLE_ALIAS);
+  }
 
   public ManifestationRepositoryImpl(
       Jdbi jdbi,
@@ -205,7 +218,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Manifestation.class,
-        SQL_SELECT_ALL_FIELDS_JOINS,
         ManifestationRepositoryImpl::additionalReduceRowsBiConsumer,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerArrayType(expressionTypeMapper);

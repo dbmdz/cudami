@@ -421,7 +421,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
                     .build())
             .build();
 
-    Collection result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
+    Collection result = retrieveOne(getSqlSelectReducedFields(), filtering, sqlAdditionalJoins);
     return result;
   }
 
