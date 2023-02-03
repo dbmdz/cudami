@@ -37,17 +37,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
 
   public static final String MAPPING_PREFIX = "pe";
   public static final String TABLE_ALIAS = "p";
-  private static final String SQL_FULL_FIELDS_JOINS =
-      " LEFT JOIN geolocations AS glbirth ON glbirth.uuid = "
-          + TABLE_ALIAS
-          + ".locationofbirth"
-          + " LEFT JOIN geolocations AS gldeath ON gldeath.uuid = "
-          + TABLE_ALIAS
-          + ".locationofdeath"
-          + " LEFT JOIN person_familynames AS pf ON pf.person_uuid = p.uuid"
-          + " LEFT JOIN familynames AS fn ON fn.uuid = pf.familyname_uuid"
-          + " LEFT JOIN person_givennames AS pg ON pg.person_uuid = p.uuid"
-          + " LEFT JOIN givennames AS gn ON gn.uuid = pg.givenname_uuid";
   public static final String TABLE_NAME = "persons";
 
   private static final BiConsumer<Map<UUID, Person>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
@@ -166,6 +155,22 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
         + ", dateofbirth=:dateOfBirth, dateofdeath=:dateOfDeath, gender=:gender, locationofbirth=:locationOfBirth, locationofdeath=:locationOfDeath, timevalueofbirth=:timeValueOfBirth::JSONB, timevalueofdeath=:timeValueOfDeath::JSONB";
   }
 
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN geolocations AS glbirth ON glbirth.uuid = %1$s.locationofbirth
+        LEFT JOIN geolocations AS gldeath ON gldeath.uuid = %1$s.locationofdeath
+        LEFT JOIN (
+          person_familynames pf INNER JOIN familynames fn ON fn.uuid = pf.familyname_uuid
+        ) ON pf.person_uuid = p.uuid
+        LEFT JOIN (
+          person_givennames pg INNER JOIN givennames gn ON gn.uuid = pg.givenname_uuid
+        ) ON pg.person_uuid = p.uuid
+        """
+            .formatted(tableAlias);
+  }
+
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final FamilyNameRepositoryImpl familyNameRepositoryImpl;
   private final GivenNameRepositoryImpl givenNameRepositoryImpl;
@@ -185,7 +190,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Person.class,
-        SQL_FULL_FIELDS_JOINS,
         ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;

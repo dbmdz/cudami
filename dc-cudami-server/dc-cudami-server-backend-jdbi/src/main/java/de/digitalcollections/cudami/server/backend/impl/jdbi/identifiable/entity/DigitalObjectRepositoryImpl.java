@@ -52,19 +52,26 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public static final String MAPPING_PREFIX = "do";
   public static final String TABLE_ALIAS = "d";
 
-  private static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      " LEFT JOIN "
-          + LicenseRepositoryImpl.TABLE_NAME
-          + " AS "
-          + LicenseRepositoryImpl.TABLE_ALIAS
-          + " ON "
-          + TABLE_ALIAS
-          + ".license_uuid = "
-          + LicenseRepositoryImpl.TABLE_ALIAS
-          + ".uuid"
-          + " LEFT JOIN %1$s %2$s ON %2$s.uuid = %3$s.item_uuid"
-              .formatted(
-                  ItemRepositoryImpl.TABLE_NAME, ItemRepositoryImpl.TABLE_ALIAS, TABLE_ALIAS);
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + " LEFT JOIN "
+        + LicenseRepositoryImpl.TABLE_NAME
+        + " AS "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + " ON "
+        + TABLE_ALIAS
+        + ".license_uuid = "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".uuid";
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + " LEFT JOIN %1$s %2$s ON %2$s.uuid = %3$s.item_uuid"
+            .formatted(ItemRepositoryImpl.TABLE_NAME, ItemRepositoryImpl.TABLE_ALIAS, TABLE_ALIAS);
+  }
 
   private static final BiConsumer<Map<UUID, DigitalObject>, RowView>
       ADDITIONAL_REDUCE_ROWS_BICONSUMER =
@@ -240,7 +247,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         TABLE_ALIAS,
         MAPPING_PREFIX,
         DigitalObject.class,
-        SQL_SELECT_ALL_FIELDS_JOINS,
         ADDITIONAL_REDUCE_ROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
   }

@@ -82,6 +82,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
+  protected String getSqlSelectAllFieldsJoins() {
+    return "";
+  }
+
   public String getSqlSelectReducedFields() {
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
@@ -122,6 +126,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         + "_previewImageRenderingHints";
   }
 
+  protected String getSqlSelectReducedFieldsJoins() {
+    return "";
+  }
+
   public String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type
@@ -145,7 +153,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
   public final BiConsumer<Map<UUID, I>, RowView> fullReduceRowsBiConsumer;
   protected final Class<? extends Identifiable> identifiableImplClass;
-  protected final String sqlSelectAllFieldsJoins;
 
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -181,26 +188,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       String tableAlias,
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
-      String sqlSelectAllFieldsJoins,
-      int offsetForAlternativePaging) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        identifiableImplClass,
-        sqlSelectAllFieldsJoins,
-        null,
-        offsetForAlternativePaging);
-  }
-
-  protected IdentifiableRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Identifiable> identifiableImplClass,
-      String sqlSelectAllFieldsJoins,
       BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
@@ -227,7 +214,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
 
     this.identifiableImplClass = identifiableImplClass;
-    this.sqlSelectAllFieldsJoins = sqlSelectAllFieldsJoins;
   }
 
   protected String addCrossTablePageRequestParams(
@@ -504,13 +490,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     Map<String, Object> arguments = new HashMap<>(0);
     addFiltering(filtering, innerSelect, arguments);
     innerSelect.append(")");
-    I result =
-        retrieveOne(
-            getSqlSelectAllFields(),
-            sqlSelectAllFieldsJoins,
-            null,
-            arguments,
-            innerSelect.toString());
+    I result = retrieveOne(getSqlSelectAllFields(), null, null, arguments, innerSelect.toString());
     return result;
   }
 
@@ -521,7 +501,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
     filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
 
-    I result = retrieveOne(getSqlSelectAllFields(), sqlSelectAllFieldsJoins, filtering);
+    I result = retrieveOne(getSqlSelectAllFields(), filtering, null);
     return result;
   }
 
@@ -685,7 +665,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
-            + (sqlSelectAllFieldsJoins != null ? " " + sqlSelectAllFieldsJoins : "")
+            + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
+                ? " %s ".formatted(getSqlSelectReducedFieldsJoins())
+                : "")
             + " LEFT JOIN "
             + IdentifierRepositoryImpl.TABLE_NAME
             + " AS "
@@ -733,23 +715,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
-  public I retrieveOne(String fieldsSql, String sqlSelectAllFieldsJoins, Filtering filtering) {
+  public I retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins) {
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings);
+    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings);
   }
 
   public I retrieveOne(
       String fieldsSql,
-      String sqlSelectAllFieldsJoins,
       Filtering filtering,
+      String sqlAdditionalJoins,
       Map<String, Object> argumentMappings) {
-    return retrieveOne(fieldsSql, sqlSelectAllFieldsJoins, filtering, argumentMappings, null);
+    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
   }
 
   public I retrieveOne(
       String fieldsSql,
-      String sqlSelectAllFieldsJoins,
       Filtering filtering,
+      String sqlAdditionalJoins,
       Map<String, Object> argumentMappings,
       String innerSelect) {
     StringBuilder sql =
@@ -768,7 +750,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
                 + tableAlias
-                + (sqlSelectAllFieldsJoins != null ? " " + sqlSelectAllFieldsJoins : "")
+                + (StringUtils.hasText(sqlAdditionalJoins)
+                    ? " %s".formatted(sqlAdditionalJoins)
+                    : "")
+                + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
+                    ? " %s".formatted(getSqlSelectReducedFieldsJoins())
+                    : "")
+                + (StringUtils.hasText(getSqlSelectAllFieldsJoins())
+                    ? " %s".formatted(getSqlSelectAllFieldsJoins())
+                    : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME
                 + " AS "

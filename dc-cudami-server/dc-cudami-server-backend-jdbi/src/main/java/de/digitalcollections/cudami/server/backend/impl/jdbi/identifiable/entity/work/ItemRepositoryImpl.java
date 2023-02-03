@@ -66,12 +66,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             .formatted(tableAlias, mappingPrefix);
   }
 
-  public static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      """
-          LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%4$s.holder_uuids)
-          LEFT JOIN %3$s poi ON %4$s.part_of_item = poi.uuid
-          """
-          .formatted(AgentRepositoryImpl.TABLE_NAME, "holdertable", TABLE_NAME, TABLE_ALIAS);
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN %1$s poi ON %2$s.part_of_item = poi.uuid
+        """
+            .formatted(tableName, tableAlias);
+  }
 
   @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
@@ -87,6 +89,15 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         + "_manifestation_uuid, "
         + agentRepository.getSqlSelectReducedFields(
             "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + """
+        LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids)
+        """
+            .formatted(AgentRepositoryImpl.TABLE_NAME, "holdertable", tableAlias);
   }
 
   @Override
@@ -112,7 +123,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Item.class,
-        SQL_SELECT_ALL_FIELDS_JOINS,
         ItemRepositoryImpl::additionalReduceRows,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;

@@ -64,7 +64,6 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
         MAPPING_PREFIX,
         CorporateBody.class,
         null,
-        null,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

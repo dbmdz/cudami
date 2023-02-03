@@ -111,7 +111,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String tableName,
       String tableAlias,
       String mappingPrefix,
-      String sqlSelectAllFieldsJoins,
       BiConsumer<Map<UUID, F>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
@@ -120,7 +119,6 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
         tableAlias,
         mappingPrefix,
         FileResource.class,
-        sqlSelectAllFieldsJoins,
         additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }

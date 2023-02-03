@@ -413,7 +413,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                     .build())
             .build();
 
-    Topic result = retrieveOne(getSqlSelectReducedFields(), sqlAdditionalJoins, filtering);
+    Topic result = retrieveOne(getSqlSelectReducedFields(), filtering, sqlAdditionalJoins);
 
     return result;
   }

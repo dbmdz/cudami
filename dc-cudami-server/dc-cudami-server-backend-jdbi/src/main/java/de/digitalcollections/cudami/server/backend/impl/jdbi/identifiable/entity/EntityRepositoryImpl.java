@@ -140,26 +140,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
-      String sqlSelectAllFieldsJoins,
-      int offsetForAlternativePaging) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        sqlSelectAllFieldsJoins,
-        null,
-        offsetForAlternativePaging);
-  }
-
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Entity> entityImplClass,
-      String sqlSelectAllFieldsJoins,
       BiConsumer<Map<UUID, E>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
@@ -168,7 +148,6 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         tableAlias,
         mappingPrefix,
         entityImplClass,
-        sqlSelectAllFieldsJoins,
         additionalReduceRowsBiConsumer,
         offsetForAlternativePaging);
   }
@@ -203,7 +182,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
             .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
             .build();
 
-    return retrieveOne(getSqlSelectAllFields(), sqlSelectAllFieldsJoins, filtering);
+    return retrieveOne(getSqlSelectAllFields(), filtering, null);
   }
 
   @Override
