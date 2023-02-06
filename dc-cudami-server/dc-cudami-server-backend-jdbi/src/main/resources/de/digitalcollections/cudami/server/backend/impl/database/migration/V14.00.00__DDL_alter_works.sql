@@ -9,7 +9,7 @@ ALTER TABLE works
   ADD COLUMN IF NOT EXISTS creation_daterange jsonb,
   ADD COLUMN IF NOT EXISTS creation_timevalue jsonb,
   ADD COLUMN IF NOT EXISTS subjects_uuids UUID[],
-  ADD COLUMN IF NOT EXISTS titles Title[] NOT NULL,
+  ADD COLUMN IF NOT EXISTS titles Title[],
   ADD CONSTRAINT fk_previewfileresource FOREIGN KEY(previewfileresource) REFERENCES fileresources_image;
 
 DROP TRIGGER IF EXISTS tr_works_subjects ON works;
