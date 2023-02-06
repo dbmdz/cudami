@@ -9,10 +9,13 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Sorting;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("identifierTypeService")
 @Transactional(rollbackFor = {Exception.class})
 public class IdentifierTypeServiceImpl implements IdentifierTypeService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
 
   private final IdentifierTypeRepository repository;
   private Map<String, String> identifierTypeCache;
@@ -105,6 +110,11 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
                   Collectors.toConcurrentMap(
                       IdentifierType::getNamespace, IdentifierType::getPattern));
     } catch (RepositoryException e) {
+      if (e.getMessage().contains("relation \"identifiertypes\" does not exist")) {
+        LOGGER.warn(
+            "The identifier type cache could not be initialised, because the corresponding relation in the DB does not yet exist - please restart the application after the migrations have run.");
+        return new HashMap<>(0);
+      }
       throw new ServiceException(e);
     }
     return identifierTypeCache;
