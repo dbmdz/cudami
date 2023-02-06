@@ -112,7 +112,7 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
     } catch (RepositoryException e) {
       if (e.getMessage().contains("relation \"identifiertypes\" does not exist")) {
         LOGGER.warn(
-            "The identifier type cache could not be initialised, because the corresponding relation in the DB does not yet exist - please restart the application after the migration have run.");
+            "The identifier type cache could not be initialised, because the corresponding relation in the DB does not yet exist - please restart the application after the migrations have run.");
         return new HashMap<>(0);
       }
       throw new ServiceException(e);
