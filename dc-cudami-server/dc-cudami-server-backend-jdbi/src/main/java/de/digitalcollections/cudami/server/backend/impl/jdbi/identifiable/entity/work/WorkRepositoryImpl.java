@@ -9,19 +9,18 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
-import de.digitalcollections.model.identifiable.entity.agent.Family;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedStructuredContent;
+import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
 import de.digitalcollections.model.time.LocalDateRange;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiFunction;
+import java.util.Vector;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -58,6 +58,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + ", first_appeared_date"
         + ", first_appeared_presentation"
         + ", first_appeared_timevalue"
+        + ", titles"
         + ", subjects_uuids";
   }
 
@@ -65,11 +66,12 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   @Override
   public String getSqlInsertValues() {
     return super.getSqlInsertValues()
-        + ", :creationDateRange::JSONB"
+        + ", :creationDateRange::daterange"
         + ", :creationTimeValue::JSONB"
         + ", :firstAppearedDate"
         + ", :firstAppearedDatePresentation"
         + ", :firstAppearedTimeValue::JSONB"
+        + ", {{titles}}"
         + ", :subjects_uuids::UUID[]";
   }
 
@@ -78,8 +80,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
             , %1$s.creation_daterange %2$s_creationDateRange
+            , %1$s.creation_timevalue %2$s_creationTimeValue
             , %1$s.first_appeared_date %2$s_firstAppearedDate
             , %1$s.first_appeared_presentation %2$s_firstAppearedDatePresentation
+            , %1$s.first_appeared_timevalue %2$s_firstAppearedTimeValue
             , %1$s.titles %2$s_titles,
             """
             .formatted(tableAlias, mappingPrefix)
@@ -105,11 +109,12 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues()
-        + ", creation_daterange=:creationDateRange::JSONB"
+        + ", creation_daterange=:creationDateRange::daterange"
         + ", creation_timevalue=:creationTimeValue::JSONB"
         + ", first_appeared_date=:firstAppearedDate"
         + ", first_appeared_presentation=:firstAppearedDatePresentation"
         + ", first_appeared_timevalue=:firstAppearedTimeValue::JSONB"
+        + ", titles={{titles}}"
         + ", subjects_uuids=:subjects_uuids::UUID[]";
   }
 
@@ -118,38 +123,44 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         // subjects
-        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS
-        // publishers
-        + ", %s, %s"
-            .formatted(
-                agentRepository.getSqlSelectReducedFields(),
-                humanSettlementRepository.getSqlSelectReducedFields());
+        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
-  public static final String SQL_SELECT_ALL_FIELDS_JOINS =
-      """
-      LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + """
       LEFT JOIN (
         work_works wws INNER JOIN works parent
         ON parent.uuid = wws.subject_uuid
       ) ON wws.object_uuid = %1$s.uuid
       LEFT JOIN (
-        %4$s %5$s INNER JOIN %6$s %7$s ON %5$s.subject_uuid = %7$s.uuid
-      ) ON %5$s.object_uuid = %1$s.uuid
+        %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
+      ) ON %3$s.object_uuid = %1$s.uuid
       """
-          .formatted(
-              TABLE_ALIAS,
-              /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
-              SubjectRepositoryImpl.TABLE_ALIAS,
-              /*4-5*/ EntityRelationRepositoryImpl.TABLE_NAME,
-              EntityRelationRepositoryImpl.TABLE_ALIAS,
-              /*6-7*/ EntityRepositoryImpl.TABLE_NAME,
-              EntityRepositoryImpl.TABLE_ALIAS);
+            .formatted(
+                tableAlias,
+                /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
+                EntityRelationRepositoryImpl.TABLE_ALIAS,
+                /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
+                EntityRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
+        """
+            .formatted(
+                tableAlias,
+                /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
+                SubjectRepositoryImpl.TABLE_ALIAS);
+  }
 
   public WorkRepositoryImpl(
       Jdbi jdbi,
       CudamiConfig cudamiConfig,
-      ExpressionTypeMapper expressionTypeMapper,
       LocalDateRangeMapper dateRangeMapper,
       TitleMapper titleMapper,
       EntityRepositoryImpl<Entity> entityRepository,
@@ -161,12 +172,9 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Work.class,
-        SQL_SELECT_ALL_FIELDS_JOINS,
         WorkRepositoryImpl::additionalReduceRowsBiConsumer,
         cudamiConfig.getOffsetForAlternativePaging());
-    dbi.registerArrayType(expressionTypeMapper);
     dbi.registerArgument(dateRangeMapper);
-    dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
     dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
     dbi.registerColumnMapper(Title.class, titleMapper);
 
@@ -187,7 +195,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       bindings = new HashMap<>(3);
     }
     bindings.put("subjects_uuids", extractUuids(work.getSubjects()));
-    super.save(work, bindings, buildTitleSql(work));
+
+    super.save(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
     saveParents(work);
   }
 
@@ -198,7 +207,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     }
     bindings.put("subjects_uuids", extractUuids(work.getSubjects()));
 
-    super.update(work, bindings, buildTitleSql(work));
+    super.update(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
     saveParents(work);
   }
 
@@ -234,38 +243,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         });
   }
 
-  private BiFunction<String, Map<String, Object>, String> buildTitleSql(final Work work) {
-    return (sql, bindings) -> {
-      if (work.getTitles() == null || work.getTitles().isEmpty()) {
-        return sql.replace("{{titles}}", "NULL");
-      }
-      List<String> titleConstructors = new ArrayList<>();
-      for (int i = 0; i < work.getTitles().size(); i++) {
-        titleConstructors.add(
-            String.format(
-                "title_constructor(:titles_%1$d_mainType, :titles_%1$d_subType, "
-                    + ":titles_%1$d_text::jsonb, :titles_%1$d_textLocales::varchar[])",
-                i));
-        Title title = work.getTitles().get(i);
-        bindings.put(
-            String.format("titles_%d_mainType", i),
-            title.getTitleType() != null ? title.getTitleType().getMainType() : null);
-        bindings.put(
-            String.format("titles_%d_subType", i),
-            title.getTitleType() != null ? title.getTitleType().getSubType() : null);
-        bindings.put(String.format("titles_%d_text", i), title.getText());
-        bindings.put(
-            String.format("titles_%d_textLocales", i),
-            title.getTextLocalesOfOriginalScripts() != null
-                ? title.getTextLocalesOfOriginalScripts().stream()
-                    .map(l -> l.toLanguageTag())
-                    .toArray(n -> new String[n])
-                : null);
-      }
-      return sql.replace("{{titles}}", "ARRAY[" + String.join(", ", titleConstructors) + "]");
-    };
-  }
-
   protected static void additionalReduceRowsBiConsumer(Map<UUID, Work> map, RowView rowView) {
     Work work = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
     // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
@@ -280,23 +257,95 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       Subject subject = rowView.getRow(Subject.class);
       work.addSubject(subject);
     }
+  }
 
-    // publishers
-    Agent publAgent = null;
-    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-      Agent ag = rowView.getRow(Agent.class);
-      publAgent =
-          switch (ag.getIdentifiableObjectType()) {
-            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
-            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
-            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
-            default -> ag;
-          };
+  @Override
+  protected void extendReducedIdentifiable(Work work, RowView rowView) {
+    // parents
+    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      if (work.getParents() == null) {
+        work.setParents(new ArrayList<>(1));
+      }
+      if (!work.getParents().stream()
+          .anyMatch(relSpec -> Objects.equals(relSpec.getUuid(), parentUuid))) {
+        Work parent =
+            Work.builder()
+                .uuid(parentUuid)
+                .label(rowView.getColumn("parent_label", LocalizedText.class))
+                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
+                .refId(rowView.getColumn("parent_refId", Integer.class))
+                .notes(
+                    rowView.getColumn(
+                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+                .created(rowView.getColumn("parent_created", LocalDateTime.class))
+                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+                .identifiableObjectType(
+                    rowView.getColumn(
+                        "parent_identifiableObjectType", IdentifiableObjectType.class))
+                .build();
+        work.getParents().add(parent);
+      }
     }
-    HumanSettlement publPlace =
-        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-                != null
-            ? rowView.getRow(HumanSettlement.class)
-            : null;
+
+    // relations
+    UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
+    if (entityUuid != null) {
+      if (work.getRelations() == null || work.getRelations().isEmpty()) {
+        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
+        relations.setSize(maxIndex);
+        work.setRelations(relations);
+      }
+      String relationPredicate =
+          rowView.getColumn(
+              EntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
+      if (!work.getRelations().stream()
+          .anyMatch(
+              relation ->
+                  relation != null
+                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
+                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
+        Entity relatedEntity = rowView.getRow(Entity.class);
+        work.getRelations()
+            .set(
+                rowView.getColumn(
+                    EntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex", Integer.class),
+                EntityRelation.builder()
+                    .subject(relatedEntity)
+                    .predicate(relationPredicate)
+                    .additionalPredicates(
+                        rowView.getColumn(
+                            EntityRelationRepositoryImpl.MAPPING_PREFIX + "_additionalPredicates",
+                            new GenericType<List<String>>() {}))
+                    .build());
+      }
+    }
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    switch (modelProperty) {
+      case "titles":
+        return modelProperty;
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> orderByFields = super.getAllowedOrderByFields();
+    return orderByFields;
+  }
+
+  @Override
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "firstAppearedDatePresentation":
+        return true;
+      default:
+        return super.supportsCaseSensitivityForProperty(modelProperty);
+    }
   }
 }

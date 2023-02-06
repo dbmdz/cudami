@@ -18,7 +18,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -72,7 +71,9 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   public void save(Manifestation manifestation) throws ServiceException, ValidationException {
     super.save(manifestation);
     try {
-      persistEntityRelations(manifestation, true);
+      List<EntityRelation> entityRelations = manifestation.getRelations();
+      entityRelationService.persistEntityRelations(manifestation, entityRelations, true);
+      manifestation.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
@@ -82,30 +83,11 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   public void update(Manifestation manifestation) throws ServiceException, ValidationException {
     super.update(manifestation);
     try {
-      persistEntityRelations(manifestation, false);
+      List<EntityRelation> entityRelations = manifestation.getRelations();
+      entityRelationService.persistEntityRelations(manifestation, entityRelations, false);
+      manifestation.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }
-  }
-
-  protected void persistEntityRelations(Manifestation manifestation, boolean deleteExisting)
-      throws ServiceException {
-    if (deleteExisting) {
-      // Check, if there are already persisted EntityRelations for the manifestation
-      // If yes, delete them
-      entityRelationService.deleteByObject(manifestation);
-    }
-
-    // save all entity relations and set the UUID of the object
-    List<EntityRelation> relations =
-        manifestation.getRelations().stream()
-            .map(
-                r -> {
-                  r.setObject(Manifestation.builder().uuid(manifestation.getUuid()).build());
-                  return r;
-                })
-            .collect(Collectors.toList());
-    entityRelationService.save(relations);
-    manifestation.setRelations(relations);
   }
 }

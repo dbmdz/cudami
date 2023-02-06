@@ -45,7 +45,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
@@ -311,39 +310,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
     if (manifestation.getPublicationInfo() != null)
       fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
-  }
-
-  private BiFunction<String, Map<String, Object>, String> buildTitleSql(
-      final Manifestation manifestation) {
-    return (sql, bindings) -> {
-      if (manifestation.getTitles() == null || manifestation.getTitles().isEmpty()) {
-        return sql.replace("{{titles}}", "NULL");
-      }
-      List<String> titleConstructors = new ArrayList<>();
-      for (int i = 0; i < manifestation.getTitles().size(); i++) {
-        titleConstructors.add(
-            String.format(
-                "title_constructor(:titles_%1$d_mainType, :titles_%1$d_subType, "
-                    + ":titles_%1$d_text::jsonb, :titles_%1$d_textLocales::varchar[])",
-                i));
-        Title title = manifestation.getTitles().get(i);
-        bindings.put(
-            String.format("titles_%d_mainType", i),
-            title.getTitleType() != null ? title.getTitleType().getMainType() : null);
-        bindings.put(
-            String.format("titles_%d_subType", i),
-            title.getTitleType() != null ? title.getTitleType().getSubType() : null);
-        bindings.put(String.format("titles_%d_text", i), title.getText());
-        bindings.put(
-            String.format("titles_%d_textLocales", i),
-            title.getTextLocalesOfOriginalScripts() != null
-                ? title.getTextLocalesOfOriginalScripts().stream()
-                    .map(l -> l.toLanguageTag())
-                    .toArray(n -> new String[n])
-                : null);
-      }
-      return sql.replace("{{titles}}", "ARRAY[" + String.join(", ", titleConstructors) + "]");
-    };
   }
 
   @Override
@@ -612,7 +578,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     manifestation.setPublicationInfo(reducePublisher(publicationInfo));
 
     setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
-    super.save(manifestation, bindings, buildTitleSql(manifestation));
+    super.save(manifestation, bindings, TitleSqlHelper.buildTitleSql(manifestation.getTitles()));
     saveParents(manifestation);
 
     manifestation.setDistributionInfo(distributionInfo);
@@ -636,7 +602,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     manifestation.setPublicationInfo(reducePublisher(publicationInfo));
 
     setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
-    super.update(manifestation, bindings, buildTitleSql(manifestation));
+    super.update(manifestation, bindings, TitleSqlHelper.buildTitleSql(manifestation.getTitles()));
     saveParents(manifestation);
 
     manifestation.setDistributionInfo(distributionInfo);
