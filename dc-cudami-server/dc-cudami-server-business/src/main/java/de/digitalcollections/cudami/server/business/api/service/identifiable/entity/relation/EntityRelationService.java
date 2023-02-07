@@ -51,6 +51,10 @@ public interface EntityRelationService {
    */
   void save(List<EntityRelation> entityRelations) throws ServiceException;
 
-  void persistEntityRelations(Entity entity, List<EntityRelation> relations, boolean deleteExisting)
+  void persistEntityRelations(
+      Entity entity,
+      List<EntityRelation> relations,
+      boolean deleteExisting,
+      Entity entityWithUuidOnly)
       throws ServiceException;
 }
