@@ -63,7 +63,8 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.save(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, true);
+      Work workWithUuidOnly = Work.builder().uuid(work.getUuid()).build();
+      entityRelationService.persistEntityRelations(work, entityRelations, true, workWithUuidOnly);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Work=" + work + ": " + e, e);
@@ -75,7 +76,8 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.update(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, false);
+      Work workWithUuidOnly = Work.builder().uuid(work.getUuid()).build();
+      entityRelationService.persistEntityRelations(work, entityRelations, false, workWithUuidOnly);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Work=" + work + ": " + e, e);

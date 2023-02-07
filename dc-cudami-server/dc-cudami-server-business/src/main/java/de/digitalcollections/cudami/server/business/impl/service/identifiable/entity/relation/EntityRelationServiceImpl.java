@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -74,7 +73,10 @@ public class EntityRelationServiceImpl implements EntityRelationService {
 
   @Override
   public void persistEntityRelations(
-      Entity entity, List<EntityRelation> relations, boolean deleteExisting)
+      Entity entity,
+      List<EntityRelation> relations,
+      boolean deleteExisting,
+      Entity entityWithUuidOnly)
       throws ServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the entity
@@ -87,7 +89,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
         relations.stream()
             .map(
                 r -> {
-                  r.setObject(Manifestation.builder().uuid(entity.getUuid()).build());
+                  r.setObject(entityWithUuidOnly);
                   return r;
                 })
             .collect(Collectors.toList());
