@@ -39,6 +39,6 @@ public abstract class AbstractServiceImplTest {
     when(cudamiConfig.getUrlAlias()).thenReturn(urlAliasConfig);
 
     when(urlAliasConfig.getGenerationExcludes())
-        .thenReturn(List.of("DigitalObject", "Item", "Manifestation"));
+        .thenReturn(List.of("DIGITALOBJECT", "ITEM", "MANIFESTATION", "WORK"));
   }
 }

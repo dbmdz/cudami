@@ -121,6 +121,10 @@ public class CudamiConfig {
       return List.copyOf(generationExcludes);
     }
 
+    public void setGenerationExcludes(List<String> generationExcludes) {
+      this.generationExcludes = generationExcludes != null ? List.copyOf(generationExcludes) : null;
+    }
+
     public int getMaxLength() {
       return maxLength;
     }
