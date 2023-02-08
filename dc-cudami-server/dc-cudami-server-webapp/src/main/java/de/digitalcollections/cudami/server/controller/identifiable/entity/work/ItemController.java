@@ -257,13 +257,13 @@ public class ItemController extends AbstractIdentifiableController<Item> {
     return itemService;
   }
 
-  @Operation(summary = "Get works embodied in an item")
+  @Operation(summary = "Get the work embodied in an item")
   @GetMapping(
       value = {"/v6/items/{uuid}/works", "/v2/items/{uuid}/works", "/latest/items/{uuid}/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return workService.getForItem(uuid);
+    return Set.of(workService.getForItem(uuid));
   }
 
   @Operation(summary = "save a newly created item")

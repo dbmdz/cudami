@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
@@ -23,9 +24,11 @@ import de.digitalcollections.model.time.LocalDateRange;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import org.jdbi.v3.core.Jdbi;
@@ -50,6 +53,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   private HumanSettlementRepositoryImpl humanSettlementRepository;
   private ItemRepositoryImpl itemRepository;
   private ManifestationRepositoryImpl manifestationRepository;
+  private PersonRepositoryImpl personRepository;
+  private EntityRelationRepositoryImpl entityRelationRepository;
 
   @Override
   public String getSqlInsertFields() {
@@ -104,7 +109,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX,
                 tableAlias)
-        + entityRepository.getSqlSelectReducedFields();
+        + entityRepository.getSqlSelectReducedFields()
+        // subjects
+        + ", "
+        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
   }
 
   @Override
@@ -120,14 +128,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        // subjects
-        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
-  }
-
-  @Override
   protected String getSqlSelectReducedFieldsJoins() {
     return super.getSqlSelectReducedFieldsJoins()
         + """
@@ -138,24 +138,15 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       LEFT JOIN (
         %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
       ) ON %3$s.object_uuid = %1$s.uuid
+      LEFT JOIN %6$s %7$s ON %7$s.uuid = ANY (%1$s.subjects_uuids)
       """
             .formatted(
                 tableAlias,
                 /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
-                EntityRepositoryImpl.TABLE_ALIAS);
-  }
-
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + """
-        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
-        """
-            .formatted(
-                tableAlias,
-                /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
+                EntityRepositoryImpl.TABLE_ALIAS,
+                /*6-7*/ SubjectRepositoryImpl.TABLE_NAME,
                 SubjectRepositoryImpl.TABLE_ALIAS);
   }
 
@@ -168,14 +159,16 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       AgentRepositoryImpl<Agent> agentRepository,
       HumanSettlementRepositoryImpl humanSettlementRepository,
       ManifestationRepositoryImpl manifestationRepository,
-      ItemRepositoryImpl itemRepository) {
+      ItemRepositoryImpl itemRepository,
+      PersonRepositoryImpl personRepository,
+      EntityRelationRepositoryImpl entityRelationRepository) {
     super(
         jdbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Work.class,
-        WorkRepositoryImpl::additionalReduceRowsBiConsumer,
+        null,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
@@ -186,6 +179,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     this.humanSettlementRepository = humanSettlementRepository;
     this.manifestationRepository = manifestationRepository;
     this.itemRepository = itemRepository;
+    this.personRepository = personRepository;
+    this.entityRelationRepository = entityRelationRepository;
   }
 
   @Override
@@ -217,15 +212,48 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
             + getTableAlias()
             + ".uuid)";
 
-    /*
-            FROM works w, manifestations m, items i WHERE
-            i.uuid = :item_uuid
-            AND i.manifestation=m.uuid AND m.work=w.uuid
-    */
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("item_uuid", itemUuid);
 
     return retrieveOne(getSqlSelectAllFields(), null, null, argumentMappings, innerSelect);
+  }
+
+  @Override
+  public Set<Work> getByPersonUuid(UUID personUuid) {
+    StringBuilder innerSelect =
+        new StringBuilder(
+            " SELECT "
+                + getTableAlias()
+                + ".* FROM "
+                + getTableName()
+                + " "
+                + getTableAlias()
+                + ", "
+                + personRepository.getTableName()
+                + " "
+                + personRepository.getTableAlias()
+                + ", "
+                + entityRelationRepository.getTableName()
+                + " "
+                + entityRelationRepository.getTableAlias()
+                + " WHERE "
+                + personRepository.getTableAlias()
+                + ".uuid = :person_uuid"
+                + " AND "
+                + entityRelationRepository.getTableAlias()
+                + ".subject_uuid="
+                + personRepository.getTableAlias()
+                + ".uuid"
+                + " AND "
+                + entityRelationRepository.getTableAlias()
+                + ".object_uuid="
+                + getTableAlias()
+                + ".uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("person_uuid", personUuid);
+    return new HashSet<>(
+        retrieveList(getSqlSelectReducedFields(), innerSelect, argumentMappings, null));
   }
 
   @Override
@@ -280,22 +308,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
           }
           batch.execute();
         });
-  }
-
-  protected static void additionalReduceRowsBiConsumer(Map<UUID, Work> map, RowView rowView) {
-    Work work = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-    // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
-
-    // subjects
-    UUID subjectUuid =
-        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-    if (subjectUuid != null
-        && (work.getSubjects() == null
-            || !work.getSubjects().stream()
-                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
-      Subject subject = rowView.getRow(Subject.class);
-      work.addSubject(subject);
-    }
   }
 
   @Override
@@ -359,6 +371,17 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                             new GenericType<List<String>>() {}))
                     .build());
       }
+    }
+
+    // subjects
+    UUID subjectUuid =
+        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+    if (subjectUuid != null
+        && (work.getSubjects() == null
+            || !work.getSubjects().stream()
+                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+      Subject subject = rowView.getRow(Subject.class);
+      work.addSubject(subject);
     }
   }
 

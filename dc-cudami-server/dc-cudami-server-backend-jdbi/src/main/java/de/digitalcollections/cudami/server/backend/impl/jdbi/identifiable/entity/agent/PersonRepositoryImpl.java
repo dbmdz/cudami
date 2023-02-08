@@ -6,14 +6,12 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.FamilyNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent.GivenNameRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.work.WorkRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocationType;
-import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.HashMap;
 import java.util.List;
@@ -174,7 +172,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final FamilyNameRepositoryImpl familyNameRepositoryImpl;
   private final GivenNameRepositoryImpl givenNameRepositoryImpl;
-  private final WorkRepositoryImpl workRepositoryImpl;
 
   @Autowired
   public PersonRepositoryImpl(
@@ -182,7 +179,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
       DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
       FamilyNameRepositoryImpl familyNameRepositoryImpl,
       GivenNameRepositoryImpl givenNameRepositoryImpl,
-      WorkRepositoryImpl workRepositoryImpl,
       CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -195,7 +191,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.familyNameRepositoryImpl = familyNameRepositoryImpl;
     this.givenNameRepositoryImpl = givenNameRepositoryImpl;
-    this.workRepositoryImpl = workRepositoryImpl;
   }
 
   @Override
@@ -253,63 +248,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
             innerQuery,
             argumentMappings,
             null);
-
-    return list.stream().collect(Collectors.toSet());
-  }
-
-  // FIXME: Ins WorkRepository verschieben als getWorksForPerson
-  @Override
-  public Set<Work> getWorks(UUID uuidPerson) {
-    final String wTableAlias = workRepositoryImpl.getTableAlias();
-    final String wTableName = workRepositoryImpl.getTableName();
-
-    // Note: if getting list of all participating persons to work is wanted,
-    // this code fragment may help as entry point:
-    /*
-    " e.uuid e_uuid, e.label e_label, e.refid e_refId"
-    + LEFT JOIN work_creators as wc on w.uuid = wc.work_uuid
-    " LEFT JOIN entities as e on e.uuid = wc.agent_uuid"
-    .registerRowMapper(BeanMapper.factory(EntityImpl.class, "e"))
-    if (rowView.getColumn("e_uuid", UUID.class) != null) {
-      EntityImpl agent = rowView.getRow(EntityImpl.class);
-      UUID agentUuid = agent.getUuid();
-      List<Agent> creators = work.getCreators();
-      boolean contained = false;
-      for (Agent creator : creators) {
-        if (agentUuid.equals(creator.getUuid())) {
-          contained = true;
-        }
-      }
-      if (!contained) {
-        // FIXME: not only persons! use entityType to disambiguate!
-        Person person = new PersonImpl();
-        person.setLabel(agent.getLabel());
-        person.setRefId(agent.getRefId());
-        person.setUuid(agent.getUuid());
-        work.getCreators().add(person);
-      }
-    }
-     */
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT wc.sortindex AS idx, * FROM "
-                + wTableName
-                + " AS "
-                + wTableAlias
-                + " LEFT JOIN work_creators AS wc ON "
-                + wTableAlias
-                + ".uuid = wc.work_uuid"
-                + " WHERE wc.agent_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", uuidPerson);
-
-    List<Work> list =
-        workRepositoryImpl.retrieveList(
-            workRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            "ORDER BY idx ASC");
 
     return list.stream().collect(Collectors.toSet());
   }
