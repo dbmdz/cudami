@@ -15,6 +15,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
@@ -47,6 +49,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Autowired SubjectRepository subjectRepository;
   @Autowired PersonRepository personRepository;
   @Autowired EntityRelationRepository entityRelationRepository;
+  @Autowired ItemRepositoryImpl itemRepository;
+  @Autowired ManifestationRepositoryImpl manifestationRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -58,7 +62,9 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
             titleMapper,
             entityRepository,
             agentRepository,
-            humanSettlementRepository);
+            humanSettlementRepository,
+            manifestationRepository,
+            itemRepository);
   }
 
   @DisplayName("Returns null when retrieve by uuid finds no match")
@@ -185,5 +191,50 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     work.setParents(List.of(parentWork1, parentWork2));
 
     updateAndAssertUpdatedLastModifiedTimestamp(work);
+  }
+
+  @DisplayName(
+      "can return null for getByItemUuid, when no item is connected to a manifestation and a work")
+  @Test
+  public void getByItemUuidReturnsNull() throws RepositoryException {
+    // First test: Query for nonexisting item must return null
+    assertThat(repo.getByItemUuid(UUID.randomUUID())).isNull();
+
+    // Second test: Query for existing item with no connection to a
+    // manifestation must return null;
+    Item item = Item.builder().label(Locale.GERMAN, "Item").build();
+    itemRepository.save(item);
+    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+  }
+
+  @DisplayName("can return the work, connected to an item")
+  @Test
+  public void getByItemUuidReturnsWork() throws RepositoryException {
+    Work work = Work.builder().label(Locale.GERMAN, "Erstlingswerk").build();
+    repo.save(work);
+
+    Manifestation manifestation =
+        Manifestation.builder()
+            .work(work)
+            .label(Locale.GERMAN, "Erstausgabe")
+            .titles(
+                List.of(
+                    Title.builder()
+                        .titleType(new TitleType("MAIN", "MAIN"))
+                        .text(new LocalizedText(Locale.GERMAN, "Erstausgabe"))
+                        .build()))
+            .build();
+    manifestationRepository.save(manifestation);
+
+    // First test: Item with no manifestation must not return any work
+    Item item = Item.builder().label(Locale.GERMAN, "Erstexemplar").build();
+    itemRepository.save(item);
+    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+
+    // Second test: Item with existing manifestation->work chain must return the work
+    item.setManifestation(manifestation);
+    itemRepository.update(item);
+    Work actual = repo.getByItemUuid(item.getUuid());
+    assertThat(actual).isEqualTo(work);
   }
 }

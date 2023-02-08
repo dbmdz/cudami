@@ -81,10 +81,13 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Add work to an item")
+  @Operation(
+      summary =
+          "Add work to an item (deprecated, there's no more direct connection of an item with a work")
   @PostMapping(
       value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
+  @Deprecated
   public ResponseEntity addWork(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {

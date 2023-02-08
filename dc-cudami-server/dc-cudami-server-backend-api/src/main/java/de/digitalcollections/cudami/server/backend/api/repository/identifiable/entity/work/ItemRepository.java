@@ -12,8 +12,6 @@ import java.util.UUID;
 /** Repository for Item persistence handling. */
 public interface ItemRepository extends EntityRepository<Item> {
 
-  boolean addWork(UUID itemUuid, UUID workUuid);
-
   PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
 
   List<Locale> getLanguagesOfDigitalObjects(UUID uuid);

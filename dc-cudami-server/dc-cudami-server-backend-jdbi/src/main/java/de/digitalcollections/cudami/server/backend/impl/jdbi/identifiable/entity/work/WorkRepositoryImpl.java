@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
 import org.jdbi.v3.core.Jdbi;
@@ -49,6 +48,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   private EntityRepositoryImpl<Entity> entityRepository;
   private AgentRepositoryImpl<Agent> agentRepository;
   private HumanSettlementRepositoryImpl humanSettlementRepository;
+  private ItemRepositoryImpl itemRepository;
+  private ManifestationRepositoryImpl manifestationRepository;
 
   @Override
   public String getSqlInsertFields() {
@@ -165,7 +166,9 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       TitleMapper titleMapper,
       EntityRepositoryImpl<Entity> entityRepository,
       AgentRepositoryImpl<Agent> agentRepository,
-      HumanSettlementRepositoryImpl humanSettlementRepository) {
+      HumanSettlementRepositoryImpl humanSettlementRepository,
+      ManifestationRepositoryImpl manifestationRepository,
+      ItemRepositoryImpl itemRepository) {
     super(
         jdbi,
         TABLE_NAME,
@@ -181,12 +184,48 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     this.entityRepository = entityRepository;
     this.agentRepository = agentRepository;
     this.humanSettlementRepository = humanSettlementRepository;
+    this.manifestationRepository = manifestationRepository;
+    this.itemRepository = itemRepository;
   }
 
   @Override
-  public Set<Work> getWorksForItem(UUID itemUuid) {
-    // FIXME
-    return null;
+  public Work getByItemUuid(UUID itemUuid) {
+    String innerSelect =
+        " (SELECT w.* FROM "
+            + getTableName()
+            + " "
+            + getTableAlias()
+            + ", "
+            + manifestationRepository.getTableName()
+            + " "
+            + manifestationRepository.getTableAlias()
+            + ", "
+            + itemRepository.getTableName()
+            + " "
+            + itemRepository.getTableAlias()
+            + " WHERE "
+            + itemRepository.getTableAlias()
+            + ".uuid = :item_uuid"
+            + " AND "
+            + itemRepository.getTableAlias()
+            + ".manifestation="
+            + manifestationRepository.getTableAlias()
+            + ".uuid"
+            + " AND "
+            + manifestationRepository.getTableAlias()
+            + ".work="
+            + getTableAlias()
+            + ".uuid)";
+
+    /*
+            FROM works w, manifestations m, items i WHERE
+            i.uuid = :item_uuid
+            AND i.manifestation=m.uuid AND m.work=w.uuid
+    */
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("item_uuid", itemUuid);
+
+    return retrieveOne(getSqlSelectAllFields(), null, null, argumentMappings, innerSelect);
   }
 
   @Override
