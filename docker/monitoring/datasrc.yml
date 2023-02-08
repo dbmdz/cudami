@@ -1,0 +1,19 @@
+
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    url: http://localhost:8086
+    secureJsonData:
+      token: "b8cVNwJf16kmSR_gKR-og891kiZ1lvLIpmJCszJSh5G6mrSB7dQusSKSVTAikvn5tGl3IUhkgpAj3RdjmLqZDQ=="
+    jsonData:
+      version: Flux
+      organization: "MDZ"
+      defaultBucket: "cudami"
+  - name: prometheus
+    type: prometheus
+    orgId: 1
+    access: proxy
+    url: http://localhost:9090
+    isDefault: true
