@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface WorkService extends EntityService<Work> {
 
-  Set<Work> getForItem(UUID itemUuid);
+  Work getForItem(UUID itemUuid);
 
-  Set<Work> getForPersons(UUID uuid);
+  Set<Work> getForPerson(UUID personUuid);
 }

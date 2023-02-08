@@ -3,21 +3,25 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
@@ -29,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,10 +52,11 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Autowired EntityRepositoryImpl<Entity> entityRepository;
   @Autowired AgentRepositoryImpl<Agent> agentRepository;
   @Autowired SubjectRepository subjectRepository;
-  @Autowired PersonRepository personRepository;
-  @Autowired EntityRelationRepository entityRelationRepository;
+  @Autowired PersonRepositoryImpl personRepository;
+  @Autowired EntityRelationRepositoryImpl entityRelationRepository;
   @Autowired ItemRepositoryImpl itemRepository;
   @Autowired ManifestationRepositoryImpl manifestationRepository;
+  @Autowired PredicateRepository predicateRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -64,7 +70,9 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
             agentRepository,
             humanSettlementRepository,
             manifestationRepository,
-            itemRepository);
+            itemRepository,
+            personRepository,
+            entityRelationRepository);
   }
 
   @DisplayName("Returns null when retrieve by uuid finds no match")
@@ -236,5 +244,64 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     itemRepository.update(item);
     Work actual = repo.getByItemUuid(item.getUuid());
     assertThat(actual).isEqualTo(work);
+  }
+
+  @DisplayName(
+      "can return an empty set for getByPersonUuid, when no persons are connected with a work")
+  @Test
+  public void getByPersonUuidReturnsEmptySet() throws RepositoryException {
+    // First test: Query for nonexisting person must return null
+    assertThat(repo.getByPersonUuid(UUID.randomUUID())).isEmpty();
+
+    // Second test: Query for existing person with no connection to a
+    // work must return null;
+    Person person =
+        Person.builder()
+            .label(Locale.GERMAN, "Karl Ranseier")
+            .name(new LocalizedText(Locale.GERMAN, "Karl Ranseier"))
+            .build();
+    personRepository.save(person);
+
+    assertThat(repo.getByPersonUuid(person.getUuid())).isEmpty();
+  }
+
+  @DisplayName("can return the set of connected persons for a work")
+  @Test
+  public void getByPersonUuidReturnsSet() throws RepositoryException {
+    Person person =
+        Person.builder()
+            .label(Locale.GERMAN, "Karl Ranseier")
+            .name(new LocalizedText(Locale.GERMAN, "Karl Ranseier"))
+            .build();
+    personRepository.save(person);
+
+    Predicate predicate = Predicate.builder().value("is_creator_of").build();
+    predicateRepository.save(predicate);
+
+    Subject subject = Subject.builder().label(new LocalizedText(Locale.GERMAN, "Subject")).build();
+    subjectRepository.save(subject);
+
+    EntityRelation entityRelation =
+        EntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
+    Work work =
+        Work.builder()
+            .label(Locale.GERMAN, "Erstlingswerk")
+            .relations(List.of(entityRelation))
+            .subjects(Set.of(subject))
+            .build();
+    work.setRelations(List.of(entityRelation));
+    repo.save(work);
+
+    // Since we use the repository and not the service, we have to
+    // persist the relations manually
+    entityRelation.setObject(work);
+    entityRelationRepository.save(entityRelation);
+    entityRelation.setObject(null); // to avoid recursion
+    work.setRelations(List.of(entityRelation));
+
+    Set<Work> actual = repo.getByPersonUuid(person.getUuid());
+    // Since the repository
+
+    assertThat(actual).containsExactly(work);
   }
 }

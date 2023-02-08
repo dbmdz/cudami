@@ -47,14 +47,13 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   }
 
   @Override
-  public Set<Work> getForItem(UUID itemUuid) {
+  public Work getForItem(UUID itemUuid) {
     return ((WorkRepository) repository).getByItemUuid(itemUuid);
   }
 
   @Override
-  public Set<Work> getForPersons(UUID uuid) {
-    // FIXME
-    return null;
+  public Set<Work> getForPerson(UUID personUuid) {
+    return ((WorkRepository) repository).getByPersonUuid(personUuid);
   }
 
   @Override
