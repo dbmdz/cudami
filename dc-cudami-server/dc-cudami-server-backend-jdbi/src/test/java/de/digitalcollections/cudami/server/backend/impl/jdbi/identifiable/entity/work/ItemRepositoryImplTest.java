@@ -58,13 +58,10 @@ public class ItemRepositoryImplTest
   void setup(
       @Autowired Jdbi jdbi,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
-      @Autowired WorkRepositoryImpl workRepository,
       @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository,
       @Autowired CudamiConfig config) {
     this.digitalObjectRepository = digitalObjectRepository;
-    repo =
-        new ItemRepositoryImpl(
-            jdbi, digitalObjectRepository, workRepository, agentRepository, config);
+    repo = new ItemRepositoryImpl(jdbi, digitalObjectRepository, agentRepository, config);
   }
 
   @Test

@@ -104,14 +104,12 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
-  private final WorkRepositoryImpl workRepositoryImpl;
   private final AgentRepositoryImpl agentRepository;
 
   @Autowired
   public ItemRepositoryImpl(
       Jdbi dbi,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
-      @Lazy WorkRepositoryImpl workRepositoryImpl,
       @Lazy AgentRepositoryImpl agentRepository,
       CudamiConfig cudamiConfig) {
     super(
@@ -123,7 +121,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         ItemRepositoryImpl::additionalReduceRows,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
-    this.workRepositoryImpl = workRepositoryImpl;
     this.agentRepository = agentRepository;
   }
 
@@ -137,28 +134,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
       item.getPartOfItem().setLabel(partOfItemLabel);
     }
-  }
-
-  @Override
-  public boolean addWork(UUID itemUuid, UUID workUuid) {
-    Integer nextSortIndex =
-        retrieveNextSortIndexForParentChildren(dbi, "item_works", "item_uuid", itemUuid);
-
-    String query =
-        "INSERT INTO item_works ("
-            + "item_uuid, work_uuid, sortindex"
-            + ") VALUES ("
-            + ":itemUuid, :workUuid, :nextSortIndex"
-            + ")";
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate(query)
-                .bind("itemUuid", itemUuid)
-                .bind("workUuid", workUuid)
-                .bind("nextSortIndex", nextSortIndex)
-                .execute());
-    return true;
   }
 
   @Override
@@ -284,21 +259,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
 
   @Override
   public List<Item> getItemsForWork(UUID workUuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT iw.sortindex AS idx, * FROM "
-                + getTableName()
-                + " AS "
-                + getTableAlias()
-                + " LEFT JOIN item_works AS iw ON "
-                + getTableAlias()
-                + ".uuid = iw.item_uuid"
-                + " WHERE iw.work_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", workUuid);
-    List<Item> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, "ORDER BY idx ASC");
-    return result;
+    // TODO
+    return null;
   }
 }
