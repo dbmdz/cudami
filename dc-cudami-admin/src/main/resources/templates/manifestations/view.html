@@ -103,39 +103,9 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.subjects}">Subjects</label></div>
-            <div class="align-items-center col-md-9 d-flex">
-              <th:block th:each="subject, iterStat: ${manifestation.subjects}">
-                <a th:href="@{/subjects/{uuid}(uuid=${subject.uuid})}" th:text="${(subject.label?.getText(dataLanguage) ?: subject.uuid)}">subject label</a>
-                <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
-              </th:block>
-            </div>
-          </div>
+          <th:block th:insert="~{fragments/subjects::renderSubjects(${manifestation.subjects}, ${dataLanguage})}"></th:block>
 
-          <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.relations}">Relations</label></div>
-            <div class="align-items-center col-md-9">
-              <th:block th:each="relation, iterStat: ${manifestation.relations}">
-                <div>
-                  <span th:with="subject=${relation.subject}" th:switch="${subject.identifiableObjectType.name.toUpperCase()}">
-                    <th:block th:case="'AGENT'" th:insert="~{fragments/entity::renderAgent(${subject})}"></th:block>
-                    <th:block th:case="'PERSON'" th:insert="~{fragments/entity::renderAgent(${subject})}"></th:block>
-                    <th:block th:case="'CORPORATE_BODY'" th:insert="~{fragments/entity::renderAgent(${subject})}"></th:block>
-                    <th:block th:case="'HUMAN_SETTLEMENT'" th:insert="~{fragments/entity::renderGeolocation(${subject})}"></th:block>
-                    <th:block th:case="'GEOLOCATION'" th:insert="~{fragments/entity::renderGeolocation(${subject})}"></th:block>
-                  </span>
-                  &nbsp;
-                  <span class="border border-dark p-2 badge badge-light mr-2">
-                    <a th:href="@{/predicates/{predicate}(predicate=${relation.predicate})}" th:text="${relation.predicate}">predicate</a>
-                  </span>
-                  <th:block th:each="additionalPredicate: ${relation.additionalPredicates}">
-                    <span class="border border-dark p-2 badge badge-light mr-2" th:text="${additionalPredicate}"></span>
-                  </th:block>
-                </div>
-              </th:block>
-            </div>
-          </div>
+          <th:block th:insert="~{fragments/entity::renderRelations(${manifestation.relations})}"></th:block>
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.language}">Language</label></div>
@@ -147,15 +117,12 @@
             <div class="align-items-center col-md-9 d-flex" th:text="${T(de.digitalcollections.cudami.admin.controller.fragments.FragmentsController).getDisplayLanguages(#locale, manifestation.otherLanguages)}" >...</div>
           </div>
 
-          <th:block th:each="title: ${#lists.sort(manifestation.titles)}">
-            <div class="row">
-              <div class="col-md-3" th:with="labelkey=${#strings.toLowerCase(title.titleType.getMainType()) + '.' + #strings.toLowerCase(title.titleType.getSubType())}">
-                <label th:with="label=${#messages.msgOrNull('lbl.title.' + labelkey)}" th:text="${label != null ? label : labelkey}">title label</label></div>
-              <div class="align-items-center col-md-9 d-flex">
-                <div th:text="${title.text?.getText(dataLanguage)} ?: ${title.text}">...</div>
-              </div>
-            </div>
-          </th:block>
+          <th:block th:insert="~{fragments/titles::renderTitles(${manifestation.titles}, ${dataLanguage})}"></th:block>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.work}">Work</label></div>
+            <div class="align-items-center col-md-9 d-flex" th:text="${manifestation.work}" >...</div>
+          </div>
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>

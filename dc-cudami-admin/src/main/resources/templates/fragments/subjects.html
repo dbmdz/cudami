@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+    <th:block th:fragment="renderSubjects(subjects, dataLanguage)">
+      <div class="row">
+        <div class="col-md-3"><label th:text="#{lbl.subjects}">Subjects</label></div>
+        <div class="align-items-center col-md-9 d-flex">
+          <th:block th:each="subject, iterStat: ${subjects}">
+            <a th:href="@{/subjects/{uuid}(uuid=${subject.uuid})}" th:text="${(subject.label?.getText(dataLanguage) ?: subject.uuid)}">subject label</a>
+            <span th:text="${!iterStat.last ? ',&nbsp;' : ''}">,</span>
+          </th:block>
+        </div>
+      </div>
+    </th:block>
+
+  </body>
+</html>
