@@ -10,9 +10,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 public interface ItemService extends EntityService<Item> {
-
-  boolean addWork(UUID uuid, UUID workUuid);
-
   PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
 
   List<Locale> getLanguagesOfDigitalObjects(UUID uuid);

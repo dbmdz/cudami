@@ -81,22 +81,6 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(
-      summary =
-          "Add work to an item (deprecated, there's no more direct connection of an item with a work")
-  @PostMapping(
-      value = {"/latest/items/{uuid}/works/{workUuid}", "/v2/items/{uuid}/works/{workUuid}"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @Deprecated
-  public ResponseEntity addWork(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
-      @Parameter(name = "workUuid", description = "UUID of the work") @PathVariable UUID workUuid) {
-    boolean successful = itemService.addWork(uuid, workUuid);
-    return successful
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-  }
-
   @Operation(summary = "count all items")
   @GetMapping(
       value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
