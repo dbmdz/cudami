@@ -40,7 +40,48 @@
 
           <hr/>
 
-          <!-- TODO: work fields -->
+          <th:block th:insert="~{fragments/titles::renderTitles(${work.titles}, ${dataLanguage})}"></th:block>
+
+          <th:block th:insert="~{fragments/subjects::renderSubjects(${work.subjects}, ${dataLanguage})}"></th:block>
+
+          <th:block th:insert="~{fragments/entity::renderRelations(${work.relations})}"></th:block>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.created}">Created</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:if="${work.creationDateRange}" th:with="creationDateRange=${work.creationDateRange}">
+                <span th:with="df=#{date.format},date=${creationDateRange.start}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+                -
+                <span th:with="df=#{date.format},date=${creationDateRange.end}" th:text="${#temporals.format(date,df)}">01.01.2000</span>
+              </span>
+              <span th:if="${work.creationTimeValue}">
+                ( <span th:insert="~{fragments/uniqueobject :: renderTimeValue(${work.creationtimeValue})}">...</span> )
+              </span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.first_appearance}">First appearamce</label></div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:text="${work.firstAppearedDatePresentation}">...</span>
+              <span th:if="${work.firstAppearedDate}">
+                ( <span th:with="df=#{date.format},date=${work.firstAppearedDate}" th:text="${#temporals.format(date,df)}">01.01.2000</span> )
+              </span>
+              <span th:if="${work.firstAppearedTimeValue}">
+                ( <span th:insert="~{fragments/uniqueobject :: renderTimeValue(${work.firstAppearedTimeValue})}">...</span> )
+              </span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.parent_work_s}">Parents</label></div>
+            <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${work.parents}">
+              <span th:text="${parent.title}"></span> &nbsp;
+              &nbsp;<span th:text="#{in_work}"></span>&nbsp;
+              <a th:href="@{/works/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp;
+              <br th:if="${!iterStat.last}"/>
+            </div>
+          </div>
 
         </div>
       </div>

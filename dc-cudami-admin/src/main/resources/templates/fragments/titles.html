@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <body>
+
+    <th:block th:fragment="renderTitles(titles, dataLanguage)">
+      <div class="row" th:each="title: ${#lists.sort(titles)}" >
+        <div class="col-md-3" th:with="labelkey=${#strings.toLowerCase(title.titleType.getMainType()) + '.' + #strings.toLowerCase(title.titleType.getSubType())}">
+          <label th:with="label=${#messages.msgOrNull('lbl.title.' + labelkey)}" th:text="${label != null ? label : labelkey}">title label</label></div>
+        <div class="align-items-center col-md-9 d-flex">
+          <div th:text="${title.text?.getText(dataLanguage)} ?: ${title.text}">...</div>
+        </div>
+      </div>
+    </th:block>
+
+  </body>
+</html>

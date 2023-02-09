@@ -97,5 +97,32 @@
     </th:block>
   </th:block>
 
+
+  <th:block th:fragment="renderRelations(relations)">
+    <div class="row">
+      <div class="col-md-3"><label th:text="#{lbl.relations}">Relations</label></div>
+      <div class="align-items-center col-md-9">
+        <th:block th:each="relation, iterStat: ${relations}">
+          <div>
+                    <span th:with="subject=${relation.subject}" th:switch="${subject.identifiableObjectType.name.toUpperCase()}">
+                      <th:block th:case="'AGENT'" th:insert="~{::renderAgent(${subject})}"></th:block>
+                      <th:block th:case="'PERSON'" th:insert="~{::renderAgent(${subject})}"></th:block>
+                      <th:block th:case="'CORPORATE_BODY'" th:insert="~{::renderAgent(${subject})}"></th:block>
+                      <th:block th:case="'HUMAN_SETTLEMENT'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+                      <th:block th:case="'GEOLOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+                    </span>
+            &nbsp;
+            <span class="border border-dark p-2 badge badge-light mr-2">
+                      <a th:href="@{/predicates/{predicate}(predicate=${relation.predicate})}" th:text="${relation.predicate}">predicate</a>
+                    </span>
+            <th:block th:each="additionalPredicate: ${relation.additionalPredicates}">
+              <span class="border border-dark p-2 badge badge-light mr-2" th:text="${additionalPredicate}"></span>
+            </th:block>
+          </div>
+        </th:block>
+      </div>
+    </div>
+  </th:block>
+
 </body>
 </html>
