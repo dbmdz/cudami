@@ -44,11 +44,6 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   }
 
   @Override
-  public boolean addWork(UUID itemUuid, UUID workUuid) {
-    return ((ItemRepository) repository).addWork(itemUuid, workUuid);
-  }
-
-  @Override
   public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
     return ((ItemRepository) repository).findDigitalObjects(itemUuid, pageRequest);
   }
