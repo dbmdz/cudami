@@ -13,6 +13,8 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +46,11 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
         localeService,
         cudamiConfig);
     this.entityRelationService = entityRelationService;
+  }
+
+  @Override
+  public PageResponse<Work> findEmbedded(UUID uuid, PageRequest pageRequest) {
+    return ((WorkRepository) repository).findEmbeddedWorks(uuid, pageRequest);
   }
 
   @Override

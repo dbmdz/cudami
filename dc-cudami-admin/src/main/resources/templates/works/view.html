@@ -76,10 +76,45 @@
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.parent_work_s}">Parents</label></div>
             <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${work.parents}">
-              <span th:text="${parent.title}"></span> &nbsp;
-              &nbsp;<span th:text="#{in_work}"></span>&nbsp;
-              <a th:href="@{/works/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp;
+              <a th:href="@{/works/{uuid}(uuid=${parent.uuid})}" th:text="${parent.label?.getText(dataLanguage)} ?: ${parent.uuid}">parent label</a>&nbsp;
               <br th:if="${!iterStat.last}"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.child_works}">Child works</label></div>
+            <div class="col-md-9">
+              <table id="table-childworks"
+                     data-toggle="table"
+                     th:data-url="@{/api/works/__${work.uuid}__/children}"
+                     th:data-locale="${#locale}"
+
+                     data-cookie="true"
+                     data-cookie-id-table="table-childworks"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsChildWorks"
+                     data-search="false"
+                     data-search-highlight="false"
+                     data-search-on-enter-key="false"
+                     data-server-sort="true"
+                     data-show-search-button="false"
+                     data-show-search-clear-button="false"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-childworks"
+                     data-unique-id="uuid">
+                <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberChildWorks" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="label" data-formatter="formatLabelChildWorks" th:text="#{lbl.title}">Title</th>
+                  <th data-field="actions" data-formatter="formatActionsChildWorks" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+                </thead>
+              </table>
+
             </div>
           </div>
 
@@ -91,7 +126,36 @@
   <section layout:fragment="beforeBodyEnds">
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
+
+      function formatRowNumberChildWorks(value, row, index) {
+        return renderRowNumber($('#table-childworks'), index);
+      }
     </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+
+      function formatLabelChildWorks(value, row) {
+        /*[+
+         const baseUrl = [[@{'/works'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#data-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
+      /*]]>*/
+
+      function formatActionsChildWorks(value, row) {
+        /*[+
+         const baseUrl = [[@{'/works'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+      /*]]>*/
+    </script>
+
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
   </section>
 </body>
 </html>

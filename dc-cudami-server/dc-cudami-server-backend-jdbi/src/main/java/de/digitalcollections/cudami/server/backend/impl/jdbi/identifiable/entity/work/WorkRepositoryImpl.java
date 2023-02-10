@@ -16,6 +16,8 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -181,6 +183,51 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     this.itemRepository = itemRepository;
     this.personRepository = personRepository;
     this.entityRelationRepository = entityRelationRepository;
+  }
+
+  @Override
+  public PageResponse<Work> findEmbeddedWorks(UUID uuid, PageRequest pageRequest) {
+    final String workWorksTableName = "work_works";
+    final String workWorksTableAlias = "wws";
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + workWorksTableName
+                + " AS "
+                + workWorksTableAlias
+                + " INNER JOIN "
+                + tableName
+                + " "
+                + tableAlias
+                + " ON "
+                + workWorksTableAlias
+                + ".object_uuid = "
+                + tableAlias
+                + ".uuid"
+                + " WHERE "
+                + workWorksTableAlias
+                + ".subject_uuid = :subject_uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("subject_uuid", uuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Work> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   @Override

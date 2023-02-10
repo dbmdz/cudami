@@ -11,8 +11,10 @@ import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdent
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -78,6 +80,23 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "label", required = false) String labelTerm,
       @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
     return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+  }
+
+  @Operation(summary = "Find all children of a work")
+  @GetMapping(
+      value = {"/v6/works/{uuid}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Work> findChildren(
+      @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return workService.findEmbedded(uuid, pageRequest);
   }
 
   @Override
