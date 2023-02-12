@@ -52,6 +52,11 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         + ".uuid = he.headword";
   }
 
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return getSqlSelectAllFieldsJoins();
+  }
+
   private static BiConsumer<Map<UUID, HeadwordEntry>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
       (map, rowView) -> {
         // entity should be already in map, as we here just add additional data
