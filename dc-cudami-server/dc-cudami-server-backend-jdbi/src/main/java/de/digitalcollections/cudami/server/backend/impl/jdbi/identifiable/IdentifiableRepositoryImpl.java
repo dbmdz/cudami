@@ -83,7 +83,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   protected String getSqlSelectAllFieldsJoins() {
-    return getSqlSelectReducedFields();
+    return "";
   }
 
   public String getSqlSelectReducedFields() {
@@ -755,6 +755,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                     : "")
                 + (StringUtils.hasText(getSqlSelectAllFieldsJoins())
                     ? " %s".formatted(getSqlSelectAllFieldsJoins())
+                    : "")
+                + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
+                    ? " %s".formatted(getSqlSelectReducedFieldsJoins())
                     : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME
