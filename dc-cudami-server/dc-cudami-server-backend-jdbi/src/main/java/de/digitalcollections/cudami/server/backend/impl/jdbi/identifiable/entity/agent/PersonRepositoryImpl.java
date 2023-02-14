@@ -221,7 +221,6 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
     }
   }
 
-  // FIXME: work_creators entfernen
   @Override
   public Set<DigitalObject> getDigitalObjects(UUID uuidPerson) {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
