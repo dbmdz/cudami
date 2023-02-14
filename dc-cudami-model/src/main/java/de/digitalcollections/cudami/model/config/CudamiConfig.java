@@ -60,7 +60,7 @@ public class CudamiConfig {
   }
 
   public UrlAlias getUrlAlias() {
-    return urlAlias;
+    return new UrlAlias(urlAlias);
   }
 
   public static class Defaults {
@@ -99,6 +99,9 @@ public class CudamiConfig {
     private List<String> generationExcludes;
     private int maxLength = -1;
 
+    public UrlAlias() {}
+    ;
+
     @SuppressFBWarnings(
         value = "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION",
         justification = "Application must not start with an invalid configuration")
@@ -117,6 +120,11 @@ public class CudamiConfig {
       this.maxLength = maxLength;
     }
 
+    public UrlAlias(UrlAlias other) {
+      this.generationExcludes = other.generationExcludes;
+      this.maxLength = other.maxLength;
+    }
+
     public List<String> getGenerationExcludes() {
       return List.copyOf(generationExcludes);
     }
@@ -127,6 +135,10 @@ public class CudamiConfig {
 
     public int getMaxLength() {
       return maxLength;
+    }
+
+    public void setMaxLength(int maxLength) {
+      this.maxLength = maxLength;
     }
   }
 }

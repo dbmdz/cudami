@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 class PersonControllerTest extends BaseControllerTest {
 
   @MockBean private PersonService personService;
+  @MockBean private WorkService workService;
 
   @DisplayName("can retrieve by identifier with plaintext id")
   @ParameterizedTest
