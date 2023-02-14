@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -34,6 +35,7 @@ class ItemControllerTest extends BaseControllerTest {
 
   @MockBean private DigitalObjectService digitalObjectService;
   @MockBean private ItemService itemService;
+  @MockBean private WorkService workService;
 
   @DisplayName("can retrieve an item by identifier without any special characters")
   @ParameterizedTest
