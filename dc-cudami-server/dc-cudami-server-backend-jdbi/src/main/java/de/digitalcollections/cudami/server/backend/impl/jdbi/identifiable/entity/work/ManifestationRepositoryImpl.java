@@ -27,6 +27,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publication
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
@@ -161,8 +162,13 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
             %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
             %1$s.titles %2$s_titles,
+            %3$s.uuid %4$s_uuid, %3$s.label %4$s_label,
             """
-            .formatted(tableAlias, mappingPrefix)
+            .formatted(
+                tableAlias,
+                mappingPrefix,
+                WorkRepositoryImpl.TABLE_ALIAS,
+                WorkRepositoryImpl.MAPPING_PREFIX)
         // parents
         + """
             mms.title parent_title, mms.sortKey parent_sortKey,
@@ -193,13 +199,16 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       LEFT JOIN (
         %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
       ) ON %3$s.object_uuid = %1$s.uuid
+      LEFT JOIN %6$s %7$s ON %7$s.uuid = %1$s.work
       """
             .formatted(
                 tableAlias,
                 /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
-                EntityRepositoryImpl.TABLE_ALIAS);
+                EntityRepositoryImpl.TABLE_ALIAS,
+                /*6-7*/ WorkRepositoryImpl.TABLE_NAME,
+                WorkRepositoryImpl.TABLE_ALIAS);
   }
 
   public ManifestationRepositoryImpl(
@@ -386,6 +395,12 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                             new GenericType<List<String>>() {}))
                     .build());
       }
+    }
+
+    // work
+    if (manifestation.getWork() == null) {
+      Work work = rowView.getRow(Work.class);
+      if (work != null && work.getUuid() != null) manifestation.setWork(work);
     }
   }
 

@@ -28,6 +28,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.ProductionI
 import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.relation.Predicate;
@@ -70,6 +71,7 @@ class ManifestationRepositoryImplTest
   @Autowired EntityRepositoryImpl<Entity> entityRepository;
   @Autowired PersonRepositoryImpl personRepository;
   @Autowired AgentRepositoryImpl<Agent> agentRepository;
+  @Autowired WorkRepositoryImpl workRepository;
 
   @BeforeEach
   void beforeEach() {
@@ -109,6 +111,14 @@ class ManifestationRepositoryImplTest
 
     List<Title> titles = prepareTitles();
 
+    Work work =
+        Work.builder()
+            .label(new LocalizedText(Locale.forLanguageTag("en-Latn"), "A referenced work"))
+            .label(new LocalizedText(Locale.forLanguageTag("de-Latn"), "Ein Werk"))
+            .description(Locale.forLanguageTag("en-Latn"), "something...")
+            .build();
+    workRepository.save(work);
+
     Manifestation manifestation = prepareManifestation(subject, parent, titles);
     manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
@@ -118,6 +128,7 @@ class ManifestationRepositoryImplTest
             .object(manifestation)
             .additionalPredicate("additional predicate")
             .build());
+    manifestation.setWork(work);
     repo.save(manifestation);
 
     // we add the relations manually, actually done by the service
@@ -155,6 +166,14 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getProductionInfo().getPublishers()).size().isEqualTo(1);
     assertThat(actual.getProductionInfo().getPublishers().get(0).getAgent())
         .isExactlyInstanceOf(Person.class);
+    // received work only contains uuid and label so we create a new work here prior to comparison
+    Work containedWork =
+        Work.builder()
+            .label(new LocalizedText(Locale.forLanguageTag("en-Latn"), "A referenced work"))
+            .label(new LocalizedText(Locale.forLanguageTag("de-Latn"), "Ein Werk"))
+            .uuid(work.getUuid())
+            .build();
+    assertThat(actual.getWork()).isEqualTo(containedWork);
   }
 
   @Test
