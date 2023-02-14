@@ -117,13 +117,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             if (numberOfBinaryResources != null) {
               digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
             }
-
-            // set item UUID and label only
-            UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
-            LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
-            if (itemUuid != null) {
-              digitalObject.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
-            }
           };
 
   @Override
@@ -269,6 +262,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
     if (parentUuid != null) {
       identifiable.setParent(DigitalObject.builder().uuid(parentUuid).build());
+    }
+
+    // set item UUID and label only
+    UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
+    LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
+    if (itemUuid != null) {
+      identifiable.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
     }
   }
 

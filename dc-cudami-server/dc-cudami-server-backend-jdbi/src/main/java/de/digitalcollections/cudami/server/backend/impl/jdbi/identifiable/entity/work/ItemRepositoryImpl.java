@@ -58,9 +58,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
           , %1$s.exemplifies_manifestation %2$s_exemplifies_manifestation,
-          poi.label poi_label
+          poi.label poi_label,
+          %3$s.label %2$s_manifestation_label
           """
-            .formatted(tableAlias, mappingPrefix);
+            .formatted(tableAlias, mappingPrefix, ManifestationRepositoryImpl.TABLE_ALIAS);
   }
 
   @Override
@@ -68,8 +69,13 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     return super.getSqlSelectAllFieldsJoins()
         + """
         LEFT JOIN %1$s poi ON %2$s.part_of_item = poi.uuid
+        LEFT JOIN %3$s %4$s ON %4$s.uuid = %2$s.manifestation
         """
-            .formatted(tableName, tableAlias);
+            .formatted(
+                tableName,
+                tableAlias,
+                ManifestationRepositoryImpl.TABLE_NAME,
+                ManifestationRepositoryImpl.TABLE_ALIAS);
   }
 
   @Override
@@ -92,9 +98,9 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   protected String getSqlSelectReducedFieldsJoins() {
     return super.getSqlSelectReducedFieldsJoins()
         + """
-        LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.holder_uuids)
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY(%1$s.holder_uuids)
         """
-            .formatted(AgentRepositoryImpl.TABLE_NAME, "holdertable", tableAlias);
+            .formatted(tableAlias, AgentRepositoryImpl.TABLE_NAME, "holdertable");
   }
 
   @Override
@@ -133,6 +139,14 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       if (item.getPartOfItem().getLabel() != null) return;
       LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
       item.getPartOfItem().setLabel(partOfItemLabel);
+    }
+
+    // same for manifestation
+    if (item.getManifestation() != null) {
+      if (item.getManifestation().getLabel() != null) return;
+      LocalizedText manifestationLabel =
+          rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
+      item.getManifestation().setLabel(manifestationLabel);
     }
   }
 
