@@ -120,11 +120,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
     workService.save(workToSave);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(
-            eq(savedWork),
-            eq(workToSave.getRelations()),
-            eq(true),
-            eq(Work.builder().uuid(savedWork.getUuid()).build()));
+        .persistEntityRelations(eq(savedWork), eq(workToSave.getRelations()), eq(true));
   }
 
   @DisplayName("can update a work without relations")
@@ -147,8 +143,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
     assertThat(workToUpdate).isEqualTo(workToUpdate);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(
-            eq(workToUpdate), eq(List.of()), eq(false), eq(Work.builder().uuid(uuid).build()));
+        .persistEntityRelations(eq(workToUpdate), eq(List.of()), eq(false));
   }
 
   @DisplayName("can update a work with relations")
@@ -184,10 +179,6 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
     assertThat(workToUpdate).isEqualTo(workToUpdate);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(
-            eq(workToUpdate),
-            eq(workToUpdate.getRelations()),
-            eq(false),
-            eq(Work.builder().uuid(uuid).build()));
+        .persistEntityRelations(eq(workToUpdate), eq(workToUpdate.getRelations()), eq(false));
   }
 }

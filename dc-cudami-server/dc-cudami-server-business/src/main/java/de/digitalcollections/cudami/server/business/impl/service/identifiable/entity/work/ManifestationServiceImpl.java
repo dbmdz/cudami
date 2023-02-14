@@ -72,11 +72,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.save(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      Manifestation manifestationWithUuidOnly =
-          Manifestation.builder().uuid(manifestation.getUuid()).build();
-      entityRelationService.persistEntityRelations(
-          manifestation, entityRelations, true, manifestationWithUuidOnly);
-      manifestation.setRelations(entityRelations);
+      entityRelationService.persistEntityRelations(manifestation, entityRelations, true);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
@@ -87,11 +83,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.update(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      Manifestation manifestationWithUuidOnly =
-          Manifestation.builder().uuid(manifestation.getUuid()).build();
-      entityRelationService.persistEntityRelations(
-          manifestation, entityRelations, false, manifestationWithUuidOnly);
-      manifestation.setRelations(entityRelations);
+      entityRelationService.persistEntityRelations(manifestation, entityRelations, false);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }

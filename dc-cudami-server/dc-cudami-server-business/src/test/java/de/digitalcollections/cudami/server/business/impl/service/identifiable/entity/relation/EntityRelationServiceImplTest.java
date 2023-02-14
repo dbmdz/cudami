@@ -44,8 +44,7 @@ class EntityRelationServiceImplTest extends AbstractServiceImplTest {
     manifestation.setRelations(List.of(relation));
 
     List<EntityRelation> relations = manifestation.getRelations();
-    entityRelationService.persistEntityRelations(
-        manifestation, relations, true, Manifestation.builder().uuid(uuid).build());
+    entityRelationService.persistEntityRelations(manifestation, relations, true);
     manifestation.setRelations(relations);
 
     Manifestation manifestionWithUUIDOnly = Manifestation.builder().uuid(uuid).build();

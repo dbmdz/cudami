@@ -8,6 +8,7 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,10 +74,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
 
   @Override
   public void persistEntityRelations(
-      Entity entity,
-      List<EntityRelation> relations,
-      boolean deleteExisting,
-      Entity entityWithUuidOnly)
+      Entity entity, List<EntityRelation> relations, boolean deleteExisting)
       throws ServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the entity
@@ -89,10 +87,29 @@ public class EntityRelationServiceImpl implements EntityRelationService {
         relations.stream()
             .map(
                 r -> {
-                  r.setObject(entityWithUuidOnly);
+                  r.setObject(extractEntityWithUuidOnly(entity));
                   return r;
                 })
             .collect(Collectors.toList());
     save(relationsToSave);
+  }
+
+  private Entity extractEntityWithUuidOnly(Entity entity) {
+    Entity entityWithUuidOnly;
+
+    try {
+      entityWithUuidOnly = entity.getClass().getConstructor().newInstance();
+      entityWithUuidOnly.setUuid(entity.getUuid());
+    } catch (NoSuchMethodException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException e) {
+      // For whatever reason, we cannot construct the entity, so
+      // as a fallback, we construct an Entity object manually
+      // and set the UUID
+      entityWithUuidOnly = Entity.builder().uuid(entity.getUuid()).build();
+    }
+
+    return entityWithUuidOnly;
   }
 }
