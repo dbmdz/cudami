@@ -100,7 +100,6 @@ public class CudamiConfig {
     private int maxLength = -1;
 
     public UrlAlias() {}
-    ;
 
     @SuppressFBWarnings(
         value = "THROWS_METHOD_THROWS_RUNTIMEEXCEPTION",
