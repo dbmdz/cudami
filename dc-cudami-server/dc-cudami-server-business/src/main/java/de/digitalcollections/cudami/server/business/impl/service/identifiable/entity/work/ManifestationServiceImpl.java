@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -12,6 +13,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -47,6 +49,16 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   @Override
   public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
     return ((ManifestationRepository) repository).findChildren(uuid, pageRequest);
+  }
+
+  @Override
+  public PageResponse<Item> findItems(UUID uuid, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository).findItems(uuid, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException(
+          "Cannot retrieve items for manifestation with uuid=" + uuid + ": " + e, e);
+    }
   }
 
   @Override

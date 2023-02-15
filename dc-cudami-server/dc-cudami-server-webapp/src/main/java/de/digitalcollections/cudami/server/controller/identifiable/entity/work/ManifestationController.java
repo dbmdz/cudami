@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -114,6 +115,25 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       pageRequest.setSorting(sorting);
     }
     return service.findChildren(uuid, pageRequest);
+  }
+
+  @Operation(summary = "Find all items of a manifestation")
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid}/items"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Item> findItems(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.findItems(uuid, pageRequest);
   }
 
   @Operation(

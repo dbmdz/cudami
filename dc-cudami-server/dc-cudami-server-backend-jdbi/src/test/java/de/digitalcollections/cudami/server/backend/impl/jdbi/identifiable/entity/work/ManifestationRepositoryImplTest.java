@@ -22,6 +22,7 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -69,6 +71,7 @@ class ManifestationRepositoryImplTest
   @Autowired LocalDateRangeMapper localDateRangeMapper;
   @Autowired TitleMapper titleMapper;
   @Autowired EntityRepositoryImpl<Entity> entityRepository;
+  @Autowired ItemRepositoryImpl itemRepository;
   @Autowired PersonRepositoryImpl personRepository;
   @Autowired AgentRepositoryImpl<Agent> agentRepository;
   @Autowired WorkRepositoryImpl workRepository;
@@ -84,7 +87,8 @@ class ManifestationRepositoryImplTest
             titleMapper,
             entityRepository,
             agentRepository,
-            humanSettlementRepository);
+            humanSettlementRepository,
+            itemRepository);
   }
 
   @Test
@@ -275,6 +279,31 @@ class ManifestationRepositoryImplTest
     PageResponse<Manifestation> actual =
         repo.findChildren(parent.getUuid(), new PageRequest(0, 10));
     assertThat(actual.getContent()).containsExactlyInAnyOrder(child1, child2);
+  }
+
+  @DisplayName("can retrieve items for a manifestation")
+  @Test
+  public void retrieveItems() throws RepositoryException {
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test-Manifestation")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test-Manifestation"))
+                    .build())
+            .build();
+    repo.save(manifestation);
+
+    Item item =
+        Item.builder().label(Locale.GERMAN, "Test-Item").manifestation(manifestation).build();
+    itemRepository.save(item);
+
+    PageResponse<Item> actual = repo.findItems(manifestation.getUuid(), new PageRequest(0, 10));
+    // For the test, we just have to verify, if the uuid of the found items are the expected ones
+    List<UUID> actualItemsUuids = actual.getContent().stream().map(Item::getUuid).toList();
+
+    assertThat(actualItemsUuids).containsExactly(item.getUuid());
   }
 
   // -------------------------------------------------------------------
