@@ -131,8 +131,8 @@
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
             <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${manifestation.parents}">
-              <span th:text="${parent.title}"></span> &nbsp;
-              &nbsp;<span th:text="#{in_manifestation}"></span>&nbsp;
+              <span th:text="${parent.title}" style="font-weight: bold"></span> &nbsp;
+              &nbsp<span th:text="#{in_manifestation}"></span>&nbsp;
               <a th:href="@{/manifestations/{uuid}(uuid=${parent.subject?.uuid})}" th:text="${parent.subject?.label?.getText(dataLanguage)} ?: ${parent.subject?.uuid}">parent label</a>&nbsp;
               <span th:if="${parent.sortKey != null}" th:text="#{with_sortkey(${parent.sortKey})}">...</span>
               <br th:if="${!iterStat.last}"/>
