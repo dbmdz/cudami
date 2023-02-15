@@ -41,8 +41,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   public static final String TABLE_NAME = "headwordentries";
 
   @Override
-  protected String getSqlSelectReducedFieldsJoins() {
-    return super.getSqlSelectReducedFieldsJoins()
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
         + " LEFT JOIN "
         + HeadwordRepositoryImpl.TABLE_NAME
         + " AS "
@@ -157,6 +157,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     List<HeadwordEntry> result =
         retrieveList(
             getSqlSelectAllFields(),
+            getSqlSelectAllFieldsJoins(),
             innerQuery,
             argumentMappings,
             "ORDER BY " + tableAlias + ".date_published ASC");
