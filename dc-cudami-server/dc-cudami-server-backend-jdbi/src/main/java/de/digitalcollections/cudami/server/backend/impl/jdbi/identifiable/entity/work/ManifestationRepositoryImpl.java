@@ -43,6 +43,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -447,6 +448,23 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Work work = rowView.getRow(Work.class);
       if (work != null && work.getUuid() != null) manifestation.setWork(work);
     }
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfItems(UUID uuid) {
+    String itemTableAlias = itemRepository.getTableAlias();
+    String itemTableName = itemRepository.getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + itemTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + itemTableName
+            + " AS "
+            + itemTableAlias
+            + String.format(" WHERE %s.manifestation = :uuid;", itemTableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
   }
 
   @SuppressWarnings("unchecked")

@@ -306,6 +306,35 @@ class ManifestationRepositoryImplTest
     assertThat(actualItemsUuids).containsExactly(item.getUuid());
   }
 
+  @DisplayName("can retrieve the list of locales for the items of a manifestation")
+  @Test
+  public void retrieveListOfLocalesForItems() throws RepositoryException {
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test-Manifestation")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test-Manifestation"))
+                    .build())
+            .build();
+    repo.save(manifestation);
+
+    Item itemDe =
+        Item.builder().label(Locale.GERMAN, "Test-Item").manifestation(manifestation).build();
+    itemRepository.save(itemDe);
+    Item itemUndLatn =
+        Item.builder().label(LOCALE_UND_LATN, "Test-Item").manifestation(manifestation).build();
+    itemRepository.save(itemUndLatn);
+
+    List<String> actual =
+        repo.getLanguagesOfItems(manifestation.getUuid()).stream()
+            .map(Locale::toLanguageTag)
+            .toList();
+    assertThat(actual)
+        .containsExactlyInAnyOrder(Locale.GERMAN.toLanguageTag(), LOCALE_UND_LATN.toLanguageTag());
+  }
+
   // -------------------------------------------------------------------
   private Manifestation ensurePersistedParentManifestation() throws RepositoryException {
     var noteText = new StructuredContent();

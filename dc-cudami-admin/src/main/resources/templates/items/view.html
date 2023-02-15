@@ -54,7 +54,7 @@
                 <i th:case="false" class="fas fa-times text-danger"></i>
                 <i th:case="*" class="fas fa-question-circle"></i>
               </span>
-              <span th:with="manifestation=*{manifestation}">
+              <span th:if="${item.manifestation}" th:with="manifestation=*{manifestation}">
                 &nbsp;<a th:href="@{/manifestations/{uuid}(uuid=${manifestation.uuid})}" th:text="${manifestation.label?.getText(dataLanguage)} ?: ${manifestation.uuid}">manifestation label</a>
               </span>
             </div>

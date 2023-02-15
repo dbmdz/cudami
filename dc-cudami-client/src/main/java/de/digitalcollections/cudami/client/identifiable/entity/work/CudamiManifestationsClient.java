@@ -8,6 +8,8 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class CudamiManifestationsClient extends CudamiEntitiesClient<Manifestation> {
@@ -26,5 +28,10 @@ public class CudamiManifestationsClient extends CudamiEntitiesClient<Manifestati
       throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format("%s/%s/items", baseEndpoint, uuid), pageRequest, Item.class);
+  }
+
+  public List<Locale> getLanguagesOfItems(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/items/languages", baseEndpoint, uuid), Locale.class);
   }
 }

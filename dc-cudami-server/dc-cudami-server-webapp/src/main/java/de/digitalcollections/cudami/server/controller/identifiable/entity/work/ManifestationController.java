@@ -15,6 +15,7 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
@@ -183,6 +184,19 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return service.getLanguages();
+  }
+
+  @Operation(
+      summary = "Get languages of all items",
+      description = "Get languages of all items",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid}/items/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguagesOfItems(
+      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
+          UUID uuid) {
+    return service.getLanguagesOfItems(uuid);
   }
 
   @Operation(summary = "Save a newly created manifestation")

@@ -15,6 +15,9 @@ public abstract class AbstractIdentifiableRepositoryImplTest<R extends Identifia
 
   protected R repo;
 
+  protected static final Locale LOCALE_UND_LATN =
+      new Locale.Builder().setLanguage("und").setScript("Latn").build();
+
   protected static final Locale LOCALE_ZH_HANI =
       new Locale.Builder().setLanguage("zh").setScript("Hani").build();
 

@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,13 @@ public class ManifestationsController
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
+
+    Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingItemsLanguages =
+        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfItems(uuid));
+    model
+        .addAttribute("existingItemsLanguages", existingItemsLanguages)
+        .addAttribute("dataLanguageItems", getDataLanguage(null, localeService));
 
     return "manifestations/view";
   }
