@@ -121,7 +121,11 @@
 
           <div class="row">
             <div class="col-md-3"><label th:text="#{lbl.work}">Work</label></div>
-            <div class="align-items-center col-md-9 d-flex" th:text="${manifestation.work}" >...</div>
+            <div class="align-items-center col-md-9 d-flex">
+              <span th:with="work=${manifestation.work}">
+                &nbsp;<a th:href="@{/works/{uuid}(uuid=${work.uuid})}" th:text="${work.label?.getText(dataLanguage)} ?: ${work.uuid}">work label</a>
+              </span>
+            </div>
           </div>
 
           <div class="row">
