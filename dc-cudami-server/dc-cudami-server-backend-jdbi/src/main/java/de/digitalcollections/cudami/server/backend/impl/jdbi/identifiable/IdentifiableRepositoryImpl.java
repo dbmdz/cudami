@@ -652,6 +652,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       StringBuilder innerQuery,
       final Map<String, Object> argumentMappings,
       String orderBy) {
+    return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
+  }
+
+  public List<I> retrieveList(
+      String fieldsSql,
+      String fieldsSqlAdditionalJoins,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy) {
     final String sql =
         "SELECT "
             + fieldsSql
@@ -665,6 +674,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
             + tableAlias
+            + (StringUtils.hasText(fieldsSqlAdditionalJoins)
+                ? " %s".formatted(fieldsSqlAdditionalJoins)
+                : "")
             + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
                 ? " %s ".formatted(getSqlSelectReducedFieldsJoins())
                 : "")
@@ -753,11 +765,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + (StringUtils.hasText(sqlAdditionalJoins)
                     ? " %s".formatted(sqlAdditionalJoins)
                     : "")
-                + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
-                    ? " %s".formatted(getSqlSelectReducedFieldsJoins())
-                    : "")
                 + (StringUtils.hasText(getSqlSelectAllFieldsJoins())
                     ? " %s".formatted(getSqlSelectAllFieldsJoins())
+                    : "")
+                + (StringUtils.hasText(getSqlSelectReducedFieldsJoins())
+                    ? " %s".formatted(getSqlSelectReducedFieldsJoins())
                     : "")
                 + " LEFT JOIN "
                 + IdentifierRepositoryImpl.TABLE_NAME

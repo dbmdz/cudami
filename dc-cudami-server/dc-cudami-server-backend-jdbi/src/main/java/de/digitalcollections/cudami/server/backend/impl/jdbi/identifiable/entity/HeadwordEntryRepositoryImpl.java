@@ -73,38 +73,56 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
   @Override
   public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", headword";
+    return super.getSqlInsertFields() + ", date_published, text, timevalue_published, headword";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   @Override
   public String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :headword";
+    return super.getSqlInsertValues()
+        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB, :headword";
   }
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+    final String sql =
+        getSqlSelectReducedFields(tableAlias, mappingPrefix)
+            + ", "
+            + tableAlias
+            + ".text "
+            + mappingPrefix
+            + "_text"
+            + ", "
+            + HeadwordRepositoryImpl.TABLE_ALIAS
+            + ".uuid "
+            + HeadwordRepositoryImpl.MAPPING_PREFIX
+            + "_uuid"
+            + ", "
+            + HeadwordRepositoryImpl.TABLE_ALIAS
+            + ".label "
+            + HeadwordRepositoryImpl.MAPPING_PREFIX
+            + "_label";
+    return sql;
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + ", "
         + tableAlias
-        + ".text "
+        + ".date_published "
         + mappingPrefix
-        + "_text"
-        + ", "
-        + HeadwordRepositoryImpl.TABLE_ALIAS
-        + ".uuid "
-        + HeadwordRepositoryImpl.MAPPING_PREFIX
-        + "_uuid"
-        + ", "
-        + HeadwordRepositoryImpl.TABLE_ALIAS
-        + ".label "
-        + HeadwordRepositoryImpl.MAPPING_PREFIX
-        + "_label";
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
   }
 
   @Override
   public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues() + ", headword=:headword";
+    return super.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB, headword=:headword";
   }
 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
@@ -139,6 +157,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
     List<HeadwordEntry> result =
         retrieveList(
             getSqlSelectAllFields(),
+            getSqlSelectAllFieldsJoins(),
             innerQuery,
             argumentMappings,
             "ORDER BY " + tableAlias + ".date_published ASC");
