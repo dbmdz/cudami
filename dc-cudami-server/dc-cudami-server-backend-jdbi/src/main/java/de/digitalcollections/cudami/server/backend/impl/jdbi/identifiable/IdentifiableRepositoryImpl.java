@@ -465,33 +465,23 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     String namespace = identifier.getNamespace();
     String identifierId = identifier.getId();
 
-    StringBuilder innerSelect =
-        new StringBuilder(
-            String.format(
-                "(SELECT %2$s.* "
-                    + "FROM %1$s %2$s INNER JOIN %3$s %4$s ON %4$s.identifiable = %2$s.uuid ",
-                tableName,
-                tableAlias,
-                IdentifierRepositoryImpl.TABLE_NAME,
-                IdentifierRepositoryImpl.TABLE_ALIAS));
-    Filtering filtering =
-        Filtering.builder()
-            .add(
-                FilterCriterion.nativeBuilder()
-                    .withExpression(IdentifierRepositoryImpl.TABLE_ALIAS + ".identifier")
-                    .isEquals(identifierId)
-                    .build())
-            .add(
-                FilterCriterion.nativeBuilder()
-                    .withExpression(IdentifierRepositoryImpl.TABLE_ALIAS + ".namespace")
-                    .isEquals(namespace)
-                    .build())
-            .build();
-    Map<String, Object> arguments = new HashMap<>(0);
-    addFiltering(filtering, innerSelect, arguments);
-    innerSelect.append(")");
-    I result = retrieveOne(getSqlSelectAllFields(), null, null, arguments, innerSelect.toString());
-    return result;
+    UUID identifiableUuid =
+        dbi.withHandle(
+            h ->
+                h.createQuery(
+                        """
+            SELECT identifiable FROM identifiers
+            WHERE namespace = ?
+              AND identifier = ?;""")
+                    .bind(0, namespace)
+                    .bind(1, identifierId)
+                    .mapTo(UUID.class)
+                    .findOne()
+                    .orElse(null));
+
+    if (identifiableUuid == null) return null;
+
+    return getByUuid(identifiableUuid);
   }
 
   @Override
