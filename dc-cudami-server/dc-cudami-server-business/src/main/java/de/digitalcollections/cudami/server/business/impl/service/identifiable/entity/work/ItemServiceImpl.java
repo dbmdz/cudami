@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.work;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
@@ -49,8 +51,24 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   }
 
   @Override
+  public PageResponse<Item> findItemsByManifestation(
+      UUID manifestationUuid, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((ItemRepository) repository).findItemsByManifestation(manifestationUuid, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException(
+          "Cannot retrieve items for manifestation with uuid=" + manifestationUuid + ": " + e, e);
+    }
+  }
+
+  @Override
   public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) {
     return ((ItemRepository) repository).getLanguagesOfDigitalObjects(uuid);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid) {
+    return ((ItemRepository) repository).getLanguagesOfItemsForManifestation(manifestationUuid);
   }
 
   @Override

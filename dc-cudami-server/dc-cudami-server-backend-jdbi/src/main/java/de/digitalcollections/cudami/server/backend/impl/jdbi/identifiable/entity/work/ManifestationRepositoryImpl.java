@@ -19,7 +19,6 @@ import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
-import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.DistributionInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.ExpressionType;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
@@ -29,7 +28,6 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
@@ -43,7 +41,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -70,7 +67,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   private EntityRepositoryImpl<Entity> entityRepository;
   private AgentRepositoryImpl<Agent> agentRepository;
   private HumanSettlementRepositoryImpl humanSettlementRepository;
-  private ItemRepositoryImpl itemRepository;
 
   @Override
   public String getSqlInsertFields() {
@@ -223,8 +219,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       TitleMapper titleMapper,
       EntityRepositoryImpl<Entity> entityRepository,
       AgentRepositoryImpl<Agent> agentRepository,
-      HumanSettlementRepositoryImpl humanSettlementRepository,
-      ItemRepositoryImpl itemRepository) {
+      HumanSettlementRepositoryImpl humanSettlementRepository) {
     super(
         jdbi,
         TABLE_NAME,
@@ -242,7 +237,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     this.entityRepository = entityRepository;
     this.agentRepository = agentRepository;
     this.humanSettlementRepository = humanSettlementRepository;
-    this.itemRepository = itemRepository;
   }
 
   private static void fillPublishers(
@@ -284,46 +278,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 }
               });
     }
-  }
-
-  @Override
-  public PageResponse<Item> findItems(UUID manifestationUuid, PageRequest pageRequest)
-      throws RepositoryException {
-    final String itemTableAlias = itemRepository.getTableAlias();
-    final String itemTableName = itemRepository.getTableName();
-
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + itemTableName
-                + " AS "
-                + itemTableAlias
-                + " WHERE "
-                + itemTableAlias
-                + ".manifestation = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", manifestationUuid);
-
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (item) than this repository (manifestation)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, itemRepository);
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
-    List<Item> result =
-        itemRepository.retrieveList(
-            itemRepository.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   protected static void additionalReduceRowsBiConsumer(
@@ -448,23 +402,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Work work = rowView.getRow(Work.class);
       if (work != null && work.getUuid() != null) manifestation.setWork(work);
     }
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfItems(UUID uuid) {
-    String itemTableAlias = itemRepository.getTableAlias();
-    String itemTableName = itemRepository.getTableName();
-    String sql =
-        "SELECT DISTINCT jsonb_object_keys("
-            + itemTableAlias
-            + ".label) as languages"
-            + " FROM "
-            + itemTableName
-            + " AS "
-            + itemTableAlias
-            + String.format(" WHERE %s.manifestation = :uuid;", itemTableAlias);
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
   }
 
   @SuppressWarnings("unchecked")

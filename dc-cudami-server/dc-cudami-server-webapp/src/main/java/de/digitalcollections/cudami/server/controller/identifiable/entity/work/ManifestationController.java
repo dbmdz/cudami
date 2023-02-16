@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Confl
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -39,10 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Manifestation controller")
 public class ManifestationController extends AbstractIdentifiableController<Manifestation> {
 
+  private ItemService itemService;
   private ManifestationService service;
 
-  public ManifestationController(ManifestationService manifestationService) {
+  public ManifestationController(
+      ManifestationService manifestationService, ItemService itemService) {
     service = manifestationService;
+    this.itemService = itemService;
   }
 
   @Override
@@ -134,7 +138,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findItems(uuid, pageRequest);
+    return itemService.findItemsByManifestation(uuid, pageRequest);
   }
 
   @Operation(
@@ -196,7 +200,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   public List<Locale> getLanguagesOfItems(
       @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
           UUID uuid) {
-    return service.getLanguagesOfItems(uuid);
+    return itemService.getLanguagesOfItemsForManifestation(uuid);
   }
 
   @Operation(summary = "Save a newly created manifestation")

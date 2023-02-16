@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -17,4 +18,9 @@ public interface ItemRepository extends EntityRepository<Item> {
   List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
 
   List<Item> getItemsForWork(UUID workUuid);
+
+  PageResponse<Item> findItemsByManifestation(UUID manifestationUuid, PageRequest pageRequest)
+      throws RepositoryException;
+
+  List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid);
 }
