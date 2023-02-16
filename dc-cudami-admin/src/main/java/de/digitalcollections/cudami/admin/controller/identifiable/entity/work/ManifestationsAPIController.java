@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -45,6 +46,27 @@ public class ManifestationsAPIController
       throws TechnicalException, ServiceException {
     PageResponse<Manifestation> pageResponse =
         super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+    return new BTResponse<>(pageResponse);
+  }
+
+  /*
+  Used in templates/manifestations/view.html
+  */
+  @GetMapping("/api/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items")
+  @ResponseBody
+  public BTResponse<Item> findItems(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
+    PageRequest pageRequest =
+        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Item> pageResponse = service.findItems(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
 

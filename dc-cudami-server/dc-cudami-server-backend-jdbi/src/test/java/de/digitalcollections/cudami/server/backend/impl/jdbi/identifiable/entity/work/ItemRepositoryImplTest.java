@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.PersonRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ManifestationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
@@ -18,11 +19,14 @@ import de.digitalcollections.model.identifiable.entity.agent.Gender;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.text.Title;
+import de.digitalcollections.model.text.TitleType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +55,8 @@ public class ItemRepositoryImplTest
   AgentRepository<Agent> agentRepository;
 
   @Autowired PersonRepository personRepository;
+
+  @Autowired ManifestationRepository manifestationRepository;
 
   private DigitalObjectRepository digitalObjectRepository;
 
@@ -406,5 +412,60 @@ public class ItemRepositoryImplTest
 
     PageResponse<DigitalObject> actual = repo.findDigitalObjects(item.getUuid(), pageRequest);
     assertThat(actual.getContent()).hasSize(1);
+  }
+
+  @DisplayName("can retrieve items for a manifestation")
+  @Test
+  public void retrieveItems() throws RepositoryException {
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test-Manifestation")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test-Manifestation"))
+                    .build())
+            .build();
+    manifestationRepository.save(manifestation);
+
+    Item item =
+        Item.builder().label(Locale.GERMAN, "Test-Item").manifestation(manifestation).build();
+    repo.save(item);
+
+    PageResponse<Item> actual =
+        repo.findItemsByManifestation(manifestation.getUuid(), new PageRequest(0, 10));
+    // For the test, we just have to verify, if the uuid of the found items are the expected ones
+    List<UUID> actualItemsUuids = actual.getContent().stream().map(Item::getUuid).toList();
+
+    assertThat(actualItemsUuids).containsExactly(item.getUuid());
+  }
+
+  @DisplayName("can retrieve the list of locales for the items of a manifestation")
+  @Test
+  public void retrieveListOfLocalesForItems() throws RepositoryException {
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test-Manifestation")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test-Manifestation"))
+                    .build())
+            .build();
+    manifestationRepository.save(manifestation);
+
+    Item itemDe =
+        Item.builder().label(Locale.GERMAN, "Test-Item").manifestation(manifestation).build();
+    repo.save(itemDe);
+    Item itemUndLatn =
+        Item.builder().label(LOCALE_UND_LATN, "Test-Item").manifestation(manifestation).build();
+    repo.save(itemUndLatn);
+
+    List<String> actual =
+        repo.getLanguagesOfItemsForManifestation(manifestation.getUuid()).stream()
+            .map(Locale::toLanguageTag)
+            .toList();
+    assertThat(actual)
+        .containsExactlyInAnyOrder(Locale.GERMAN.toLanguageTag(), LOCALE_UND_LATN.toLanguageTag());
   }
 }

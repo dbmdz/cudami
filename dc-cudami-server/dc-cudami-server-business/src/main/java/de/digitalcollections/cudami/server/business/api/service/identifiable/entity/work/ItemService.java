@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -14,5 +15,10 @@ public interface ItemService extends EntityService<Item> {
 
   List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
 
+  List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid);
+
   List<Item> getItemsForWork(UUID workUuid);
+
+  PageResponse<Item> findItemsByManifestation(UUID uuid, PageRequest pageRequest)
+      throws ServiceException;
 }

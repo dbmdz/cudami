@@ -69,11 +69,11 @@ public class ItemsController extends AbstractIdentifiablesController<Item, Cudam
         .addAttribute("dataLanguage", dataLanguage);
 
     Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingDigitalObjectLanguages =
+    List<Locale> existingDigitalObjectsLanguages =
         languageSortingHelper.sortLanguages(
             displayLocale, service.getLanguagesOfDigitalObjects(uuid));
     model
-        .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages)
+        .addAttribute("existingDigitalObjectsLanguages", existingDigitalObjectsLanguages)
         .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
 
     return "items/view";

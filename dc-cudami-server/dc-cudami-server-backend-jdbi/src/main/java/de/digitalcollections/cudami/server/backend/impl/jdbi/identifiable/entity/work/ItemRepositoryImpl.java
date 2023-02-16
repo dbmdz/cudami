@@ -228,6 +228,46 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
+  public PageResponse<Item> findItemsByManifestation(
+      UUID manifestationUuid, PageRequest pageRequest) throws RepositoryException {
+    final String itemTableAlias = getTableAlias();
+    final String itemTableName = getTableName();
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + itemTableName
+                + " AS "
+                + itemTableAlias
+                + " WHERE "
+                + itemTableAlias
+                + ".manifestation = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", manifestationUuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (item) than this repository (manifestation)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Item> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
@@ -255,6 +295,27 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
             + String.format(" WHERE %s.item_uuid = :uuid;", doTableAlias);
     return this.dbi.withHandle(
         h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid) {
+    String itemTableAlias = getTableAlias();
+    String itemTableName = getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + itemTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + itemTableName
+            + " AS "
+            + itemTableAlias
+            + String.format(" WHERE %s.manifestation = :manifestation_uuid;", itemTableAlias);
+    return this.dbi.withHandle(
+        h ->
+            h.createQuery(sql)
+                .bind("manifestation_uuid", manifestationUuid)
+                .mapTo(Locale.class)
+                .list());
   }
 
   @Override

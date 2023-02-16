@@ -4,8 +4,10 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Confl
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -14,6 +16,7 @@ import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
@@ -37,10 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Manifestation controller")
 public class ManifestationController extends AbstractIdentifiableController<Manifestation> {
 
+  private ItemService itemService;
   private ManifestationService service;
 
-  public ManifestationController(ManifestationService manifestationService) {
+  public ManifestationController(
+      ManifestationService manifestationService, ItemService itemService) {
     service = manifestationService;
+    this.itemService = itemService;
   }
 
   @Override
@@ -116,6 +122,25 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     return service.findChildren(uuid, pageRequest);
   }
 
+  @Operation(summary = "Find all items of a manifestation")
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid}/items"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Item> findItems(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return itemService.findItemsByManifestation(uuid, pageRequest);
+  }
+
   @Operation(
       summary = "Get a manifestation by namespace and id",
       description =
@@ -163,6 +188,19 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return service.getLanguages();
+  }
+
+  @Operation(
+      summary = "Get languages of all items",
+      description = "Get languages of all items",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid}/items/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguagesOfItems(
+      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
+          UUID uuid) {
+    return itemService.getLanguagesOfItemsForManifestation(uuid);
   }
 
   @Operation(summary = "Save a newly created manifestation")
