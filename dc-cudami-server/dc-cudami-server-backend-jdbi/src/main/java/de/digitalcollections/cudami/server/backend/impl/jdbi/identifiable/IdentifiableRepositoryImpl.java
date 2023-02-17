@@ -471,10 +471,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 h.createQuery(
                         """
             SELECT identifiable FROM identifiers
-            WHERE namespace = ?
-              AND identifier = ?;""")
-                    .bind(0, namespace)
-                    .bind(1, identifierId)
+            WHERE namespace = :namespace
+              AND identifier = :id;
+            """) /* affords index only scan on "unique_namespace_identifier" (V14.04.00) */
+                    .bind("namespace", namespace)
+                    .bind("id", identifierId)
                     .mapTo(UUID.class)
                     .findOne()
                     .orElse(null));
