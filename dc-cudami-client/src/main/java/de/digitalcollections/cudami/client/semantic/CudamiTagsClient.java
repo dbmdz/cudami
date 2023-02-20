@@ -18,24 +18,17 @@ public class CudamiTagsClient extends CudamiRestClient<Tag> {
   }
 
   /**
-   * Retrieves a tag by its namespace and id
+   * Retrieves a tag by its value
    *
-   * @param type the type. Must be plain text, not encoded in any wav
-   * @param namespace the namespace. Must be plain text, not encoded in any way
-   * @param id the id. Must be in plain text, not encoded in any way
+   * @param value the type. Must be plain text, not encoded in any way
    * @return the Tag or null
    * @throws TechnicalException in case of an error
    */
-  public Tag getByTypeAndIdentifier(String type, String namespace, String id)
-      throws TechnicalException {
-    String namespaceAndId = type + ":" + namespace + ":" + id;
-
-    String encodedNamespaceAndId =
-        Base64.encodeBase64URLSafeString(namespaceAndId.getBytes(StandardCharsets.UTF_8));
+  public Tag getByValue(String value) throws TechnicalException {
+    String encodedValue = Base64.encodeBase64URLSafeString(value.getBytes(StandardCharsets.UTF_8));
 
     try {
-      return doGetRequestForObject(
-          String.format(baseEndpoint + "/identifier/%s", encodedNamespaceAndId));
+      return doGetRequestForObject(String.format(baseEndpoint + "/value/%s", encodedValue));
     } catch (ResourceNotFoundException e) {
       return null;
     }
