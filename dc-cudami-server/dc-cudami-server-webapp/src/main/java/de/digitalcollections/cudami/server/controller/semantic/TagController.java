@@ -58,10 +58,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
-  @Operation(
-      summary = "Get a tag by value",
-      description =
-          "If value contains multiple values, separate them with a colon, e.g. foo:bar:baz. It is also possible, to add a .json suffix, which will be ignored then")
+  @Operation(summary = "Get a tag by value")
   @GetMapping(
       value = {"/v6/tags/value/{value}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
