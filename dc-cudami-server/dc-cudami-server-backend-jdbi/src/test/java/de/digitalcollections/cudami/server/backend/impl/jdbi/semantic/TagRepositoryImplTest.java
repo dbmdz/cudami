@@ -13,8 +13,6 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Tag;
-import de.digitalcollections.model.text.LocalizedText;
-import java.util.Locale;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,16 +57,11 @@ class TagRepositoryImplTest {
   @DisplayName("can save and retrieve by uuid")
   @Test
   void saveAndRetrieveByUuid() {
-    LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
-    Tag tag =
-        Tag.builder().label(label).namespace("tag-namespace").id("tag-id").type("type").build();
+    Tag tag = Tag.builder().value("foo").build();
 
     Tag savedTag = repo.save(tag);
 
-    assertThat(savedTag.getNamespace()).isEqualTo(tag.getNamespace());
-    assertThat(savedTag.getId()).isEqualTo(tag.getId());
-    assertThat(savedTag.getLabel()).isEqualTo(label);
-    assertThat(savedTag.getType()).isEqualTo(tag.getType());
+    assertThat(savedTag.getValue()).isEqualTo(tag.getValue());
     assertThat(savedTag.getUuid()).isNotNull();
     assertThat(savedTag.getCreated()).isNotNull();
     assertThat(savedTag.getLastModified()).isNotNull();
@@ -81,7 +74,7 @@ class TagRepositoryImplTest {
   @DisplayName("can save and successfully delete")
   @Test
   void saveAndDelete() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id2", "type");
+    Tag savedTag = ensureSavedTag("Test");
     boolean success = repo.delete(savedTag.getUuid());
     assertThat(success).isTrue();
 
@@ -92,14 +85,11 @@ class TagRepositoryImplTest {
   @DisplayName("can save and update")
   @Test
   void saveAndUpdate() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id3", "type");
+    Tag savedTag = ensureSavedTag("Test");
 
     Tag tagToUpdate =
         Tag.builder()
-            .label(new LocalizedText(Locale.GERMAN, "different label"))
-            .namespace(savedTag.getNamespace())
-            .id(savedTag.getId())
-            .type(savedTag.getType())
+            .value(savedTag.getValue())
             .uuid(savedTag.getUuid())
             .created(savedTag.getCreated())
             .build();
@@ -112,7 +102,7 @@ class TagRepositoryImplTest {
   @DisplayName("can retrieve all tags with paging")
   @Test
   void findAllPaged() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id4", "type");
+    Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
         repo.find(PageRequest.builder().pageNumber(0).pageSize(99).build());
@@ -122,8 +112,8 @@ class TagRepositoryImplTest {
   @DisplayName("can retrieve all tags with sorting")
   @Test
   void findAllPagedAndSorted() {
-    Tag savedTag1 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5b", "type");
-    Tag savedTag2 = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id5a", "type");
+    Tag savedTag1 = ensureSavedTag("Test1");
+    Tag savedTag2 = ensureSavedTag("Test2");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -132,16 +122,16 @@ class TagRepositoryImplTest {
                 .pageSize(99)
                 .sorting(
                     Sorting.builder()
-                        .order(Order.builder().property("id").direction(Direction.ASC).build())
+                        .order(Order.builder().property("value").direction(Direction.ASC).build())
                         .build())
                 .build());
-    assertThat(pageResponse.getContent()).containsExactly(savedTag2, savedTag1);
+    assertThat(pageResponse.getContent()).containsExactly(savedTag1, savedTag2);
   }
 
   @DisplayName("can retrieve tags with filtering")
   @Test
   void findFiltered() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id6", "type");
+    Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -152,18 +142,8 @@ class TagRepositoryImplTest {
                     Filtering.builder()
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("namespace")
-                                .isEquals("tag-namespace")
-                                .build())
-                        .add(
-                            FilterCriterion.builder()
-                                .withExpression("id")
-                                .isEquals("tag-id6")
-                                .build())
-                        .add(
-                            FilterCriterion.builder()
-                                .withExpression("type")
-                                .isEquals("type")
+                                .withExpression("value")
+                                .isEquals("Test")
                                 .build())
                         .build())
                 .build());
@@ -173,7 +153,7 @@ class TagRepositoryImplTest {
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
   void noMatches() {
-    Tag savedTag = ensureSavedTag(Locale.GERMAN, "Test", "tag-namespace", "tag-id7", "type");
+    ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -184,12 +164,7 @@ class TagRepositoryImplTest {
                     Filtering.builder()
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("namespace")
-                                .isEquals("tag-namespace")
-                                .build())
-                        .add(
-                            FilterCriterion.builder()
-                                .withExpression("id")
+                                .withExpression("value")
                                 .isEquals("nonexistent")
                                 .build())
                         .build())
@@ -197,21 +172,19 @@ class TagRepositoryImplTest {
     assertThat(pageResponse.getContent()).isEmpty();
   }
 
-  @DisplayName("can return by type, namespace and id")
+  @DisplayName("can return by value")
   @Test
-  void getByTypeAndIdentifier() {
-    Tag savedTag = ensureSavedTag(null, null, "tag-namespace", "tag-id8", "type");
-
-    Tag foundTag = repo.getByTypeAndIdentifier("type", "tag-namespace", "tag-id8");
+  void getByValue() {
+    Tag savedTag = ensureSavedTag("foo");
+    Tag foundTag = repo.getByValue("foo");
     assertThat(foundTag).isEqualTo(savedTag);
   }
 
-  @DisplayName("can find 'like' by label")
+  @DisplayName("can find 'like' by value")
   @Test
-  void findByLabel() throws RepositoryException {
-    Tag savedTag =
-        ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Testtag1", null, null, "type");
-    ensureSavedTag(Locale.GERMAN, "Testtag2", null, null, "type");
+  void findByValue() throws RepositoryException {
+    Tag savedTag = ensureSavedTag("Testtag1");
+    ensureSavedTag("Testtag2");
 
     PageResponse<Tag> pageResponse =
         repo.find(
@@ -222,7 +195,7 @@ class TagRepositoryImplTest {
                     Filtering.builder()
                         .add(
                             FilterCriterion.builder()
-                                .withExpression("label.und-Latn")
+                                .withExpression("value")
                                 .contains("Testtag1")
                                 .build())
                         .build())
@@ -231,44 +204,9 @@ class TagRepositoryImplTest {
     assertThat(pageResponse.getContent()).containsExactly(savedTag);
   }
 
-  @DisplayName("can find exact by label")
-  @Test
-  void findExactByLabel() throws RepositoryException {
-    Tag savedTag =
-        ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Karl Ranseier", null, null, "type");
-    ensureSavedTag(Locale.forLanguageTag("und-Latn"), "Hans Dampf", null, null, "type");
-
-    PageResponse<Tag> pageResponse =
-        repo.find(
-            PageRequest.builder()
-                .pageNumber(0)
-                .pageSize(2)
-                .filtering(
-                    Filtering.builder()
-                        .add(
-                            FilterCriterion.builder()
-                                .withExpression("label.und-Latn")
-                                .isEquals("\"Karl Ranseier\"")
-                                .build())
-                        .build())
-                .build());
-
-    assertThat(pageResponse.getContent()).containsExactly(savedTag);
-  }
-
   // ------------------------------------------------------------------------------------------
-  private Tag ensureSavedTag(
-      Locale labelLocale, String labelText, String namespace, String id, String type) {
-    Tag tag =
-        Tag.builder()
-            .label(
-                labelLocale != null && labelText != null
-                    ? new LocalizedText(labelLocale, labelText)
-                    : null)
-            .namespace(namespace)
-            .id(id)
-            .type(type)
-            .build();
+  private Tag ensureSavedTag(String value) {
+    Tag tag = Tag.builder().value(value).build();
 
     return repo.save(tag);
   }

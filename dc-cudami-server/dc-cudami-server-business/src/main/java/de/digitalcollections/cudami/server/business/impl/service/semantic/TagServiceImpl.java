@@ -30,8 +30,32 @@ public class TagServiceImpl extends UniqueObjectServiceImpl<Tag, TagRepository>
   }
 
   @Override
+  public boolean delete(List<UUID> uuids) {
+    return repository.delete(uuids);
+  }
+
+  @Override
+  protected Function<Tag, Optional<LocalizedText>> extractLabelFunction() {
+    return i -> Optional.ofNullable(null);
+  }
+
+  @Override
+  public PageResponse<Tag> find(PageRequest pageRequest) {
+    return super.find(pageRequest);
+  }
+
+  @Override
   public Tag getByUuid(UUID uuid) {
     return repository.getByUuid(uuid);
+  }
+
+  @Override
+  public Tag getByValue(String value) throws ServiceException {
+    try {
+      return repository.getByValue(value);
+    } catch (Exception e) {
+      throw new ServiceException("cannot get by value=" + value + ": " + e, e);
+    }
   }
 
   @Override
@@ -42,31 +66,5 @@ public class TagServiceImpl extends UniqueObjectServiceImpl<Tag, TagRepository>
   @Override
   public Tag update(Tag tag) {
     return repository.update(tag);
-  }
-
-  @Override
-  public boolean delete(List<UUID> uuids) {
-    return repository.delete(uuids);
-  }
-
-  @Override
-  protected Function<Tag, Optional<LocalizedText>> extractLabelFunction() {
-    return t -> Optional.ofNullable(t.getLabel());
-  }
-
-  @Override
-  public PageResponse<Tag> find(PageRequest pageRequest) {
-    return super.find(pageRequest);
-  }
-
-  @Override
-  public Tag getByTypeAndIdentifier(String type, String namespace, String id)
-      throws ServiceException {
-    try {
-      return repository.getByTypeAndIdentifier(type, namespace, id);
-    } catch (Exception e) {
-      throw new ServiceException(
-          "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
-    }
   }
 }

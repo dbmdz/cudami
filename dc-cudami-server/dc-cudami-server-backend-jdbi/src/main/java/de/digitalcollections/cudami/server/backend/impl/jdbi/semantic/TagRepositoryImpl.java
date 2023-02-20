@@ -27,13 +27,11 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
   public static final String TABLE_ALIAS = "tags";
   public static final String MAPPING_PREFIX = "tags";
 
-  public static final String SQL_INSERT_FIELDS =
-      " uuid, label, namespace, id, type, created, last_modified, split_label";
-  public static final String SQL_INSERT_VALUES =
-      " :uuid, :label::JSONB, :namespace, :id, :type, :created, :lastModified, :split_label";
+  public static final String SQL_INSERT_FIELDS = " uuid, value, created, last_modified";
+  public static final String SQL_INSERT_VALUES = " :uuid, :value, :created, :lastModified";
   public static final String SQL_REDUCED_FIELDS_TAGS =
       String.format(
-          " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.namespace as %2$s_namespace, %1$s.id as %2$s_id, %1$s.type as %2$s_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
+          " %1$s.uuid as %2$s_uuid, %1$s.value as %2$s_value, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
           TABLE_ALIAS, MAPPING_PREFIX);
   public static final String SQL_FULL_FIELDS_TAGS = SQL_REDUCED_FIELDS_TAGS;
 
@@ -80,13 +78,7 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
 
     Tag result =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(tag)
-                    .bind("split_label", splitToArray(tag.getLabel()))
-                    .mapToBean(Tag.class)
-                    .findOne()
-                    .orElse(null));
+            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
     return result;
   }
 
@@ -97,17 +89,11 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
     final String sql =
         "UPDATE "
             + tableName
-            + " SET label=:label::JSONB, last_modified=:lastModified, namespace=:namespace, id=:id, type=:type, split_label=:split_label WHERE uuid=:uuid RETURNING *";
+            + " SET value=:value, last_modified=:lastModified WHERE uuid=:uuid RETURNING *";
 
     Tag result =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bindBean(tag)
-                    .bind("split_label", splitToArray(tag.getLabel()))
-                    .mapToBean(Tag.class)
-                    .findOne()
-                    .orElse(null));
+            h -> h.createQuery(sql).bindBean(tag).mapToBean(Tag.class).findOne().orElse(null));
     return result;
   }
 
@@ -145,34 +131,20 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
   }
 
   @Override
-  public Tag getByTypeAndIdentifier(String type, String namespace, String id) {
+  public Tag getByValue(String value) {
     final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_TAGS
-            + " FROM "
-            + tableName
-            + " WHERE type = :type"
-            + " AND namespace = :namespace"
-            + " AND id = :id";
+        "SELECT " + SQL_FULL_FIELDS_TAGS + " FROM " + tableName + " WHERE value = :value";
 
     Tag tag =
         dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("type", type)
-                    .bind("namespace", namespace)
-                    .bind("id", id)
-                    .mapTo(Tag.class)
-                    .findOne()
-                    .orElse(null));
+            h -> h.createQuery(sql).bind("value", value).mapTo(Tag.class).findOne().orElse(null));
 
     return tag;
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList("created", "label", "namespace", "id", "type", "lastModified"));
+    return new ArrayList<>(Arrays.asList("created", "lastModified", "value"));
   }
 
   @Override
@@ -183,16 +155,10 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
     switch (modelProperty) {
       case "created":
         return tableAlias + ".created";
-      case "label":
-        return tableAlias + ".label";
+      case "value":
+        return tableAlias + ".value";
       case "lastModified":
         return tableAlias + ".last_modified";
-      case "namespace":
-        return tableAlias + ".namespace";
-      case "id":
-        return tableAlias + ".id";
-      case "type":
-        return tableAlias + ".type";
       case "uuid":
         return tableAlias + ".uuid";
       default:
@@ -208,10 +174,7 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
   @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
-      case "label":
-      case "type":
-      case "namespace":
-      case "id":
+      case "value":
         return true;
       default:
         return false;
