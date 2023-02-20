@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.semantic.Tag;
@@ -14,8 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,29 +49,6 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
     return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
   }
 
-  @Operation(
-      summary = "Get a tag by type, namespace and id",
-      description =
-          "Separate type, namespace and id with a colon, e.g. foo:bar:baz. It is also possible, to add a .json suffix, which will be ignored then")
-  @GetMapping(
-      value = {"/v6/tags/identifier/**"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Tag> getByIdentifier(HttpServletRequest request)
-      throws ValidationException, ServiceException {
-    Triple<String, String, String> typeNamespaceId =
-        ParameterHelper.extractTripleOfStringsFromUri(request.getRequestURI(), "^.*?/identifier/");
-    if (typeNamespaceId.getLeft().isBlank()
-        || (typeNamespaceId.getMiddle() == null || typeNamespaceId.getMiddle().isBlank())
-        || (typeNamespaceId.getRight() == null || typeNamespaceId.getRight().isBlank())) {
-      throw new ValidationException(
-          "No type, namespace and/or ids were provided in a colon separated manner");
-    }
-    Tag tag =
-        service.getByTypeAndIdentifier(
-            typeNamespaceId.getLeft(), typeNamespaceId.getMiddle(), typeNamespaceId.getRight());
-    return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-  }
-
   @Operation(summary = "Get tag by UUID")
   @GetMapping(
       value = {"/v6/tags/{uuid}"},
@@ -82,6 +56,16 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
   public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) {
     Tag result = service.getByUuid(uuid);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Get a tag by value")
+  @GetMapping(
+      value = {"/v6/tags/value/{value}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Tag> getByValue(@PathVariable String value)
+      throws ValidationException, ServiceException {
+    Tag tag = service.getByValue(value);
+    return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Save a newly created tag")

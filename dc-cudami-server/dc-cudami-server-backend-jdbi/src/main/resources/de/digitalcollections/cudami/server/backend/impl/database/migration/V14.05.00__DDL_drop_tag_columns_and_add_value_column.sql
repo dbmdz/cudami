@@ -1,0 +1,9 @@
+ALTER TABLE tags DROP CONSTRAINT tags_type_namespace_id_key;
+
+ALTER TABLE tags DROP COLUMN id CASCADE;
+ALTER TABLE tags DROP COLUMN label CASCADE;
+ALTER TABLE tags DROP COLUMN namespace CASCADE;
+ALTER TABLE tags DROP COLUMN type CASCADE;
+
+ALTER TABLE tags ADD COLUMN value VARCHAR collate "ucs_basic";
+ALTER TABLE tags ADD UNIQUE (value);

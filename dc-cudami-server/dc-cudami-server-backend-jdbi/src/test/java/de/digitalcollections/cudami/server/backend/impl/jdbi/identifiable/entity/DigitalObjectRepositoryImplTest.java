@@ -148,8 +148,7 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag =
-        tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
+    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
 
     var noteText = new Text("a note to a digital object");
     var noteContent = new StructuredContent();
@@ -431,8 +430,7 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag =
-        tagRepository.save(Tag.builder().type("type").namespace("namespace").id("id").build());
+    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
 
     DigitalObject digitalObject =
         DigitalObject.builder()
