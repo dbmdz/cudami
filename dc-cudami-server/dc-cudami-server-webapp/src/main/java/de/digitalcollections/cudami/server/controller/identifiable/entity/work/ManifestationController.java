@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
@@ -64,7 +65,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
   @Operation(summary = "Delete a manifestation")
   @DeleteMapping(
-      value = {"/v6/manifestations/{uuid}"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
@@ -106,7 +107,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
   @Operation(summary = "Find all children of a manifestation")
   @GetMapping(
-      value = {"/v6/manifestations/{uuid}/children"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Manifestation> findSubcollections(
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
@@ -124,7 +125,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
   @Operation(summary = "Find all items of a manifestation")
   @GetMapping(
-      value = {"/v6/manifestations/{uuid}/items"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Item> findItems(
       @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
@@ -156,7 +157,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
   @Operation(summary = "Get a manifestation by uuid")
   @GetMapping(
-      value = {"/v6/manifestations/{uuid}"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Manifestation> getByUuid(
       @Parameter(
@@ -195,7 +196,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       description = "Get languages of all items",
       responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
   @GetMapping(
-      value = {"/v6/manifestations/{uuid}/items/languages"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfItems(
       @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
@@ -215,7 +216,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
   @Operation(summary = "update an manifestation")
   @PutMapping(
-      value = {"/v6/manifestations/{uuid}"},
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Manifestation update(
       @PathVariable UUID uuid, @RequestBody Manifestation manifestation, BindingResult errors)

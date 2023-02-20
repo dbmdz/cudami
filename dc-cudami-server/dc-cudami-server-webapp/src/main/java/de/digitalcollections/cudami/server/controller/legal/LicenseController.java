@@ -183,7 +183,10 @@ public class LicenseController {
 
   @Operation(summary = "Update a license")
   @PutMapping(
-      value = {"/v6/licenses/{uuid}", "/v5/licenses/{uuid}"},
+      value = {
+        "/v6/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License update(
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid,

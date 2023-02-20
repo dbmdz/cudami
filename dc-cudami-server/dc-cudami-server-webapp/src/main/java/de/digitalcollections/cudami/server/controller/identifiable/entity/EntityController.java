@@ -162,10 +162,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
   @Operation(summary = "Get related file resources of entity")
   @GetMapping(
       value = {
-        "/v6/entities/{uuid}/related/fileresources",
-        "/v5/entities/{uuid}/related/fileresources",
-        "/v2/entities/{uuid}/related/fileresources",
-        "/latest/entities/{uuid}/related/fileresources"
+        "/v6/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/v5/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/v2/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
@@ -175,10 +175,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
   @Operation(summary = "Get relations for an entity (being the subject)")
   @GetMapping(
       value = {
-        "/v6/entities/relations/{uuid}",
-        "/v5/entities/relations/{uuid}",
-        "/v2/entities/relations/{uuid}",
-        "/latest/entities/relations/{uuid}"
+        "/v6/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<EntityRelation> getRelations(@PathVariable UUID uuid) {

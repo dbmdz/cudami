@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.GivenNameService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -92,7 +93,10 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
 
   @Operation(summary = "Get a givenname by uuid")
   @GetMapping(
-      value = {"/v6/givennames/{uuid}", "/v5/givennames/{uuid}"},
+      value = {
+        "/v6/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GivenName> getByUuid(
       @Parameter(
@@ -130,7 +134,10 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
 
   @Operation(summary = "update a givenname")
   @PutMapping(
-      value = {"/v6/givennames/{uuid}", "/v5/givennames/{uuid}"},
+      value = {
+        "/v6/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName update(
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)

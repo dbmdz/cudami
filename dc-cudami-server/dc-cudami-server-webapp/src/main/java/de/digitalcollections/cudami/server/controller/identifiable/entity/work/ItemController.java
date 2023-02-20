@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -62,9 +63,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @Operation(summary = "Add digital object to an item")
   @PostMapping(
       value = {
-        "/v6/items/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v2/items/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/latest/items/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects/{digitalObjectUuid}",
+        "/v2/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects/{digitalObjectUuid}",
+        "/latest/items/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObject(
@@ -91,7 +94,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "Delete an item")
   @DeleteMapping(
-      value = {"/v6/items/{uuid}"},
+      value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the item") @PathVariable("uuid") UUID uuid)
@@ -133,7 +136,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @Operation(summary = "Get paged list of digital objects of this item")
   @GetMapping(
       value = {
-        "/v6/items/{uuid}/digitalobjects",
+        "/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> findDigitalObjects(
@@ -188,7 +191,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "Get an item by uuid")
   @GetMapping(
-      value = {"/v6/items/{uuid}"},
+      value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByUuid(
       @Parameter(
@@ -229,7 +232,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       description = "Get languages of all items",
       responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
   @GetMapping(
-      value = {"/v6/items/{uuid}/digitalobjects/languages"},
+      value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
@@ -243,7 +246,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "Get the work embodied in an item")
   @GetMapping(
-      value = {"/v6/items/{uuid}/works", "/v2/items/{uuid}/works", "/latest/items/{uuid}/works"},
+      value = {
+        "/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works",
+        "/v2/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works",
+        "/latest/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
@@ -262,7 +269,12 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
   @Operation(summary = "update an item")
   @PutMapping(
-      value = {"/v6/items/{uuid}", "/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
+      value = {
+        "/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws ServiceException, ValidationException {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.TopicService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
@@ -72,9 +73,9 @@ public class V5TopicController {
   @Operation(summary = "Get paged entities of a topic")
   @GetMapping(
       value = {
-        "/v5/topics/{uuid}/entities",
-        "/v3/topics/{uuid}/entities",
-        "/latest/topics/{uuid}/entities"
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findEntities(
@@ -102,7 +103,7 @@ public class V5TopicController {
   @Operation(summary = "Get paged subtopics of a topic")
   @GetMapping(
       value = {
-        "/v5/topics/{uuid}/subtopics",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subtopics",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findSubtopics(
@@ -131,9 +132,9 @@ public class V5TopicController {
   @Operation(summary = "Get file resources of topic")
   @GetMapping(
       value = {
-        "/v5/topics/{uuid}/fileresources",
-        "/v3/topics/{uuid}/fileresources",
-        "/latest/topics/{uuid}/fileresources"
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findFileResources(

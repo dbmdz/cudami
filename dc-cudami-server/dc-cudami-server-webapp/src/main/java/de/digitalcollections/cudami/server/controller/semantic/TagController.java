@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.semantic.Tag;
@@ -51,7 +52,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
 
   @Operation(summary = "Get tag by UUID")
   @GetMapping(
-      value = {"/v6/tags/{uuid}"},
+      value = {"/v6/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) {
     Tag result = service.getByUuid(uuid);
@@ -78,7 +79,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
 
   @Operation(summary = "Update a tag")
   @PutMapping(
-      value = {"/v6/tags/{uuid}"},
+      value = {"/v6/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors) {
     assert Objects.equals(uuid, tag.getUuid());

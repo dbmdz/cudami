@@ -6,6 +6,7 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -68,8 +69,8 @@ public class V3CollectionController {
       })
   @GetMapping(
       value = {
-        "/v3/collections/{uuid}/digitalobjects",
-        "/latest/collections/{uuid}/digitalobjects"
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findDigitalObjects(
@@ -143,8 +144,8 @@ public class V3CollectionController {
       })
   @GetMapping(
       value = {
-        "/v3/collections/{uuid}/subcollections",
-        "/latest/collections/{uuid}/subcollections"
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findSubcollections(

@@ -6,6 +6,7 @@ import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -50,7 +51,7 @@ public class V3WebsiteController {
   @Operation(
       deprecated = true,
       summary = "Get a website by its uuid",
-      description = "Use /v5/websites/{uuid} instead",
+      description = "Use /v5/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "} instead",
       responses = {
         @ApiResponse(
             responseCode = "200",
@@ -62,7 +63,10 @@ public class V3WebsiteController {
         @ApiResponse(responseCode = "404", description = "never returned!")
       })
   @GetMapping(
-      value = {"/latest/websites/{uuid}", "/v3/websites/{uuid}"},
+      value = {
+        "/latest/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getByUuid(
       @Parameter(
@@ -112,7 +116,10 @@ public class V3WebsiteController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/websites/{uuid}/rootpages", "/latest/websites/{uuid}/rootpages"},
+      value = {
+        "/v3/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages",
+        "/latest/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findRootPages(
       @Parameter(

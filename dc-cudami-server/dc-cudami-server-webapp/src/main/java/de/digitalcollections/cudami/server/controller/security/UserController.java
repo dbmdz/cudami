@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.security;
 
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -74,7 +75,12 @@ public class UserController {
 
   @Operation(summary = "Get user by uuid")
   @GetMapping(
-      value = {"/v6/users/{uuid}", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {
+        "/v6/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) {
     User result = userService.getByUuid(uuid);
@@ -91,7 +97,12 @@ public class UserController {
 
   @Operation(summary = "Update a user")
   @PutMapping(
-      value = {"/v6/users/{uuid}", "/v5/users/{uuid}", "/v2/users/{uuid}", "/latest/users/{uuid}"},
+      value = {
+        "/v6/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());

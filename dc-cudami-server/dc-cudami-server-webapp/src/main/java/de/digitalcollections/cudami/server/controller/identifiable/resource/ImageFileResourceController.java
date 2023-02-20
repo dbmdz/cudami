@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.ImageFileResourceService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -96,7 +97,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
 
   @Operation(summary = "Get an ImageFileResource by uuid")
   @GetMapping(
-      value = {"/v6/imagefileresources/{uuid}"},
+      value = {"/v6/imagefileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ImageFileResource> getByUuid(
       @Parameter(
@@ -133,7 +134,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
 
   @Operation(summary = "Update an ImageFileResource")
   @PutMapping(
-      value = {"/v6/imagefileresources/{uuid}"},
+      value = {"/v6/imagefileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ImageFileResource update(
       @PathVariable UUID uuid, @RequestBody ImageFileResource imageFileResource)

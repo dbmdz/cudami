@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -80,7 +81,7 @@ public class V5CollectionController {
 
   @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
-      value = {"/v5/collections/{uuid}/digitalobjects"},
+      value = {"/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
@@ -106,7 +107,7 @@ public class V5CollectionController {
 
   @Operation(summary = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
-      value = {"/v5/collections/{uuid}/subcollections"},
+      value = {"/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")

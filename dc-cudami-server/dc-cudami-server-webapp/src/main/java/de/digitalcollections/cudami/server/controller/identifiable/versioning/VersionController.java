@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.versioning;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.versioning.VersionService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.versioning.Version;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,10 +31,10 @@ public class VersionController {
   @Operation(summary = "Get version by uuid")
   @GetMapping(
       value = {
-        "/v6/versions/{uuid}",
-        "/v5/versions/{uuid}",
-        "/v2/versions/{uuid}",
-        "/latest/versions/{uuid}"
+        "/v6/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Version> getByUuid(@PathVariable UUID uuid) {
@@ -44,10 +45,10 @@ public class VersionController {
   @Operation(summary = "Update the version status")
   @PutMapping(
       value = {
-        "/v6/versions/{uuid}",
-        "/v5/versions/{uuid}",
-        "/v2/versions/{uuid}",
-        "/latest/versions/{uuid}"
+        "/v6/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/versions/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Version update(@PathVariable UUID uuid, @RequestBody Version version, BindingResult errors)

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -64,10 +65,10 @@ public class IdentifierTypeController {
   @Operation(summary = "get identifier type by uuid")
   @GetMapping(
       value = {
-        "/v6/identifiertypes/{uuid}",
-        "/v5/identifiertypes/{uuid}",
-        "/v2/identifiertypes/{uuid}",
-        "/latest/identifiertypes/{uuid}"
+        "/v6/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) {
@@ -94,10 +95,10 @@ public class IdentifierTypeController {
   @Operation(summary = "update an identifier type")
   @PutMapping(
       value = {
-        "/v6/identifiertypes/{uuid}",
-        "/v5/identifiertypes/{uuid}",
-        "/v2/identifiertypes/{uuid}",
-        "/latest/identifiertypes/{uuid}"
+        "/v6/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType update(

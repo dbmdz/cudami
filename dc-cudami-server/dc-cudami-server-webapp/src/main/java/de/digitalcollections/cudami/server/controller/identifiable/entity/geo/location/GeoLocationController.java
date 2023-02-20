@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -65,7 +66,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
 
   @Operation(summary = "Delete a geolocation")
   @DeleteMapping(
-      value = {"/v6/geolocations/{uuid}"},
+      value = {"/v6/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the geolocation") @PathVariable("uuid")
@@ -139,10 +140,10 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
   @Operation(summary = "Get a geolocation by uuid")
   @GetMapping(
       value = {
-        "/v6/geolocations/{uuid}",
-        "/v5/geolocations/{uuid}",
-        "/v2/geolocations/{uuid}",
-        "/latest/geolocations/{uuid}"
+        "/v6/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<GeoLocation> getByUuid(
@@ -195,10 +196,10 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
   @Operation(summary = "update a geolocation")
   @PutMapping(
       value = {
-        "/v6/geolocations/{uuid}",
-        "/v5/geolocations/{uuid}",
-        "/v2/geolocations/{uuid}",
-        "/latest/geolocations/{uuid}"
+        "/v6/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/geolocations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation update(

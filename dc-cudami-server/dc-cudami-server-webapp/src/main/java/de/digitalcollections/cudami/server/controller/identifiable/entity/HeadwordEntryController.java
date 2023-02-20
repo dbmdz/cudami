@@ -149,7 +149,10 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
 
   @Operation(summary = "Update an headwordentry")
   @PutMapping(
-      value = {"/v6/headwordentries/{uuid}", "/v5/headwordentries/{uuid}"},
+      value = {
+        "/v6/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry update(
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)

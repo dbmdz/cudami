@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.view;
 
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -54,10 +55,10 @@ public class RenderingTemplateController {
   @Operation(summary = "Get rendering template by uuid")
   @GetMapping(
       value = {
-        "/v6/renderingtemplates/{uuid}",
-        "/v5/renderingtemplates/{uuid}",
-        "/v3/renderingtemplates/{uuid}",
-        "/latest/renderingtemplates/{uuid}"
+        "/v6/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<RenderingTemplate> getByUuid(@PathVariable UUID uuid) {
@@ -89,10 +90,10 @@ public class RenderingTemplateController {
   @Operation(summary = "Update a rendering template")
   @PutMapping(
       value = {
-        "/v6/renderingtemplates/{uuid}",
-        "/v5/renderingtemplates/{uuid}",
-        "/v3/renderingtemplates/{uuid}",
-        "/latest/renderingtemplates/{uuid}"
+        "/v6/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate update(

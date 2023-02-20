@@ -57,7 +57,10 @@ public class HeadwordController {
 
   @Operation(summary = "Delete an headword with all its relations")
   @DeleteMapping(
-      value = {"/v6/headwords/{uuid}", "/v5/headwords/{uuid}"},
+      value = {
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -149,7 +152,10 @@ public class HeadwordController {
 
   @Operation(summary = "Get related entities of an headword")
   @GetMapping(
-      value = {"/v6/headwords/{uuid}/related/entities", "/v5/headwords/{uuid}/related/entities"},
+      value = {
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/entities",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/entities"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> findRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -163,8 +169,8 @@ public class HeadwordController {
   @Operation(summary = "Get related file resources of an headword")
   @GetMapping(
       value = {
-        "/v6/headwords/{uuid}/related/fileresources",
-        "/v5/headwords/{uuid}/related/fileresources"
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findRelatedFileResources(
@@ -208,7 +214,10 @@ public class HeadwordController {
 
   @Operation(summary = "Save list of related entities for a given headword")
   @PostMapping(
-      value = {"/v6/headwords/{uuid}/entities", "/v5/headwords/{uuid}/entities"},
+      value = {
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> setRelatedEntities(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -219,7 +228,10 @@ public class HeadwordController {
 
   @Operation(summary = "Save list of related fileresources for a given headword")
   @PostMapping(
-      value = {"/v6/headwords/{uuid}/fileresources", "/v5/headwords/{uuid}/fileresources"},
+      value = {
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setRelatedFileResources(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
@@ -230,7 +242,10 @@ public class HeadwordController {
 
   @Operation(summary = "Update an headword")
   @PutMapping(
-      value = {"/v6/headwords/{uuid}", "/v5/headwords/{uuid}"},
+      value = {
+        "/v6/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword update(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")

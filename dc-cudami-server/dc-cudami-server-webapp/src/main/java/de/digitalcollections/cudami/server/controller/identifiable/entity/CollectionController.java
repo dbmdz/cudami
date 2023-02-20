@@ -63,10 +63,18 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Add an existing digital object to an existing collection")
   @PostMapping(
       value = {
-        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v5/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v3/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/latest/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObject(
@@ -90,10 +98,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Add existing digital objects to an existing collection")
   @PostMapping(
       value = {
-        "/v6/collections/{uuid}/digitalobjects",
-        "/v5/collections/{uuid}/digitalobjects",
-        "/v3/collections/{uuid}/digitalobjects",
-        "/latest/collections/{uuid}/digitalobjects"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObjects(
@@ -113,10 +121,18 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Add an existing collection to an existing collection")
   @PostMapping(
       value = {
-        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
+        "/v6/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/v5/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/v3/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/latest/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addSubcollection(
@@ -140,10 +156,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Add existing collections to an existing collection")
   @PostMapping(
       value = {
-        "/v6/collections/{uuid}/subcollections",
-        "/v5/collections/{uuid}/subcollections",
-        "/v3/collections/{uuid}/subcollections",
-        "/latest/collections/{uuid}/subcollections"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addSubcollections(
@@ -176,7 +192,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Delete an existing collection")
   @DeleteMapping(
       value = {
-        "/v6/collections/{uuid}",
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
@@ -225,7 +241,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
   @Operation(summary = "Get paged digital objects of a collection")
   @GetMapping(
-      value = {"/v6/collections/{uuid}/digitalobjects"},
+      value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
@@ -244,10 +260,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       summary = "Get all related - by the given predicate - corporate bodies of a collection")
   @GetMapping(
       value = {
-        "/v6/collections/{uuid}/related/corporatebodies",
-        "/v5/collections/{uuid}/related/corporatebodies",
-        "/v3/collections/{uuid}/related/corporatebodies",
-        "/latest/collections/{uuid}/related/corporatebodies"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/corporatebodies",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/corporatebodies",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/corporatebodies",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/corporatebodies"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<CorporateBody> findRelatedCorporateBodies(
@@ -260,7 +276,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
   @Operation(summary = "Get (active or all) paged subcollections of a collection")
   @GetMapping(
-      value = {"/v6/collections/{uuid}/subcollections"},
+      value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> findSubcollections(
       @Parameter(example = "", description = "UUID of the collection") @PathVariable("uuid")
@@ -301,10 +317,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Get the breadcrumb for a collection")
   @GetMapping(
       value = {
-        "/v6/collections/{uuid}/breadcrumb",
-        "/v5/collections/{uuid}/breadcrumb",
-        "/v3/collections/{uuid}/breadcrumb",
-        "/latest/collections/{uuid}/breadcrumb"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
@@ -420,10 +436,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Get the first created parent of a collection")
   @GetMapping(
       value = {
-        "/v6/collections/{uuid}/parent",
-        "/v5/collections/{uuid}/parent",
-        "/v3/collections/{uuid}/parent",
-        "/latest/collections/{uuid}/parent"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection getParent(@PathVariable UUID uuid) {
@@ -433,10 +449,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Get parent collections")
   @GetMapping(
       value = {
-        "/v6/collections/{uuid}/parents",
-        "/v5/collections/{uuid}/parents",
-        "/v3/collections/{uuid}/parents",
-        "/latest/collections/{uuid}/parents"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parents",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parents",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parents",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parents"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Collection> getParents(
@@ -461,10 +477,18 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Remove an existing digital object from an existing collection")
   @DeleteMapping(
       value = {
-        "/v6/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v5/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/collections/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/latest/collections/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v5/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v3/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/latest/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity removeDigitalObject(
@@ -488,10 +512,18 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Remove an existing collection from an existing collection")
   @DeleteMapping(
       value = {
-        "/v6/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/v5/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/v3/collections/{uuid}/subcollections/{subcollectionUuid}",
-        "/latest/collections/{uuid}/subcollections/{subcollectionUuid}"
+        "/v6/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/v5/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/v3/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}",
+        "/latest/collections/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/subcollections/{subcollectionUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity removeSubcollection(
@@ -525,10 +557,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Save existing digital objects into an existing collection")
   @PutMapping(
       value = {
-        "/v6/collections/{uuid}/digitalobjects",
-        "/v5/collections/{uuid}/digitalobjects",
-        "/v3/collections/{uuid}/digitalobjects",
-        "/latest/collections/{uuid}/digitalobjects"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v3/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity saveDigitalObjects(
@@ -566,10 +598,10 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @Operation(summary = "Update a collection")
   @PutMapping(
       value = {
-        "/v6/collections/{uuid}",
-        "/v5/collections/{uuid}",
-        "/v2/collections/{uuid}",
-        "/latest/collections/{uuid}"
+        "/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection update(

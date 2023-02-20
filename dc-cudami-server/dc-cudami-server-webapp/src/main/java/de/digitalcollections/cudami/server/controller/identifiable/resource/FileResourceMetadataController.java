@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -164,10 +165,10 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   @Operation(summary = "Get a fileresource by uuid")
   @GetMapping(
       value = {
-        "/v6/fileresources/{uuid}",
-        "/v5/fileresources/{uuid}",
-        "/v2/fileresources/{uuid}",
-        "/latest/fileresources/{uuid}"
+        "/v6/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FileResource> getByUuid(
@@ -224,10 +225,10 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   @Operation(summary = "Update a fileresource")
   @PutMapping(
       value = {
-        "/v6/fileresources/{uuid}",
-        "/v5/fileresources/{uuid}",
-        "/v2/fileresources/{uuid}",
-        "/latest/fileresources/{uuid}"
+        "/v6/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource update(

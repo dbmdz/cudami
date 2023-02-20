@@ -46,7 +46,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
 
   @Operation(summary = "Delete a corporate body")
   @DeleteMapping(
-      value = {"/v6/corporatebodies/{uuid}"},
+      value = {"/v6/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the corporate body") @PathVariable("uuid")
@@ -208,10 +208,10 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
   @Operation(summary = "Update a corporate body")
   @PutMapping(
       value = {
-        "/v6/corporatebodies/{uuid}",
-        "/v5/corporatebodies/{uuid}",
-        "/v2/corporatebodies/{uuid}",
-        "/latest/corporatebodies/{uuid}"
+        "/v6/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody update(

@@ -76,7 +76,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
   @Operation(summary = "Delete a person")
   @DeleteMapping(
-      value = {"/v6/persons/{uuid}"},
+      value = {"/v6/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the person") @PathVariable("uuid") UUID uuid)
@@ -121,7 +121,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
   @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
-      value = {"/v6/persons/placeofbirth/{uuid}"},
+      value = {"/v6/persons/placeofbirth/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfBirth(
       @Parameter(
@@ -143,7 +143,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
   @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
-      value = {"/v6/persons/placeofdeath/{uuid}"},
+      value = {"/v6/persons/placeofdeath/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Person> findByGeoLocationOfDeath(
       @Parameter(
@@ -236,10 +236,10 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   @Operation(summary = "Get a person's digital objects")
   @GetMapping(
       value = {
-        "/v6/persons/{uuid}/digitalobjects",
-        "/v5/persons/{uuid}/digitalobjects",
-        "/v2/persons/{uuid}/digitalobjects",
-        "/latest/persons/{uuid}/digitalobjects"
+        "/v6/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v5/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v2/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
@@ -263,10 +263,10 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   @Operation(summary = "Get a person's works")
   @GetMapping(
       value = {
-        "/v6/persons/{uuid}/works",
-        "/v5/persons/{uuid}/works",
-        "/v2/persons/{uuid}/works",
-        "/latest/persons/{uuid}/works"
+        "/v6/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works",
+        "/v5/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works",
+        "/v2/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works",
+        "/latest/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/works"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
@@ -286,10 +286,10 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   @Operation(summary = "update a person")
   @PutMapping(
       value = {
-        "/v5/persons/{uuid}",
-        "/v6/persons/{uuid}",
-        "/v2/persons/{uuid}",
-        "/latest/persons/{uuid}"
+        "/v5/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v6/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person update(

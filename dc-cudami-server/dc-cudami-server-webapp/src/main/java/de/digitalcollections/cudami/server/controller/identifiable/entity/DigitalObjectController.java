@@ -70,10 +70,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Delete a digital object with all its relations")
   @DeleteMapping(
       value = {
-        "/v6/digitalobjects/{uuid}",
-        "/v5/digitalobjects/{uuid}",
-        "/v2/digitalobjects/{uuid}",
-        "/latest/digitalobjects/{uuid}"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
@@ -118,7 +118,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
 
   @Operation(summary = "Get paged projects of a digital objects")
   @GetMapping(
-      value = {"/v6/digitalobjects/{uuid}/projects"},
+      value = {"/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Project> findProjects(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -204,7 +204,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
 
   @Operation(summary = "Get (active or all) paged collections of a digital objects")
   @GetMapping(
-      value = {"/v6/digitalobjects/{uuid}/collections"},
+      value = {"/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Collection> getCollections(
       @Parameter(example = "", description = "UUID of the digital object") @PathVariable("uuid")
@@ -226,10 +226,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Get file resources of a digital object")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/fileresources",
-        "/v5/digitalobjects/{uuid}/fileresources",
-        "/v2/digitalobjects/{uuid}/fileresources",
-        "/latest/digitalobjects/{uuid}/fileresources"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v2/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
@@ -239,10 +239,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Get image file resources of a digital object")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/fileresources/images",
-        "/v5/digitalobjects/{uuid}/fileresources/images",
-        "/v2/digitalobjects/{uuid}/fileresources/images",
-        "/latest/digitalobjects/{uuid}/fileresources/images"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images",
+        "/v2/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
@@ -252,10 +252,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Get item for digital object by digital object uuid")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/item",
-        "/v5/digitalobjects/{uuid}/item",
-        "/v2/digitalobjects/{uuid}/item",
-        "/latest/digitalobjects/{uuid}/item"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/item",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/item",
+        "/v2/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/item",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/item"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item getItem(@PathVariable UUID uuid) {
@@ -284,8 +284,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Get all languages of a digital object's collections")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/collections/languages",
-        "/v5/digitalobjects/{uuid}/collections/languages"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections/languages",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
@@ -295,8 +295,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Get all languages of a digital object's projects")
   @GetMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/projects/languages",
-        "/v5/digitalobjects/{uuid}/projects/languages"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects/languages",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
@@ -335,10 +335,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Save list of fileresources for a given digital object")
   @PostMapping(
       value = {
-        "/v6/digitalobjects/{uuid}/fileresources",
-        "/v5/digitalobjects/{uuid}/fileresources",
-        "/v3/digitalobjects/{uuid}/fileresources",
-        "/latest/digitalobjects/{uuid}/fileresources"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v3/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setFileResources(
@@ -352,10 +352,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @Operation(summary = "Update a digital object")
   @PutMapping(
       value = {
-        "/v6/digitalobjects/{uuid}",
-        "/v5/digitalobjects/{uuid}",
-        "/v2/digitalobjects/{uuid}",
-        "/latest/digitalobjects/{uuid}"
+        "/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject update(

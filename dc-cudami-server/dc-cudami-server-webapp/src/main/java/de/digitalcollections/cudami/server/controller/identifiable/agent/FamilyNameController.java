@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.agent.FamilyNameService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -92,7 +93,10 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
 
   @Operation(summary = "Get a familyname by uuid")
   @GetMapping(
-      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
+      value = {
+        "/v6/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<FamilyName> getByUuid(
       @Parameter(
@@ -130,7 +134,10 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
 
   @Operation(summary = "update a familyname")
   @PutMapping(
-      value = {"/v6/familynames/{uuid}", "/v5/familynames/{uuid}"},
+      value = {
+        "/v6/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)

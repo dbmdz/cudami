@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -137,7 +138,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
                     schema = @Schema(implementation = PageResponseWebpage.class)))
       })
   @GetMapping(
-      value = {"/v6/websites/{uuid}/rootpages"},
+      value = {"/v6/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> findRootPages(
       @Parameter(
@@ -185,7 +186,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
                     schema = @Schema(implementation = Website.class)))
       })
   @GetMapping(
-      value = {"/v6/websites/{uuid}", "/v5/websites/{uuid}"},
+      value = {
+        "/v6/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Website> getByUuid(
       @Parameter(
@@ -251,10 +255,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       })
   @PutMapping(
       value = {
-        "/v6/websites/{uuid}",
-        "/v5/websites/{uuid}",
-        "/v2/websites/{uuid}",
-        "/latest/websites/{uuid}"
+        "/v6/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website update(
@@ -290,10 +294,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       })
   @PutMapping(
       value = {
-        "/v6/websites/{uuid}/rootpages",
-        "/v5/websites/{uuid}/rootpages",
-        "/v3/websites/{uuid}/rootpages",
-        "/latest/websites/{uuid}/rootpages"
+        "/v6/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages",
+        "/v5/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages",
+        "/v3/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages",
+        "/latest/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity updateRootPagesOrder(

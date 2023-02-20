@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -59,7 +60,10 @@ public class V3ProjectController {
                     }))
       })
   @GetMapping(
-      value = {"/v3/projects/{uuid}/digitalobjects", "/latest/projects/{uuid}/digitalobjects"},
+      value = {
+        "/v3/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findDigitalObjects(
       @Parameter(
