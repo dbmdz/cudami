@@ -17,3 +17,6 @@ application-local.yaml
 application-local.yml
 
 /dc-cudami-client/nb-configuration.xml
+**/.settings
+**/.classpath
+**/.project
