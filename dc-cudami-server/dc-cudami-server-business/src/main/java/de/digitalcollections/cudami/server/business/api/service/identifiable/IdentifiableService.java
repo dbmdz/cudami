@@ -98,7 +98,9 @@ public interface IdentifiableService<I extends Identifiable> extends UniqueObjec
 
   I getByIdentifier(Identifier identifier);
 
-  I getByIdentifier(String namespace, String id) throws ServiceException;
+  default I getByIdentifier(String namespace, String id) {
+    return getByIdentifier(new Identifier(null, namespace, id));
+  }
 
   I getByUuid(UUID uuid) throws ServiceException;
 

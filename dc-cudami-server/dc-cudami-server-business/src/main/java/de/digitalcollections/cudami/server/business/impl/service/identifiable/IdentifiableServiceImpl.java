@@ -127,11 +127,6 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public I getByIdentifier(String namespace, String id) throws ServiceException {
-    return repository.getByIdentifier(namespace, id);
-  }
-
-  @Override
   public I getByUuid(UUID uuid) throws ServiceException {
     return repository.getByUuid(uuid);
   }

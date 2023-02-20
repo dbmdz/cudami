@@ -75,7 +75,7 @@ public class FileResourceMetadataServiceImpl
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id) throws ServiceException {
+  public FileResource getByIdentifier(String namespace, String id) {
     FileResource fileResource = repository.getByIdentifier(namespace, id);
     return getTypeSpecific(fileResource);
   }
@@ -86,23 +86,28 @@ public class FileResourceMetadataServiceImpl
     return getTypeSpecific(fileResource);
   }
 
-  private FileResource getTypeSpecific(FileResource fileResource) throws ServiceException {
+  private FileResource getTypeSpecific(FileResource fileResource) {
     if (fileResource == null) {
       return null;
     }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
-    if (specificFileResource instanceof ApplicationFileResource) {
-      return applicationFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof AudioFileResource) {
-      return audioFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof ImageFileResource) {
-      return imageFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof LinkedDataFileResource) {
-      return linkedDataFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof TextFileResource) {
-      return textFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof VideoFileResource) {
-      return videoFileResourceService.getByUuid(fileResource.getUuid());
+    try {
+      if (specificFileResource instanceof ApplicationFileResource) {
+        return applicationFileResourceService.getByUuid(fileResource.getUuid());
+      } else if (specificFileResource instanceof AudioFileResource) {
+        return audioFileResourceService.getByUuid(fileResource.getUuid());
+      } else if (specificFileResource instanceof ImageFileResource) {
+        return imageFileResourceService.getByUuid(fileResource.getUuid());
+      } else if (specificFileResource instanceof LinkedDataFileResource) {
+        return linkedDataFileResourceService.getByUuid(fileResource.getUuid());
+      } else if (specificFileResource instanceof TextFileResource) {
+        return textFileResourceService.getByUuid(fileResource.getUuid());
+      } else if (specificFileResource instanceof VideoFileResource) {
+        return videoFileResourceService.getByUuid(fileResource.getUuid());
+      }
+    } catch (ServiceException ex) {
+      LOGGER.error(
+          "Cannot get type specific data for fileresource. Returning generic fileresource.", ex);
     }
     return fileResource;
   }
