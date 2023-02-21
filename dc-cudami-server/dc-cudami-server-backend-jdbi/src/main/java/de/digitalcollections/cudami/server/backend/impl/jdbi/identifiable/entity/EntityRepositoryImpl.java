@@ -10,13 +10,17 @@ import de.digitalcollections.model.identifiable.entity.NamedEntity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
@@ -34,6 +38,17 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String MAPPING_PREFIX = "e";
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
+
+  @Override
+  protected LinkedHashMap<String, Function<E, Optional<LocalizedText>>> getLocalizedTextFields() {
+    LinkedHashMap<String, Function<E, Optional<LocalizedText>>> localizedTextFields =
+        super.getLocalizedTextFields();
+    // An Entity might be a NamedEntity, too:
+    localizedTextFields.put(
+        "name",
+        i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
+    return localizedTextFields;
+  }
 
   @Override
   public String getSqlInsertFields() {

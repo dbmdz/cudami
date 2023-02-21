@@ -8,11 +8,8 @@ import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectSer
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
-import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,11 +53,6 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
   @Override
   public boolean delete(List<UUID> uuids) {
     return repository.delete(uuids);
-  }
-
-  @Override
-  protected Function<Subject, Optional<LocalizedText>> extractLabelFunction() {
-    return s -> Optional.ofNullable(s.getLabel());
   }
 
   @Override

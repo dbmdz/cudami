@@ -35,12 +35,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -378,7 +381,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    PageResponse<I> pageResponse =
+        new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+
+    filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
+
+    return pageResponse;
   }
 
   protected PageResponse<I> find(PageRequest pageRequest, String commonSql) {
@@ -556,6 +564,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + tableAlias;
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
+  }
+
+  @Override
+  protected LinkedHashMap<String, Function<I, Optional<LocalizedText>>> getLocalizedTextFields() {
+    LinkedHashMap<String, Function<I, Optional<LocalizedText>>> localizedTextFields =
+        super.getLocalizedTextFields();
+    localizedTextFields.put("label", i -> Optional.ofNullable(i.getLabel()));
+    return localizedTextFields;
   }
 
   @Override

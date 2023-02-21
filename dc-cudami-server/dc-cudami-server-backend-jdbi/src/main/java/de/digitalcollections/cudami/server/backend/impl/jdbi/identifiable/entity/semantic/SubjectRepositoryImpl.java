@@ -9,13 +9,17 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
+import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -181,7 +185,12 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    PageResponse<Subject> pageResponse =
+        new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+
+    filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
+
+    return pageResponse;
   }
 
   @Override
@@ -219,6 +228,15 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
       default:
         return null;
     }
+  }
+
+  @Override
+  protected LinkedHashMap<String, Function<Subject, Optional<LocalizedText>>>
+      getLocalizedTextFields() {
+    LinkedHashMap<String, Function<Subject, Optional<LocalizedText>>> linkedHashMap =
+        super.getLocalizedTextFields();
+    linkedHashMap.put("label", i -> Optional.ofNullable(i.getLabel()));
+    return linkedHashMap;
   }
 
   @Override
