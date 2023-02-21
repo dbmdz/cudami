@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
@@ -76,11 +75,7 @@ public class V5ItemController {
 
   @Operation(summary = "Get an item by uuid")
   @GetMapping(
-      value = {
-        "/v5/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/v2/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/latest/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
-      },
+      value = {"/v5/items/{uuid}", "/v2/items/{uuid}", "/latest/items/{uuid}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Item> getByUuid(
       @Parameter(
@@ -107,10 +102,7 @@ public class V5ItemController {
 
   @Operation(summary = "Get digital objects of this item")
   @GetMapping(
-      value = {
-        "/v2/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
-        "/latest/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
-      },
+      value = {"/v2/items/{uuid}/digitalobjects", "/latest/items/{uuid}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {

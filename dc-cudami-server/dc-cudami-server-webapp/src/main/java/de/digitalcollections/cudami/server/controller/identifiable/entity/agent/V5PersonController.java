@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -85,9 +84,9 @@ public class V5PersonController {
   @Operation(summary = "get all persons born at given geo location")
   @GetMapping(
       value = {
-        "/v5/persons/placeofbirth/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/v2/persons/placeofbirth/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/latest/persons/placeofbirth/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+        "/v5/persons/placeofbirth/{uuid}",
+        "/v2/persons/placeofbirth/{uuid}",
+        "/latest/persons/placeofbirth/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findByGeoLocationOfBirth(
@@ -118,9 +117,9 @@ public class V5PersonController {
   @Operation(summary = "get all persons died at given geo location")
   @GetMapping(
       value = {
-        "/v5/persons/placeofdeath/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/v2/persons/placeofdeath/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/latest/persons/placeofdeath/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+        "/v5/persons/placeofdeath/{uuid}",
+        "/v2/persons/placeofdeath/{uuid}",
+        "/latest/persons/placeofdeath/{uuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findByGeoLocationOfDeath(

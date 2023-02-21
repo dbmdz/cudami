@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -63,8 +62,8 @@ public class V3DigitalObjectController {
       })
   @GetMapping(
       value = {
-        "/v3/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections",
-        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections"
+        "/v3/digitalobjects/{uuid}/collections",
+        "/latest/digitalobjects/{uuid}/collections"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findCollections(
@@ -143,10 +142,7 @@ public class V3DigitalObjectController {
                     }))
       })
   @GetMapping(
-      value = {
-        "/v3/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects",
-        "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects"
-      },
+      value = {"/v3/digitalobjects/{uuid}/projects", "/latest/digitalobjects/{uuid}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findProjects(
       @Parameter(

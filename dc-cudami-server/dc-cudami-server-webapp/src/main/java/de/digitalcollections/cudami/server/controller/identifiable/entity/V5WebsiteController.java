@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -115,7 +114,7 @@ public class V5WebsiteController {
                     schema = @Schema(implementation = PageResponseWebpage.class)))
       })
   @GetMapping(
-      value = {"/v5/websites/{uuid:" + ParameterHelper.UUID_PATTERN + "}/rootpages"},
+      value = {"/v5/websites/{uuid}/rootpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findRootPages(
       @Parameter(

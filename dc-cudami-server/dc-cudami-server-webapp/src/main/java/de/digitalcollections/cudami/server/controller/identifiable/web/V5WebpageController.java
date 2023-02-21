@@ -6,7 +6,6 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
-import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -80,7 +79,7 @@ public class V5WebpageController {
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
-      value = {"/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
+      value = {"/v5/webpages/{uuid}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> findSubpages(
       @Parameter(
