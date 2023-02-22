@@ -123,7 +123,7 @@ class IdentifiableServiceImplTest {
   @DisplayName("throws an Exception to trigger a rollback on save, when saving in the repo fails")
   @Test
   public void exceptionOnSaveWhenRepoFails() throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).save(any(Identifiable.class));
+    doThrow(RepositoryException.class).when(repo).save(any(Identifiable.class));
 
     Identifiable identifiable = Identifiable.builder().label("label").build();
     assertThrows(

@@ -198,7 +198,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     validate(identifiable);
     try {
       repository.save(identifiable);
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       throw new ServiceException("Cannot save identifiable " + identifiable + ": " + e, e);
     }
 
