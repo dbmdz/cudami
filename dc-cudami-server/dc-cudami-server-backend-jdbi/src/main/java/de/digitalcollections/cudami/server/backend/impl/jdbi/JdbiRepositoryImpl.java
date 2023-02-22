@@ -153,12 +153,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return term;
   }
 
-  protected PageResponse<U> filterByLocalizedTextFields(
+  protected void filterByLocalizedTextFields(
       PageRequest pageRequest,
       PageResponse<U> pageResponse,
       LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields) {
     if (!pageRequest.hasFiltering()) {
-      return pageResponse;
+      return;
     }
 
     // FIXME: modifying pageResponse afterwards should not only change current page but all pages !
@@ -176,11 +176,10 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       if (filterCriterion != null) {
         filterBySplitField(pageResponse, filterCriterion, retrieveFieldFunction);
         // only one filtering supported (first in order of added rules):
-        return pageResponse;
+        return;
         // TODO: what happens if all entries have been removed by the filter?
       }
     }
-    return pageResponse;
   }
 
   /**
