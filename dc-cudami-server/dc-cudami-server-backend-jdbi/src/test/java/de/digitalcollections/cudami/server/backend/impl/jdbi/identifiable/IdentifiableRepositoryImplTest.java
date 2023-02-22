@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -227,7 +226,7 @@ class IdentifiableRepositoryImplTest
           "other",
           "stuff"
         };
-    String[] out = IdentifiableRepository.splitToArray(in);
+    String[] out = repo.splitToArray(in);
     assertThat(out).containsExactly(expected);
 
     in = "\"Here we have quotes and a word-with-two hyphens!\"";
@@ -245,17 +244,17 @@ class IdentifiableRepositoryImplTest
           "word-with-two",
           "hyphens"
         };
-    out = IdentifiableRepository.splitToArray(in);
+    out = repo.splitToArray(in);
     assertThat(out).containsExactly(expected1);
 
     in = "something easy";
     final String[] expected2 = new String[] {"something", "easy"};
-    out = IdentifiableRepository.splitToArray(in);
+    out = repo.splitToArray(in);
     assertThat(out).containsExactly(expected2);
 
     in = "one";
     final String[] expected3 = new String[] {"one"};
-    out = IdentifiableRepository.splitToArray(in);
+    out = repo.splitToArray(in);
     assertThat(out).containsExactly(expected3);
   }
 
@@ -263,7 +262,7 @@ class IdentifiableRepositoryImplTest
   @DisplayName("can split umlauts")
   void testSplitterWithUmlauts() {
     String[] expected = {"münchen", "bayerische", "staatsbibliothek"};
-    String[] actual = IdentifiableRepository.splitToArray("München, Bayerische Staatsbibliothek");
+    String[] actual = repo.splitToArray("München, Bayerische Staatsbibliothek");
     assertThat(actual).containsExactly(expected);
   }
 
@@ -271,7 +270,7 @@ class IdentifiableRepositoryImplTest
   @DisplayName("can split text with numbers, too")
   void testSplitterWithNumbers() {
     String[] expected = {"80333", "münchen", "ludwigstr", "16"};
-    String[] actual = IdentifiableRepository.splitToArray("80333 München, Ludwigstr. 16");
+    String[] actual = repo.splitToArray("80333 München, Ludwigstr. 16");
     assertThat(actual).containsExactly(expected);
   }
 
@@ -279,7 +278,7 @@ class IdentifiableRepositoryImplTest
   @DisplayName("can split in foreign scripts")
   void testSplitterWithForeignScripts() {
     String[] expected = {"古學二千文", "名山勝槩圖", "本草求真", "8"};
-    String[] actual = IdentifiableRepository.splitToArray("古學二千文 名山勝槩圖, 本草求真. 8");
+    String[] actual = repo.splitToArray("古學二千文 名山勝槩圖, 本草求真. 8");
     assertThat(actual).containsExactly(expected);
   }
 

@@ -267,9 +267,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
-    argumentMappings.put(
-        SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-        IdentifiableRepository.splitToArray(searchTerm));
+    argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(searchTerm));
     return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 

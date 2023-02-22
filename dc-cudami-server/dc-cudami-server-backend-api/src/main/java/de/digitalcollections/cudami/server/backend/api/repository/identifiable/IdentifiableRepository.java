@@ -8,43 +8,12 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
-
-  static String[] splitToArray(String term) {
-    term = term.toLowerCase();
-    /*
-     * Remove all characters that are NOT:
-     * - space
-     * - letter or digit
-     * - underscore
-     * - hyphen
-     * and remove all standalone hyphens (space hyphen space)
-     * (flag `U` stands for Unicode)
-     */
-    term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
-    // Look for words with hyphens to split them too
-    Matcher hyphenWords = Pattern.compile("(?iU)\\b\\w+(-\\w+)+\\b").matcher(term);
-    List<String> result =
-        hyphenWords
-            .results()
-            .collect(
-                ArrayList<String>::new,
-                (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
-                ArrayList::addAll);
-    for (String word : term.trim().split("\\s+")) {
-      result.add(word);
-    }
-    return result.toArray(new String[result.size()]);
-  }
 
   default void addRelatedEntity(I identifiable, Entity entity) {
     if (identifiable == null || entity == null) {
