@@ -94,7 +94,7 @@ class SubjectServiceImplTest {
                             .build())
                     .build())
             .build();
-    PageResponse<Subject> pageResponse =
+    PageResponse<Subject> expectedPageResponse =
         PageResponse.builder()
             .withContent(
                 List.of(
@@ -107,20 +107,9 @@ class SubjectServiceImplTest {
                         .label(new LocalizedText(Locale.forLanguageTag("de"), "Altertum"))
                         .build()))
             .build();
-    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(pageResponse);
+    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(expectedPageResponse);
 
     PageResponse<Subject> actual = subjectService.find(expectedPageRequest);
-
-    PageResponse<Subject> expectedPageResponse =
-        PageResponse.builder()
-            .withContent(
-                List.of(
-                    Subject.builder()
-                        .label(
-                            new LocalizedText(
-                                Locale.forLanguageTag("und-Latn"), "Antike und Altertum"))
-                        .build()))
-            .build();
 
     assertThat(actual).isEqualTo(expectedPageResponse);
   }
@@ -141,7 +130,7 @@ class SubjectServiceImplTest {
                             .build())
                     .build())
             .build();
-    PageResponse<Subject> pageResponse =
+    PageResponse<Subject> expectedPageResponse =
         PageResponse.builder()
             .withContent(
                 List.of(
@@ -154,20 +143,9 @@ class SubjectServiceImplTest {
                         .label(new LocalizedText(Locale.forLanguageTag("de"), "Altertum"))
                         .build()))
             .build();
-    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(pageResponse);
+    when(subjectRepository.find(eq(expectedPageRequest))).thenReturn(expectedPageResponse);
 
     PageResponse<Subject> actual = subjectService.find(expectedPageRequest);
-
-    PageResponse<Subject> expectedPageResponse =
-        PageResponse.builder()
-            .withContent(
-                List.of(
-                    Subject.builder()
-                        .label(
-                            new LocalizedText(
-                                Locale.forLanguageTag("und-Latn"), "Antike und Altertum"))
-                        .build()))
-            .build();
 
     assertThat(actual).isEqualTo(expectedPageResponse);
   }
