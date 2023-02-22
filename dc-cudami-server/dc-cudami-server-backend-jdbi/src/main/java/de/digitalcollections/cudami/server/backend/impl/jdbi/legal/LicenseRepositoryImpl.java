@@ -27,7 +27,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class LicenseRepositoryImpl extends JdbiRepositoryImpl implements LicenseRepository {
+public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
+    implements LicenseRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicenseRepositoryImpl.class);
 

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -7,12 +8,20 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -20,7 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
+public abstract class JdbiRepositoryImpl<U extends UniqueObject>
+    extends AbstractPagingAndSortingRepositoryImpl {
 
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
   private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
@@ -143,6 +153,85 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return term;
   }
 
+  protected PageResponse<U> filterByLocalizedTextFields(
+      PageRequest pageRequest,
+      PageResponse<U> pageResponse,
+      LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields) {
+    if (!pageRequest.hasFiltering()) {
+      return pageResponse;
+    }
+
+    // FIXME: modifying pageResponse afterwards should not only change current page but all pages !
+    // seems to be not possible, as other pages base on SQL filtering.... rethink the whole thing...
+    for (Map.Entry<String, Function<U, Optional<LocalizedText>>> entry :
+        localizedTextFields.entrySet()) {
+      String fieldName = entry.getKey();
+      Function<U, Optional<LocalizedText>> retrieveFieldFunction = entry.getValue();
+
+      FilterCriterion filterCriterion =
+          pageRequest.getFiltering().getFilterCriteria().stream()
+              .filter(fc -> fc.getExpression().startsWith(fieldName))
+              .findAny()
+              .orElse(null);
+      if (filterCriterion != null) {
+        filterBySplitField(pageResponse, filterCriterion, retrieveFieldFunction);
+        // only one filtering supported (first in order of added rules):
+        return pageResponse;
+        // TODO: what happens if all entries have been removed by the filter?
+      }
+    }
+    return pageResponse;
+  }
+
+  /**
+   * Special logic to filter by label, optionally paying attention to the language. The passed
+   * {@code PageResponse} could be modified.
+   *
+   * @param pageResponse the response from the repo, must always contain the request too (if
+   *     everything goes right)
+   */
+  protected void filterBySplitField(
+      PageResponse<U> pageResponse,
+      FilterCriterion<String> filter,
+      Function<U, Optional<LocalizedText>> retrieveField) {
+    if (!pageResponse.hasContent()) {
+      return;
+    }
+    // we must differentiate several cases
+    if (filter.getOperation() == FilterOperation.EQUALS) {
+      // everything has been done by repo already
+      return;
+    }
+
+    // for CONTAINS the language, if any, has not been taken into account yet
+    Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(filter.getExpression());
+    if (matchLanguage.find()) {
+      // there is a language...
+      Locale language = Locale.forLanguageTag(matchLanguage.group(1));
+      List<String> searchTerms =
+          Arrays.asList(IdentifiableRepository.splitToArray((String) filter.getValue()));
+      List<U> filteredContent =
+          pageResponse.getContent().parallelStream()
+              .filter(
+                  uniqueObject -> {
+                    String text =
+                        retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
+                    if (text == null) {
+                      return false;
+                    }
+                    List<String> splitText =
+                        Arrays.asList(IdentifiableRepository.splitToArray(text));
+                    return splitText.containsAll(searchTerms);
+                  })
+              .collect(Collectors.toList());
+      // fix total elements count roughly
+      pageResponse.setTotalElements(
+          pageResponse.getTotalElements()
+              - (pageResponse.getContent().size() - filteredContent.size()));
+      pageResponse.setContent(filteredContent);
+    }
+  }
+
   public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
     List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
     return searchTermTemplates.isEmpty()
@@ -166,6 +255,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
 
     String filterClauses = whereClauses.stream().collect(Collectors.joining(" AND "));
     return filterClauses;
+  }
+
+  protected LinkedHashMap<String, Function<U, Optional<LocalizedText>>> getLocalizedTextFields() {
+    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields =
+        new LinkedHashMap<>();
+    return localizedTextFields;
   }
 
   public String getMappingPrefix() {

@@ -25,7 +25,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class PredicateRepositoryImpl extends JdbiRepositoryImpl implements PredicateRepository {
+public class PredicateRepositoryImpl extends JdbiRepositoryImpl<Predicate>
+    implements PredicateRepository {
 
   public static final String MAPPING_PREFIX = "pred";
 

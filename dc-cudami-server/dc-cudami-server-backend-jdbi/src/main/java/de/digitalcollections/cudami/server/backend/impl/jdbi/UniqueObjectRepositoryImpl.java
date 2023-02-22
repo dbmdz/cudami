@@ -18,8 +18,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 
-public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject> extends JdbiRepositoryImpl
-    implements UniqueObjectRepository<U> {
+public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
+    extends JdbiRepositoryImpl<U> implements UniqueObjectRepository<U> {
 
   public UniqueObjectRepositoryImpl(
       Jdbi jdbi,
