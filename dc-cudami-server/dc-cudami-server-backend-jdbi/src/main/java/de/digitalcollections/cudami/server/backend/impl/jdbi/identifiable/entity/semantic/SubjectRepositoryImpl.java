@@ -73,7 +73,8 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  public Subject getByTypeAndIdentifier(String type, String namespace, String id) {
+  public Subject getByTypeAndIdentifier(String type, String namespace, String id)
+      throws RepositoryException {
     final String sql =
         "SELECT "
             + SQL_FULL_FIELDS_SUBJECTS
@@ -88,18 +89,15 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
             + " AND subjids.namespace = :namespace"
             + " AND subjids.id = :id";
 
-    Subject subject =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sql)
-                    .bind("type", type)
-                    .bind("namespace", namespace)
-                    .bind("id", id)
-                    .mapTo(Subject.class)
-                    .findOne()
-                    .orElse(null));
-
-    return subject;
+    return dbi.withHandle(
+        h ->
+            h.createQuery(sql)
+                .bind("type", type)
+                .bind("namespace", namespace)
+                .bind("id", id)
+                .mapTo(Subject.class)
+                .findOne()
+                .orElse(null));
   }
 
   @Override

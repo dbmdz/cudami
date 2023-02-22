@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -36,9 +37,9 @@ class SubjectServiceImplTest {
   @DisplayName(
       "throws a ServiceException at getByTypeAndIdentifier when an exception happens in the repository")
   @Test
-  public void testCudamiServiceExceptionAtGetByTypeAndIdentifier() {
+  public void testCudamiServiceExceptionAtGetByTypeAndIdentifier() throws RepositoryException {
     when(subjectRepository.getByTypeAndIdentifier(any(), any(), any()))
-        .thenThrow(new NullPointerException("boo"));
+        .thenThrow(new RepositoryException("boo"));
 
     assertThrows(
         ServiceException.class,
