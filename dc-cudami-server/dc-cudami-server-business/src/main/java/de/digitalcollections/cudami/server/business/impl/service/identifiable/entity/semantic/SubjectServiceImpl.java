@@ -65,7 +65,7 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
       throws ServiceException {
     try {
       return repository.getByTypeAndIdentifier(type, namespace, id);
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       throw new ServiceException(
           "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
     }
