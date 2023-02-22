@@ -1,9 +1,17 @@
-ALTER TABLE tags DROP CONSTRAINT tags_type_namespace_id_key;
+ALTER TABLE tags ADD COLUMN IF NOT EXISTS value varchar COLLATE "ucs_basic";
 
-ALTER TABLE tags DROP COLUMN id CASCADE;
-ALTER TABLE tags DROP COLUMN label CASCADE;
-ALTER TABLE tags DROP COLUMN namespace CASCADE;
-ALTER TABLE tags DROP COLUMN type CASCADE;
+UPDATE tags SET value = format('%s:%s:%s', "type", namespace, id);
 
-ALTER TABLE tags ADD COLUMN value VARCHAR collate "ucs_basic";
-ALTER TABLE tags ADD UNIQUE (value);
+DROP INDEX IF EXISTS idx_tags_split_label;
+ALTER TABLE tags
+  DROP CONSTRAINT IF EXISTS tags_type_namespace_id_key,
+  DROP COLUMN IF EXISTS id CASCADE,
+  DROP COLUMN IF EXISTS label CASCADE,
+  DROP COLUMN IF EXISTS namespace CASCADE,
+  DROP COLUMN IF EXISTS type CASCADE,
+  DROP COLUMN IF EXISTS split_label;
+
+ALTER TABLE tags
+  ALTER COLUMN value SET NOT NULL,
+  ADD CONSTRAINT unique_value UNIQUE (value);
+
