@@ -37,7 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class HeadwordRepositoryImpl extends JdbiRepositoryImpl implements HeadwordRepository {
+public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
+    implements HeadwordRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordRepositoryImpl.class);
 

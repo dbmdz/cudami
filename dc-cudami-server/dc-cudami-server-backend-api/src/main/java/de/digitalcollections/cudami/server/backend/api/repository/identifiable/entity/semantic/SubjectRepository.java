@@ -26,5 +26,6 @@ public interface SubjectRepository extends UniqueObjectRepository<Subject> {
 
   PageResponse<Subject> find(PageRequest pageRequest);
 
-  Subject getByTypeAndIdentifier(String type, String namespace, String id);
+  Subject getByTypeAndIdentifier(String type, String namespace, String id)
+      throws RepositoryException;
 }

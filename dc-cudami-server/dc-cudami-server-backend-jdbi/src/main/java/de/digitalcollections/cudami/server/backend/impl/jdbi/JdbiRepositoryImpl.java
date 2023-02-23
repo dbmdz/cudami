@@ -1,18 +1,28 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
@@ -20,7 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
+public abstract class JdbiRepositoryImpl<U extends UniqueObject>
+    extends AbstractPagingAndSortingRepositoryImpl {
 
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
   private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
@@ -143,6 +154,84 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return term;
   }
 
+  protected void filterByLocalizedTextFields(
+      PageRequest pageRequest,
+      PageResponse<U> pageResponse,
+      LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields) {
+    if (!pageRequest.hasFiltering()) {
+      return;
+    }
+
+    // FIXME: modifying pageResponse afterwards should not only change current page
+    // but all pages !
+    // seems to be not possible, as other pages base on SQL filtering.... rethink
+    // the whole thing...
+    for (Map.Entry<String, Function<U, Optional<LocalizedText>>> entry :
+        localizedTextFields.entrySet()) {
+      String fieldName = entry.getKey();
+      Function<U, Optional<LocalizedText>> retrieveFieldFunction = entry.getValue();
+
+      FilterCriterion filterCriterion =
+          pageRequest.getFiltering().getFilterCriteria().stream()
+              .filter(fc -> fc.getExpression().startsWith(fieldName))
+              .findAny()
+              .orElse(null);
+      if (filterCriterion != null) {
+        filterBySplitField(pageResponse, filterCriterion, retrieveFieldFunction);
+        // only one filtering supported (first in order of added rules):
+        return;
+        // TODO: what happens if all entries have been removed by the filter?
+      }
+    }
+  }
+
+  /**
+   * Special logic to filter by label, optionally paying attention to the language. The passed
+   * {@code PageResponse} could be modified.
+   *
+   * @param pageResponse the response from the repo, must always contain the request too (if
+   *     everything goes right)
+   */
+  protected void filterBySplitField(
+      PageResponse<U> pageResponse,
+      FilterCriterion<String> filter,
+      Function<U, Optional<LocalizedText>> retrieveField) {
+    if (!pageResponse.hasContent()) {
+      return;
+    }
+    // we must differentiate several cases
+    if (filter.getOperation() == FilterOperation.EQUALS) {
+      // everything has been done by repo already
+      return;
+    }
+
+    // for CONTAINS the language, if any, has not been taken into account yet
+    Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(filter.getExpression());
+    if (matchLanguage.find()) {
+      // there is a language...
+      Locale language = Locale.forLanguageTag(matchLanguage.group(1));
+      List<String> searchTerms = Arrays.asList(splitToArray((String) filter.getValue()));
+      List<U> filteredContent =
+          pageResponse.getContent().parallelStream()
+              .filter(
+                  uniqueObject -> {
+                    String text =
+                        retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
+                    if (text == null) {
+                      return false;
+                    }
+                    List<String> splitText = Arrays.asList(splitToArray(text));
+                    return splitText.containsAll(searchTerms);
+                  })
+              .collect(Collectors.toList());
+      // fix total elements count roughly
+      pageResponse.setTotalElements(
+          pageResponse.getTotalElements()
+              - (pageResponse.getContent().size() - filteredContent.size()));
+      pageResponse.setContent(filteredContent);
+    }
+  }
+
   public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
     List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
     return searchTermTemplates.isEmpty()
@@ -168,6 +257,12 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
     return filterClauses;
   }
 
+  protected LinkedHashMap<String, Function<U, Optional<LocalizedText>>> getLocalizedTextFields() {
+    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields =
+        new LinkedHashMap<>();
+    return localizedTextFields;
+  }
+
   public String getMappingPrefix() {
     return mappingPrefix;
   }
@@ -187,6 +282,49 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
+    Set<String> fieldNames = getLocalizedTextFields().keySet();
+    if (!fieldNames.isEmpty()) {
+      // special handling of localized text fields
+      String regexPatternFieldNames = String.join("|", fieldNames);
+
+      Matcher localizedTextFieldsMatcher =
+          Pattern.compile("^(" + regexPatternFieldNames + ")\\b").matcher(fc.getExpression());
+      if (localizedTextFieldsMatcher.find()) {
+        if (!(fc.getValue() instanceof String)) {
+          throw new IllegalArgumentException(
+              "Value of localized text field expression must be a string!");
+        }
+        String localizedTextFieldName = localizedTextFieldsMatcher.group(1);
+        String value = (String) fc.getValue();
+        switch (fc.getOperation()) {
+          case CONTAINS:
+            if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
+              throw new IllegalArgumentException(
+                  "Filtering by localized text fields value are mutually exclusive!");
+            }
+            argumentMappings.put(
+                SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
+            return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
+                tableAlias, "split_" + localizedTextFieldName);
+          case EQUALS:
+            if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
+              throw new IllegalArgumentException(
+                  "Filtering by localized text fields value are mutually exclusive!");
+            }
+            Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
+            String language =
+                matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
+            argumentMappings.put(
+                SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
+            return SearchTermTemplates.JSONB_PATH.renderTemplate(
+                tableAlias, localizedTextFieldName, language);
+          default:
+            throw new UnsupportedOperationException(
+                "Filtering by localized text field only supports CONTAINS (to be preferred) or EQUALS operator!");
+        }
+      }
+    }
+
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       FilterOperation filterOperation = fc.getOperation();
@@ -471,8 +609,9 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
   }
 
   /*
-   * if filtering has other target object type than actual (this) repository instance
-   * use this method to rename filter expression names to target table alias and column names
+   * if filtering has other target object type than actual (this) repository
+   * instance use this method to rename filter expression names to target table
+   * alias and column names
    */
   protected void mapFilterExpressionsToOtherTableColumnNames(
       Filtering filtering, AbstractPagingAndSortingRepositoryImpl otherRepository) {
@@ -534,5 +673,40 @@ public abstract class JdbiRepositoryImpl extends AbstractPagingAndSortingReposit
                     .findOne()
                     .get());
     return total;
+  }
+
+  public String[] splitToArray(LocalizedText localizedText) {
+    if (localizedText == null) {
+      return new String[0];
+    }
+    List<String> splitLabels =
+        localizedText.values().stream()
+            .map(text -> splitToArray(text))
+            .flatMap(Arrays::stream)
+            .collect(Collectors.toList());
+    return splitLabels.toArray(new String[splitLabels.size()]);
+  }
+
+  public String[] splitToArray(String term) {
+    term = term.toLowerCase();
+    /*
+     * Remove all characters that are NOT: - space - letter or digit - underscore -
+     * hyphen and remove all standalone hyphens (space hyphen space) (flag `U`
+     * stands for Unicode)
+     */
+    term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
+    // Look for words with hyphens to split them too
+    Matcher hyphenWords = Pattern.compile("(?iU)\\b\\w+(-\\w+)+\\b").matcher(term);
+    List<String> result =
+        hyphenWords
+            .results()
+            .collect(
+                ArrayList<String>::new,
+                (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
+                ArrayList::addAll);
+    for (String word : term.trim().split("\\s+")) {
+      result.add(word);
+    }
+    return result.toArray(new String[result.size()]);
   }
 }

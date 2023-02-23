@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -50,10 +51,18 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Add an existing digital object to an existing project")
   @PostMapping(
       value = {
-        "/v6/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v5/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/latest/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObject(
@@ -77,10 +86,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Add existing digital objects to an existing project")
   @PostMapping(
       value = {
-        "/v6/projects/{uuid}/digitalobjects",
-        "/v5/projects/{uuid}/digitalobjects",
-        "/v3/projects/{uuid}/digitalobjects",
-        "/latest/projects/{uuid}/digitalobjects"
+        "/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v5/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v3/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity addDigitalObjects(
@@ -101,10 +110,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       summary = "Delete an existing project and the identifiers, which belong to this project")
   @DeleteMapping(
       value = {
-        "/v6/projects/{uuid}",
-        "/v5/projects/{uuid}",
-        "/v3/projects/{uuid}",
-        "/latest/projects/{uuid}"
+        "/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
@@ -138,7 +147,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
   @Operation(summary = "Get paged digital objects of a project")
   @GetMapping(
-      value = {"/v6/projects/{uuid}/digitalobjects"},
+      value = {"/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<DigitalObject> findDigitalObjects(
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
@@ -174,10 +183,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Get a project by uuid")
   @GetMapping(
       value = {
-        "/v6/projects/{uuid}",
-        "/v5/projects/{uuid}",
-        "/v2/projects/{uuid}",
-        "/latest/projects/{uuid}"
+        "/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Project> getByUuid(
@@ -220,10 +229,18 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Remove an existing digital object from an existing project")
   @DeleteMapping(
       value = {
-        "/v6/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v5/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/v3/projects/{uuid}/digitalobjects/{digitalObjectUuid}",
-        "/latest/projects/{uuid}/digitalobjects/{digitalObjectUuid}"
+        "/v6/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v5/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/v3/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}",
+        "/latest/projects/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/digitalobjects/{digitalObjectUuid}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity removeDigitalObject(
@@ -257,10 +274,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Save existing digital objects into an existing project")
   @PutMapping(
       value = {
-        "/v6/projects/{uuid}/digitalobjects",
-        "/v5/projects/{uuid}/digitalobjects",
-        "/v3/projects/{uuid}/digitalobjects",
-        "/latest/projects/{uuid}/digitalobjects"
+        "/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v5/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/v3/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity setDigitalObjects(
@@ -280,10 +297,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   @Operation(summary = "Update an project")
   @PutMapping(
       value = {
-        "/v6/projects/{uuid}",
-        "/v5/projects/{uuid}",
-        "/v2/projects/{uuid}",
-        "/latest/projects/{uuid}"
+        "/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)

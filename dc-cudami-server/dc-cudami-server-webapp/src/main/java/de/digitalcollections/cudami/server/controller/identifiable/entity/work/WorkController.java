@@ -84,7 +84,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
   @Operation(summary = "Find all children of a work")
   @GetMapping(
-      value = {"/v6/works/{uuid}/children"},
+      value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Work> findChildren(
       @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid,
@@ -171,10 +171,10 @@ public class WorkController extends AbstractIdentifiableController<Work> {
   @Operation(summary = "Get creators of a work")
   @GetMapping(
       value = {
-        "/v6/works/{uuid}/creators",
-        "/v5/works/{uuid}/creators",
-        "/v2/works/{uuid}/creators",
-        "/latest/works/{uuid}/creators"
+        "/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators",
+        "/v5/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators",
+        "/v2/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators",
+        "/latest/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/creators"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Agent> getCreators(@PathVariable UUID uuid) {
@@ -184,10 +184,10 @@ public class WorkController extends AbstractIdentifiableController<Work> {
   @Operation(summary = "Get items of a work")
   @GetMapping(
       value = {
-        "/v6/works/{uuid}/items",
-        "/v5/works/{uuid}/items",
-        "/v2/works/{uuid}/items",
-        "/latest/works/{uuid}/items"
+        "/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
+        "/v5/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
+        "/v2/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items",
+        "/latest/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Item> getItems(@PathVariable UUID uuid) {
@@ -217,7 +217,12 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
   @Operation(summary = "update a work")
   @PutMapping(
-      value = {"/v6/works/{uuid}", "/v5/works/{uuid}", "/v2/works/{uuid}", "/latest/works/{uuid}"},
+      value = {
+        "/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {

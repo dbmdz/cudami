@@ -53,7 +53,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
 
   @Operation(summary = "Delete a human settlement")
   @DeleteMapping(
-      value = {"/v6/humansettlements/{uuid}"},
+      value = {"/v6/humansettlements/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the human settlement") @PathVariable("uuid")
@@ -175,10 +175,10 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
   @Operation(summary = "update a human settlement")
   @PutMapping(
       value = {
-        "/v6/humansettlements/{uuid}",
-        "/v5/humansettlements/{uuid}",
-        "/v2/humansettlements/{uuid}",
-        "/latest/humansettlements/{uuid}"
+        "/v6/humansettlements/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/humansettlements/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/humansettlements/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/humansettlements/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement update(

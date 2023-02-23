@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ArticleService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -70,10 +71,10 @@ public class ArticleController {
   @Operation(summary = "Get an article")
   @GetMapping(
       value = {
-        "/v6/articles/{uuid}",
-        "/v5/articles/{uuid}",
-        "/v2/articles/{uuid}",
-        "/latest/articles/{uuid}"
+        "/v6/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Article> getByUuid(
@@ -126,10 +127,10 @@ public class ArticleController {
   @Operation(summary = "Update an article")
   @PutMapping(
       value = {
-        "/v6/articles/{uuid}",
-        "/v5/articles/{uuid}",
-        "/v2/articles/{uuid}",
-        "/latest/articles/{uuid}"
+        "/v6/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/articles/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Article update(@PathVariable UUID uuid, @RequestBody Article article, BindingResult errors)

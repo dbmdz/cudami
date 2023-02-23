@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -61,8 +62,8 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
   @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
   @GetMapping(
       value = {
-        "/v6/identifiables/{uuid}/localizedUrlAliases",
-        "/v5/identifiables/{uuid}/localizedUrlAliases"
+        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases",
+        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
@@ -109,10 +110,10 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
   @Operation(summary = "Get identifiable by uuid")
   @GetMapping(
       value = {
-        "/v6/identifiables/{uuid}",
-        "/v5/identifiables/{uuid}",
-        "/v2/identifiables/{uuid}",
-        "/latest/identifiables/{uuid}"
+        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)

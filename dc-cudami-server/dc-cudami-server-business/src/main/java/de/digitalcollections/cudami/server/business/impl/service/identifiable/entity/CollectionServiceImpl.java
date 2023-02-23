@@ -206,13 +206,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getByIdentifier(String namespace, String id) throws ServiceException {
-    Collection collection = super.getByIdentifier(namespace, id);
-    setPublicationStatus(collection);
-    return collection;
-  }
-
-  @Override
   public Collection getByRefId(long refId) {
     Collection collection = super.getByRefId(refId);
     setPublicationStatus(collection);

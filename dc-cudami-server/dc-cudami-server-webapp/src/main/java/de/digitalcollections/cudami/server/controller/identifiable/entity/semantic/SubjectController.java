@@ -78,7 +78,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
 
   @Operation(summary = "Get subject by UUID")
   @GetMapping(
-      value = {"/v6/subjects/{uuid}"},
+      value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) {
     Subject subject = service.getByUuid(uuid);
@@ -96,7 +96,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
 
   @Operation(summary = "Update a subject")
   @PutMapping(
-      value = {"/v6/subjects/{uuid}"},
+      value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
       throws ServiceException {

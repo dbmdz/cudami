@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -118,7 +119,10 @@ public class LinkedDataFileResourceController
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")
   @GetMapping(
-      value = {"/v6/linkeddatafileresources/{uuid}", "/v5/linkeddatafileresources/{uuid}"},
+      value = {
+        "/v6/linkeddatafileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/linkeddatafileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<LinkedDataFileResource> getByUuid(
       @Parameter(
@@ -155,7 +159,10 @@ public class LinkedDataFileResourceController
 
   @Operation(summary = "Update a linkedDataFileResource")
   @PutMapping(
-      value = {"/v6/linkeddatafileresources/{uuid}", "/v5/linkeddatafileresources/{uuid}"},
+      value = {
+        "/v6/linkeddatafileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/linkeddatafileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public LinkedDataFileResource update(
       @PathVariable UUID uuid,

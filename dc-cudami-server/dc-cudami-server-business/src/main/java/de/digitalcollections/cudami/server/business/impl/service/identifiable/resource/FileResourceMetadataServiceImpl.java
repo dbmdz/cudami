@@ -75,7 +75,7 @@ public class FileResourceMetadataServiceImpl
   }
 
   @Override
-  public FileResource getByIdentifier(String namespace, String id) throws ServiceException {
+  public FileResource getByIdentifier(String namespace, String id) {
     FileResource fileResource = repository.getByIdentifier(namespace, id);
     return getTypeSpecific(fileResource);
   }
@@ -86,23 +86,26 @@ public class FileResourceMetadataServiceImpl
     return getTypeSpecific(fileResource);
   }
 
-  private FileResource getTypeSpecific(FileResource fileResource) throws ServiceException {
+  private FileResource getTypeSpecific(FileResource fileResource) {
     if (fileResource == null) {
       return null;
     }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
-    if (specificFileResource instanceof ApplicationFileResource) {
-      return applicationFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof AudioFileResource) {
-      return audioFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof ImageFileResource) {
-      return imageFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof LinkedDataFileResource) {
-      return linkedDataFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof TextFileResource) {
-      return textFileResourceService.getByUuid(fileResource.getUuid());
-    } else if (specificFileResource instanceof VideoFileResource) {
-      return videoFileResourceService.getByUuid(fileResource.getUuid());
+    try {
+      return switch (specificFileResource.getIdentifiableObjectType()) {
+        case APPLICATION_FILE_RESOURCE -> applicationFileResourceService.getByUuid(
+            fileResource.getUuid());
+        case AUDIO_FILE_RESOURCE -> audioFileResourceService.getByUuid(fileResource.getUuid());
+        case IMAGE_FILE_RESOURCE -> imageFileResourceService.getByUuid(fileResource.getUuid());
+        case LINKED_DATA_FILE_RESOURCE -> linkedDataFileResourceService.getByUuid(
+            fileResource.getUuid());
+        case TEXT_FILE_RESOURCE -> textFileResourceService.getByUuid(fileResource.getUuid());
+        case VIDEO_FILE_RESOURCE -> videoFileResourceService.getByUuid(fileResource.getUuid());
+        default -> fileResource;
+      };
+    } catch (ServiceException ex) {
+      LOGGER.error(
+          "Cannot get type specific data for fileresource. Returning generic fileresource.", ex);
     }
     return fileResource;
   }
@@ -115,18 +118,18 @@ public class FileResourceMetadataServiceImpl
           new LocalizedText(
               new Locale(localeService.getDefaultLanguage()), fileResource.getFilename()));
     }
-    if (fileResource instanceof ApplicationFileResource) {
-      applicationFileResourceService.save((ApplicationFileResource) fileResource);
-    } else if (fileResource instanceof AudioFileResource) {
-      audioFileResourceService.save((AudioFileResource) fileResource);
-    } else if (fileResource instanceof ImageFileResource) {
-      imageFileResourceService.save((ImageFileResource) fileResource);
-    } else if (fileResource instanceof LinkedDataFileResource) {
-      linkedDataFileResourceService.save((LinkedDataFileResource) fileResource);
-    } else if (fileResource instanceof TextFileResource) {
-      textFileResourceService.save((TextFileResource) fileResource);
-    } else if (fileResource instanceof VideoFileResource) {
-      videoFileResourceService.save((VideoFileResource) fileResource);
+    if (fileResource instanceof ApplicationFileResource app) {
+      applicationFileResourceService.save(app);
+    } else if (fileResource instanceof AudioFileResource audio) {
+      audioFileResourceService.save(audio);
+    } else if (fileResource instanceof ImageFileResource image) {
+      imageFileResourceService.save(image);
+    } else if (fileResource instanceof LinkedDataFileResource ldata) {
+      linkedDataFileResourceService.save(ldata);
+    } else if (fileResource instanceof TextFileResource text) {
+      textFileResourceService.save(text);
+    } else if (fileResource instanceof VideoFileResource video) {
+      videoFileResourceService.save(video);
     } else {
       super.save(fileResource);
     }
@@ -134,18 +137,18 @@ public class FileResourceMetadataServiceImpl
 
   @Override
   public void update(FileResource fileResource) throws ServiceException, ValidationException {
-    if (fileResource instanceof ApplicationFileResource) {
-      applicationFileResourceService.update((ApplicationFileResource) fileResource);
-    } else if (fileResource instanceof AudioFileResource) {
-      audioFileResourceService.update((AudioFileResource) fileResource);
-    } else if (fileResource instanceof ImageFileResource) {
-      imageFileResourceService.update((ImageFileResource) fileResource);
-    } else if (fileResource instanceof LinkedDataFileResource) {
-      linkedDataFileResourceService.update((LinkedDataFileResource) fileResource);
-    } else if (fileResource instanceof TextFileResource) {
-      textFileResourceService.update((TextFileResource) fileResource);
-    } else if (fileResource instanceof VideoFileResource) {
-      videoFileResourceService.update((VideoFileResource) fileResource);
+    if (fileResource instanceof ApplicationFileResource app) {
+      applicationFileResourceService.update(app);
+    } else if (fileResource instanceof AudioFileResource audio) {
+      audioFileResourceService.update(audio);
+    } else if (fileResource instanceof ImageFileResource image) {
+      imageFileResourceService.update(image);
+    } else if (fileResource instanceof LinkedDataFileResource ldata) {
+      linkedDataFileResourceService.update(ldata);
+    } else if (fileResource instanceof TextFileResource text) {
+      textFileResourceService.update(text);
+    } else if (fileResource instanceof VideoFileResource video) {
+      videoFileResourceService.update(video);
     } else {
       super.update(fileResource);
     }

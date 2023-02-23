@@ -100,7 +100,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
 
   @Operation(summary = "Get paged entities of a topic")
   @GetMapping(
-      value = {"/v6/topics/{uuid}/entities"},
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Entity> findEntities(
       @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
@@ -118,7 +118,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
 
   @Operation(summary = "Get file resources of topic")
   @GetMapping(
-      value = {"/v6/topics/{uuid}/fileresources"},
+      value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findFileResources(
       @PathVariable UUID uuid,
@@ -130,7 +130,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get paged subtopics of a topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/subtopics",
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subtopics",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Topic> findSubtopics(
@@ -168,10 +168,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get the breadcrumb for a topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/breadcrumb",
-        "/v5/topics/{uuid}/breadcrumb",
-        "/v3/topics/{uuid}/breadcrumb",
-        "/latest/topics/{uuid}/breadcrumb"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
@@ -255,10 +255,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/children",
-        "/v5/topics/{uuid}/children",
-        "/v3/topics/{uuid}/children",
-        "/latest/topics/{uuid}/children"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Topic> getChildren(@PathVariable UUID uuid) {
@@ -268,10 +268,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get all entities of topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/entities/all",
-        "/v5/topics/{uuid}/entities/all",
-        "/v3/topics/{uuid}/entities/all",
-        "/latest/topics/{uuid}/entities/all"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getEntities(
@@ -281,7 +281,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
 
   @Operation(summary = "Get all languages of entities of a topic")
   @GetMapping(
-      value = {"/v6/topics/{uuid}/entities/languages", "/v5/topics/{uuid}/entities/languages"},
+      value = {
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/languages",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/languages"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfEntities(@PathVariable UUID uuid) {
     return this.topicService.getLanguagesOfEntities(uuid);
@@ -290,8 +293,8 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get all languages of file resources of a topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/fileresources/languages",
-        "/v5/topics/{uuid}/fileresources/languages"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/languages",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfFileResources(@PathVariable UUID uuid) {
@@ -301,10 +304,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get parent topic of topic")
   @GetMapping(
       value = {
-        "/v6/topics/{uuid}/parent",
-        "/v5/topics/{uuid}/parent",
-        "/v3/topics/{uuid}/parent",
-        "/latest/topics/{uuid}/parent"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic getParent(@PathVariable UUID uuid) {
@@ -313,11 +316,13 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
 
   @Operation(summary = "Get subtopics of topic")
   @GetMapping(
-      value = {"/v2/topics/{uuid}/subtopics"},
+      value = {"/v2/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subtopics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> getSubtopics(@PathVariable UUID uuid) {
     return new ResponseEntity<>(
-        "no longer supported. use '/v3/topics/{uuid}/children' endpoint, returning list of child-topics",
+        "no longer supported. use '/v3/topics/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/children' endpoint, returning list of child-topics",
         HttpStatus.GONE);
   }
 
@@ -337,10 +342,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get topics an entity is linked to")
   @GetMapping(
       value = {
-        "/v6/topics/entity/{uuid}",
-        "/v5/topics/entity/{uuid}",
-        "/v3/topics/entity/{uuid}",
-        "/latest/topics/entity/{uuid}"
+        "/v6/topics/entity/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/topics/entity/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/topics/entity/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/topics/entity/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Topic> getTopicsOfEntity(@PathVariable UUID uuid) {
@@ -350,10 +355,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Get topics a fileresource is linked to")
   @GetMapping(
       value = {
-        "/v6/topics/fileresource/{uuid}",
-        "/v5/topics/fileresource/{uuid}",
-        "/v3/topics/fileresource/{uuid}",
-        "/latest/topics/fileresource/{uuid}"
+        "/v6/topics/fileresource/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/topics/fileresource/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v3/topics/fileresource/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/topics/fileresource/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Topic> getTopicsOfFileResource(@PathVariable UUID uuid) {
@@ -413,10 +418,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Save entities of topic")
   @PostMapping(
       value = {
-        "/v6/topics/{uuid}/entities",
-        "/v5/topics/{uuid}/entities",
-        "/v3/topics/{uuid}/entities",
-        "/latest/topics/{uuid}/entities"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> setEntities(@PathVariable UUID uuid, @RequestBody List<Entity> entities) {
@@ -426,10 +431,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Save fileresources of topic")
   @PostMapping(
       value = {
-        "/v6/topics/{uuid}/fileresources",
-        "/v5/topics/{uuid}/fileresources",
-        "/v3/topics/{uuid}/fileresources",
-        "/latest/topics/{uuid}/fileresources"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> setFileresources(
@@ -440,10 +445,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
   @Operation(summary = "Update a topic")
   @PutMapping(
       value = {
-        "/v6/topics/{uuid}",
-        "/v5/topics/{uuid}",
-        "/v2/topics/{uuid}",
-        "/latest/topics/{uuid}"
+        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)

@@ -20,3 +20,4 @@ application-local.yml
 **/.settings
 **/.classpath
 **/.project
+**/.dbeaver

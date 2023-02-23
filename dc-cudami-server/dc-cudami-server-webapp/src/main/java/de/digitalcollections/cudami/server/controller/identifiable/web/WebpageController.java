@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.web.WebpageService;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -57,10 +58,18 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Add file resource related to webpage")
   @PostMapping(
       value = {
-        "/v6/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
-        "/v5/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
-        "/v2/webpages/{uuid}/related/fileresources/{fileResourceUuid}",
-        "/latest/webpages/{uuid}/related/fileresources/{fileResourceUuid}"
+        "/v6/webpages/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/related/fileresources/{fileResourceUuid}",
+        "/v5/webpages/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/related/fileresources/{fileResourceUuid}",
+        "/v2/webpages/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/related/fileresources/{fileResourceUuid}",
+        "/latest/webpages/{uuid:"
+            + ParameterHelper.UUID_PATTERN
+            + "}/related/fileresources/{fileResourceUuid}"
       })
   @ResponseStatus(value = HttpStatus.OK)
   public void addRelatedFileResource(@PathVariable UUID uuid, @PathVariable UUID fileResourceUuid) {
@@ -94,7 +103,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
   @GetMapping(
-      value = {"/v6/webpages/{uuid}/children"},
+      value = {"/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Webpage> findSubpages(
       @Parameter(
@@ -123,10 +132,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Get the breadcrumb for a webpage")
   @GetMapping(
       value = {
-        "/v6/webpages/{uuid}/breadcrumb",
-        "/v5/webpages/{uuid}/breadcrumb",
-        "/v3/webpages/{uuid}/breadcrumb",
-        "/latest/webpages/{uuid}/breadcrumb"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/v3/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/breadcrumb"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BreadcrumbNavigation> getBreadcrumbNavigation(
@@ -161,7 +170,11 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
 
   @Operation(summary = "Get a webpage by uuid")
   @GetMapping(
-      value = {"/v6/webpages/{uuid}", "/v5/webpages/{uuid}", "/latest/webpages/{uuid}"},
+      value = {
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
+      },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Webpage> getByUuid(
       @Parameter(
@@ -200,9 +213,9 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Get (active or all) children of a webpage recursivly as JSON")
   @GetMapping(
       value = {
-        "/v6/webpages/{uuid}/childrentree",
-        "/v5/webpages/{uuid}/childrentree",
-        "/latest/webpages/{uuid}/childrentree"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/childrentree",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/childrentree",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/childrentree"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Webpage> getChildrenTree(
@@ -224,10 +237,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Get parent of a webpage as JSON")
   @GetMapping(
       value = {
-        "/v6/webpages/{uuid}/parent",
-        "/v5/webpages/{uuid}/parent",
-        "/v3/webpages/{uuid}/parent",
-        "/latest/webpages/{uuid}/parent"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/v3/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/parent"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage getParent(
@@ -244,10 +257,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Get file resources related to webpage")
   @GetMapping(
       value = {
-        "/v6/webpages/{uuid}/related/fileresources",
-        "/v5/webpages/{uuid}/related/fileresources",
-        "/v2/webpages/{uuid}/related/fileresources",
-        "/latest/webpages/{uuid}/related/fileresources"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/v2/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
@@ -257,10 +270,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Get website of a webpage as JSON")
   @GetMapping(
       value = {
-        "/v6/webpages/{uuid}/website",
-        "/v5/webpages/{uuid}/website",
-        "/v3/webpages/{uuid}/website",
-        "/latest/webpages/{uuid}/website"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/website",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/website",
+        "/v3/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/website",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/website"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website getWebsite(
@@ -307,10 +320,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Update a webpage")
   @PutMapping(
       value = {
-        "/v6/webpages/{uuid}",
-        "/v5/webpages/{uuid}",
-        "/v2/webpages/{uuid}",
-        "/latest/webpages/{uuid}"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/v2/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
@@ -323,10 +336,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
   @Operation(summary = "Update the order of a webpage's children")
   @PutMapping(
       value = {
-        "/v6/webpages/{uuid}/children",
-        "/v5/webpages/{uuid}/children",
-        "/v3/webpages/{uuid}/children",
-        "/latest/webpages/{uuid}/children"
+        "/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/v5/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/v3/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children",
+        "/latest/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity updateChildrenOrder(

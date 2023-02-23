@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ResourceNotFoundException;
@@ -21,10 +22,8 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +38,11 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableServiceImpl.class);
 
-  private CudamiConfig cudamiConfig;
+  private final CudamiConfig cudamiConfig;
   protected IdentifierService identifierService;
-  private LocaleService localeService;
+  private final LocaleService localeService;
 
-  private UrlAliasService urlAliasService;
+  private final UrlAliasService urlAliasService;
 
   public IdentifiableServiceImpl(
       @Qualifier("identifiableRepositoryImpl") R repository,
@@ -100,6 +99,13 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
+  public PageResponse<I> find(PageRequest pageRequest) {
+    setDefaultSorting(pageRequest);
+    PageResponse<I> response = repository.find(pageRequest);
+    return response;
+  }
+
+  @Override
   public List<I> find(String searchTerm, int maxResults) {
     return repository.find(searchTerm, maxResults);
   }
@@ -124,11 +130,6 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   @Override
   public I getByIdentifier(Identifier identifier) {
     return repository.getByIdentifier(identifier);
-  }
-
-  @Override
-  public I getByIdentifier(String namespace, String id) throws ServiceException {
-    return repository.getByIdentifier(namespace, id);
   }
 
   @Override
@@ -197,7 +198,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     validate(identifiable);
     try {
       repository.save(identifiable);
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       throw new ServiceException("Cannot save identifiable " + identifiable + ": " + e, e);
     }
 
@@ -263,7 +264,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
 
     try {
       repository.update(identifiable);
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       throw new ServiceException("Cannot update identifiable " + identifiable + ": " + e, e);
     }
 
@@ -343,10 +344,5 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     } catch (ServiceException e) {
       throw new ValidationException("Cannot validate: " + e, e);
     }
-  }
-
-  @Override
-  protected Function<I, Optional<LocalizedText>> extractLabelFunction() {
-    return i -> Optional.ofNullable(i.getLabel());
   }
 }

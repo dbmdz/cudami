@@ -171,13 +171,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public Webpage getByIdentifier(String namespace, String id) throws ServiceException {
-    Webpage webpage = super.getByIdentifier(namespace, id);
-    setPublicationStatus(webpage);
-    return webpage;
-  }
-
-  @Override
   public Webpage getByUuid(UUID uuid) throws ServiceException {
     Webpage webpage = super.getByUuid(uuid);
     setPublicationStatus(webpage);

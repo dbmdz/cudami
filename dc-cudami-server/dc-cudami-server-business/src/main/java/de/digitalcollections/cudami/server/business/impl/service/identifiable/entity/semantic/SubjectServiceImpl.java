@@ -8,11 +8,8 @@ import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectSer
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
-import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,11 +56,6 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
   }
 
   @Override
-  protected Function<Subject, Optional<LocalizedText>> extractLabelFunction() {
-    return s -> Optional.ofNullable(s.getLabel());
-  }
-
-  @Override
   public PageResponse<Subject> find(PageRequest pageRequest) {
     return super.find(pageRequest);
   }
@@ -73,7 +65,7 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
       throws ServiceException {
     try {
       return repository.getByTypeAndIdentifier(type, namespace, id);
-    } catch (Exception e) {
+    } catch (RepositoryException e) {
       throw new ServiceException(
           "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
     }
