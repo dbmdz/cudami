@@ -8,7 +8,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EventService;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.Event;
+import org.springframework.stereotype.Service;
 
+@Service("eventService")
 public class EventServiceImpl extends EntityServiceImpl<Event> implements EventService {
 
   public EventServiceImpl(
