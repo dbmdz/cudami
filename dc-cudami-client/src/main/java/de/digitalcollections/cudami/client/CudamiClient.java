@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesCli
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiEventsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
@@ -50,6 +51,7 @@ public class CudamiClient {
   private final CudamiDigitalObjectsClient cudamiDigitalObjectsClient;
   private final CudamiEntitiesClient cudamiEntitiesClient;
   private final CudamiEntityRelationsClient cudamiEntityRelationsClient;
+  private final CudamiEventsClient cudamiEventsClient;
   private final CudamiFamilyNamesClient cudamiFamilyNamesClient;
   private final CudamiFileResourcesBinaryClient cudamiFileResourcesBinaryClient;
   private final CudamiFileResourcesMetadataClient cudamiFileResourcesMetadataClient;
@@ -102,6 +104,7 @@ public class CudamiClient {
     this.cudamiEntitiesClient = new CudamiEntitiesClient(http, cudamiServerUrl, mapper);
     this.cudamiEntityRelationsClient =
         new CudamiEntityRelationsClient(http, cudamiServerUrl, mapper);
+    this.cudamiEventsClient = new CudamiEventsClient(http, cudamiServerUrl, mapper);
     this.cudamiFamilyNamesClient = new CudamiFamilyNamesClient(http, cudamiServerUrl, mapper);
     this.cudamiFileResourcesBinaryClient =
         new CudamiFileResourcesBinaryClient(cudamiServerUrl, mapper);
@@ -162,6 +165,10 @@ public class CudamiClient {
 
   public CudamiEntitiesClient forEntities() {
     return cudamiEntitiesClient;
+  }
+
+  public CudamiEventsClient forEvents() {
+    return cudamiEventsClient;
   }
 
   public CudamiEntityRelationsClient forEntityRelations() {
