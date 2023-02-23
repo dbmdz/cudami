@@ -11,7 +11,9 @@ import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class EventRepositoryImpl extends EntityRepositoryImpl<Event> implements EventRepository {
 
   public static final String TABLE_NAME = "events";
