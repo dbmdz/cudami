@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.entity.Event;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -19,7 +18,6 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
@@ -31,11 +29,9 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
 
   private EventRepositoryImpl eventRepository;
 
-  @Autowired DbIdentifierMapper dbIdentifierMapper;
-
   @BeforeEach
   public void beforeEach() {
-    eventRepository = new EventRepositoryImpl(jdbi, cudamiConfig, dbIdentifierMapper);
+    eventRepository = new EventRepositoryImpl(jdbi, cudamiConfig);
   }
 
   @Test
