@@ -26,11 +26,6 @@ cudami:
       - TITLE
       - TOPIC
 
-    tagTypes:
-      - GENRE
-      - IDENTIFIER
-      - SHELFGROUP
-
     expressionTypes:
       - mainType: TEXT
         subType: HANDMADE
