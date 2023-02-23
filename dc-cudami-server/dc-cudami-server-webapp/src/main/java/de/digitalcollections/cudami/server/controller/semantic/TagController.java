@@ -10,10 +10,12 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.semantic.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +67,14 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Tag> getByValue(@PathVariable String value)
       throws ValidationException, ServiceException {
+    // The tag can be base-64 encoded, too
     Tag tag = service.getByValue(value);
+    if (tag == null) {
+      tag =
+          service.getByValue(
+              new String(Base64.decodeBase64(value.getBytes(StandardCharsets.UTF_8))));
+    }
+
     return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 

@@ -19,7 +19,6 @@ public class TypeDeclarations {
 
   private List<String> relationPredicates;
   private List<String> subjectTypes;
-  private List<String> tagTypes;
 
   private List<ExpressionType> expressionTypes;
   private List<TitleType> titleTypes;
@@ -29,14 +28,12 @@ public class TypeDeclarations {
       @JsonProperty(value = "manufacturingTypes") List<String> manufacturingTypes,
       @JsonProperty(value = "mediaTypes") List<String> mediaTypes,
       @JsonProperty(value = "subjectTypes") List<String> subjectTypes,
-      @JsonProperty(value = "tagTypes") List<String> tagTypes,
       @JsonProperty(value = "expressionTypes") List<ExpressionType> expressionTypes,
       @JsonProperty(value = "titleTypes") List<TitleType> titleTypes) {
     this.manufacturingTypes =
         manufacturingTypes != null ? List.copyOf(manufacturingTypes) : Collections.emptyList();
     this.mediaTypes = mediaTypes != null ? List.copyOf(mediaTypes) : Collections.emptyList();
     this.subjectTypes = subjectTypes != null ? List.copyOf(subjectTypes) : Collections.emptyList();
-    this.tagTypes = tagTypes != null ? List.copyOf(tagTypes) : Collections.emptyList();
 
     this.expressionTypes =
         expressionTypes != null ? List.copyOf(expressionTypes) : Collections.emptyList();
@@ -58,10 +55,6 @@ public class TypeDeclarations {
 
   public List<String> getSubjectTypes() {
     return List.copyOf(subjectTypes);
-  }
-
-  public List<String> getTagTypes() {
-    return List.copyOf(tagTypes);
   }
 
   public List<ExpressionType> getExpressionTypes() {
