@@ -18,6 +18,7 @@ delete from digitalobject_linkeddataresources;
 delete from digitalobject_renderingresources;
 delete from digitalobjects;
 delete from entities;
+delete from events;
 delete from familynames;
 delete from fileresources;
 delete from fileresources_application;
