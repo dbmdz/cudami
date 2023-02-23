@@ -2,14 +2,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EventRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Event;
-import de.digitalcollections.model.semantic.Subject;
 import java.util.List;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,8 +17,7 @@ public class EventRepositoryImpl extends EntityRepositoryImpl<Event> implements 
   public static final String MAPPING_PREFIX = "ev";
 
   @Autowired
-  public EventRepositoryImpl(
-      Jdbi dbi, CudamiConfig cudamiConfig, DbIdentifierMapper dbIdentifierMapper) {
+  public EventRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
         TABLE_NAME,
@@ -30,9 +25,6 @@ public class EventRepositoryImpl extends EntityRepositoryImpl<Event> implements 
         MAPPING_PREFIX,
         Event.class,
         cudamiConfig.getOffsetForAlternativePaging());
-    this.dbi.registerRowMapper(BeanMapper.factory(Subject.class, MAPPING_PREFIX));
-    this.dbi.registerArrayType(dbIdentifierMapper);
-    this.dbi.registerColumnMapper(Identifier.class, dbIdentifierMapper);
   }
 
   @Override
