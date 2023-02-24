@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.semantic;
 
+import com.google.common.base.Charsets;
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -72,7 +73,8 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
     if (tag == null) {
       tag =
           service.getByValue(
-              new String(Base64.decodeBase64(value.getBytes(StandardCharsets.UTF_8))));
+              new String(
+                  Base64.decodeBase64(value.getBytes(StandardCharsets.UTF_8)), Charsets.UTF_8));
     }
 
     return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
