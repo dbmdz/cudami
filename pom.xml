@@ -170,12 +170,6 @@
         <version>4.0.1</version>
       </dependency>
       <dependency>
-        <groupId>net.bytebuddy</groupId>
-        <artifactId>byte-buddy</artifactId>
-        <version>1.13.0</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>net.logstash.logback</groupId>
         <artifactId>logstash-logback-encoder</artifactId>
         <version>7.2</version>
