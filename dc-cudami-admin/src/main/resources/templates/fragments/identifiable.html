@@ -50,7 +50,7 @@
 
   <th:block th:fragment="renderTags(tags, language)">
     <th:block th:each="tag,iter : ${tags}" th:object="${tag}">
-      <span th:title="|*{type} *{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{type} *{namespace}:*{id}">...</span>
+      <span th:title="|*{value}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{value}">...</span>
     </th:block>
   </th:block>
 
