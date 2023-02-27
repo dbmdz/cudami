@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
@@ -26,6 +27,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
@@ -39,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -67,14 +70,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_NAME = "identifiables";
 
   public String getSqlInsertFields() {
-    return " uuid, created, description, identifiable_objecttype, identifiable_type, "
-        + "label, last_modified, previewfileresource, preview_hints, split_label, tags_uuids";
+    return """
+        uuid, created, description, identifiable_objecttype,
+        identifiable_type, label, last_modified, previewfileresource,
+        preview_hints, split_label, tags_uuids, subjects_uuids
+        """;
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
   public String getSqlInsertValues() {
-    return " :uuid, :created, :description::JSONB, :identifiableObjectType, :type, "
-        + ":label::JSONB, :lastModified, :previewFileResource, :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[]";
+    return """
+        :uuid, :created, :description::JSONB, :identifiableObjectType,
+        :type, :label::JSONB, :lastModified, :previewFileResource,
+        :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[], :subjects_uuids::UUID[]
+        """;
   }
 
   public String getSqlSelectAllFields() {
@@ -138,7 +147,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // uuid, created, identifiable_type
     return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
         + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]"
-        + ", tags_uuids=:tags_uuids::UUID[]";
+        + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
   }
 
   /**
@@ -202,13 +211,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     dbi.registerRowMapper(
         BeanMapper.factory(UrlAlias.class, UrlAliasRepositoryImpl.MAPPING_PREFIX));
 
-    // set basic reduce rows bifunction for reduced selects (lists, paging)
+    // set basic reduce rows biconsumer for reduced selects (lists, paging)
     // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
-    // currently there is no difference to full, except that we do not want tags in reduced selects.
-    this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, false);
+    // currently there is no difference to full, except that we do not want tags and subjects in
+    // reduced selects.
+    this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(false);
 
-    // set full reduce rows bifunction for full selects (find one)
-    this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true, true, true);
+    // set full reduce rows biconsumer for full selects (find one)
+    this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true);
 
     // for detailes select (only used in find one, not lists): if additional objects should be
     // "joined" into instance, set bi function for doing this:
@@ -271,8 +281,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return super.addSearchTermMappings(searchTerm, argumentMappings);
   }
 
-  private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(
-      boolean withIdentifiers, boolean withPreviewImage, boolean withTags) {
+  private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(boolean isForAllFields) {
     return (map, rowView) -> {
       I identifiable =
           map.computeIfAbsent(
@@ -281,7 +290,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 return (I) rowView.getRow(identifiableImplClass);
               });
 
-      if (withPreviewImage && rowView.getColumn("pi_uuid", UUID.class) != null) {
+      // preview image
+      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
         // see definition in FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
         // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
         // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
@@ -297,10 +307,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
         identifiable.setPreviewImage(previewImage);
       }
-      if (withIdentifiers && rowView.getColumn("id_uuid", UUID.class) != null) {
+
+      // identifiers
+      if (rowView.getColumn("id_uuid", UUID.class) != null) {
         Identifier dbIdentifier = rowView.getRow(Identifier.class);
         identifiable.addIdentifier(dbIdentifier);
       }
+
+      // urlaliases
       if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
         UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
         UUID websiteUuid =
@@ -321,11 +335,25 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           identifiable.getLocalizedUrlAliases().add(urlAlias);
         }
       }
-      if (withTags
-          && rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        Tag tag = rowView.getRow(Tag.class);
-        if (tag != null) {
-          identifiable.addTag(tag);
+
+      if (isForAllFields) {
+        // tags
+        if (rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+          Tag tag = rowView.getRow(Tag.class);
+          if (tag != null) {
+            identifiable.addTag(tag);
+          }
+        }
+
+        // subjects
+        UUID subjectUuid =
+            rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+        if (subjectUuid != null
+            && (identifiable.getSubjects() == null
+                || !identifiable.getSubjects().stream()
+                    .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+          Subject subject = rowView.getRow(Subject.class);
+          identifiable.addSubject(subject);
         }
       }
 
@@ -763,6 +791,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + UrlAliasRepositoryImpl.getSelectFields(true)
                 + ", "
                 + TagRepositoryImpl.SQL_REDUCED_FIELDS_TAGS
+                + ", "
+                + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS
                 + " FROM "
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
@@ -800,9 +830,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + ".target_uuid"
                 + UrlAliasRepositoryImpl.WEBSITESJOIN
-                + String.format(
-                    " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.tags_uuids) ",
-                    TagRepositoryImpl.TABLE_NAME, TagRepositoryImpl.TABLE_ALIAS, tableAlias));
+                + " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.tags_uuids)"
+                    .formatted(
+                        TagRepositoryImpl.TABLE_NAME, TagRepositoryImpl.TABLE_ALIAS, tableAlias)
+                + " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.subjects_uuids)"
+                    .formatted(
+                        SubjectRepositoryImpl.TABLE_NAME,
+                        SubjectRepositoryImpl.TABLE_ALIAS,
+                        tableAlias));
 
     if (argumentMappings == null) {
       argumentMappings = new HashMap<>(0);
@@ -863,6 +898,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
+    bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
+
     if (identifiable.getUuid() == null) {
       // in case of fileresource the uuid is created on binary upload (before metadata save)
       // to make saving on storage using uuid is possible
@@ -981,6 +1018,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // split label
     bindings.put("split_label", splitToArray(identifiable.getLabel()));
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
+    bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
     identifiable.setLastModified(LocalDateTime.now());
     // do not update/left out from statement (not changed since insert):

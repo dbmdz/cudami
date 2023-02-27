@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
@@ -18,7 +17,6 @@ import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
@@ -66,8 +64,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + ", first_appeared_date"
         + ", first_appeared_presentation"
         + ", first_appeared_timevalue"
-        + ", titles"
-        + ", subjects_uuids";
+        + ", titles";
   }
 
   /* Do not change order! Must match order in getSqlInsertFields!!! */
@@ -79,8 +76,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + ", :firstAppearedDate"
         + ", :firstAppearedDatePresentation"
         + ", :firstAppearedTimeValue::JSONB"
-        + ", {{titles}}"
-        + ", :subjects_uuids::UUID[]";
+        + ", {{titles}}";
   }
 
   @Override
@@ -111,10 +107,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 EntityRelationRepositoryImpl.MAPPING_PREFIX,
                 tableAlias)
-        + entityRepository.getSqlSelectReducedFields()
-        // subjects
-        + ", "
-        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS;
+        + entityRepository.getSqlSelectReducedFields();
   }
 
   @Override
@@ -125,8 +118,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         + ", first_appeared_date=:firstAppearedDate"
         + ", first_appeared_presentation=:firstAppearedDatePresentation"
         + ", first_appeared_timevalue=:firstAppearedTimeValue::JSONB"
-        + ", titles={{titles}}"
-        + ", subjects_uuids=:subjects_uuids::UUID[]";
+        + ", titles={{titles}}";
   }
 
   @Override
@@ -140,16 +132,13 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       LEFT JOIN (
         %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
       ) ON %3$s.object_uuid = %1$s.uuid
-      LEFT JOIN %6$s %7$s ON %7$s.uuid = ANY (%1$s.subjects_uuids)
       """
             .formatted(
                 tableAlias,
                 /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
                 EntityRelationRepositoryImpl.TABLE_ALIAS,
                 /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
-                EntityRepositoryImpl.TABLE_ALIAS,
-                /*6-7*/ SubjectRepositoryImpl.TABLE_NAME,
-                SubjectRepositoryImpl.TABLE_ALIAS);
+                EntityRepositoryImpl.TABLE_ALIAS);
   }
 
   public WorkRepositoryImpl(
@@ -308,8 +297,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
-    bindings.put("subjects_uuids", extractUuids(work.getSubjects()));
-
     super.save(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
     saveParents(work);
   }
@@ -319,8 +306,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
-    bindings.put("subjects_uuids", extractUuids(work.getSubjects()));
-
     super.update(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
     saveParents(work);
   }
@@ -418,17 +403,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                             new GenericType<List<String>>() {}))
                     .build());
       }
-    }
-
-    // subjects
-    UUID subjectUuid =
-        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-    if (subjectUuid != null
-        && (work.getSubjects() == null
-            || !work.getSubjects().stream()
-                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
-      Subject subject = rowView.getRow(Subject.class);
-      work.addSubject(subject);
     }
   }
 
