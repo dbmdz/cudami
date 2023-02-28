@@ -335,6 +335,8 @@ public class V3CollectionController {
     for (Iterator it = digitalobjects.iterator(); it.hasNext(); ) {
       JSONObject digitalobject = (JSONObject) it.next();
       digitalobject.put("className", expectedClassName);
+      if (digitalobject.isNull("fileResources"))
+        digitalobject.put("fileResources", new JSONArray());
     }
     return result;
   }

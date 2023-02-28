@@ -103,16 +103,6 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     Work parentWork = Work.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parentWork);
 
-    Subject subject1 =
-        Subject.builder().type("Test").label(new LocalizedText(Locale.GERMAN, "Test")).build();
-    Subject subject2 =
-        Subject.builder()
-            .type("Test")
-            .identifier(Identifier.builder().namespace("foo").id("bar").build())
-            .build();
-    subjectRepository.save(subject1);
-    subjectRepository.save(subject2);
-
     Work work =
         Work.builder()
             .label(Locale.GERMAN, "Erstlingswerk")
@@ -126,7 +116,6 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
                         .titleType(new TitleType("uni", "sub"))
                         .text(new LocalizedText(Locale.GERMAN, "Aller Anfang ist schwer"))
                         .build()))
-            .subjects(new HashSet<>(Arrays.asList(subject1, subject2)))
             .creationDateRange(
                 new LocalDateRange(LocalDate.parse("2023-01-01"), LocalDate.parse("2023-02-01")))
             .creationTimeValue(new TimeValue(2023, (byte) 1, (byte) 1))
@@ -278,18 +267,13 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     Predicate predicate = Predicate.builder().value("is_creator_of").build();
     predicateRepository.save(predicate);
 
-    Subject subject = Subject.builder().label(new LocalizedText(Locale.GERMAN, "Subject")).build();
-    subjectRepository.save(subject);
-
     EntityRelation entityRelation =
         EntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
     Work work =
         Work.builder()
             .label(Locale.GERMAN, "Erstlingswerk")
             .relations(List.of(entityRelation))
-            .subjects(Set.of(subject))
             .build();
-    work.setRelations(List.of(entityRelation));
     repo.save(work);
 
     // Since we use the repository and not the service, we have to
@@ -297,10 +281,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     entityRelation.setObject(work);
     entityRelationRepository.save(entityRelation);
     entityRelation.setObject(null); // to avoid recursion
-    work.setRelations(List.of(entityRelation));
 
     Set<Work> actual = repo.getByPersonUuid(person.getUuid());
-    // Since the repository
 
     assertThat(actual).containsExactly(work);
   }

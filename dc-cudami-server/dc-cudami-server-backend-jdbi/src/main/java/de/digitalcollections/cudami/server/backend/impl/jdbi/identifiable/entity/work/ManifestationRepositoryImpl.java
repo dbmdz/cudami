@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
@@ -30,7 +29,6 @@ import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.Title;
@@ -75,8 +73,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         , composition, dimensions, expressiontypes,
         language, manifestationtype, manufacturingtype,
         mediatypes, otherlanguages,
-        scale, subjects_uuids, version,
-        work, titles,
+        scale, version, work, titles,
         publication_info, publication_nav_date,
         production_info, production_nav_date,
         distribution_info, distribution_nav_date,
@@ -91,8 +88,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         , :composition, :dimensions, :expressionTypes::mainsubtype[],
         :language, :manifestationType, :manufacturingType,
         :mediaTypes::varchar[], :otherLanguages::varchar[],
-        :scale, :subjects_uuids::UUID[], :version,
-        :work?.uuid, {{titles}},
+        :scale, :version, :work?.uuid, {{titles}},
         :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
         :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
         :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange,
@@ -107,8 +103,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         , composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[],
         language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType,
         mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[],
-        scale=:scale, subjects_uuids=:subjects_uuids::UUID[], version=:version,
-        work=:work?.uuid, titles={{titles}},
+        scale=:scale, version=:version, work=:work?.uuid, titles={{titles}},
         publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
         production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
         distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange,
@@ -126,10 +121,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
           %1$s.distribution_info %2$s_distributionInfo,
           """
             .formatted(tableAlias, mappingPrefix)
-        // subjects
-        + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS
         // publishers
-        + ", %s, %s"
+        + "%s, %s"
             .formatted(
                 agentRepository.getSqlSelectReducedFields(),
                 humanSettlementRepository.getSqlSelectReducedFields());
@@ -139,18 +132,15 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   protected String getSqlSelectAllFieldsJoins() {
     return super.getSqlSelectAllFieldsJoins()
         + """
-        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.subjects_uuids)
-        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
-        LEFT JOIN %6$s %7$s ON %7$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
+        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
         """
             .formatted(
                 tableAlias,
-                /*2-3*/ SubjectRepositoryImpl.TABLE_NAME,
-                SubjectRepositoryImpl.TABLE_ALIAS,
-                /*4-5 Publisher agents*/
+                /*2-3 Publisher agents*/
                 AgentRepositoryImpl.TABLE_NAME,
                 AgentRepositoryImpl.TABLE_ALIAS,
-                /*6-7 Publisher locations*/
+                /*4-5 Publisher locations*/
                 HumanSettlementRepositoryImpl.TABLE_NAME,
                 HumanSettlementRepositoryImpl.TABLE_ALIAS);
   }
@@ -284,17 +274,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Map<UUID, Manifestation> map, RowView rowView) {
     Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
     // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
-
-    // subjects
-    UUID subjectUuid =
-        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-    if (subjectUuid != null
-        && (manifestation.getSubjects() == null
-            || !manifestation.getSubjects().stream()
-                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
-      Subject subject = rowView.getRow(Subject.class);
-      manifestation.addSubject(subject);
-    }
 
     // publishers
     Agent publAgent = null;
@@ -583,7 +562,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
-    bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
 
     DistributionInfo distributionInfo = manifestation.getDistributionInfo();
     manifestation.setDistributionInfo(reducePublisher(distributionInfo));
@@ -607,7 +585,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     if (bindings == null) {
       bindings = new HashMap<>(3);
     }
-    bindings.put("subjects_uuids", extractUuids(manifestation.getSubjects()));
 
     DistributionInfo distributionInfo = manifestation.getDistributionInfo();
     manifestation.setDistributionInfo(reducePublisher(distributionInfo));

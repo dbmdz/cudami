@@ -185,7 +185,6 @@ class ManifestationRepositoryImplTest
     Manifestation manifestation = prepareManifestation(subject, parent, titles);
     repo.save(manifestation);
 
-    // get the Manifestation saved in 1.0.
     Manifestation persisted = repo.getByUuid(manifestation.getUuid());
     manifestation.getLabel().put(Locale.ENGLISH, "An updated label");
     manifestation
