@@ -73,6 +73,26 @@ public class V5MigrationHelper {
       }
     }
 
+    if (jsonObject.has("content")) {
+      JSONArray content = jsonObject.getJSONArray("content");
+      content.forEach(
+          obj -> {
+            if (obj instanceof JSONObject item) {
+              if (item.has("entityType")) {
+                switch (item.getString("entityType")) {
+                  case "DIGITAL_OBJECT" -> {
+                    if (item.isNull("fileResources")) item.put("fileResources", new JSONArray());
+                  }
+                  case "ARTICLE" -> {
+                    if (item.isNull("creators")) item.put("creators", new JSONArray());
+                  }
+                }
+                ;
+              }
+            }
+          });
+    }
+
     return migrateToV5(jsonObject.toString());
   }
 

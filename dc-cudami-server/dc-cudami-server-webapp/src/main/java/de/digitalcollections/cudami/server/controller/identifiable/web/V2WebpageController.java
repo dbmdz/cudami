@@ -117,6 +117,10 @@ public class V2WebpageController {
     }
     result.put("type", "RESOURCE");
     result.put("entityPartType", "WEBPAGE");
+    if (result.isNull("children")) {
+      result.put("children", new JSONArray());
+    }
+
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 

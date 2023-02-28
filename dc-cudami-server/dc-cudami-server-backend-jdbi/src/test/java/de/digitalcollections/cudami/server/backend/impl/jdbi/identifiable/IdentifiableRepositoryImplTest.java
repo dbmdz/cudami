@@ -3,16 +3,19 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import de.digitalcollections.model.semantic.Subject;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import de.digitalcollections.model.text.StructuredContent;
@@ -25,6 +28,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
@@ -32,6 +36,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The Identifiable Repository")
 class IdentifiableRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
+
+  @Autowired SubjectRepository subjectRepository;
 
   @BeforeEach
   public void beforeEach() {
@@ -119,11 +125,28 @@ class IdentifiableRepositoryImplTest
   @Test
   @DisplayName("saves an Identifiable and fills uuid and timestamps")
   void testSave() throws RepositoryException {
+    Subject subject1 =
+        Subject.builder()
+            .label(new LocalizedText(Locale.ENGLISH, "My first subject"))
+            .identifier(Identifier.builder().namespace("test").id("12345").build())
+            .type("SUBJECT_TYPE")
+            .build();
+    subjectRepository.save(subject1);
+    Subject subject2 =
+        Subject.builder()
+            .label(new LocalizedText(Locale.ENGLISH, "My second subject"))
+            .identifier(Identifier.builder().namespace("test").id("123456").build())
+            .type("SUBJECT_TYPE")
+            .build();
+    subjectRepository.save(subject2);
+
     Identifiable identifiable =
         Identifiable.builder()
             .type(IdentifiableType.ENTITY)
             .identifiableObjectType(IdentifiableObjectType.IDENTIFIABLE)
             .label(Locale.GERMAN, "Test")
+            .subject(subject1)
+            .subject(subject2)
             .build();
 
     assertThat(identifiable.getCreated()).isNull();
