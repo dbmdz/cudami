@@ -117,6 +117,10 @@ public class V3WebpageController {
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(webpage));
     result.put("type", "ENTITY_PART");
     result.put("entityPartType", "WEBPAGE");
+    if (result.isNull("children")) {
+      result.put("children", new JSONArray());
+    }
+
     return new ResponseEntity<>(result.toString(), HttpStatus.OK);
   }
 

@@ -98,6 +98,8 @@ public class V3ProjectController {
       JSONObject projectObject = (JSONObject) it.next();
       projectObject.put(
           "className", "de.digitalcollections.model.impl.identifiable.entity.DigitalObjectImpl");
+      if (projectObject.isNull("fileResources"))
+        projectObject.put("fileResources", new JSONArray());
     }
 
     String resultStr = result.toString();
