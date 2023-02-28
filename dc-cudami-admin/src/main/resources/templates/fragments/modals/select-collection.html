@@ -42,7 +42,7 @@
     <script type="text/javascript">
       $('#selectCollectionDialog-userInput').autocomplete({
 //     	  serviceUrl: '/api/collections/search',
-    	  paramName: 'searchTerm',
+//     	  paramName: 'searchTerm',
 //     	  params: {
 //     		  pageNumber: 0,
 //     		  pageSize: 25,
@@ -50,7 +50,7 @@
 //     		},
     		lookup: function (query, done) {
     			let apiUrl = '/api/collections/search';
-    			apiUrl = apiUrl + '?pageNumber=0&pageSize=25';
+    			apiUrl = apiUrl + '?pageNumber=0&pageSize=25&searchTerm=' + query;
     			apiUrl = apiUrl + '&sortBy=label_de'
     			apiUrl = apiUrl + '&searchField=' + $("#selectCollectionDialog-inputType").val();
     			$.ajax({type: "GET", url: apiUrl,
