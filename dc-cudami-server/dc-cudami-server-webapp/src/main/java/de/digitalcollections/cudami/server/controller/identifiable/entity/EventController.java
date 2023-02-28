@@ -9,9 +9,14 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Event;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -54,6 +60,20 @@ public class EventController extends AbstractIdentifiableController<Event> {
     return eventService.count();
   }
 
+  @Operation(summary = "get all events")
+  @GetMapping(
+      value = {"/v6/events"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Event> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "label", required = false) String labelTerm,
+      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
+    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+  }
+
   @Operation(summary = "Get an event by uuid")
   @GetMapping(
       value = {"/v6/events/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
@@ -80,6 +100,17 @@ public class EventController extends AbstractIdentifiableController<Event> {
   public ResponseEntity<Event> getByIdentifier(HttpServletRequest request)
       throws ServiceException, ValidationException {
     return super.getByIdentifier(request);
+  }
+
+  @Operation(
+      summary = "Get languages of all events",
+      description = "Get languages of all events",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/events/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() {
+    return eventService.getLanguages();
   }
 
   @Operation(summary = "Delete an event")
