@@ -137,7 +137,6 @@
       <artifactId>spring-boot-devtools</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -186,6 +185,11 @@
       <groupId>org.webjars</groupId>
       <artifactId>webjars-locator</artifactId>
       <version>0.46</version>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.bowergithub.devbridge</groupId>
+      <artifactId>jquery-autocomplete</artifactId>
+      <version>1.4.11</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>
