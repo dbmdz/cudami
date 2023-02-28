@@ -80,14 +80,14 @@ public class V5MigrationHelper {
             if (obj instanceof JSONObject item) {
               if (item.has("entityType")) {
                 switch (item.getString("entityType")) {
-                  case "DIGITAL_OBJECT" -> {
+                  case "DIGITAL_OBJECT":
                     if (item.isNull("fileResources")) item.put("fileResources", new JSONArray());
-                  }
-                  case "ARTICLE" -> {
+                    break;
+                  case "ARTICLE":
                     if (item.isNull("creators")) item.put("creators", new JSONArray());
-                  }
+                    break;
+                  default:
                 }
-                ;
               }
             }
           });
