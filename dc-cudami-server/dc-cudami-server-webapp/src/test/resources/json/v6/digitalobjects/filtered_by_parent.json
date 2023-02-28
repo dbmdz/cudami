@@ -33,19 +33,13 @@
       "type": "ENTITY",
       "entityType": "DIGITAL_OBJECT",
       "refId": 72,
-      "fileResources": [],
-      "linkedDataResources": [],
       "parent": {
         "uuid": "1c419226-8d61-4efa-923a-7fbaf961eb9d",
         "identifiers": [],
         "type": "ENTITY",
         "entityType": "DIGITAL_OBJECT",
-        "refId": 0,
-        "fileResources": [],
-        "linkedDataResources": [],
-        "renderingResources": []
-      },
-      "renderingResources": []
+        "refId": 0
+      }
     }
   ],
   "totalElements": 0
