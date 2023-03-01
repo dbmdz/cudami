@@ -19,7 +19,11 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
@@ -45,6 +49,7 @@ import org.junit.jupiter.api.Test;
 class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
   private CollectionService collectionService;
+  private CorporateBodyService corporateBodyService;
   private DigitalObjectServiceImpl service;
   private DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService;
   private DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
@@ -53,8 +58,11 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   private IdentifierService identifierService;
   private ItemService itemService;
   private LocaleService localeService;
+  private ManifestationService manifestationService;
+  private PersonService personService;
   private ProjectService projectService;
   private UrlAliasService urlAliasService;
+  private WorkService workService;
   private DigitalObjectLinkedDataFileResourceRepository
       digitalObjectLinkedDataFileResourceRepository;
 
@@ -64,6 +72,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     super.beforeEach();
     repo = mock(DigitalObjectRepository.class);
     collectionService = mock(CollectionService.class);
+    corporateBodyService = mock(CorporateBodyService.class);
     digitalObjectLinkedDataFileResourceService =
         mock(DigitalObjectLinkedDataFileResourceService.class);
     digitalObjectRenderingFileResourceService =
@@ -73,8 +82,11 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     itemService = mock(ItemService.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("de");
+    manifestationService = mock(ManifestationService.class);
+    personService = mock(PersonService.class);
     projectService = mock(ProjectService.class);
     urlAliasService = mock(UrlAliasService.class);
+    workService = mock(WorkService.class);
     digitalObjectLinkedDataFileResourceRepository =
         mock(DigitalObjectLinkedDataFileResourceRepository.class);
 
@@ -82,9 +94,13 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
         new DigitalObjectServiceImpl(
             repo,
             collectionService,
+            corporateBodyService,
             projectService,
             identifierService,
             itemService,
+            manifestationService,
+            personService,
+            workService,
             urlAliasService,
             digitalObjectLinkedDataFileResourceService,
             digitalObjectRenderingFileResourceService,

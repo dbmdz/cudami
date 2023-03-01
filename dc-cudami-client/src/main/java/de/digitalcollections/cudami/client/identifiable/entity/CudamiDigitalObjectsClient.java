@@ -43,6 +43,10 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return getByIdentifier(namespace, id, Map.of("fill-wemi", "true"));
   }
 
+  public DigitalObject getByUUIDAndFillWEMI(UUID uuid) throws TechnicalException {
+    return doGetRequestForObject(String.format(baseEndpoint + "/%s?fill-wemi=true", uuid));
+  }
+
   public PageResponse<Project> findProjects(UUID uuid, PageRequest pageRequest)
       throws TechnicalException {
     return doGetRequestForPagedObjectList(

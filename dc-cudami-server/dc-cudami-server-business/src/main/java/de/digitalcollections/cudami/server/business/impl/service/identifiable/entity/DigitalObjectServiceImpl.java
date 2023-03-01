@@ -12,15 +12,23 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.PersonService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectLinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.DigitalObjectRenderingFileResourceService;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
@@ -31,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,18 +53,26 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectServiceImpl.class);
 
   private final CollectionService collectionService;
+  private final CorporateBodyService corporateBodyService;
   private final DigitalObjectLinkedDataFileResourceService
       digitalObjectLinkedDataFileResourceService;
   private final DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService;
   private final ItemService itemService;
+  private final ManifestationService manifestationService;
+  private final PersonService personService;
   private final ProjectService projectService;
+  private final WorkService workService;
 
   public DigitalObjectServiceImpl(
       DigitalObjectRepository repository,
       CollectionService collectionService,
+      CorporateBodyService corporateBodyService,
       ProjectService projectService,
       IdentifierService identifierService,
       ItemService itemService,
+      ManifestationService manifestationService,
+      PersonService personService,
+      WorkService workService,
       UrlAliasService urlAliasService,
       DigitalObjectLinkedDataFileResourceService digitalObjectLinkedDataFileResourceService,
       DigitalObjectRenderingFileResourceService digitalObjectRenderingFileResourceService,
@@ -70,8 +87,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
         localeService,
         cudamiConfig);
     this.collectionService = collectionService;
+    this.corporateBodyService = corporateBodyService;
     this.itemService = itemService;
+    this.manifestationService = manifestationService;
+    this.personService = personService;
     this.projectService = projectService;
+    this.workService = workService;
     this.digitalObjectRenderingFileResourceService = digitalObjectRenderingFileResourceService;
     this.digitalObjectLinkedDataFileResourceService = digitalObjectLinkedDataFileResourceService;
   }
@@ -230,18 +251,82 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     if (digitalObject == null) {
       return null;
     }
+    fillWMID(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  public DigitalObject getByUuidWithWEMI(UUID uuid) throws ServiceException {
+    DigitalObject digitalObject = getByUuid(uuid);
+    if (digitalObject == null) {
+      return null;
+    }
+    fillWMID(digitalObject);
+    return digitalObject;
+  }
+
+  private void fillWMID(DigitalObject digitalObject) throws ServiceException {
     if (digitalObject.getItem() != null) {
       Item item = itemService.getByUuid(digitalObject.getItem().getUuid());
 
-      // for later:
       if (item.getManifestation() != null) {
-        // TODO: fetch manifestation and fill item
+        Manifestation manifestation =
+            manifestationService.getByUuid(item.getManifestation().getUuid());
+        manifestation.setRelations(fillEntityRelations(manifestation.getRelations()));
+
+        if (manifestation.getWork() != null) {
+          Work work = workService.getByUuid(manifestation.getWork().getUuid());
+          work.setRelations(fillEntityRelations(work.getRelations()));
+          manifestation.setWork(work);
+        }
+
+        if (manifestation.getParents() != null && !manifestation.getParents().isEmpty()) {
+          manifestation.setParents(fillManifestationParents(manifestation.getParents()));
+        }
+
+        item.setManifestation(manifestation);
       }
 
       digitalObject.setItem(item);
     }
+  }
 
-    return digitalObject;
+  private List<RelationSpecification<Manifestation>> fillManifestationParents(
+      List<RelationSpecification<Manifestation>> parents) {
+    return parents.stream()
+        .peek(
+            p -> {
+              try {
+                p.setSubject(manifestationService.getByUuid(p.getSubject().getUuid()));
+              } catch (ServiceException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .collect(Collectors.toList());
+  }
+
+  private List<EntityRelation> fillEntityRelations(List<EntityRelation> relations) {
+    return relations.stream()
+        .peek(
+            r -> {
+              switch (r.getSubject().getIdentifiableObjectType()) {
+                case PERSON -> {
+                  try {
+                    r.setSubject(personService.getByUuid(r.getSubject().getUuid()));
+                  } catch (ServiceException e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+                case CORPORATE_BODY -> {
+                  try {
+                    r.setSubject(corporateBodyService.getByUuid(r.getSubject().getUuid()));
+                  } catch (ServiceException e) {
+                    throw new RuntimeException(e);
+                  }
+                }
+              }
+            })
+        .collect(Collectors.toList());
   }
 
   @Override

@@ -42,6 +42,8 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
 
   DigitalObject getByIdentifierWithWEMI(String namespace, String id) throws ServiceException;
 
+  DigitalObject getByUuidWithWEMI(UUID uuid) throws ServiceException;
+
   default List<FileResource> getFileResources(DigitalObject digitalObject) {
     return getFileResources(digitalObject.getUuid());
   }
