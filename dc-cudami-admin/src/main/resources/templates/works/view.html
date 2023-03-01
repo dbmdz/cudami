@@ -118,6 +118,50 @@
             </div>
           </div>
 
+          <div class="row">
+            <div class="col-md-3"><label th:text="#{lbl.manifestations}">Manifestations</label></div>
+            <div class="col-md-9">
+              <div id="toolbar-items">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingManifestationsLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('items-languages', ${existingManifestationsLanguages}, ${dataLanguageItems})">English</select>
+                </th:block>
+              </div>
+              <table id="table-manifestations"
+                     data-toggle="table"
+                     th:data-url="@{/api/works/__${work.uuid}__/manifestations}"
+                     th:data-locale="${#locale}"
+
+                     data-cookie="true"
+                     data-cookie-id-table="table-manifestations"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsItems"
+                     data-search="false"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="false"
+                     data-show-search-clear-button="false"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-manifestations"
+                     data-unique-id="uuid">
+                <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberManifestations" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelManifestations" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                  <th data-field="actions" data-formatter="formatActionsManifestations" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -129,6 +173,10 @@
 
       function formatRowNumberChildWorks(value, row, index) {
         return renderRowNumber($('#table-childworks'), index);
+      }
+
+      function formatRowNumberManifestations(value, row, index) {
+        return renderRowNumber($('#table-manifestations'), index);
       }
     </script>
 
@@ -142,11 +190,27 @@
         const dataLanguage = $("#data-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
       }
-      /*]]>*/
+
+      function formatLabelManifestations(value, row) {
+        /*[+
+         const baseUrl = [[@{'/manifestations'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#data-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
 
       function formatActionsChildWorks(value, row) {
         /*[+
          const baseUrl = [[@{'/works'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+
+      function formatActionsManifestations(value, row) {
+        /*[+
+         const baseUrl = [[@{'/manifestations'}]] + '/' + row.uuid;
          +]*/
         return [
           renderViewAction(baseUrl)

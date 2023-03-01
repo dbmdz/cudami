@@ -27,6 +27,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
@@ -268,6 +269,46 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 }
               });
     }
+  }
+
+  @Override
+  public PageResponse<Manifestation> findManifestationsByWork(
+      UUID workUuid, PageRequest pageRequest) throws RepositoryException {
+    final String manifestationTableAlias = getTableAlias();
+    final String manifestationTableName = getTableName();
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + manifestationTableName
+                + " AS "
+                + manifestationTableAlias
+                + " WHERE "
+                + manifestationTableAlias
+                + ".work = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (item) than this repository (manifestation)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Manifestation> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
   }
 
   protected static void additionalReduceRowsBiConsumer(

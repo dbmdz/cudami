@@ -5,11 +5,13 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -47,12 +49,17 @@ public class WorkController extends AbstractIdentifiableController<Work> {
   private final WorkService workService;
   private final ItemService itemService;
   private final AgentService agentService;
+  private final ManifestationService manifestationService;
 
   public WorkController(
-      WorkService workService, ItemService itemService, AgentService agentService) {
+      WorkService workService,
+      ItemService itemService,
+      AgentService agentService,
+      ManifestationService manifestationService) {
     this.workService = workService;
     this.itemService = itemService;
     this.agentService = agentService;
+    this.manifestationService = manifestationService;
   }
 
   @Override
@@ -97,6 +104,24 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       pageRequest.setSorting(sorting);
     }
     return workService.findEmbedded(uuid, pageRequest);
+  }
+
+  @Operation(summary = "Find all manifestations of a work")
+  @GetMapping(
+      value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/manifestations"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> findManifestations(
+      @Parameter(example = "", description = "UUID of the work") @PathVariable("uuid") UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return manifestationService.findManifestationsByWork(uuid, pageRequest);
   }
 
   @Override
