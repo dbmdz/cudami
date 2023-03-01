@@ -125,28 +125,20 @@ class IdentifiableRepositoryImplTest
   @Test
   @DisplayName("saves an Identifiable and fills uuid and timestamps")
   void testSave() throws RepositoryException {
-    Subject subject1 =
+    Subject subject =
         Subject.builder()
             .label(new LocalizedText(Locale.ENGLISH, "My first subject"))
             .identifier(Identifier.builder().namespace("test").id("12345").build())
             .type("SUBJECT_TYPE")
             .build();
-    subjectRepository.save(subject1);
-    Subject subject2 =
-        Subject.builder()
-            .label(new LocalizedText(Locale.ENGLISH, "My second subject"))
-            .identifier(Identifier.builder().namespace("test").id("123456").build())
-            .type("SUBJECT_TYPE")
-            .build();
-    subjectRepository.save(subject2);
+    subjectRepository.save(subject);
 
     Identifiable identifiable =
         Identifiable.builder()
             .type(IdentifiableType.ENTITY)
             .identifiableObjectType(IdentifiableObjectType.IDENTIFIABLE)
             .label(Locale.GERMAN, "Test")
-            .subject(subject1)
-            .subject(subject2)
+            .subject(subject)
             .build();
 
     assertThat(identifiable.getCreated()).isNull();
