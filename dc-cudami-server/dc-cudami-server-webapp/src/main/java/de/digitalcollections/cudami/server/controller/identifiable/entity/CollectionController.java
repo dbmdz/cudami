@@ -386,6 +386,9 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           long refId)
       throws ServiceException {
     Collection collection = collectionService.getByRefId(refId);
+    if (collection == null) {
+      return ResponseEntity.notFound().build();
+    }
     return getByUuid(collection.getUuid(), null, null);
   }
 
