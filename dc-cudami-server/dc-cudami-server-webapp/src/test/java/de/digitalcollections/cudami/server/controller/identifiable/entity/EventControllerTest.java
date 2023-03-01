@@ -10,7 +10,12 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Event;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -78,6 +83,16 @@ class EventControllerTest extends BaseControllerTest {
     testDeleteSuccessful(path);
 
     verify(eventService, times(1)).delete(eq(uuid));
+  }
+
+  @DisplayName("can not delete an already deleted event")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a"})
+  void deleteEventTwice(String path) throws Exception {
+    UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
+    when(eventService.delete(eq(uuid))).thenReturn(false);
+
+    testDeleteNotFound(path);
   }
 
   @DisplayName("can save an event")
@@ -158,5 +173,43 @@ class EventControllerTest extends BaseControllerTest {
     testPutJsonWithState("/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a", jsonBody, 200);
 
     verify(eventService, times(1)).update(eq(expectedEventToBeSaved));
+  }
+
+  @DisplayName("can return the languages of all events")
+  @Test
+  public void allLanguages() throws Exception {
+    when(eventService.getLanguages()).thenReturn(List.of(Locale.GERMAN, Locale.ENGLISH));
+    testGetJsonString("/v6/events/languages", "[\"de\",\"en\"]");
+  }
+
+  @DisplayName("shall find a filtered list of events")
+  @ParameterizedTest
+  @ValueSource(strings = {"/v6/events/?pageNumber=0&pageSize=10&label=foo"})
+  public void relatedByPredicate(String path) throws Exception {
+    List<Event> events =
+        List.of(
+            Event.builder()
+                .created("2020-10-20T14:38:07.757894")
+                .identifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                .label(Locale.GERMAN, "foo")
+                .name(new LocalizedText(Locale.GERMAN, "foo"))
+                .lastModified("2021-02-25T09:05:34.039316")
+                .uuid("2d72fc41-e7a7-4666-a76f-38e3d565eb48")
+                .build());
+
+    PageResponse<Event> pageResponse = PageResponse.builder().withContent(events).build();
+
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber(0)
+            .pageSize(10)
+            .filtering(
+                Filtering.builder()
+                    .add(FilterCriterion.builder().withExpression("label").contains("foo").build())
+                    .build())
+            .build();
+    when(eventService.find(eq(pageRequest))).thenReturn(pageResponse);
+
+    testJson(path, "/v6/events/listresult.json");
   }
 }
