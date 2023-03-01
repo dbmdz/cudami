@@ -15,8 +15,8 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            <form>
+					<div class="modal-body">
+						<form>
               <div class="row">
                 <label for="inputType" class="form-label col-sm-2 pt-1" th:text="#{lbl.target_collection}">Password</label>
                 <div class="input-group col-sm-10">
@@ -26,12 +26,15 @@
                     <option value="identifier" th:text="#{lbl.identifier}">Identifier</option>
                     <option value="uuid" th:text="#{lbl.uuid}">UUID</option>
                   </select>
-                  <input id="selectCollectionDialog-userInput" type="text" aria-label="User input" name="userInput" class="form-control">
+                  <div class="form-control auto-search-wrapper p-0 border-0">
+                    <input id="selectCollectionDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
+                  </div>
                 </div>
               </div>
+              <input type="hidden" name="selectedUuid"/>
             </form>
-          </div>
-          <div class="modal-footer justify-content-between">
+					</div>
+					<div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
             <a class="btn btn-primary" id="confirm" th:text="#{btn.move}">Move</a>
           </div>
@@ -40,37 +43,56 @@
     </div>
 
     <script type="text/javascript">
-      $('#selectCollectionDialog-userInput').autocomplete({
-//     	  serviceUrl: '/api/collections/search',
-//     	  paramName: 'searchTerm',
-//     	  params: {
-//     		  pageNumber: 0,
-//     		  pageSize: 25,
-//     		  sortBy: 'label_de'
-//     		},
-    		lookup: function (query, done) {
-    			let apiUrl = '/api/collections/search';
-    			apiUrl = apiUrl + '?pageNumber=0&pageSize=25&searchTerm=' + query;
-    			apiUrl = apiUrl + '&sortBy=label_de'
-    			apiUrl = apiUrl + '&searchField=' + $("#selectCollectionDialog-inputType").val();
-    			$.ajax({type: "GET", url: apiUrl,
-    		          success: function (data) {
-    		        	  var result = {
-    		        			suggestions: $.map(data.content, function(dataItem) {
-    	                  return { value: dataItem.label.de, data: dataItem.uuid };
-    	                })
-    		            };
-    		        	  done(result);
-    		          },
-    		          error: function () {
-    		            alert("FEHLER");
-    		          }
-    		        });
-    	    },
-        onSelect: function (suggestion) {
-          alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
-  	    }
-    	});
+      // empty input field every time the type select changes
+      $('#selectCollectionDialog-inputType').change(function() { $('#selectCollectionDialog-userInput').val(""); });
+      
+      new Autocomplete('selectCollectionDialog-userInput', {
+    	  insertToInput: false,
+    	  noResults: ({ element, currentValue, template }) => template(`<li>No results found: "${currentValue}"</li>`),
+        onSearch: ({ currentValue }) => {
+          let apiUrl = `/api/collections/search?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
+          apiUrl = apiUrl + '&sortBy=label_de';
+          apiUrl = apiUrl + '&searchField=' + $("#selectCollectionDialog-inputType").val();
+          return new Promise((resolve) => {
+            fetch(apiUrl)
+                    .then((response) => response.json())
+                    .then((data) => {
+                    	// only content property of PageResponse:
+                      resolve(data.content);
+                    })
+                    .catch((error) => {
+                    	// just show user "no result"
+                    	resolve([]);
+                    });
+          });
+        },
+
+        onResults: ({ currentValue, matches, template, classGroup }) => {
+        	return matches === 0
+            ? template
+            : matches
+        	    .map((el) => {
+        	    	let html = '<li><div class="row"><div class="col-md-1">';
+        	    	if (el.previewImage) {
+        	    		html = html + `<figure class="mb-0 mx-auto" style="max-width: 50px;">
+                        <img class="img-fluid mw-100" src="${el.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
+                        </figure>`;
+        	    	} else {
+        	    		html = html + '<img alt="kein Vorschaubild" class="img-fluid mw-100" src="/images/no-image.png">';
+        	    	}
+        	    	html = html + `</div><div class="col-md-11">${el.label.de}</div></div></li>`;
+        	      return html;
+        	    })
+        	    .join('');
+        	},
+        onSubmit: ({ index, element, object, results }) => {
+	        // the onSubmit function is executed when the user
+	        // submits their result by either selecting a result
+	        // from the list, or pressing enter or mouse button
+//           console.log('selected: ', object);
+          $('#selectCollectionDialog').find('input[name="selectedUuid"]').val(object.uuid);
+        },
+      });
     </script>
   </th:block>
 </body>

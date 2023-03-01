@@ -9,17 +9,17 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollections
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,6 +55,9 @@ public class CollectionsAPIController
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
+  /*
+   * Used in templates/collections/view.html
+   */
   @PostMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
@@ -93,34 +96,56 @@ public class CollectionsAPIController
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
     PageRequest pageRequest;
-    if (searchField != null) {
-      pageRequest = new PageRequest(pageNumber, pageSize);
-      if ("uuid".equals(searchField) || "refId".equals(searchField)) {
-        // TODO: does this work?
-        Filtering filtering =
-            Filtering.builder()
-                .add(searchField, FilterCriterion.builder().isEquals(searchTerm).build())
-                .build();
-        pageRequest.setFiltering(filtering);
-      } else if ("identifier".equals(searchField)) {
-        // TODO special filtering needed (search in set of identifiers...)
-      } else {
-        // label
-        // pageRequest.setSearchTerm(searchTerm); // searches in description, too
-        Filtering filtering =
-            Filtering.builder()
-                .add(searchField, FilterCriterion.builder().contains(searchTerm).build())
-                .build();
-        pageRequest.setFiltering(filtering);
-      }
-    } else {
+    PageResponse<Collection> pageResponse;
+
+    if (searchField == null) {
       pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+      if (sortBy != null) {
+        Sorting sorting = new Sorting(sortBy);
+        pageRequest.setSorting(sorting);
+      }
+      pageResponse = service.find(pageRequest);
+      return pageResponse;
+    } else {
+      pageRequest = new PageRequest(pageNumber, pageSize);
+      if (sortBy != null) {
+        Sorting sorting = new Sorting(sortBy);
+        pageRequest.setSorting(sorting);
+      }
+
+      Collection collection;
+      switch (searchField) {
+        case "label":
+          pageRequest.setSearchTerm(searchTerm);
+          pageResponse = service.find(pageRequest);
+          return pageResponse;
+        case "uuid":
+          collection = service.getByUuid(UUID.fromString(searchTerm));
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse = PageResponse.builder().withContent(collection).build();
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
+        case "refId":
+          collection = service.getByRefId(Long.valueOf(searchTerm));
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
+        case "identifier":
+          // TODO
+          break;
+        default:
+          throw new InvalidEndpointRequestException("invalid request params", searchTerm);
+      }
+      throw new InvalidEndpointRequestException("invalid request params", searchTerm);
     }
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.find(pageRequest);
   }
 
   /*

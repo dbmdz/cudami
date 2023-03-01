@@ -187,9 +187,10 @@
       <version>0.46</version>
     </dependency>
     <dependency>
-      <groupId>org.webjars.bowergithub.devbridge</groupId>
-      <artifactId>jquery-autocomplete</artifactId>
-      <version>1.4.11</version>
+      <groupId>org.webjars.bowergithub.tomik23</groupId>
+      <artifactId>autocomplete</artifactId>
+      <version>1.8.6</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>

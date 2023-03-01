@@ -292,6 +292,35 @@
         return renderLabel(baseUrl, value, dataLanguage);
       }
 
+      function moveSubcollection(uuid) {
+        $('#selectCollectionDialog').modal('hide');
+        
+    	  let selectedTargetCollectionUuid = $('#selectCollectionDialog').find('input[name="selectedUuid"]').val();
+        /*[+
+          const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
+          const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
+          const errorMessage = [[#{error.technical_error}]];
+        +]*/
+
+        // move = add + delete:
+        $.ajax({type: "POST", url: apiUrlAdd,
+            success: function () {
+            	$.ajax({type: "DELETE", url: apiUrlDelete,
+                    success: function () {
+                      $('#table-sub-collections').bootstrapTable('refresh');
+            	        // TODO i18n message:
+                      showAlert('#alert-subcollections', "collection moved");
+                    },
+                    error: function () {
+                    	showAlert('#alert-subcollections', errorMessage);
+                    }
+                  });
+            },
+            error: function () {
+            	showAlert('#alert-subcollections', errorMessage);
+            }
+          });
+      }
       function moveSubcollectionDialog(uuid) {
         const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
         const label = row.label[Object.keys(row.label)[0]];
@@ -303,7 +332,7 @@
         const modalDialog = $('#selectCollectionDialog');
 //        $(modalDialog).find('.modal-title').text(modalTitle);
 //        $(modalDialog).find('.modal-body').html(modalMessage);
-//        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
+        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:moveSubcollection('" + uuid + "');");
         $(modalDialog).modal('show');
       }
 
@@ -326,34 +355,6 @@
         return "<a title=\"" + tooltip + "\" href=\"javascript:removeSubcollectionDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
       }
 
-      function removeDigitalObjectDialog(uuid) {
-        const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
-        const label = row.label[Object.keys(row.label)[0]];
-        /*[+
-         const modalTitle = [[#{modal.title.warning}]];
-         const modalMessage = `[(#{modal.msg.confirm_remove_digitalobject_from_collection})]`;
-         +]*/
-
-        const modalDialog = $('#confirmYesNoDialog');
-        $(modalDialog).find('.modal-title').text(modalTitle);
-        $(modalDialog).find('.modal-body').html(modalMessage);
-        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeDigitalObject('" + uuid + "');");
-        $(modalDialog).modal('show');
-      }
-      function removeSubcollectionDialog(uuid) {
-        const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
-        const label = row.label[Object.keys(row.label)[0]];
-        /*[+
-         const modalTitle = [[#{modal.title.warning}]];
-         const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
-         +]*/
-
-        const modalDialog = $('#confirmYesNoDialog');
-        $(modalDialog).find('.modal-title').text(modalTitle);
-        $(modalDialog).find('.modal-body').html(modalMessage);
-        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
-        $(modalDialog).modal('show');
-      }
       function removeDigitalObject(uuid) {
         /*[+
          const apiUrl = [[@{'/api/collections/__${collection.uuid}__/digitalobjects/'}]] + uuid;
@@ -372,6 +373,21 @@
           }
         });
       }
+      function removeDigitalObjectDialog(uuid) {
+        const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
+        const label = row.label[Object.keys(row.label)[0]];
+        /*[+
+         const modalTitle = [[#{modal.title.warning}]];
+         const modalMessage = `[(#{modal.msg.confirm_remove_digitalobject_from_collection})]`;
+         +]*/
+
+        const modalDialog = $('#confirmYesNoDialog');
+        $(modalDialog).find('.modal-title').text(modalTitle);
+        $(modalDialog).find('.modal-body').html(modalMessage);
+        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeDigitalObject('" + uuid + "');");
+        $(modalDialog).modal('show');
+      }
+      
       function removeSubcollection(uuid) {
         /*[+
          const apiUrl = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
@@ -389,6 +405,26 @@
             alert(errorMessage);
           }
         });
+      }
+      function removeSubcollectionDialog(uuid) {
+        const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
+        const label = row.label[Object.keys(row.label)[0]];
+        /*[+
+         const modalTitle = [[#{modal.title.warning}]];
+         const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
+         +]*/
+
+        const modalDialog = $('#confirmYesNoDialog');
+        $(modalDialog).find('.modal-title').text(modalTitle);
+        $(modalDialog).find('.modal-body').html(modalMessage);
+        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
+        $(modalDialog).modal('show');
+      }
+      
+      function showAlert(alertElementId, message) {
+    	  // TODO alert-success/warn/info class...
+    	  $(alertElementId).children('span:first-child').text(message);
+    	  $(alertElementId).removeClass("d-none");
       }
       /*]]>*/
     </script>
