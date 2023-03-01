@@ -17,13 +17,13 @@ java -jar dc-cudami-admin-webapp-7.0.0-SNAPSHOT.jar --cudami.server.address=<you
 ### Javascript and CSS
 
 * AdminLTE 3.2.0
-* Bootstrap-Table 1.21.1
-* jQuery 3.6.0
 * Bootstrap v4.6.1 (https://getbootstrap.com/)
-* Font Awesome Free 5.15.4
-* TipTap 2.0.0beta
+* Bootstrap-Table 1.21.1
 * filesize 9.0.1
-* jQuery-Autocomplete 1.4.11 (<https://github.com/devbridge/jQuery-Autocomplete>)
+* Font Awesome Free 5.15.4
+* jQuery 3.6.0
+* jQuery-Autocomplete tomik23/autocomplete 1.8.6
+* TipTap 2.0.0beta
 
 ## Migrations
 
