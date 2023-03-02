@@ -17,6 +17,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
@@ -86,6 +88,9 @@ public class CollectionsAPIController
     return service.create();
   }
 
+  /*
+   * Used in templates/collections/view.html
+   */
   @GetMapping("/api/collections/search")
   @ResponseBody
   public PageResponse<Collection> find(
@@ -126,7 +131,6 @@ public class CollectionsAPIController
           } else {
             pageResponse = PageResponse.builder().withContent(collection).build();
           }
-          pageResponse = PageResponse.builder().withContent(collection).build();
           pageResponse.setRequest(pageRequest);
           return pageResponse;
         case "refId":
@@ -139,12 +143,18 @@ public class CollectionsAPIController
           pageResponse.setRequest(pageRequest);
           return pageResponse;
         case "identifier":
-          // TODO
-          break;
+          Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
+          collection = service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
         default:
           throw new InvalidEndpointRequestException("invalid request params", searchTerm);
       }
-      throw new InvalidEndpointRequestException("invalid request params", searchTerm);
     }
   }
 

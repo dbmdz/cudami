@@ -84,7 +84,7 @@
             <div class="col-md-3"><label th:text="#{lbl.sub_collections}">Sub collections</label></div>
             <div class="col-md-9">
               <div id="alert-subcollections" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
-                <span th:utext="#{alert.success.subcollection_removed_from_collection}">The sub collection has been removed successfully from the collection.</span>
+                <span>Alert message.</span>
 
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
@@ -200,7 +200,7 @@
 
   <section layout:fragment="beforeBodyEnds">
     <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
-    <div th:replace="fragments/modals/select-collection :: render"></div>
+    <div th:replace="fragments/modals/select-entity :: render"></div>
 
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
@@ -293,13 +293,23 @@
       }
 
       function moveSubcollection(uuid) {
-        $('#selectCollectionDialog').modal('hide');
+    	  if (selectedTargetCollectionUuid == uuid) {
+          return;
+    	  }
+    	  
+    	  $('#selectEntityDialog').modal('hide');
         
-    	  let selectedTargetCollectionUuid = $('#selectCollectionDialog').find('input[name="selectedUuid"]').val();
+    	  let selectedTargetCollectionUuid = $('#selectEntityDialog').find('input[name="selectedUuid"]').val();
+    	  if (selectedTargetCollectionUuid) {
+    		  let selectedTargetCollectionLabel = $('#selectEntityDialog-userInput').val();
+    		  let collectionLabel = $('#selectEntityDialog .modal-message b').text();
+    		  
         /*[+
           const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
           const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
           const errorMessage = [[#{error.technical_error}]];
+          const targetCollectionUrl = [[@{'/collections/'}]] + selectedTargetCollectionUuid;
+          const successMessage = `[(#{msg.move_collection.success})]`;
         +]*/
 
         // move = add + delete:
@@ -308,8 +318,7 @@
             	$.ajax({type: "DELETE", url: apiUrlDelete,
                     success: function () {
                       $('#table-sub-collections').bootstrapTable('refresh');
-            	        // TODO i18n message:
-                      showAlert('#alert-subcollections', "collection moved");
+                      showAlert('#alert-subcollections', successMessage);
                     },
                     error: function () {
                     	showAlert('#alert-subcollections', errorMessage);
@@ -320,19 +329,27 @@
             	showAlert('#alert-subcollections', errorMessage);
             }
           });
+    	  } else {
+    		  showAlert('#alert-subcollections', "Keine Ziel-Sammlung ausgewählt.");
+    	  }
       }
       function moveSubcollectionDialog(uuid) {
         const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
         const label = row.label[Object.keys(row.label)[0]];
         /*[+
-         const modalTitle = [[#{modal.title.warning}]];
-         const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
+         const modalTitle = [[#{modal.title.move_collection}]];
+         const modalMessage = `[(#{modal.msg.move_collection})]`;
+         const modalBtnText = `[(#{btn.move})]`;
+         const searchApiUrl = [[@{/api/collections/search}]];
          +]*/
 
-        const modalDialog = $('#selectCollectionDialog');
-//        $(modalDialog).find('.modal-title').text(modalTitle);
-//        $(modalDialog).find('.modal-body').html(modalMessage);
-        $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:moveSubcollection('" + uuid + "');");
+        const modalDialog = $('#selectEntityDialog');
+        $(modalDialog).data('searchApiUrl', searchApiUrl);
+        $(modalDialog).find('.modal-title').text(modalTitle);
+        $(modalDialog).find('.modal-message').html(modalMessage);
+        var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+        $(btnOk).attr('href', "javascript:moveSubcollection('" + uuid + "');");
+        $(btnOk).html(modalBtnText);
         $(modalDialog).modal('show');
       }
 
@@ -423,7 +440,7 @@
       
       function showAlert(alertElementId, message) {
     	  // TODO alert-success/warn/info class...
-    	  $(alertElementId).children('span:first-child').text(message);
+    	  $(alertElementId).children('span:first-child').html(message);
     	  $(alertElementId).removeClass("d-none");
       }
       /*]]>*/
