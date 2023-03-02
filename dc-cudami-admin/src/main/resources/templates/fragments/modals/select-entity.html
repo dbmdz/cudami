@@ -6,53 +6,63 @@
   </head>
   <body>
   <th:block th:fragment="render">
-    <div class="modal fade" id="selectCollectionDialog">
+    <div class="modal fade" id="selectEntityDialog" data-searchApiUrl="#">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" th:text="#{modal.title.move_collection}">Move sub collection into collection</h4>
+            <h4 class="modal-title">Modal Title</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
 					<div class="modal-body">
+					  <p class="modal-message">Modal Message</p>
 						<form>
               <div class="row">
-                <label for="inputType" class="form-label col-sm-2 pt-1" th:text="#{lbl.target_collection}">Password</label>
-                <div class="input-group col-sm-10">
-                  <select class="form-select" id="selectCollectionDialog-inputType">
+                <div class="input-group col-sm-12">
+                  <select class="form-select" id="selectEntityDialog-inputType">
                     <option value="label" selected th:text="#{lbl.label}">Label</option>
                     <option value="refId" th:text="#{lbl.ref_id}">Reference ID</option>
                     <option value="identifier" th:text="#{lbl.identifier}">Identifier</option>
                     <option value="uuid" th:text="#{lbl.uuid}">UUID</option>
                   </select>
                   <div class="form-control auto-search-wrapper p-0 border-0">
-                    <input id="selectCollectionDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
+                    <input id="selectEntityDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
                   </div>
                 </div>
               </div>
               <input type="hidden" name="selectedUuid"/>
             </form>
+            
+            <div class="previewSelected mt-2 p-1 border d-none"></div>
+            
 					</div>
 					<div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-            <a class="btn btn-primary" id="confirm" th:text="#{btn.move}">Move</a>
+            <a class="btn btn-primary" th:text="#{btn.ok}">Ok</a>
           </div>
         </div>
       </div>
     </div>
 
-    <script type="text/javascript">
-      // empty input field every time the type select changes
-      $('#selectCollectionDialog-inputType').change(function() { $('#selectCollectionDialog-userInput').val(""); });
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+    	  
+    	/*[+
+       const msgNoResultsFound = [[#{msg.no_results_found}]];
+      +]*/
       
-      new Autocomplete('selectCollectionDialog-userInput', {
+      // empty input field every time the type select changes
+      $('#selectEntityDialog-inputType').change(function() { $('#selectEntityDialog-userInput').val(""); });
+      
+      new Autocomplete('selectEntityDialog-userInput', {
     	  insertToInput: false,
-    	  noResults: ({ element, currentValue, template }) => template(`<li>No results found: "${currentValue}"</li>`),
+    	  noResults: ({ element, currentValue, template }) => template(`<li>${msgNoResultsFound}: "${currentValue}"</li>`),
         onSearch: ({ currentValue }) => {
-          let apiUrl = `/api/collections/search?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
+        	let apiUrl = $('#selectEntityDialog').data('searchApiUrl');
+          apiUrl = apiUrl + `?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
           apiUrl = apiUrl + '&sortBy=label_de';
-          apiUrl = apiUrl + '&searchField=' + $("#selectCollectionDialog-inputType").val();
+          apiUrl = apiUrl + '&searchField=' + $("#selectEntityDialog-inputType").val();
           return new Promise((resolve) => {
             fetch(apiUrl)
                     .then((response) => response.json())
@@ -78,21 +88,36 @@
                         <img class="img-fluid mw-100" src="${el.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
                         </figure>`;
         	    	} else {
-        	    		html = html + '<img alt="kein Vorschaubild" class="img-fluid mw-100" src="/images/no-image.png">';
+        	    		html = html + '<img class="img-fluid mw-100" src="/images/no-image.png">';
         	    	}
-        	    	html = html + `</div><div class="col-md-11">${el.label.de}</div></div></li>`;
+        	    	html = html + `</div><div class="col">${el.label.de}</div></div></li>`;
         	      return html;
         	    })
         	    .join('');
         	},
         onSubmit: ({ index, element, object, results }) => {
-	        // the onSubmit function is executed when the user
-	        // submits their result by either selecting a result
-	        // from the list, or pressing enter or mouse button
-//           console.log('selected: ', object);
-          $('#selectCollectionDialog').find('input[name="selectedUuid"]').val(object.uuid);
+          $('#selectEntityDialog').find('input[name="selectedUuid"]').val(object.uuid);
+          
+          let selectedHtml = $(results).children().eq(index).children().first();
+          // add delete button, fill preview box and show box
+          let deleteHtml = '<a href="javascript:doUnselect();" class="remove"><i class="fa fa-trash"></i></a>';
+          $(selectedHtml).append('<div class="text-right col-md-1">' + deleteHtml + '</div>');
+          let previewBox = $('#selectEntityDialog').find('div.previewSelected');
+          $('#selectEntityDialog').find('div.previewSelected').html(selectedHtml);
+          $(previewBox).removeClass('d-none');
+          
+          // hide input group in form
+          $('#selectEntityDialog').find('form div.input-group').hide();
         },
       });
+      
+      function doUnselect() {
+    	  $('#selectEntityDialog').find('div.previewSelected').addClass('d-none');
+    	  $('#selectEntityDialog-userInput').val("");
+    	  $('#selectEntityDialog').find('form div.input-group').show();
+      }
+      
+      /*]]>*/
     </script>
   </th:block>
 </body>
