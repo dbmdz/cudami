@@ -86,6 +86,20 @@
     <th:block th:if="${(geolocation != null)}">
       <span th:switch="${geolocation.identifiableObjectType?.name()}">
         <a
+            th:case="'GEOLOCATION'"
+            th:href="@{/geolocations/{uuid}(uuid=${geolocation.uuid})}"
+            th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}"
+        >
+          geolocation label
+        </a>
+        <a
+            th:case="'GEO_LOCATION'"
+            th:href="@{/geolocations/{uuid}(uuid=${geolocation.uuid})}"
+            th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}"
+        >
+          geolocation label
+        </a>
+        <a
             th:case="'HUMAN_SETTLEMENT'"
             th:href="@{/geolocations/{uuid}(uuid=${geolocation.uuid})}"
             th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}"
@@ -93,6 +107,19 @@
           human settlement label
         </a>
         <span th:case="*" th:text="${geolocation.label?.getText(defaultLanguage)} ?: ${geolocation.uuid}">geolocation label</span>
+      </span>
+    </th:block>
+  </th:block>
+
+  <th:block th:fragment="renderEvent(event)">
+    <th:block th:if="${(event != null)}">
+        <a
+            th:href="@{/events/{uuid}(uuid=${event.uuid})}"
+            th:text="${event.label?.getText(defaultLanguage)} ?: ${event.uuid}"
+        >
+          event label
+        </a>
+        <span th:case="*" th:text="${event.label?.getText(defaultLanguage)} ?: ${event.uuid}">event label</span>
       </span>
     </th:block>
   </th:block>
@@ -110,6 +137,8 @@
                       <th:block th:case="'CORPORATE_BODY'" th:insert="~{::renderAgent(${subject})}"></th:block>
                       <th:block th:case="'HUMAN_SETTLEMENT'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
                       <th:block th:case="'GEOLOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+                      <th:block th:case="'GEO_LOCATION'" th:insert="~{::renderGeolocation(${subject})}"></th:block>
+                      <th:block th:case="'EVENT'" th:insert="~{::renderEvent(${subject})}"></th:block>
                     </span>
             &nbsp;
             <span class="border border-dark p-2 badge badge-light mr-2">

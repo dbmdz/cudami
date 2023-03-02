@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="#{events}">Events</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.events}">Events</h1>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+
+            <div id="toolbar-events">
+              <!-- TODO it always contains "und" undefined language? -->
+              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="fragments/components/select-language-dropdown::render('events-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+              </th:block>
+            </div>
+            <table id="table-events"
+                   data-toggle="table"
+                   th:data-url="@{/api/events}"
+                   th:data-locale="${#locale}"
+
+                   data-cookie="true"
+                   data-cookie-id-table="table-events"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+                   data-query-params="queryParamsEvents"
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="label"
+                   data-sort-order="asc"
+                   data-toolbar="#toolbar-events"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberEvents" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                  <th data-field="label" data-sortable="true" data-formatter="formatLabelEvents" th:text="#{lbl.label}">Label</th>
+                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActionsEvents" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      $(function () {
+        $("#geolocations-languages").change(function () {
+          $('#table-geolocations').bootstrapTable('refresh');
+        });
+      });
+
+      function formatRowNumberEvents(value, row, index) {
+        return renderRowNumber($('#table-events'), index);
+      }
+      
+      function queryParamsEvents(params) {
+        let dataLanguage = $("#events-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
+      }
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatActionsEvents(value, row) {
+        /*[+
+         const baseUrl = [[@{'/events'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+      
+      function formatLabelEvents(value, row) {
+        /*[+
+         const baseUrl = [[@{'/events'}]] + '/' + row.uuid;
+         +]*/
+        const dataLanguage = $("#events-languages").val();
+        return renderLabel(baseUrl, value, dataLanguage);
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+  </th:block>
+</body>
+</html>

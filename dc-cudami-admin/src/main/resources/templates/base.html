@@ -315,6 +315,16 @@
                       <p th:text="#{geolocations}">Geolocations</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a class="nav-link"
+                       th:classappend="${menu == 'events'} ? active"
+                       th:href="@{/events}"
+                       th:title="#{events}"
+                    >
+                      <i class="fas fa-calendar-alt nav-icon"></i>
+                      <p th:text="#{events}">Events</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
 
