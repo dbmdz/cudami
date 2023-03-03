@@ -9,15 +9,20 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollections
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +58,9 @@ public class CollectionsAPIController
     return new ResponseEntity<>(successful, HttpStatus.NOT_FOUND);
   }
 
+  /*
+   * Used in templates/collections/view.html
+   */
   @PostMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
@@ -81,25 +89,87 @@ public class CollectionsAPIController
     return service.create();
   }
 
+  /*
+   * Used in templates/collections/view.html
+   */
   @GetMapping("/api/collections/search")
   @ResponseBody
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "searchField", required = false) String searchField,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
+    PageRequest pageRequest;
+    PageResponse<Collection> pageResponse;
+
+    if (searchField == null) {
+      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+      if (sortBy != null) {
+        Sorting sorting = new Sorting(sortBy);
+        pageRequest.setSorting(sorting);
+      }
+      pageResponse = service.find(pageRequest);
+      return pageResponse;
+    } else {
+      pageRequest = new PageRequest(pageNumber, pageSize);
+      if (sortBy != null) {
+        Sorting sorting = new Sorting(sortBy);
+        pageRequest.setSorting(sorting);
+      }
+
+      Collection collection;
+      switch (searchField) {
+        case "label":
+          Filtering filtering =
+              Filtering.builder()
+                  .add(
+                      FilterCriterion.builder()
+                          .withExpression("label")
+                          .isEquals(searchTerm)
+                          .build())
+                  .build();
+          pageRequest.setFiltering(filtering);
+          pageResponse = service.find(pageRequest);
+          return pageResponse;
+        case "uuid":
+          collection = service.getByUuid(UUID.fromString(searchTerm));
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
+        case "refId":
+          collection = service.getByRefId(Long.parseLong(searchTerm));
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
+        case "identifier":
+          Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
+          collection = service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+          if (collection == null) {
+            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+          } else {
+            pageResponse = PageResponse.builder().withContent(collection).build();
+          }
+          pageResponse.setRequest(pageRequest);
+          return pageResponse;
+        default:
+          throw new InvalidEndpointRequestException("invalid request params", searchTerm);
+      }
     }
-    return service.find(pageRequest);
   }
 
   /*
-  Used in templates/collections/view.html
-  */
+   * Used in templates/collections/view.html
+   */
   @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
   public BTResponse<DigitalObject> findDigitalObjects(
@@ -118,8 +188,8 @@ public class CollectionsAPIController
   }
 
   /*
-  Used in templates/collections/view.html
-  */
+   * Used in templates/collections/view.html
+   */
   @GetMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections")
   @ResponseBody
   public BTResponse<Collection> findSubcollections(
@@ -138,8 +208,8 @@ public class CollectionsAPIController
   }
 
   /*
-  Used in templates/collections/list.html
-  */
+   * Used in templates/collections/list.html
+   */
   @SuppressFBWarnings
   @GetMapping("/api/collections")
   @ResponseBody
@@ -177,8 +247,8 @@ public class CollectionsAPIController
   }
 
   /*
-  Used in templates/collections/view.html
-  */
+   * Used in templates/collections/view.html
+   */
   @DeleteMapping("/api/collections/{collectionUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
   public ResponseEntity removeDigitalObject(
@@ -192,8 +262,8 @@ public class CollectionsAPIController
   }
 
   /*
-  Used in templates/collections/view.html
-  */
+   * Used in templates/collections/view.html
+   */
   @DeleteMapping("/api/collections/{collectionUuid}/collections/{subcollectionUuid}")
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)

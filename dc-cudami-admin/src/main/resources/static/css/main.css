@@ -19,7 +19,6 @@
 }
 /* admin lte */
 
-
 a[href^="http"]:not(.no-external):after {
   content: "\f35d";
   font-family: "Font Awesome 5 Free";

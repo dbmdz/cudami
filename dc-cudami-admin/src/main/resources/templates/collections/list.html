@@ -4,141 +4,144 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{collections}">Collections</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.collections}">Collections</h1>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-
-            <div id="toolbar-collections">
-              <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('collections-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-              </th:block>
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.collections}">Collections</h1>
+              <hr>
             </div>
-            <table id="table-collections"
-                   data-toggle="table"
-                   th:data-url="@{/api/collections}"
-                   th:data-locale="${#locale}"
-                   data-buttons="buttonsCollections"
-                   data-cookie="true"
-                   data-cookie-id-table="table-collections"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   data-query-params="queryParamsCollections"
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="label"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-collections"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberCollections" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabelCollections" th:text="#{lbl.label}">Label</th>
-                  <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
-                  <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
-                  <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsCollections" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
+
+          <div class="row">
+            <div class="col">
+
+              <div id="toolbar-collections">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('collections-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                </th:block>
+              </div>
+              <table id="table-collections"
+                     data-toggle="table"
+                     th:data-url="@{/api/collections}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsCollections"
+                     data-cookie="true"
+                     data-cookie-id-table="table-collections"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsCollections"
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-collections"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberCollections" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelCollections" th:text="#{lbl.label}">Label</th>
+                    <th data-field="publicationStatus" data-formatter="renderPublicationStatus" data-halign="center" data-align="center" th:text="#{lbl.status}">Status</th>
+                    <th data-field="publicationStart" data-formatter="renderDate" th:text="#{lbl.publication_start}">Start of publication</th>
+                    <th data-field="publicationEnd" data-formatter="renderDate" th:text="#{lbl.publication_end}">End of publication</th>
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsCollections" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
-    <script type="text/javascript">
-      $(function () {
-        $("#collections-languages").change(function () {
-          $('#table-collections').bootstrapTable('refresh');
+      <script type="text/javascript">
+        $(function () {
+          $("#collections-languages").change(function () {
+            $('#table-collections').bootstrapTable('refresh');
+          });
         });
-      });
 
-      function formatRowNumberCollections(value, row, index) {
-        return renderRowNumber($('#table-collections'), index);
-      }
-      
-      function queryParamsCollections(params) {
-        let dataLanguage = $("#collections-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberCollections(value, row, index) {
+          return renderRowNumber($('#table-collections'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function buttonsCollections() {
-        /*[+
-         const baseUrl = [[@{'/collections'}]];
-         const textAdd = [[#{btn.add}]];
-         const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-         +]*/
-        return {
-          btnAdd: {
-            text: textAdd,
-            icon: 'fa-plus',
-            event: function () {
-              location.href = baseUrl + '/new';
-            },
-            attributes: {
-              title: tooltipAdd
+        function queryParamsCollections(params) {
+          let dataLanguage = $("#collections-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        function buttonsCollections() {
+          /*[+
+           const baseUrl = [[@{'/collections'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
             }
-          }
-        };
-      }
-      
-      function formatActionsCollections(value, row) {
-        /*[+
-         const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
-         const itemType = [[#{lbl.collection.inline}]];
-         +]*/
-        const dataLanguage = $("#collections-languages").val();
-        const itemId = renderLocalizedText(row.label, dataLanguage);
-        return [
-          renderViewAction(baseUrl),
-          renderEditAction(baseUrl)
-        ].join(' ');
-      }
+          };
+        }
 
-      function formatLabelCollections(value, row) {
-        /*[+
-         const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#collections-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+        function formatActionsCollections(value, row) {
+          /*[+
+           const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
+           const itemType = [[#{lbl.collection.inline}]];
+           +]*/
+          const dataLanguage = $("#collections-languages").val();
+          const itemId = renderLocalizedText(row.label, dataLanguage);
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelCollections(value, row) {
+          /*[+
+           const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#collections-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>

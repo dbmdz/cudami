@@ -12,6 +12,19 @@ Example:
 java -jar dc-cudami-admin-webapp-7.0.0-SNAPSHOT.jar --cudami.server.address=<your_endpoint_address> --cudami.server.url=<your_endpoint_url>
 ```
 
+## Frameworks
+
+### Javascript and CSS
+
+* AdminLTE 3.2.0
+* Bootstrap v4.6.1 (https://getbootstrap.com/)
+* Bootstrap-Table 1.21.1
+* filesize 9.0.1
+* Font Awesome Free 5.15.4
+* jQuery 3.6.0
+* jQuery-Autocomplete tomik23/autocomplete 1.8.6
+* TipTap 2.0.0beta
+
 ## Migrations
 
 ### Migration to Thymeleaf 3
