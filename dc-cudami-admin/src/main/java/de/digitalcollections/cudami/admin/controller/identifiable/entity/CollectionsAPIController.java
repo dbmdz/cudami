@@ -9,6 +9,8 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollections
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -120,7 +122,15 @@ public class CollectionsAPIController
       Collection collection;
       switch (searchField) {
         case "label":
-          pageRequest.setSearchTerm(searchTerm);
+          Filtering filtering =
+              Filtering.builder()
+                  .add(
+                      FilterCriterion.builder()
+                          .withExpression("label")
+                          .isEquals(searchTerm)
+                          .build())
+                  .build();
+          pageRequest.setFiltering(filtering);
           pageResponse = service.find(pageRequest);
           return pageResponse;
         case "uuid":
