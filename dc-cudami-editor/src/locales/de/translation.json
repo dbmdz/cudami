@@ -138,11 +138,11 @@
   },
   "publicationStatus": {
     "currentlyPublished": "aktuell veröffentlicht",
-    "endDate": "Publikationsende",
+    "endDate": "Veröffentlichungsende",
     "noLongerPublished": "nicht mehr veröffentlicht",
     "notYetPublished": "noch nicht veröffentlicht",
     "publishedOn": "veröffentlicht am {{ date }}",
-    "startDate": "Publikationsstart"
+    "startDate": "Veröffentlichungsstart"
   },
   "translation": {
     "acronym": "Akronym",
