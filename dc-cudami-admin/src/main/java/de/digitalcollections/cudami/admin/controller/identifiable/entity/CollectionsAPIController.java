@@ -143,7 +143,7 @@ public class CollectionsAPIController
           pageResponse.setRequest(pageRequest);
           return pageResponse;
         case "refId":
-          collection = service.getByRefId(Long.valueOf(searchTerm));
+          collection = service.getByRefId(Long.parseLong(searchTerm));
           if (collection == null) {
             pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
           } else {
