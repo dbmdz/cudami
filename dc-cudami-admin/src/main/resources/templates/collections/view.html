@@ -1,530 +1,486 @@
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
-	xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
-	layout:decorate="~{base}">
-<head>
-<title th:text="|#{page.title.collections}: #{collection}|">Collections:
-	Collection</title>
-<!-- Custom styles for this template -->
-<link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
-</head>
-<body>
-	<th:block layout:fragment="content" th:object="${collection}">
-		<div class="content">
-			<div class="container-fluid">
-				<div id="content-header">
-					<div class="row">
-						<div class="col-sm-6">
-							<h1 th:text="#{collection}">Collection</h1>
-						</div>
-						<div class="col-sm-6">
-							<div class="float-right">
-								<a class="btn btn-primary" id="edit-button"
-									th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
-							</div>
-						</div>
-					</div>
-				</div>
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
 
-				<div id="content-body" class="rows-striped">
-					<div class="row">
-						<div class="col-12">
-							<ol class="breadcrumb hidden-xs-down">
-								<li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-								<li class="breadcrumb-item"><a th:href="@{/collections}"
-									th:text="#{collections}">Collections</a></li>
-								<th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
-									<th:block th:each="breadcrumb : ${breadcrumbs}">
-										<li class="breadcrumb-item"><a
-											th:href="@{/collections/} + ${breadcrumb.targetId}"><th:block
-													th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block></a></li>
-									</th:block>
-								</th:block>
-							</ol>
-						</div>
-					</div>
+  <head>
+    <title th:text="|#{page.title.collections}: #{collection}|">Collections: Collection</title>
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/cudami/media-in-text.css}" rel="stylesheet" />
+  </head>
 
-					<!-- TODO it always contains "und" undefined language? -->
-					<th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-						<div class="language-selection">
-							<span th:text="#{lbl.data_language}">Show language
-								dependent values in</span>&nbsp; <select
-								th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English
-							</select>
-						</div>
-					</th:block>
+  <body>
+    <th:block layout:fragment="content" th:object="${collection}">
+      <div class="content">
+        <div class="container-fluid">
+          <div id="content-header">
+            <div class="row">
+              <div class="col-sm-6">
+                <h1 th:text="#{collection}">Collection</h1>
+              </div>
+              <div class="col-sm-6">
+                <div class="float-right">
+                  <a class="btn btn-primary" id="edit-button" th:href="@{*{uuid} + '/edit'}" th:text="#{edit}">edit</a>
+                </div>
+              </div>
+            </div>
+          </div>
 
-					<th:block
-						th:insert="fragments/uniqueobject::renderFields(${collection})"></th:block>
+          <div id="content-body" class="rows-striped">
+            <div class="row">
+              <div class="col-12">
+                <ol class="breadcrumb hidden-xs-down">
+                  <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                  <li class="breadcrumb-item"><a th:href="@{/collections}" th:text="#{collections}">Collections</a></li>
+                  <th:block th:if="${not #lists.isEmpty(breadcrumbs)}">
+                    <th:block th:each="breadcrumb : ${breadcrumbs}">
+                      <li class="breadcrumb-item">
+                        <a th:href="@{/collections/} + ${breadcrumb.targetId}">
+                          <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${breadcrumb.label}, ${locale})">Node Label</th:block>
+                        </a>
+                      </li>
+                    </th:block>
+                  </th:block>
+                </ol>
+              </div>
+            </div>
 
-					<th:block
-						th:insert="fragments/identifiable::renderFields(${collection})"></th:block>
+            <!-- TODO it always contains "und" undefined language? -->
+            <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+              <div class="language-selection">
+                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                <select th:replace="fragments/components/select-language-dropdown::render('data-languages', ${existingLanguages}, ${dataLanguage})">English </select>
+              </div>
+            </th:block>
 
-					<th:block th:insert="fragments/entity::renderFields(${collection})"></th:block>
+            <th:block th:insert="fragments/uniqueobject::renderFields(${collection})"></th:block>
 
-					<th:block
-						th:insert="fragments/managedcontent::renderFields(${collection})"></th:block>
+            <th:block th:insert="fragments/identifiable::renderFields(${collection})"></th:block>
 
-					<hr />
+            <th:block th:insert="fragments/entity::renderFields(${collection})"></th:block>
 
-					<div class="row" th:if="${not #lists.isEmpty(parents)}">
-						<div class="col-md-3">
-							<label th:text="#{lbl.parent_collections}">Parent
-								collections</label>
-						</div>
-						<div class="col-md-9">
-							<th:block th:each="parent : ${parents}">
-								<a class="mr-2" th:href="@{/collections/} + ${parent.uuid}"><th:block
-										th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${dataLanguage})">Parent Label</th:block></a>
-							</th:block>
-						</div>
-					</div>
+            <th:block th:insert="fragments/managedcontent::renderFields(${collection})"></th:block>
 
-					<th:block
-						th:if="${collection.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
-						<div class="row mb-1">
-							<div class="col-md-3">
-								<label th:text="#{lbl.text}">Long text</label>
-							</div>
-							<div class="col-md-9">
-								<div class="card">
-									<div class="card-body">
-										<th:block
-											th:insert="fragments/text::renderLocalizedStructuredContent(${collection.text}, ${dataLanguage})"></th:block>
-									</div>
-								</div>
-							</div>
-						</div>
-					</th:block>
+            <hr />
 
-					<div class="row">
-						<div class="col-md-3">
-							<label th:text="#{lbl.sub_collections}">Sub collections</label>
-						</div>
-						<div class="col-md-9">
-							<div id="alert-subcollections"
-								class="mt-2 alert alert-success alert-dismissible fade show d-none"
-								role="alert">
-								<span>Alert message.</span>
+            <div class="row" th:if="${not #lists.isEmpty(parents)}">
+              <div class="col-md-3">
+                <label th:text="#{lbl.parent_collections}">Parent collections</label>
+              </div>
+              <div class="col-md-9">
+                <th:block th:each="parent : ${parents}">
+                  <a class="mr-2" th:href="@{/collections/} + ${parent.uuid}">
+                    <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${parent.label}, ${dataLanguage})">Parent Label</th:block>
+                  </a>
+                </th:block>
+              </div>
+            </div>
 
-								<button type="button" class="close" data-dismiss="alert"
-									aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
+            <th:block th:if="${collection.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
+              <div class="row mb-1">
+                <div class="col-md-3">
+                  <label th:text="#{lbl.text}">Long text</label>
+                </div>
+                <div class="col-md-9">
+                  <div class="card">
+                    <div class="card-body">
+                      <th:block th:insert="fragments/text::renderLocalizedStructuredContent(${collection.text}, ${dataLanguage})"></th:block>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </th:block>
 
-							<div id="toolbar-sub-collections">
-								<!-- TODO it always contains "und" undefined language? -->
-								<th:block
-									th:if="${not #lists.isEmpty(existingSubcollectionsLanguages)}">
-									<span th:text="#{lbl.data_language}">Show language
-										dependent values in</span>&nbsp;
-                  <select
-										th:replace="fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})">English
-									</select>
-								</th:block>
-							</div>
-							<table id="table-sub-collections" data-toggle="table"
-								th:data-url="@{/api/collections/__${collection.uuid}__/collections}"
-								th:data-locale="${#locale}" data-buttons="buttonsCollections"
-								data-cookie="true" data-cookie-id-table="table-sub-collections"
-								data-id-field="uuid" data-pagination="true"
-								data-pagination-v-align="both"
-								data-query-params="queryParamsSubcollections" data-search="true"
-								data-search-highlight="true" data-search-on-enter-key="true"
-								data-server-sort="true" data-show-search-button="true"
-								data-show-search-clear-button="true"
-								data-side-pagination="server" data-sort-name="label"
-								data-sort-order="asc" data-toolbar="#toolbar-sub-collections"
-								data-unique-id="uuid">
-								<thead>
-									<tr>
-										<th data-field="index"
-											data-formatter="formatRowNumberSubCollections"
-											data-halign="right" data-align="right"
-											th:text="#{lbl.row_number}">#</th>
-										<th data-field="previewImage"
-											data-formatter="renderPreviewImage" data-halign="center"
-											data-align="center"><i class="fas fa-image"></i></th>
-										<th data-field="label"
-											data-formatter="formatLabelSubCollections"
-											th:text="#{lbl.label}">Label</th>
-										<th data-field="publicationStatus"
-											data-formatter="renderPublicationStatus" data-halign="center"
-											data-align="center" th:text="#{lbl.status}">Status</th>
-										<th data-field="publicationStart" data-formatter="renderDate"
-											th:text="#{lbl.publication_start}">Start of publication</th>
-										<th data-field="publicationEnd" data-formatter="renderDate"
-											th:text="#{lbl.publication_end}">End of publication</th>
-										<th data-field="lastModified" data-formatter="renderDateTime"
-											th:text="#{lbl.last_modified}">last modified</th>
-										<th data-field="created" data-formatter="renderDateTime"
-											th:text="#{lbl.created}">created</th>
-										<th data-field="actions"
-											data-formatter="formatActionsSubCollections"
-											th:text="#{lbl.actions}">Actions</th>
-									</tr>
-								</thead>
-							</table>
+            <div class="row">
+              <div class="col-md-3">
+                <label th:text="#{lbl.sub_collections}">Sub collections</label>
+              </div>
+              <div class="col-md-9">
+                <div id="alert-subcollections" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+                  <span>Alert message.</span>
 
-						</div>
-					</div>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
 
-					<div class="row">
-						<div class="col-md-3">
-							<label th:text="#{lbl.digital_objects}">Digital objects</label>
-						</div>
-						<div class="col-md-9">
-							<div id="alert-digitalobjects"
-								class="mt-2 alert alert-success alert-dismissible fade show d-none"
-								role="alert">
-								<span
-									th:utext="#{alert.success.digitalobject_removed_from_collection}">The
-									digital object has been removed successfully from the
-									collection.</span>
+                <div id="toolbar-sub-collections">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingSubcollectionsLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('subcollections-languages', ${existingSubcollectionsLanguages}, ${dataLanguageSubcollections})">English
+                    </select>
+                  </th:block>
+                </div>
+                <table id="table-sub-collections" data-toggle="table"
+                       th:data-url="@{/api/collections/__${collection.uuid}__/collections}"
+                       th:data-locale="${#locale}" data-buttons="buttonsCollections"
+                       data-cookie="true" data-cookie-id-table="table-sub-collections"
+                       data-id-field="uuid" data-pagination="true"
+                       data-pagination-v-align="both"
+                       data-query-params="queryParamsSubcollections" data-search="true"
+                       data-search-highlight="true" data-search-on-enter-key="true"
+                       data-server-sort="true" data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-side-pagination="server" data-sort-name="label"
+                       data-sort-order="asc" data-toolbar="#toolbar-sub-collections"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index"
+                          data-formatter="formatRowNumberSubCollections"
+                          data-halign="right" data-align="right"
+                          th:text="#{lbl.row_number}">#</th>
+                      <th data-field="previewImage"
+                          data-formatter="renderPreviewImage" data-halign="center"
+                          data-align="center"><i class="fas fa-image"></i></th>
+                      <th data-field="label"
+                          data-formatter="formatLabelSubCollections"
+                          th:text="#{lbl.label}">Label</th>
+                      <th data-field="publicationStatus"
+                          data-formatter="renderPublicationStatus" data-halign="center"
+                          data-align="center" th:text="#{lbl.status}">Status</th>
+                      <th data-field="publicationStart" data-formatter="renderDate"
+                          th:text="#{lbl.publication_start}">Start of publication</th>
+                      <th data-field="publicationEnd" data-formatter="renderDate"
+                          th:text="#{lbl.publication_end}">End of publication</th>
+                      <th data-field="lastModified" data-formatter="renderDateTime"
+                          th:text="#{lbl.last_modified}">last modified</th>
+                      <th data-field="created" data-formatter="renderDateTime"
+                          th:text="#{lbl.created}">created</th>
+                      <th data-field="actions"
+                          data-formatter="formatActionsSubCollections"
+                          th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
 
-								<button type="button" class="close" data-dismiss="alert"
-									aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
+              </div>
+            </div>
 
-							<div id="toolbar-digitalobjects">
-								<!-- TODO it always contains "und" undefined language? -->
-								<th:block
-									th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
-									<span th:text="#{lbl.data_language}">Show language
-										dependent values in</span>&nbsp;
-                  <select
-										th:replace="fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})">English
-									</select>
-								</th:block>
-							</div>
-							<table id="table-digitalobjects" data-toggle="table"
-								th:data-url="@{/api/collections/__${collection.uuid}__/digitalobjects}"
-								th:data-locale="${#locale}" data-cookie="true"
-								data-cookie-id-table="table-digitalobjects" data-id-field="uuid"
-								data-pagination="true" data-pagination-v-align="both"
-								data-query-params="queryParamsDigitalObjects" data-search="true"
-								data-search-highlight="true" data-search-on-enter-key="true"
-								data-server-sort="true" data-show-search-button="true"
-								data-show-search-clear-button="true"
-								data-side-pagination="server" data-sort-name="label"
-								data-sort-order="asc" data-toolbar="#toolbar-digitalobjects"
-								data-unique-id="uuid">
-								<thead>
-									<tr>
-										<th data-field="index"
-											data-formatter="formatRowNumberDigitalObjects"
-											data-halign="right" data-align="right"
-											th:text="#{lbl.row_number}">#</th>
-										<th data-field="previewImage"
-											data-formatter="renderPreviewImage" data-halign="center"
-											data-align="center"><i class="fas fa-image"></i></th>
-										<th data-field="label"
-											data-formatter="formatLabelDigitalObjects"
-											th:text="#{lbl.label}">Label</th>
-										<th data-field="identifiers" data-sortable="false"
-											data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
-										<th data-field="lastModified" data-formatter="renderDateTime"
-											th:text="#{lbl.last_modified}">last modified</th>
-										<th data-field="created" data-formatter="renderDateTime"
-											th:text="#{lbl.created}">created</th>
-										<th data-field="actions"
-											data-formatter="formatActionsDigitalObjects"
-											th:text="#{lbl.actions}">Actions</th>
-									</tr>
-								</thead>
-							</table>
+            <div class="row">
+              <div class="col-md-3">
+                <label th:text="#{lbl.digital_objects}">Digital objects</label>
+              </div>
+              <div class="col-md-9">
+                <div id="alert-digitalobjects" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
+                  <span th:utext="#{alert.success.digitalobject_removed_from_collection}">The
+                    digital object has been removed successfully from the
+                    collection.</span>
 
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</th:block>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
 
-	<section layout:fragment="beforeBodyEnds">
-		<div
-			th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
-		<div th:replace="fragments/modals/select-entity :: render"></div>
+                <div id="toolbar-digitalobjects">
+                  <!-- TODO it always contains "und" undefined language? -->
+                  <th:block th:if="${not #lists.isEmpty(existingDigitalObjectsLanguages)}">
+                    <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                    <select th:replace="fragments/components/select-language-dropdown::render('digitalobjects-languages', ${existingDigitalObjectsLanguages}, ${dataLanguageDigitalObjects})">English
+                    </select>
+                  </th:block>
+                </div>
+                <table id="table-digitalobjects" data-toggle="table"
+                       th:data-url="@{/api/collections/__${collection.uuid}__/digitalobjects}"
+                       th:data-locale="${#locale}" data-cookie="true"
+                       data-cookie-id-table="table-digitalobjects" data-id-field="uuid"
+                       data-pagination="true" data-pagination-v-align="both"
+                       data-query-params="queryParamsDigitalObjects" data-search="true"
+                       data-search-highlight="true" data-search-on-enter-key="true"
+                       data-server-sort="true" data-show-search-button="true"
+                       data-show-search-clear-button="true"
+                       data-side-pagination="server" data-sort-name="label"
+                       data-sort-order="asc" data-toolbar="#toolbar-digitalobjects"
+                       data-unique-id="uuid">
+                  <thead>
+                    <tr>
+                      <th data-field="index"
+                          data-formatter="formatRowNumberDigitalObjects"
+                          data-halign="right" data-align="right"
+                          th:text="#{lbl.row_number}">#</th>
+                      <th data-field="previewImage"
+                          data-formatter="renderPreviewImage" data-halign="center"
+                          data-align="center"><i class="fas fa-image"></i></th>
+                      <th data-field="label"
+                          data-formatter="formatLabelDigitalObjects"
+                          th:text="#{lbl.label}">Label</th>
+                      <th data-field="identifiers" data-sortable="false"
+                          data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+                      <th data-field="lastModified" data-formatter="renderDateTime"
+                          th:text="#{lbl.last_modified}">last modified</th>
+                      <th data-field="created" data-formatter="renderDateTime"
+                          th:text="#{lbl.created}">created</th>
+                      <th data-field="actions"
+                          data-formatter="formatActionsDigitalObjects"
+                          th:text="#{lbl.actions}">Actions</th>
+                    </tr>
+                  </thead>
+                </table>
 
-		<script type="text/javascript">
-			$(addDataLanguageChangeHandler());
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
 
-			$(function() {
-				$("#subcollections-languages").change(function() {
-					$('#table-sub-collections').bootstrapTable('refresh');
-				});
-				$("#digitalobjects-languages").change(function() {
-					$('#table-digitalobjects').bootstrapTable('refresh');
-				});
-			});
+    <section layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
+      <div th:replace="fragments/modals/select-entity :: render"></div>
 
-			function formatRowNumberDigitalObjects(value, row, index) {
-				return renderRowNumber($('#table-digitalobjects'), index);
-			}
-			function queryParamsDigitalObjects(params) {
-				let dataLanguage = $("#digitalobjects-languages").val();
-				params.dataLanguage = dataLanguage;
-				return params;
-			}
+      <script type="text/javascript">
+        $(addDataLanguageChangeHandler());
 
-			function formatRowNumberSubCollections(value, row, index) {
-				return renderRowNumber($('#table-sub-collections'), index);
-			}
-			function queryParamsSubcollections(params) {
-				let dataLanguage = $("#subcollections-languages").val();
-				params.dataLanguage = dataLanguage;
-				return params;
-			}
-		</script>
+        $(function () {
+          $("#subcollections-languages").change(function () {
+            $('#table-sub-collections').bootstrapTable('refresh');
+          });
+          $("#digitalobjects-languages").change(function () {
+            $('#table-digitalobjects').bootstrapTable('refresh');
+          });
+        });
 
-		<script type="text/javascript" th:inline="javascript">
-			/*<![CDATA[*/
-			function buttonsCollections() {
-				/*[+
-				 const baseUrl = [[@{'/collections'}]];
-				 const textAdd = [[#{btn.add}]];
-				 const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
-				 const parentUuid = [[${collection.uuid}]]
-				 +]*/
-				return {
-					btnAdd : {
-						text : textAdd,
-						icon : 'fa-plus',
-						event : function() {
-							location.href = baseUrl
-									+ '/new?parentType=collection&parentUuid='
-									+ parentUuid;
-						},
-						attributes : {
-							title : tooltipAdd
-						}
-					}
-				};
-			}
+        function formatRowNumberDigitalObjects(value, row, index) {
+          return renderRowNumber($('#table-digitalobjects'), index);
+        }
+        function queryParamsDigitalObjects(params) {
+          let dataLanguage = $("#digitalobjects-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
 
-			function formatActionsSubCollections(value, row) {
-				/*[+
-				 const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
-				 +]*/
-				return [ renderViewAction(baseUrl), renderEditAction(baseUrl),
-						renderMoveSubcollectionAction(row),
-						renderRemoveSubcollectionAction(row) ].join(' ');
-			}
-			function formatActionsDigitalObjects(value, row) {
-				/*[+
-				 const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-				 +]*/
-				return [ renderViewAction(baseUrl),
-						renderRemoveDigitalObjectAction(row) ].join(' ');
-			}
+        function formatRowNumberSubCollections(value, row, index) {
+          return renderRowNumber($('#table-sub-collections'), index);
+        }
+        function queryParamsSubcollections(params) {
+          let dataLanguage = $("#subcollections-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
 
-			function formatLabelSubCollections(value, row) {
-				/*[+
-				 const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
-				 +]*/
-				const dataLanguage = $("#subcollections-languages").val();
-				return renderLabel(baseUrl, value, dataLanguage);
-			}
-			function formatLabelDigitalObjects(value, row) {
-				/*[+
-				 const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
-				 +]*/
-				const dataLanguage = $("#digitalobjects-languages").val();
-				return renderLabel(baseUrl, value, dataLanguage);
-			}
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        function buttonsCollections() {
+          /*[+
+           const baseUrl = [[@{'/collections'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           const parentUuid = [[${collection.uuid}]]
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl
+                  + '/new?parentType=collection&parentUuid='
+                  + parentUuid;
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
 
-			function moveSubcollection(uuid) {
-				let selectedTargetCollectionUuid = $('#selectEntityDialog')
-						.find('input[name="selectedUuid"]').val();
-				if (selectedTargetCollectionUuid) {
-					if (selectedTargetCollectionUuid == uuid) {
-						return;
-					}
+        function formatActionsSubCollections(value, row) {
+          /*[+
+           const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
+           +]*/
+          return [renderViewAction(baseUrl), renderEditAction(baseUrl),
+          renderMoveSubcollectionAction(row),
+          renderRemoveSubcollectionAction(row)].join(' ');
+        }
+        function formatActionsDigitalObjects(value, row) {
+          /*[+
+           const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+           +]*/
+          return [renderViewAction(baseUrl),
+          renderRemoveDigitalObjectAction(row)].join(' ');
+        }
 
-					$('#selectEntityDialog').modal('hide');
-					let selectedTargetCollectionLabel = $(
-							'#selectEntityDialog-userInput').val();
-					let collectionLabel = $(
-							'#selectEntityDialog .modal-message b').text();
+        function formatLabelSubCollections(value, row) {
+          /*[+
+           const baseUrl = [[@{'/collections'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#subcollections-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
+        function formatLabelDigitalObjects(value, row) {
+          /*[+
+           const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#digitalobjects-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
 
-					/*[+
-					  const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
-					  const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
-					  const errorMessage = [[#{error.technical_error}]];
-					  const targetCollectionUrl = [[@{'/collections/'}]] + selectedTargetCollectionUuid;
-					  const successMessage = `[(#{msg.move_collection.success})]`;
-					  const noTargetSelectedMessage = `[(#{msg.move_collection.no_target_selected})]`;
-					+]*/
+        function moveSubcollection(uuid) {
+          let selectedTargetCollectionUuid = $('#selectEntityDialog').find('input[name="selectedUuid"]').val();
+          if (selectedTargetCollectionUuid) {
+            if (selectedTargetCollectionUuid == uuid) {
+              return;
+            }
 
-					// move = add + delete:
-					$.ajax({
-						type : "POST",
-						url : apiUrlAdd,
-						success : function() {
-							$.ajax({
-								type : "DELETE",
-								url : apiUrlDelete,
-								success : function() {
-									$('#table-sub-collections').bootstrapTable(
-											'refresh');
-									showMessage('alert-success',
-											'#alert-subcollections',
-											successMessage);
-								},
-								error : function() {
-									showMessage('alert-danger',
-											'#alert-subcollections',
-											errorMessage);
-								}
-							});
-						},
-						error : function() {
-							showMessage('alert-danger',
-									'#alert-subcollections', errorMessage);
-						}
-					});
-				} else {
-					showMessage('alert-danger', '#alert-subcollections',
-							noTargetSelectedMessage);
-				}
-			}
-			function moveSubcollectionDialog(uuid) {
-				const row = $('#table-sub-collections').bootstrapTable(
-						'getRowByUniqueId', uuid);
-				const label = row.label[Object.keys(row.label)[0]];
-				/*[+
-				 const modalTitle = [[#{modal.title.move_collection}]];
-				 const modalMessage = `[(#{modal.msg.move_collection})]`;
-				 const modalBtnText = `[(#{btn.move})]`;
-				 const searchApiUrl = [[@{/api/collections/search}]];
-				 +]*/
+            $('#selectEntityDialog').modal('hide');
+            let selectedTargetCollectionLabel = $('#selectEntityDialog-userInput').val();
+            let collectionLabel = $('#selectEntityDialog .modal-message b').text();
 
-				const modalDialog = $('#selectEntityDialog');
-				$(modalDialog).data('searchApiUrl', searchApiUrl);
-				$(modalDialog).find('.modal-title').text(modalTitle);
-				$(modalDialog).find('.modal-message').html(modalMessage);
-				var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-				$(btnOk).attr('href',
-						"javascript:moveSubcollection('" + uuid + "');");
-				$(btnOk).html(modalBtnText);
-				$(modalDialog).modal('show');
-			}
+            /*[+
+              const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
+              const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
+              const errorMessage = [[#{error.technical_error}]];
+              const targetCollectionUrl = [[@{'/collections/'}]] + selectedTargetCollectionUuid;
+              const successMessage = `[(#{msg.move_collection.success})]`;
+              const noTargetSelectedMessage = `[(#{msg.move_collection.no_target_selected})]`;
+            +]*/
 
-			function renderMoveSubcollectionAction(row) {
-				/*[+
-				 const tooltip = [[#{tooltip.move_subcollection_to_collection}]];
-				 +]*/
-				return "<a title=\"" + tooltip
-						+ "\" href=\"javascript:moveSubcollectionDialog('"
-						+ row.uuid
-						+ "');\"><i class='fas fa-exchange-alt'></i></a>";
-			}
-			function renderRemoveDigitalObjectAction(row) {
-				/*[+
-				 const tooltip = [[#{tooltip.remove_from_collection}]];
-				 +]*/
-				return "<a title=\"" + tooltip
-						+ "\" href=\"javascript:removeDigitalObjectDialog('"
-						+ row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
-			}
-			function renderRemoveSubcollectionAction(row) {
-				/*[+
-				 const tooltip = [[#{tooltip.remove_from_collection}]];
-				 +]*/
-				return "<a title=\"" + tooltip
-						+ "\" href=\"javascript:removeSubcollectionDialog('"
-						+ row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
-			}
+            // move = add + delete:
+            $.ajax({
+              type: "POST",
+              url: apiUrlAdd,
+              success: function () {
+                $.ajax({
+                  type: "DELETE",
+                  url: apiUrlDelete,
+                  success: function () {
+                    $('#table-sub-collections').bootstrapTable('refresh');
+                    showMessage('alert-success', '#alert-subcollections', successMessage);
+                  },
+                  error: function () {
+                    showMessage('alert-danger', '#alert-subcollections', errorMessage);
+                  }
+                });
+              },
+              error: function () {
+                showMessage('alert-danger', '#alert-subcollections', errorMessage);
+              }
+            });
+          } else {
+            showMessage('alert-danger', '#alert-subcollections', noTargetSelectedMessage);
+          }
+        }
+        function moveSubcollectionDialog(uuid) {
+          const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
+          const label = row.label[Object.keys(row.label)[0]];
+          /*[+
+           const modalTitle = [[#{modal.title.move_collection}]];
+           const modalMessage = `[(#{modal.msg.move_collection})]`;
+           const modalBtnText = `[(#{btn.move})]`;
+           const searchApiUrl = [[@{/api/collections/search}]];
+           +]*/
 
-			function removeDigitalObject(uuid) {
-				/*[+
-				 const apiUrl = [[@{'/api/collections/__${collection.uuid}__/digitalobjects/'}]] + uuid;
-				 const errorMessage = [[#{error.technical_error}]];
-				 +]*/
+          const modalDialog = $('#selectEntityDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('href', "javascript:moveSubcollection('" + uuid + "');");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
 
-				$('#confirmYesNoDialog').modal('hide');
+        function renderMoveSubcollectionAction(row) {
+          /*[+
+           const tooltip = [[#{tooltip.move_subcollection_to_collection}]];
+           +]*/
+          return "<a title=\"" + tooltip + "\" href=\"javascript:moveSubcollectionDialog('" + row.uuid + "');\"><i class='fas fa-exchange-alt'></i></a>";
+        }
+        function renderRemoveDigitalObjectAction(row) {
+          /*[+
+           const tooltip = [[#{tooltip.remove_from_collection}]];
+           +]*/
+          return "<a title=\"" + tooltip + "\" href=\"javascript:removeDigitalObjectDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+        }
+        function renderRemoveSubcollectionAction(row) {
+          /*[+
+           const tooltip = [[#{tooltip.remove_from_collection}]];
+           +]*/
+          return "<a title=\"" + tooltip + "\" href=\"javascript:removeSubcollectionDialog('" + row.uuid + "');\"><i class='fa fa-unlink'></i></a>";
+        }
 
-				$.ajax({
-					type : "DELETE",
-					url : apiUrl,
-					success : function() {
-						$('#alert-digitalobjects').removeClass("d-none");
-						$('#table-digitalobjects').bootstrapTable('refresh');
-					},
-					error : function() {
-						alert(errorMessage);
-					}
-				});
-			}
-			function removeDigitalObjectDialog(uuid) {
-				const row = $('#table-digitalobjects').bootstrapTable(
-						'getRowByUniqueId', uuid);
-				const label = row.label[Object.keys(row.label)[0]];
-				/*[+
-				 const modalTitle = [[#{modal.title.warning}]];
-				 const modalMessage = `[(#{modal.msg.confirm_remove_digitalobject_from_collection})]`;
-				 +]*/
+        function removeDigitalObject(uuid) {
+          /*[+
+           const apiUrl = [[@{'/api/collections/__${collection.uuid}__/digitalobjects/'}]] + uuid;
+           const errorMessage = [[#{error.technical_error}]];
+           +]*/
 
-				const modalDialog = $('#confirmYesNoDialog');
-				$(modalDialog).find('.modal-title').text(modalTitle);
-				$(modalDialog).find('.modal-body').html(modalMessage);
-				$(modalDialog).find('.modal-footer #confirm').attr('href',
-						"javascript:removeDigitalObject('" + uuid + "');");
-				$(modalDialog).modal('show');
-			}
+          $('#confirmYesNoDialog').modal('hide');
 
-			function removeSubcollection(uuid) {
-				/*[+
-				 const apiUrl = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
-				 const errorMessage = [[#{error.technical_error}]];
-				 +]*/
+          $.ajax({
+            type: "DELETE",
+            url: apiUrl,
+            success: function () {
+              $('#alert-digitalobjects').removeClass("d-none");
+              $('#table-digitalobjects').bootstrapTable('refresh');
+            },
+            error: function () {
+              alert(errorMessage);
+            }
+          });
+        }
+        function removeDigitalObjectDialog(uuid) {
+          const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
+          const label = row.label[Object.keys(row.label)[0]];
+          /*[+
+           const modalTitle = [[#{modal.title.warning}]];
+           const modalMessage = `[(#{modal.msg.confirm_remove_digitalobject_from_collection})]`;
+           +]*/
 
-				$('#confirmYesNoDialog').modal('hide');
+          const modalDialog = $('#confirmYesNoDialog');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-body').html(modalMessage);
+          $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeDigitalObject('" + uuid + "');");
+          $(modalDialog).modal('show');
+        }
 
-				$.ajax({
-					type : "DELETE",
-					url : apiUrl,
-					success : function() {
-						$('#alert-subcollections').removeClass("d-none");
-						$('#table-sub-collections').bootstrapTable('refresh');
-					},
-					error : function() {
-						alert(errorMessage);
-					}
-				});
-			}
-			function removeSubcollectionDialog(uuid) {
-				const row = $('#table-sub-collections').bootstrapTable(
-						'getRowByUniqueId', uuid);
-				const label = row.label[Object.keys(row.label)[0]];
-				/*[+
-				 const modalTitle = [[#{modal.title.warning}]];
-				 const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
-				 +]*/
+        function removeSubcollection(uuid) {
+          /*[+
+           const apiUrl = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
+           const errorMessage = [[#{error.technical_error}]];
+           +]*/
 
-				const modalDialog = $('#confirmYesNoDialog');
-				$(modalDialog).find('.modal-title').text(modalTitle);
-				$(modalDialog).find('.modal-body').html(modalMessage);
-				$(modalDialog).find('.modal-footer #confirm').attr('href',
-						"javascript:removeSubcollection('" + uuid + "');");
-				$(modalDialog).modal('show');
-			}
+          $('#confirmYesNoDialog').modal('hide');
 
-			function showMessage(cssClass, alertElementId, message) {
-				$(alertElementId).removeClass(
-						"alert-success alert-danger alert-warning alert-info")
-						.addClass(cssClass);
-				$(alertElementId).children('span:first-child').html(message);
-				$(alertElementId).removeClass("d-none");
-			}
+          $.ajax({
+            type: "DELETE",
+            url: apiUrl,
+            success: function () {
+              $('#alert-subcollections').removeClass("d-none");
+              $('#table-sub-collections').bootstrapTable('refresh');
+            },
+            error: function () {
+              alert(errorMessage);
+            }
+          });
+        }
+        function removeSubcollectionDialog(uuid) {
+          const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
+          const label = row.label[Object.keys(row.label)[0]];
+          /*[+
+           const modalTitle = [[#{modal.title.warning}]];
+           const modalMessage = `[(#{modal.msg.confirm_remove_subcollection_from_collection})]`;
+           +]*/
+
+          const modalDialog = $('#confirmYesNoDialog');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-body').html(modalMessage);
+          $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
+          $(modalDialog).modal('show');
+        }
+
+        function showMessage(cssClass, alertElementId, message) {
+          $(alertElementId).removeClass("alert-success alert-danger alert-warning alert-info").addClass(cssClass);
+          $(alertElementId).children('span:first-child').html(message);
+          $(alertElementId).removeClass("d-none");
+        }
 			/*]]>*/
-		</script>
+      </script>
 
-		<div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-	</section>
-</body>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </section>
+  </body>
+
 </html>
