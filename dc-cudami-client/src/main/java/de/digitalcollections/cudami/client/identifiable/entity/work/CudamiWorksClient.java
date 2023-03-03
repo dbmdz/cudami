@@ -12,6 +12,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,5 +44,10 @@ public class CudamiWorksClient extends CudamiEntitiesClient<Work> {
         String.format("%s/%s/manifestations", baseEndpoint, uuid),
         pageRequest,
         Manifestation.class);
+  }
+
+  public List<Locale> getLanguagesOfManifestations(UUID uuid) throws TechnicalException {
+    return doGetRequestForObjectList(
+        String.format("%s/%s/manifestations/languages", baseEndpoint, uuid), Locale.class);
   }
 }

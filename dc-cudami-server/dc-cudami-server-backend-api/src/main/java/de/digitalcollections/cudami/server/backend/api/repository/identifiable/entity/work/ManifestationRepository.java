@@ -5,6 +5,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public interface ManifestationRepository extends EntityRepository<Manifestation> {
@@ -13,4 +15,6 @@ public interface ManifestationRepository extends EntityRepository<Manifestation>
 
   PageResponse<Manifestation> findManifestationsByWork(UUID workUuid, PageRequest pageRequest)
       throws RepositoryException;
+
+  List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid);
 }

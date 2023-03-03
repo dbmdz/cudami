@@ -230,6 +230,18 @@ public class WorkController extends AbstractIdentifiableController<Work> {
     return workService.getLanguages();
   }
 
+  @Operation(
+      summary = "Get languages of all manifestations",
+      description = "Get languages of all manifestations",
+      responses = {@ApiResponse(responseCode = "200", description = "List&lt;Locale&gt;")})
+  @GetMapping(
+      value = {"/v6/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/manifestations/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguagesOfManifestations(
+      @Parameter(name = "uuid", description = "UUID of the work") @PathVariable UUID uuid) {
+    return manifestationService.getLanguagesOfManifestationsForWork(uuid);
+  }
+
   @Operation(summary = "save a newly created work")
   @PostMapping(
       value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},

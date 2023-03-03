@@ -125,7 +125,7 @@
                 <!-- TODO it always contains "und" undefined language? -->
                 <th:block th:if="${not #lists.isEmpty(existingManifestationsLanguages)}">
                   <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('items-languages', ${existingManifestationsLanguages}, ${dataLanguageItems})">English</select>
+                  <select th:replace="fragments/components/select-language-dropdown::render('manifestations-languages', ${existingManifestationsLanguages}, ${dataLanguageItems})">English</select>
                 </th:block>
               </div>
               <table id="table-manifestations"
@@ -138,7 +138,7 @@
                      data-id-field="uuid"
                      data-pagination="true"
                      data-pagination-v-align="both"
-                     data-query-params="queryParamsItems"
+                     data-query-params="queryParamsManifestations"
                      data-search="false"
                      data-search-highlight="true"
                      data-search-on-enter-key="true"
@@ -171,6 +171,12 @@
     <script type="text/javascript">
       $(addDataLanguageChangeHandler());
 
+      function queryParamsManifestations(params) {
+        let dataLanguage = $("#manifestations-languages").val();
+        params.dataLanguage = dataLanguage;
+        return params;
+      }
+
       function formatRowNumberChildWorks(value, row, index) {
         return renderRowNumber($('#table-childworks'), index);
       }
@@ -195,7 +201,7 @@
         /*[+
          const baseUrl = [[@{'/manifestations'}]] + '/' + row.uuid;
          +]*/
-        const dataLanguage = $("#data-languages").val();
+        const dataLanguage = $("#manifestations-languages").val();
         return renderLabel(baseUrl, value, dataLanguage);
       }
 

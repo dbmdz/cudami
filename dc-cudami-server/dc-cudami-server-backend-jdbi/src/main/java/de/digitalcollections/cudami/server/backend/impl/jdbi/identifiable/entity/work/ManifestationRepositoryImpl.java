@@ -40,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -309,6 +310,23 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     long total = retrieveCount(countQuery, argumentMappings);
 
     return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
+    String manifestationTableAlias = getTableAlias();
+    String manifestationTableName = getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + manifestationTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + manifestationTableName
+            + " AS "
+            + manifestationTableAlias
+            + String.format(" WHERE %s.work = :work_uuid;", manifestationTableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("work_uuid", workUuid).mapTo(Locale.class).list());
   }
 
   protected static void additionalReduceRowsBiConsumer(

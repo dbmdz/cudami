@@ -18,6 +18,7 @@ import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +78,11 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   public Manifestation getByRefId(long refId) {
     // TODO Auto-generated method stub
     return super.getByRefId(refId);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
+    return ((ManifestationRepository) repository).getLanguagesOfManifestationsForWork(workUuid);
   }
 
   @Override
