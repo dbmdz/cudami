@@ -338,26 +338,27 @@
             +]*/
 
             // move = add + delete:
-            $.ajax({
-              type: "POST",
-              url: apiUrlAdd,
-              success: function () {
-                $.ajax({
-                  type: "DELETE",
-                  url: apiUrlDelete,
-                  success: function () {
+            fetch(apiUrlAdd, {method: "POST"})
+              .then(handleFetchErrors)
+              .then(function (response) {
+                console.log("ok");
+
+                fetch(apiUrlDelete, {method: "DELETE"})
+                  .then(handleFetchErrors)
+                  .then(function (response) {
                     $('#table-sub-collections').bootstrapTable('refresh');
                     showMessage('alert-success', '#alert-subcollections', successMessage);
-                  },
-                  error: function () {
+                  })
+                  .catch(function (error) {
+                    console.log(error);
                     showMessage('alert-danger', '#alert-subcollections', errorMessage);
-                  }
-                });
-              },
-              error: function () {
+                  });
+
+              })
+              .catch(function (error) {
+                console.log(error);
                 showMessage('alert-danger', '#alert-subcollections', errorMessage);
-              }
-            });
+              });
           } else {
             showMessage('alert-danger', '#alert-subcollections', noTargetSelectedMessage);
           }
