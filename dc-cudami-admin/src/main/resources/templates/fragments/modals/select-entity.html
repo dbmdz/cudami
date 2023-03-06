@@ -36,12 +36,12 @@
                 <input type="hidden" name="selectedUuid" />
               </form>
 
-              <div class="previewSelected mt-2 p-1 border d-none"></div>
+              <div class="previewSelected mt-2 p-1 border" style="display: none;"></div>
 
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-              <a class="btn btn-primary" th:text="#{btn.ok}">Ok</a>
+              <button type="button" class="btn btn-primary" onclick="void(0);" th:text="#{btn.ok}">Ok</button>
             </div>
           </div>
         </div>
@@ -54,13 +54,28 @@
          const msgNoResultsFound = [[#{msg.no_results_found}]];
         +]*/
 
+        doUnselect();
+
         // empty input field every time the type select changes
         $('#selectEntityDialog-inputType').change(function () {$('#selectEntityDialog-userInput').val("");});
 
+        $('#selectEntityDialog').on('hidden.bs.modal', function (e) {
+          doUnselect();
+        })
+
+        let resultCount = 0;
+        const maxRecords = 25; // == pageSize
+        let totalElements = 0;
         new Autocomplete('selectEntityDialog-userInput', {
-          insertToInput: false,
+          insertToInput: true,
+          cache: true,
+          classGroup: "group-by",
           noResults: ({element, currentValue, template}) => template(`<li>${msgNoResultsFound}: "${currentValue}"</li>`),
           onSearch: ({currentValue}) => {
+            // clear count always when new searching
+            resultCount = 0;
+            totalElements = 0;
+
             let apiUrl = $('#selectEntityDialog').data('searchApiUrl');
             apiUrl = apiUrl + `?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
             apiUrl = apiUrl + '&sortBy=label_de';
@@ -69,8 +84,13 @@
               fetch(apiUrl)
                 .then((response) => response.json())
                 .then((data) => {
-                  // only content property of PageResponse:
-                  resolve(data.content);
+                  // only content property of PageResponse
+                  const result = data.content;
+                  resolve(result);
+
+                  // save counts for paging message (if totalElements > maxRecords)
+                  totalElements = data.totalElements;
+                  resultCount = result.length;
                 })
                 .catch((error) => {
                   // just show user "no result"
@@ -78,45 +98,67 @@
                 });
             });
           },
-
           onResults: ({currentValue, matches, template, classGroup}) => {
             return matches === 0
               ? template
               : matches
-                .map((el) => {
-                  let html = '<li><div class="row"><div class="col-md-1">';
-                  if (el.previewImage) {
-                    html = html + `<figure class="mb-0 mx-auto" style="max-width: 50px;">
-                        <img class="img-fluid mw-100" src="${el.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
-                        </figure>`;
-                  } else {
-                    html = html + '<img class="img-fluid mw-100" src="/images/no-image.png">';
+                .map((object, index) => {
+                  let moreResultsMessage = "";
+
+                  if (index === 0 && totalElements > maxRecords) {
+                    /*[+
+                      const msgPagingMoreResultsFound = `[(#{msg.paging.more_results_found})]`;
+                    +]*/
+                    moreResultsMessage = `<li class="${classGroup} alert-warning"><span><small>${msgPagingMoreResultsFound}</small></span></li>`;
                   }
-                  html = html + `</div><div class="col">${el.label.de}</div></div></li>`;
-                  return html;
+
+                  let objectHtml = renderObject(object, currentValue);
+                  let html = '<li>' + objectHtml + '</li>';
+
+                  return `${moreResultsMessage} ${html}`;
                 })
-                .join('');
+                .join("");
           },
           onSubmit: ({index, element, object, results}) => {
             $('#selectEntityDialog').find('input[name="selectedUuid"]').val(object.uuid);
 
-            let selectedHtml = $(results).children().eq(index).children().first();
+            let selectedHtml = '' + renderObject(object);
             // add delete button, fill preview box and show box
             let deleteHtml = '<a href="javascript:doUnselect();" class="remove"><i class="fa fa-trash"></i></a>';
-            $(selectedHtml).append('<div class="text-right col-md-1">' + deleteHtml + '</div>');
+            selectedHtml = $(selectedHtml).append('<div class="text-right col-md-1">' + deleteHtml + '</div>');
             let previewBox = $('#selectEntityDialog').find('div.previewSelected');
             $('#selectEntityDialog').find('div.previewSelected').html(selectedHtml);
-            $(previewBox).removeClass('d-none');
+            $('#selectEntityDialog').find('div.previewSelected').show();
 
-            // hide input group in form
             $('#selectEntityDialog').find('form div.input-group').hide();
+            $('#selectEntityDialog').find('.modal-footer .btn-primary').prop("disabled", false);
           },
         });
 
+        function renderObject(object, currentValue) {
+          let html = '<div class="row">';
+          html = html + '<div class="col-md-1">';
+          if (object.previewImage) {
+            html = html + `<figure class="mb-0 mx-auto" style="max-width: 50px;">
+                        <img class="img-fluid mw-100" src="${object.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
+                        </figure>`;
+          } else {
+            html = html + '<img class="img-fluid mw-100" src="/images/no-image.png">';
+          }
+          html = html + '</div>';
+          if (currentValue) {
+            html = html + `<div class="col">${object.label.de.replace(new RegExp(currentValue, "gi"), (str) => `<span class="alert-warning">${str}</span>`)}</div>`;
+          } else {
+            html = html + `<div class="col">${object.label.de}</div></div>`;
+          }
+          return `${html}`;
+        }
+
         function doUnselect() {
-          $('#selectEntityDialog').find('div.previewSelected').addClass('d-none');
+          $('#selectEntityDialog').find('div.previewSelected').hide();
           $('#selectEntityDialog-userInput').val("");
           $('#selectEntityDialog').find('form div.input-group').show();
+          $('#selectEntityDialog').find('.modal-footer .btn-primary').prop("disabled", true);
         }
 
         /*]]>*/
