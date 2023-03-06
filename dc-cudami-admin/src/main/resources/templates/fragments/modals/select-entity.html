@@ -57,9 +57,7 @@
         // empty input field every time the type select changes
         $('#selectEntityDialog-inputType').change(function () {$('#selectEntityDialog-userInput').val("");});
         $('#selectEntityDialog').on('hidden.bs.modal', function (e) {
-          $('#selectEntityDialog').find('form div.input-group').show();
-          $('#selectEntityDialog').find('div.previewSelected').hide();
-          $('#selectEntityDialog-userInput').val("");
+          doUnselect();
         })
 
         let resultCount = 0;
