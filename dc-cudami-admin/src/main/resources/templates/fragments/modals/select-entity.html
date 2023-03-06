@@ -41,7 +41,7 @@
             </div>
             <div class="modal-footer justify-content-between">
               <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-              <a class="btn btn-primary" th:text="#{btn.ok}">Ok</a>
+              <button type="button" class="btn btn-primary" onclick="void(0);" th:text="#{btn.ok}">Ok</button>
             </div>
           </div>
         </div>
@@ -54,8 +54,11 @@
          const msgNoResultsFound = [[#{msg.no_results_found}]];
         +]*/
 
+        doUnselect();
+
         // empty input field every time the type select changes
         $('#selectEntityDialog-inputType').change(function () {$('#selectEntityDialog-userInput').val("");});
+
         $('#selectEntityDialog').on('hidden.bs.modal', function (e) {
           doUnselect();
         })
@@ -127,8 +130,8 @@
             $('#selectEntityDialog').find('div.previewSelected').html(selectedHtml);
             $('#selectEntityDialog').find('div.previewSelected').show();
 
-            // hide input group in form
             $('#selectEntityDialog').find('form div.input-group').hide();
+            $('#selectEntityDialog').find('.modal-footer .btn-primary').prop("disabled", false);
           },
         });
 
@@ -155,6 +158,7 @@
           $('#selectEntityDialog').find('div.previewSelected').hide();
           $('#selectEntityDialog-userInput').val("");
           $('#selectEntityDialog').find('form div.input-group').show();
+          $('#selectEntityDialog').find('.modal-footer .btn-primary').prop("disabled", true);
         }
 
         /*]]>*/

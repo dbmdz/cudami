@@ -378,7 +378,7 @@
           $(modalDialog).find('.modal-title').text(modalTitle);
           $(modalDialog).find('.modal-message').html(modalMessage);
           var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-          $(btnOk).attr('href', "javascript:moveSubcollection('" + uuid + "');");
+          $(btnOk).attr('onclick', "moveSubcollection('" + uuid + "');");
           $(btnOk).html(modalBtnText);
           $(modalDialog).modal('show');
         }
