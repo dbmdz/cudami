@@ -176,3 +176,9 @@ function prependErrorIcon(element) {
   /* used in form pages to mark tabs with erroneous input */
   $(element).prepend('<i class="fas fa-exclamation-circle error mr-2"></i>');
 }
+
+function showMessage(cssClass, alertElementId, message) {
+  $(alertElementId).removeClass("alert-success alert-danger alert-warning alert-info").addClass(cssClass);
+  $(alertElementId).children('span:first-child').html(message);
+  $(alertElementId).removeClass("d-none");
+}

@@ -165,9 +165,7 @@
               </div>
               <div class="col-md-9">
                 <div id="alert-digitalobjects" class="mt-2 alert alert-success alert-dismissible fade show d-none" role="alert">
-                  <span th:utext="#{alert.success.digitalobject_removed_from_collection}">The
-                    digital object has been removed successfully from the
-                    collection.</span>
+                  <span>Alert message.</span>
 
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -341,8 +339,6 @@
             fetch(apiUrlAdd, {method: "POST"})
               .then(handleFetchErrors)
               .then(function (response) {
-                console.log("ok");
-
                 fetch(apiUrlDelete, {method: "DELETE"})
                   .then(handleFetchErrors)
                   .then(function (response) {
@@ -350,13 +346,11 @@
                     showMessage('alert-success', '#alert-subcollections', successMessage);
                   })
                   .catch(function (error) {
-                    console.log(error);
                     showMessage('alert-danger', '#alert-subcollections', errorMessage);
                   });
 
               })
               .catch(function (error) {
-                console.log(error);
                 showMessage('alert-danger', '#alert-subcollections', errorMessage);
               });
           } else {
@@ -406,21 +400,21 @@
           /*[+
            const apiUrl = [[@{'/api/collections/__${collection.uuid}__/digitalobjects/'}]] + uuid;
            const errorMessage = [[#{error.technical_error}]];
+           const alertSuccessMessage = [[#{alert.success.digitalobject_removed_from_collection}]];
            +]*/
 
           $('#confirmYesNoDialog').modal('hide');
 
-          $.ajax({
-            type: "DELETE",
-            url: apiUrl,
-            success: function () {
+          fetch(apiUrl, {method: "DELETE"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-digitalobjects', alertSuccessMessage);
               $('#alert-digitalobjects').removeClass("d-none");
               $('#table-digitalobjects').bootstrapTable('refresh');
-            },
-            error: function () {
+            })
+            .catch(function (error) {
               alert(errorMessage);
-            }
-          });
+            });
         }
         function removeDigitalObjectDialog(uuid) {
           const row = $('#table-digitalobjects').bootstrapTable('getRowByUniqueId', uuid);
@@ -441,21 +435,21 @@
           /*[+
            const apiUrl = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
            const errorMessage = [[#{error.technical_error}]];
+           const alertSuccessMessage = [[#{alert.success.subcollection_removed_from_collection}]];
            +]*/
 
           $('#confirmYesNoDialog').modal('hide');
 
-          $.ajax({
-            type: "DELETE",
-            url: apiUrl,
-            success: function () {
+          fetch(apiUrl, {method: "DELETE"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              showMessage('alert-success', '#alert-subcollections', alertSuccessMessage);
               $('#alert-subcollections').removeClass("d-none");
               $('#table-sub-collections').bootstrapTable('refresh');
-            },
-            error: function () {
+            })
+            .catch(function (error) {
               alert(errorMessage);
-            }
-          });
+            });
         }
         function removeSubcollectionDialog(uuid) {
           const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
@@ -470,12 +464,6 @@
           $(modalDialog).find('.modal-body').html(modalMessage);
           $(modalDialog).find('.modal-footer #confirm').attr('href', "javascript:removeSubcollection('" + uuid + "');");
           $(modalDialog).modal('show');
-        }
-
-        function showMessage(cssClass, alertElementId, message) {
-          $(alertElementId).removeClass("alert-success alert-danger alert-warning alert-info").addClass(cssClass);
-          $(alertElementId).children('span:first-child').html(message);
-          $(alertElementId).removeClass("d-none");
         }
 			/*]]>*/
       </script>

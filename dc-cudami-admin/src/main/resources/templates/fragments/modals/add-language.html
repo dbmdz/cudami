@@ -1,147 +1,156 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
   <body>
 
-  <th:block th:fragment="add-language-dialog">
-    <div class="modal fade" id="addLanguageDialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" th:text="#{modal.title.choose_language}">Choose a language</h4>
-            <button type="button" class="close" data-dismiss="modal" th:aria-label="#{modal.close}">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <form>
-                <select id="label-locales" class="form-control">
-                  <th:block th:each="locale : ${allLanguages}">
-                    <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}">English</option>
-                  </th:block>
-                </select>
-              </form>
+    <th:block th:fragment="add-language-dialog">
+      <div class="modal fade" id="addLanguageDialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title" th:text="#{modal.title.choose_language}">Choose a language</h4>
+              <button type="button" class="close" data-dismiss="modal" th:aria-label="#{modal.close}">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-          </div>
-          <div class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
-            <button type="submit" class="btn btn-primary" data-dismiss="modal" th:text="#{btn.add}">Add</button>
+            <div class="modal-body">
+              <div class="form-group">
+                <form>
+                  <select id="label-locales" class="form-control">
+                    <th:block th:each="locale : ${allLanguages}">
+                      <option th:value="${locale.toLanguageTag()}" th:text="${locale.getDisplayName(#locale)}">English</option>
+                    </th:block>
+                  </select>
+                </form>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
+              <button type="submit" class="btn btn-primary" data-dismiss="modal" th:text="#{btn.add}">Add</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      let targetLocalizedForm;
-      let fragmentBaseUrl;
-      $('#addLanguageDialog').on('show.bs.modal', function (e) {
-        /*[+
-         fragmentBaseUrl = [[@{/fragments/forms}]];
-         +]*/
-        targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
-        fragmentBaseUrl = fragmentBaseUrl + '/' + $(e.relatedTarget).data("fragment");
-      });
-      $("#addLanguageDialog").on('click', '.btn-primary', function () {
-        let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
-        let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
-        let tabIdPrefix = $(targetLocalizedForm).data("tabid-prefix");
 
-        addNavTab(selectedOptionValue, selectedOptionText, tabIdPrefix);
-        addTabPane(selectedOptionValue);
-        bindTabEvents();
-      });
-
-      function addDeleteLink(languageTab) {
-        if ($(languageTab).children(".deleteAction").length === 0) {
-          let navLink = $(languageTab).children(".nav-link");
-          let targetId = $(navLink).attr("href");
-          let tabLabel = $(navLink).text();
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        let targetLocalizedForm;
+        let fragmentBaseUrl;
+        $('#addLanguageDialog').on('show.bs.modal', function (e) {
           /*[+
-           const modalDeleteMessage = `[(#{modal.msg.confirm_delete_tab})]`;
-           const modalDeleteTitle = [[#{modal.title.warning}]];
-           const tooltipDelete = [[#{tooltip.delete}]];
+           fragmentBaseUrl = [[@{/fragments/forms}]];
            +]*/
-          $(languageTab).append('<a class="deleteAction" title="' + tooltipDelete + '" data-href="javascript:deleteTab(\'' + targetId + '\');" data-message="' + escape(modalDeleteMessage) + '" data-title="' + modalDeleteTitle + '" data-target="#confirmYesNoDialog" data-toggle="modal"><i class="fa fa-trash ml-2"></i></a>');
-        }
-      }
+          targetLocalizedForm = $(e.relatedTarget).parent().closest('.localized-form');
+          fragmentBaseUrl = fragmentBaseUrl + '/' + $(e.relatedTarget).data("fragment");
+        });
+        $("#addLanguageDialog").on('click', '.btn-primary', function () {
+          let selectedOptionValue = $('#addLanguageDialog').find('#label-locales').val();
+          let selectedOptionText = $('#addLanguageDialog').find('#label-locales option:selected').text();
+          let tabIdPrefix = $(targetLocalizedForm).data("tabid-prefix");
 
-      function addNavTab(languageAcronym, languageLabel, idPrefix) {
-        /*[- remove class 'active' from all 'nav-tab's and '.nav-link' links -]*/
-        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).children(".nav-tab").removeClass('active');
-        $(navTabs).find('.nav-link').removeClass('active');
+          addNavTab(selectedOptionValue, selectedOptionText, tabIdPrefix);
+          addTabPane(selectedOptionValue);
+          bindTabEvents();
+        });
 
-        /*[- append a new active tab with selected language before plus tab -]*/
-        /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
-//        let newTab = $(navTabs).children('.nav-tab').first().clone();
-        let newTab = '<li class="nav-tab language-tab active"><a class="language-switcher nav-link" class="active" data-toggle="tab" role="tab" href="#' + idPrefix + languageAcronym + '">' + languageLabel + '</a></li>';
-        let lastLanguageTab = $(navTabs).find('.language-tab').last();
-        $(lastLanguageTab).after(newTab);
-
-        updateActionsInTabs(navTabs);
-      }
-
-      function addTabPane(languageAcronym) {
-        /*[- remove class 'active' from all '.tab-pane' panes -]*/
-        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
-
-        /*[- append a new tab pane for new language by getting fragment for new language from server -]*/
-        /*[+
-         let uiLocale = [[${#locale.language}]];
-         +]*/
-        let tabContent = $(targetLocalizedForm).find('.tab-content').first();
-        $.ajax({type: "GET",
-          url: fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + languageAcronym,
-          success: function (html) {
-            $(tabContent).append(html);
+        function addDeleteLink(languageTab) {
+          if ($(languageTab).children(".deleteAction").length === 0) {
+            let navLink = $(languageTab).children(".nav-link");
+            let targetId = $(navLink).attr("href");
+            let tabLabel = $(navLink).text();
+            /*[+
+             const modalDeleteMessage = `[(#{modal.msg.confirm_delete_tab})]`;
+             const modalDeleteTitle = [[#{modal.title.warning}]];
+             const tooltipDelete = [[#{tooltip.delete}]];
+             +]*/
+            $(languageTab).append('<a class="deleteAction" title="' + tooltipDelete + '" data-href="javascript:deleteTab(\'' + targetId + '\');" data-message="' + escape(modalDeleteMessage) + '" data-title="' + modalDeleteTitle + '" data-target="#confirmYesNoDialog" data-toggle="modal"><i class="fa fa-trash ml-2"></i></a>');
           }
-        });
-      }
-
-      function deleteTab(id) {
-        /*[- remove tab linking to given id -]*/
-        $(".nav-tabs").find("a[href='" + id + "']").each(function (index) {
-          targetLocalizedForm = $(this).closest('.localized-form');
-          // remove tab:
-          $(this).parent().remove();
-        });
-        /*[- remove tab-pane with given id -]*/
-        $(targetLocalizedForm).find(id).remove();
-
-        let navTabs = $(targetLocalizedForm).children('.nav-tabs');
-        $(navTabs).children(".nav-tab").removeClass('active');
-        $(navTabs).find('.nav-link').removeClass('active');
-        $(targetLocalizedForm).find('.tab-pane').removeClass('active');
-
-        $(targetLocalizedForm).find(".nav-tab").first().addClass("active");
-        $(targetLocalizedForm).find(".tab-pane").first().addClass("active");
-        updateActionsInTabs(navTabs);
-        $('#confirmYesNoDialog').modal('hide');
-      }
-
-      function removeDeleteLink(languageTab) {
-        if ($(languageTab).children(".deleteAction").length === 1) {
-          $(languageTab).children(".deleteAction").remove();
         }
-      }
 
-      function updateActionsInTabs(navTabs) {
-        /*[- remove delete links from all language tabs ("add"-tab excluded) if there is only one language tab, otherwise add delete link (if not exists yet) to all language tabs -]*/
-        let languageTabsCount = $(navTabs).children('.language-tab').length;
-        if (languageTabsCount === 1) {
-          $(navTabs).children('.language-tab').each(function (index) {
-            removeDeleteLink(this);
-          });
-        } else {
-          $(navTabs).children('.language-tab').each(function (index) {
-            addDeleteLink(this);
-          });
+        function addNavTab(languageAcronym, languageLabel, idPrefix) {
+          /*[- remove class 'active' from all 'nav-tab's and '.nav-link' links -]*/
+          let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+          $(navTabs).children(".nav-tab").removeClass('active');
+          $(navTabs).find('.nav-link').removeClass('active');
+
+          /*[- append a new active tab with selected language before plus tab -]*/
+          /*[- clone first (other language tab), change tab specifics for new language and add it before plus tab -]*/
+          //        let newTab = $(navTabs).children('.nav-tab').first().clone();
+          let newTab = '<li class="nav-tab language-tab active"><a class="language-switcher nav-link" class="active" data-toggle="tab" role="tab" href="#' + idPrefix + languageAcronym + '">' + languageLabel + '</a></li>';
+          let lastLanguageTab = $(navTabs).find('.language-tab').last();
+          $(lastLanguageTab).after(newTab);
+
+          updateActionsInTabs(navTabs);
         }
-      }
+
+        function addTabPane(languageAcronym) {
+          /*[- remove class 'active' from all '.tab-pane' panes -]*/
+          $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+
+          /*[- append a new tab pane for new language by getting fragment for new language from server -]*/
+          /*[+
+           let uiLocale = [[${#locale.language}]];
+           +]*/
+          let tabContent = $(targetLocalizedForm).find('.tab-content').first();
+
+          fetch(fragmentBaseUrl + '?language=' + uiLocale + '&fieldLanguage=' + languageAcronym, {method: "GET"})
+            .then(handleFetchErrors)
+            .then(function (html) {
+              $(tabContent).append(html);
+            })
+            .catch(function (error) {
+              alert(errorMessage);
+            });
+        }
+
+        function deleteTab(id) {
+          /*[- remove tab linking to given id -]*/
+          $(".nav-tabs").find("a[href='" + id + "']").each(function (index) {
+            targetLocalizedForm = $(this).closest('.localized-form');
+            // remove tab:
+            $(this).parent().remove();
+          });
+          /*[- remove tab-pane with given id -]*/
+          $(targetLocalizedForm).find(id).remove();
+
+          let navTabs = $(targetLocalizedForm).children('.nav-tabs');
+          $(navTabs).children(".nav-tab").removeClass('active');
+          $(navTabs).find('.nav-link').removeClass('active');
+          $(targetLocalizedForm).find('.tab-pane').removeClass('active');
+
+          $(targetLocalizedForm).find(".nav-tab").first().addClass("active");
+          $(targetLocalizedForm).find(".tab-pane").first().addClass("active");
+          updateActionsInTabs(navTabs);
+          $('#confirmYesNoDialog').modal('hide');
+        }
+
+        function removeDeleteLink(languageTab) {
+          if ($(languageTab).children(".deleteAction").length === 1) {
+            $(languageTab).children(".deleteAction").remove();
+          }
+        }
+
+        function updateActionsInTabs(navTabs) {
+          /*[- remove delete links from all language tabs ("add"-tab excluded) if there is only one language tab, otherwise add delete link (if not exists yet) to all language tabs -]*/
+          let languageTabsCount = $(navTabs).children('.language-tab').length;
+          if (languageTabsCount === 1) {
+            $(navTabs).children('.language-tab').each(function (index) {
+              removeDeleteLink(this);
+            });
+          } else {
+            $(navTabs).children('.language-tab').each(function (index) {
+              addDeleteLink(this);
+            });
+          }
+        }
       /*]]>*/
-    </script>
-  </th:block>
+      </script>
+    </th:block>
 
+  </body>
+
+</html>
 </body>
+
 </html>
