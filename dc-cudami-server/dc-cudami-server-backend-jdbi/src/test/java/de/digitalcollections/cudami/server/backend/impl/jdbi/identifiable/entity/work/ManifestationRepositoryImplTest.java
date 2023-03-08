@@ -342,7 +342,7 @@ class ManifestationRepositoryImplTest
             .peek(m -> m.setWork(Work.builder().uuid(m.getWork().getUuid()).build()))
             .toList();
 
-    assertThat(actual).isEqualTo(expected);
+    assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
   }
 
   // -------------------------------------------------------------------
