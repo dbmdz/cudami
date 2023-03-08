@@ -4,6 +4,7 @@ delete from rel_entity_entities;
 delete from predicates;
 delete from manifestation_manifestations;
 delete from work_works;
+delete from identifiers;
 -- hier evtl. zuerst webpages löschen?
 delete from website_webpages;
 
@@ -34,7 +35,6 @@ delete from headwordentry_creators;
 delete from headwords;
 delete from humansettlements;
 delete from identifiables;
-delete from identifiers;
 delete from identifiertypes;
 delete from items;
 delete from licenses;
