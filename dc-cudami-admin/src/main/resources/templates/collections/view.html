@@ -226,7 +226,7 @@
 
     <section layout:fragment="beforeBodyEnds">
       <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog-html"></div>
-      <div th:replace="fragments/modals/select-entity :: render"></div>
+      <div th:replace="fragments/modals/select-entities :: render"></div>
 
       <script type="text/javascript">
         $(addDataLanguageChangeHandler());
@@ -261,6 +261,38 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        function addSubcollections() {
+          /*[+
+           const parentLabel = [[${collection.label['de']}]];
+           const addApiUrl = [[@{/api/collections/${collection.uuid}/collections}]];
+           +]*/
+
+          $('#selectEntitiesDialog').modal('hide');
+          let entities = getSelectedEntities();
+          console.log(entities);
+        }
+        function addSubcollectionsDialog() {
+          /*[+
+           const modalTitle = [[#{modal.title.add_subcollections}]];
+           const parentLabel = [[${collection.label['de']}]];
+           const modalMessage = `[(#{modal.msg.add_subcollections})]`;
+           const modalBtnText = `[(#{btn.add})]`;
+           const parentUuid = [[${collection.uuid}]];
+           // TODO i18n: which language? from page dropdown...
+           const searchApiUrl = [[@{/api/collections/search}]];
+           +]*/
+
+          const modalDialog = $('#selectEntitiesDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'multi');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('onclick', "addSubcollections('" + parentUuid + "');");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
+
         function buttonsCollections() {
           /*[+
            const baseUrl = [[@{'/collections'}]];
@@ -271,15 +303,18 @@
           return {
             btnAdd: {
               text: textAdd,
-              icon: 'fa-plus',
-              event: function () {
-                location.href = baseUrl
-                  + '/new?parentType=collection&parentUuid='
-                  + parentUuid;
-              },
-              attributes: {
-                title: tooltipAdd
-              }
+              html: `
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-plus"></i>
+                    <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="${baseUrl}/new?parentType=collection&parentUuid=${parentUuid}">Neue Untersammlung erstellen</a>
+                    <a class="dropdown-item" href="javascript:addSubcollectionsDialog();">Vorhandene Sammlung hinzufügen</a>
+                  </div>
+                </div>
+                `
             }
           };
         }
@@ -316,49 +351,47 @@
         }
 
         function moveSubcollection(uuid) {
-          let selectedTargetCollectionUuid = $('#selectEntityDialog').find('input[name="selectedUuid"]').val();
-          if (selectedTargetCollectionUuid) {
-            if (selectedTargetCollectionUuid == uuid) {
-              return;
-            }
+          $('#selectEntitiesDialog').modal('hide');
+          let entities = getSelectedEntities();
 
-            $('#selectEntityDialog').modal('hide');
-            let selectedTargetCollectionLabel = $('#selectEntityDialog-userInput').val();
-            let collectionLabel = $('#selectEntityDialog .modal-message b').text();
-
-            /*[+
-              const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
-              const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
-              const errorMessage = [[#{error.technical_error}]];
-              const targetCollectionUrl = [[@{'/collections/'}]] + selectedTargetCollectionUuid;
-              const successMessage = `[(#{msg.move_collection.success})]`;
-              const noTargetSelectedMessage = `[(#{msg.move_collection.no_target_selected})]`;
-            +]*/
-
-            // move = add + delete:
-            fetch(apiUrlAdd, {method: "POST"})
-              .then(handleFetchErrors)
-              .then(function (response) {
-                fetch(apiUrlDelete, {method: "DELETE"})
-                  .then(handleFetchErrors)
-                  .then(function (response) {
-                    $('#table-sub-collections').bootstrapTable('refresh');
-                    showMessage('alert-success', '#alert-subcollections', successMessage);
-                  })
-                  .catch(function (error) {
-                    showMessage('alert-danger', '#alert-subcollections', errorMessage);
-                  });
-
-              })
-              .catch(function (error) {
-                showMessage('alert-danger', '#alert-subcollections', errorMessage);
-              });
-          } else {
+          if (entities.length == 0) {
             showMessage('alert-danger', '#alert-subcollections', noTargetSelectedMessage);
+            return;
           }
+          let selectedTargetCollectionUuid = entities[0].uuid;
+          let selectedTargetCollectionLabel = $('#selectEntitiesDialog-userInput').val();
+          let collectionLabel = $('#selectEntitiesDialog .modal-message b').text();
+
+          /*[+
+            const apiUrlAdd = [[@{'/api/collections/'}]] + selectedTargetCollectionUuid + '/collections/' + uuid;
+            const apiUrlDelete = [[@{'/api/collections/__${collection.uuid}__/collections/'}]] + uuid;
+            const errorMessage = [[#{error.technical_error}]];
+            const targetCollectionUrl = [[@{'/collections/'}]] + selectedTargetCollectionUuid;
+            const successMessage = `[(#{msg.move_collection.success})]`;
+            const noTargetSelectedMessage = `[(#{msg.move_collection.no_target_selected})]`;
+          +]*/
+
+          // move = add + delete:
+          fetch(apiUrlAdd, {method: "POST"})
+            .then(handleFetchErrors)
+            .then(function (response) {
+              fetch(apiUrlDelete, {method: "DELETE"})
+                .then(handleFetchErrors)
+                .then(function (response) {
+                  $('#table-sub-collections').bootstrapTable('refresh');
+                  showMessage('alert-success', '#alert-subcollections', successMessage);
+                })
+                .catch(function (error) {
+                  showMessage('alert-danger', '#alert-subcollections', errorMessage);
+                });
+
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-subcollections', errorMessage);
+            });
         }
-        function moveSubcollectionDialog(uuid) {
-          const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', uuid);
+        function moveSubcollectionDialog(subcollectionUuid) {
+          const row = $('#table-sub-collections').bootstrapTable('getRowByUniqueId', subcollectionUuid);
           const label = row.label[Object.keys(row.label)[0]];
           /*[+
            const modalTitle = [[#{modal.title.move_collection}]];
@@ -367,12 +400,13 @@
            const searchApiUrl = [[@{/api/collections/search}]];
            +]*/
 
-          const modalDialog = $('#selectEntityDialog');
+          const modalDialog = $('#selectEntitiesDialog');
           $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'single');
           $(modalDialog).find('.modal-title').text(modalTitle);
           $(modalDialog).find('.modal-message').html(modalMessage);
           var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-          $(btnOk).attr('onclick', "moveSubcollection('" + uuid + "');");
+          $(btnOk).attr('onclick', "moveSubcollection('" + subcollectionUuid + "');");
           $(btnOk).html(modalBtnText);
           $(modalDialog).modal('show');
         }
