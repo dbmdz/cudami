@@ -263,13 +263,32 @@
         /*<![CDATA[*/
         function addSubcollections() {
           /*[+
+           const errorMessage = [[#{error.technical_error}]];
            const parentLabel = [[${collection.label['de']}]];
-           const addApiUrl = [[@{/api/collections/${collection.uuid}/collections}]];
+           const addApiUrl = [[@{/api/collections/__${collection.uuid}__/collections}]];
+           const successMessage = `[(#{msg.add_subcollections.success})]`;
            +]*/
 
           $('#selectEntitiesDialog').modal('hide');
           let entities = getSelectedEntities();
-          console.log(entities);
+
+          // add collections to parent collection
+          fetch(addApiUrl,
+            {
+              method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(entities)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              $('#table-sub-collections').bootstrapTable('refresh');
+              showMessage('alert-success', '#alert-subcollections', successMessage);
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-subcollections', errorMessage);
+            });
         }
         function addSubcollectionsDialog() {
           /*[+
@@ -288,7 +307,7 @@
           $(modalDialog).find('.modal-title').text(modalTitle);
           $(modalDialog).find('.modal-message').html(modalMessage);
           var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
-          $(btnOk).attr('onclick', "addSubcollections('" + parentUuid + "');");
+          $(btnOk).attr('onclick', "addSubcollections();");
           $(btnOk).html(modalBtnText);
           $(modalDialog).modal('show');
         }
@@ -299,6 +318,8 @@
            const textAdd = [[#{btn.add}]];
            const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
            const parentUuid = [[${collection.uuid}]]
+           const optionsAddExistingCollections = [[#{options.add_existing_collections}]];
+           const optionsCreateSubcollection = [[#{options.create_subcollection}]];
            +]*/
           return {
             btnAdd: {
@@ -310,8 +331,8 @@
                     <span class="caret"></span>
                   </button>
                   <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="${baseUrl}/new?parentType=collection&parentUuid=${parentUuid}">Neue Untersammlung erstellen</a>
-                    <a class="dropdown-item" href="javascript:addSubcollectionsDialog();">Vorhandene Sammlung hinzufügen</a>
+                    <a class="dropdown-item" href="${baseUrl}/new?parentType=collection&parentUuid=${parentUuid}">${optionsCreateSubcollection}</a>
+                    <a class="dropdown-item" href="javascript:addSubcollectionsDialog();">${optionsAddExistingCollections}</a>
                   </div>
                 </div>
                 `
