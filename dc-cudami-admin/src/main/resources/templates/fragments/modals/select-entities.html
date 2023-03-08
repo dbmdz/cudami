@@ -33,7 +33,6 @@
                     </div>
                   </div>
                 </div>
-                <input type="hidden" name="selectedUuid" />
                 <input type="hidden" name="selectedEntities" />
               </form>
 
@@ -212,6 +211,7 @@
           }
           html = html + '</div>';
           if (currentValue) {
+            // highlight current value in string
             html = html + `<div class="col">${object.label.de.replace(new RegExp(currentValue, "gi"), (str) => `<span class="alert-warning">${str}</span>`)}</div>`;
           } else {
             html = html + `<div class="col">${object.label.de}</div>`;
