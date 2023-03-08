@@ -9,8 +9,10 @@ cudami:
       - ARTICLE
       - BOOK
       - CONTAINED
+      - IMAGES
       - ISSUE
       - NEWSPAPER
+      - PART
       - SERIAL
       - UNINDEPENDENT
       - WASSERZEICHEN
