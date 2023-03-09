@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -15,9 +14,11 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "DigitalObjects" endpoints (API). */
 @RestController
 public class DigitalObjectsAPIController
-    extends AbstractIdentifiablesController<DigitalObject, CudamiDigitalObjectsClient> {
+    extends AbstractEntitiesController<DigitalObject, CudamiDigitalObjectsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
@@ -38,7 +39,7 @@ public class DigitalObjectsAPIController
   }
 
   @SuppressFBWarnings
-  @GetMapping({"/api/digitalobjects", "/api/digitalobjects/search"})
+  @GetMapping("/api/digitalobjects")
   @ResponseBody
   public BTResponse<DigitalObject> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
@@ -52,6 +53,28 @@ public class DigitalObjectsAPIController
     PageResponse<DigitalObject> pageResponse =
         super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
+  }
+
+  /*
+   * Used in templates/collections/view.html and
+   * templates/fragments/modals/select-entities.html
+   */
+  @GetMapping("/api/digitalobjects/search")
+  @ResponseBody
+  public PageResponse<DigitalObject> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "searchField", required = false) String searchField,
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws TechnicalException {
+    PageRequest pageRequest =
+        createPageRequest(pageNumber, pageSize, searchField, searchTerm, sortBy);
+    PageResponse<DigitalObject> pageResponse = search(searchField, searchTerm, pageRequest);
+    if (pageResponse == null) {
+      throw new InvalidEndpointRequestException("invalid request param", searchField);
+    }
+    return pageResponse;
   }
 
   @GetMapping(

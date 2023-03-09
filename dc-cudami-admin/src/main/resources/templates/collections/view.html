@@ -182,7 +182,7 @@
                 </div>
                 <table id="table-digitalobjects" data-toggle="table"
                        th:data-url="@{/api/collections/__${collection.uuid}__/digitalobjects}"
-                       th:data-locale="${#locale}" data-cookie="true"
+                       th:data-locale="${#locale}" data-buttons="buttonsDigitalObjects" data-cookie="true"
                        data-cookie-id-table="table-digitalobjects" data-id-field="uuid"
                        data-pagination="true" data-pagination-v-align="both"
                        data-query-params="queryParamsDigitalObjects" data-search="true"
@@ -261,9 +261,62 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        function addDigitalObjects() {
+          /*[+
+           const errorMessage = [[#{error.technical_error}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${collection.label['de']}]];
+           const addApiUrl = [[@{/api/collections/__${collection.uuid}__/digitalobjects}]];
+           const successMessage = `[(#{msg.add_digitalobjects.success})]`;
+           +]*/
+
+          $('#selectEntitiesDialog').modal('hide');
+          let entities = getSelectedEntities();
+
+          // add digitalobjects to parent collection
+          fetch(addApiUrl,
+            {
+              method: "POST", headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(entities)
+            })
+            .then(handleFetchErrors)
+            .then(function (response) {
+              $('#table-digitalobjects').bootstrapTable('refresh');
+              showMessage('alert-success', '#alert-digitalobjects', successMessage);
+            })
+            .catch(function (error) {
+              showMessage('alert-danger', '#alert-digitalobjects', errorMessage);
+            });
+        }
+        function addDigitalObjectsDialog() {
+          /*[+
+           const modalTitle = [[#{modal.title.add_digitalobjects}]];
+           // TODO i18n: which language? from page dropdown...
+           const parentLabel = [[${collection.label['de']}]];
+           const modalMessage = `[(#{modal.msg.add_digitalobjects})]`;
+           const modalBtnText = `[(#{btn.add})]`;
+           const parentUuid = [[${collection.uuid}]];
+           const searchApiUrl = [[@{/api/digitalobjects/search}]];
+           +]*/
+
+          const modalDialog = $('#selectEntitiesDialog');
+          $(modalDialog).data('searchApiUrl', searchApiUrl);
+          $(modalDialog).data('mode', 'multi');
+          $(modalDialog).find('.modal-title').text(modalTitle);
+          $(modalDialog).find('.modal-message').html(modalMessage);
+          var btnOk = $(modalDialog).find('.modal-footer .btn-primary');
+          $(btnOk).attr('onclick', "addDigitalObjects();");
+          $(btnOk).html(modalBtnText);
+          $(modalDialog).modal('show');
+        }
+
         function addSubcollections() {
           /*[+
            const errorMessage = [[#{error.technical_error}]];
+           // TODO i18n: which language? from page dropdown...
            const parentLabel = [[${collection.label['de']}]];
            const addApiUrl = [[@{/api/collections/__${collection.uuid}__/collections}]];
            const successMessage = `[(#{msg.add_subcollections.success})]`;
@@ -293,11 +346,11 @@
         function addSubcollectionsDialog() {
           /*[+
            const modalTitle = [[#{modal.title.add_subcollections}]];
+           // TODO i18n: which language? from page dropdown...
            const parentLabel = [[${collection.label['de']}]];
            const modalMessage = `[(#{modal.msg.add_subcollections})]`;
            const modalBtnText = `[(#{btn.add})]`;
            const parentUuid = [[${collection.uuid}]];
-           // TODO i18n: which language? from page dropdown...
            const searchApiUrl = [[@{/api/collections/search}]];
            +]*/
 
@@ -323,10 +376,9 @@
            +]*/
           return {
             btnAdd: {
-              text: textAdd,
               html: `
                 <div class="dropdown">
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="${tooltipAdd}">
                     <i class="fa fa-plus"></i>
                     <span class="caret"></span>
                   </button>
@@ -336,6 +388,25 @@
                   </div>
                 </div>
                 `
+            }
+          };
+        }
+
+        function buttonsDigitalObjects() {
+          /*[+
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                addDigitalObjectsDialog();
+              },
+              attributes: {
+                title: tooltipAdd
+              }
             }
           };
         }
