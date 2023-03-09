@@ -43,7 +43,7 @@
           <hr/>
 
           <div class="row mb-1">
-            <div class="col-md-3"><label th:text="#{lbl.text}">Long text</label></div>
+            <div class="col-md-3 multilanguage"><label th:text="#{lbl.text}">Long text</label></div>
             <div class="col-md-9">
               <th:block th:if="${article.text?.containsKey(#locale.forLanguageTag(dataLanguage))}">
                 <div class="card">

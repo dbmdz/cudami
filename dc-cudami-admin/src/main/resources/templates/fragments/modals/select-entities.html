@@ -65,7 +65,7 @@
         
         new Autocomplete('selectEntitiesDialog-userInput', {
           insertToInput: true,
-          cache: true,
+          cache: false,
           classGroup: "group-by",
           noResults: ({element, currentValue, template}) => template(`<li>${msgNoResultsFound}: "${currentValue}"</li>`),
           onSearch: ({currentValue}) => {
