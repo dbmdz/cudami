@@ -42,6 +42,12 @@
                 'data-toggle="modal"' +
                 '><i class="fa fa-trash"></i></a>';
       }
+      function renderDnDHandle() {
+        /*[+
+         const tooltip = [[#{tooltip.move}]];
+         +]*/
+        return `<i class="fa fa-exchange-alt fa-rotate-90" title="${tooltip}"></i>`;
+      }
       function renderEditAction(baseUrl) {
         /*[+
          const tooltipEdit = [[#{tooltip.edit}]];
