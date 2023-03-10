@@ -120,7 +120,7 @@
           <th:block th:insert="~{fragments/titles::renderTitles(${manifestation.titles}, ${dataLanguage})}"></th:block>
 
           <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.work}">Work</label></div>
+            <div class="col-md-3 multilanguage"><label th:text="#{lbl.work}">Work</label></div>
             <div class="align-items-center col-md-9 d-flex">
               <span th:with="work=${manifestation.work}" th:if="${manifestation.work}">
                 &nbsp;<a th:href="@{/works/{uuid}(uuid=${work.uuid})}" th:text="${work.label?.getText(dataLanguage)} ?: ${work.uuid}">work label</a>
@@ -129,7 +129,7 @@
           </div>
 
           <div class="row">
-            <div class="col-md-3"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
+            <div class="col-md-3 multilanguage"><label th:text="#{lbl.parent_manifestation_s}">Parents</label></div>
             <div class="align-items-center col-md-9 d-flex" th:each="parent, iterStat: ${manifestation.parents}">
               <span th:text="${parent.title}" style="font-weight: bold"></span> &nbsp;
               &nbsp<span th:text="#{in_manifestation}"></span>&nbsp;

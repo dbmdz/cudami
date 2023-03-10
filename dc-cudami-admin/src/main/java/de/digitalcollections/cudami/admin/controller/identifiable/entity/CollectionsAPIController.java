@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -9,17 +8,12 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollections
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
@@ -38,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "Collections" endpoints (API). */
 @RestController
 public class CollectionsAPIController
-    extends AbstractIdentifiablesController<Collection, CudamiCollectionsClient> {
+    extends AbstractEntitiesController<Collection, CudamiCollectionsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsAPIController.class);
 
@@ -90,7 +84,8 @@ public class CollectionsAPIController
   }
 
   /*
-   * Used in templates/collections/view.html
+   * Used in templates/collections/view.html and
+   * templates/fragments/modals/select-entities.html
    */
   @GetMapping("/api/collections/search")
   @ResponseBody
@@ -101,70 +96,13 @@ public class CollectionsAPIController
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    PageRequest pageRequest;
-    PageResponse<Collection> pageResponse;
-
-    if (searchField == null) {
-      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-      if (sortBy != null) {
-        Sorting sorting = new Sorting(sortBy);
-        pageRequest.setSorting(sorting);
-      }
-      pageResponse = service.find(pageRequest);
-      return pageResponse;
-    } else {
-      pageRequest = new PageRequest(pageNumber, pageSize);
-      if (sortBy != null) {
-        Sorting sorting = new Sorting(sortBy);
-        pageRequest.setSorting(sorting);
-      }
-
-      Collection collection;
-      switch (searchField) {
-        case "label":
-          Filtering filtering =
-              Filtering.builder()
-                  .add(
-                      FilterCriterion.builder()
-                          .withExpression("label")
-                          .isEquals(searchTerm)
-                          .build())
-                  .build();
-          pageRequest.setFiltering(filtering);
-          pageResponse = service.find(pageRequest);
-          return pageResponse;
-        case "uuid":
-          collection = service.getByUuid(UUID.fromString(searchTerm));
-          if (collection == null) {
-            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
-          } else {
-            pageResponse = PageResponse.builder().withContent(collection).build();
-          }
-          pageResponse.setRequest(pageRequest);
-          return pageResponse;
-        case "refId":
-          collection = service.getByRefId(Long.parseLong(searchTerm));
-          if (collection == null) {
-            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
-          } else {
-            pageResponse = PageResponse.builder().withContent(collection).build();
-          }
-          pageResponse.setRequest(pageRequest);
-          return pageResponse;
-        case "identifier":
-          Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
-          collection = service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-          if (collection == null) {
-            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
-          } else {
-            pageResponse = PageResponse.builder().withContent(collection).build();
-          }
-          pageResponse.setRequest(pageRequest);
-          return pageResponse;
-        default:
-          throw new InvalidEndpointRequestException("invalid request params", searchTerm);
-      }
+    PageRequest pageRequest =
+        createPageRequest(pageNumber, pageSize, searchField, searchTerm, sortBy);
+    PageResponse<Collection> pageResponse = search(searchField, searchTerm, pageRequest);
+    if (pageResponse == null) {
+      throw new InvalidEndpointRequestException("invalid request param", searchField);
     }
+    return pageResponse;
   }
 
   /*

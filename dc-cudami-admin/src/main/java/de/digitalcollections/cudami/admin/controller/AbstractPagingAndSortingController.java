@@ -29,6 +29,23 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
 
   @SuppressFBWarnings
   protected PageRequest createPageRequest(
+      int pageNumber, int pageSize, String searchField, String searchTerm, List<Order> sortBy) {
+    PageRequest pageRequest;
+    if (searchField == null) {
+      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    } else {
+      pageRequest = new PageRequest(pageNumber, pageSize);
+    }
+
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return pageRequest;
+  }
+
+  @SuppressFBWarnings
+  protected PageRequest createPageRequest(
       String sort,
       String order,
       String dataLanguage,

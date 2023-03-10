@@ -52,10 +52,13 @@ a[href^="http"]:not(.no-external):after {
   z-index: 1000;
   
   position: fixed;
-  top: 48px;
+/*   top: 48px; */
 }
 #content-header h1 {
   font-size: 1.7em;
+}
+.content-wrapper {
+  padding-bottom: 2rem;
 }
 @media only screen and (max-width: 991px) {
   #content-header {

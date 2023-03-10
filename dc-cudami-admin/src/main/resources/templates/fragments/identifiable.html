@@ -1,157 +1,157 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
   <body>
 
-  <th:block th:fragment="renderFields(identifiable)" th:object="${identifiable}">
-    <div class="row">
-      <div class="col-md-3 multilanguage"><label th:text="#{lbl.preview_image}">Preview Image</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)"></th:block>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="fragments/text::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})"></th:block>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3 multilanguage"><label th:text="#{lbl.url_aliases}">URL Aliases</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})"></th:block>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3 multilanguage"><label th:text="#{lbl.tags}">Tags</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="::renderTags(*{tags}, ${dataLanguage})"></th:block>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-3"><label th:text="#{lbl.identifiers}">Identifiers</label></div>
-      <div class="col-md-9">
-        <th:block th:insert="::renderIdentifiers(*{identifiers})"></th:block>
-      </div>
-    </div>
-  </th:block>
-
-  <th:block th:fragment="renderIdentifiers(identifiers)">
-    <th:block th:each="identifier,iter : ${identifiers}" th:object="${identifier}">
-      <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
-    </th:block>
-  </th:block>
-
-  <th:block th:fragment="renderTags(tags, language)">
-    <th:block th:each="tag,iter : ${tags}" th:object="${tag}">
-      <span th:title="|*{value}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{value}">...</span>
-    </th:block>
-  </th:block>
-
-  <th:block th:fragment="renderUrlAliases(aliases, language)">
-    <th:block th:if="${aliases}">
-      <ul class="list-group">
-        <th:block th:with="urlAliases=${aliases.get(#locale.forLanguageTag(language))}">
-          <li th:each="urlAlias : ${urlAliases}" class="list-group-item d-flex justify-content-between py-1 align-items-center">
-          <th:block th:if="${website}">
-            <!--/* If ${website} is in model, prefix url alias with website url */-->
-            <span th:text="|${website.url}${#strings.endsWith(website.url,'/') ? '' : '/'}${urlAlias.slug}|">https://www.example.org/slug</span>
-          </th:block>
-          <th:block th:unless="${website}">
-            <span th:text="|/${urlAlias.slug}|">/slug</span>
-          </th:block>
-          <small th:if="${urlAlias.primary}" th:text="#{primaryAlias}">Primary URL</small>
-          <small th:if="${urlAlias.lastPublished != null}" th:with="df=#{date.format}" th:text="#{last_published(__${#temporals.format(urlAlias.lastPublished, df)}__)}">01.01.2023</small>
-          </li>
-      </ul>
-    </th:block>
-  </th:block>
-</th:block>
-
-<th:block th:fragment="renderIdentifiersAndRefId(identifiable, hasRefId)">
-  <section class="mb-3 rows-striped">
-    <div class="row mb-1">
-      <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
-      <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
-    </div>
-    <div class="row mb-1" th:if="${hasRefId}">
-      <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
-      <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
-    </div>
-    <div class="row mb-1">
-      <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
-      <div class="col-md-9" id="identifiers-list"></div>
-    </div>
-  </section>
-</th:block>
-
-<th:block th:fragment="renderLocalizedTeaser(identifiable, languages, hasLongText)">
-  <ul class="nav nav-tabs" role="tablist">
-    <li class="nav-item" th:each="language,iter : ${languages}">
-      <a
-        class="language-switcher nav-link"
-        data-toggle="tab"
-        role="tab"
-        th:classappend="${iter.index} == 0 ? active"
-        th:href="${'#' + language}"
-        th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
-        th:with="languageToDisplay=${language.getDisplayName(#locale)}"
-        >
-        language
-      </a>
-    </li>
-  </ul>
-  <div class="tab-content">
-    <div th:each="language,iter : ${languages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
-      <div class="card">
-        <div class="card-body bg-light">
-          <th:block th:insert="::renderTeaser(${identifiable}, ${language})"></th:block>
+    <th:block th:fragment="renderFields(identifiable)" th:object="${identifiable}">
+      <div class="row">
+        <div class="col-md-3 multilanguage"><label th:text="#{lbl.preview_image}">Preview Image</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(*{previewImage}, *{previewImageRenderingHints}, ${dataLanguage}, 100)"></th:block>
         </div>
-        <th:block th:if="${hasLongText} and ${identifiable.text?.containsKey(language)}">
-          <div class="card-body long-text">
-            <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.text}, ${language})"></th:block>
-          </div>
-        </th:block>
       </div>
-    </div>
-  </div>
-</th:block>
+      <div class="row">
+        <div class="col-md-3 multilanguage"><label th:text="#{lbl.label}">Label</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="fragments/text::renderLocalizedText(*{label}, ${dataLanguage})"></th:block>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 multilanguage"><label th:text="#{lbl.description}">Abstract</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="fragments/text::renderLocalizedStructuredContent(*{description}, ${dataLanguage})"></th:block>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 multilanguage"><label th:text="#{lbl.url_aliases}">URL Aliases</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="::renderUrlAliases(*{localizedUrlAliases}, ${dataLanguage})"></th:block>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3"><label th:text="#{lbl.tags}">Tags</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="::renderTags(*{tags})"></th:block>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3"><label th:text="#{lbl.identifiers}">Identifiers</label></div>
+        <div class="col-md-9">
+          <th:block th:insert="::renderIdentifiers(*{identifiers})"></th:block>
+        </div>
+      </div>
+    </th:block>
 
-<th:block th:fragment="renderTeaser(identifiable, language)">
-  <div class="row">
-    <div class="col-sm-2">
-      <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${identifiable.previewImage}, ${identifiable.previewImageRenderingHints}, ${language}, 100)"></th:block>
-    </div>
-    <div class="col-sm-10">
-      <label class="font-weight-bold">
-        <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})"></th:block>
-      </label>
-      <th:block th:if="${identifiable.description?.containsKey(language)}">
-        <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description}, ${language})"></div>
+    <th:block th:fragment="renderIdentifiers(identifiers)">
+      <th:block th:each="identifier,iter : ${identifiers}" th:object="${identifier}">
+        <span th:title="*{namespace}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{namespace}:*{id}">...</span>
       </th:block>
-    </div>
-  </div>
-  <div class="row" th:if="${identifiable.localizedUrlAliases}">
-    <div class="col-sm-12">
-      <div th:id="${'list-of-url-aliases-' + language}"></div>
-      <script th:src="@{/js/url-aliases-list.bundle.js}"></script>
-      <script th:inline="javascript">
-        UrlAliasesList({
-        id: /*[[${'list-of-url-aliases-' + language}]]*/
-                ,
-                uiLocale: /*[[${#locale.language}]]*/,
-                urlAliases: /*[[${identifiable.localizedUrlAliases.get(language)}]]*/,
-        });
-      </script>
-    </div>
-  </div>
+    </th:block>
 
-</th:block>
-</body>
+    <th:block th:fragment="renderTags(tags)">
+      <th:block th:each="tag,iter : ${tags}" th:object="${tag}">
+        <span th:title="|*{value}" class="border border-dark p-2 badge badge-light badge-pill mr-2" th:text="|*{value}">...</span>
+      </th:block>
+    </th:block>
+
+    <th:block th:fragment="renderUrlAliases(aliases, language)">
+      <th:block th:if="${aliases}">
+        <ul class="list-group">
+          <th:block th:with="urlAliases=${aliases.get(#locale.forLanguageTag(language))}">
+            <li th:each="urlAlias : ${urlAliases}" class="list-group-item d-flex justify-content-between py-1 align-items-center">
+              <th:block th:if="${website}">
+                <!--/* If ${website} is in model, prefix url alias with website url */-->
+                <span th:text="|${website.url}${#strings.endsWith(website.url,'/') ? '' : '/'}${urlAlias.slug}|">https://www.example.org/slug</span>
+              </th:block>
+              <th:block th:unless="${website}">
+                <span th:text="|/${urlAlias.slug}|">/slug</span>
+              </th:block>
+              <small th:if="${urlAlias.primary}" th:text="#{primaryAlias}">Primary URL</small>
+              <small th:if="${urlAlias.lastPublished != null}" th:with="df=#{date.format}" th:text="#{last_published(__${#temporals.format(urlAlias.lastPublished, df)}__)}">01.01.2023</small>
+            </li>
+        </ul>
+      </th:block>
+    </th:block>
+    </th:block>
+
+    <th:block th:fragment="renderIdentifiersAndRefId(identifiable, hasRefId)">
+      <section class="mb-3 rows-striped">
+        <div class="row mb-1">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{id}">ID</label></div>
+          <div class="col-md-9"><span th:text="${identifiable.uuid}">b7a245fe-da46-4d7d-a8e4-a7ee8f24f840</span></div>
+        </div>
+        <div class="row mb-1" th:if="${hasRefId}">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{ref_id}">Reference id</label></div>
+          <div class="col-md-9"><span th:text="${identifiable.refId}">42</span></div>
+        </div>
+        <div class="row mb-1">
+          <div class="col-md-3"><label class="font-weight-bold mb-0" th:text="#{identifiers}">...</label></div>
+          <div class="col-md-9" id="identifiers-list"></div>
+        </div>
+      </section>
+    </th:block>
+
+    <th:block th:fragment="renderLocalizedTeaser(identifiable, languages, hasLongText)">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" th:each="language,iter : ${languages}">
+          <a
+             class="language-switcher nav-link"
+             data-toggle="tab"
+             role="tab"
+             th:classappend="${iter.index} == 0 ? active"
+             th:href="${'#' + language}"
+             th:text="${#strings.isEmpty(languageToDisplay)} ? #{language_not_specified} : ${languageToDisplay}"
+             th:with="languageToDisplay=${language.getDisplayName(#locale)}">
+            language
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div th:each="language,iter : ${languages}" th:id="${language}" class="tab-pane" th:classappend="${iter.index} == 0 ? active">
+          <div class="card">
+            <div class="card-body bg-light">
+              <th:block th:insert="::renderTeaser(${identifiable}, ${language})"></th:block>
+            </div>
+            <th:block th:if="${hasLongText} and ${identifiable.text?.containsKey(language)}">
+              <div class="card-body long-text">
+                <th:block th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.text}, ${language})"></th:block>
+              </div>
+            </th:block>
+          </div>
+        </div>
+      </div>
+    </th:block>
+
+    <th:block th:fragment="renderTeaser(identifiable, language)">
+      <div class="row">
+        <div class="col-sm-2">
+          <th:block th:insert="cudami/fragments/previewimage-to-html::renderImage(${identifiable.previewImage}, ${identifiable.previewImageRenderingHints}, ${language}, 100)"></th:block>
+        </div>
+        <div class="col-sm-10">
+          <label class="font-weight-bold">
+            <th:block th:insert="cudami/fragments/localizedtext::renderLocalizedText(${identifiable.label}, ${language})"></th:block>
+          </label>
+          <th:block th:if="${identifiable.description?.containsKey(language)}">
+            <div th:insert="cudami/fragments/structuredcontent::renderLocalizedStructuredContent(${identifiable.description}, ${language})"></div>
+          </th:block>
+        </div>
+      </div>
+      <div class="row" th:if="${identifiable.localizedUrlAliases}">
+        <div class="col-sm-12">
+          <div th:id="${'list-of-url-aliases-' + language}"></div>
+          <script th:src="@{/js/url-aliases-list.bundle.js}"></script>
+          <script th:inline="javascript">
+            UrlAliasesList({
+              id: /*[[${'list-of-url-aliases-' + language}]]*/,
+              uiLocale: /*[[${#locale.language}]]*/,
+              urlAliases: /*[[${identifiable.localizedUrlAliases.get(language)}]]*/
+            });
+          </script>
+        </div>
+      </div>
+
+    </th:block>
+  </body>
+
 </html>

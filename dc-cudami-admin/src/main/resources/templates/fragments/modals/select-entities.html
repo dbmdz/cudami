@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+  <head lang="en">
+    <meta charset="UTF-8" />
+    <title></title>
+  </head>
+
+  <body>
+    <th:block th:fragment="render">
+      <div class="modal fade" id="selectEntitiesDialog" data-searchApiUrl="#" data-mode="single">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Modal Title</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="modal-message">Modal Message</p>
+              <form>
+                <div class="row">
+                  <div class="input-group col-sm-12">
+                    <select class="form-select" id="selectEntitiesDialog-inputType">
+                      <option value="label" selected th:text="#{lbl.label}">Label</option>
+                      <option value="refId" th:text="#{lbl.ref_id}">Reference ID</option>
+                      <option value="identifier" th:text="#{lbl.identifier}">Identifier</option>
+                      <option value="uuid" th:text="#{lbl.uuid}">UUID</option>
+                    </select>
+                    <div class="form-control auto-search-wrapper p-0 border-0">
+                      <input id="selectEntitiesDialog-userInput" type="text" autocomplete="off" aria-label="User input" name="userInput" class="w-100" style="height: inherit;">
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="selectedEntities" />
+              </form>
+
+              <div class="list-group mt-2" style="display: none;"></div>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{btn.cancel}">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="void(0);" th:text="#{btn.ok}">Ok</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+
+        /*[+
+         const msgNoResultsFound = [[#{msg.no_results_found}]];
+        +]*/
+
+        // empty input field every time the type select changes
+        $('#selectEntitiesDialog-inputType').change(function () {$('#selectEntitiesDialog-userInput').val("");});
+        $('#selectEntitiesDialog').on('show.bs.modal', function () {
+          resetEntitiesDialog();
+        });
+        let resultCount = 0;
+        const maxRecords = 25; // == pageSize
+        let totalElements = 0;
+        
+        new Autocomplete('selectEntitiesDialog-userInput', {
+          insertToInput: true,
+          cache: false,
+          classGroup: "group-by",
+          noResults: ({element, currentValue, template}) => template(`<li>${msgNoResultsFound}: "${currentValue}"</li>`),
+          onSearch: ({currentValue}) => {
+            // clear count always when new searching
+            resultCount = 0;
+            totalElements = 0;
+
+            let apiUrl = $('#selectEntitiesDialog').data('searchApiUrl');
+            apiUrl = apiUrl + `?pageNumber=0&pageSize=25&searchTerm=${encodeURI(currentValue)}`;
+            apiUrl = apiUrl + '&sortBy=label_de';
+            apiUrl = apiUrl + '&searchField=' + $("#selectEntitiesDialog-inputType").val();
+            return new Promise((resolve) => {
+              fetch(apiUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                  // only content property of PageResponse
+                  const result = data.content;
+                  resolve(result);
+
+                  // save counts for paging message (if totalElements > maxRecords)
+                  totalElements = data.totalElements;
+                  resultCount = result.length;
+                })
+                .catch((error) => {
+                  // just show user "no result"
+                  resolve([]);
+                });
+            });
+          },
+          onResults: ({currentValue, matches, template, classGroup}) => {
+            return matches === 0
+              ? template
+              : matches
+                .map((object, index) => {
+                  let moreResultsMessage = "";
+                  if (index === 0 && totalElements > maxRecords) {
+                    /*[+
+                      const msgPagingMoreResultsFound = `[(#{msg.paging.more_results_found})]`;
+                    +]*/
+                    moreResultsMessage = `<li class="${classGroup} alert-warning"><span><small>${msgPagingMoreResultsFound}</small></span></li>`;
+                  }
+
+                  let objectHtml = renderEntity(object, currentValue);
+                  let html = '<li><div class="row">' + objectHtml + '</div></li>';
+
+                  return `${moreResultsMessage} ${html}`;
+                })
+                .join("");
+          },
+          onSubmit: ({currentValue, index, element, object, results}) => {
+            let selectedEntities = addEntity(object, currentValue);
+            refreshEntitiesDialog();
+          },
+        });
+
+        function addEntity(object, currentValue) {
+          let modalDialog = $('#selectEntitiesDialog');
+
+          // add selected entity to data
+          let selectedEntities = getSelectedEntities();
+          if (isSelected(object)) {
+            // do not add again
+            return;
+          }
+          selectedEntities.push(object);
+          setSelectedEntities(selectedEntities);
+
+          // TODO make obsolete, use array:
+          $(modalDialog).find('input[name="selectedUuid"]').val(object.uuid);
+
+          return selectedEntities;
+        }
+
+        function getSelectedEntities() {
+          let selectedEntities = $('#selectEntitiesDialog input[name="selectedEntities"]').val();
+          if (!selectedEntities) {
+            selectedEntities = [];
+          } else {
+            selectedEntities = JSON.parse(decodeURIComponent(selectedEntities));
+          }
+          return selectedEntities;
+        }
+
+        function isSelected(entity) {
+          let selectedEntities = getSelectedEntities();
+          const found = selectedEntities.find(object => object.uuid == entity.uuid);
+          if (found) {
+            return true;
+          }
+          return false;
+        }
+
+        function setSelectedEntities(selectedEntities) {
+          $('#selectEntitiesDialog input[name="selectedEntities"]').val(encodeURIComponent(JSON.stringify(selectedEntities)));
+        }
+
+        function refreshEntitiesDialog() {
+          // refreshes list and ok-button state
+          let modalDialog = $('#selectEntitiesDialog');
+          let mode = $(modalDialog).data('mode');
+
+          let selectedEntities = getSelectedEntities();
+          if (selectedEntities.length > 0) {
+            let htmlItems = '';
+            if (selectedEntities) {
+              getSelectedEntities().forEach(function (object, index) {
+                let entityHtml = '<div class="list-group-item d-flex align-items-start">' + renderEntity(object, null, true) + '</div>';
+                htmlItems = htmlItems + entityHtml;
+              });
+            }
+            let htmlList = $(modalDialog).find('div.list-group').html(htmlItems);
+            $(htmlList).show();
+            $(modalDialog).find('.modal-footer .btn-primary').prop("disabled", false);
+
+            if (mode === "single") {
+              $(modalDialog).find('div.input-group').hide();
+            }
+          } else {
+            $(modalDialog).find('div.input-group').show();
+            let htmlList = $(modalDialog).find('div.list-group').html('');
+            $(htmlList).hide();
+            $(modalDialog).find('.modal-footer .btn-primary').prop("disabled", true);
+          }
+        }
+
+        function removeEntity(uuid) {
+          let selectedEntities = getSelectedEntities();
+          selectedEntities.forEach(function (object, index) {
+            selectedEntities = selectedEntities.filter(object => object.uuid !== uuid);
+          });
+          setSelectedEntities(selectedEntities);
+        }
+
+        function renderEntity(object, currentValue, withDeleteButton) {
+          // render just the columns and add wrapping outside method
+          let html = '<div class="col-md-1">';
+          if (object.previewImage) {
+            html = html + `<figure class="mb-0 mx-auto" style="max-width: 50px;">
+                        <img class="img-fluid mw-100" src="${object.previewImage.httpBaseUrl}/full/50,/0/default.jpg">
+                        </figure>`;
+          } else {
+            html = html + '<img class="img-fluid mw-100" src="/images/no-image.png">';
+          }
+          html = html + '</div>';
+          if (currentValue) {
+            // highlight current value in string
+            html = html + `<div class="col">${object.label.de.replace(new RegExp(currentValue, "gi"), (str) => `<span class="alert-warning">${str}</span>`)}</div>`;
+          } else {
+            html = html + `<div class="col">${object.label.de}</div>`;
+          }
+          if (withDeleteButton) {
+            html = html + `<div class="text-right col-md-1"><a href="#" onclick="removeEntity('${object.uuid}'); refreshEntitiesDialog();" class="remove"><i class="fa fa-trash"></i></a></div>`;
+          }
+          return `${html}`;
+        }
+        
+        function resetEntitiesDialog() {
+          $('#selectEntitiesDialog-userInput').val("");
+          setSelectedEntities([]);
+          refreshEntitiesDialog();
+        }
+        /*]]>*/
+      </script>
+    </th:block>
+  </body>
+
+</html>
