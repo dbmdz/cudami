@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.alias;
 
+import com.github.openjson.JSONObject;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -35,6 +36,6 @@ public class UrlAliasesAPIController extends AbstractController {
       @PathVariable String label,
       @PathVariable(required = false) UUID websiteUuid)
       throws TechnicalException {
-    return service.generateSlug(pLocale, label, websiteUuid);
+    return JSONObject.quote(service.generateSlug(pLocale, label, websiteUuid));
   }
 }
