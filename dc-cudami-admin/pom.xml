@@ -26,6 +26,10 @@
       <artifactId>thymeleaf-extras-data-attribute</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.openjson</groupId>
+      <artifactId>openjson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
     </dependency>
