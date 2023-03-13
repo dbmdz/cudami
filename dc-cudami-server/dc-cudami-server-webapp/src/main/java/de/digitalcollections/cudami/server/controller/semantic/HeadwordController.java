@@ -82,7 +82,12 @@ public class HeadwordController {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
       @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    PageRequest pageRequest;
+    if (searchTerm != null) {
+      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    } else {
+      pageRequest = new PageRequest(pageNumber, pageSize);
+    }
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
