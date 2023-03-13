@@ -89,8 +89,6 @@
                        data-show-search-button="true"
                        data-show-search-clear-button="true"
                        data-side-pagination="server"
-                       data-sort-name="label"
-                       data-sort-order="asc"
                        data-toolbar="#toolbar-webpages"
                        data-unique-id="uuid"
                        data-use-row-attr-func="true">
@@ -220,7 +218,7 @@
            
           let list = $(tableId).bootstrapTable('getData');
 
-          // updateRootPagesOrder
+          // update root pages order
           fetch(apiUrl,
             {
               method: "PUT", headers: {

@@ -52,8 +52,8 @@ public class WebpagesAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false) String sort,
+      @RequestParam(name = "order", required = false) String order,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
@@ -102,6 +102,7 @@ public class WebpagesAPIController
     }
   }
 
+  /** used in webpages/view.html */
   @PutMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   public ResponseEntity updateSubpagesOrder(
       @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws TechnicalException {

@@ -163,13 +163,13 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(type = "integer"))
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize,
-          @Parameter(
+      @Parameter(
               name = "sortBy",
-              description =
-                  "the sorting specification; if unset, default to sortindex)",
+              description = "the sorting specification; if unset, default to sortindex)",
               example = "label_de.desc.nullsfirst",
               schema = @Schema(type = "string"))
-          @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+          @RequestParam(name = "sortBy", required = false)
+          List<Order> sortBy,
       @Parameter(
               name = "searchTerm",
               description = "the search term, of which the result is filtered (substring match)",
