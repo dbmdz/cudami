@@ -392,7 +392,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "lastModified"));
+    return new ArrayList<>(Arrays.asList("created", "label", "locale", "lastModified"));
   }
 
   @Override

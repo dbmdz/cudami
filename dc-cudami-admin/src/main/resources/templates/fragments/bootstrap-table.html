@@ -69,6 +69,12 @@
       function renderLabel(baseUrl, value, language) {
         return '<a href="' + baseUrl + '">' + renderLocalizedText(value, language) + '</a>';
       }
+      function renderLocale(value, language) {
+        if (value === undefined) {
+          return "";
+        }
+        return value;
+      }
       function renderLocalizedText(value, language) {
         if (value === undefined) {
           return "";
@@ -148,6 +154,12 @@
          const tooltipView = [[#{tooltip.view}]];
          +]*/
         return '<a href="' + baseUrl + '" title="' + tooltipView + '"><i class="fa fa-eye"></i></a>';
+      }
+      function renderViewLink(baseUrl, text) {
+        /*[+
+         const tooltipView = [[#{tooltip.view}]];
+         +]*/
+        return '<a href="' + baseUrl + '" title="' + tooltipView + '">' + text + '</a>';
       }
       /*]]>*/
     </script>
