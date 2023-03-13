@@ -1,22 +1,6 @@
 version: '3.5'
 
 services:
-  influx1:
-    image: influxdb:2.0
-    container_name: influx1
-    ports:
-      - "8086:8086"
-    environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=mdz
-      - DOCKER_INFLUXDB_INIT_PASSWORD=supergeheim
-      - DOCKER_INFLUXDB_INIT_ORG=MDZ
-      - DOCKER_INFLUXDB_INIT_BUCKET=cudami
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=b8cVNwJf16kmSR_gKR-og891kiZ1lvLIpmJCszJSh5G6mrSB7dQusSKSVTAikvn5tGl3IUhkgpAj3RdjmLqZDQ==
-    volumes:
-      - ./data:/var/lib/influxdb2
-      - ./config:/etc/influxdb2
-    network_mode: host
 
   grafana:
     image: grafana/grafana:7.4.2
@@ -24,7 +8,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./datasrc.yml:/etc/grafana/provisioning/datasources/influx-datasrc.yml:ro
+      - ./datasrc.yml:/etc/grafana/provisioning/datasources/prometheus-datasrc.yml:ro
       - ./dashboards:/var/lib/grafana/dashboards
       - ./dashboard-provider.yml:/etc/grafana/provisioning/dashboards/dashboard-provider.yml:ro
       - ./grafana.ini:/etc/grafana/grafana.ini:ro
