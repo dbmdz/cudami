@@ -12,6 +12,7 @@
     <link rel="shortcut icon" th:href="@{/images/favicon.png}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-table/dist/bootstrap-table.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-table/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/AdminLTE/plugins/fontawesome-free/css/all.min.css}">
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/AdminLTE/dist/css/adminlte.min.css}">
@@ -388,9 +389,11 @@
       })
     </script>
 
+    <script th:src="@{/webjars/tablednd/dist/jquery.tablednd.min.js}"></script>
     <script th:src="@{/webjars/bootstrap-table/dist/bootstrap-table.min.js}"></script>
     <script th:src="@{/webjars/bootstrap-table/dist/bootstrap-table-locale-all.min.js}"></script>
     <script th:src="@{/webjars/bootstrap-table/dist/extensions/cookie/bootstrap-table-cookie.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap-table/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js}"></script>
 
     <th:block layout:fragment="beforeBodyEnds"></th:block>
   </body>

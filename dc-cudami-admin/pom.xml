@@ -199,7 +199,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootstrap-table</artifactId>
-      <version>1.21.1</version>
+      <version>1.21.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -225,6 +225,11 @@
       <artifactId>linkifyjs</artifactId>
       <version>4.0.0-beta.6</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>tablednd</artifactId>
+      <version>1.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.webjars.npm</groupId>

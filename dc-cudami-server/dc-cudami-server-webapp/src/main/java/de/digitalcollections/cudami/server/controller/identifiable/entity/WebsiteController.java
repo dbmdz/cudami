@@ -12,6 +12,7 @@ import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -163,6 +164,13 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize,
       @Parameter(
+              name = "sortBy",
+              description = "the sorting specification; if unset, default to sortindex)",
+              example = "label_de.desc.nullsfirst",
+              schema = @Schema(type = "string"))
+          @RequestParam(name = "sortBy", required = false)
+          List<Order> sortBy,
+      @Parameter(
               name = "searchTerm",
               description = "the search term, of which the result is filtered (substring match)",
               example = "Test",
@@ -170,6 +178,10 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm) {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      searchPageRequest.setSorting(sorting);
+    }
     return websiteService.findRootWebpages(uuid, searchPageRequest);
   }
 
