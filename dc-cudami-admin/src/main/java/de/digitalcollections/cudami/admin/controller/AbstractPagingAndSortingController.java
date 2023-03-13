@@ -57,7 +57,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     Sorting sorting = null;
     if (sort != null && order != null) {
       Order sortingOrder;
-      if ("label".equals(sort)) {
+      if ("label".equals(sort) && dataLanguage != null) {
         String language = getDataLanguage(dataLanguage, localeService);
         sortingOrder =
             Order.builder()
