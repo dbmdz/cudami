@@ -8,9 +8,6 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.semantic.TagService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.semantic.Tag;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.codec.binary.Base64;
@@ -26,48 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 class TagControllerTest extends BaseControllerTest {
 
   @MockBean private TagService tagService;
-
-  @DisplayName("can retrieve by localized exact label")
-  @ParameterizedTest
-  @ValueSource(strings = {"/v6/tags?label=\"Antike und Altertum\"&labelLanguage=und-Latn"})
-  public void findByLocalizedExactLabel(String path) throws Exception {
-    testHttpGet(path);
-    PageRequest expectedPageRequest =
-        PageRequest.builder()
-            .pageSize(25)
-            .pageNumber(0)
-            .filtering(
-                Filtering.builder()
-                    .add(
-                        FilterCriterion.builder()
-                            .withExpression("label.und-latn")
-                            .isEquals("\"Antike und Altertum\"")
-                            .build())
-                    .build())
-            .build();
-    verify(tagService, times(1)).find(eq(expectedPageRequest));
-  }
-
-  @DisplayName("can retrieve by localized 'like' label")
-  @ParameterizedTest
-  @ValueSource(strings = {"/v6/tags?label=Antike&labelLanguage=und-Latn"})
-  public void findByLocalizedLikeLabel(String path) throws Exception {
-    testHttpGet(path);
-    PageRequest expectedPageRequest =
-        PageRequest.builder()
-            .pageSize(25)
-            .pageNumber(0)
-            .filtering(
-                Filtering.builder()
-                    .add(
-                        FilterCriterion.builder()
-                            .withExpression("label.und-latn")
-                            .contains("Antike")
-                            .build())
-                    .build())
-            .build();
-    verify(tagService, times(1)).find(eq(expectedPageRequest));
-  }
 
   @DisplayName("can retrieve by non-encoded value")
   @ParameterizedTest

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
+      xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
+      layout:decorate="~{base}">
+  <head>
+    <title th:text="#{page.title.tags}">Tags</title>
+  </head>
+  <body>
+  <th:block layout:fragment="content">
+    <div class="content-header">
+      <div class="container-fluid">
+
+        <div class="row">
+          <div class="col">
+            <h1 th:text="#{page.title.tags}">Tags</h1>
+            <hr>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <table id="table-tags"
+                   data-toggle="table"
+                   th:data-url="@{/api/tags}"
+                   th:data-locale="${#locale}"
+
+                   data-cookie="true"
+                   data-cookie-id-table="table-tags"
+                   data-id-field="uuid"
+                   data-pagination="true"
+                   data-pagination-v-align="both"
+
+                   data-search="true"
+                   data-search-highlight="true"
+                   data-search-on-enter-key="true"
+                   data-server-sort="true"
+                   data-show-search-button="true"
+                   data-show-search-clear-button="true"
+                   data-side-pagination="server"
+                   data-sort-name="value"
+                   data-sort-order="asc"
+                   data-unique-id="uuid">
+              <thead>
+                <tr>
+                  <th data-field="index" data-formatter="formatRowNumberTags" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                  <th data-field="value" data-sortable="true" data-formatter="formatValueTags" th:text="#{lbl.value}">Value</th>
+                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                  <th data-field="actions" data-formatter="formatActionsTags" th:text="#{lbl.actions}">Actions</th>
+                </tr>
+              </thead>
+            </table>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </th:block>
+
+  <th:block layout:fragment="beforeBodyEnds">
+    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+
+    <script type="text/javascript">
+      function formatRowNumberTags(value, row, index) {
+        return renderRowNumber($('#table-tags'), index);
+      }
+    </script>
+
+    <script type="text/javascript" th:inline="javascript">
+      /*<![CDATA[*/
+      function formatActionsTags(value, row) {
+        /*[+
+         const baseUrl = [[@{'/tags'}]] + '/' + row.uuid;
+         +]*/
+        return [
+          renderViewAction(baseUrl)
+        ].join(' ');
+      }
+      function formatValueTags(value, row) {
+        /*[+
+         const baseUrl = [[@{'/tags'}]] + '/' + row.uuid;
+         +]*/
+        return renderViewLink(baseUrl, value);
+      }
+      /*]]>*/
+    </script>
+    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+  </th:block>
+</body>
+</html>
