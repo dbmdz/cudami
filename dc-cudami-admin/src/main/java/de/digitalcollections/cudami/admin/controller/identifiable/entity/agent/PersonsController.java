@@ -1,9 +1,16 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +22,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
-
 /** Controller for Person management pages. */
 @Controller
-public class PersonsController
-    extends AbstractEntitiesController<Person, CudamiPersonsClient> {
+public class PersonsController extends AbstractEntitiesController<Person, CudamiPersonsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsController.class);
 

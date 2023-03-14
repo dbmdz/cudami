@@ -1,9 +1,15 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.Article;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -14,18 +20,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.Article;
-
 /** Controller for articles management pages. */
 @Controller
-public class ArticlesController
-    extends AbstractEntitiesController<Article, CudamiArticlesClient> {
+public class ArticlesController extends AbstractEntitiesController<Article, CudamiArticlesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
