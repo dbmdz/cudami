@@ -247,53 +247,13 @@
                         <p th:text="#{articles}">Articles</p>
                       </a>
                     </li>
-                  </ul>
-                </li>
-
-                <li class="nav-item menu-open">
-                  <a href="#" class="nav-link">
-                    <p>
-                      <span th:text="#{menu.collection_cataloguing}">Collection Cataloguing</span>
-                      <i class="right fas fa-angle-left"></i>
-                    </p>
-                  </a>
-                  <ul class="nav nav-treeview">
                     <li class="nav-item">
                       <a class="nav-link"
-                         th:classappend="${menu == 'headwords'} ? active"
-                         th:href="@{/headwords}"
-                         th:title="#{tooltip.headwords}">
-                        <i class="fas fa-bullseye nav-icon"></i>
-                        <p th:text="#{menu.headwords}">Headwords</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link"
-                         th:classappend="${menu == 'tags'} ? active"
-                         th:href="@{/tags}"
-                         th:title="#{tooltip.tags}">
-                        <i class="fas fa-hashtag nav-icon"></i>
-                        <p th:text="#{menu.tags}">Tags</p>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-
-                <li class="nav-item menu-open">
-                  <a href="#" class="nav-link">
-                    <p>
-                      <span th:text="#{menu.collection_development}">Collection Development</span>
-                      <i class="right fas fa-angle-left"></i>
-                    </p>
-                  </a>
-                  <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                      <a class="nav-link"
-                         th:classappend="${menu == 'projects'} ? active"
-                         th:href="@{/projects}"
-                         th:title="#{digitization_projects}">
-                        <i class="fas fa-industry nav-icon"></i>
-                        <p th:text="#{menu.digitization_projects}">Digitization-Projects</p>
+                         th:classappend="${menu == 'headwordentries'} ? active"
+                         th:href="@{/headwordentries}"
+                         th:title="#{tooltip.headwordentries}">
+                        <i class="far fa-newspaper nav-icon"></i>
+                        <p th:text="#{menu.headwordentries}">Headword articles</p>
                       </a>
                     </li>
                   </ul>
@@ -341,6 +301,55 @@
                          th:title="#{events}">
                         <i class="fas fa-calendar-alt nav-icon"></i>
                         <p th:text="#{events}">Events</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="nav-item menu-open">
+                  <a href="#" class="nav-link">
+                    <p>
+                      <span th:text="#{menu.collection_cataloguing}">Collection Cataloguing</span>
+                      <i class="right fas fa-angle-left"></i>
+                    </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'headwords'} ? active"
+                         th:href="@{/headwords}"
+                         th:title="#{tooltip.headwords}">
+                        <i class="fas fa-bullseye nav-icon"></i>
+                        <p th:text="#{menu.headwords}">Headwords</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'tags'} ? active"
+                         th:href="@{/tags}"
+                         th:title="#{tooltip.tags}">
+                        <i class="fas fa-hashtag nav-icon"></i>
+                        <p th:text="#{menu.tags}">Tags</p>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="nav-item menu-open">
+                  <a href="#" class="nav-link">
+                    <p>
+                      <span th:text="#{menu.collection_development}">Collection Development</span>
+                      <i class="right fas fa-angle-left"></i>
+                    </p>
+                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'projects'} ? active"
+                         th:href="@{/projects}"
+                         th:title="#{digitization_projects}">
+                        <i class="fas fa-industry nav-icon"></i>
+                        <p th:text="#{menu.digitization_projects}">Digitization-Projects</p>
                       </a>
                     </li>
                   </ul>
