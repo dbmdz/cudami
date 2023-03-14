@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "CorporateBodies" endpoints (API). */
 @RestController
 public class CorporateBodiesAPIController
-    extends AbstractIdentifiablesController<CorporateBody, CudamiCorporateBodiesClient> {
+    extends AbstractEntitiesController<CorporateBody, CudamiCorporateBodiesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesAPIController.class);
 

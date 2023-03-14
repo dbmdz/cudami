@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -34,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "Projects" endpoints (API). */
 @RestController
 public class ProjectsAPIController
-    extends AbstractIdentifiablesController<Project, CudamiProjectsClient> {
+    extends AbstractEntitiesController<Project, CudamiProjectsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsAPIController.class);
 

@@ -1,19 +1,17 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
+package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,33 +20,34 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** Controller for Person management pages. */
+/** Controller for headwordentries management pages. */
 @Controller
-public class PersonsController extends AbstractEntitiesController<Person, CudamiPersonsClient> {
+public class HeadwordEntriesController
+    extends AbstractEntitiesController<HeadwordEntry, CudamiHeadwordEntriesClient> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PersonsController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesController.class);
 
-  @Autowired
-  public PersonsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forPersons(), languageSortingHelper, client.forLocales());
+  public HeadwordEntriesController(
+      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+    super(client.forHeadwordEntries(), languageSortingHelper, client.forLocales());
   }
 
-  @GetMapping("/persons/new")
+  @GetMapping("/headwordentries/new")
   public String create(Model model) throws TechnicalException {
     model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
-    return "persons/create";
+    return "headwordentries/create";
   }
 
-  @GetMapping("/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
+  @GetMapping("/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Person person = service.getByUuid(uuid);
+    HeadwordEntry headwordEntry = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
+        languageSortingHelper.sortLanguages(displayLocale, headwordEntry.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -56,44 +55,44 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("uuid", person.getUuid());
+    model.addAttribute("uuid", headwordEntry.getUuid());
 
-    return "persons/edit";
+    return "headwordentries/edit";
   }
 
-  @GetMapping("/persons")
+  @GetMapping("/headwordentries")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
 
-    return "persons/list";
+    return "headwordentries/list";
   }
 
   @ModelAttribute("menu")
   protected String module() {
-    return "persons";
+    return "headwordentries";
   }
 
-  @GetMapping("/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @GetMapping("/headwordentries/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(
       @PathVariable UUID uuid,
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
-    Person person = service.getByUuid(uuid);
-    if (person == null) {
+    HeadwordEntry headwordEntry = service.getByUuid(uuid);
+    if (headwordEntry == null) {
       throw new ResourceNotFoundException();
     }
-    model.addAttribute("person", person);
+    model.addAttribute("headwordEntry", headwordEntry);
 
-    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(person);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(headwordEntry);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
-    return "persons/view";
+    return "headwordentries/view";
   }
 }

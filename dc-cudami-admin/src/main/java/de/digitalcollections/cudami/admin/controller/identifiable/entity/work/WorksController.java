@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for work management pages. */
 @Controller
-public class WorksController extends AbstractIdentifiablesController<Work, CudamiWorksClient> {
+public class WorksController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
   public WorksController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     super(client.forWorks(), languageSortingHelper, client.forLocales());

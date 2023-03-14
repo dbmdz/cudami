@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEventsClient;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for events pages. */
 @Controller
-public class EventsController extends AbstractIdentifiablesController<Event, CudamiEventsClient> {
+public class EventsController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     super(client.forEvents(), languageSortingHelper, client.forLocales());

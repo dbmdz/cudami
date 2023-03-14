@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Works" endpoints (API). */
 @RestController
-public class WorksAPIController extends AbstractIdentifiablesController<Work, CudamiWorksClient> {
+public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
   public WorksAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     super(client.forWorks(), languageSortingHelper, client.forLocales());

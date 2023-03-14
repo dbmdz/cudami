@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Controller for CorporateBody management pages. */
 @Controller
 public class CorporateBodiesController
-    extends AbstractIdentifiablesController<CorporateBody, CudamiCorporateBodiesClient> {
+    extends AbstractEntitiesController<CorporateBody, CudamiCorporateBodiesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 

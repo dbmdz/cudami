@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.InvertedRelationSpecification;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "Manifestations" endpoints (API). */
 @RestController
 public class ManifestationsAPIController
-    extends AbstractIdentifiablesController<Manifestation, CudamiManifestationsClient> {
+    extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsAPIController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {

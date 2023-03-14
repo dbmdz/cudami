@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Controller for collection management pages. */
 @Controller
 public class CollectionsController
-    extends AbstractIdentifiablesController<Collection, CudamiCollectionsClient> {
+    extends AbstractEntitiesController<Collection, CudamiCollectionsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 

@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Controller for digital objects management pages. */
 @Controller
 public class DigitalObjectsController
-    extends AbstractIdentifiablesController<DigitalObject, CudamiDigitalObjectsClient> {
+    extends AbstractEntitiesController<DigitalObject, CudamiDigitalObjectsClient> {
 
   public DigitalObjectsController(
       LanguageSortingHelper languageSortingHelper, CudamiClient client) {

@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -20,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Events" endpoints (API). */
 @RestController
-public class EventsAPIController
-    extends AbstractIdentifiablesController<Event, CudamiEventsClient> {
+public class EventsAPIController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     super(client.forEvents(), languageSortingHelper, client.forLocales());
