@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -274,6 +275,74 @@ class ManifestationRepositoryImplTest
     PageResponse<Manifestation> actual =
         repo.findChildren(parent.getUuid(), new PageRequest(0, 10));
     assertThat(actual.getContent()).containsExactlyInAnyOrder(child1, child2);
+  }
+
+  @Test
+  @DisplayName("can return the languages of manifestations for a work")
+  public void languagesForManifestationsOfWork() throws RepositoryException {
+    Work work = Work.builder().label(Locale.GERMAN, "Werk").build();
+    workRepository.save(work);
+    LocalizedText labelText = new LocalizedText();
+    labelText.setText(Locale.GERMAN, "Manifestation");
+    labelText.setText(Locale.ITALIAN, "manifestatione");
+    Manifestation manifestation =
+        Manifestation.builder()
+            .label(labelText)
+            .title(Title.builder().titleType(new TitleType("main", "main")).text(labelText).build())
+            .work(work)
+            .build();
+    repo.save(manifestation);
+
+    List<Locale> actual = repo.getLanguagesOfManifestationsForWork(work.getUuid());
+    assertThat(actual).containsExactlyInAnyOrder(Locale.GERMAN, Locale.ITALIAN);
+  }
+
+  @Test
+  @DisplayName("can find manifestations for a work")
+  public void findManifestationsForWork() throws RepositoryException {
+    Work work = Work.builder().label(Locale.GERMAN, "Werk").build();
+    workRepository.save(work);
+
+    Manifestation manifestation1 =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test 1")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test 1"))
+                    .build())
+            .work(work)
+            .build();
+    repo.save(manifestation1);
+
+    Manifestation manifestation2 =
+        Manifestation.builder()
+            .label(Locale.GERMAN, "Test 2")
+            .title(
+                Title.builder()
+                    .titleType(new TitleType("main", "main"))
+                    .text(new LocalizedText(Locale.GERMAN, "Test 2"))
+                    .build())
+            .work(work)
+            .build();
+    repo.save(manifestation2);
+
+    PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
+    PageResponse<Manifestation> actualPageResponse =
+        repo.findManifestationsByWork(work.getUuid(), pageRequest);
+
+    // For verification, we only check the UUID of the embedded work, not any other contents of the
+    // work
+    List<Manifestation> actual =
+        actualPageResponse.getContent().stream()
+            .peek(m -> m.setWork(Work.builder().uuid(m.getWork().getUuid()).build()))
+            .toList();
+    List<Manifestation> expected =
+        Stream.of(manifestation1, manifestation2)
+            .peek(m -> m.setWork(Work.builder().uuid(m.getWork().getUuid()).build()))
+            .toList();
+
+    assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
   }
 
   // -------------------------------------------------------------------

@@ -8,6 +8,7 @@ import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -60,6 +61,27 @@ public class WorksAPIController extends AbstractIdentifiablesController<Work, Cu
     PageRequest pageRequest =
         createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<Work> pageResponse = service.findChildren(uuid, pageRequest);
+    return new BTResponse<>(pageResponse);
+  }
+
+  /*
+  Used in templates/works/view.html
+  */
+  @GetMapping("/api/works/{uuid:" + ParameterHelper.UUID_PATTERN + "}/manifestations")
+  @ResponseBody
+  public BTResponse<Manifestation> findManifestations(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
+    PageRequest pageRequest =
+        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
+    PageResponse<Manifestation> pageResponse = service.findManifestations(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.entity.work.Work;
@@ -24,6 +25,7 @@ class WorkControllerTest extends BaseControllerTest {
   @MockBean private WorkService workService;
   @MockBean private ItemService itemService;
   @MockBean private AgentService agentService;
+  @MockBean private ManifestationService manifestationService;
 
   @DisplayName("can retrieve by identifier with plaintext id")
   @ParameterizedTest

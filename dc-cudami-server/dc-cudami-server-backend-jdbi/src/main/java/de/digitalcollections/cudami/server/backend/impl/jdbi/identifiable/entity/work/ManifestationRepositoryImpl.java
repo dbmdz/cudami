@@ -27,6 +27,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
@@ -39,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -268,6 +270,63 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 }
               });
     }
+  }
+
+  @Override
+  public PageResponse<Manifestation> findManifestationsByWork(
+      UUID workUuid, PageRequest pageRequest) throws RepositoryException {
+    final String manifestationTableAlias = getTableAlias();
+    final String manifestationTableName = getTableName();
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + manifestationTableName
+                + " AS "
+                + manifestationTableAlias
+                + " WHERE "
+                + manifestationTableAlias
+                + ".work = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
+
+    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (item) than this repository (manifestation)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPageRequestParams(pageRequest, innerQuery);
+    List<Manifestation> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
+    String manifestationTableAlias = getTableAlias();
+    String manifestationTableName = getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + manifestationTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + manifestationTableName
+            + " AS "
+            + manifestationTableAlias
+            + String.format(" WHERE %s.work = :work_uuid;", manifestationTableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("work_uuid", workUuid).mapTo(Locale.class).list());
   }
 
   protected static void additionalReduceRowsBiConsumer(

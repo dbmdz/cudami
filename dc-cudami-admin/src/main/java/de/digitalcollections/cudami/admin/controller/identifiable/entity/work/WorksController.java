@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,9 +55,14 @@ public class WorksController extends AbstractIdentifiablesController<Work, Cudam
     model.addAttribute("work", work);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(work);
+    Locale displayLocale = LocaleContextHolder.getLocale();
+    List<Locale> existingManifestationsLanguages =
+        languageSortingHelper.sortLanguages(
+            displayLocale, service.getLanguagesOfManifestations(uuid));
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
+        .addAttribute("existingManifestationsLanguages", existingManifestationsLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     return "works/view";
