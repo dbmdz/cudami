@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -34,8 +34,8 @@ public class WebsitesAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesAPIController.class);
 
-  public WebsitesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWebsites(), languageSortingHelper, client.forLocales());
+  public WebsitesAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forWebsites(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/websites/new")

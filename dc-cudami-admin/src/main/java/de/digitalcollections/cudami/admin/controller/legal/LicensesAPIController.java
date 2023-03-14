@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Servic
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
@@ -34,8 +33,7 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
   private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
-  public LicensesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
+  public LicensesAPIController(CudamiClient client) {
     this.localeService = client.forLocales();
     this.service = client.forLicenses();
   }

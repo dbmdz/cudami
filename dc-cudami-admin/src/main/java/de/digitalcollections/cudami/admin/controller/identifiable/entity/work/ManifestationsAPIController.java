@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.InvertedRelationSpecification;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.RelationSpecification;
@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ManifestationsAPIController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
-  public ManifestationsAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forManifestations(), languageSortingHelper, client.forLocales());
+  public ManifestationsAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forManifestations(), languageService, client.forLocales());
   }
 
   @SuppressFBWarnings
@@ -50,8 +49,8 @@ public class ManifestationsAPIController
   }
 
   /*
-  Used in templates/manifestations/view.html
-  */
+   * Used in templates/manifestations/view.html
+   */
   @GetMapping("/api/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items")
   @ResponseBody
   public BTResponse<Item> findItems(
@@ -63,7 +62,8 @@ public class ManifestationsAPIController
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
+    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale
+    // problem
     PageRequest pageRequest =
         createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
     PageResponse<Item> pageResponse = service.findItems(uuid, pageRequest);
@@ -71,8 +71,8 @@ public class ManifestationsAPIController
   }
 
   /*
-  Used in templates/manifestations/view.html
-  */
+   * Used in templates/manifestations/view.html
+   */
   @GetMapping("/api/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children")
   @ResponseBody
   public BTResponse<InvertedRelationSpecification<Manifestation>> findChildManifestations(

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -36,9 +36,8 @@ public class CollectionsAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsAPIController.class);
 
-  public CollectionsAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forCollections(), languageSortingHelper, client.forLocales());
+  public CollectionsAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forCollections(), languageService, client.forLocales());
   }
 
   @PostMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")

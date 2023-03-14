@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Servic
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
@@ -37,9 +36,7 @@ public class RenderingTemplatesAPIController
   private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
-  public RenderingTemplatesAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
+  public RenderingTemplatesAPIController(CudamiClient client) {
     this.localeService = client.forLocales();
     this.service = client.forRenderingTemplates();
   }

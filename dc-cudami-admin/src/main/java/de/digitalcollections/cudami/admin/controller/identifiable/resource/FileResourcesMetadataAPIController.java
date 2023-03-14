@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -37,9 +37,8 @@ public class FileResourcesMetadataAPIController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataAPIController.class);
 
-  public FileResourcesMetadataAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forFileResourcesMetadata(), languageSortingHelper, client.forLocales());
+  public FileResourcesMetadataAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forFileResourcesMetadata(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/fileresources/new")

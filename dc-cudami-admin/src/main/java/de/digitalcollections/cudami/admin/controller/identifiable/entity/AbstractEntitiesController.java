@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -14,8 +14,8 @@ public class AbstractEntitiesController<E extends Entity, C extends CudamiEntiti
     extends AbstractIdentifiablesController<E, C> {
 
   protected AbstractEntitiesController(
-      C service, LanguageSortingHelper languageSortingHelper, CudamiLocalesClient localeService) {
-    super(service, languageSortingHelper, localeService);
+      C service, LanguageService languageService, CudamiLocalesClient localeService) {
+    super(service, languageService, localeService);
   }
 
   protected PageResponse search(String searchField, String searchTerm, PageRequest pageRequest)

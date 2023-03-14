@@ -1,12 +1,14 @@
-package de.digitalcollections.cudami.admin.controller.identifiable.entity;
+package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
+import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
+import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -20,32 +22,45 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** Controller for project management pages. */
+/** Controller for family names management pages. */
 @Controller
-public class ProjectsController extends AbstractEntitiesController<Project, CudamiProjectsClient> {
+public class FamilynamesController
+    extends AbstractIdentifiablesController<FamilyName, CudamiFamilyNamesClient> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesController.class);
 
-  public ProjectsController(LanguageService languageService, CudamiClient client) {
-    super(client.forProjects(), languageService, client.forLocales());
+  public FamilynamesController(LanguageService languageService, CudamiClient client) {
+    super(client.forFamilyNames(), languageService, client.forLocales());
   }
 
-  @GetMapping("/projects/new")
+  @GetMapping("/familynames/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
-    return "projects/create";
+    FamilyName familyName = service.create();
+    Locale defaultLanguage = localeService.getDefaultLanguage();
+    familyName.setLabel(new LocalizedText(defaultLanguage, ""));
+    model.addAttribute("familyName", familyName);
+    List<Locale> existingLanguages = List.of(defaultLanguage);
+
+    List<Locale> sortedLanguages = languageService.getAllLanguages();
+
+    model.addAttribute("existingLanguages", existingLanguages);
+    model.addAttribute("allLanguages", sortedLanguages);
+    model.addAttribute("activeLanguage", defaultLanguage);
+
+    model.addAttribute("mode", "create");
+    return "familynames/create-or-edit";
   }
 
-  @GetMapping("/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
+  @GetMapping("/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(
       @PathVariable UUID uuid,
       @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
       Model model)
       throws TechnicalException {
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    Project project = service.getByUuid(uuid);
+    FamilyName familyName = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageService.sortLanguages(displayLocale, project.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, familyName.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -53,53 +68,44 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
     model.addAttribute("existingLanguages", existingLanguages);
-    model.addAttribute("uuid", project.getUuid());
+    model.addAttribute("uuid", familyName.getUuid());
 
-    return "projects/edit";
+    return "familynames/edit";
   }
 
-  @GetMapping("/projects")
+  @GetMapping("/familynames")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
 
-    return "projects/list";
+    return "familynames/list";
   }
 
   @ModelAttribute("menu")
   protected String module() {
-    return "projects";
+    return "familynames";
   }
 
-  @GetMapping("/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @GetMapping("/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   public String view(
       @PathVariable UUID uuid,
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
-    Project project = service.getByUuid(uuid);
-    if (project == null) {
+    FamilyName familyName = service.getByUuid(uuid);
+    if (familyName == null) {
       throw new ResourceNotFoundException();
     }
-    model.addAttribute("project", project);
+    model.addAttribute("familyName", familyName);
 
-    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(project);
+    List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(familyName);
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
-    // FIXME: missing endpoint for languages of digital objects
-    //    Locale displayLocale = LocaleContextHolder.getLocale();
-    //    List<Locale> existingDigitalObjectLanguages =
-    //        languageSortingHelper.sortLanguages(
-    //            displayLocale, service.getLanguagesOfDigitalObjects(uuid));
-    //    model
-    //        .addAttribute("existingDigitalObjectLanguages", existingDigitalObjectLanguages)
-    //        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
-
-    return "projects/view";
+    return "familynames/view";
   }
 }

@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -28,8 +28,8 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
-  public TopicsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forTopics(), languageSortingHelper, client.forLocales());
+  public TopicsController(LanguageService languageService, CudamiClient client) {
+    super(client.forTopics(), languageService, client.forLocales());
   }
 
   @GetMapping("/topics/new")
@@ -53,7 +53,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Topic topic = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, topic.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, topic.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -69,7 +69,8 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   @GetMapping("/topics")
   public String list(Model model) throws TechnicalException {
     model.addAttribute(
-        "existingLanguages", getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
+        "existingLanguages",
+        languageService.getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
 
     String dataLanguage = getDataLanguage(null, localeService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -111,14 +112,14 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     model
         .addAttribute(
             "existingEntitiesLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingEntitiesLanguages))
+            languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
         .addAttribute("dataLanguageEntities", getDataLanguage(null, localeService));
 
     List<Locale> existingFileResourcesLanguages = service.getLanguagesOfFileResources(uuid);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
-            languageSortingHelper.sortLanguages(displayLocale, existingFileResourcesLanguages))
+            languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
         .addAttribute("dataLanguageFileResources", getDataLanguage(null, localeService));
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);

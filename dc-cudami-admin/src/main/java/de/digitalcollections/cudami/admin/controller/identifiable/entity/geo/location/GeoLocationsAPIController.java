@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,9 +24,8 @@ public class GeoLocationsAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsAPIController.class);
 
-  public GeoLocationsAPIController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forGeoLocations(), languageSortingHelper, client.forLocales());
+  public GeoLocationsAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forGeoLocations(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/geolocations/new")

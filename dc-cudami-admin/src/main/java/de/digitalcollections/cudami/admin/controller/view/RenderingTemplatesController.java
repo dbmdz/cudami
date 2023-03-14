@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
@@ -34,12 +34,12 @@ public class RenderingTemplatesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
+  private final LanguageService languageService;
   private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
-  public RenderingTemplatesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
+  public RenderingTemplatesController(LanguageService languageService, CudamiClient client) {
+    this.languageService = languageService;
     this.localeService = client.forLocales();
     this.service = client.forRenderingTemplates();
   }
@@ -70,7 +70,7 @@ public class RenderingTemplatesController
     }
     Locale displayLocale = LocaleContextHolder.getLocale();
     existingLanguages =
-        new LinkedHashSet<>(languageSortingHelper.sortLanguages(displayLocale, existingLanguages));
+        new LinkedHashSet<>(languageService.sortLanguages(displayLocale, existingLanguages));
 
     model
         .addAttribute(
@@ -83,7 +83,8 @@ public class RenderingTemplatesController
 
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
+    List<Locale> existingLanguages =
+        languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);
@@ -112,7 +113,7 @@ public class RenderingTemplatesController
     LocalizedText label = renderingTemplate.getLabel();
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
+      existingLanguages = languageService.sortLanguages(displayLocale, label.getLocales());
     }
 
     String dataLanguage = targetDataLanguage;

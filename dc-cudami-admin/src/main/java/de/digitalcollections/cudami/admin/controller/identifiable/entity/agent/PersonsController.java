@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -13,7 +13,6 @@ import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,9 +27,8 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsController.class);
 
-  @Autowired
-  public PersonsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forPersons(), languageSortingHelper, client.forLocales());
+  public PersonsController(LanguageService languageService, CudamiClient client) {
+    super(client.forPersons(), languageService, client.forLocales());
   }
 
   @GetMapping("/persons/new")
@@ -48,7 +46,7 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Person person = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, person.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, person.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);

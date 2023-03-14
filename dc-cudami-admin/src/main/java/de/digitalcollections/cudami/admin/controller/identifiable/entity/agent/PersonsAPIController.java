@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -14,7 +14,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +31,8 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsAPIController.class);
 
-  @Autowired
-  public PersonsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forPersons(), languageSortingHelper, client.forLocales());
+  public PersonsAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forPersons(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/persons/new")

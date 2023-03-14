@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.controller.semantic;
 
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
@@ -28,8 +27,7 @@ public class TagsController extends AbstractPagingAndSortingController<Tag> {
   private final CudamiLocalesClient localeService;
   private final CudamiTagsClient service;
 
-  public TagsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
+  public TagsController(CudamiClient client) {
     this.localeService = client.forLocales();
     this.service = client.forTags();
   }

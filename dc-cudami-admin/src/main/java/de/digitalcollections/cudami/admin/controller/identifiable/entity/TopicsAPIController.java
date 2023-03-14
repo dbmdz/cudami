@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -32,8 +32,8 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsAPIController.class);
 
-  public TopicsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forTopics(), languageSortingHelper, client.forLocales());
+  public TopicsAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forTopics(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/topics/new")

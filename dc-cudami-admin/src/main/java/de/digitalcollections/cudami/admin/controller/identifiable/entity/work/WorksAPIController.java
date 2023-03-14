@@ -1,10 +1,10 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiWorksClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
-  public WorksAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWorks(), languageSortingHelper, client.forLocales());
+  public WorksAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forWorks(), languageService, client.forLocales());
   }
 
   @SuppressFBWarnings

@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
@@ -12,20 +11,10 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.util.CollectionUtils;
 
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     extends AbstractController {
-
-  protected final LanguageSortingHelper languageSortingHelper;
-
-  protected AbstractPagingAndSortingController(LanguageSortingHelper languageSortingHelper) {
-    this.languageSortingHelper = languageSortingHelper;
-  }
 
   @SuppressFBWarnings
   protected PageRequest createPageRequest(int offset, int limit, String sort, String order) {
@@ -122,14 +111,5 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       dataLanguage = localeService.getDefaultLanguage().getLanguage();
     }
     return dataLanguage;
-  }
-
-  protected List<Locale> getExistingLanguagesForLocales(List<Locale> locales) {
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(locales)) {
-      existingLanguages =
-          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), locales);
-    }
-    return existingLanguages;
   }
 }

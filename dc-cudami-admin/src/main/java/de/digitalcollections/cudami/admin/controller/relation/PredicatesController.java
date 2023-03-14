@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
@@ -21,7 +21,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -40,16 +39,17 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
   private final LabelNotBlankValidator labelNotBlankValidator;
+  private final LanguageService languageService;
   private final CudamiLocalesClient localeService;
   private final MessageSource messageSource;
   private final CudamiPredicatesClient service;
 
   public PredicatesController(
       MessageSource messageSource,
-      LanguageSortingHelper languageSortingHelper,
+      LanguageService languageService,
       CudamiClient client,
       LabelNotBlankValidator labelNotBlankValidator) {
-    super(languageSortingHelper);
+    this.languageService = languageService;
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.localeService = client.forLocales();
     this.messageSource = messageSource;
@@ -64,7 +64,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     model.addAttribute("predicate", predicate);
     List<Locale> existingLanguages = List.of(defaultLanguage);
 
-    List<Locale> sortedLanguages = getAllLanguages();
+    List<Locale> sortedLanguages = languageService.getAllLanguages();
 
     model.addAttribute("existingLanguages", existingLanguages);
     model.addAttribute("allLanguages", sortedLanguages);
@@ -94,7 +94,8 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     model.addAttribute("predicate", predicate);
 
     List<Locale> existingLanguages =
-        getExistingLanguages(localeService.getDefaultLanguage(), predicate);
+        languageService.getExistingLanguages(
+            localeService.getDefaultLanguage(), predicate.getLabel());
     model.addAttribute("existingLanguages", existingLanguages);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
@@ -103,35 +104,17 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
       model.addAttribute("activeLanguage", existingLanguages.get(0));
     }
 
-    List<Locale> sortedLanguages = getAllLanguages();
+    List<Locale> sortedLanguages = languageService.getAllLanguages();
     model.addAttribute("allLanguages", sortedLanguages);
 
     model.addAttribute("mode", "edit");
     return "predicates/create-or-edit";
   }
 
-  private List<Locale> getAllLanguages() throws TechnicalException {
-    List<Locale> allLanguagesAsLocales = localeService.getAllLanguagesAsLocales();
-    final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> sortedLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, allLanguagesAsLocales);
-    return sortedLanguages;
-  }
-
-  private List<Locale> getExistingLanguages(Locale defaultLanguage, Predicate predicate) {
-    List<Locale> existingLanguages = List.of(defaultLanguage);
-    LocalizedText label = predicate.getLabel();
-    if (!CollectionUtils.isEmpty(label)) {
-      Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, predicate.getLabel().getLocales());
-    }
-    return existingLanguages;
-  }
-
   @GetMapping("/predicates")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
+    List<Locale> existingLanguages =
+        languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);
@@ -169,8 +152,10 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     // model?
     if (results.hasErrors()) {
       Locale defaultLanguage = localeService.getDefaultLanguage();
-      model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
-      model.addAttribute("allLanguages", getAllLanguages());
+      model.addAttribute(
+          "existingLanguages",
+          languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
+      model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
       return "predicates/create-or-edit";
     }
@@ -218,8 +203,10 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     // model?
     if (results.hasErrors()) {
       Locale defaultLanguage = localeService.getDefaultLanguage();
-      model.addAttribute("existingLanguages", getExistingLanguages(defaultLanguage, predicate));
-      model.addAttribute("allLanguages", getAllLanguages());
+      model.addAttribute(
+          "existingLanguages",
+          languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
+      model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
       return "predicates/create-or-edit";
     }
@@ -257,7 +244,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     }
     List<Locale> existingLanguages =
         predicate.getLabel() != null
-            ? getExistingLanguagesForLocales(predicate.getLabel().getLocales())
+            ? languageService.getExistingLanguagesForLocales(predicate.getLabel().getLocales())
             : List.of();
     String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
 

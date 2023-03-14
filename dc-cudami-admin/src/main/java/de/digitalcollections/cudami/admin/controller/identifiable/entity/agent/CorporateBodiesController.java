@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -28,9 +28,8 @@ public class CorporateBodiesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
-  public CorporateBodiesController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forCorporateBodies(), languageSortingHelper, client.forLocales());
+  public CorporateBodiesController(LanguageService languageService, CudamiClient client) {
+    super(client.forCorporateBodies(), languageService, client.forLocales());
   }
 
   @GetMapping("/corporatebodies/new")
@@ -48,7 +47,7 @@ public class CorporateBodiesController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     CorporateBody corporateBody = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, corporateBody.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -26,14 +26,15 @@ public class AbstractIdentifiablesController<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>
     extends AbstractPagingAndSortingController<I> {
 
-  protected final C service;
+  protected final LanguageService languageService;
   protected final CudamiLocalesClient localeService;
+  protected final C service;
 
   protected AbstractIdentifiablesController(
-      C service, LanguageSortingHelper languageSortingHelper, CudamiLocalesClient localeService) {
-    super(languageSortingHelper);
-    this.service = service;
+      C service, LanguageService languageService, CudamiLocalesClient localeService) {
+    this.languageService = languageService;
     this.localeService = localeService;
+    this.service = service;
   }
 
   protected PageResponse search(String searchField, String searchTerm, PageRequest pageRequest)
@@ -90,7 +91,7 @@ public class AbstractIdentifiablesController<
     List<Locale> existingLanguages = Collections.emptyList();
     if (!CollectionUtils.isEmpty(serviceLocales)) {
       existingLanguages =
-          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), serviceLocales);
+          languageService.sortLanguages(LocaleContextHolder.getLocale(), serviceLocales);
     }
     return existingLanguages;
   }
@@ -110,7 +111,7 @@ public class AbstractIdentifiablesController<
                               : Stream.of()))
               .collect(Collectors.toList());
       existingLanguages =
-          languageSortingHelper.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
+          languageService.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
     }
     return existingLanguages;
   }

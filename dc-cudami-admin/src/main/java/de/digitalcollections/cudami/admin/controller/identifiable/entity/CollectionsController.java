@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiCollectionsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -29,8 +29,8 @@ public class CollectionsController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
-  public CollectionsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forCollections(), languageSortingHelper, client.forLocales());
+  public CollectionsController(LanguageService languageService, CudamiClient client) {
+    super(client.forCollections(), languageService, client.forLocales());
   }
 
   @GetMapping("/collections/new")
@@ -54,7 +54,7 @@ public class CollectionsController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Collection collection = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, collection.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, collection.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);
@@ -70,7 +70,7 @@ public class CollectionsController
   @GetMapping("/collections")
   public String list(Model model) throws TechnicalException {
     List<Locale> existingLanguages =
-        getExistingLanguagesForLocales(service.getLanguagesOfTopCollections());
+        languageService.getExistingLanguagesForLocales(service.getLanguagesOfTopCollections());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);

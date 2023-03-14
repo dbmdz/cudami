@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.geo.location;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.geo.location.CudamiGeoLocationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -27,8 +27,8 @@ public class GeoLocationsController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
-  public GeoLocationsController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forGeoLocations(), languageSortingHelper, client.forLocales());
+  public GeoLocationsController(LanguageService languageService, CudamiClient client) {
+    super(client.forGeoLocations(), languageService, client.forLocales());
   }
 
   @GetMapping("/geolocations")

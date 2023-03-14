@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.legal;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
@@ -30,11 +30,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class LicensesController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
+  private final LanguageService languageService;
   private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
-  public LicensesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
+  public LicensesController(LanguageService languageService, CudamiClient client) {
+    this.languageService = languageService;
     this.localeService = client.forLocales();
     this.service = client.forLicenses();
   }
@@ -58,7 +59,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
       existingLanguages =
-          languageSortingHelper.sortLanguages(displayLocale, license.getLabel().getLocales());
+          languageService.sortLanguages(displayLocale, license.getLabel().getLocales());
     }
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
@@ -75,7 +76,8 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
 
   @GetMapping("/licenses")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages = getExistingLanguagesForLocales(service.getLanguages());
+    List<Locale> existingLanguages =
+        languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, localeService);
@@ -104,7 +106,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
     LocalizedText label = license.getLabel();
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
-      existingLanguages = languageSortingHelper.sortLanguages(displayLocale, label.getLocales());
+      existingLanguages = languageService.sortLanguages(displayLocale, label.getLocales());
     }
 
     String dataLanguage = targetDataLanguage;

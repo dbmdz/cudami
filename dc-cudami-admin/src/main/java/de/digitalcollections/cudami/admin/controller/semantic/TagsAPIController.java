@@ -4,9 +4,7 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Servic
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -29,12 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class TagsAPIController extends AbstractPagingAndSortingController<Tag> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TagsAPIController.class);
-  private final CudamiLocalesClient localeService;
   private final CudamiTagsClient service;
 
-  public TagsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(languageSortingHelper);
-    this.localeService = client.forLocales();
+  public TagsAPIController(CudamiClient client) {
     this.service = client.forTags();
   }
 

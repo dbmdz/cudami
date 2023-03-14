@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiArticlesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -26,8 +26,8 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
-  public ArticlesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forArticles(), languageSortingHelper, client.forLocales());
+  public ArticlesController(LanguageService languageService, CudamiClient client) {
+    super(client.forArticles(), languageService, client.forLocales());
   }
 
   @GetMapping("/articles/new")
@@ -45,7 +45,7 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Article article = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, article.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, article.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);

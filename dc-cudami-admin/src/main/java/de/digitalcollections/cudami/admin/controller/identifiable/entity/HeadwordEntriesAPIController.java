@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiHeadwordEntriesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -30,9 +30,8 @@ public class HeadwordEntriesAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesAPIController.class);
 
-  public HeadwordEntriesAPIController(
-      CudamiClient client, LanguageSortingHelper languageSortingHelper) {
-    super(client.forHeadwordEntries(), languageSortingHelper, client.forLocales());
+  public HeadwordEntriesAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forHeadwordEntries(), languageService, client.forLocales());
   }
 
   @GetMapping("/api/headwordentries/new")

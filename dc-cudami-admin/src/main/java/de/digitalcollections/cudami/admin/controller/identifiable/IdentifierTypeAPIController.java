@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.api.service.exceptions.Servic
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifierTypesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -35,9 +34,7 @@ public class IdentifierTypeAPIController
 
   private final CudamiIdentifierTypesClient service;
 
-  public IdentifierTypeAPIController(
-      CudamiClient client, LanguageSortingHelper languageSortingHelper) {
-    super(languageSortingHelper);
+  public IdentifierTypeAPIController(CudamiClient client) {
     this.service = client.forIdentifierTypes();
   }
 

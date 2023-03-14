@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiDigitalObjectsClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -33,9 +33,8 @@ public class DigitalObjectsAPIController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
-  public DigitalObjectsAPIController(
-      CudamiClient client, LanguageSortingHelper languageSortingHelper) {
-    super(client.forDigitalObjects(), languageSortingHelper, client.forLocales());
+  public DigitalObjectsAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forDigitalObjects(), languageService, client.forLocales());
   }
 
   @SuppressFBWarnings

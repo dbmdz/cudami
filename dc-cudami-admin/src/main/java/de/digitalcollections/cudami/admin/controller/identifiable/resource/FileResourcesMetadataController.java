@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.resource;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.resource.CudamiFileResourcesMetadataClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -29,9 +29,8 @@ public class FileResourcesMetadataController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
-  public FileResourcesMetadataController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forFileResourcesMetadata(), languageSortingHelper, client.forLocales());
+  public FileResourcesMetadataController(LanguageService languageService, CudamiClient client) {
+    super(client.forFileResourcesMetadata(), languageService, client.forLocales());
   }
 
   @GetMapping(value = "/fileresources/new")
@@ -49,7 +48,7 @@ public class FileResourcesMetadataController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     FileResource fileResource = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, fileResource.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);

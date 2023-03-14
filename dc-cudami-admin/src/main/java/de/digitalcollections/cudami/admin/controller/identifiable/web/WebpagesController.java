@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
@@ -34,8 +34,8 @@ public class WebpagesController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
   private final CudamiWebsitesClient websiteService;
 
-  public WebpagesController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWebpages(), languageSortingHelper, client.forLocales());
+  public WebpagesController(LanguageService languageService, CudamiClient client) {
+    super(client.forWebpages(), languageService, client.forLocales());
     this.websiteService = client.forWebsites();
   }
 
@@ -67,7 +67,7 @@ public class WebpagesController
     final Locale displayLocale = LocaleContextHolder.getLocale();
     Webpage webpage = service.getByUuid(uuid);
     List<Locale> existingLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, webpage.getLabel().getLocales());
+        languageService.sortLanguages(displayLocale, webpage.getLabel().getLocales());
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
       model.addAttribute("activeLanguage", activeLanguage);

@@ -1,8 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.work.CudamiManifestationsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -24,9 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ManifestationsController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
-  public ManifestationsController(
-      LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forManifestations(), languageSortingHelper, client.forLocales());
+  public ManifestationsController(LanguageService languageService, CudamiClient client) {
+    super(client.forManifestations(), languageService, client.forLocales());
   }
 
   @GetMapping("/manifestations")
@@ -64,7 +63,7 @@ public class ManifestationsController
 
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingItemsLanguages =
-        languageSortingHelper.sortLanguages(displayLocale, service.getLanguagesOfItems(uuid));
+        languageService.sortLanguages(displayLocale, service.getLanguagesOfItems(uuid));
     model
         .addAttribute("existingItemsLanguages", existingItemsLanguages)
         .addAttribute("dataLanguageItems", getDataLanguage(null, localeService));

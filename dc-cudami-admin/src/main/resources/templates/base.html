@@ -275,6 +275,17 @@
                         <i class="fas fa-users nav-icon"></i>
                         <p th:text="#{persons}">Persons</p>
                       </a>
+                      <ul class="list-unstyled pl-3">
+                        <li class="nav-item">
+                          <a class="nav-link"
+                             th:classappend="${menu == 'familynames'} ? active"
+                             th:href="@{/familynames}"
+                             th:title="#{tooltip.familynames}">
+                            <i class="far fa-address-card nav-icon"></i>
+                            <p th:text="#{menu.familynames}">Family names</p>
+                          </a>
+                        </li>
+                      </ul>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link"

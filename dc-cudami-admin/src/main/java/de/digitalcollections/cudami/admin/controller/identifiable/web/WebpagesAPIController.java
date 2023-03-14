@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.web;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
@@ -34,8 +34,8 @@ public class WebpagesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesAPIController.class);
   private final CudamiWebsitesClient websiteService;
 
-  public WebpagesAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
-    super(client.forWebpages(), languageSortingHelper, client.forLocales());
+  public WebpagesAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forWebpages(), languageService, client.forLocales());
     this.websiteService = client.forWebsites();
   }
 

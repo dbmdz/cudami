@@ -3,12 +3,12 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
+import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiCorporateBodiesClient;
+import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
+import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.paging.PageResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
@@ -25,63 +25,67 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for all public "CorporateBodies" endpoints (API). */
+/** Controller for all public "FamilyName" endpoints (API). */
 @RestController
-public class CorporateBodiesAPIController
-    extends AbstractEntitiesController<CorporateBody, CudamiCorporateBodiesClient> {
+public class FamilynamesAPIController
+    extends AbstractIdentifiablesController<FamilyName, CudamiFamilyNamesClient> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesAPIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesAPIController.class);
 
-  public CorporateBodiesAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forCorporateBodies(), languageService, client.forLocales());
+  public FamilynamesAPIController(LanguageService languageService, CudamiClient client) {
+    super(client.forFamilyNames(), languageService, client.forLocales());
   }
 
-  @GetMapping("/api/corporatebodies/new")
+  @GetMapping("/api/familynames/new")
   @ResponseBody
-  public CorporateBody create() throws TechnicalException {
+  public FamilyName create() throws TechnicalException {
     return service.create();
   }
 
   @SuppressFBWarnings
-  @GetMapping("/api/corporatebodies")
+  @GetMapping("/api/familynames")
   @ResponseBody
-  public BTResponse<CorporateBody> find(
+  public BTResponse<FamilyName> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    PageResponse<CorporateBody> pageResponse =
+    /* FIXME
+     * empty list: Got 500 for backend call GET /v6/familynames?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.
+     * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
+     */
+    PageResponse<FamilyName> pageResponse =
         super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @GetMapping("/api/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
-  public CorporateBody getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+  public FamilyName getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @PostMapping("/api/corporatebodies")
-  public ResponseEntity save(@RequestBody CorporateBody corporateBody) {
+  @PostMapping("/api/familynames")
+  public ResponseEntity save(@RequestBody FamilyName familyName) {
     try {
-      CorporateBody corporateBodyDb = service.save(corporateBody);
-      return ResponseEntity.status(HttpStatus.CREATED).body(corporateBodyDb);
+      FamilyName familyNameDb = service.save(familyName);
+      return ResponseEntity.status(HttpStatus.CREATED).body(familyNameDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save corporate body: ", e);
+      LOGGER.error("Cannot save family name: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @PutMapping("/api/corporatebodies/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody CorporateBody corporateBody) {
+  @PutMapping("/api/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FamilyName familyName) {
     try {
-      CorporateBody corporateBodyDb = service.update(uuid, corporateBody);
-      return ResponseEntity.ok(corporateBodyDb);
+      FamilyName familyNameDb = service.update(uuid, familyName);
+      return ResponseEntity.ok(familyNameDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save corporate body with uuid={}", uuid, e);
+      LOGGER.error("Cannot save family name with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
