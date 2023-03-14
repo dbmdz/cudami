@@ -9,6 +9,9 @@ import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
 import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -49,11 +52,17 @@ public class HeadwordsAPIController extends AbstractPagingAndSortingController<H
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
       throws TechnicalException, ServiceException {
-    PageResponse<Headword> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+    PageRequest pageRequest = createPageRequest(offset, limit, sort, order);
+    if (searchTerm != null) {
+      Filtering filtering =
+          Filtering.builder()
+              .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
+              .build();
+      pageRequest.setFiltering(filtering);
+    }
+    PageResponse<Headword> pageResponse = service.find(pageRequest);
     return new BTResponse<>(pageResponse);
   }
 
