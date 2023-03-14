@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.age
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -125,14 +124,12 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
 
   @Operation(summary = "Get languages of all family names")
   @GetMapping(
-      value = {
-        "/v6/familynames/languages"
-      },
+      value = {"/v6/familynames/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
     return familyNameService.getLanguages();
   }
-  
+
   @Operation(summary = "save a newly created family")
   @PostMapping(
       value = {"/v6/familynames", "/v5/familynames"},
