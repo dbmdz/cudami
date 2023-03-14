@@ -7,13 +7,13 @@ import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.CudamiLocalesClient;
-import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
+import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Headword;
+import de.digitalcollections.model.semantic.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -24,51 +24,51 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for all public "Headwords" endpoints (API). */
+/** Controller for all public "Tags" endpoints (API). */
 @RestController
-public class HeadwordsAPIController extends AbstractPagingAndSortingController<Headword> {
+public class TagsAPIController extends AbstractPagingAndSortingController<Tag> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordsAPIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TagsAPIController.class);
   private final CudamiLocalesClient localeService;
-  private final CudamiHeadwordsClient service;
+  private final CudamiTagsClient service;
 
-  public HeadwordsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
+  public TagsAPIController(LanguageSortingHelper languageSortingHelper, CudamiClient client) {
     super(languageSortingHelper);
     this.localeService = client.forLocales();
-    this.service = client.forHeadwords();
+    this.service = client.forTags();
   }
 
-  @GetMapping("/api/headwords/new")
+  @GetMapping("/api/tags/new")
   @ResponseBody
-  public Headword createModel() throws TechnicalException {
+  public Tag createModel() throws TechnicalException {
     return service.create();
   }
 
   @SuppressFBWarnings
-  @GetMapping("/api/headwords")
+  @GetMapping("/api/tags")
   @ResponseBody
-  public BTResponse<Headword> find(
+  public BTResponse<Tag> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
       throws TechnicalException, ServiceException {
     PageRequest pageRequest = createPageRequest(offset, limit, sort, order);
     if (searchTerm != null) {
       Filtering filtering =
           Filtering.builder()
-              .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
+              .add(FilterCriterion.builder().withExpression("value").contains(searchTerm).build())
               .build();
       pageRequest.setFiltering(filtering);
     }
-    PageResponse<Headword> pageResponse = service.find(pageRequest);
+    PageResponse<Tag> pageResponse = service.find(pageRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  @GetMapping("/api/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @GetMapping("/api/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
-  public Headword getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+  public Tag getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 }

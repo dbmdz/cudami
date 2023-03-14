@@ -28,6 +28,23 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   }
 
   @SuppressFBWarnings
+  protected PageRequest createPageRequest(int offset, int limit, String sort, String order) {
+    Sorting sorting = null;
+    if (sort != null && order != null) {
+      Order sortingOrder =
+          Order.builder().property(sort).direction(Direction.fromString(order)).build();
+      sorting = Sorting.builder().order(sortingOrder).build();
+    }
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber((int) Math.ceil(offset / limit))
+            .pageSize(limit)
+            .sorting(sorting)
+            .build();
+    return pageRequest;
+  }
+
+  @SuppressFBWarnings
   protected PageRequest createPageRequest(
       int pageNumber, int pageSize, String searchField, String searchTerm, List<Order> sortBy) {
     PageRequest pageRequest;

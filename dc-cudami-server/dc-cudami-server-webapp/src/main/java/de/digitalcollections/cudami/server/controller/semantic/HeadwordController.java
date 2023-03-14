@@ -15,7 +15,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -79,19 +78,9 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
       @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion) {
-    PageRequest pageRequest;
-    if (searchTerm != null) {
-      pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    } else {
-      pageRequest = new PageRequest(pageNumber, pageSize);
-    }
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sortBy);
     if (labelCriterion != null || localeCriterion != null) {
       Filtering filtering = new Filtering();
       if (labelCriterion != null) {
@@ -99,13 +88,10 @@ public class HeadwordController {
       }
       if (localeCriterion != null) {
         filtering.add(
-            Filtering.builder()
-                .add(
-                    new FilterCriterion<Locale>(
-                        "locale",
-                        localeCriterion.getOperation(),
-                        Locale.forLanguageTag(localeCriterion.getValue().toString())))
-                .build());
+            new FilterCriterion<Locale>(
+                "locale",
+                localeCriterion.getOperation(),
+                Locale.forLanguageTag(localeCriterion.getValue().toString())));
       }
       pageRequest.setFiltering(filtering);
     }

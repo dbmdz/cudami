@@ -267,6 +267,15 @@
                         <p th:text="#{menu.headwords}">Headwords</p>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a class="nav-link"
+                         th:classappend="${menu == 'tags'} ? active"
+                         th:href="@{/tags}"
+                         th:title="#{tooltip.tags}">
+                        <i class="fas fa-hashtag nav-icon"></i>
+                        <p th:text="#{menu.tags}">Tags</p>
+                      </a>
+                    </li>
                   </ul>
                 </li>
 

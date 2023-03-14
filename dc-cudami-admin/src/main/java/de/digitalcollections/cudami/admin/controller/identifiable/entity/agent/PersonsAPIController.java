@@ -55,6 +55,12 @@ public class PersonsAPIController
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
+    // FIXME: exception at showing/sorting empty person list:
+    /*
+         * Got 500 for backend call GET /v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.
+    ⤷ http://localhost:9000/v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase
+         * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
+         */
     PageResponse<Person> pageResponse =
         super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
