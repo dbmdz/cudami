@@ -31,7 +31,7 @@ public class ArticlesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesAPIController.class);
 
   public ArticlesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forArticles(), languageService, client.forLocales());
+    super(client.forArticles(), languageService);
   }
 
   @GetMapping("/api/articles/new")
@@ -53,7 +53,7 @@ public class ArticlesAPIController
       throws TechnicalException {
 
     PageResponse<Article> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

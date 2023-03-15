@@ -33,7 +33,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsAPIController.class);
 
   public TopicsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forTopics(), languageService, client.forLocales());
+    super(client.forTopics(), languageService);
   }
 
   @GetMapping("/api/topics/new")
@@ -55,7 +55,8 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
       throws TechnicalException {
     PageResponse<Topic> pageResponse =
         service.findTopTopics(
-            createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm));
+            createPageRequest(
+                sort, order, dataLanguage, languageService, offset, limit, searchTerm));
     return new BTResponse<>(pageResponse);
   }
 
@@ -71,7 +72,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Topic> pageResponse = service.findSubtopics(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
@@ -88,7 +89,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Entity> pageResponse = service.findEntities(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
@@ -111,7 +112,7 @@ public class TopicsAPIController extends AbstractEntitiesController<Topic, Cudam
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<FileResource> pageResponse = service.findFileResources(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

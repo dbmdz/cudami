@@ -33,7 +33,7 @@ public class FamilynamesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesAPIController.class);
 
   public FamilynamesAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forFamilyNames(), languageService, client.forLocales());
+    super(client.forFamilyNames(), languageService);
   }
 
   @GetMapping("/api/familynames/new")
@@ -58,7 +58,7 @@ public class FamilynamesAPIController
      * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
      */
     PageResponse<FamilyName> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

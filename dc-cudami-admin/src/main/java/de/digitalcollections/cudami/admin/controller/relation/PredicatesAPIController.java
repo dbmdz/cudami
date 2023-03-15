@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -22,11 +22,11 @@ public class PredicatesAPIController extends AbstractPagingAndSortingController<
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesAPIController.class);
 
-  private final CudamiLocalesClient localeService;
+  private final LanguageService languageService;
   private final CudamiPredicatesClient service;
 
-  public PredicatesAPIController(CudamiClient client) {
-    this.localeService = client.forLocales();
+  public PredicatesAPIController(CudamiClient client, LanguageService languageService) {
+    this.languageService = languageService;
     this.service = client.forPredicates();
   }
 
@@ -43,7 +43,7 @@ public class PredicatesAPIController extends AbstractPagingAndSortingController<
       throws TechnicalException {
 
     PageResponse<Predicate> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 }

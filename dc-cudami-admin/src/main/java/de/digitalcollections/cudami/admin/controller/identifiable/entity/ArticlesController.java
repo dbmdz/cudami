@@ -27,12 +27,12 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
   private static final Logger LOGGER = LoggerFactory.getLogger(ArticlesController.class);
 
   public ArticlesController(LanguageService languageService, CudamiClient client) {
-    super(client.forArticles(), languageService, client.forLocales());
+    super(client.forArticles(), languageService);
   }
 
   @GetMapping("/articles/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "articles/create";
   }
 
@@ -62,7 +62,7 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "articles/list";
@@ -86,7 +86,7 @@ public class ArticlesController extends AbstractEntitiesController<Article, Cuda
     model.addAttribute("article", article);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(article);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

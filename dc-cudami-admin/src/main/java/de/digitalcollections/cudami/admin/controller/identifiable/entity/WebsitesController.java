@@ -27,12 +27,12 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesController.class);
 
   public WebsitesController(LanguageService languageService, CudamiClient client) {
-    super(client.forWebsites(), languageService, client.forLocales());
+    super(client.forWebsites(), languageService);
   }
 
   @GetMapping("/websites/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "websites/create";
   }
 
@@ -63,7 +63,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "websites/list";
@@ -86,7 +86,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
     }
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(website);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -95,7 +95,7 @@ public class WebsitesController extends AbstractEntitiesController<Website, Cuda
         getExistingLanguagesFromIdentifiables(website.getRootPages());
     model
         .addAttribute("existingWebpageLanguages", existingWebpageLanguages)
-        .addAttribute("dataLanguageWebpages", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageWebpages", getDataLanguage(null, languageService));
 
     model.addAttribute("website", website);
     return "websites/view";

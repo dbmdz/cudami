@@ -35,7 +35,7 @@ public class WebpagesAPIController
   private final CudamiWebsitesClient websiteService;
 
   public WebpagesAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forWebpages(), languageService, client.forLocales());
+    super(client.forWebpages(), languageService);
     this.websiteService = client.forWebsites();
   }
 
@@ -57,7 +57,7 @@ public class WebpagesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Webpage> pageResponse = service.findSubpages(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

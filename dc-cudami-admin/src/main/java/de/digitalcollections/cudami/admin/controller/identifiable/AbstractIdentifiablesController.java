@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -27,13 +26,10 @@ public class AbstractIdentifiablesController<
     extends AbstractPagingAndSortingController<I> {
 
   protected final LanguageService languageService;
-  protected final CudamiLocalesClient localeService;
   protected final C service;
 
-  protected AbstractIdentifiablesController(
-      C service, LanguageService languageService, CudamiLocalesClient localeService) {
+  protected AbstractIdentifiablesController(C service, LanguageService languageService) {
     this.languageService = languageService;
-    this.localeService = localeService;
     this.service = service;
   }
 

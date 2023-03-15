@@ -37,7 +37,7 @@ public class CollectionsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsAPIController.class);
 
   public CollectionsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forCollections(), languageService, client.forLocales());
+    super(client.forCollections(), languageService);
   }
 
   @PostMapping("/api/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
@@ -119,7 +119,7 @@ public class CollectionsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
@@ -139,7 +139,7 @@ public class CollectionsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Collection> pageResponse = service.findSubcollections(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
@@ -160,7 +160,8 @@ public class CollectionsAPIController
       throws TechnicalException {
     PageResponse<Collection> pageResponse =
         service.findTopCollections(
-            createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm));
+            createPageRequest(
+                sort, order, dataLanguage, languageService, offset, limit, searchTerm));
     return new BTResponse<>(pageResponse);
   }
 

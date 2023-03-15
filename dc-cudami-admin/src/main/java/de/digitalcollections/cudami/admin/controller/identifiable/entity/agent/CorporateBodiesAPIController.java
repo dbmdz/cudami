@@ -33,7 +33,7 @@ public class CorporateBodiesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesAPIController.class);
 
   public CorporateBodiesAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forCorporateBodies(), languageService, client.forLocales());
+    super(client.forCorporateBodies(), languageService);
   }
 
   @GetMapping("/api/corporatebodies/new")
@@ -54,7 +54,7 @@ public class CorporateBodiesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<CorporateBody> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

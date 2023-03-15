@@ -28,12 +28,12 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsController.class);
 
   public PersonsController(LanguageService languageService, CudamiClient client) {
-    super(client.forPersons(), languageService, client.forLocales());
+    super(client.forPersons(), languageService);
   }
 
   @GetMapping("/persons/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "persons/create";
   }
 
@@ -63,7 +63,7 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "persons/list";
@@ -87,7 +87,7 @@ public class PersonsController extends AbstractEntitiesController<Person, Cudami
     model.addAttribute("person", person);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(person);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

@@ -27,12 +27,12 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
 
   public ProjectsController(LanguageService languageService, CudamiClient client) {
-    super(client.forProjects(), languageService, client.forLocales());
+    super(client.forProjects(), languageService);
   }
 
   @GetMapping("/projects/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "projects/create";
   }
 
@@ -62,7 +62,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "projects/list";
@@ -86,7 +86,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
     model.addAttribute("project", project);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(project);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

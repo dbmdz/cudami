@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventsAPIController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forEvents(), languageService, client.forLocales());
+    super(client.forEvents(), languageService);
   }
 
   /*
@@ -40,7 +40,7 @@ public class EventsAPIController extends AbstractEntitiesController<Event, Cudam
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Event> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

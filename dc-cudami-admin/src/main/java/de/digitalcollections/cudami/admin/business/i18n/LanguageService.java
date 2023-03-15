@@ -39,6 +39,27 @@ public class LanguageService {
     return sortedLanguages;
   }
 
+  public List<Locale> getAllLanguagesAsLocales() throws TechnicalException {
+    List<Locale> allLocales = getAllLocales();
+    return allLocales.stream().filter(l -> l.getCountry().isBlank()).collect(Collectors.toList());
+  }
+
+  public List<String> getAllLanguagesAsString() throws TechnicalException {
+    return localeService.getAllLanguages();
+  }
+
+  public List<Locale> getAllLocales() throws TechnicalException {
+    return localeService.getAllLocales();
+  }
+
+  public Locale getDefaultLanguage() throws TechnicalException {
+    return localeService.getDefaultLanguage();
+  }
+
+  public String getDefaultLocale() throws TechnicalException {
+    return localeService.getDefaultLocale();
+  }
+
   public List<Locale> getExistingLanguages(Locale defaultLanguage, LocalizedText localizedText) {
     List<Locale> existingLanguages = List.of(defaultLanguage);
     if (!CollectionUtils.isEmpty(localizedText)) {

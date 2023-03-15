@@ -38,7 +38,7 @@ public class FileResourcesMetadataAPIController
       LoggerFactory.getLogger(FileResourcesMetadataAPIController.class);
 
   public FileResourcesMetadataAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forFileResourcesMetadata(), languageService, client.forLocales());
+    super(client.forFileResourcesMetadata(), languageService);
   }
 
   @GetMapping("/api/fileresources/new")
@@ -59,7 +59,7 @@ public class FileResourcesMetadataAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<FileResource> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

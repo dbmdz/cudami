@@ -24,14 +24,14 @@ public class DigitalObjectsController
     extends AbstractEntitiesController<DigitalObject, CudamiDigitalObjectsClient> {
 
   public DigitalObjectsController(LanguageService languageService, CudamiClient client) {
-    super(client.forDigitalObjects(), languageService, client.forLocales());
+    super(client.forDigitalObjects(), languageService);
   }
 
   @GetMapping("/digitalobjects")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "digitalobjects/list";
@@ -55,7 +55,7 @@ public class DigitalObjectsController
     model.addAttribute("digitalObject", digitalObject);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(digitalObject);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -67,14 +67,14 @@ public class DigitalObjectsController
         .addAttribute(
             "existingCollectionsLanguages",
             languageService.sortLanguages(displayLocale, existingCollectionsLanguages))
-        .addAttribute("dataLanguageCollections", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageCollections", getDataLanguage(null, languageService));
 
     List<Locale> existingProjectsLanguages = service.getLanguagesOfProjects(uuid);
     model
         .addAttribute(
             "existingProjectsLanguages",
             languageService.sortLanguages(displayLocale, existingProjectsLanguages))
-        .addAttribute("dataLanguageProjects", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageProjects", getDataLanguage(null, languageService));
 
     List<Locale> existingContainedDigitalObjectsLanguages =
         service.getLanguagesOfContainedDigitalObjects(uuid);
@@ -82,7 +82,7 @@ public class DigitalObjectsController
         .addAttribute(
             "existingDigitalObjectsLanguages",
             languageService.sortLanguages(displayLocale, existingContainedDigitalObjectsLanguages))
-        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));
 
     return "digitalobjects/view";
   }

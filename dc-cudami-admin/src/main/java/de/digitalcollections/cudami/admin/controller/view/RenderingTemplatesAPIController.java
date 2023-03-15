@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -33,11 +33,11 @@ public class RenderingTemplatesAPIController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(RenderingTemplatesAPIController.class);
 
-  private final CudamiLocalesClient localeService;
+  private final LanguageService languageService;
   private final CudamiRenderingTemplatesClient service;
 
-  public RenderingTemplatesAPIController(CudamiClient client) {
-    this.localeService = client.forLocales();
+  public RenderingTemplatesAPIController(CudamiClient client, LanguageService languageService) {
+    this.languageService = languageService;
     this.service = client.forRenderingTemplates();
   }
 
@@ -59,7 +59,7 @@ public class RenderingTemplatesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<RenderingTemplate> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

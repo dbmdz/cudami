@@ -5,7 +5,6 @@ import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankV
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -40,7 +39,6 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
 
   private final LabelNotBlankValidator labelNotBlankValidator;
   private final LanguageService languageService;
-  private final CudamiLocalesClient localeService;
   private final MessageSource messageSource;
   private final CudamiPredicatesClient service;
 
@@ -51,7 +49,6 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
       LabelNotBlankValidator labelNotBlankValidator) {
     this.languageService = languageService;
     this.labelNotBlankValidator = labelNotBlankValidator;
-    this.localeService = client.forLocales();
     this.messageSource = messageSource;
     this.service = client.forPredicates();
   }
@@ -59,7 +56,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   @GetMapping("/predicates/new")
   public String create(Model model) throws TechnicalException {
     Predicate predicate = service.create();
-    Locale defaultLanguage = localeService.getDefaultLanguage();
+    Locale defaultLanguage = languageService.getDefaultLanguage();
     predicate.setLabel(new LocalizedText(defaultLanguage, ""));
     model.addAttribute("predicate", predicate);
     List<Locale> existingLanguages = List.of(defaultLanguage);
@@ -95,7 +92,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
 
     List<Locale> existingLanguages =
         languageService.getExistingLanguages(
-            localeService.getDefaultLanguage(), predicate.getLabel());
+            languageService.getDefaultLanguage(), predicate.getLabel());
     model.addAttribute("existingLanguages", existingLanguages);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
@@ -117,7 +114,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
         languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "predicates/list";
@@ -151,7 +148,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     // TODO: move validate() to service layer on server side using new ValidationException of dc
     // model?
     if (results.hasErrors()) {
-      Locale defaultLanguage = localeService.getDefaultLanguage();
+      Locale defaultLanguage = languageService.getDefaultLanguage();
       model.addAttribute(
           "existingLanguages",
           languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
@@ -202,7 +199,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     // TODO: move validate() to service layer on server side using new ValidationException of dc
     // model?
     if (results.hasErrors()) {
-      Locale defaultLanguage = localeService.getDefaultLanguage();
+      Locale defaultLanguage = languageService.getDefaultLanguage();
       model.addAttribute(
           "existingLanguages",
           languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
@@ -246,7 +243,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
         predicate.getLabel() != null
             ? languageService.getExistingLanguagesForLocales(predicate.getLabel().getLocales())
             : List.of();
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
 
     model
         .addAttribute("predicate", predicate)

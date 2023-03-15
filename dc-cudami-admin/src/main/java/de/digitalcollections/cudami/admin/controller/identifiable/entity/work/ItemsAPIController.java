@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiItemsClient> {
 
   public ItemsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forItems(), languageService, client.forLocales());
+    super(client.forItems(), languageService);
   }
 
   @SuppressFBWarnings
@@ -40,7 +40,7 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Item> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
@@ -57,7 +57,7 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
       throws TechnicalException {
     // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
     PageRequest pageRequest =
-        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(null, null, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<DigitalObject> pageResponse = service.findDigitalObjects(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

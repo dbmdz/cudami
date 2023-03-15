@@ -30,7 +30,7 @@ public class CollectionsController
   private static final Logger LOGGER = LoggerFactory.getLogger(CollectionsController.class);
 
   public CollectionsController(LanguageService languageService, CudamiClient client) {
-    super(client.forCollections(), languageService, client.forLocales());
+    super(client.forCollections(), languageService);
   }
 
   @GetMapping("/collections/new")
@@ -39,7 +39,7 @@ public class CollectionsController
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "collections/create";
@@ -73,7 +73,7 @@ public class CollectionsController
         languageService.getExistingLanguagesForLocales(service.getLanguagesOfTopCollections());
     model.addAttribute("existingLanguages", existingLanguages);
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "collections/list";
@@ -97,7 +97,7 @@ public class CollectionsController
     model.addAttribute("collection", collection);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiables(List.of(collection));
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -106,7 +106,7 @@ public class CollectionsController
         getExistingLanguagesFromIdentifiables(collection.getChildren());
     model
         .addAttribute("existingSubcollectionsLanguages", existingSubcollectionsLanguages)
-        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubcollections", getDataLanguage(null, languageService));
 
     List<Collection> parents = service.getParents(uuid);
     model.addAttribute("parents", parents);

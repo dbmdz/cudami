@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorksAPIController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
   public WorksAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forWorks(), languageService, client.forLocales());
+    super(client.forWorks(), languageService);
   }
 
   @SuppressFBWarnings
@@ -40,7 +40,7 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Work> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
@@ -59,7 +59,7 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Work> pageResponse = service.findChildren(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }
@@ -80,7 +80,7 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
       throws TechnicalException {
     // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
     PageRequest pageRequest =
-        createPageRequest(null, null, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(null, null, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Manifestation> pageResponse = service.findManifestations(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

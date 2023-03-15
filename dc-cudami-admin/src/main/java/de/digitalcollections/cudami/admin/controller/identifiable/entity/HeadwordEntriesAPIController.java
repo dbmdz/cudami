@@ -31,7 +31,7 @@ public class HeadwordEntriesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesAPIController.class);
 
   public HeadwordEntriesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forHeadwordEntries(), languageService, client.forLocales());
+    super(client.forHeadwordEntries(), languageService);
   }
 
   @GetMapping("/api/headwordentries/new")
@@ -53,7 +53,7 @@ public class HeadwordEntriesAPIController
       throws TechnicalException {
 
     PageResponse<HeadwordEntry> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

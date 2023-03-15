@@ -29,7 +29,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
   public TopicsController(LanguageService languageService, CudamiClient client) {
-    super(client.forTopics(), languageService, client.forLocales());
+    super(client.forTopics(), languageService);
   }
 
   @GetMapping("/topics/new")
@@ -38,7 +38,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
       @RequestParam(name = "parentType", required = false) String parentType,
       @RequestParam(name = "parentUuid", required = false) UUID parentUuid)
       throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     model.addAttribute("parentType", parentType);
     model.addAttribute("parentUuid", parentUuid);
     return "topics/create";
@@ -72,7 +72,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         "existingLanguages",
         languageService.getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "topics/list";
@@ -96,7 +96,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
     model.addAttribute("topic", topic);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(topic);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -105,7 +105,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         getExistingLanguagesFromIdentifiables(topic.getChildren());
     model
         .addAttribute("existingSubtopicsLanguages", existingSubtopicsLanguages)
-        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubtopics", getDataLanguage(null, languageService));
 
     final Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingEntitiesLanguages = service.getLanguagesOfEntities(uuid);
@@ -113,14 +113,14 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         .addAttribute(
             "existingEntitiesLanguages",
             languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
-        .addAttribute("dataLanguageEntities", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageEntities", getDataLanguage(null, languageService));
 
     List<Locale> existingFileResourcesLanguages = service.getLanguagesOfFileResources(uuid);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
             languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
-        .addAttribute("dataLanguageFileResources", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageFileResources", getDataLanguage(null, languageService));
 
     BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();

@@ -29,12 +29,12 @@ public class CorporateBodiesController
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
   public CorporateBodiesController(LanguageService languageService, CudamiClient client) {
-    super(client.forCorporateBodies(), languageService, client.forLocales());
+    super(client.forCorporateBodies(), languageService);
   }
 
   @GetMapping("/corporatebodies/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "corporatebodies/create";
   }
 
@@ -64,7 +64,7 @@ public class CorporateBodiesController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "corporatebodies/list";
@@ -88,7 +88,7 @@ public class CorporateBodiesController
     model.addAttribute("corporateBody", corporateBody);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(corporateBody);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

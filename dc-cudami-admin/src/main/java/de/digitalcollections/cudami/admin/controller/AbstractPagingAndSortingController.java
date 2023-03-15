@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller;
 
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.client.CudamiRestClient;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -55,7 +55,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       String sort,
       String order,
       String dataLanguage,
-      CudamiLocalesClient localeService,
+      LanguageService languageService,
       int offset,
       int limit,
       String searchTerm)
@@ -64,7 +64,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     if (sort != null && order != null) {
       Order sortingOrder;
       if ("label".equals(sort) && dataLanguage != null) {
-        String language = getDataLanguage(dataLanguage, localeService);
+        String language = getDataLanguage(dataLanguage, languageService);
         sortingOrder =
             Order.builder()
                 .property("label")
@@ -88,7 +88,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   }
 
   public PageResponse<T> find(
-      CudamiLocalesClient localeService,
+      LanguageService languageService,
       CudamiRestClient<T> service,
       int offset,
       int limit,
@@ -99,16 +99,16 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       throws TechnicalException {
 
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<T> pageResponse = service.find(pageRequest);
     return pageResponse;
   }
 
-  protected String getDataLanguage(String targetDataLanguage, CudamiLocalesClient localeService)
+  protected String getDataLanguage(String targetDataLanguage, LanguageService languageService)
       throws TechnicalException {
     String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    if (dataLanguage == null && languageService != null) {
+      dataLanguage = languageService.getDefaultLanguage().getLanguage();
     }
     return dataLanguage;
   }

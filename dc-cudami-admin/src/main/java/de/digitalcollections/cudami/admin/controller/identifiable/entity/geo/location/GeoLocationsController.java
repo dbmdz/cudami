@@ -28,14 +28,14 @@ public class GeoLocationsController
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsController.class);
 
   public GeoLocationsController(LanguageService languageService, CudamiClient client) {
-    super(client.forGeoLocations(), languageService, client.forLocales());
+    super(client.forGeoLocations(), languageService);
   }
 
   @GetMapping("/geolocations")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "geolocations/list";
@@ -59,7 +59,7 @@ public class GeoLocationsController
     model.addAttribute("geoLocation", geoLocation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(geoLocation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -24,17 +24,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HeadwordsController extends AbstractPagingAndSortingController<Headword> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordsController.class);
-  private final CudamiLocalesClient localeService;
+  private final LanguageService languageService;
   private final CudamiHeadwordsClient service;
 
-  public HeadwordsController(CudamiClient client) {
-    this.localeService = client.forLocales();
+  public HeadwordsController(CudamiClient client, LanguageService languageService) {
+    this.languageService = languageService;
     this.service = client.forHeadwords();
   }
 
   @GetMapping("/headwords/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "headwords/create";
   }
 

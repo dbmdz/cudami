@@ -34,7 +34,7 @@ public class DigitalObjectsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectsAPIController.class);
 
   public DigitalObjectsAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forDigitalObjects(), languageService, client.forLocales());
+    super(client.forDigitalObjects(), languageService);
   }
 
   @SuppressFBWarnings
@@ -50,7 +50,7 @@ public class DigitalObjectsAPIController
       throws TechnicalException {
 
     PageResponse<DigitalObject> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
@@ -90,11 +90,11 @@ public class DigitalObjectsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
 
     if ("label".equals(sort)) {
       if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+        dataLanguage = languageService.getDefaultLanguage().getLanguage();
       }
       Sorting sorting =
           Sorting.builder()
@@ -120,11 +120,11 @@ public class DigitalObjectsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
 
     if ("label".equals(sort)) {
       if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+        dataLanguage = languageService.getDefaultLanguage().getLanguage();
       }
       Sorting sorting =
           Sorting.builder()
@@ -148,11 +148,11 @@ public class DigitalObjectsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
 
     if ("label".equals(sort)) {
       if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+        dataLanguage = languageService.getDefaultLanguage().getLanguage();
       }
       Sorting sorting =
           Sorting.builder()

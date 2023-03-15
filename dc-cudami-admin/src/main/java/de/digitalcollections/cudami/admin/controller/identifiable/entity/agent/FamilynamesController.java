@@ -30,13 +30,13 @@ public class FamilynamesController
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesController.class);
 
   public FamilynamesController(LanguageService languageService, CudamiClient client) {
-    super(client.forFamilyNames(), languageService, client.forLocales());
+    super(client.forFamilyNames(), languageService);
   }
 
   @GetMapping("/familynames/new")
   public String create(Model model) throws TechnicalException {
     FamilyName familyName = service.create();
-    Locale defaultLanguage = localeService.getDefaultLanguage();
+    Locale defaultLanguage = languageService.getDefaultLanguage();
     familyName.setLabel(new LocalizedText(defaultLanguage, ""));
     model.addAttribute("familyName", familyName);
     List<Locale> existingLanguages = List.of(defaultLanguage);
@@ -77,7 +77,7 @@ public class FamilynamesController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "familynames/list";
@@ -101,7 +101,7 @@ public class FamilynamesController
     model.addAttribute("familyName", familyName);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(familyName);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

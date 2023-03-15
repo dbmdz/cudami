@@ -3,8 +3,8 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.model.InvertedRelationSpecification;
-import de.digitalcollections.cudami.admin.util.LanguageSortingHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.model.RelationSpecification;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
@@ -21,14 +21,14 @@ import org.junit.jupiter.api.Test;
 class ManifestationsAPIControllerTest {
 
   private ManifestationsAPIController controller;
-  private LanguageSortingHelper languageSortingHelper;
+  private LanguageService languageService;
   private CudamiClient cudamiClient;
 
   @BeforeEach
   public void beforeEach() {
-    languageSortingHelper = mock(LanguageSortingHelper.class);
+    languageService = mock(LanguageService.class);
     cudamiClient = mock(CudamiClient.class);
-    controller = new ManifestationsAPIController(languageSortingHelper, cudamiClient);
+    controller = new ManifestationsAPIController(languageService, cudamiClient);
   }
 
   @DisplayName(

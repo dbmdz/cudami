@@ -1,11 +1,11 @@
 package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.legal.License;
@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class LicensesAPIController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesAPIController.class);
-  private final CudamiLocalesClient localeService;
+  private final LanguageService languageService;
   private final CudamiLicensesClient service;
 
-  public LicensesAPIController(CudamiClient client) {
-    this.localeService = client.forLocales();
+  public LicensesAPIController(CudamiClient client, LanguageService languageService) {
+    this.languageService = languageService;
     this.service = client.forLicenses();
   }
 
@@ -56,7 +56,7 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<License> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

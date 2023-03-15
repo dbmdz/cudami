@@ -38,7 +38,7 @@ public class ProjectsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsAPIController.class);
 
   public ProjectsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forProjects(), languageService, client.forLocales());
+    super(client.forProjects(), languageService);
   }
 
   @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
@@ -73,7 +73,7 @@ public class ProjectsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Project> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
@@ -98,11 +98,11 @@ public class ProjectsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
 
     if ("label".equals(sort)) {
       if (dataLanguage == null) {
-        dataLanguage = localeService.getDefaultLanguage().getLanguage();
+        dataLanguage = languageService.getDefaultLanguage().getLanguage();
       }
       Sorting sorting =
           Sorting.builder()

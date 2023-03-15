@@ -35,7 +35,7 @@ public class WebsitesAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsitesAPIController.class);
 
   public WebsitesAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forWebsites(), languageService, client.forLocales());
+    super(client.forWebsites(), languageService);
   }
 
   @GetMapping("/api/websites/new")
@@ -56,7 +56,7 @@ public class WebsitesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<Website> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 
@@ -72,7 +72,7 @@ public class WebsitesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
     PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, localeService, offset, limit, searchTerm);
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<Webpage> pageResponse = service.findRootWebpages(uuid, pageRequest);
     return new BTResponse<>(pageResponse);
   }

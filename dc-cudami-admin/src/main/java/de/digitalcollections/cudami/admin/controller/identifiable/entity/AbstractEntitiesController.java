@@ -2,7 +2,6 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -13,9 +12,8 @@ import java.util.ArrayList;
 public class AbstractEntitiesController<E extends Entity, C extends CudamiEntitiesClient<E>>
     extends AbstractIdentifiablesController<E, C> {
 
-  protected AbstractEntitiesController(
-      C service, LanguageService languageService, CudamiLocalesClient localeService) {
-    super(service, languageService, localeService);
+  protected AbstractEntitiesController(C service, LanguageService languageService) {
+    super(service, languageService);
   }
 
   protected PageResponse search(String searchField, String searchTerm, PageRequest pageRequest)

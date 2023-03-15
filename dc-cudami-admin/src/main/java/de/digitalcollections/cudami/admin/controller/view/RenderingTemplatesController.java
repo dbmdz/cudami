@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -35,25 +34,23 @@ public class RenderingTemplatesController
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
   private final LanguageService languageService;
-  private final CudamiLocalesClient localeService;
   private final CudamiRenderingTemplatesClient service;
 
   public RenderingTemplatesController(LanguageService languageService, CudamiClient client) {
     this.languageService = languageService;
-    this.localeService = client.forLocales();
     this.service = client.forRenderingTemplates();
   }
 
   @GetMapping("/renderingtemplates/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "renderingtemplates/create";
   }
 
   @GetMapping("/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
   public String edit(@PathVariable UUID uuid, Model model) throws TechnicalException {
     RenderingTemplate template = service.getByUuid(uuid);
-    Locale defaultLanguage = localeService.getDefaultLanguage();
+    Locale defaultLanguage = languageService.getDefaultLanguage();
 
     Set<Locale> existingLanguages = new LinkedHashSet<>();
     LocalizedText label = template.getLabel();
@@ -87,7 +84,7 @@ public class RenderingTemplatesController
         languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "renderingtemplates/list";
@@ -117,8 +114,8 @@ public class RenderingTemplatesController
     }
 
     String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    if (dataLanguage == null && languageService != null) {
+      dataLanguage = languageService.getDefaultLanguage().getLanguage();
     }
 
     model

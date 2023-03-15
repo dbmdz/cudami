@@ -30,12 +30,12 @@ public class FileResourcesMetadataController
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
   public FileResourcesMetadataController(LanguageService languageService, CudamiClient client) {
-    super(client.forFileResourcesMetadata(), languageService, client.forLocales());
+    super(client.forFileResourcesMetadata(), languageService);
   }
 
   @GetMapping(value = "/fileresources/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "fileresources/create";
   }
 
@@ -66,7 +66,7 @@ public class FileResourcesMetadataController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "fileresources/list";
@@ -90,7 +90,7 @@ public class FileResourcesMetadataController
     model.addAttribute("fileresource", resource);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(resource);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);

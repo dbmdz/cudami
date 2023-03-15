@@ -25,7 +25,7 @@ public class GeoLocationsAPIController
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationsAPIController.class);
 
   public GeoLocationsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forGeoLocations(), languageService, client.forLocales());
+    super(client.forGeoLocations(), languageService);
   }
 
   @GetMapping("/api/geolocations/new")
@@ -46,7 +46,7 @@ public class GeoLocationsAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     PageResponse<GeoLocation> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 }

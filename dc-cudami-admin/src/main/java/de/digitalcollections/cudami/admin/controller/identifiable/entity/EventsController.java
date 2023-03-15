@@ -23,12 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class EventsController extends AbstractEntitiesController<Event, CudamiEventsClient> {
 
   public EventsController(LanguageService languageService, CudamiClient client) {
-    super(client.forEvents(), languageService, client.forLocales());
+    super(client.forEvents(), languageService);
   }
 
   @GetMapping("/events/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "events/create";
   }
 
@@ -67,7 +67,7 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
     model.addAttribute("event", event);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(event);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -79,7 +79,7 @@ public class EventsController extends AbstractEntitiesController<Event, CudamiEv
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "events/list";

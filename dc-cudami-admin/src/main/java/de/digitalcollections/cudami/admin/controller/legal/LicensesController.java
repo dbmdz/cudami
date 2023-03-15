@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.CudamiLocalesClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -31,18 +30,16 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
   private final LanguageService languageService;
-  private final CudamiLocalesClient localeService;
   private final CudamiLicensesClient service;
 
   public LicensesController(LanguageService languageService, CudamiClient client) {
     this.languageService = languageService;
-    this.localeService = client.forLocales();
     this.service = client.forLicenses();
   }
 
   @GetMapping("/licenses/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "licenses/create";
   }
 
@@ -54,7 +51,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
       throws TechnicalException {
     License license = service.getByUuid(uuid);
 
-    List<Locale> existingLanguages = List.of(localeService.getDefaultLanguage());
+    List<Locale> existingLanguages = List.of(languageService.getDefaultLanguage());
     LocalizedText label = license.getLabel();
     if (!CollectionUtils.isEmpty(label)) {
       Locale displayLocale = LocaleContextHolder.getLocale();
@@ -80,7 +77,7 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
         languageService.getExistingLanguagesForLocales(service.getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "licenses/list";
@@ -110,8 +107,8 @@ public class LicensesController extends AbstractPagingAndSortingController<Licen
     }
 
     String dataLanguage = targetDataLanguage;
-    if (dataLanguage == null && localeService != null) {
-      dataLanguage = localeService.getDefaultLanguage().getLanguage();
+    if (dataLanguage == null && languageService != null) {
+      dataLanguage = languageService.getDefaultLanguage().getLanguage();
     }
 
     model

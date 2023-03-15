@@ -35,7 +35,7 @@ public class WebpagesController
   private final CudamiWebsitesClient websiteService;
 
   public WebpagesController(LanguageService languageService, CudamiClient client) {
-    super(client.forWebpages(), languageService, client.forLocales());
+    super(client.forWebpages(), languageService);
     this.websiteService = client.forWebsites();
   }
 
@@ -46,7 +46,7 @@ public class WebpagesController
       @RequestParam("parentUuid") UUID parentUuid)
       throws TechnicalException {
     model
-        .addAttribute("activeLanguage", localeService.getDefaultLanguage())
+        .addAttribute("activeLanguage", languageService.getDefaultLanguage())
         .addAttribute("parentType", parentType)
         .addAttribute("parentUuid", parentUuid);
 
@@ -113,7 +113,7 @@ public class WebpagesController
     model.addAttribute("webpage", webpage);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(webpage);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -122,7 +122,7 @@ public class WebpagesController
         getExistingLanguagesFromIdentifiables(webpage.getChildren());
     model
         .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
-        .addAttribute("dataLanguageSubpages", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageSubpages", getDataLanguage(null, languageService));
 
     List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);

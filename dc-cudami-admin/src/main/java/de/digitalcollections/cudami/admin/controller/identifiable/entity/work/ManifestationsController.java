@@ -25,14 +25,14 @@ public class ManifestationsController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
   public ManifestationsController(LanguageService languageService, CudamiClient client) {
-    super(client.forManifestations(), languageService, client.forLocales());
+    super(client.forManifestations(), languageService);
   }
 
   @GetMapping("/manifestations")
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "manifestations/list";
@@ -56,7 +56,7 @@ public class ManifestationsController
     model.addAttribute("manifestation", manifestation);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(manifestation);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
@@ -66,7 +66,7 @@ public class ManifestationsController
         languageService.sortLanguages(displayLocale, service.getLanguagesOfItems(uuid));
     model
         .addAttribute("existingItemsLanguages", existingItemsLanguages)
-        .addAttribute("dataLanguageItems", getDataLanguage(null, localeService));
+        .addAttribute("dataLanguageItems", getDataLanguage(null, languageService));
 
     return "manifestations/view";
   }

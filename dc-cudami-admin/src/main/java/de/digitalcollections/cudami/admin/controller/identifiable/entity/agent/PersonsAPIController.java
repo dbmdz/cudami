@@ -32,7 +32,7 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsAPIController.class);
 
   public PersonsAPIController(LanguageService languageService, CudamiClient client) {
-    super(client.forPersons(), languageService, client.forLocales());
+    super(client.forPersons(), languageService);
   }
 
   @GetMapping("/api/persons/new")
@@ -59,7 +59,7 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
          * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
          */
     PageResponse<Person> pageResponse =
-        super.find(localeService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
     return new BTResponse<>(pageResponse);
   }
 

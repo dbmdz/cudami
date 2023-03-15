@@ -28,12 +28,12 @@ public class HeadwordEntriesController
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesController.class);
 
   public HeadwordEntriesController(LanguageService languageService, CudamiClient client) {
-    super(client.forHeadwordEntries(), languageService, client.forLocales());
+    super(client.forHeadwordEntries(), languageService);
   }
 
   @GetMapping("/headwordentries/new")
   public String create(Model model) throws TechnicalException {
-    model.addAttribute("activeLanguage", localeService.getDefaultLanguage());
+    model.addAttribute("activeLanguage", languageService.getDefaultLanguage());
     return "headwordentries/create";
   }
 
@@ -63,7 +63,7 @@ public class HeadwordEntriesController
   public String list(Model model) throws TechnicalException {
     model.addAttribute("existingLanguages", getExistingLanguagesFromService());
 
-    String dataLanguage = getDataLanguage(null, localeService);
+    String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
 
     return "headwordentries/list";
@@ -87,7 +87,7 @@ public class HeadwordEntriesController
     model.addAttribute("headwordEntry", headwordEntry);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(headwordEntry);
-    String dataLanguage = getDataLanguage(targetDataLanguage, localeService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
