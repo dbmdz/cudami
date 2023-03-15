@@ -1,17 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.list.paging.PageResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,13 +15,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /** Controller for all public "Persons" endpoints (API). */
 @RestController
 public class PersonsAPIController extends AbstractEntitiesController<Person, CudamiPersonsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonsAPIController.class);
 
-  public PersonsAPIController(LanguageService languageService, CudamiClient client) {
+  public PersonsAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forPersons(), languageService);
   }
 
@@ -48,19 +49,18 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
+    return find(Person.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    
     // FIXME: exception at showing/sorting empty person list:
     /*
          * Got 500 for backend call GET /v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.
     ⤷ http://localhost:9000/v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase
          * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
          */
-    PageResponse<Person> pageResponse =
-        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

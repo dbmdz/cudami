@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ItemsController extends AbstractEntitiesController<Item, CudamiItemsClient> {
   private final CudamiManifestationsClient manifestationsService;
 
-  public ItemsController(LanguageService languageService, CudamiClient client) {
+  public ItemsController(CudamiClient client, LanguageService languageService) {
     super(client.forItems(), languageService);
     this.manifestationsService = client.forManifestations();
   }
@@ -70,7 +70,7 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
 
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingDigitalObjectsLanguages =
-        languageService.sortLanguages(displayLocale, service.getLanguagesOfDigitalObjects(uuid));
+        languageService.sortLanguages(displayLocale, ((CudamiItemsClient) service).getLanguagesOfDigitalObjects(uuid));
     model
         .addAttribute("existingDigitalObjectsLanguages", existingDigitalObjectsLanguages)
         .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));

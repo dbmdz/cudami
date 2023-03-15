@@ -1,19 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.semantic.CudamiHeadwordsClient;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.semantic.Headword;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,15 +10,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.semantic.Headword;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /** Controller for all public "Headwords" endpoints (API). */
 @RestController
 public class HeadwordsAPIController extends AbstractPagingAndSortingController<Headword> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordsAPIController.class);
-  private final CudamiHeadwordsClient service;
 
   public HeadwordsAPIController(CudamiClient client) {
-    this.service = client.forHeadwords();
+    // no "languageService" needed / no multilingual fields
+    super(client.forHeadwords(), null);
   }
 
   @GetMapping("/api/headwords/new")
@@ -42,23 +39,14 @@ public class HeadwordsAPIController extends AbstractPagingAndSortingController<H
   @SuppressFBWarnings
   @GetMapping("/api/headwords")
   @ResponseBody
-  public BTResponse<Headword> find(
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+  public BTResponse<Headword> find(@RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
       throws TechnicalException, ServiceException {
-    PageRequest pageRequest = createPageRequest(offset, limit, sort, order);
-    if (searchTerm != null) {
-      Filtering filtering =
-          Filtering.builder()
-              .add(FilterCriterion.builder().withExpression("label").contains(searchTerm).build())
-              .build();
-      pageRequest.setFiltering(filtering);
-    }
-    PageResponse<Headword> pageResponse = service.find(pageRequest);
-    return new BTResponse<>(pageResponse);
+    // no "dataLanguage" / no multilingual fields
+    return find(Headword.class, offset, limit, sort, order, "label", searchTerm, null);
   }
 
   @GetMapping("/api/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

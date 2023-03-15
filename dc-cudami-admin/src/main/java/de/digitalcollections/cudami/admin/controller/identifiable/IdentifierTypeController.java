@@ -28,11 +28,6 @@ public class IdentifierTypeController extends AbstractController {
     this.service = client.forIdentifierTypes();
   }
 
-  @ModelAttribute("menu")
-  protected String module() {
-    return "identifiertypes";
-  }
-
   @GetMapping("/identifiertypes/new")
   public String create() {
     return "identifiertypes/create";
@@ -53,6 +48,11 @@ public class IdentifierTypeController extends AbstractController {
   @GetMapping("/identifiertypes")
   public String list() {
     return "identifiertypes/list";
+  }
+
+  @ModelAttribute("menu")
+  protected String module() {
+    return "identifiertypes";
   }
 
   @GetMapping("/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

@@ -38,7 +38,8 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
   private final UserService<User> service;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public UserAPIController(MessageSource messageSource, UserService service) {
+  public UserAPIController(MessageSource messageSource, UserService<User> service) {
+    super(null, null);
     this.messageSource = messageSource;
     this.service = service;
   }

@@ -16,7 +16,7 @@ public class AbstractEntitiesController<E extends Entity, C extends CudamiEntiti
     super(service, languageService);
   }
 
-  protected PageResponse search(String searchField, String searchTerm, PageRequest pageRequest)
+  protected PageResponse<E> search(String searchField, String searchTerm, PageRequest pageRequest)
       throws TechnicalException {
     PageResponse<E> pageResponse = super.search(searchField, searchTerm, pageRequest);
     if (pageResponse != null) {
@@ -26,7 +26,7 @@ public class AbstractEntitiesController<E extends Entity, C extends CudamiEntiti
     E entity;
     switch (searchField) {
       case "refId":
-        entity = service.getByRefId(Long.parseLong(searchTerm));
+        entity = ((CudamiEntitiesClient<E>) service).getByRefId(Long.parseLong(searchTerm));
         if (entity == null) {
           pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
         } else {

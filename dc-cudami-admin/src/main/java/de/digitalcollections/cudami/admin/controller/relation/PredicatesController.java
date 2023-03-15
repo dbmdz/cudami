@@ -32,25 +32,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /** Controller for predicate management pages. */
 @Controller
-@SessionAttributes(value = {"predicate"})
+@SessionAttributes(value = { "predicate" })
 public class PredicatesController extends AbstractPagingAndSortingController<Predicate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 
   private final LabelNotBlankValidator labelNotBlankValidator;
-  private final LanguageService languageService;
   private final MessageSource messageSource;
-  private final CudamiPredicatesClient service;
 
-  public PredicatesController(
-      MessageSource messageSource,
-      LanguageService languageService,
-      CudamiClient client,
+  public PredicatesController(CudamiClient client, LanguageService languageService, MessageSource messageSource, 
       LabelNotBlankValidator labelNotBlankValidator) {
-    this.languageService = languageService;
+    super(client.forPredicates(), languageService);
     this.labelNotBlankValidator = labelNotBlankValidator;
     this.messageSource = messageSource;
-    this.service = client.forPredicates();
   }
 
   @GetMapping("/predicates/new")
@@ -75,24 +69,20 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   public String delete(@PathVariable UUID uuid, Model model, RedirectAttributes redirectAttributes)
       throws TechnicalException {
     service.deleteByUuid(uuid);
-    String message =
-        messageSource.getMessage("msg.deleted_successfully", null, LocaleContextHolder.getLocale());
+    String message = messageSource.getMessage("msg.deleted_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/predicates";
   }
 
   @GetMapping("/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}/edit")
-  public String edit(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage,
-      Model model)
+  public String edit(@PathVariable UUID uuid,
+      @RequestParam(name = "activeLanguage", required = false) Locale activeLanguage, Model model)
       throws TechnicalException {
     Predicate predicate = service.getByUuid(uuid);
     model.addAttribute("predicate", predicate);
 
-    List<Locale> existingLanguages =
-        languageService.getExistingLanguages(
-            languageService.getDefaultLanguage(), predicate.getLabel());
+    List<Locale> existingLanguages = languageService.getExistingLanguages(languageService.getDefaultLanguage(),
+        predicate.getLabel());
     model.addAttribute("existingLanguages", existingLanguages);
 
     if (activeLanguage != null && existingLanguages.contains(activeLanguage)) {
@@ -110,8 +100,8 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
 
   @GetMapping("/predicates")
   public String list(Model model) throws TechnicalException {
-    List<Locale> existingLanguages =
-        languageService.getExistingLanguagesForLocales(service.getLanguages());
+    List<Locale> existingLanguages = languageService
+        .getExistingLanguagesForLocales(((CudamiPredicatesClient) service).getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, languageService);
@@ -126,31 +116,27 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   }
 
   @PostMapping("/predicates/new")
-  public String save(
-      @ModelAttribute("formData") Predicate predicateFormData,
-      @ModelAttribute @Valid Predicate predicate,
-      BindingResult results,
-      Model model,
-      SessionStatus status,
-      RedirectAttributes redirectAttributes)
-      throws TechnicalException {
+  public String save(@ModelAttribute("formData") Predicate predicateFormData,
+      @ModelAttribute @Valid Predicate predicate, BindingResult results, Model model, SessionStatus status,
+      RedirectAttributes redirectAttributes) throws TechnicalException {
     model.addAttribute("mode", "create");
     verifyBinding(results);
 
     // set hashmap fields from form data:
-    // needed session attribute independent "predicateFormData" because session attributes just get
+    // needed session attribute independent "predicateFormData" because session
+    // attributes just get
     // data set,
     // but do not remove hashmap entry (language, if tab is removed)
     predicate.setLabel(predicateFormData.getLabel());
     predicate.setDescription(predicateFormData.getDescription());
 
     validate(predicate, results);
-    // TODO: move validate() to service layer on server side using new ValidationException of dc
+    // TODO: move validate() to service layer on server side using new
+    // ValidationException of dc
     // model?
     if (results.hasErrors()) {
       Locale defaultLanguage = languageService.getDefaultLanguage();
-      model.addAttribute(
-          "existingLanguages",
+      model.addAttribute("existingLanguages",
           languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
       model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
@@ -158,50 +144,43 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     }
     Predicate predicateDB = null;
     try {
-      //      predicateDB = service.save(predicate, results);
+      // predicateDB = service.save(predicate, results);
       predicateDB = service.save(predicate);
       LOGGER.info("Successfully saved predicate");
     } catch (TechnicalException e) {
       LOGGER.error("Cannot save predicate: ", e);
-      String message =
-          messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
+      String message = messageSource.getMessage("error.technical_error", null, LocaleContextHolder.getLocale());
       redirectAttributes.addFlashAttribute("error_message", message);
       return "redirect:/predicates";
     }
     status.setComplete();
-    String message =
-        messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
+    String message = messageSource.getMessage("msg.created_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/predicates/" + predicateDB.getUuid().toString();
   }
 
   @PostMapping(value = "/predicates/{pathUuid}/edit")
-  public String update(
-      @PathVariable UUID pathUuid,
-      @ModelAttribute("formData") Predicate predicateFormData,
-      @ModelAttribute Predicate predicate,
-      BindingResult results,
-      Model model,
-      SessionStatus status,
-      RedirectAttributes redirectAttributes)
-      throws TechnicalException {
+  public String update(@PathVariable UUID pathUuid, @ModelAttribute("formData") Predicate predicateFormData,
+      @ModelAttribute Predicate predicate, BindingResult results, Model model, SessionStatus status,
+      RedirectAttributes redirectAttributes) throws TechnicalException {
     model.addAttribute("mode", "edit");
     verifyBinding(results);
 
     // just update the fields, that were editable
-    // needed session attribute independent "predicateFormData" because session attributes just get
+    // needed session attribute independent "predicateFormData" because session
+    // attributes just get
     // data set,
     // but do not remove hashmap entry (language, if tab is removed)
     predicate.setLabel(predicateFormData.getLabel());
     predicate.setDescription(predicateFormData.getDescription());
 
     validate(predicate, results);
-    // TODO: move validate() to service layer on server side using new ValidationException of dc
+    // TODO: move validate() to service layer on server side using new
+    // ValidationException of dc
     // model?
     if (results.hasErrors()) {
       Locale defaultLanguage = languageService.getDefaultLanguage();
-      model.addAttribute(
-          "existingLanguages",
+      model.addAttribute("existingLanguages",
           languageService.getExistingLanguages(defaultLanguage, predicate.getLabel()));
       model.addAttribute("allLanguages", languageService.getAllLanguages());
       model.addAttribute("activeLanguage", defaultLanguage);
@@ -218,9 +197,7 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
     }
 
     status.setComplete();
-    String message =
-        messageSource.getMessage(
-            "msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
+    String message = messageSource.getMessage("msg.changes_saved_successfully", null, LocaleContextHolder.getLocale());
     redirectAttributes.addFlashAttribute("success_message", message);
     return "redirect:/predicates/" + pathUuid;
   }
@@ -230,24 +207,19 @@ public class PredicatesController extends AbstractPagingAndSortingController<Pre
   }
 
   @GetMapping("/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public String view(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
-      Model model)
+  public String view(@PathVariable UUID uuid,
+      @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage, Model model)
       throws TechnicalException, ResourceNotFoundException {
     Predicate predicate = service.getByUuid(uuid);
     if (predicate == null) {
       throw new ResourceNotFoundException();
     }
-    List<Locale> existingLanguages =
-        predicate.getLabel() != null
-            ? languageService.getExistingLanguagesForLocales(predicate.getLabel().getLocales())
-            : List.of();
+    List<Locale> existingLanguages = predicate.getLabel() != null
+        ? languageService.getExistingLanguagesForLocales(predicate.getLabel().getLocales())
+        : List.of();
     String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
 
-    model
-        .addAttribute("predicate", predicate)
-        .addAttribute("existingLanguages", existingLanguages)
+    model.addAttribute("predicate", predicate).addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     return "predicates/view";

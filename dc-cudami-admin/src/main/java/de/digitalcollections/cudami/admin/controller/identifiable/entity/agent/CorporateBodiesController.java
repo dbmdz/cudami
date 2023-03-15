@@ -28,7 +28,7 @@ public class CorporateBodiesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CorporateBodiesController.class);
 
-  public CorporateBodiesController(LanguageService languageService, CudamiClient client) {
+  public CorporateBodiesController(CudamiClient client, LanguageService languageService) {
     super(client.forCorporateBodies(), languageService);
   }
 

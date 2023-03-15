@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ManifestationsAPIController
     extends AbstractEntitiesController<Manifestation, CudamiManifestationsClient> {
 
-  public ManifestationsAPIController(LanguageService languageService, CudamiClient client) {
+  public ManifestationsAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forManifestations(), languageService);
   }
 
@@ -39,12 +39,43 @@ public class ManifestationsAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
+    return find(
+        Manifestation.class,
+        offset,
+        limit,
+        sortProperty,
+        sortOrder,
+        "label",
+        searchTerm,
+        dataLanguage);
+
     PageResponse<Manifestation> pageResponse =
         super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
+    return new BTResponse<>(pageResponse);
+  }
+
+  /*
+   * Used in templates/manifestations/view.html
+   */
+  @GetMapping("/api/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children")
+  @ResponseBody
+  public BTResponse<InvertedRelationSpecification<Manifestation>> findChildManifestations(
+      @PathVariable UUID uuid,
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "search", required = false) String searchTerm,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
+    PageResponse<InvertedRelationSpecification<Manifestation>> pageResponse =
+        transformToInvertedRelationSpecification(uuid, service.findChildren(uuid, pageRequest));
     return new BTResponse<>(pageResponse);
   }
 
@@ -70,41 +101,6 @@ public class ManifestationsAPIController
     return new BTResponse<>(pageResponse);
   }
 
-  /*
-   * Used in templates/manifestations/view.html
-   */
-  @GetMapping("/api/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children")
-  @ResponseBody
-  public BTResponse<InvertedRelationSpecification<Manifestation>> findChildManifestations(
-      @PathVariable UUID uuid,
-      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
-      @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
-      throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
-    PageResponse<InvertedRelationSpecification<Manifestation>> pageResponse =
-        transformToInvertedRelationSpecification(uuid, service.findChildren(uuid, pageRequest));
-    return new BTResponse<>(pageResponse);
-  }
-
-  protected PageResponse<InvertedRelationSpecification<Manifestation>>
-      transformToInvertedRelationSpecification(
-          UUID parentManifestationUuid, PageResponse<Manifestation> children) {
-    PageResponse<InvertedRelationSpecification<Manifestation>> ret = new PageResponse<>();
-    ret.setRequest(children.getRequest());
-    ret.setExecutedSearchTerm(children.getExecutedSearchTerm());
-    ret.setTotalElements(children.getTotalElements());
-    ret.setContent(
-        children.getContent().stream()
-            .map(m -> toInvertedRelationSpecification(parentManifestationUuid, m))
-            .collect(Collectors.toList()));
-    return ret;
-  }
-
   private InvertedRelationSpecification<Manifestation> toInvertedRelationSpecification(
       UUID parentManifstationUuid, Manifestation manifestation) {
     InvertedRelationSpecification<Manifestation> ret = new InvertedRelationSpecification<>();
@@ -121,6 +117,20 @@ public class ManifestationsAPIController
       ret.setSortKey(parentRelationSpecification.getSortKey());
     }
 
+    return ret;
+  }
+
+  protected PageResponse<InvertedRelationSpecification<Manifestation>>
+      transformToInvertedRelationSpecification(
+          UUID parentManifestationUuid, PageResponse<Manifestation> children) {
+    PageResponse<InvertedRelationSpecification<Manifestation>> ret = new PageResponse<>();
+    ret.setRequest(children.getRequest());
+    ret.setExecutedSearchTerm(children.getExecutedSearchTerm());
+    ret.setTotalElements(children.getTotalElements());
+    ret.setContent(
+        children.getContent().stream()
+            .map(m -> toInvertedRelationSpecification(parentManifestationUuid, m))
+            .collect(Collectors.toList()));
     return ret;
   }
 }

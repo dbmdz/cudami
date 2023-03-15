@@ -26,7 +26,7 @@ public class ProjectsController extends AbstractEntitiesController<Project, Cuda
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsController.class);
 
-  public ProjectsController(LanguageService languageService, CudamiClient client) {
+  public ProjectsController(CudamiClient client, LanguageService languageService) {
     super(client.forProjects(), languageService);
   }
 

@@ -29,7 +29,7 @@ public class FamilynamesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesController.class);
 
-  public FamilynamesController(LanguageService languageService, CudamiClient client) {
+  public FamilynamesController(CudamiClient client, LanguageService languageService) {
     super(client.forFamilyNames(), languageService);
   }
 

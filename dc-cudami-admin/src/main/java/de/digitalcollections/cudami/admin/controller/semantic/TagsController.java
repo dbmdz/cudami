@@ -1,15 +1,8 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
-import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.semantic.CudamiTagsClient;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.semantic.Tag;
 import java.util.Locale;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -19,17 +12,22 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.semantic.Tag;
+
 /** Controller for headwords management pages. */
 @Controller
 public class TagsController extends AbstractPagingAndSortingController<Tag> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TagsController.class);
-  private final LanguageService languageService;
-  private final CudamiTagsClient service;
 
   public TagsController(CudamiClient client, LanguageService languageService) {
-    this.languageService = languageService;
-    this.service = client.forTags();
+    super(client.forTags(), languageService);
   }
 
   @GetMapping("/tags/new")

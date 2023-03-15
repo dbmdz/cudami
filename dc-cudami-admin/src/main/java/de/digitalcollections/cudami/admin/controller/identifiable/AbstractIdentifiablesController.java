@@ -25,15 +25,45 @@ public class AbstractIdentifiablesController<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>
     extends AbstractPagingAndSortingController<I> {
 
-  protected final LanguageService languageService;
-  protected final C service;
-
   protected AbstractIdentifiablesController(C service, LanguageService languageService) {
-    this.languageService = languageService;
-    this.service = service;
+    super(service, languageService);
   }
 
-  protected PageResponse search(String searchField, String searchTerm, PageRequest pageRequest)
+  protected List<Locale> getExistingLanguagesFromIdentifiable(Identifiable identifiable) {
+    return getExistingLanguagesFromIdentifiables(List.of(identifiable));
+  }
+
+  protected List<Locale> getExistingLanguagesFromIdentifiables(
+      List<? extends Identifiable> identifiables) {
+    List<Locale> existingLanguages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(identifiables)) {
+      existingLanguages =
+          identifiables.stream()
+              .flatMap(
+                  child ->
+                      Stream.concat(
+                          child.getLabel().getLocales().stream(),
+                          child.getDescription() != null
+                              ? child.getDescription().keySet().stream()
+                              : Stream.of()))
+              .collect(Collectors.toList());
+      existingLanguages =
+          languageService.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
+    }
+    return existingLanguages;
+  }
+
+  protected List<Locale> getExistingLanguagesFromService() throws TechnicalException {
+    List<Locale> serviceLocales = ((CudamiIdentifiablesClient<I>) service).getLanguages();
+    List<Locale> existingLanguages = Collections.emptyList();
+    if (!CollectionUtils.isEmpty(serviceLocales)) {
+      existingLanguages =
+          languageService.sortLanguages(LocaleContextHolder.getLocale(), serviceLocales);
+    }
+    return existingLanguages;
+  }
+
+  protected PageResponse<I> search(String searchField, String searchTerm, PageRequest pageRequest)
       throws TechnicalException {
     PageResponse<I> pageResponse;
 
@@ -59,7 +89,7 @@ public class AbstractIdentifiablesController<
         case "uuid":
           identifiable = service.getByUuid(UUID.fromString(searchTerm));
           if (identifiable == null) {
-            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+            pageResponse = PageResponse.builder().withContent(new ArrayList<I>()).build();
           } else {
             pageResponse = PageResponse.builder().withContent(identifiable).build();
           }
@@ -68,9 +98,9 @@ public class AbstractIdentifiablesController<
         case "identifier":
           Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
           identifiable =
-              service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+              ((CudamiIdentifiablesClient<I>) service).getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
           if (identifiable == null) {
-            pageResponse = PageResponse.builder().withContent(new ArrayList()).build();
+            pageResponse = PageResponse.builder().withContent(new ArrayList<I>()).build();
           } else {
             pageResponse = PageResponse.builder().withContent(identifiable).build();
           }
@@ -80,39 +110,5 @@ public class AbstractIdentifiablesController<
           return null;
       }
     }
-  }
-
-  protected List<Locale> getExistingLanguagesFromService() throws TechnicalException {
-    List<Locale> serviceLocales = service.getLanguages();
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(serviceLocales)) {
-      existingLanguages =
-          languageService.sortLanguages(LocaleContextHolder.getLocale(), serviceLocales);
-    }
-    return existingLanguages;
-  }
-
-  protected List<Locale> getExistingLanguagesFromIdentifiables(
-      List<? extends Identifiable> identifiables) {
-    List<Locale> existingLanguages = Collections.emptyList();
-    if (!CollectionUtils.isEmpty(identifiables)) {
-      existingLanguages =
-          identifiables.stream()
-              .flatMap(
-                  child ->
-                      Stream.concat(
-                          child.getLabel().getLocales().stream(),
-                          child.getDescription() != null
-                              ? child.getDescription().keySet().stream()
-                              : Stream.of()))
-              .collect(Collectors.toList());
-      existingLanguages =
-          languageService.sortLanguages(LocaleContextHolder.getLocale(), existingLanguages);
-    }
-    return existingLanguages;
-  }
-
-  protected List<Locale> getExistingLanguagesFromIdentifiable(Identifiable identifiable) {
-    return getExistingLanguagesFromIdentifiables(List.of(identifiable));
   }
 }

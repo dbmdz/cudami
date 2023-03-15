@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiEntitiesClient;
 import de.digitalcollections.cudami.client.identifiable.entity.CudamiTopicsClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -28,7 +29,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TopicsController.class);
 
-  public TopicsController(LanguageService languageService, CudamiClient client) {
+  public TopicsController(CudamiClient client, LanguageService languageService) {
     super(client.forTopics(), languageService);
   }
 
@@ -70,7 +71,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   public String list(Model model) throws TechnicalException {
     model.addAttribute(
         "existingLanguages",
-        languageService.getExistingLanguagesForLocales(service.getLanguagesOfTopTopics()));
+        languageService.getExistingLanguagesForLocales(((CudamiTopicsClient) service).getLanguagesOfTopTopics()));
 
     String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -108,21 +109,21 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         .addAttribute("dataLanguageSubtopics", getDataLanguage(null, languageService));
 
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingEntitiesLanguages = service.getLanguagesOfEntities(uuid);
+    List<Locale> existingEntitiesLanguages = ((CudamiTopicsClient) service).getLanguagesOfEntities(uuid);
     model
         .addAttribute(
             "existingEntitiesLanguages",
             languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
         .addAttribute("dataLanguageEntities", getDataLanguage(null, languageService));
 
-    List<Locale> existingFileResourcesLanguages = service.getLanguagesOfFileResources(uuid);
+    List<Locale> existingFileResourcesLanguages = ((CudamiTopicsClient) service).getLanguagesOfFileResources(uuid);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
             languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
         .addAttribute("dataLanguageFileResources", getDataLanguage(null, languageService));
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation = ((CudamiTopicsClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 
@@ -135,7 +136,7 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
       @RequestParam(name = "dataLanguage", required = false) String targetDataLanguage,
       Model model)
       throws TechnicalException, ResourceNotFoundException {
-    Topic topic = service.getByRefId(refId);
+    Topic topic = ((CudamiEntitiesClient<Topic>) service).getByRefId(refId);
     if (topic == null) {
       throw new ResourceNotFoundException();
     }

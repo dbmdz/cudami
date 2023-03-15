@@ -21,29 +21,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class IdentifiableController extends AbstractController {
 
-  CudamiIdentifiablesClient service;
   CudamiHeadwordEntriesClient headwordEntriesService;
+  CudamiIdentifiablesClient service;
 
   public IdentifiableController(CudamiClient client) {
     this.service = client.forIdentifiables();
     this.headwordEntriesService = client.forHeadwordEntries();
-  }
-
-  @GetMapping(value = "/identifiables")
-  @ResponseBody
-  public List<Identifiable> find(@RequestParam(name = "term") String searchTerm)
-      throws TechnicalException {
-    return service.find(searchTerm, 25);
-  }
-
-  @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z_\\-]+}:{id:.+}"})
-  public String view(@PathVariable String namespace, @PathVariable String id, Model model)
-      throws TechnicalException, ResourceNotFoundException {
-    Identifiable identifiable = service.getByIdentifier(namespace, id);
-    if (identifiable == null) {
-      throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
-    }
-    return doForward(identifiable, model);
   }
 
   public String doForward(Identifiable identifiable, Model model) throws TechnicalException {
@@ -115,5 +98,22 @@ public class IdentifiableController extends AbstractController {
         throw new TechnicalException(
             "Unhandled object type " + identifiable.getIdentifiableObjectType());
     }
+  }
+
+  @GetMapping(value = "/identifiables")
+  @ResponseBody
+  public List<Identifiable> find(@RequestParam(name = "term") String searchTerm)
+      throws TechnicalException {
+    return service.find(searchTerm, 25);
+  }
+
+  @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z_\\-]+}:{id:.+}"})
+  public String view(@PathVariable String namespace, @PathVariable String id, Model model)
+      throws TechnicalException, ResourceNotFoundException {
+    Identifiable identifiable = service.getByIdentifier(namespace, id);
+    if (identifiable == null) {
+      throw new ResourceNotFoundException("get entity by identifier with " + namespace + ":" + id);
+    }
+    return doForward(identifiable, model);
   }
 }

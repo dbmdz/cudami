@@ -27,7 +27,7 @@ public class HeadwordEntriesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordEntriesController.class);
 
-  public HeadwordEntriesController(LanguageService languageService, CudamiClient client) {
+  public HeadwordEntriesController(CudamiClient client, LanguageService languageService) {
     super(client.forHeadwordEntries(), languageService);
   }
 

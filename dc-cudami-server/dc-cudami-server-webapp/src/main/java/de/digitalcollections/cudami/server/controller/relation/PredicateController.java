@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.controller.relation;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -65,12 +67,18 @@ public class PredicateController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion) {
 
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
+    }
+    if (valueCriterion != null) {
+      Filtering filtering = new Filtering();
+      filtering.add("value", valueCriterion);
+      pageRequest.setFiltering(filtering);
     }
     return predicateService.find(pageRequest);
   }
