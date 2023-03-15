@@ -70,7 +70,8 @@ public class ItemsController extends AbstractEntitiesController<Item, CudamiItem
 
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingDigitalObjectsLanguages =
-        languageService.sortLanguages(displayLocale, ((CudamiItemsClient) service).getLanguagesOfDigitalObjects(uuid));
+        languageService.sortLanguages(
+            displayLocale, ((CudamiItemsClient) service).getLanguagesOfDigitalObjects(uuid));
     model
         .addAttribute("existingDigitalObjectsLanguages", existingDigitalObjectsLanguages)
         .addAttribute("dataLanguageDigitalObjects", getDataLanguage(null, languageService));

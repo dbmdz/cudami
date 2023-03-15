@@ -71,7 +71,8 @@ public class CollectionsController
   @GetMapping("/collections")
   public String list(Model model) throws TechnicalException {
     List<Locale> existingLanguages =
-        languageService.getExistingLanguagesForLocales(((CudamiCollectionsClient) service).getLanguagesOfTopCollections());
+        languageService.getExistingLanguagesForLocales(
+            ((CudamiCollectionsClient) service).getLanguagesOfTopCollections());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, languageService);
@@ -112,7 +113,8 @@ public class CollectionsController
     List<Collection> parents = ((CudamiCollectionsClient) service).getParents(uuid);
     model.addAttribute("parents", parents);
 
-    BreadcrumbNavigation breadcrumbNavigation = ((CudamiCollectionsClient) service).getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiCollectionsClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 

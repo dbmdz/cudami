@@ -1,13 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import java.util.UUID;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
@@ -17,6 +9,12 @@ import de.digitalcollections.cudami.client.identifiable.entity.CudamiEventsClien
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Event;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Events" endpoints (API). */
 @RestController
@@ -40,7 +38,8 @@ public class EventsAPIController extends AbstractEntitiesController<Event, Cudam
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    return find(Event.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    return find(
+        Event.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   @GetMapping("/api/events/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

@@ -1,23 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
@@ -33,6 +15,22 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.endpoint.InvalidEndpointRequestException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Collections" endpoints (API). */
 @RestController
@@ -49,7 +47,8 @@ public class CollectionsAPIController
   public ResponseEntity addDigitalObjects(
       @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
-    boolean successful = ((CudamiCollectionsClient) service).addDigitalObjects(uuid, digitalObjects);
+    boolean successful =
+        ((CudamiCollectionsClient) service).addDigitalObjects(uuid, digitalObjects);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -63,7 +62,8 @@ public class CollectionsAPIController
   public ResponseEntity addSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws TechnicalException {
-    boolean successful = ((CudamiCollectionsClient) service).addSubcollection(collectionUuid, subcollectionUuid);
+    boolean successful =
+        ((CudamiCollectionsClient) service).addSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -74,7 +74,8 @@ public class CollectionsAPIController
   public ResponseEntity addSubcollections(
       @PathVariable UUID collectionUuid, @RequestBody List<Collection> subcollections)
       throws TechnicalException {
-    boolean successful = ((CudamiCollectionsClient) service).addSubcollections(collectionUuid, subcollections);
+    boolean successful =
+        ((CudamiCollectionsClient) service).addSubcollections(collectionUuid, subcollections);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -124,9 +125,18 @@ public class CollectionsAPIController
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    BTRequest btRequest = createBTRequest(DigitalObject.class, offset, limit, sortProperty, sortOrder, "label",
-        searchTerm, dataLanguage);
-    PageResponse<DigitalObject> pageResponse = ((CudamiCollectionsClient) service).findDigitalObjects(uuid, btRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            DigitalObject.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<DigitalObject> pageResponse =
+        ((CudamiCollectionsClient) service).findDigitalObjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -144,9 +154,18 @@ public class CollectionsAPIController
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    BTRequest btRequest = createBTRequest(Collection.class, offset, limit, sortProperty, sortOrder, "label",
-        searchTerm, dataLanguage);
-    PageResponse<Collection> pageResponse = ((CudamiCollectionsClient) service).findSubcollections(uuid, btRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Collection.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Collection> pageResponse =
+        ((CudamiCollectionsClient) service).findSubcollections(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -164,9 +183,18 @@ public class CollectionsAPIController
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    BTRequest btRequest = createBTRequest(Collection.class, offset, limit, sortProperty, sortOrder, "label",
-        searchTerm, dataLanguage);
-    PageResponse<Collection> pageResponse = ((CudamiCollectionsClient) service).findTopCollections(btRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Collection.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Collection> pageResponse =
+        ((CudamiCollectionsClient) service).findTopCollections(btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -197,7 +225,8 @@ public class CollectionsAPIController
   public ResponseEntity removeDigitalObject(
       @PathVariable UUID collectionUuid, @PathVariable UUID digitalobjectUuid)
       throws TechnicalException {
-    boolean successful = ((CudamiCollectionsClient) service).removeDigitalObject(collectionUuid, digitalobjectUuid);
+    boolean successful =
+        ((CudamiCollectionsClient) service).removeDigitalObject(collectionUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -211,7 +240,8 @@ public class CollectionsAPIController
   public ResponseEntity removeSubcollection(
       @PathVariable UUID collectionUuid, @PathVariable UUID subcollectionUuid)
       throws TechnicalException {
-    boolean successful = ((CudamiCollectionsClient) service).removeSubcollection(collectionUuid, subcollectionUuid);
+    boolean successful =
+        ((CudamiCollectionsClient) service).removeSubcollection(collectionUuid, subcollectionUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
@@ -226,7 +256,8 @@ public class CollectionsAPIController
     try {
       Collection collectionDb = null;
       if ("collection".equals(parentType)) {
-        collectionDb = ((CudamiCollectionsClient) service).saveWithParentCollection(collection, parentUuid);
+        collectionDb =
+            ((CudamiCollectionsClient) service).saveWithParentCollection(collection, parentUuid);
       } else {
         collectionDb = service.save(collection);
       }

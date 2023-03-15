@@ -1,12 +1,20 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
+import de.digitalcollections.model.exception.ResourceNotFoundException;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.text.LocalizedText;
+import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -17,16 +25,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.text.LocalizedText;
-import de.digitalcollections.model.view.RenderingTemplate;
 
 /** Controller for rendering template management pages. */
 @Controller
@@ -79,7 +77,8 @@ public class RenderingTemplatesController
   @GetMapping("/renderingtemplates")
   public String list(Model model) throws TechnicalException {
     List<Locale> existingLanguages =
-        languageService.getExistingLanguagesForLocales(((CudamiRenderingTemplatesClient) service).getLanguages());
+        languageService.getExistingLanguagesForLocales(
+            ((CudamiRenderingTemplatesClient) service).getLanguages());
     model.addAttribute("existingLanguages", existingLanguages);
 
     String dataLanguage = getDataLanguage(null, languageService);

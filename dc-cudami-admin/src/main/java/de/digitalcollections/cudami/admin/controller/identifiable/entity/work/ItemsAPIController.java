@@ -1,13 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.work;
 
-import java.util.UUID;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
@@ -21,6 +13,12 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.list.paging.PageResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Items" endpoints (API). */
 @RestController
@@ -41,7 +39,8 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    return find(Item.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    return find(
+        Item.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   @GetMapping("/api/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
@@ -55,11 +54,20 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    BTRequest btRequest = createBTRequest(DigitalObject.class, offset, limit, sortProperty, sortOrder, "label",
-        searchTerm, dataLanguage);
-    PageResponse<DigitalObject> pageResponse = ((CudamiItemsClient) service).findDigitalObjects(uuid, btRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            DigitalObject.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<DigitalObject> pageResponse =
+        ((CudamiItemsClient) service).findDigitalObjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
-    
+
     // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
   }
 }

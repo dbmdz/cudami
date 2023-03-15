@@ -71,7 +71,8 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
   public String list(Model model) throws TechnicalException {
     model.addAttribute(
         "existingLanguages",
-        languageService.getExistingLanguagesForLocales(((CudamiTopicsClient) service).getLanguagesOfTopTopics()));
+        languageService.getExistingLanguagesForLocales(
+            ((CudamiTopicsClient) service).getLanguagesOfTopTopics()));
 
     String dataLanguage = getDataLanguage(null, languageService);
     model.addAttribute("dataLanguage", dataLanguage);
@@ -109,21 +110,24 @@ public class TopicsController extends AbstractEntitiesController<Topic, CudamiTo
         .addAttribute("dataLanguageSubtopics", getDataLanguage(null, languageService));
 
     final Locale displayLocale = LocaleContextHolder.getLocale();
-    List<Locale> existingEntitiesLanguages = ((CudamiTopicsClient) service).getLanguagesOfEntities(uuid);
+    List<Locale> existingEntitiesLanguages =
+        ((CudamiTopicsClient) service).getLanguagesOfEntities(uuid);
     model
         .addAttribute(
             "existingEntitiesLanguages",
             languageService.sortLanguages(displayLocale, existingEntitiesLanguages))
         .addAttribute("dataLanguageEntities", getDataLanguage(null, languageService));
 
-    List<Locale> existingFileResourcesLanguages = ((CudamiTopicsClient) service).getLanguagesOfFileResources(uuid);
+    List<Locale> existingFileResourcesLanguages =
+        ((CudamiTopicsClient) service).getLanguagesOfFileResources(uuid);
     model
         .addAttribute(
             "existingFileResourcesLanguages",
             languageService.sortLanguages(displayLocale, existingFileResourcesLanguages))
         .addAttribute("dataLanguageFileResources", getDataLanguage(null, languageService));
 
-    BreadcrumbNavigation breadcrumbNavigation = ((CudamiTopicsClient) service).getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiTopicsClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     model.addAttribute("breadcrumbs", breadcrumbs);
 

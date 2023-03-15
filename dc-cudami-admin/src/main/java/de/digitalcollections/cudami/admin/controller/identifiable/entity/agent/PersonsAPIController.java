@@ -1,7 +1,16 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,17 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.controller.identifiable.entity.AbstractEntitiesController;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.agent.CudamiPersonsClient;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.agent.Person;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /** Controller for all public "Persons" endpoints (API). */
 @RestController
@@ -53,8 +51,9 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    return find(Person.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
-    
+    return find(
+        Person.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+
     // FIXME: exception at showing/sorting empty person list:
     /*
          * Got 500 for backend call GET /v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.

@@ -98,7 +98,8 @@ public class AbstractIdentifiablesController<
         case "identifier":
           Pair<String, String> namespaceAndId = ParameterHelper.extractPairOfStrings(searchTerm);
           identifiable =
-              ((CudamiIdentifiablesClient<I>) service).getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+              ((CudamiIdentifiablesClient<I>) service)
+                  .getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
           if (identifiable == null) {
             pageResponse = PageResponse.builder().withContent(new ArrayList<I>()).build();
           } else {

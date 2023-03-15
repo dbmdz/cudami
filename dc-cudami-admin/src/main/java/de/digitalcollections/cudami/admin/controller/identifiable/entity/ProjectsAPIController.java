@@ -1,8 +1,20 @@
 package de.digitalcollections.cudami.admin.controller.identifiable.entity;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.cudami.client.CudamiClient;
+import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.identifiable.entity.Project;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.relation.Predicate;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,23 +29,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiProjectsClient;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.relation.Predicate;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /** Controller for all public "Projects" endpoints (API). */
 @RestController
-public class ProjectsAPIController extends AbstractEntitiesController<Project, CudamiProjectsClient> {
+public class ProjectsAPIController
+    extends AbstractEntitiesController<Project, CudamiProjectsClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProjectsAPIController.class);
 
@@ -42,7 +41,8 @@ public class ProjectsAPIController extends AbstractEntitiesController<Project, C
   }
 
   @PostMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
-  public ResponseEntity addDigitalObjects(@PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
+  public ResponseEntity addDigitalObjects(
+      @PathVariable UUID uuid, @RequestBody List<DigitalObject> digitalObjects)
       throws TechnicalException {
     boolean successful = ((CudamiProjectsClient) service).addDigitalObjects(uuid, digitalObjects);
     if (successful) {
@@ -63,14 +63,16 @@ public class ProjectsAPIController extends AbstractEntitiesController<Project, C
   @SuppressFBWarnings
   @GetMapping("/api/projects")
   @ResponseBody
-  public BTResponse<Project> find(@RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
+  public BTResponse<Project> find(
+      @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    return find(Predicate.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+    return find(
+        Predicate.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   /*
@@ -78,16 +80,27 @@ public class ProjectsAPIController extends AbstractEntitiesController<Project, C
    */
   @GetMapping("/api/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects")
   @ResponseBody
-  public BTResponse<DigitalObject> findDigitalObjects(@PathVariable UUID uuid,
+  public BTResponse<DigitalObject> findDigitalObjects(
+      @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
-      @RequestParam(name = "dataLanguage", required = false) String dataLanguage) throws TechnicalException {
-    BTRequest btRequest = createBTRequest(DigitalObject.class, offset, limit, sortProperty, sortOrder, "label",
-        searchTerm, dataLanguage);
-    PageResponse<DigitalObject> pageResponse = ((CudamiProjectsClient) service).findDigitalObjects(uuid, btRequest);
+      @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
+      throws TechnicalException {
+    BTRequest btRequest =
+        createBTRequest(
+            DigitalObject.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<DigitalObject> pageResponse =
+        ((CudamiProjectsClient) service).findDigitalObjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -102,9 +115,11 @@ public class ProjectsAPIController extends AbstractEntitiesController<Project, C
    */
   @DeleteMapping("/api/projects/{projectUuid}/digitalobjects/{digitalobjectUuid}")
   @ResponseBody
-  public ResponseEntity removeDigitalObject(@PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid)
+  public ResponseEntity removeDigitalObject(
+      @PathVariable UUID projectUuid, @PathVariable UUID digitalobjectUuid)
       throws TechnicalException {
-    boolean successful = ((CudamiProjectsClient) service).removeDigitalObject(projectUuid, digitalobjectUuid);
+    boolean successful =
+        ((CudamiProjectsClient) service).removeDigitalObject(projectUuid, digitalobjectUuid);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }

@@ -18,22 +18,31 @@ import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.lang.reflect.Field;
 import java.util.List;
 
-public abstract class AbstractPagingAndSortingController<T extends UniqueObject> extends AbstractController {
+public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
+    extends AbstractController {
 
   protected final LanguageService languageService;
   protected final CudamiRestClient<T> service;
 
-  public AbstractPagingAndSortingController(CudamiRestClient<T> service, LanguageService languageService) {
+  public AbstractPagingAndSortingController(
+      CudamiRestClient<T> service, LanguageService languageService) {
     this.languageService = languageService;
     this.service = service;
   }
 
-  protected BTRequest createBTRequest(Class targetClass, int offset, int limit, String sortProperty, String sortOrder,
-      String searchProperty, String searchTerm, String dataLanguage) throws TechnicalException {
+  protected BTRequest createBTRequest(
+      Class targetClass,
+      int offset,
+      int limit,
+      String sortProperty,
+      String sortOrder,
+      String searchProperty,
+      String searchTerm,
+      String dataLanguage)
+      throws TechnicalException {
     BTRequest btRequest;
     if (isMultiLanguageField(Predicate.class, sortProperty)) {
       if (dataLanguage == null && languageService != null) {
@@ -51,8 +60,14 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
         // handling in pagerequest on server side
         btRequest.setSearchTerm(searchTerm);
       } else {
-        filtering = Filtering.builder()
-            .add(FilterCriterion.builder().withExpression(searchProperty).contains(searchTerm).build()).build();
+        filtering =
+            Filtering.builder()
+                .add(
+                    FilterCriterion.builder()
+                        .withExpression(searchProperty)
+                        .contains(searchTerm)
+                        .build())
+                .build();
         btRequest.setFiltering(filtering);
       }
     }
@@ -63,17 +78,22 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   protected PageRequest createPageRequest(int offset, int limit, String sort, String order) {
     Sorting sorting = null;
     if (sort != null && order != null) {
-      Order sortingOrder = Order.builder().property(sort).direction(Direction.fromString(order)).build();
+      Order sortingOrder =
+          Order.builder().property(sort).direction(Direction.fromString(order)).build();
       sorting = Sorting.builder().order(sortingOrder).build();
     }
-    PageRequest pageRequest = PageRequest.builder().pageNumber((int) Math.ceil(offset / limit)).pageSize(limit)
-        .sorting(sorting).build();
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber((int) Math.ceil(offset / limit))
+            .pageSize(limit)
+            .sorting(sorting)
+            .build();
     return pageRequest;
   }
 
   @SuppressFBWarnings
-  protected PageRequest createPageRequest(int pageNumber, int pageSize, String searchField, String searchTerm,
-      List<Order> sortBy) {
+  protected PageRequest createPageRequest(
+      int pageNumber, int pageSize, String searchField, String searchTerm, List<Order> sortBy) {
     PageRequest pageRequest;
     if (searchField == null) {
       pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
@@ -89,37 +109,79 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   }
 
   @SuppressFBWarnings
-  protected PageRequest createPageRequest(String sort, String order, String dataLanguage,
-      LanguageService languageService, int offset, int limit, String searchTerm) throws TechnicalException {
+  protected PageRequest createPageRequest(
+      String sort,
+      String order,
+      String dataLanguage,
+      LanguageService languageService,
+      int offset,
+      int limit,
+      String searchTerm)
+      throws TechnicalException {
     Sorting sorting = null;
     if (sort != null && order != null) {
       Order sortingOrder;
       if ("label".equals(sort) && dataLanguage != null) {
         String language = getDataLanguage(dataLanguage, languageService);
-        sortingOrder = Order.builder().property("label").subProperty(language).direction(Direction.fromString(order))
-            .build();
+        sortingOrder =
+            Order.builder()
+                .property("label")
+                .subProperty(language)
+                .direction(Direction.fromString(order))
+                .build();
       } else {
-        sortingOrder = Order.builder().property(sort).direction(Direction.fromString(order)).build();
+        sortingOrder =
+            Order.builder().property(sort).direction(Direction.fromString(order)).build();
       }
       sorting = Sorting.builder().order(sortingOrder).build();
     }
-    PageRequest pageRequest = PageRequest.builder().pageNumber((int) Math.ceil(offset / limit)).pageSize(limit)
-        .searchTerm(searchTerm).sorting(sorting).build();
+    PageRequest pageRequest =
+        PageRequest.builder()
+            .pageNumber((int) Math.ceil(offset / limit))
+            .pageSize(limit)
+            .searchTerm(searchTerm)
+            .sorting(sorting)
+            .build();
     return pageRequest;
   }
 
-  protected BTResponse<T> find(Class targetClass, int offset, int limit, String sortProperty, String sortOrder,
-      String searchProperty, String searchTerm, String dataLanguage) throws TechnicalException {
-    BTRequest btRequest = createBTRequest(targetClass, offset, limit, sortProperty, sortOrder, searchProperty,
-        searchTerm, dataLanguage);
+  protected BTResponse<T> find(
+      Class targetClass,
+      int offset,
+      int limit,
+      String sortProperty,
+      String sortOrder,
+      String searchProperty,
+      String searchTerm,
+      String dataLanguage)
+      throws TechnicalException {
+    BTRequest btRequest =
+        createBTRequest(
+            targetClass,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            searchProperty,
+            searchTerm,
+            dataLanguage);
     PageResponse<T> pageResponse = service.find(btRequest);
     return new BTResponse<>(pageResponse);
   }
 
-  public PageResponse<T> find(LanguageService languageService, CudamiRestClient<T> service, int offset, int limit,
-      String searchTerm, String sort, String order, String dataLanguage) throws TechnicalException {
+  public PageResponse<T> find(
+      LanguageService languageService,
+      CudamiRestClient<T> service,
+      int offset,
+      int limit,
+      String searchTerm,
+      String sort,
+      String order,
+      String dataLanguage)
+      throws TechnicalException {
 
-    PageRequest pageRequest = createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
+    PageRequest pageRequest =
+        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
     PageResponse<T> pageResponse = service.find(pageRequest);
     return pageResponse;
   }
@@ -138,7 +200,8 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     try {
       field = clz.getDeclaredField(fieldName);
       Class fieldTypeClass = field.getType();
-      if (LocalizedText.class == fieldTypeClass || LocalizedStructuredContent.class == fieldTypeClass) {
+      if (LocalizedText.class == fieldTypeClass
+          || LocalizedStructuredContent.class == fieldTypeClass) {
         return true;
       }
       return false;
