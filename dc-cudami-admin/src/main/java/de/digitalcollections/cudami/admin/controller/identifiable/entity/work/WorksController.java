@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class WorksController extends AbstractEntitiesController<Work, CudamiWorksClient> {
 
-  public WorksController(LanguageService languageService, CudamiClient client) {
+  public WorksController(CudamiClient client, LanguageService languageService) {
     super(client.forWorks(), languageService);
   }
 
@@ -57,7 +57,8 @@ public class WorksController extends AbstractEntitiesController<Work, CudamiWork
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(work);
     Locale displayLocale = LocaleContextHolder.getLocale();
     List<Locale> existingManifestationsLanguages =
-        languageService.sortLanguages(displayLocale, service.getLanguagesOfManifestations(uuid));
+        languageService.sortLanguages(
+            displayLocale, ((CudamiWorksClient) service).getLanguagesOfManifestations(uuid));
     String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)

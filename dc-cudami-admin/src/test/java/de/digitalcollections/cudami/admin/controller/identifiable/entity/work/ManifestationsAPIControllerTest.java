@@ -28,7 +28,7 @@ class ManifestationsAPIControllerTest {
   public void beforeEach() {
     languageService = mock(LanguageService.class);
     cudamiClient = mock(CudamiClient.class);
-    controller = new ManifestationsAPIController(languageService, cudamiClient);
+    controller = new ManifestationsAPIController(cudamiClient, languageService);
   }
 
   @DisplayName(

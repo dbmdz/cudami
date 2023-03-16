@@ -37,7 +37,7 @@ public class UserController extends AbstractController {
   private final UserService<User> service;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public UserController(MessageSource messageSource, UserService service) {
+  public UserController(UserService service, MessageSource messageSource) {
     this.messageSource = messageSource;
     this.service = service;
   }

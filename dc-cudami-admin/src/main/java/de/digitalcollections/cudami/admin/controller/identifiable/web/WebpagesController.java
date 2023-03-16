@@ -34,7 +34,7 @@ public class WebpagesController
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesController.class);
   private final CudamiWebsitesClient websiteService;
 
-  public WebpagesController(LanguageService languageService, CudamiClient client) {
+  public WebpagesController(CudamiClient client, LanguageService languageService) {
     super(client.forWebpages(), languageService);
     this.websiteService = client.forWebsites();
   }
@@ -88,7 +88,7 @@ public class WebpagesController
 
   private Website getWebsite(UUID uuid, String parentType) throws TechnicalException {
     if (parentType == null || "webpage".equals(parentType.toLowerCase())) {
-      return service.getWebsite(uuid);
+      return ((CudamiWebpagesClient) service).getWebsite(uuid);
     } else if ("website".equals(parentType.toLowerCase())) {
       return websiteService.getByUuid(uuid);
     }
@@ -124,17 +124,19 @@ public class WebpagesController
         .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
         .addAttribute("dataLanguageSubpages", getDataLanguage(null, languageService));
 
-    List<FileResource> relatedFileResources = service.getRelatedFileResources(uuid);
+    List<FileResource> relatedFileResources =
+        ((CudamiWebpagesClient) service).getRelatedFileResources(uuid);
     model.addAttribute("relatedFileResources", relatedFileResources);
 
-    BreadcrumbNavigation breadcrumbNavigation = service.getBreadcrumbNavigation(uuid);
+    BreadcrumbNavigation breadcrumbNavigation =
+        ((CudamiWebpagesClient) service).getBreadcrumbNavigation(uuid);
     List<BreadcrumbNode> breadcrumbs = breadcrumbNavigation.getNavigationItems();
     // Cut out first breadcrumb node (the one with empty uuid), which identifies the website, since
     // it is handled individually
     breadcrumbs.removeIf(n -> n.getTargetId() == null);
     model.addAttribute("breadcrumbs", breadcrumbs);
 
-    Website website = service.getWebsite(uuid);
+    Website website = ((CudamiWebpagesClient) service).getWebsite(uuid);
     model.addAttribute("website", website);
 
     return "webpages/view";

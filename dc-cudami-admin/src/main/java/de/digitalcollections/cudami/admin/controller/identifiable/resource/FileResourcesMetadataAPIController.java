@@ -37,7 +37,7 @@ public class FileResourcesMetadataAPIController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataAPIController.class);
 
-  public FileResourcesMetadataAPIController(LanguageService languageService, CudamiClient client) {
+  public FileResourcesMetadataAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forFileResourcesMetadata(), languageService);
   }
 
@@ -54,13 +54,19 @@ public class FileResourcesMetadataAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    PageResponse<FileResource> pageResponse =
-        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
+    return find(
+        FileResource.class,
+        offset,
+        limit,
+        sortProperty,
+        sortOrder,
+        "label",
+        searchTerm,
+        dataLanguage);
   }
 
   @GetMapping("/api/fileresources/type/{type}")
@@ -77,7 +83,7 @@ public class FileResourcesMetadataAPIController
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findByType(pageRequest, type);
+    return ((CudamiFileResourcesMetadataClient) service).findByType(pageRequest, type);
   }
 
   @GetMapping("/api/fileresources/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

@@ -14,13 +14,13 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
-import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Field;
 import java.util.List;
 
+@SuppressFBWarnings
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     extends AbstractController {
 
@@ -44,7 +44,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       String dataLanguage)
       throws TechnicalException {
     BTRequest btRequest;
-    if (isMultiLanguageField(Predicate.class, sortProperty)) {
+    if (isMultiLanguageField(targetClass, sortProperty)) {
       if (dataLanguage == null && languageService != null) {
         dataLanguage = languageService.getDefaultLanguage().getLanguage();
       }

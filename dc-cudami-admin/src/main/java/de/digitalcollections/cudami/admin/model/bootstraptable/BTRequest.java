@@ -3,18 +3,24 @@ package de.digitalcollections.cudami.admin.model.bootstraptable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
+@SuppressFBWarnings
 public class BTRequest extends PageRequest {
 
   public BTRequest(int offset, int limit, String sortProperty, String sortOrder) {
     this(offset, limit, sortProperty, sortOrder, null);
   }
 
+  public BTRequest(int offset, int limit, List<Order> sortOrders) {
+    super((int) Math.ceil(offset / limit), limit, sortOrders);
+  }
+
   public BTRequest(
       int offset, int limit, String sortProperty, String sortOrder, String sortLanguage) {
-    super(
-        (int) Math.ceil(offset / limit),
+    this(
+        offset,
         limit,
         List.of(
             Order.builder()

@@ -41,11 +41,11 @@ public class HeadwordsAPIController extends AbstractPagingAndSortingController<H
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "label") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
       throws TechnicalException, ServiceException {
     // no "dataLanguage" / no multilingual fields
-    return find(Headword.class, offset, limit, sort, order, "label", searchTerm, null);
+    return find(Headword.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, null);
   }
 
   @GetMapping("/api/headwords/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

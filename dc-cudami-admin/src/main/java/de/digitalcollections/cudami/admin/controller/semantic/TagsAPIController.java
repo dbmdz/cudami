@@ -41,11 +41,11 @@ public class TagsAPIController extends AbstractPagingAndSortingController<Tag> {
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "value") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
+      @RequestParam(name = "sort", required = false, defaultValue = "value") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
       throws TechnicalException, ServiceException {
     // no "dataLanguage" / no multilingual fields
-    return find(Tag.class, offset, limit, sort, order, "value", searchTerm, null);
+    return find(Tag.class, offset, limit, sortProperty, sortOrder, "value", searchTerm, null);
   }
 
   @GetMapping("/api/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

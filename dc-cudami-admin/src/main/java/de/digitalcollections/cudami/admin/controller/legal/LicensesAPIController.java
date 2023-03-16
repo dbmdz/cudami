@@ -6,10 +6,8 @@ import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingCon
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.legal.License;
-import de.digitalcollections.model.list.paging.PageResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -30,12 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class LicensesAPIController extends AbstractPagingAndSortingController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesAPIController.class);
-  private final LanguageService languageService;
-  private final CudamiLicensesClient service;
 
   public LicensesAPIController(CudamiClient client, LanguageService languageService) {
-    this.languageService = languageService;
-    this.service = client.forLicenses();
+    super(client.forLicenses(), languageService);
   }
 
   @GetMapping("/api/licenses/new")
@@ -51,13 +46,12 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "url") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "url") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
-    PageResponse<License> pageResponse =
-        super.find(languageService, service, offset, limit, searchTerm, sort, order, dataLanguage);
-    return new BTResponse<>(pageResponse);
+    return find(
+        License.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
   @GetMapping("/api/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

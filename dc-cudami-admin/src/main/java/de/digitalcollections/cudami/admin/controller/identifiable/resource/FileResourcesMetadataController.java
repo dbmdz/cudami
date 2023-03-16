@@ -29,7 +29,7 @@ public class FileResourcesMetadataController
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourcesMetadataController.class);
 
-  public FileResourcesMetadataController(LanguageService languageService, CudamiClient client) {
+  public FileResourcesMetadataController(CudamiClient client, LanguageService languageService) {
     super(client.forFileResourcesMetadata(), languageService);
   }
 

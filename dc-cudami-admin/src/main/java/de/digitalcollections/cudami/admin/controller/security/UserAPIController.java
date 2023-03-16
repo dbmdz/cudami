@@ -6,15 +6,12 @@ import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingCon
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -34,13 +31,11 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserAPIController.class);
 
-  private final MessageSource messageSource;
   private final UserService<User> service;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public UserAPIController(MessageSource messageSource, UserService<User> service) {
+  public UserAPIController(UserService<User> service) {
     super(null, null);
-    this.messageSource = messageSource;
     this.service = service;
   }
 
@@ -62,12 +57,10 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false, defaultValue = "lastname") String sort,
-      @RequestParam(name = "order", required = false, defaultValue = "asc") String order)
+      @RequestParam(name = "sort", required = false, defaultValue = "lastname") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
       throws TechnicalException, ServiceException {
-    PageRequest pageRequest = createPageRequest(sort, order, null, null, offset, limit, searchTerm);
-    PageResponse<User> pageResponse = service.find(pageRequest);
-    return new BTResponse<>(pageResponse);
+    return find(User.class, offset, limit, sortProperty, sortOrder, "value", searchTerm, null);
   }
 
   @GetMapping("/api/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

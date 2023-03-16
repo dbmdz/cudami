@@ -33,7 +33,7 @@ public class RenderingTemplatesController
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 
-  public RenderingTemplatesController(LanguageService languageService, CudamiClient client) {
+  public RenderingTemplatesController(CudamiClient client, LanguageService languageService) {
     super(client.forRenderingTemplates(), languageService);
   }
 

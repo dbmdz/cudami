@@ -3,13 +3,12 @@ package de.digitalcollections.cudami.admin.controller.identifiable.web;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.entity.CudamiWebsitesClient;
 import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
@@ -32,11 +31,9 @@ public class WebpagesAPIController
     extends AbstractIdentifiablesController<Webpage, CudamiWebpagesClient> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebpagesAPIController.class);
-  private final CudamiWebsitesClient websiteService;
 
-  public WebpagesAPIController(LanguageService languageService, CudamiClient client) {
+  public WebpagesAPIController(CudamiClient client, LanguageService languageService) {
     super(client.forWebpages(), languageService);
-    this.websiteService = client.forWebsites();
   }
 
   @GetMapping("/api/webpages/new")
@@ -52,13 +49,22 @@ public class WebpagesAPIController
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
-      @RequestParam(name = "sort", required = false) String sort,
-      @RequestParam(name = "order", required = false) String order,
+      @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
+      @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    PageRequest pageRequest =
-        createPageRequest(sort, order, dataLanguage, languageService, offset, limit, searchTerm);
-    PageResponse<Webpage> pageResponse = service.findSubpages(uuid, pageRequest);
+    BTRequest btRequest =
+        createBTRequest(
+            Webpage.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "label",
+            searchTerm,
+            dataLanguage);
+    PageResponse<Webpage> pageResponse =
+        ((CudamiWebpagesClient) service).findSubpages(uuid, btRequest);
     return new BTResponse<>(pageResponse);
   }
 
@@ -76,9 +82,9 @@ public class WebpagesAPIController
     try {
       Webpage webpageDb = null;
       if (parentType.equals("website")) {
-        webpageDb = service.saveWithParentWebsite(webpage, parentUuid);
+        webpageDb = ((CudamiWebpagesClient) service).saveWithParentWebsite(webpage, parentUuid);
       } else {
-        webpageDb = service.saveWithParentWebpage(webpage, parentUuid);
+        webpageDb = ((CudamiWebpagesClient) service).saveWithParentWebpage(webpage, parentUuid);
       }
       return ResponseEntity.status(HttpStatus.CREATED).body(webpageDb);
     } catch (TechnicalException e) {
@@ -106,7 +112,7 @@ public class WebpagesAPIController
   @PutMapping("/api/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/webpages")
   public ResponseEntity updateSubpagesOrder(
       @PathVariable UUID uuid, @RequestBody List<Webpage> subpages) throws TechnicalException {
-    boolean successful = service.updateChildrenOrder(uuid, subpages);
+    boolean successful = ((CudamiWebpagesClient) service).updateChildrenOrder(uuid, subpages);
     if (successful) {
       return new ResponseEntity<>(successful, HttpStatus.OK);
     }
