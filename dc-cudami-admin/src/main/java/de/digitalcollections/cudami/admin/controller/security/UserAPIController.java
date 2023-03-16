@@ -1,15 +1,9 @@
 package de.digitalcollections.cudami.admin.controller.security;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.security.User;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
+
 import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,6 +18,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.security.User;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /** Controller for all public "Users" endpoints (API). */
 @RestController
@@ -60,7 +65,19 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
       @RequestParam(name = "sort", required = false, defaultValue = "lastname") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)
       throws TechnicalException, ServiceException {
-    return find(User.class, offset, limit, sortProperty, sortOrder, "value", searchTerm, null);
+    BTRequest btRequest =
+        createBTRequest(
+            User.class,
+            offset,
+            limit,
+            sortProperty,
+            sortOrder,
+            "lastname",
+            searchTerm,
+            null);
+    PageResponse<User> pageResponse =
+        service.find(btRequest);
+    return new BTResponse<>(pageResponse);
   }
 
   @GetMapping("/api/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
