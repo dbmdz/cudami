@@ -55,7 +55,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
     String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
 
     // TODO add filtering
-    
+
     // Actually "*" should be used in select, but here we don't need it as there is no outer select
     StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + commonSql);
     addPageRequestParams(pageRequest, query);
