@@ -1,9 +1,17 @@
 package de.digitalcollections.cudami.admin.controller.security;
 
+import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
+import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.ParameterHelper;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
+import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.security.User;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
-
 import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,27 +27,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
-import de.digitalcollections.cudami.admin.controller.ParameterHelper;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.security.User;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /** Controller for all public "Users" endpoints (API). */
 @RestController
-public class UserAPIController extends AbstractPagingAndSortingController<User> {
+public class UsersAPIController extends AbstractPagingAndSortingController<User> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(UserAPIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UsersAPIController.class);
 
   private final UserService<User> service;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public UserAPIController(UserService<User> service) {
+  public UsersAPIController(UserService<User> service) {
     super(null, null);
     this.service = service;
   }
@@ -67,16 +64,8 @@ public class UserAPIController extends AbstractPagingAndSortingController<User> 
       throws TechnicalException, ServiceException {
     BTRequest btRequest =
         createBTRequest(
-            User.class,
-            offset,
-            limit,
-            sortProperty,
-            sortOrder,
-            "lastname",
-            searchTerm,
-            null);
-    PageResponse<User> pageResponse =
-        service.find(btRequest);
+            User.class, offset, limit, sortProperty, sortOrder, "lastname", searchTerm, null);
+    PageResponse<User> pageResponse = service.find(btRequest);
     return new BTResponse<>(pageResponse);
   }
 

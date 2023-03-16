@@ -31,13 +31,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Controller for all "Users" pages. */
 @Controller
 @SessionAttributes(value = {"user"})
-public class UserController extends AbstractController {
+public class UsersController extends AbstractController {
 
   private final MessageSource messageSource;
   private final UserService<User> service;
 
   @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
-  public UserController(UserService service, MessageSource messageSource) {
+  public UsersController(UserService service, MessageSource messageSource) {
     this.messageSource = messageSource;
     this.service = service;
   }

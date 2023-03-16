@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.controller.security;
 
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -11,6 +13,7 @@ import de.digitalcollections.model.security.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -43,11 +46,19 @@ public class UserController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "lastname", required = false) FilterCriterion<String> lastnameCriterion,
       @RequestParam(name = "searchTerm", required = false) String searchTerm) {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
+    }
+    if (lastnameCriterion != null) {
+      Filtering filtering = new Filtering();
+      if (lastnameCriterion != null) {
+        filtering.add(Filtering.builder().add("lastname", lastnameCriterion).build());
+      }
+      pageRequest.setFiltering(filtering);
     }
     return userService.find(pageRequest);
   }
