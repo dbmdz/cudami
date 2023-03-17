@@ -81,6 +81,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-users').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.lastname}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsUsers() {
         /*[+
          const baseUrl = [[@{'/users'}]];
