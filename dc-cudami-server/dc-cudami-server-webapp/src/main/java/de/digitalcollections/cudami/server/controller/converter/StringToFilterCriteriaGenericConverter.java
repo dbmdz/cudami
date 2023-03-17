@@ -1,12 +1,13 @@
 package de.digitalcollections.cudami.server.controller.converter;
 
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
@@ -14,25 +15,20 @@ import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.FilterOperation;
-
 @Component
 /**
- * Converter for converting URL params for Filtering from String to
- * FilterCriterion-instance. Used in WebController. Fills model object
- * FilterCriterion.
+ * Converter for converting URL params for Filtering from String to FilterCriterion-instance. Used
+ * in WebController. Fills model object FilterCriterion.
  *
- * <p>
- * For available filter operations and request examples:
+ * <p>For available filter operations and request examples:
  *
  * @see de.digitalcollections.model.api.filter.enums.FilterOperation
  * @see de.digitalcollections.model.api.filter.FilterCriterion
  */
-public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> implements GenericConverter {
+public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
+    implements GenericConverter {
 
-  @Autowired
-  private ConversionService conversionService;
+  @Autowired private ConversionService conversionService;
 
   @Override
   public Set<ConvertiblePair> getConvertibleTypes() {
@@ -75,7 +71,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> imp
       // length = 2 could also be new style of no value operations (like "set",
       // "unset"), check second part:
       FilterOperation filterOperation = FilterOperation.fromValue(filterParts[1]);
-      if (filterOperation != null && filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
+      if (filterOperation != null
+          && filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
         newStyle = true;
       }
     }
@@ -95,8 +92,9 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> imp
       }
     } else {
       // old style without expression part
-      int separatorPosition = filter.indexOf(':'); // index of the first occurrence of ":" (operation value may contain
-                                                   // ":", too...
+      int separatorPosition =
+          filter.indexOf(':'); // index of the first occurrence of ":" (operation value may contain
+      // ":", too...
       operationAcronym = filter.substring(0, separatorPosition);
       operationValue = filter.substring(separatorPosition + 1);
     }
@@ -107,11 +105,16 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> imp
     }
     FilterOperation filterOperation = FilterOperation.fromValue(operationAcronym);
 
-    return createFilterCriterion(targetClass, expression, filterOperation, operationValue, conversionService);
+    return createFilterCriterion(
+        targetClass, expression, filterOperation, operationValue, conversionService);
   }
 
-  public static FilterCriterion createFilterCriterion(Class<?> targetClass, String expression,
-      FilterOperation filterOperation, String operationValue, ConversionService conversionService)
+  public static FilterCriterion createFilterCriterion(
+      Class<?> targetClass,
+      String expression,
+      FilterOperation filterOperation,
+      String operationValue,
+      ConversionService conversionService)
       throws IllegalArgumentException {
     // no value operand (e.g. "set")
     if (filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
@@ -141,8 +144,11 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> imp
       Collection<String> originalValues = Arrays.asList(operationValues);
       Collection convertedValues = new ArrayList<>();
       convertedValues.addAll(
-          originalValues.stream().map(s -> conversionService.convert(s, targetClass)).collect(Collectors.toList()));
-      FilterCriterion fc = new FilterCriterion(expression, filterOperation, null, null, null, convertedValues);
+          originalValues.stream()
+              .map(s -> conversionService.convert(s, targetClass))
+              .collect(Collectors.toList()));
+      FilterCriterion fc =
+          new FilterCriterion(expression, filterOperation, null, null, null, convertedValues);
       return fc;
     }
 
@@ -175,7 +181,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>> imp
           maxValue = value2;
         }
       }
-      FilterCriterion fc = new FilterCriterion(expression, filterOperation, null, minValue, maxValue, null);
+      FilterCriterion fc =
+          new FilterCriterion(expression, filterOperation, null, minValue, maxValue, null);
       return fc;
     }
     return null;

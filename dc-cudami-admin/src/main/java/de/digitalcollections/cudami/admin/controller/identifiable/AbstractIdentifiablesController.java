@@ -1,17 +1,5 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.util.CollectionUtils;
-
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
@@ -20,6 +8,16 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.util.CollectionUtils;
 
 public class AbstractIdentifiablesController<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>

@@ -1,24 +1,8 @@
 package de.digitalcollections.client;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.HttpErrorDecoder;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -31,6 +15,19 @@ import de.digitalcollections.model.list.sorting.NullHandling;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 public abstract class BaseRestClient<T extends Object> {
@@ -605,7 +602,8 @@ public abstract class BaseRestClient<T extends Object> {
         operand = URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
         break;
       case MIN_MAX_VALUES:
-        operand = URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
+        operand =
+            URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
                 + ","
                 + URLEncoder.encode(
                     filterCriterion.getMaxValue().toString(), StandardCharsets.UTF_8);
@@ -614,7 +612,8 @@ public abstract class BaseRestClient<T extends Object> {
         operand =
             filterCriterion.getValues().stream()
                 .map(value -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining(",")).toString();
+                .collect(Collectors.joining(","))
+                .toString();
         break;
       default:
         // no value operations ("set"/"notset")

@@ -12,7 +12,7 @@ public class BTRequest extends PageRequest {
   public BTRequest(int offset, int limit) {
     this(offset, limit, null);
   }
-  
+
   public BTRequest(int offset, int limit, String sortProperty, String sortOrder) {
     this(offset, limit, sortProperty, sortOrder, null);
   }
@@ -23,13 +23,11 @@ public class BTRequest extends PageRequest {
 
   public BTRequest(
       int offset, int limit, String sortProperty, String sortOrder, String sortLanguage) {
-    this(
-        offset,
-        limit,
-        createSorting(sortProperty, sortOrder, sortLanguage));
+    this(offset, limit, createSorting(sortProperty, sortOrder, sortLanguage));
   }
 
-  public static List<Order> createSorting(String sortProperty, String sortOrder, String sortLanguage) {
+  public static List<Order> createSorting(
+      String sortProperty, String sortOrder, String sortLanguage) {
     return List.of(
         Order.builder()
             .property(sortProperty)

@@ -100,10 +100,12 @@ public class CollectionsAPIController
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    // TODO ?: add datalanguage as request param to allow search / autocompletion in selected data language
+    // TODO ?: add datalanguage as request param to allow search / autocompletion in selected data
+    // language
     String dataLanguage = null;
     PageRequest pageRequest =
-        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, searchField, searchTerm, dataLanguage);
+        createPageRequest(
+            Collection.class, pageNumber, pageSize, sortBy, searchField, searchTerm, dataLanguage);
     PageResponse<Collection> pageResponse = search(searchField, searchTerm, pageRequest);
     if (pageResponse == null) {
       throw new InvalidEndpointRequestException("invalid request param", searchField);

@@ -69,7 +69,8 @@ public class PredicateController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion<String>> filterCriterias) {
+      @RequestParam(name = "filter", required = false)
+          List<FilterCriterion<String>> filterCriterias) {
 
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
