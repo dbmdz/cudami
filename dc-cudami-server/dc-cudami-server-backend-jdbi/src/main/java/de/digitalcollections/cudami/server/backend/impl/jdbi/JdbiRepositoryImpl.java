@@ -30,8 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-public abstract class JdbiRepositoryImpl<U extends UniqueObject>
-    extends AbstractPagingAndSortingRepositoryImpl {
+public abstract class JdbiRepositoryImpl<U extends UniqueObject> extends AbstractPagingAndSortingRepositoryImpl {
 
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
   private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
@@ -41,11 +40,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   protected final String tableAlias;
   protected final String tableName;
 
-  public JdbiRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
+  public JdbiRepositoryImpl(Jdbi dbi, String tableName, String tableAlias, String mappingPrefix,
       int offsetForAlternativePaging) {
     this.dbi = dbi;
     this.mappingPrefix = mappingPrefix;
@@ -54,15 +49,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     this.offsetForAlternativePaging = offsetForAlternativePaging;
   }
 
-  public void addFiltering(
-      PageRequest pageRequest, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
+  public void addFiltering(PageRequest pageRequest, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
     if (pageRequest != null) {
       addFiltering(pageRequest.getFiltering(), sqlQuery, argumentMappings);
     }
   }
 
-  public void addFiltering(
-      Filtering filtering, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
+  public void addFiltering(Filtering filtering, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
     if (filtering != null) {
       // handle optional filtering params
       String filterClauses = getFilterClauses(filtering, argumentMappings);
@@ -78,16 +71,15 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
-  protected String addSearchTerm(
-      PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object> argumentMappings) {
+  protected String addSearchTerm(PageRequest pageRequest, StringBuilder innerQuery,
+      Map<String, Object> argumentMappings) {
     // handle search term
     String searchTerm = pageRequest.getSearchTerm();
     String executedSearchTerm = null;
     String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
     if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
       String commonSql = innerQuery.toString();
-      if (commonSql.toUpperCase().contains(" WHERE ")
-          || commonSql.toUpperCase().contains(" WHERE(")) {
+      if (commonSql.toUpperCase().contains(" WHERE ") || commonSql.toUpperCase().contains(" WHERE(")) {
         innerQuery.append(" AND ");
       } else {
         innerQuery.append(" WHERE ");
@@ -100,14 +92,15 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   /**
-   * Add the search term to the argument map. By overriding this method custom modifications can be
-   * made. Belongs to {@link #getSearchTermTemplates(String, String)} and {@link
-   * #addSearchTerm(PageRequest, StringBuilder, Map)}.
+   * Add the search term to the argument map. By overriding this method custom
+   * modifications can be made. Belongs to
+   * {@link #getSearchTermTemplates(String, String)} and
+   * {@link #addSearchTerm(PageRequest, StringBuilder, Map)}.
    *
-   * @param searchTerm original term from the {@code PageRequest}
+   * @param searchTerm       original term from the {@code PageRequest}
    * @param argumentMappings
-   * @return the search term that should be used for the {@link
-   *     PageResponse#setExecutedSearchTerm(String)}
+   * @return the search term that should be used for the
+   *         {@link PageResponse#setExecutedSearchTerm(String)}
    */
   protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
     String executedSearchTerm = escapeTermForJsonpath(searchTerm);
@@ -123,18 +116,19 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
 
   public long count(String commonSql, Map<String, Object> argumentMappings) {
     final String sql = "SELECT count(*) " + commonSql;
-    return dbi.withHandle(
-        h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
+    return dbi.withHandle(h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
   }
 
   /**
    * Escape characters that must not appear in jsonpath inner strings.
    *
-   * <p>This method should always be used to clean up strings, e.g. search terms, that are intended
-   * to appear in an jsonpath inner string, i.e. between double quotes. If the inserted term
-   * contains double quotes then the jsonpath breaks. Hence we remove double quotes at start and end
-   * of the provided string (they do not have any meaning for the search at all) and escape the
-   * remaining ones with a backslash.
+   * <p>
+   * This method should always be used to clean up strings, e.g. search terms,
+   * that are intended to appear in an jsonpath inner string, i.e. between double
+   * quotes. If the inserted term contains double quotes then the jsonpath breaks.
+   * Hence we remove double quotes at start and end of the provided string (they
+   * do not have any meaning for the search at all) and escape the remaining ones
+   * with a backslash.
    *
    * @param term can be null
    * @return term with forbidden characters removed or escaped
@@ -154,9 +148,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return term;
   }
 
-  protected void filterByLocalizedTextFields(
-      PageRequest pageRequest,
-      PageResponse<U> pageResponse,
+  protected void filterByLocalizedTextFields(PageRequest pageRequest, PageResponse<U> pageResponse,
       LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields) {
     if (!pageRequest.hasFiltering()) {
       return;
@@ -166,16 +158,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     // but all pages !
     // seems to be not possible, as other pages base on SQL filtering.... rethink
     // the whole thing...
-    for (Map.Entry<String, Function<U, Optional<LocalizedText>>> entry :
-        localizedTextFields.entrySet()) {
+    for (Map.Entry<String, Function<U, Optional<LocalizedText>>> entry : localizedTextFields.entrySet()) {
       String fieldName = entry.getKey();
       Function<U, Optional<LocalizedText>> retrieveFieldFunction = entry.getValue();
 
-      FilterCriterion filterCriterion =
-          pageRequest.getFiltering().getFilterCriteria().stream()
-              .filter(fc -> fc.getExpression().startsWith(fieldName))
-              .findAny()
-              .orElse(null);
+      FilterCriterion filterCriterion = pageRequest.getFiltering().getFilterCriteria().stream()
+          .filter(fc -> fc.getExpression().startsWith(fieldName)).findAny().orElse(null);
       if (filterCriterion != null) {
         filterBySplitField(pageResponse, filterCriterion, retrieveFieldFunction);
         // only one filtering supported (first in order of added rules):
@@ -186,15 +174,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   /**
-   * Special logic to filter by label, optionally paying attention to the language. The passed
-   * {@code PageResponse} could be modified.
+   * Special logic to filter by label, optionally paying attention to the
+   * language. The passed {@code PageResponse} could be modified.
    *
-   * @param pageResponse the response from the repo, must always contain the request too (if
-   *     everything goes right)
+   * @param pageResponse the response from the repo, must always contain the
+   *                     request too (if everything goes right)
    */
-  protected void filterBySplitField(
-      PageResponse<U> pageResponse,
-      FilterCriterion<String> filter,
+  protected void filterBySplitField(PageResponse<U> pageResponse, FilterCriterion<String> filter,
       Function<U, Optional<LocalizedText>> retrieveField) {
     if (!pageResponse.hasContent()) {
       return;
@@ -211,31 +197,24 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       // there is a language...
       Locale language = Locale.forLanguageTag(matchLanguage.group(1));
       List<String> searchTerms = Arrays.asList(splitToArray((String) filter.getValue()));
-      List<U> filteredContent =
-          pageResponse.getContent().parallelStream()
-              .filter(
-                  uniqueObject -> {
-                    String text =
-                        retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
-                    if (text == null) {
-                      return false;
-                    }
-                    List<String> splitText = Arrays.asList(splitToArray(text));
-                    return splitText.containsAll(searchTerms);
-                  })
-              .collect(Collectors.toList());
+      List<U> filteredContent = pageResponse.getContent().parallelStream().filter(uniqueObject -> {
+        String text = retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
+        if (text == null) {
+          return false;
+        }
+        List<String> splitText = Arrays.asList(splitToArray(text));
+        return splitText.containsAll(searchTerms);
+      }).collect(Collectors.toList());
       // fix total elements count roughly
       pageResponse.setTotalElements(
-          pageResponse.getTotalElements()
-              - (pageResponse.getContent().size() - filteredContent.size()));
+          pageResponse.getTotalElements() - (pageResponse.getContent().size() - filteredContent.size()));
       pageResponse.setContent(filteredContent);
     }
   }
 
   public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
     List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
-    return searchTermTemplates.isEmpty()
-        ? ""
+    return searchTermTemplates.isEmpty() ? ""
         : "(" + searchTermTemplates.stream().collect(Collectors.joining(" OR ")) + ")";
   }
 
@@ -258,8 +237,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   protected LinkedHashMap<String, Function<U, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields =
-        new LinkedHashMap<>();
+    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields = new LinkedHashMap<>();
     return localizedTextFields;
   }
 
@@ -279,48 +257,39 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return tableName;
   }
 
-  protected String getWhereClause(
-      FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
+  protected String getWhereClause(FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
     Set<String> fieldNames = getLocalizedTextFields().keySet();
     if (!fieldNames.isEmpty()) {
       // special handling of localized text fields
       String regexPatternFieldNames = String.join("|", fieldNames);
 
-      Matcher localizedTextFieldsMatcher =
-          Pattern.compile("^(" + regexPatternFieldNames + ")\\b").matcher(fc.getExpression());
+      Matcher localizedTextFieldsMatcher = Pattern.compile("^(" + regexPatternFieldNames + ")\\b")
+          .matcher(fc.getExpression());
       if (localizedTextFieldsMatcher.find()) {
         if (!(fc.getValue() instanceof String)) {
-          throw new IllegalArgumentException(
-              "Value of localized text field expression must be a string!");
+          throw new IllegalArgumentException("Value of localized text field expression must be a string!");
         }
         String localizedTextFieldName = localizedTextFieldsMatcher.group(1);
         String value = (String) fc.getValue();
         switch (fc.getOperation()) {
-          case CONTAINS:
-            if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
-              throw new IllegalArgumentException(
-                  "Filtering by localized text fields value are mutually exclusive!");
-            }
-            argumentMappings.put(
-                SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
-            return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
-                tableAlias, "split_" + localizedTextFieldName);
-          case EQUALS:
-            if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
-              throw new IllegalArgumentException(
-                  "Filtering by localized text fields value are mutually exclusive!");
-            }
-            Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
-            String language =
-                matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
-            argumentMappings.put(
-                SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
-            return SearchTermTemplates.JSONB_PATH.renderTemplate(
-                tableAlias, localizedTextFieldName, language);
-          default:
-            throw new UnsupportedOperationException(
-                "Filtering by localized text field only supports CONTAINS (to be preferred) or EQUALS operator!");
+        case CONTAINS:
+          if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
+            throw new IllegalArgumentException("Filtering by localized text fields value are mutually exclusive!");
+          }
+          argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
+          return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(tableAlias, "split_" + localizedTextFieldName);
+        case EQUALS:
+          if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
+            throw new IllegalArgumentException("Filtering by localized text fields value are mutually exclusive!");
+          }
+          Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
+          String language = matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
+          argumentMappings.put(SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
+          return SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, localizedTextFieldName, language);
+        default:
+          throw new UnsupportedOperationException(
+              "Filtering by localized text field only supports CONTAINS (to be preferred) or EQUALS operator!");
         }
       }
     }
@@ -338,257 +307,146 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
         expression = getColumnName(givenExpression);
         if (expression == null) {
           throw new IllegalArgumentException(
-              String.format(
-                  "Given expression '%s' is invalid / can not be mapped.", givenExpression));
+              String.format("Given expression '%s' is invalid / can not be mapped.", givenExpression));
         }
       }
 
       String criterionKey = KEY_PREFIX_FILTERVALUE + criterionCount;
       switch (filterOperation) {
-          // @see https://www.postgresql.org/docs/11/functions.html
-        case BETWEEN:
-          if (fc.getMinValue() == null || fc.getMaxValue() == null) {
-            throw new IllegalArgumentException("For 'BETWEEN' operation two values are expected");
-          } else {
-            // example: BETWEEN '2015-01-01' AND '2015-12-31'
-            String keyMin = criterionKey + "_min";
-            String keyMax = criterionKey + "_max";
-            query
-                .append("(")
-                .append(expression)
-                .append(" BETWEEN ")
-                .append(":")
-                .append(keyMin)
-                .append(" AND ")
-                .append(":")
-                .append(keyMax)
-                .append(")");
-            argumentMappings.put(keyMin, fc.getMinValue());
-            argumentMappings.put(keyMax, fc.getMaxValue());
-          }
-          break;
-        case IN:
-        case NOT_IN:
-          if (fc.getValues() == null || fc.getValues().isEmpty()) {
-            throw new IllegalArgumentException(
-                "For 'IN/NOT_IN' operation at least one value is expected");
-          }
-          // For 'in' or 'nin' operation
-          query.append("(").append(expression);
-          if (filterOperation == FilterOperation.NOT_IN) {
-            query.append(" NOT");
-          }
-          query.append(" IN (");
+      // @see https://www.postgresql.org/docs/11/functions.html
+      case BETWEEN:
+        if (fc.getMinValue() == null || fc.getMaxValue() == null) {
+          throw new IllegalArgumentException("For 'BETWEEN' operation two values are expected");
+        } else {
+          // example: BETWEEN '2015-01-01' AND '2015-12-31'
+          String keyMin = criterionKey + "_min";
+          String keyMax = criterionKey + "_max";
+          query.append("(").append(expression).append(" BETWEEN ").append(":").append(keyMin).append(" AND ")
+              .append(":").append(keyMax).append(")");
+          argumentMappings.put(keyMin, fc.getMinValue());
+          argumentMappings.put(keyMax, fc.getMaxValue());
+        }
+        break;
+      case IN:
+      case NOT_IN:
+        if (fc.getValues() == null || fc.getValues().isEmpty()) {
+          throw new IllegalArgumentException("For 'IN/NOT_IN' operation at least one value is expected");
+        }
+        // For 'in' or 'nin' operation
+        query.append("(").append(expression);
+        if (filterOperation == FilterOperation.NOT_IN) {
+          query.append(" NOT");
+        }
+        query.append(" IN (");
 
-          ArrayList<String> values = new ArrayList<>();
-          AtomicInteger valueCounter = new AtomicInteger(0);
-          fc.getValues()
-              .forEach(
-                  v -> {
-                    String key = criterionKey + "_" + valueCounter.incrementAndGet();
-                    values.add(":" + key);
-                    argumentMappings.put(key, v);
-                  });
-          query.append(values.stream().collect(Collectors.joining(",")));
+        ArrayList<String> values = new ArrayList<>();
+        AtomicInteger valueCounter = new AtomicInteger(0);
+        fc.getValues().forEach(v -> {
+          String key = criterionKey + "_" + valueCounter.incrementAndGet();
+          values.add(":" + key);
+          argumentMappings.put(key, v);
+        });
+        query.append(values.stream().collect(Collectors.joining(",")));
 
-          query.append("))");
-          break;
-        case CONTAINS:
-          // @see https://www.postgresql.org/docs/11/functions-matching.html
+        query.append("))");
+        break;
+      case CONTAINS:
+        // @see https://www.postgresql.org/docs/11/functions-matching.html
 
-          if (fc.getValue() instanceof Collection<?> valueCollection
-              && !valueCollection.isEmpty()) {
-            String arrayType =
-                getArrayTypeAndFillArgumentMappings(
-                    argumentMappings, criterionKey, valueCollection);
-            query
-                .append("(")
-                .append(expression)
-                .append(" @> ")
-                .append(":")
-                .append(criterionKey)
-                .append("::")
-                .append(arrayType)
-                .append(")");
+        if (fc.getValue() instanceof Collection<?> valueCollection && !valueCollection.isEmpty()) {
+          String arrayType = getArrayTypeAndFillArgumentMappings(argumentMappings, criterionKey, valueCollection);
+          query.append("(").append(expression).append(" @> ").append(":").append(criterionKey).append("::")
+              .append(arrayType).append(")");
 
-          } else {
-            query
-                .append("(")
-                .append(expression)
-                .append(" ILIKE '%' || ")
-                .append(":")
-                .append(criterionKey)
-                .append(" || '%')");
-            argumentMappings.put(criterionKey, fc.getValue());
-          }
-          break;
-        case STARTS_WITH:
-          // @see https://www.postgresql.org/docs/11/functions-matching.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" ILIKE ")
-              .append(":")
-              .append(criterionKey)
+        } else {
+          query.append("(").append(expression).append(" ILIKE '%' || ").append(":").append(criterionKey)
               .append(" || '%')");
           argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case EQUALS:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          if (fc.getValue() instanceof Collection<?> valueCollection
-              && !valueCollection.isEmpty()) {
-            String arrayType =
-                getArrayTypeAndFillArgumentMappings(
-                    argumentMappings, criterionKey, valueCollection);
+        }
+        break;
+      case STARTS_WITH:
+        // @see https://www.postgresql.org/docs/11/functions-matching.html
+        query.append("(").append(expression).append(" ILIKE ").append(":").append(criterionKey).append(" || '%')");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case EQUALS:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        if (fc.getValue() instanceof Collection<?> valueCollection && !valueCollection.isEmpty()) {
+          String arrayType = getArrayTypeAndFillArgumentMappings(argumentMappings, criterionKey, valueCollection);
 
-            query
-                .append("(")
-                .append(expression)
-                .append(" = ")
-                .append(":")
-                .append(criterionKey)
-                .append("::")
-                .append(arrayType)
-                .append(")");
-          } else {
-            query
-                .append("(")
-                .append(expression)
-                .append(" = ")
-                .append(":")
-                .append(criterionKey)
-                .append(")");
-            argumentMappings.put(criterionKey, fc.getValue());
-          }
-          break;
-        case NOT_EQUALS:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" != ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
+          query.append("(").append(expression).append(" = ").append(":").append(criterionKey).append("::")
+              .append(arrayType).append(")");
+        } else {
+          query.append("(").append(expression).append(" = ").append(":").append(criterionKey).append(")");
           argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case GREATER_THAN:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" > ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case GREATER_THAN_OR_NOT_SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" > ")
-              .append(":")
-              .append(criterionKey)
-              .append(" OR ")
-              .append(expression)
-              .append(" IS NULL")
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case GREATER_THAN_OR_EQUAL_TO:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" >= ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case LESS_THAN:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" < ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case LESS_THAN_AND_SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" < ")
-              .append(":")
-              .append(criterionKey)
-              .append(" AND ")
-              .append(expression)
-              .append(" IS NOT NULL")
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case LESS_THAN_OR_EQUAL_TO:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" <= ")
-              .append(":")
-              .append(criterionKey)
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case LESS_THAN_OR_EQUAL_TO_AND_SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" <= ")
-              .append(":")
-              .append(criterionKey)
-              .append(" AND ")
-              .append(expression)
-              .append(" IS NOT NULL")
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case LESS_THAN_OR_EQUAL_TO_OR_NOT_SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query
-              .append("(")
-              .append(expression)
-              .append(" <= ")
-              .append(":")
-              .append(criterionKey)
-              .append(" OR ")
-              .append(expression)
-              .append(" IS NULL")
-              .append(")");
-          argumentMappings.put(criterionKey, fc.getValue());
-          break;
-        case SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(expression).append(" IS NOT NULL").append(")");
-          break;
-        case NOT_SET:
-          // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(expression).append(" IS NULL").append(")");
-          break;
-        default:
-          throw new UnsupportedOperationException(filterOperation + " not supported yet");
+        }
+        break;
+      case NOT_EQUALS:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" != ").append(":").append(criterionKey).append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case GREATER_THAN:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" > ").append(":").append(criterionKey).append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case GREATER_THAN_OR_NOT_SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" > ").append(":").append(criterionKey).append(" OR ")
+            .append(expression).append(" IS NULL").append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case GREATER_THAN_OR_EQUAL_TO:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" >= ").append(":").append(criterionKey).append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case LESS_THAN:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" < ").append(":").append(criterionKey).append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case LESS_THAN_AND_SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" < ").append(":").append(criterionKey).append(" AND ")
+            .append(expression).append(" IS NOT NULL").append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case LESS_THAN_OR_EQUAL_TO:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" <= ").append(":").append(criterionKey).append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case LESS_THAN_OR_EQUAL_TO_AND_SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" <= ").append(":").append(criterionKey).append(" AND ")
+            .append(expression).append(" IS NOT NULL").append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case LESS_THAN_OR_EQUAL_TO_OR_NOT_SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" <= ").append(":").append(criterionKey).append(" OR ")
+            .append(expression).append(" IS NULL").append(")");
+        argumentMappings.put(criterionKey, fc.getValue());
+        break;
+      case SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" IS NOT NULL").append(")");
+        break;
+      case NOT_SET:
+        // @see https://www.postgresql.org/docs/11/functions-comparison.html
+        query.append("(").append(expression).append(" IS NULL").append(")");
+        break;
+      default:
+        throw new UnsupportedOperationException(filterOperation + " not supported yet");
       }
     }
     return query.toString();
   }
 
-  private static String getArrayTypeAndFillArgumentMappings(
-      Map<String, Object> argumentMappings, String criterionKey, Collection<?> valueCollection) {
+  private static String getArrayTypeAndFillArgumentMappings(Map<String, Object> argumentMappings, String criterionKey,
+      Collection<?> valueCollection) {
     String arrayType = "varchar[]";
     Object valueSample = valueCollection.stream().findFirst().get();
 
@@ -613,38 +471,25 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    * instance use this method to rename filter expression names to target table
    * alias and column names
    */
-  protected void mapFilterExpressionsToOtherTableColumnNames(
-      Filtering filtering, AbstractPagingAndSortingRepositoryImpl otherRepository) {
+  protected void mapFilterExpressionsToOtherTableColumnNames(Filtering filtering,
+      AbstractPagingAndSortingRepositoryImpl otherRepository) {
     if (filtering != null) {
-      List<FilterCriterion> filterCriteria =
-          filtering.getFilterCriteria().stream()
-              .map(
-                  fc -> {
-                    fc.setExpression(otherRepository.getColumnName(fc.getExpression()));
-                    fc.setNativeExpression(true);
-                    return fc;
-                  })
-              .collect(Collectors.toList());
+      List<FilterCriterion> filterCriteria = filtering.getFilterCriteria().stream().map(fc -> {
+        fc.setExpression(otherRepository.getColumnName(fc.getExpression()));
+        fc.setNativeExpression(true);
+        return fc;
+      }).collect(Collectors.toList());
       filtering.setFilterCriteria(filterCriteria);
     }
   }
 
-  protected Integer retrieveNextSortIndexForParentChildren(
-      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+  protected Integer retrieveNextSortIndexForParentChildren(Jdbi dbi, String tableName, String columNameParentUuid,
+      UUID parentUuid) {
     // first child: max gets no results (= null)):
-    Integer sortIndex =
-        dbi.withHandle(
-            (Handle h) ->
-                h.createQuery(
-                        "SELECT MAX(sortIndex) + 1 FROM "
-                            + tableName
-                            + " WHERE "
-                            + columNameParentUuid
-                            + " = :parent_uuid")
-                    .bind("parent_uuid", parentUuid)
-                    .mapTo(Integer.class)
-                    .findOne()
-                    .orElse(null));
+    Integer sortIndex = dbi.withHandle((Handle h) -> h
+        .createQuery(
+            "SELECT MAX(sortIndex) + 1 FROM " + tableName + " WHERE " + columNameParentUuid + " = :parent_uuid")
+        .bind("parent_uuid", parentUuid).mapTo(Integer.class).findOne().orElse(null));
     if (sortIndex == null) {
       return 0;
     }
@@ -656,22 +501,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       return new UUID[0];
     }
     return uniqueObjects.stream()
-        .collect(
-            ArrayList<UUID>::new,
-            (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
-            ArrayList::addAll)
+        .collect(ArrayList<UUID>::new, (result, uniqueObject) -> result.add(uniqueObject.getUuid()), ArrayList::addAll)
         .toArray(new UUID[1]);
   }
 
   protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
+    long total = dbi.withHandle(
+        h -> h.createQuery(sqlCount.toString()).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
     return total;
   }
 
@@ -679,11 +515,8 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     if (localizedText == null) {
       return new String[0];
     }
-    List<String> splitLabels =
-        localizedText.values().stream()
-            .map(text -> splitToArray(text))
-            .flatMap(Arrays::stream)
-            .collect(Collectors.toList());
+    List<String> splitLabels = localizedText.values().stream().map(text -> splitToArray(text)).flatMap(Arrays::stream)
+        .collect(Collectors.toList());
     return splitLabels.toArray(new String[splitLabels.size()]);
   }
 
@@ -697,13 +530,8 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     term = term.replaceAll("(?iU)[^\\s\\w_-]|(?<=\\s)-(?=\\s)", "");
     // Look for words with hyphens to split them too
     Matcher hyphenWords = Pattern.compile("(?iU)\\b\\w+(-\\w+)+\\b").matcher(term);
-    List<String> result =
-        hyphenWords
-            .results()
-            .collect(
-                ArrayList<String>::new,
-                (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))),
-                ArrayList::addAll);
+    List<String> result = hyphenWords.results().collect(ArrayList<String>::new,
+        (list, match) -> list.addAll(Arrays.asList(match.group().split("-+"))), ArrayList::addAll);
     for (String word : term.trim().split("\\s+")) {
       result.add(word);
     }

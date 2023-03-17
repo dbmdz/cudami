@@ -89,8 +89,7 @@ public class CollectionsAPIController
   }
 
   /*
-   * Used in templates/collections/view.html and
-   * templates/fragments/modals/select-entities.html
+   * Used in templates/collections/view.html as param for templates/fragments/modals/select-entities.html
    */
   @GetMapping("/api/collections/search")
   @ResponseBody
@@ -101,9 +100,10 @@ public class CollectionsAPIController
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
       throws TechnicalException {
-    // TODO ?: add datalanguage to allow search / autocompletion in selected data language
+    // TODO ?: add datalanguage as request param to allow search / autocompletion in selected data language
+    String dataLanguage = null;
     PageRequest pageRequest =
-        createPageRequest(pageNumber, pageSize, searchField, searchTerm, sortBy);
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, searchField, searchTerm, dataLanguage);
     PageResponse<Collection> pageResponse = search(searchField, searchTerm, pageRequest);
     if (pageResponse == null) {
       throw new InvalidEndpointRequestException("invalid request param", searchField);

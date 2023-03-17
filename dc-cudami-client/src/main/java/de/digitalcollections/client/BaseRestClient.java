@@ -1,19 +1,5 @@
 package de.digitalcollections.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.exception.http.HttpErrorDecoder;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.NullHandling;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -25,8 +11,26 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+
+import de.digitalcollections.model.exception.TechnicalException;
+import de.digitalcollections.model.exception.http.HttpErrorDecoder;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.FilterOperation;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.NullHandling;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings(value = "EI_EXPOSE_REP2")
 public abstract class BaseRestClient<T extends Object> {
@@ -590,32 +594,36 @@ public abstract class BaseRestClient<T extends Object> {
   }
 
   protected String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
-    if (filterCriterion.getOperation() == null) {
+    String expression = filterCriterion.getExpression();
+    FilterOperation operation = filterCriterion.getOperation();
+    if (expression == null || operation == null) {
       return "";
     }
-    String criterion = filterCriterion.getExpression() + "=" + filterCriterion.getOperation() + ":";
-    switch (filterCriterion.getOperation().getOperandCount()) {
+    String operand;
+    switch (operation.getOperandCount()) {
       case SINGLEVALUE:
-        criterion +=
-            URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
+        operand = URLEncoder.encode(filterCriterion.getValue().toString(), StandardCharsets.UTF_8);
         break;
       case MIN_MAX_VALUES:
-        criterion +=
-            URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
+        operand = URLEncoder.encode(filterCriterion.getMinValue().toString(), StandardCharsets.UTF_8)
                 + ","
                 + URLEncoder.encode(
                     filterCriterion.getMaxValue().toString(), StandardCharsets.UTF_8);
         break;
       case MULTIVALUE:
-        criterion +=
+        operand =
             filterCriterion.getValues().stream()
                 .map(value -> URLEncoder.encode(value.toString(), StandardCharsets.UTF_8))
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(",")).toString();
         break;
       default:
+        // no value operations ("set"/"notset")
+        operand = "";
         break;
     }
-    return criterion;
+
+    // filter=expression:operation:operand
+    return "filter=" + expression + ":" + operation + ":" + operand;
   }
 
   /**
