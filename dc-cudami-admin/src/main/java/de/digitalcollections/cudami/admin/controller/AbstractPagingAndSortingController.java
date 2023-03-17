@@ -63,10 +63,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     if (searchProperty != null && searchTerm != null && targetClass != null) {
       String expression = searchProperty;
       if (isMultiLanguageField(targetClass, searchProperty)) {
-        if (dataLanguage == null) {
-          throw new IllegalArgumentException(
-              "dataLanguage must not be null for multilanguage field " + expression);
-        }
+        dataLanguage = getDataLanguage(dataLanguage, languageService);
         // convention: add datalanguage as "sub"-expression to expression (safe, as
         // properties in Java do not have "_" in name) - to be handled later on
         // serverside
