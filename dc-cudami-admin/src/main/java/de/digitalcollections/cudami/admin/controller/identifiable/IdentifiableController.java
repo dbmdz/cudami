@@ -9,6 +9,8 @@ import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Controller;
@@ -104,7 +106,10 @@ public class IdentifiableController extends AbstractController {
   @ResponseBody
   public List<Identifiable> find(@RequestParam(name = "term") String searchTerm)
       throws TechnicalException {
-    return service.find(searchTerm, 25);
+    // FIXME replace with filtering
+    PageRequest pageRequest = new PageRequest(searchTerm, 0, 25, null);
+    PageResponse<Identifiable> response = service.find(pageRequest);
+    return response.getContent();
   }
 
   @GetMapping(value = {"/identifiables/{namespace:[a-zA-Z_\\-]+}:{id:.+}"})

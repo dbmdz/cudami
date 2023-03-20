@@ -41,18 +41,14 @@ public class CudamiIdentifiablesClient<I extends Identifiable> extends CudamiRes
         API_VERSION_PREFIX + "/identifiables");
   }
 
-  public List<I> find(String searchTerm, int maxResults) throws TechnicalException {
-    PageRequest pageRequest = new PageRequest(searchTerm, 0, maxResults, null);
-    PageResponse<I> response = find(pageRequest);
-    return response.getContent();
-  }
-
+  // FIXME replace with filtering
   public PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws TechnicalException {
     return doGetRequestForPagedObjectList(
         String.format(baseEndpoint + "?language=%s&initial=%s", language, initial), pageRequest);
   }
 
+  // FIXME replace with filtering
   public PageResponse<I> findByLanguageAndInitial(
       int pageNumber,
       int pageSize,
