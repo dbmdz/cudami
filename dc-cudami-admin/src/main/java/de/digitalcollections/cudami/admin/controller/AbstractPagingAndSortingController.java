@@ -130,10 +130,11 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   }
 
   private Sorting createSorting(
-      Class targetClass, String sortProperty, String sortOrder, String sortLanguage)
+      Class targetClass, String sortProperty, String sortOrder, String dataLanguage)
       throws TechnicalException {
+    String sortLanguage = null;
     if (isMultiLanguageField(targetClass, sortProperty)) {
-      sortLanguage = getDataLanguage(sortLanguage, languageService);
+      sortLanguage = getDataLanguage(dataLanguage, languageService);
     }
     List<Order> orders =
         List.of(
@@ -146,10 +147,10 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     return sorting;
   }
 
-  private Sorting createSorting(Class targetClass, List<Order> sortBy, String sortLanguage)
+  private Sorting createSorting(Class targetClass, List<Order> sortBy, String dataLanguage)
       throws TechnicalException {
     if (sortBy != null) {
-      sortLanguage = getDataLanguage(sortLanguage, languageService);
+      String sortLanguage = getDataLanguage(dataLanguage, languageService);
       for (Order order : sortBy) {
         String sortProperty = order.getProperty();
         if (isMultiLanguageField(targetClass, sortProperty)) {
