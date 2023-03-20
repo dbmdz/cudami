@@ -70,6 +70,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
         filterCriteria);
   }
 
+  // FIXME: remove find with all the deprecated style, use filtering, no need for getService()...
   /**
    * The usual find implementation
    *

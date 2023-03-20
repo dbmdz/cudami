@@ -1,22 +1,24 @@
 package de.digitalcollections.cudami.server.controller.relation;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.validation.ValidationError;
 import de.digitalcollections.model.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Predicate controller")
-public class PredicateController {
+public class PredicateController extends AbstractUniqueObjectController<Predicate> {
 
   private final PredicateService predicateService;
 
@@ -62,31 +64,28 @@ public class PredicateController {
   @GetMapping(
       value = {"/v6/predicates/paged"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // FIXME: delete "/paged" from mapping as soon as we proceed to breaking V7 API-Version
+  // FIXME: delete "/paged" from mapping as soon as we proceed to breaking V7
+  // API-Version
+  // TODO V7 remove deprecated params value, searchTerm
   public PageResponse<Predicate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
       @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion,
-      @RequestParam(name = "filter", required = false)
-          List<FilterCriterion<String>> filterCriterias) {
+      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
+    Map<String, FilterCriterion<String>> oldCriteria = new HashMap<>();
+    oldCriteria.put("value", valueCriterion);
 
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (valueCriterion != null) {
-      Filtering filtering = new Filtering();
-      filtering.add("value", valueCriterion);
-      pageRequest.setFiltering(filtering);
-    }
+    PageRequest pageRequest =
+        createPageRequest(
+            Predicate.class, pageNumber, pageSize, sortBy, filterCriteria, oldCriteria, searchTerm);
     return predicateService.find(pageRequest);
   }
 
   @GetMapping(value = {"/v6/predicates"})
-  // FIXME: append "/all" to mapping as soon as we proceed to breaking V7 API-Version
+  // FIXME: append "/all" to mapping as soon as we proceed to breaking V7
+  // API-Version
   public List<Predicate> getAll() {
     return predicateService.getAll();
   }
@@ -137,8 +136,8 @@ public class PredicateController {
   }
 
   /*
-  Since we cannot use .* als "fallback" mapping (Spring reports "ambigious handler methods"), we
-  must evaluate the parameter manually
+   * Since we cannot use .* als "fallback" mapping (Spring reports
+   * "ambigious handler methods"), we must evaluate the parameter manually
    */
   @Operation(summary = "create or update a predicate, identified either by its value or by uuid")
   @PutMapping(
@@ -172,5 +171,11 @@ public class PredicateController {
     }
 
     return predicateService.saveOrUpdate(predicate);
+  }
+
+  @Override
+  protected UniqueObjectService<Predicate> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 }
