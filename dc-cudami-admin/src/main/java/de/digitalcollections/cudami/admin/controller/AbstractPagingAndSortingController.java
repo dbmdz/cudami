@@ -1,5 +1,10 @@
 package de.digitalcollections.cudami.admin.controller;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
@@ -17,11 +22,6 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 @SuppressFBWarnings
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
@@ -202,10 +202,9 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   private boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
     Field field;
     try {
-      field = getField(clz, fieldName);
-      Class fieldTypeClass = field.getType();
-      if (LocalizedText.class == fieldTypeClass
-          || LocalizedStructuredContent.class == fieldTypeClass) {
+      Class fieldType = getFieldType(clz, fieldName);
+      if (LocalizedText.class == fieldType
+          || LocalizedStructuredContent.class == fieldType) {
         return true;
       }
       return false;
@@ -215,31 +214,19 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
     }
   }
 
-  public static Field getField(Class<?> clz, String fieldName) throws NoSuchFieldException {
-    List<Field> allFields = getAllFields(clz);
-    if (allFields.isEmpty()) {
+  /**
+   * Get Class of a field of a given class.
+   * 
+   * @param clz class to search in
+   * @param fieldName name of field
+   * @return Class/Type of field (if found)
+   * @throws NoSuchFieldException thrown if not found
+   */
+  public static Class getFieldType(Class clz, String fieldName) throws NoSuchFieldException {
+    Field field = FieldUtils.getField(clz, fieldName, true);
+    if (field == null) {
       throw new NoSuchFieldException();
     }
-    Optional<Field> fieldOpt =
-        allFields.stream().filter(f -> f.getName().equals(fieldName)).findFirst();
-    if (fieldOpt.isPresent()) {
-      return fieldOpt.get();
-    }
-    throw new NoSuchFieldException();
-  }
-
-  /**
-   * getDeclaredFields only finds fields of current class not the inherited fields. So recursively
-   * collect super fields.
-   *
-   * @param clz class to get all fields for
-   * @return list of all fields (recursively)
-   */
-  public static List<Field> getAllFields(Class<?> clz) {
-    List<Field> fields = new ArrayList<Field>();
-    for (Class<?> c = clz; c != null; c = c.getSuperclass()) {
-      fields.addAll(Arrays.asList(c.getDeclaredFields()));
-    }
-    return fields;
+    return field.getType();
   }
 }
