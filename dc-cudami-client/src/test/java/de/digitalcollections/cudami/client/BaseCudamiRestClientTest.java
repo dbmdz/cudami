@@ -50,7 +50,7 @@ public abstract class BaseCudamiRestClientTest<
     FilterCriterion filterCriterion2 =
         new FilterCriterion("gnarf", FilterOperation.EQUALS, "krchch");
     Filtering filtering = new Filtering(List.of(filterCriterion1, filterCriterion2));
-    return new PageRequest(1, 2, sorting, filtering, "hello");
+    return new PageRequest(1, 2, sorting, filtering);
   }
 
   @Test
@@ -98,7 +98,7 @@ public abstract class BaseCudamiRestClientTest<
     client.find(buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+        "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test

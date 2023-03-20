@@ -34,18 +34,6 @@ class CudamiGeoLocationsClientTest
   }
 
   @Test
-  @DisplayName("can execute the find method with a search term and max results")
-  @Override
-  public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"," + "\"content\":[]}";
-    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
-
-    assertThat(client.find("foo", 100)).isNotNull();
-
-    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=100&searchTerm=foo");
-  }
-
-  @Test
   @DisplayName("can return the languages for all geo locations")
   public void testGetLanguages() throws Exception {
     client.getLanguages();

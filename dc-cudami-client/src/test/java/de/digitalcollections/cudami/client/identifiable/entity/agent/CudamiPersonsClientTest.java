@@ -26,7 +26,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
         "get",
         "/placeofbirth/"
             + placeUuid
-            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -38,7 +38,7 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
         "get",
         "/placeofdeath/"
             + placeUuid
-            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+            + "?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -82,17 +82,5 @@ class CudamiPersonsClientTest extends BaseCudamiEntitiesClientTest<Person, Cudam
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=0");
-  }
-
-  @Test
-  @DisplayName("can execute the find method with a search term and max results")
-  @Override
-  public void testFindWithSearchTermAndMaxResults() throws Exception {
-    String bodyJson = "{" + "\"listResponseType\":\"PAGE_RESPONSE\"," + "\"content\":[]}";
-    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
-
-    assertThat(client.find("foo", 100)).isNotNull();
-
-    verifyHttpRequestByMethodAndRelativeURL("get", "?pageNumber=0&pageSize=100&searchTerm=foo");
   }
 }

@@ -46,7 +46,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+            + "/collections?active=true&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -58,7 +58,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+            + "/collections?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test
@@ -119,7 +119,7 @@ class CudamiDigitalObjectsClientTest
         "get",
         "/"
             + uuid
-            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
+            + "/projects?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch");
   }
 
   @Test

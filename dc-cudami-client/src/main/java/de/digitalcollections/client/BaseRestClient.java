@@ -274,12 +274,6 @@ public abstract class BaseRestClient<T extends Object> {
       requestUrl += "&" + getFilterParamsAsString(filtering.getFilterCriteria());
     }
 
-    String searchTerm = pageRequest.getSearchTerm();
-    if (searchTerm != null) {
-      requestUrl =
-          requestUrl + "&searchTerm=" + URLEncoder.encode(searchTerm, StandardCharsets.UTF_8);
-    }
-
     HttpRequest req = createGetRequest(requestUrl);
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
