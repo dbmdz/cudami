@@ -96,6 +96,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-licenses').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.url}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsLicenses() {
         /*[+
          const baseUrl = [[@{'/licenses'}]];

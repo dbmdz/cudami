@@ -51,7 +51,7 @@ public class LicensesAPIController extends AbstractPagingAndSortingController<Li
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     return find(
-        License.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
+        License.class, offset, limit, sortProperty, sortOrder, "url", searchTerm, dataLanguage);
   }
 
   @GetMapping("/api/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

@@ -1,16 +1,16 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "License controller")
-public class LicenseController {
+public class LicenseController extends AbstractUniqueObjectController<License> {
 
   private final LicenseService service;
 
@@ -60,7 +60,8 @@ public class LicenseController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url) {
     // WARNING: a DELETE request with param seems not to be spec allowed?
-    // an url as path variable is technically not possible (unescaping leads to not allowed
+    // an url as path variable is technically not possible (unescaping leads to not
+    // allowed
     // characters in url)
     service.deleteByUrl(url);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -86,7 +87,8 @@ public class LicenseController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids) {
     // WARNING: a DELETE request with body seems not to be spec allowed?
-    // FIXME: How to implement deleteByUrl (also with body? how to distinguish these both methods?
+    // FIXME: How to implement deleteByUrl (also with body? how to distinguish these
+    // both methods?
     // give param?)
     service.deleteByUuids(uuids);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -101,31 +103,9 @@ public class LicenseController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) FilterCriterion<String> labelCriterion,
-      @RequestParam(name = "locale", required = false) FilterCriterion<String> localeCriterion) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (labelCriterion != null || localeCriterion != null) {
-      Filtering filtering = new Filtering();
-      if (labelCriterion != null) {
-        filtering.add(Filtering.builder().add("label", labelCriterion).build());
-      }
-      if (localeCriterion != null) {
-        filtering.add(
-            Filtering.builder()
-                .add(
-                    new FilterCriterion<Locale>(
-                        "locale",
-                        localeCriterion.getOperation(),
-                        Locale.forLanguageTag(localeCriterion.getValue().toString())))
-                .build());
-      }
-      pageRequest.setFiltering(filtering);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(License.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
   }
 
@@ -195,5 +175,11 @@ public class LicenseController {
       throws ServiceException {
     assert Objects.equals(uuid, license.getUuid());
     return service.update(license);
+  }
+
+  @Override
+  protected UniqueObjectService<License> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 }
