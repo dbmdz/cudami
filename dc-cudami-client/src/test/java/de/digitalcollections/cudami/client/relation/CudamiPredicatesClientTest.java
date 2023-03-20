@@ -57,6 +57,6 @@ class CudamiPredicatesClientTest
     client.find(buildExamplePageRequest());
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "/paged?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+        "/paged?pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
   }
 }

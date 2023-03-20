@@ -42,7 +42,7 @@ public abstract class BaseCudamiIdentifiablesClientTest<
 
     verifyHttpRequestByMethodAndRelativeURL(
         "get",
-        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&foo=eq:bar&gnarf=eq:krchch&searchTerm=hello");
+        "?language=de&initial=a&pageNumber=1&pageSize=2&sortBy=sortable.desc.nullsfirst.ignorecase&filter=foo:eq:bar&filter=gnarf:eq:krchch&searchTerm=hello");
   }
 
   @Test

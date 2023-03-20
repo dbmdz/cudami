@@ -36,6 +36,6 @@ class CudamiLinkedDataFileResourcesClientTest
     assertThat(response).isNotNull();
 
     verifyHttpRequestByMethodAndRelativeURL(
-        "get", "?pageNumber=0&pageSize=0&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml");
+        "get", "?pageNumber=0&pageSize=0&filter=uri:eq:http%3A%2F%2Ffoo.bar%2Fbla.xml");
   }
 }

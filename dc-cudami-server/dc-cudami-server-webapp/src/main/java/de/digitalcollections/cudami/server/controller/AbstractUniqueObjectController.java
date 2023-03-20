@@ -191,7 +191,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
       }
       pageRequest.setFiltering(filtering);
     } else {
-      // deprecated: old style
+      // deprecated: old style (no longer used by admin webapp!)
       pageRequest.setSearchTerm(searchTerm);
 
       for (Entry<String, FilterCriterion<String>> expFilterCriterion :
