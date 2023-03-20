@@ -18,7 +18,10 @@ import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @SuppressFBWarnings
 public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
@@ -69,7 +72,8 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
         // serverside
         expression = expression + "_" + dataLanguage;
       }
-      // TODO: default operation is "contains" for now, maybe pass other operators (controller) if
+      // TODO: default operation is "contains" for now, maybe pass other operators
+      // (controller) if
       // we want search in non "string" fields....
       filtering =
           Filtering.builder()
@@ -198,7 +202,7 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
   private boolean isMultiLanguageField(Class clz, String fieldName) throws TechnicalException {
     Field field;
     try {
-      field = clz.getDeclaredField(fieldName);
+      field = getField(clz, fieldName);
       Class fieldTypeClass = field.getType();
       if (LocalizedText.class == fieldTypeClass
           || LocalizedStructuredContent.class == fieldTypeClass) {
@@ -206,11 +210,36 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       }
       return false;
     } catch (NoSuchFieldException | SecurityException e) {
-      // for now it is save to return false, as multilingual fields should be found...
-      // FIXME: Problem was: "created" was not found...
-      return false;
-      // throw new TechnicalException("Field " + fieldName + " in class " +
-      // clz.getSimpleName(), e);
+      throw new TechnicalException(
+          "Field " + fieldName + " not found in class " + clz.getSimpleName(), e);
     }
+  }
+
+  public static Field getField(Class<?> clz, String fieldName) throws NoSuchFieldException {
+    List<Field> allFields = getAllFields(clz);
+    if (allFields.isEmpty()) {
+      throw new NoSuchFieldException();
+    }
+    Optional<Field> fieldOpt =
+        allFields.stream().filter(f -> f.getName().equals(fieldName)).findFirst();
+    if (fieldOpt.isPresent()) {
+      return fieldOpt.get();
+    }
+    throw new NoSuchFieldException();
+  }
+
+  /**
+   * getDeclaredFields only finds fields of current class not the inherited fields. So recursively
+   * collect super fields.
+   *
+   * @param clz class to get all fields for
+   * @return list of all fields (recursively)
+   */
+  public static List<Field> getAllFields(Class<?> clz) {
+    List<Field> fields = new ArrayList<Field>();
+    for (Class<?> c = clz; c != null; c = c.getSuperclass()) {
+      fields.addAll(Arrays.asList(c.getDeclaredFields()));
+    }
+    return fields;
   }
 }
