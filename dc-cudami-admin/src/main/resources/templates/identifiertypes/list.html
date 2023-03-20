@@ -80,6 +80,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-identifier_types').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.namespace}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsIdentifierTypes() {
         /*[+
          const baseUrl = [[@{'/identifiertypes'}]];
