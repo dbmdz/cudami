@@ -91,11 +91,10 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
       commonSql = " FROM " + tableName + " AS " + tableAlias;
     }
     StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
     addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".*" + commonSqlBuilder);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     String orderBy = getOrderBy(pageRequest.getSorting());
     if (StringUtils.hasText(orderBy)) {
       orderBy = " ORDER BY " + orderBy;
@@ -106,7 +105,7 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
     StringBuilder sqlCount = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(sqlCount, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

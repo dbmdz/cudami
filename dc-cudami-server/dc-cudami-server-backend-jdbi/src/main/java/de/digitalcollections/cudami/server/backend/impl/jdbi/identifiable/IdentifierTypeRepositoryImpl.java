@@ -55,14 +55,15 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<IdentifierType> find(PageRequest pageRequest) {
-    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
+    StringBuilder commonSqlBuilder = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
 
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
+    // Actually "*" should be used in select, but here we don't need it as there is
+    // no outer select
+    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_IDT + commonSqlBuilder);
+    addPagingAndSorting(pageRequest, query);
 
-    // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_IDT + commonSql);
-    addPageRequestParams(pageRequest, query);
     List<IdentifierType> result =
         dbi.withHandle(
             h ->
@@ -71,8 +72,8 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
                     .mapToBean(IdentifierType.class)
                     .list());
 
-    long total = count(commonSql.toString(), argumentMappings);
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    long total = count(commonSqlBuilder.toString(), argumentMappings);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

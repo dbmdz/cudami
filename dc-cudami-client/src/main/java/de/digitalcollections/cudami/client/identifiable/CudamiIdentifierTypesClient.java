@@ -18,6 +18,7 @@ public class CudamiIdentifierTypesClient extends CudamiRestClient<IdentifierType
   }
 
   public List<IdentifierType> find(String searchTerm, int maxResults) throws TechnicalException {
+    // FIXME replace with filtering
     PageRequest pageRequest = new PageRequest(searchTerm, 0, maxResults, null);
     PageResponse<IdentifierType> response = find(pageRequest);
     return response.getContent();

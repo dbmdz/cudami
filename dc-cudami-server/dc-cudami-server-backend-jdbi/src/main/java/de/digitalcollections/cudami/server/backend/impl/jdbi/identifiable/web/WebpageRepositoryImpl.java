@@ -139,12 +139,11 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + ".parent_webpage_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
@@ -152,7 +151,7 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -190,19 +189,18 @@ public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
                 + ".website_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Webpage> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

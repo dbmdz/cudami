@@ -205,7 +205,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", itemUuid);
 
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (digitalobject) than this repository (item)
     // we have to rename filter field names to target table alias and column names:
@@ -213,7 +212,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
@@ -224,7 +223,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -245,7 +244,6 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", manifestationUuid);
 
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (item) than this repository (manifestation)
     // we have to rename filter field names to target table alias and column names:
@@ -253,7 +251,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Item> result =
         retrieveList(
             getSqlSelectReducedFields(),
@@ -264,7 +262,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

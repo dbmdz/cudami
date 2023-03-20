@@ -290,7 +290,6 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("uuid", workUuid);
 
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (item) than this repository (manifestation)
     // we have to rename filter field names to target table alias and column names:
@@ -298,7 +297,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Manifestation> result =
         retrieveList(
             getSqlSelectReducedFields(),
@@ -309,7 +308,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -531,11 +530,10 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("subject_uuid", uuid);
 
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Manifestation> result =
         retrieveList(
             getSqlSelectReducedFields(),
@@ -546,7 +544,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   private void saveParents(Manifestation manifestation) {

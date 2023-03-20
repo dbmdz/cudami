@@ -136,7 +136,6 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
                 + ".project_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", projectUuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (digitalobject) than this repository (project)
     // we have to rename filter field names to target table alias and column names:
@@ -145,7 +144,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
@@ -156,7 +155,7 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

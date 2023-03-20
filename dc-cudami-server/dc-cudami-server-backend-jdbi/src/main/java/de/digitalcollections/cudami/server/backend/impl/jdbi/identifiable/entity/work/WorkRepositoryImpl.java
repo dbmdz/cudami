@@ -201,11 +201,10 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     Map<String, Object> argumentMappings = new HashMap<>();
     argumentMappings.put("subject_uuid", uuid);
 
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Work> result =
         retrieveList(
             getSqlSelectReducedFields(),
@@ -216,7 +215,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

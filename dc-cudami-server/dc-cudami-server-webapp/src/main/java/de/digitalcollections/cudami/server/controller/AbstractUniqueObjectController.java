@@ -13,8 +13,6 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,21 +155,18 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
       int pageNumber,
       int pageSize,
       List<Order> sortBy,
-      List<FilterCriterion> filterCriteria,
-      Map<String, FilterCriterion<String>> oldStyleFilterCriteria,
-      String searchTerm) {
+      List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     // add filtering
-    Filtering filtering = null;
-    if (filterCriteria != null && searchTerm == null) {
-      // new style
-      // TODO: add datalanguage to be sure multilanguage fields in filtercriteria have
-      // already
-      // "_language" as postfix assigned...
+    if (filterCriteria != null) {
+      Filtering filtering = null;
+      // TODO: add datalanguage to be able to validate that multilanguage fields in filtercriteria
+      // have
+      // already "_language" as postfix assigned...
 
       // convert filter criterion String value(s) to type of expression field (as generics
-      // type got lost over http (and list of eventually different FilterCriterion types)...)
+      // type got lost over http (and list contains eventually different FilterCriterion types)...)
       for (FilterCriterion fc : filterCriteria) {
         String expression = fc.getExpression();
         FilterOperation filterOperation = fc.getOperation();
@@ -188,23 +183,6 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
           filtering.add(convertedFc);
         } catch (NoSuchFieldException | SecurityException e) {
           LOGGER.warn("Field " + expression + " not found in class " + targetClass.getSimpleName());
-        }
-      }
-      pageRequest.setFiltering(filtering);
-    } else {
-      // deprecated: old style (no longer used by admin webapp!)
-      pageRequest.setSearchTerm(searchTerm);
-
-      for (Entry<String, FilterCriterion<String>> expFilterCriterion :
-          oldStyleFilterCriteria.entrySet()) {
-        String expression = expFilterCriterion.getKey();
-        FilterCriterion<String> fc = expFilterCriterion.getValue();
-        if (fc != null) {
-          if (filtering == null) {
-            filtering = new Filtering();
-          }
-          fc.setExpression(expression);
-          filtering.add(fc);
         }
       }
       pageRequest.setFiltering(filtering);

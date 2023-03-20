@@ -28,7 +28,6 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     extends AbstractPagingAndSortingRepositoryImpl {
@@ -78,26 +77,26 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
-  protected String addSearchTerm(
-      PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object> argumentMappings) {
-    // handle search term
-    String searchTerm = pageRequest.getSearchTerm();
-    String executedSearchTerm = null;
-    String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
-    if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
-      String commonSql = innerQuery.toString();
-      if (commonSql.toUpperCase().contains(" WHERE ")
-          || commonSql.toUpperCase().contains(" WHERE(")) {
-        innerQuery.append(" AND ");
-      } else {
-        innerQuery.append(" WHERE ");
-      }
-      // select with search term
-      innerQuery.append(commonSearchSql);
-      executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
-    }
-    return executedSearchTerm;
-  }
+  //  protected String addSearchTerm(
+  //      PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object> argumentMappings) {
+  //    // handle search term
+  //    String searchTerm = pageRequest.getSearchTerm();
+  //    String executedSearchTerm = null;
+  //    String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
+  //    if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
+  //      String commonSql = innerQuery.toString();
+  //      if (commonSql.toUpperCase().contains(" WHERE ")
+  //          || commonSql.toUpperCase().contains(" WHERE(")) {
+  //        innerQuery.append(" AND ");
+  //      } else {
+  //        innerQuery.append(" WHERE ");
+  //      }
+  //      // select with search term
+  //      innerQuery.append(commonSearchSql);
+  //      executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
+  //    }
+  //    return executedSearchTerm;
+  //  }
 
   /**
    * Add the search term to the argument map. By overriding this method custom modifications can be
@@ -257,10 +256,14 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return filterClauses;
   }
 
+  /**
+   * FIXME: not only for localized text, but for jsonb-fields I think... refactor?
+   *
+   * @return map containing name of localizedText/jsonbField and function to get the field object
+   */
   protected LinkedHashMap<String, Function<U, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields =
-        new LinkedHashMap<>();
-    return localizedTextFields;
+    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> jsonbFields = new LinkedHashMap<>();
+    return jsonbFields;
   }
 
   public String getMappingPrefix() {
@@ -282,19 +285,20 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
-    Set<String> fieldNames = getLocalizedTextFields().keySet();
-    if (!fieldNames.isEmpty()) {
-      // special handling of localized text fields
-      String regexPatternFieldNames = String.join("|", fieldNames);
+    Set<String> jsonbFieldNames = getLocalizedTextFields().keySet();
+    if (!jsonbFieldNames.isEmpty()) {
+      // special handling of jsonb fields
+      String expression = fc.getExpression();
+      String basicExpression = expression;
+      if (expression.contains("_")) {
+        basicExpression = expression.split("_")[0];
+      }
 
-      Matcher localizedTextFieldsMatcher =
-          Pattern.compile("^(" + regexPatternFieldNames + ")\\b").matcher(fc.getExpression());
-      if (localizedTextFieldsMatcher.find()) {
+      if (jsonbFieldNames.contains(basicExpression)) {
         if (!(fc.getValue() instanceof String)) {
           throw new IllegalArgumentException(
               "Value of localized text field expression must be a string!");
         }
-        String localizedTextFieldName = localizedTextFieldsMatcher.group(1);
         String value = (String) fc.getValue();
         switch (fc.getOperation()) {
           case CONTAINS:
@@ -305,22 +309,22 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
             argumentMappings.put(
                 SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
             return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
-                tableAlias, "split_" + localizedTextFieldName);
+                tableAlias, "split_" + basicExpression);
           case EQUALS:
             if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
               throw new IllegalArgumentException(
                   "Filtering by localized text fields value are mutually exclusive!");
             }
-            Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(fc.getExpression());
+            Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(expression);
             String language =
                 matchLanguage.find() ? "\"%s\"".formatted(matchLanguage.group(1)) : "**";
             argumentMappings.put(
                 SearchTermTemplates.JSONB_PATH.placeholder, escapeTermForJsonpath(value));
             return SearchTermTemplates.JSONB_PATH.renderTemplate(
-                tableAlias, localizedTextFieldName, language);
+                tableAlias, basicExpression, language);
           default:
             throw new UnsupportedOperationException(
-                "Filtering by localized text field only supports CONTAINS (to be preferred) or EQUALS operator!");
+                "Filtering on JSONB field only supports CONTAINS (to be preferred) or EQUALS operator!");
         }
       }
     }

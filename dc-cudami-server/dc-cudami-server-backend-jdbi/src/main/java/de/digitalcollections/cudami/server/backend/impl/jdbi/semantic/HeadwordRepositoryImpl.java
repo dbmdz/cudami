@@ -149,11 +149,10 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   public PageResponse<Headword> find(PageRequest pageRequest) {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Headword> result =
         retrieveList(
             SQL_REDUCED_FIELDS_HW,
@@ -165,7 +164,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

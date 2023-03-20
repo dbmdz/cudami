@@ -43,14 +43,14 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<RenderingTemplate> find(PageRequest pageRequest) {
-    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
+    StringBuilder commonSqlBuilder = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
 
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
     // Actually "*" should be used in select, but here we don't need it as there is no outer select
-    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_RT + commonSql);
-    addPageRequestParams(pageRequest, query);
+    StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_RT + commonSqlBuilder);
+    addPagingAndSorting(pageRequest, query);
     List<RenderingTemplate> result =
         dbi.withHandle(
             h ->
@@ -59,9 +59,9 @@ public class RenderingTemplateRepositoryImpl extends JdbiRepositoryImpl
                     .mapToBean(RenderingTemplate.class)
                     .list());
 
-    long total = count(commonSql.toString(), argumentMappings);
+    long total = count(commonSqlBuilder.toString(), argumentMappings);
 
-    return new PageResponse(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse(result, pageRequest, total);
   }
 
   @Override

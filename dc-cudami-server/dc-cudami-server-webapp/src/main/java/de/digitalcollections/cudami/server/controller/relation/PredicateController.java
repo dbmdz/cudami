@@ -15,10 +15,8 @@ import de.digitalcollections.model.validation.ValidationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -60,34 +58,18 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Get all predicates as (sorted, paged) list")
+  @Operation(summary = "Get all predicates as (paged, sorted, filtered) list")
   @GetMapping(
-      value = {"/v6/predicates/paged"},
+      value = {"/v6/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // FIXME: delete "/paged" from mapping as soon as we proceed to breaking V7
-  // API-Version
-  // TODO V7 remove deprecated params value, searchTerm
   public PageResponse<Predicate> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
-      @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    Map<String, FilterCriterion<String>> oldCriteria = new HashMap<>();
-    oldCriteria.put("value", valueCriterion);
-
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
-        createPageRequest(
-            Predicate.class, pageNumber, pageSize, sortBy, filterCriteria, oldCriteria, searchTerm);
+        createPageRequest(Predicate.class, pageNumber, pageSize, sortBy, filterCriteria);
     return predicateService.find(pageRequest);
-  }
-
-  @GetMapping(value = {"/v6/predicates"})
-  // FIXME: append "/all" to mapping as soon as we proceed to breaking V7
-  // API-Version
-  public List<Predicate> getAll() {
-    return predicateService.getAll();
   }
 
   @Operation(summary = "Get a predicate by its value or UUID")

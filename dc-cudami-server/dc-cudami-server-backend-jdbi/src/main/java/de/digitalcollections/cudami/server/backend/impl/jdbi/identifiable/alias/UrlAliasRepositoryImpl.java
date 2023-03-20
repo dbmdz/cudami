@@ -159,7 +159,7 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       pageRequest.setSorting(new Sorting("slug"));
     }
     commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
-    addPageRequestParams(pageRequest, commonSql);
+    addPagingAndSorting(pageRequest, commonSql);
 
     try {
       UrlAlias[] resultset =

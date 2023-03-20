@@ -219,6 +219,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
   // if unknown)
+  // FIXME: searchTerm obsolete only when old client (searching collection) is removed from webapps
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,

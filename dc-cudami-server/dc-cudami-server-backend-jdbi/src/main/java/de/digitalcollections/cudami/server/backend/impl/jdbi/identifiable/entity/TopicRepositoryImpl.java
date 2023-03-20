@@ -108,12 +108,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".parent_topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", uuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Topic> result =
         retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, orderBy);
 
@@ -121,7 +120,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -148,7 +147,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", topicUuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (entity) than this repository (topic)
     // we have to rename filter field names to target table alias and column names:
@@ -157,7 +155,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<Entity> result =
         entityRepositoryImpl.retrieveList(
             entityRepositoryImpl.getSqlSelectReducedFields(),
@@ -168,7 +166,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override
@@ -195,7 +193,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 + ".topic_uuid = :uuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", topicUuid);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     Filtering filtering = pageRequest.getFiltering();
     // as filtering has other target object type (digitalobject) than this repository (collection)
     // we have to rename filter field names to target table alias and column names:
@@ -204,7 +201,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePageRequestParams(pageRequest, innerQuery, crossTableAlias);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),
@@ -215,7 +212,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

@@ -1,13 +1,15 @@
 package de.digitalcollections.cudami.server.controller.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Identifier type controller")
-public class IdentifierTypeController {
+public class IdentifierTypeController extends AbstractUniqueObjectController<IdentifierType> {
 
   private final IdentifierTypeService identifierTypeService;
 
@@ -35,7 +37,7 @@ public class IdentifierTypeController {
     this.identifierTypeService = identifierTypeService;
   }
 
-  @Operation(summary = "Get all identifier types")
+  @Operation(summary = "Get all identifier types as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/identifiertypes"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,12 +45,9 @@ public class IdentifierTypeController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(IdentifierType.class, pageNumber, pageSize, sortBy, filterCriteria);
     return identifierTypeService.find(pageRequest);
   }
 
@@ -107,5 +106,11 @@ public class IdentifierTypeController {
     assert Objects.equals(uuid, identifierType.getUuid());
     identifierTypeService.update(identifierType);
     return identifierType;
+  }
+
+  @Override
+  protected UniqueObjectService<IdentifierType> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 }

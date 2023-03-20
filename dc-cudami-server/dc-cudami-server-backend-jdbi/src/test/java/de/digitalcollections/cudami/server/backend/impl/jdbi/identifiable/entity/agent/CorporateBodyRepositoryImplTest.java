@@ -117,7 +117,7 @@ class CorporateBodyRepositoryImplTest
                     Filtering.builder()
                         .add(
                             new FilterCriterion<>(
-                                "name.de", FilterOperation.CONTAINS, "Unternehmen Körperschaft"))
+                                "name_de", FilterOperation.CONTAINS, "Unternehmen Körperschaft"))
                         .build())
                 .build());
     PageResponse<CorporateBody> byEnglishName =
@@ -129,7 +129,7 @@ class CorporateBodyRepositoryImplTest
                     Filtering.builder()
                         .add(
                             new FilterCriterion<>(
-                                "name.en", FilterOperation.CONTAINS, "corporation funny stuff"))
+                                "name_en", FilterOperation.CONTAINS, "corporation funny stuff"))
                         .build())
                 .build());
     PageResponse<CorporateBody> byEnglishNameEquals =
@@ -141,7 +141,7 @@ class CorporateBodyRepositoryImplTest
                     Filtering.builder()
                         .add(
                             new FilterCriterion<>(
-                                "name.en",
+                                "name_en",
                                 FilterOperation.EQUALS,
                                 "a corporation doing funny stuff"))
                         .build())

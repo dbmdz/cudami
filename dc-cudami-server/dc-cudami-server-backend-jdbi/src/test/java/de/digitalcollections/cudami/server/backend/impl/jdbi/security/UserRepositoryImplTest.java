@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.security.User;
@@ -43,7 +45,7 @@ public class UserRepositoryImplTest {
   }
 
   @Test
-  @DisplayName("can find rendering templates")
+  @DisplayName("can find users")
   void find() {
     User user1 = new User();
     user1.setEmail("homer@simpson.de");
@@ -63,8 +65,12 @@ public class UserRepositoryImplTest {
     user3.setLastname("Wiggum");
     user3 = repo.save(user3);
 
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("email").contains("simpson.de").build())
+            .build();
     PageRequest pageRequest =
-        PageRequest.builder().pageNumber(0).pageSize(99).searchTerm("simpson.de").build();
+        PageRequest.builder().pageNumber(0).pageSize(99).filtering(filtering).build();
     PageResponse<User> pageResponse = repo.find(pageRequest);
     List<User> actualContent = pageResponse.getContent();
     assertThat(actualContent).hasSize(2);
@@ -73,7 +79,11 @@ public class UserRepositoryImplTest {
     assertThat(actual.getFirstname()).isEqualTo(user1.getFirstname());
     assertThat(actual.getLastname()).isEqualTo(user1.getLastname());
 
-    pageRequest = PageRequest.builder().pageNumber(0).pageSize(99).searchTerm("marjorie").build();
+    filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("firstname").contains("marjorie").build())
+            .build();
+    pageRequest.setFiltering(filtering);
     pageResponse = repo.find(pageRequest);
     actualContent = pageResponse.getContent();
     assertThat(actualContent).hasSize(1);
@@ -82,7 +92,11 @@ public class UserRepositoryImplTest {
     assertThat(actual.getFirstname()).isEqualTo(user2.getFirstname());
     assertThat(actual.getLastname()).isEqualTo(user2.getLastname());
 
-    pageRequest = PageRequest.builder().pageNumber(0).pageSize(99).searchTerm("Wiggum").build();
+    filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("lastname").contains("Wiggum").build())
+            .build();
+    pageRequest.setFiltering(filtering);
     pageResponse = repo.find(pageRequest);
     actualContent = pageResponse.getContent();
     assertThat(actualContent).hasSize(1);

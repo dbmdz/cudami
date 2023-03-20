@@ -168,11 +168,10 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
             + tableAlias
             + "_identifier on true";
     StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
     addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Subject> result =
         retrieveList(
             SQL_REDUCED_FIELDS_SUBJECTS,
@@ -183,8 +182,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    PageResponse<Subject> pageResponse =
-        new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    PageResponse<Subject> pageResponse = new PageResponse<>(result, pageRequest, total);
 
     filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
 

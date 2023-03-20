@@ -51,17 +51,11 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
   public PageResponse<User> find(PageRequest pageRequest) {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
     Map<String, Object> argumentMappings = new HashMap<>(0);
-
-    String executedSearchTerm = null;
-    if (pageRequest.getSearchTerm() != null) {
-      // TODO deprecated: old style
-      executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
-    } else {
-      addFiltering(pageRequest, commonSql, argumentMappings);
-    }
-    // Actually "*" should be used in select, but here we don't need it as there is no outer select
+    addFiltering(pageRequest, commonSql, argumentMappings);
+    // Actually "*" should be used in select, but here we don't need it as there is
+    // no outer select
     StringBuilder query = new StringBuilder("SELECT " + SQL_REDUCED_FIELDS_US + commonSql);
-    addPageRequestParams(pageRequest, query);
+    addPagingAndSorting(pageRequest, query);
     List<User> result =
         dbi.withHandle(
             h ->
@@ -71,7 +65,7 @@ public class UserRepositoryImpl extends JdbiRepositoryImpl implements UserReposi
                     .list());
 
     long total = count(commonSql.toString(), argumentMappings);
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

@@ -160,7 +160,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return new ArrayList<>(0);
   }
 
-  /* BiFunction for reducing rows (related objects) of joins not already part of identifiable (Identifier, preview image ImageFileResource). */
+  /*
+   * BiFunction for reducing rows (related objects) of joins not already part of
+   * identifiable (Identifier, preview image ImageFileResource).
+   */
   public BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer = (map, rowView) -> {};
   public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
   public final BiConsumer<Map<UUID, I>, RowView> fullReduceRowsBiConsumer;
@@ -205,22 +208,26 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
     // register row mapper for given class and mapping prefix
-    // (until now everywhere BeanMapper.factory... was used. If this changes, row mapper
+    // (until now everywhere BeanMapper.factory... was used. If this changes, row
+    // mapper
     // registration may be moved back into each repository impl?)
     dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
     dbi.registerRowMapper(
         BeanMapper.factory(UrlAlias.class, UrlAliasRepositoryImpl.MAPPING_PREFIX));
 
     // set basic reduce rows biconsumer for reduced selects (lists, paging)
-    // note: it turned out, that we also want identifiers and previewimage for reduced selects. So
-    // currently there is no difference to full, except that we do not want tags and subjects in
+    // note: it turned out, that we also want identifiers and previewimage for
+    // reduced selects. So
+    // currently there is no difference to full, except that we do not want tags and
+    // subjects in
     // reduced selects.
     this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(false);
 
     // set full reduce rows biconsumer for full selects (find one)
     this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true);
 
-    // for detailes select (only used in find one, not lists): if additional objects should be
+    // for detailes select (only used in find one, not lists): if additional objects
+    // should be
     // "joined" into instance, set bi function for doing this:
     if (additionalReduceRowsBiConsumer != null) {
       this.additionalReduceRowsBiConsumer = additionalReduceRowsBiConsumer;
@@ -229,17 +236,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     this.identifiableImplClass = identifiableImplClass;
   }
 
-  protected String addCrossTablePageRequestParams(
+  protected String addCrossTablePagingAndSorting(
       PageRequest pageRequest, StringBuilder innerQuery, final String crossTableAlias) {
     String orderBy = getOrderBy(pageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
       orderBy = "ORDER BY idx ASC";
       innerQuery.append(
-          " ORDER BY "
-              + crossTableAlias
-              + ".sortindex"); // must be the column itself to use window functions
+          " ORDER BY " + crossTableAlias + ".sortindex"); // must be the column itself to use window
+      // functions
     }
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     return orderBy;
   }
 
@@ -292,11 +298,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
       // preview image
       if (rowView.getColumn("pi_uuid", UUID.class) != null) {
-        // see definition in FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
+        // see definition in
+        // FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
         // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
         // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
 
-        // TODO workaround as long at is not possible to register two RowMappers for one type
+        // TODO workaround as long at is not possible to register two RowMappers for one
+        // type
         // but for different prefixes (unitl now the first takes precedence),
         // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
         ImageFileResource previewImage = new ImageFileResource();
@@ -392,11 +400,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       argumentMappings = new HashMap<>(0);
     }
     StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
     addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<I> result =
         retrieveList(
             getSqlSelectReducedFields(),
@@ -407,8 +414,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    PageResponse<I> pageResponse =
-        new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
 
     filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
 
@@ -504,10 +510,10 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             h ->
                 h.createQuery(
                         """
-            SELECT identifiable FROM identifiers
-            WHERE namespace = :namespace
-              AND identifier = :id;
-            """) /* affords index only scan on "unique_namespace_identifier" (V14.04.00) */
+        SELECT identifiable FROM identifiers
+        WHERE namespace = :namespace
+          AND identifier = :id;
+        """) /* affords index only scan on "unique_namespace_identifier" (V14.04.00) */
                     .bind("namespace", namespace)
                     .bind("id", identifierId)
                     .mapTo(UUID.class)
@@ -744,7 +750,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     List<I> result =
         dbi.withHandle(
             (Handle handle) -> {
-              //              handle.execute("SET cust.code=:customerID", "bav");
+              // handle.execute("SET cust.code=:customerID", "bav");
               // multitenancy, see
               // https://varun-verma.medium.com/isolate-multi-tenant-data-in-postgresql-db-using-row-level-security-rls-bdd3089d9337
               // https://aws.amazon.com/de/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/
@@ -862,7 +868,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   private void execInsertUpdate(
       final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback) {
-    // because of a significant difference in execution duration it makes sense to distinguish here
+    // because of a significant difference in execution duration it makes sense to
+    // distinguish here
     if (withCallback) {
       Map<String, Object> returnedFields =
           dbi.withHandle(
@@ -901,7 +908,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
     if (identifiable.getUuid() == null) {
-      // in case of fileresource the uuid is created on binary upload (before metadata save)
+      // in case of fileresource the uuid is created on binary upload (before metadata
+      // save)
       // to make saving on storage using uuid is possible
       identifiable.setUuid(UUID.randomUUID());
     }

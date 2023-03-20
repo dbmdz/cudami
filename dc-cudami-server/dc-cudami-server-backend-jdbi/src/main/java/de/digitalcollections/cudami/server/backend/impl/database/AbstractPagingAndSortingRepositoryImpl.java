@@ -66,7 +66,7 @@ public abstract class AbstractPagingAndSortingRepositoryImpl {
    * @param pageRequest
    * @param sqlQuery
    */
-  public void addPageRequestParams(PageRequest pageRequest, StringBuilder sqlQuery) {
+  public void addPagingAndSorting(PageRequest pageRequest, StringBuilder sqlQuery) {
     if (pageRequest != null) {
       if (pageRequest.getOffset() < offsetForAlternativePaging) {
         // standard handling with LIMIT and OFFSET

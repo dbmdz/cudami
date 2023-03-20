@@ -112,11 +112,10 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
     Map argumentMappings = new HashMap<>(0);
     String commonSql = " FROM " + tableName + " AS " + tableAlias;
     StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSqlBuilder, argumentMappings);
     addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPageRequestParams(pageRequest, innerQuery);
+    addPagingAndSorting(pageRequest, innerQuery);
     List<Tag> result =
         retrieveList(
             SQL_REDUCED_FIELDS_TAGS,
@@ -127,7 +126,7 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    return new PageResponse<>(result, pageRequest, total, executedSearchTerm);
+    return new PageResponse<>(result, pageRequest, total);
   }
 
   @Override

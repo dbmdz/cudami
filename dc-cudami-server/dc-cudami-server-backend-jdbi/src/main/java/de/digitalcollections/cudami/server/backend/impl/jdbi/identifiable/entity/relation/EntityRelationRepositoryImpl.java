@@ -75,7 +75,6 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   public PageResponse<EntityRelation> find(PageRequest pageRequest) {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
     Map<String, Object> argumentMappings = new HashMap<>(0);
-    String executedSearchTerm = addSearchTerm(pageRequest, commonSql, argumentMappings);
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder query =
@@ -83,7 +82,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
             "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object, rel.additional_predicates rel_addpredicates"
                 + commonSql);
     pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
-    addPageRequestParams(pageRequest, query);
+    addPagingAndSorting(pageRequest, query);
     List<EntityRelation> result =
         dbi.withHandle(
             h ->
@@ -102,8 +101,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                     .findOne()
                     .get());
 
-    PageResponse<EntityRelation> pageResponse =
-        new PageResponse<>(result, pageRequest, count, executedSearchTerm);
+    PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }
 

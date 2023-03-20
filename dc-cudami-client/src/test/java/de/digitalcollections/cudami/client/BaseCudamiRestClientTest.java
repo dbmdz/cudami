@@ -37,7 +37,6 @@ public abstract class BaseCudamiRestClientTest<
    *   <li>order: Descending for property "sortable" and nulls first
    *   <li>pageNumber: 1
    *   <li>pageSize: 2
-   *   <li>searchTerm: "hello"
    * </ul>
    *
    * @return example PageRequest with defined pageSize, pageNumber, sorting and two filters

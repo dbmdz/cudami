@@ -302,13 +302,16 @@ public class ItemRepositoryImplTest
             .build();
     repo.save(expectedItem);
 
-    PageRequest pageRequest =
-        PageRequest.builder()
-            .pageNumber(0)
-            .pageSize(100)
-            .searchTerm("testSetHolderAndPartofItemUuidInSearchResult")
+    Filtering filtering =
+        Filtering.builder()
+            .add(
+                FilterCriterion.builder()
+                    .withExpression("label_de")
+                    .contains("testSetHolderAndPartofItemUuidInSearchResult")
+                    .build())
             .build();
-
+    PageRequest pageRequest =
+        PageRequest.builder().pageNumber(0).pageSize(100).filtering(filtering).build();
     PageResponse<Item> actualPageResponse = repo.find(pageRequest);
 
     assertThat(actualPageResponse.getTotalElements()).isEqualTo(1);

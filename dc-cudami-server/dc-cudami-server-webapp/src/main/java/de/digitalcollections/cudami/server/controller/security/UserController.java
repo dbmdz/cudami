@@ -12,9 +12,7 @@ import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -47,14 +45,9 @@ public class UserController extends AbstractUniqueObjectController<User> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
-      @RequestParam(name = "lastname", required = false) FilterCriterion<String> lastnameCriterion,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    Map<String, FilterCriterion<String>> oldCriteria = new HashMap<>();
-    oldCriteria.put("lastname", lastnameCriterion);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
-        createPageRequest(
-            User.class, pageNumber, pageSize, sortBy, filterCriteria, oldCriteria, searchTerm);
+        createPageRequest(User.class, pageNumber, pageSize, sortBy, filterCriteria);
     return userService.find(pageRequest);
   }
 
