@@ -105,6 +105,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     PageRequest pageRequest =
         createPageRequest(CorporateBody.class, pageNumber, pageSize, sortBy, filterCriteria);
     return corporateBodyService.find(pageRequest);
+    // FIXME: remove it and find in super
     //      @RequestParam(name = "searchTerm", required = false) String searchTerm,
     //      @RequestParam(name = "label", required = false) String labelTerm,
     //      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
