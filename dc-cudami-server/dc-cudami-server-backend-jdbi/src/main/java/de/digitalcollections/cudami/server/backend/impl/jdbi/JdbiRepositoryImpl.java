@@ -35,9 +35,31 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
   private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
 
+  private static String getArrayTypeAndFillArgumentMappings(
+      Map<String, Object> argumentMappings, String criterionKey, Collection<?> valueCollection) {
+    String arrayType = "varchar[]";
+    Object valueSample = valueCollection.stream().findFirst().get();
+
+    if (valueSample instanceof UUID) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(UUID[]::new));
+      arrayType = "UUID[]";
+    } else if (valueSample instanceof String) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(String[]::new));
+      arrayType = "varchar[]";
+    } else if (valueSample instanceof Integer) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Integer[]::new));
+      arrayType = "int[]";
+    } else if (valueSample instanceof Long) {
+      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Long[]::new));
+      arrayType = "long[]";
+    }
+    return arrayType;
+  }
+
   protected final Jdbi dbi;
   protected final String mappingPrefix;
   protected final String tableAlias;
+
   protected final String tableName;
 
   public JdbiRepositoryImpl(
@@ -54,49 +76,52 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   public void addFiltering(
-      PageRequest pageRequest, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
-    if (pageRequest != null) {
-      addFiltering(pageRequest.getFiltering(), sqlQuery, argumentMappings);
-    }
-  }
-
-  public void addFiltering(
       Filtering filtering, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
     if (filtering != null) {
       // handle optional filtering params
-      String filterClauses = getFilterClauses(filtering, argumentMappings);
-      if (!filterClauses.isEmpty()) {
+      String whereClauses = getWhereClauses(filtering, argumentMappings);
+      if (!whereClauses.isEmpty()) {
         String sqlQueryStr = sqlQuery.toString();
         if (sqlQueryStr.toUpperCase().contains(" WHERE ")) {
           sqlQuery.append(" AND ");
         } else {
           sqlQuery.append(" WHERE ");
         }
-        sqlQuery.append(filterClauses);
+        sqlQuery.append(whereClauses);
       }
     }
   }
 
-  //  protected String addSearchTerm(
-  //      PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object> argumentMappings) {
-  //    // handle search term
-  //    String searchTerm = pageRequest.getSearchTerm();
-  //    String executedSearchTerm = null;
-  //    String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
-  //    if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm)) {
-  //      String commonSql = innerQuery.toString();
-  //      if (commonSql.toUpperCase().contains(" WHERE ")
-  //          || commonSql.toUpperCase().contains(" WHERE(")) {
-  //        innerQuery.append(" AND ");
-  //      } else {
-  //        innerQuery.append(" WHERE ");
-  //      }
-  //      // select with search term
-  //      innerQuery.append(commonSearchSql);
-  //      executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
-  //    }
-  //    return executedSearchTerm;
-  //  }
+  // FIXME: delete
+  // protected String addSearchTerm(
+  // PageRequest pageRequest, StringBuilder innerQuery, Map<String, Object>
+  // argumentMappings) {
+  // // handle search term
+  // String searchTerm = pageRequest.getSearchTerm();
+  // String executedSearchTerm = null;
+  // String commonSearchSql = getCommonSearchSql(tableAlias, searchTerm);
+  // if (StringUtils.hasText(commonSearchSql) && StringUtils.hasText(searchTerm))
+  // {
+  // String commonSql = innerQuery.toString();
+  // if (commonSql.toUpperCase().contains(" WHERE ")
+  // || commonSql.toUpperCase().contains(" WHERE(")) {
+  // innerQuery.append(" AND ");
+  // } else {
+  // innerQuery.append(" WHERE ");
+  // }
+  // // select with search term
+  // innerQuery.append(commonSearchSql);
+  // executedSearchTerm = addSearchTermMappings(searchTerm, argumentMappings);
+  // }
+  // return executedSearchTerm;
+  // }
+
+  public void addFiltering(
+      PageRequest pageRequest, StringBuilder sqlQuery, Map<String, Object> argumentMappings) {
+    if (pageRequest != null) {
+      addFiltering(pageRequest.getFiltering(), sqlQuery, argumentMappings);
+    }
+  }
 
   /**
    * Add the search term to the argument map. By overriding this method custom modifications can be
@@ -153,10 +178,22 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return term;
   }
 
+  protected UUID[] extractUuids(Collection<? extends UniqueObject> uniqueObjects) {
+    if (uniqueObjects == null || uniqueObjects.isEmpty()) {
+      return new UUID[0];
+    }
+    return uniqueObjects.stream()
+        .collect(
+            ArrayList<UUID>::new,
+            (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
+            ArrayList::addAll)
+        .toArray(new UUID[1]);
+  }
+
   protected void filterByLocalizedTextFields(
       PageRequest pageRequest,
       PageResponse<U> pageResponse,
-      LinkedHashMap<String, Function<U, Optional<LocalizedText>>> localizedTextFields) {
+      LinkedHashMap<String, Function<U, Optional<Object>>> jsonbFields) {
     if (!pageRequest.hasFiltering()) {
       return;
     }
@@ -165,10 +202,9 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     // but all pages !
     // seems to be not possible, as other pages base on SQL filtering.... rethink
     // the whole thing...
-    for (Map.Entry<String, Function<U, Optional<LocalizedText>>> entry :
-        localizedTextFields.entrySet()) {
+    for (Map.Entry<String, Function<U, Optional<Object>>> entry : jsonbFields.entrySet()) {
       String fieldName = entry.getKey();
-      Function<U, Optional<LocalizedText>> retrieveFieldFunction = entry.getValue();
+      Function<U, Optional<Object>> retrieveFieldFunction = entry.getValue();
 
       FilterCriterion filterCriterion =
           pageRequest.getFiltering().getFilterCriteria().stream()
@@ -194,7 +230,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   protected void filterBySplitField(
       PageResponse<U> pageResponse,
       FilterCriterion<String> filter,
-      Function<U, Optional<LocalizedText>> retrieveField) {
+      Function<U, Optional<Object>> retrieveField) {
     if (!pageResponse.hasContent()) {
       return;
     }
@@ -214,13 +250,19 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           pageResponse.getContent().parallelStream()
               .filter(
                   uniqueObject -> {
-                    String text =
-                        retrieveField.apply(uniqueObject).orElse(new LocalizedText()).get(language);
-                    if (text == null) {
-                      return false;
+                    Optional<Object> objOpt = retrieveField.apply(uniqueObject);
+                    if (objOpt.isPresent()) {
+                      Object obj = objOpt.get();
+                      if (obj instanceof LocalizedText) {
+                        String text = ((LocalizedText) obj).get(language);
+                        if (text == null) {
+                          return false;
+                        }
+                        List<String> splitText = Arrays.asList(splitToArray(text));
+                        return splitText.containsAll(searchTerms);
+                      }
                     }
-                    List<String> splitText = Arrays.asList(splitToArray(text));
-                    return splitText.containsAll(searchTerms);
+                    return false;
                   })
               .collect(Collectors.toList());
       // fix total elements count roughly
@@ -231,6 +273,34 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
+  private String getColumnName(FilterCriterion<?> fc) throws IllegalArgumentException {
+    // map expression to column name:
+    String givenExpression = fc.getExpression(); // e.g. "label_de"
+    String columnName;
+    if (fc.isNativeExpression()) {
+      // safe (not created using user input)
+      columnName = getTableAlias() + "." + givenExpression;
+    } else {
+      String basicExpression = givenExpression;
+      if (givenExpression.contains("_")) {
+        basicExpression = givenExpression.split("_")[0]; // e.g. "label"
+      }
+      // may be created using user input: map expression to column name
+      columnName = getColumnName(basicExpression); // e.g. tableAlias + ".label"
+      if (columnName == null) {
+        throw new IllegalArgumentException(
+            String.format(
+                "Given expression '%s' is invalid / can not be mapped to column name.",
+                givenExpression));
+      }
+
+      // FIXME: columname = tableAlias + ".split_label" if split_label column
+      // exists...
+      // and contains/equals operations are a search in an array?
+    }
+    return columnName;
+  }
+
   public String getCommonSearchSql(String tblAlias, String originalSearchTerm) {
     List<String> searchTermTemplates = getSearchTermTemplates(tblAlias, originalSearchTerm);
     return searchTermTemplates.isEmpty()
@@ -238,31 +308,11 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
         : "(" + searchTermTemplates.stream().collect(Collectors.joining(" OR ")) + ")";
   }
 
-  protected String getFilterClauses(Filtering filtering, Map<String, Object> argumentMappings) {
-    if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
-      return "";
-    }
-
-    ArrayList<String> whereClauses = new ArrayList<>();
-    List<FilterCriterion> filterCriteria = filtering.getFilterCriteria();
-    int criterionCount = argumentMappings.size() + 1;
-    for (FilterCriterion filterCriterion : filterCriteria) {
-      String whereClause = getWhereClause(filterCriterion, argumentMappings, criterionCount);
-      whereClauses.add(whereClause);
-      criterionCount++;
-    }
-
-    String filterClauses = whereClauses.stream().collect(Collectors.joining(" AND "));
-    return filterClauses;
-  }
-
   /**
-   * FIXME: not only for localized text, but for jsonb-fields I think... refactor?
-   *
-   * @return map containing name of localizedText/jsonbField and function to get the field object
+   * @return map containing name of jsonb field and function to get the field value
    */
-  protected LinkedHashMap<String, Function<U, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<U, Optional<LocalizedText>>> jsonbFields = new LinkedHashMap<>();
+  protected LinkedHashMap<String, Function<U, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<U, Optional<Object>>> jsonbFields = new LinkedHashMap<>();
     return jsonbFields;
   }
 
@@ -285,35 +335,52 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   protected String getWhereClause(
       FilterCriterion<?> fc, Map<String, Object> argumentMappings, int criterionCount)
       throws IllegalArgumentException, UnsupportedOperationException {
-    Set<String> jsonbFieldNames = getLocalizedTextFields().keySet();
-    if (!jsonbFieldNames.isEmpty()) {
-      // special handling of jsonb fields
+    Set<String> jsonbFields = getJsonbFields().keySet();
+    if (!jsonbFields.isEmpty()) {
       String expression = fc.getExpression();
       String basicExpression = expression;
-      if (expression.contains("_")) {
+      if (!fc.isNativeExpression() && expression.contains("_")) {
         basicExpression = expression.split("_")[0];
       }
 
-      if (jsonbFieldNames.contains(basicExpression)) {
+      if (jsonbFields.contains(basicExpression)) {
+        // JSONB field handling:
         if (!(fc.getValue() instanceof String)) {
-          throw new IllegalArgumentException(
-              "Value of localized text field expression must be a string!");
+          throw new IllegalArgumentException("Value of JSONB field expression must be a string!");
         }
         String value = (String) fc.getValue();
         switch (fc.getOperation()) {
           case CONTAINS:
             if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
               throw new IllegalArgumentException(
-                  "Filtering by localized text fields value are mutually exclusive!");
+                  "Filtering by JSONB fields value are mutually exclusive!");
             }
-            argumentMappings.put(
-                SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
-            return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
-                tableAlias, "split_" + basicExpression);
+            // FIXME: we introduced "split_xyz" column, because LocalizedText and
+            // LocalizedStructuredContent
+            // are HashMaps producing something like "{"de": "...", "en": "..."}" what is
+            // not
+            // properly handled (extremely slow) by JSONB search.
+            // TODO: 1. migrate jsonb content to proper key:value structure:
+            // "[{"lang":"de, "text": "..."}, {"lang":"en", "text":"..."}]"
+            // 2. implement new LocalizedArgumentFactory and LocalizedColumnMapper for
+            // JsonJdbiPlugin, converting
+            // between searchable json and Localized-Model-Objects
+            // 3. implement new CONTAINS search here (JdbiRepository.getWhereClause)
+            // 4. remove "split_" columns and code for that (e.g.
+            // filterBLocalizedTextFields, filterBySplitField)
+            if (isSplitField(basicExpression)) {
+              argumentMappings.put(
+                  SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
+              return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
+                  tableAlias, "split_" + basicExpression);
+            } else {
+              throw new UnsupportedOperationException(
+                  "Filtering on JSONB field with CONTAINS only supported if split_-column exists (for now)!");
+            }
           case EQUALS:
             if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
               throw new IllegalArgumentException(
-                  "Filtering by localized text fields value are mutually exclusive!");
+                  "Filtering by JSONB fields value are mutually exclusive!");
             }
             Matcher matchLanguage = Pattern.compile("\\.([\\w_-]+)$").matcher(expression);
             String language =
@@ -329,23 +396,15 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       }
     }
 
+    // normal field (non JSONB) handling:
     StringBuilder query = new StringBuilder();
     if (fc != null) {
-      FilterOperation filterOperation = fc.getOperation();
-      String givenExpression = fc.getExpression();
-      String expression;
-      if (fc.isNativeExpression()) {
-        // safe (not created using user input)
-        expression = givenExpression;
-      } else {
-        // may be created using user input: map expression to column name
-        expression = getColumnName(givenExpression);
-        if (expression == null) {
-          throw new IllegalArgumentException(
-              String.format(
-                  "Given expression '%s' is invalid / can not be mapped.", givenExpression));
-        }
-      }
+      // e.g.: "url:like:creativeco"
+      String columnName =
+          getColumnName(
+              fc); // e.g. "url" -> tableAlias + ".url" or native: "parent_uuid" -> tableAlias +
+      // ".parent_uuid
+      FilterOperation filterOperation = fc.getOperation(); // e.g. "like" -> "CONTAINS"
 
       String criterionKey = KEY_PREFIX_FILTERVALUE + criterionCount;
       switch (filterOperation) {
@@ -359,7 +418,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
             String keyMax = criterionKey + "_max";
             query
                 .append("(")
-                .append(expression)
+                .append(columnName)
                 .append(" BETWEEN ")
                 .append(":")
                 .append(keyMin)
@@ -378,7 +437,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
                 "For 'IN/NOT_IN' operation at least one value is expected");
           }
           // For 'in' or 'nin' operation
-          query.append("(").append(expression);
+          query.append("(").append(columnName);
           if (filterOperation == FilterOperation.NOT_IN) {
             query.append(" NOT");
           }
@@ -407,7 +466,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
                     argumentMappings, criterionKey, valueCollection);
             query
                 .append("(")
-                .append(expression)
+                .append(columnName)
                 .append(" @> ")
                 .append(":")
                 .append(criterionKey)
@@ -418,7 +477,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           } else {
             query
                 .append("(")
-                .append(expression)
+                .append(columnName)
                 .append(" ILIKE '%' || ")
                 .append(":")
                 .append(criterionKey)
@@ -430,7 +489,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" ILIKE ")
               .append(":")
               .append(criterionKey)
@@ -447,7 +506,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
 
             query
                 .append("(")
-                .append(expression)
+                .append(columnName)
                 .append(" = ")
                 .append(":")
                 .append(criterionKey)
@@ -457,7 +516,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           } else {
             query
                 .append("(")
-                .append(expression)
+                .append(columnName)
                 .append(" = ")
                 .append(":")
                 .append(criterionKey)
@@ -469,7 +528,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" != ")
               .append(":")
               .append(criterionKey)
@@ -480,7 +539,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" > ")
               .append(":")
               .append(criterionKey)
@@ -491,12 +550,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" > ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(expression)
+              .append(columnName)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -505,7 +564,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" >= ")
               .append(":")
               .append(criterionKey)
@@ -516,7 +575,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" < ")
               .append(":")
               .append(criterionKey)
@@ -527,12 +586,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" < ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(expression)
+              .append(columnName)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -541,7 +600,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
@@ -552,12 +611,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(expression)
+              .append(columnName)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -566,23 +625,23 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(expression)
+              .append(columnName)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(expression)
+              .append(columnName)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(expression).append(" IS NOT NULL").append(")");
+          query.append("(").append(columnName).append(" IS NOT NULL").append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(expression).append(" IS NULL").append(")");
+          query.append("(").append(columnName).append(" IS NULL").append(")");
           break;
         default:
           throw new UnsupportedOperationException(filterOperation + " not supported yet");
@@ -591,25 +650,32 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return query.toString();
   }
 
-  private static String getArrayTypeAndFillArgumentMappings(
-      Map<String, Object> argumentMappings, String criterionKey, Collection<?> valueCollection) {
-    String arrayType = "varchar[]";
-    Object valueSample = valueCollection.stream().findFirst().get();
-
-    if (valueSample instanceof UUID) {
-      argumentMappings.put(criterionKey, valueCollection.stream().toArray(UUID[]::new));
-      arrayType = "UUID[]";
-    } else if (valueSample instanceof String) {
-      argumentMappings.put(criterionKey, valueCollection.stream().toArray(String[]::new));
-      arrayType = "varchar[]";
-    } else if (valueSample instanceof Integer) {
-      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Integer[]::new));
-      arrayType = "int[]";
-    } else if (valueSample instanceof Long) {
-      argumentMappings.put(criterionKey, valueCollection.stream().toArray(Long[]::new));
-      arrayType = "long[]";
+  protected String getWhereClauses(Filtering filtering, Map<String, Object> argumentMappings) {
+    if (filtering == null || filtering.getFilterCriteria().isEmpty()) {
+      return "";
     }
-    return arrayType;
+
+    ArrayList<String> whereClauses = new ArrayList<>();
+    List<FilterCriterion> filterCriteria = filtering.getFilterCriteria();
+    int criterionCount = argumentMappings.size() + 1;
+    for (FilterCriterion filterCriterion : filterCriteria) {
+      String whereClause = getWhereClause(filterCriterion, argumentMappings, criterionCount);
+      whereClauses.add(whereClause);
+      criterionCount++;
+    }
+
+    String filterClauses = whereClauses.stream().collect(Collectors.joining(" AND "));
+    return filterClauses;
+  }
+
+  /**
+   * Override this method for check of split fields that exist in the repository's context
+   *
+   * @param basicExpression jsonb column name
+   * @return corresponding split-column exists
+   */
+  protected boolean isSplitField(String basicExpression) {
+    return false;
   }
 
   /*
@@ -633,6 +699,18 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
+  protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+    long total =
+        dbi.withHandle(
+            h ->
+                h.createQuery(sqlCount.toString())
+                    .bindMap(argumentMappings)
+                    .mapTo(Long.class)
+                    .findOne()
+                    .get());
+    return total;
+  }
+
   protected Integer retrieveNextSortIndexForParentChildren(
       Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
     // first child: max gets no results (= null)):
@@ -653,30 +731,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       return 0;
     }
     return sortIndex;
-  }
-
-  protected UUID[] extractUuids(Collection<? extends UniqueObject> uniqueObjects) {
-    if (uniqueObjects == null || uniqueObjects.isEmpty()) {
-      return new UUID[0];
-    }
-    return uniqueObjects.stream()
-        .collect(
-            ArrayList<UUID>::new,
-            (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
-            ArrayList::addAll)
-        .toArray(new UUID[1]);
-  }
-
-  protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-    return total;
   }
 
   public String[] splitToArray(LocalizedText localizedText) {

@@ -96,6 +96,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-rendering_templates').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.name}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function buttonsRenderingTemplates() {
         /*[+
          const baseUrl = [[@{'/renderingtemplates'}]];

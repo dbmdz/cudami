@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -16,22 +17,21 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierTypeService")
 @Transactional(rollbackFor = {Exception.class})
-public class IdentifierTypeServiceImpl implements IdentifierTypeService {
+public class IdentifierTypeServiceImpl
+    extends UniqueObjectServiceImpl<IdentifierType, IdentifierTypeRepository>
+    implements IdentifierTypeService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierTypeServiceImpl.class);
 
-  private final IdentifierTypeRepository repository;
   private Map<String, String> identifierTypeCache;
 
-  @Autowired
   public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) throws ServiceException {
-    this.repository = repository;
+    super(repository);
     updateIdentifierTypeCache();
   }
 
@@ -80,7 +80,8 @@ public class IdentifierTypeServiceImpl implements IdentifierTypeService {
     return saved;
   }
 
-  private void setDefaultSorting(PageRequest pageRequest) {
+  @Override
+  protected void setDefaultSorting(PageRequest pageRequest) {
     if (!pageRequest.hasSorting()) {
       Sorting sorting = new Sorting(Direction.ASC, "namespace", "uuid");
       pageRequest.setSorting(sorting);

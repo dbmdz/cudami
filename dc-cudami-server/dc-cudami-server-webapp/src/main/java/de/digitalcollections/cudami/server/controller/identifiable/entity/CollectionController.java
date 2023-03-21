@@ -217,23 +217,14 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   @GetMapping(
       value = {"/v6/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  // should work with v5-clients, too, as only searchTerm field is added (will be ignored by jackson
-  // if unknown)
-  // FIXME: searchTerm obsolete only when old client (searching collection) is removed from webapps
   public PageResponse<Collection> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
       @RequestParam(name = "active", required = false) String active) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
       return collectionService.findActive(pageRequest);
     }

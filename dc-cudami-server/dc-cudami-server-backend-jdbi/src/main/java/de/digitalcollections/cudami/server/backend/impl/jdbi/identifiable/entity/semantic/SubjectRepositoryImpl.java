@@ -9,7 +9,6 @@ import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
-import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -184,7 +183,9 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
     PageResponse<Subject> pageResponse = new PageResponse<>(result, pageRequest, total);
 
-    filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
+    // FIXME: try to avoid doing this after database select! Delete when jsonb search without
+    // split-field implemented
+    filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
 
     return pageResponse;
   }
@@ -227,10 +228,9 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  protected LinkedHashMap<String, Function<Subject, Optional<LocalizedText>>>
-      getLocalizedTextFields() {
-    LinkedHashMap<String, Function<Subject, Optional<LocalizedText>>> linkedHashMap =
-        super.getLocalizedTextFields();
+  protected LinkedHashMap<String, Function<Subject, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<Subject, Optional<Object>>> linkedHashMap =
+        super.getJsonbFields();
     linkedHashMap.put("label", i -> Optional.ofNullable(i.getLabel()));
     return linkedHashMap;
   }

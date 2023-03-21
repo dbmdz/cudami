@@ -1,14 +1,13 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.IdentifierType;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public interface IdentifierTypeService {
+public interface IdentifierTypeService extends UniqueObjectService<IdentifierType> {
 
   long count();
 
@@ -17,8 +16,6 @@ public interface IdentifierTypeService {
   }
 
   void delete(List<UUID> uuids);
-
-  PageResponse<IdentifierType> find(PageRequest pageRequest);
 
   IdentifierType getByNamespace(String namespace);
 

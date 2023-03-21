@@ -76,7 +76,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -94,7 +94,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -108,7 +108,7 @@ public abstract class BaseRestClient<T extends Object> {
             .uri(url)
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -125,7 +125,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -140,7 +140,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -156,7 +156,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -172,7 +172,7 @@ public abstract class BaseRestClient<T extends Object> {
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
             // TODO add creation of a request id if needed
-            //            .header("X-Request-Id", request.getRequestId())
+            // .header("X-Request-Id", request.getRequestId())
             .build();
     return req;
   }
@@ -239,7 +239,7 @@ public abstract class BaseRestClient<T extends Object> {
     }
     HttpRequest req = createGetRequest(requestUrl);
     // TODO add creation of a request id if needed
-    //            .header("X-Request-Id", request.getRequestId())
+    // .header("X-Request-Id", request.getRequestId())
     try {
       HttpResponse<byte[]> response = http.send(req, HttpResponse.BodyHandlers.ofByteArray());
       Integer statusCode = response.statusCode();
@@ -584,8 +584,9 @@ public abstract class BaseRestClient<T extends Object> {
     }
   }
 
-  protected String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
+  public String filterCriterionToUrlParam(FilterCriterion filterCriterion) {
     String expression = filterCriterion.getExpression();
+    boolean isNativeExpression = filterCriterion.isNativeExpression();
     FilterOperation operation = filterCriterion.getOperation();
     if (expression == null || operation == null) {
       return "";
@@ -615,7 +616,11 @@ public abstract class BaseRestClient<T extends Object> {
         break;
     }
 
-    // filter=expression:operation:operand
+    if (isNativeExpression) {
+      expression = URLEncoder.encode("[" + expression + "]", StandardCharsets.UTF_8);
+    }
+    // filter=expression:operation:operand (non native)
+    // filter=[expression]:operation:operand (native)
     return "filter=" + expression + ":" + operation + ":" + operand;
   }
 

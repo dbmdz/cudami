@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.Search
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -177,12 +176,10 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
   }
 
   @Override
-  protected LinkedHashMap<String, Function<License, Optional<LocalizedText>>>
-      getLocalizedTextFields() {
-    LinkedHashMap<String, Function<License, Optional<LocalizedText>>> localizedTextFields =
-        super.getLocalizedTextFields();
-    localizedTextFields.put("label", i -> Optional.ofNullable(i.getLabel()));
-    return localizedTextFields;
+  protected LinkedHashMap<String, Function<License, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<License, Optional<Object>>> jsonbFields = super.getJsonbFields();
+    jsonbFields.put("label", i -> Optional.ofNullable(i.getLabel()));
+    return jsonbFields;
   }
 
   @Override

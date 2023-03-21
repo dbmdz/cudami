@@ -78,10 +78,16 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
     }
 
     String expression = null;
+    boolean isNativeExpression = false;
     String operationAcronym = null;
     String operationValue = "";
     if (newStyle) {
       expression = filterParts[0];
+      if (expression.startsWith("[") && expression.endsWith("]")) {
+        // native expression marked by surrounding brackets
+        isNativeExpression = true;
+        expression = expression.substring(1, expression.length() - 2);
+      }
       operationAcronym = filterParts[1];
       for (int i = 2; i < filterParts.length; i++) {
         if (i > 2) {
@@ -106,19 +112,27 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
     FilterOperation filterOperation = FilterOperation.fromValue(operationAcronym);
 
     return createFilterCriterion(
-        targetClass, expression, filterOperation, operationValue, conversionService);
+        targetClass,
+        expression,
+        isNativeExpression,
+        filterOperation,
+        operationValue,
+        conversionService);
   }
 
   public static FilterCriterion createFilterCriterion(
       Class<?> targetClass,
       String expression,
+      boolean isNativeExpression,
       FilterOperation filterOperation,
       String operationValue,
       ConversionService conversionService)
       throws IllegalArgumentException {
     // no value operand (e.g. "set")
     if (filterOperation.getOperandCount() == FilterOperation.OperandCount.NO_VALUE) {
-      FilterCriterion fc = new FilterCriterion(expression, filterOperation, null, null, null, null);
+      FilterCriterion fc =
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, null, null, null);
       return fc;
     }
 
@@ -128,7 +142,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
         throw new IllegalArgumentException("No operation value found");
       }
       Object value = conversionService.convert(operationValue, targetClass);
-      FilterCriterion fc = new FilterCriterion(expression, filterOperation, value);
+      FilterCriterion fc =
+          new FilterCriterion(expression, isNativeExpression, filterOperation, value);
       return fc;
     }
 
@@ -148,7 +163,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
               .map(s -> conversionService.convert(s, targetClass))
               .collect(Collectors.toList()));
       FilterCriterion fc =
-          new FilterCriterion(expression, filterOperation, null, null, null, convertedValues);
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, null, null, convertedValues);
       return fc;
     }
 
@@ -182,7 +198,8 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
         }
       }
       FilterCriterion fc =
-          new FilterCriterion(expression, filterOperation, null, minValue, maxValue, null);
+          new FilterCriterion(
+              expression, isNativeExpression, filterOperation, null, minValue, maxValue, null);
       return fc;
     }
     return null;

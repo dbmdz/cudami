@@ -93,7 +93,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             UUID creationGeolocationUuid =
                 rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
 
-            // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date is set,
+            // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date
+            // is set,
             // We must build the CreationInfo object
             if (creationCreatorUuid != null
                 || creationDate != null
@@ -193,9 +194,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
-          , %1$s.parent_uuid %2$s_parent_uuid,
-          %1$s.item_uuid %2$s_item_uuid,
-          %3$s.label item_label"""
+        , %1$s.parent_uuid %2$s_parent_uuid,
+        %1$s.item_uuid %2$s_item_uuid,
+        %3$s.label item_label"""
             .formatted(tableAlias, mappingPrefix, ItemRepositoryImpl.TABLE_ALIAS);
   }
 
@@ -284,7 +285,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
       digitalObject.setPreviewImage(imageFileResourceRepositoryImpl.getByUuid(previewImageUuid));
     }
 
-    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their objects
+    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their
+    // objects
     CreationInfo creationInfo = digitalObject.getCreationInfo();
     if (creationInfo != null) {
       UUID creatorUuid =
@@ -356,7 +358,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", digitalObjectUuid);
     Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (collection) than this repository (digitalobject)
+    // as filtering has other target object type (collection) than this repository
+    // (digitalobject)
     // we have to rename filter field names to target table alias and column names:
     mapFilterExpressionsToOtherTableColumnNames(filtering, collectionRepositoryImpl);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -402,7 +405,8 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", digitalObjectUuid);
     Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (project) than this repository (digitalobject)
+    // as filtering has other target object type (project) than this repository
+    // (digitalobject)
     // we have to rename filter field names to target table alias and column names:
     mapFilterExpressionsToOtherTableColumnNames(filtering, projectRepositoryImpl);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -457,12 +461,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     if (super.getColumnName(modelProperty) != null) {
       return super.getColumnName(modelProperty);
     }
-    switch (modelProperty) {
-      case "parent.uuid":
-        return tableAlias + ".parent_uuid";
-      default:
-        return null;
-    }
+    return null;
   }
 
   @Override

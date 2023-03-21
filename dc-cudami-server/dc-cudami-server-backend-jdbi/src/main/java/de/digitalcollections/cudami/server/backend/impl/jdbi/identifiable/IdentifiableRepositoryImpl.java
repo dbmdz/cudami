@@ -416,7 +416,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
 
-    filterByLocalizedTextFields(pageRequest, pageResponse, getLocalizedTextFields());
+    // FIXME: try to avoid doing this after database select! Delete when jsonb search without
+    // split-field implemented
+    filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
 
     return pageResponse;
   }
@@ -599,11 +601,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  protected LinkedHashMap<String, Function<I, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<I, Optional<LocalizedText>>> localizedTextFields =
-        super.getLocalizedTextFields();
-    localizedTextFields.put("label", i -> Optional.ofNullable(i.getLabel()));
-    return localizedTextFields;
+  protected LinkedHashMap<String, Function<I, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<I, Optional<Object>>> jsonbFields = super.getJsonbFields();
+    jsonbFields.put("description", i -> Optional.ofNullable(i.getDescription()));
+    jsonbFields.put("label", i -> Optional.ofNullable(i.getLabel()));
+    jsonbFields.put(
+        "previewImageRenderingHints", i -> Optional.ofNullable(i.getPreviewImageRenderingHints()));
+    return jsonbFields;
   }
 
   @Override
@@ -671,6 +675,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
    */
   protected void insertUpdateCallback(I identifiable, Map<String, Object> returnedFields) {
     // can be implemented in derived classes
+  }
+
+  // FIXME: delete when proper jsonb contains search implemented
+  protected boolean isSplitField(String basicExpression) {
+    // only label for now
+    return "label".equals(basicExpression);
   }
 
   @Override

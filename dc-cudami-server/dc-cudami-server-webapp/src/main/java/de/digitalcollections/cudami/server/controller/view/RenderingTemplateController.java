@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.controller.view;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.RenderingTemplate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Rendering template controller")
-public class RenderingTemplateController {
+public class RenderingTemplateController extends AbstractUniqueObjectController<RenderingTemplate> {
 
   private final RenderingTemplateService renderingTemplateService;
 
@@ -35,7 +37,7 @@ public class RenderingTemplateController {
     this.renderingTemplateService = renderingTemplateService;
   }
 
-  @Operation(summary = "Get all rendering templates")
+  @Operation(summary = "Get all rendering templates as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/renderingtemplates", "/v5/renderingtemplates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,12 +45,9 @@ public class RenderingTemplateController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(RenderingTemplate.class, pageNumber, pageSize, sortBy, filterCriteria);
     return renderingTemplateService.find(pageRequest);
   }
 
@@ -100,5 +99,11 @@ public class RenderingTemplateController {
       @PathVariable UUID uuid, @RequestBody RenderingTemplate template, BindingResult errors) {
     assert Objects.equals(uuid, template.getUuid());
     return renderingTemplateService.update(template);
+  }
+
+  @Override
+  protected UniqueObjectService<RenderingTemplate> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 }

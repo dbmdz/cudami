@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -76,54 +77,18 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     return websiteService.count();
   }
 
-  @Operation(
-      summary = "Get websites",
-      description = "Get a paged, filtered and sorted list of websites",
-      responses = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "SearchPageResponse&lt;Website&gt;",
-            content =
-                @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = PageResponseWebsite.class)))
-      })
+  @Operation(summary = "Get all websites as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/websites"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<Website> find(
-      @Parameter(
-              name = "pageNumber",
-              description = "the page number (starting with 0); if unset, defaults to 0.",
-              example = "0",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageNumber", required = false, defaultValue = "0")
-          int pageNumber,
-      @Parameter(
-              name = "pageSize",
-              description = "the page size; if unset, defaults to 25",
-              example = "25",
-              schema = @Schema(type = "integer"))
-          @RequestParam(name = "pageSize", required = false, defaultValue = "25")
-          int pageSize,
-      @Parameter(
-              name = "sortBy",
-              description =
-                  "the sorting specification; if unset, default to alphabetically ascending sorting of the field 'label')",
-              example = "label_de.desc.nullsfirst",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "sortBy", required = false)
-          List<Order> sortBy,
-      @Parameter(
-              name = "searchTerm",
-              description = "the search term, of which the result is filtered (substring match)",
-              example = "Test",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "searchTerm", required = false)
-          String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Website.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return websiteService.find(pageRequest);
   }
 
   @Operation(

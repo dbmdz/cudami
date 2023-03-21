@@ -10,7 +10,6 @@ import de.digitalcollections.model.identifiable.entity.NamedEntity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.text.LocalizedText;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -40,14 +39,13 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   @Override
-  protected LinkedHashMap<String, Function<E, Optional<LocalizedText>>> getLocalizedTextFields() {
-    LinkedHashMap<String, Function<E, Optional<LocalizedText>>> localizedTextFields =
-        super.getLocalizedTextFields();
+  protected LinkedHashMap<String, Function<E, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<E, Optional<Object>>> jsonbFields = super.getJsonbFields();
     // An Entity might be a NamedEntity, too:
-    localizedTextFields.put(
+    jsonbFields.put(
         "name",
         i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
-    return localizedTextFields;
+    return jsonbFields;
   }
 
   @Override

@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierTypeRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -17,11 +17,10 @@ import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.statement.StatementException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
+public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<IdentifierType>
     implements IdentifierTypeRepository {
 
   public static final String MAPPING_PREFIX = "idt";
@@ -38,7 +37,6 @@ public class IdentifierTypeRepositoryImpl extends JdbiRepositoryImpl
   public static final String SQL_FULL_FIELDS_IDT = SQL_REDUCED_FIELDS_IDT;
   public static final String TABLE_NAME = "identifiertypes";
 
-  @Autowired
   public IdentifierTypeRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
