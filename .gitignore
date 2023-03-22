@@ -21,3 +21,7 @@ application-local.yml
 **/.classpath
 **/.project
 **/.dbeaver
+
+/docker/repository/postgres-initdb.d/**
+!/docker/repository/postgres-initdb.d/*.sh
+
