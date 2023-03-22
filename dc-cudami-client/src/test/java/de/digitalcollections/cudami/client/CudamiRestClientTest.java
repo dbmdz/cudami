@@ -51,54 +51,10 @@ public class CudamiRestClientTest {
   @Test
   @DisplayName("params for filtering")
   public void testFilteringParams() {
-    // FIXME: remove special handling of label
-    //    FilterCriterion fcLabel =
-    //        FilterCriterion.builder().withExpression("label").contains("something
-    // special").build();
-    //    String expLabel = "label=something+special";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabel)).isEqualTo(expLabel);
-    //
-    //    FilterCriterion fcLabelWithLanguage =
-    //        FilterCriterion.builder().withExpression("label.en").contains("something").build();
-    //    String expLabelWithLanguage = "label=something&labelLanguage=en";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabelWithLanguage))
-    //    .isEqualTo(expLabelWithLanguage);
-    //
-    //    FilterCriterion fcLabelEquals =
-    //        FilterCriterion.builder().withExpression("label").isEquals("something
-    // special").build();
-    //    String expLabelEquals = "label=%22something+special%22";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabelEquals)).isEqualTo(expLabelEquals);
-
-    // normal case
     LocalDate date = LocalDate.now();
     FilterCriterion fcDate =
         FilterCriterion.builder().withExpression("lastModified").isEquals(date).build();
     String expDate = String.format("filter=lastModified:eq:%s", date.toString());
     assertThat(client.filterCriterionToUrlParam(fcDate)).isEqualTo(expDate);
-  }
-
-  @Test
-  @DisplayName("params for name filtering are treated different")
-  // FIXME: remove special handling of name
-  public void testNameParams() {
-
-    //    FilterCriterion fcLabel =
-    //        FilterCriterion.builder().withExpression("name").contains("something
-    // special").build();
-    //    String expLabel = "name=something+special";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabel)).isEqualTo(expLabel);
-    //
-    //    FilterCriterion fcLabelWithLanguage =
-    //        FilterCriterion.builder().withExpression("name.en").contains("something").build();
-    //    String expLabelWithLanguage = "name=something&nameLanguage=en";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabelWithLanguage))
-    //    .isEqualTo(expLabelWithLanguage);
-    //
-    //    FilterCriterion fcLabelEquals =
-    //        FilterCriterion.builder().withExpression("name").isEquals("something
-    // special").build();
-    //    String expLabelEquals = "name=%22something+special%22";
-    //    assertThat(client.filterCriterionToUrlParam(fcLabelEquals)).isEqualTo(expLabelEquals);
   }
 }
