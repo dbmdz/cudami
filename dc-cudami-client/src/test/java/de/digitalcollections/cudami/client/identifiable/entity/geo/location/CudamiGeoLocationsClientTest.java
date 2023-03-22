@@ -22,7 +22,7 @@ class CudamiGeoLocationsClientTest
     String bodyJson =
         "{"
             + "\"listResponseType\":\"PAGE_RESPONSE\","
-            + "\"content\":[{\"objectType\":\"GEO_LOCATION\", \"geoLocation\":{\"entityType\":\"GEO_LOCATION\",\"identifiableType\":\"ENTITY\"}}]}";
+            + "\"content\":[{\"objectType\":\"GEO_LOCATION\", \"geoLocation\":{\"identifiableObjectType\":\"GEO_LOCATION\"}}]}";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     PageRequest pageRequest = new PageRequest();

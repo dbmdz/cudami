@@ -19,8 +19,7 @@ class CudamiDigitalObjectsClientTest
   @Test
   @DisplayName("can retrieve the list of reduced DigitalObjects")
   public void testFindAllReduced() throws Exception {
-    String bodyJson =
-        "[{\"entityType\":\"DIGITAL_OBJECT\",\"identifiableObjectType\":\"DIGITAL_OBJECT\"}]";
+    String bodyJson = "[{\"identifiableObjectType\":\"DIGITAL_OBJECT\"}]";
     when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
 
     List<DigitalObject> actual = client.getAllReduced();

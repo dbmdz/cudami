@@ -32,7 +32,7 @@ class CudamiFileResourcesMetadataClientTest
             + "\"content\":["
             + "{"
             + "\"objectType\":\"FILE_RESOURCE\","
-            + "\"fileResource\":{\"entityType\":\"FILE_RESOURCE\",\"identifiableType\":\"ENTITY\"}"
+            + "\"fileResource\":{\"identifiableObjectType\":\"FILE_RESOURCE\"}"
             + "}"
             + "]"
             + "}";
