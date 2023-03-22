@@ -38,10 +38,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Predicate controller")
 public class PredicateController extends AbstractUniqueObjectController<Predicate> {
 
-  private final PredicateService predicateService;
+  private final PredicateService service;
 
   public PredicateController(PredicateService predicateService) {
-    this.predicateService = predicateService;
+    this.service = predicateService;
   }
 
   @DeleteMapping(value = {"/v6/predicates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"})
@@ -52,7 +52,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
                   "UUID of the predicate, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid) {
-    boolean successful = predicateService.delete(uuid);
+    boolean successful = service.delete(uuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,7 +69,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Predicate.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return predicateService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get a predicate by its value or UUID")
@@ -81,9 +81,9 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
     Predicate result;
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
-      result = predicateService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = predicateService.getByValue(valueOrUuid);
+      result = service.getByValue(valueOrUuid);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -93,7 +93,13 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       value = {"/v6/predicates/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return predicateService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected UniqueObjectService<Predicate> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 
   @Operation(summary = "Save a newly created predicate")
@@ -114,7 +120,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
               });
       throw validationException;
     }
-    return predicateService.save(predicate);
+    return service.save(predicate);
   }
 
   /*
@@ -143,7 +149,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
                 + " does not match uuid of predicate="
                 + predicate.getUuid());
       }
-      return predicateService.update(predicate);
+      return service.update(predicate);
     }
 
     String value = valueOrUuid;
@@ -152,12 +158,6 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
           "value of path=" + value + " does not match value of predicate=" + predicate.getValue());
     }
 
-    return predicateService.saveOrUpdate(predicate);
-  }
-
-  @Override
-  protected UniqueObjectService<Predicate> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service.saveOrUpdate(predicate);
   }
 }

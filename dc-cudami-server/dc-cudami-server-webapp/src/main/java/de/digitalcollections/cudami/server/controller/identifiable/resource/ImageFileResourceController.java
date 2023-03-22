@@ -40,11 +40,6 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
     this.service = service;
   }
 
-  @Override
-  protected IdentifiableService<ImageFileResource> getService() {
-    return service;
-  }
-
   @Operation(summary = "Get all ImageFileResources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/imagefileresources", "/v6/imagefileresources/search"},
@@ -97,6 +92,11 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected IdentifiableService<ImageFileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created ImageFileResource")

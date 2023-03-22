@@ -42,15 +42,10 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GeoLocationController.class);
 
-  private final GeoLocationService<GeoLocation> geoLocationService;
+  private final GeoLocationService<GeoLocation> service;
 
   public GeoLocationController(GeoLocationService<GeoLocation> geoLocationservice) {
-    this.geoLocationService = geoLocationservice;
-  }
-
-  @Override
-  protected IdentifiableService<GeoLocation> getService() {
-    return geoLocationService;
+    this.service = geoLocationservice;
   }
 
   @Operation(summary = "count all geolocations")
@@ -63,7 +58,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return geoLocationService.count();
+    return service.count();
   }
 
   @Operation(summary = "Delete a geolocation")
@@ -76,7 +71,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       throws ConflictException {
     boolean successful;
     try {
-      successful = geoLocationService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -96,7 +91,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(GeoLocation.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return geoLocationService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Override
@@ -162,9 +157,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
 
     GeoLocation result;
     if (pLocale == null) {
-      result = geoLocationService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = geoLocationService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -179,7 +174,12 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return geoLocationService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<GeoLocation> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created geolocation")
@@ -188,7 +188,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GeoLocation save(@RequestBody GeoLocation geoLocation, BindingResult errors)
       throws ServiceException, ValidationException {
-    geoLocationService.save(geoLocation);
+    service.save(geoLocation);
     return geoLocation;
   }
 
@@ -205,7 +205,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @PathVariable("uuid") UUID uuid, @RequestBody GeoLocation geoLocation, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, geoLocation.getUuid());
-    geoLocationService.update(geoLocation);
+    service.update(geoLocation);
     return geoLocation;
   }
 }

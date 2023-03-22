@@ -42,15 +42,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Website controller")
 public class WebsiteController extends AbstractIdentifiableController<Website> {
 
-  private final WebsiteService websiteService;
+  // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
+  // ----------------- cannot yet handle generics
+  @Hidden
+  private static class PageResponseWebpage extends PageResponse<Webpage> {}
+
+  @Hidden
+  private static class PageResponseWebsite extends PageResponse<Website> {}
+
+  private final WebsiteService service;
 
   public WebsiteController(WebsiteService websiteService) {
-    this.websiteService = websiteService;
-  }
-
-  @Override
-  protected IdentifiableService<Website> getService() {
-    return websiteService;
+    this.service = websiteService;
   }
 
   @Operation(
@@ -74,7 +77,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return websiteService.count();
+    return service.count();
   }
 
   @Operation(summary = "Get all websites as (paged, sorted, filtered) list")
@@ -88,7 +91,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Website.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return websiteService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(
@@ -147,7 +150,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       Sorting sorting = new Sorting(sortBy);
       searchPageRequest.setSorting(sorting);
     }
-    return websiteService.findRootWebpages(uuid, searchPageRequest);
+    return service.findRootWebpages(uuid, searchPageRequest);
   }
 
   @Operation(
@@ -177,7 +180,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException, ServiceException {
-    Website website = websiteService.getByUuid(uuid);
+    Website website = service.getByUuid(uuid);
     return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -194,7 +197,12 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return websiteService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Website> getService() {
+    return service;
   }
 
   @Operation(
@@ -214,7 +222,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
       throws ServiceException, ValidationException {
-    websiteService.save(website);
+    service.save(website);
     return website;
   }
 
@@ -250,7 +258,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, website.getUuid());
-    websiteService.update(website);
+    service.update(website);
     return website;
   }
 
@@ -290,17 +298,9 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
     Website website = new Website();
     website.setUuid(uuid);
 
-    boolean successful = websiteService.updateRootWebpagesOrder(website, rootPages);
+    boolean successful = service.updateRootWebpagesOrder(website, rootPages);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
-
-  // ----------------- Helper classes for Swagger Annotations only, since Swagger Annotations
-  // ----------------- cannot yet handle generics
-  @Hidden
-  private static class PageResponseWebpage extends PageResponse<Webpage> {}
-
-  @Hidden
-  private static class PageResponseWebsite extends PageResponse<Website> {}
 }

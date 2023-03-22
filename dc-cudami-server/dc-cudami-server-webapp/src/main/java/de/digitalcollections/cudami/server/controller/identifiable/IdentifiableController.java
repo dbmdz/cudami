@@ -28,19 +28,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Identifiable controller")
 public class IdentifiableController extends AbstractIdentifiableController<Identifiable> {
 
-  private final IdentifiableService identifiableService;
+  private final IdentifiableService service;
   private final UrlAliasService urlAliasService;
 
   public IdentifiableController(
       @Qualifier("identifiableService") IdentifiableService identifiableService,
       UrlAliasService urlAliasService) {
-    this.identifiableService = identifiableService;
+    this.service = identifiableService;
     this.urlAliasService = urlAliasService;
-  }
-
-  @Override
-  protected IdentifiableService<Identifiable> getService() {
-    return identifiableService;
   }
 
   @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
@@ -55,38 +50,8 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
   public List<Identifiable> find(
       @RequestParam(name = "searchTerm") String searchTerm,
       @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
-    List<Identifiable> identifiables = identifiableService.find(searchTerm, maxResults);
+    List<Identifiable> identifiables = service.find(searchTerm, maxResults);
     return identifiables;
-  }
-
-  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
-  @GetMapping(
-      value = {
-        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases",
-        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
-      @Parameter(
-              description =
-                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
-          @PathVariable("uuid")
-          UUID uuid)
-      throws CudamiControllerException {
-
-    try {
-      if (identifiableService.getByUuid(uuid) == null) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-    } catch (Exception e) {
-      throw new CudamiControllerException(e);
-    }
-
-    try {
-      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
-    } catch (ServiceException e) {
-      throw new CudamiControllerException(e);
-    }
   }
 
   @Operation(
@@ -118,8 +83,43 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
       throws ResourceNotFoundException, ServiceException {
-    Identifiable identifiable = identifiableService.getByUuid(uuid);
+    Identifiable identifiable = service.getByUuid(uuid);
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")
+  @GetMapping(
+      value = {
+        "/v6/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases",
+        "/v5/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}/localizedUrlAliases"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<LocalizedUrlAliases> getLocalizedUrlAliases(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid)
+      throws CudamiControllerException {
+
+    try {
+      if (service.getByUuid(uuid) == null) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      throw new CudamiControllerException(e);
+    }
+
+    try {
+      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
+    } catch (ServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+  }
+
+  @Override
+  protected IdentifiableService<Identifiable> getService() {
+    return service;
   }
 }

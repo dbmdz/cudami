@@ -35,15 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "HeadwordEntry controller")
 public class HeadwordEntryController extends AbstractIdentifiableController<HeadwordEntry> {
 
-  private final HeadwordEntryService headwordEntryService;
+  private final HeadwordEntryService service;
 
   public HeadwordEntryController(HeadwordEntryService headwordEntryService) {
-    this.headwordEntryService = headwordEntryService;
-  }
-
-  @Override
-  protected IdentifiableService<HeadwordEntry> getService() {
-    return headwordEntryService;
+    this.service = headwordEntryService;
   }
 
   @Operation(summary = "Get count of headwordentries")
@@ -51,7 +46,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries/count", "/v5/headwordentries/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return headwordEntryService.count();
+    return service.count();
   }
 
   @Operation(summary = "Get all headwordentries as (paged, sorted, filtered) list")
@@ -65,7 +60,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(HeadwordEntry.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return headwordEntryService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get all headwordentries by headword")
@@ -83,7 +78,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return headwordEntryService.getByHeadword(uuid);
+    return service.getByHeadword(uuid);
   }
 
   @Override
@@ -123,9 +118,9 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
 
     HeadwordEntry headwordEntry;
     if (pLocale == null) {
-      headwordEntry = headwordEntryService.getByUuid(uuid);
+      headwordEntry = service.getByUuid(uuid);
     } else {
-      headwordEntry = headwordEntryService.getByUuidAndLocale(uuid, pLocale);
+      headwordEntry = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(
         headwordEntry, headwordEntry != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -136,7 +131,12 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       value = {"/v6/headwordentries/languages", "/v5/headwordentries/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return this.headwordEntryService.getLanguages();
+    return this.service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<HeadwordEntry> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created headwordentry")
@@ -145,7 +145,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HeadwordEntry save(@RequestBody HeadwordEntry headwordEntry, BindingResult errors)
       throws ServiceException, ValidationException {
-    headwordEntryService.save(headwordEntry);
+    service.save(headwordEntry);
     return headwordEntry;
   }
 
@@ -160,7 +160,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       @PathVariable UUID uuid, @RequestBody HeadwordEntry headwordEntry, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, headwordEntry.getUuid());
-    headwordEntryService.update(headwordEntry);
+    service.update(headwordEntry);
     return headwordEntry;
   }
 }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -15,7 +16,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 /** Service for Headword. */
-public interface HeadwordService {
+public interface HeadwordService extends UniqueObjectService<Headword> {
 
   default void addRelatedEntity(Headword headword, Entity entity) {
     if (headword == null || entity == null) {
@@ -37,17 +38,15 @@ public interface HeadwordService {
 
   long count();
 
+  boolean delete(List<UUID> uuids);
+
   default boolean delete(UUID uuid) {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
-  boolean delete(List<UUID> uuids);
-
   BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest);
 
   BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
-
-  PageResponse<Headword> find(PageRequest pageRequest);
 
   List<Headword> find(String searchTerm, int maxResults);
 

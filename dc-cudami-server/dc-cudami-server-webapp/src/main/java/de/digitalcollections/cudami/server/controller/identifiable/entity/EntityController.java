@@ -34,18 +34,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class EntityController<E extends Entity> extends AbstractIdentifiableController<Entity> {
 
   private final EntityRelationService entityRelationService;
-  private final EntityService<Entity> entityService;
+  private final EntityService<Entity> service;
 
   public EntityController(
       EntityRelationService entityRelationService,
       @Qualifier("entityService") EntityService<Entity> entityService) {
     this.entityRelationService = entityRelationService;
-    this.entityService = entityService;
-  }
-
-  @Override
-  protected IdentifiableService<Entity> getService() {
-    return entityService;
+    this.service = entityService;
   }
 
   @Operation(summary = "Get count of entities")
@@ -58,7 +53,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return entityService.count();
+    return service.count();
   }
 
   @Operation(summary = "Get all entities as (paged, sorted, filtered) list")
@@ -72,7 +67,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return entityService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Override
@@ -97,8 +92,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
           "No namespace and/or id were provided in a colon separated manner");
     }
 
-    Entity entity =
-        entityService.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    Entity entity = service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -111,7 +105,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByRefId(@PathVariable long refId) {
-    Entity entity = entityService.getByRefId(refId);
+    Entity entity = service.getByRefId(refId);
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     // routing should be done in frontend webapp (second call will be sent on entity type)
     //    EntityType entityType = entity.getEntityType();
@@ -132,7 +126,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Entity entity = entityService.getByUuid(uuid);
+    Entity entity = service.getByUuid(uuid);
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -147,7 +141,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getRandomEntities(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return entityService.getRandom(count);
+    return service.getRandom(count);
   }
 
   @Operation(summary = "Get related file resources of entity")
@@ -160,7 +154,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return entityService.getRelatedFileResources(uuid);
+    return service.getRelatedFileResources(uuid);
   }
 
   @Operation(summary = "Get relations for an entity (being the subject)")
@@ -174,5 +168,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<EntityRelation> getRelations(@PathVariable UUID uuid) {
     return entityRelationService.getBySubject(uuid);
+  }
+
+  @Override
+  protected IdentifiableService<Entity> getService() {
+    return service;
   }
 }

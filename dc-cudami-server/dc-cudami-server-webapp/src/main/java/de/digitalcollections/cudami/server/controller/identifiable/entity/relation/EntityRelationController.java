@@ -24,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity relation controller")
 public class EntityRelationController {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityRelationService service;
 
   public EntityRelationController(EntityRelationService entityRelationservice) {
-    this.entityRelationService = entityRelationservice;
+    this.service = entityRelationservice;
   }
 
   @Operation(summary = "Get paged, sorted, filtered relations")
@@ -49,7 +49,22 @@ public class EntityRelationController {
 
       pageRequest.add(filtering);
     }
-    return entityRelationService.find(pageRequest);
+    return service.find(pageRequest);
+  }
+
+  @Operation(summary = "Connect a list of entity pairs with a predicate each")
+  @PutMapping(
+      value = {
+        "/v5/entities/relations",
+        "/v6/entities/relations",
+        "/v3/entities/relations",
+        "/latest/entities/relations"
+      },
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
+      throws ServiceException {
+    service.save(entityRelations);
+    return entityRelations;
   }
 
   @Operation(
@@ -75,22 +90,7 @@ public class EntityRelationController {
       throw new IllegalArgumentException(
           "Mismatching arguments. SubjectUuid must match the Uuid of the subject of the first item");
     }
-    entityRelationService.save(entityRelations);
-    return entityRelations;
-  }
-
-  @Operation(summary = "Connect a list of entity pairs with a predicate each")
-  @PutMapping(
-      value = {
-        "/v5/entities/relations",
-        "/v6/entities/relations",
-        "/v3/entities/relations",
-        "/latest/entities/relations"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
-      throws ServiceException {
-    entityRelationService.save(entityRelations);
+    service.save(entityRelations);
     return entityRelations;
   }
 }

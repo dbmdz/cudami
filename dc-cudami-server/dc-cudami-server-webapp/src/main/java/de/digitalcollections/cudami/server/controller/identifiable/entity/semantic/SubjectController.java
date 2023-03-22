@@ -86,6 +86,11 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
     return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
+  @Override
+  protected UniqueObjectService<Subject> getService() {
+    return service;
+  }
+
   @Operation(summary = "Save a newly created subject")
   @PostMapping(
       value = {"/v6/subjects"},
@@ -104,10 +109,5 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
     assert Objects.equals(uuid, subject.getUuid());
     service.update(subject);
     return subject;
-  }
-
-  @Override
-  protected UniqueObjectService<Subject> getService() {
-    return service;
   }
 }

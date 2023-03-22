@@ -98,6 +98,16 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
+        $('#table-collections').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
         function buttonsCollections() {
           /*[+
            const baseUrl = [[@{'/collections'}]];

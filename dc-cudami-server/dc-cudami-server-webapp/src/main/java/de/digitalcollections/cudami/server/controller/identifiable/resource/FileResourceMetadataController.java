@@ -42,17 +42,12 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   private static final Logger LOGGER =
       LoggerFactory.getLogger(FileResourceMetadataController.class);
 
-  private final FileResourceMetadataService<FileResource> metadataService;
+  private final FileResourceMetadataService<FileResource> service;
 
   public FileResourceMetadataController(
       @Qualifier("fileResourceMetadataService")
           FileResourceMetadataService<FileResource> metadataService) {
-    this.metadataService = metadataService;
-  }
-
-  @Override
-  protected IdentifiableService<FileResource> getService() {
-    return metadataService;
+    this.service = metadataService;
   }
 
   @Operation(summary = "Get all fileresources as (paged, sorted, filtered) list")
@@ -66,7 +61,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return metadataService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get all fileresources of given type as (paged, sorted, filtered) list")
@@ -115,7 +110,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
               .build();
       pageRequest.add(filtering);
     }
-    return metadataService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(
@@ -161,9 +156,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       throws ServiceException {
     FileResource result;
     if (pLocale == null) {
-      result = metadataService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = metadataService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -178,7 +173,12 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return metadataService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<FileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created fileresource")
@@ -192,7 +192,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FileResource save(@RequestBody FileResource fileResource)
       throws ServiceException, ValidationException {
-    metadataService.save(fileResource);
+    service.save(fileResource);
     return fileResource;
   }
 
@@ -209,7 +209,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, fileResource.getUuid());
-    metadataService.update(fileResource);
+    service.update(fileResource);
     return fileResource;
   }
 }

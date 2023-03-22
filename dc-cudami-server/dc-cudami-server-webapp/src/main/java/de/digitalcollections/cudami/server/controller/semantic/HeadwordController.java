@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.controller.semantic;
 
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.semantic.HeadwordService;
+import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -38,12 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Headword controller")
-public class HeadwordController {
+public class HeadwordController extends AbstractUniqueObjectController<Headword> {
 
-  private final HeadwordService headwordService;
+  private final HeadwordService service;
 
   public HeadwordController(HeadwordService headwordService) {
-    this.headwordService = headwordService;
+    this.service = headwordService;
   }
 
   @Operation(summary = "Get count of headwords")
@@ -51,7 +53,7 @@ public class HeadwordController {
       value = {"/v6/headwords/count", "/v5/headwords/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return headwordService.count();
+    return service.count();
   }
 
   @Operation(summary = "Delete an headword with all its relations")
@@ -64,7 +66,7 @@ public class HeadwordController {
   public ResponseEntity delete(
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid) {
-    boolean successful = headwordService.delete(uuid);
+    boolean successful = service.delete(uuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -95,7 +97,7 @@ public class HeadwordController {
       }
       pageRequest.setFiltering(filtering);
     }
-    return headwordService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(
@@ -116,7 +118,7 @@ public class HeadwordController {
     // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
     BucketObjectsRequest<Headword> bucketObjectsRequest =
         new BucketObjectsRequest<>(bucket, pageNumber, pageSize, null, null);
-    return headwordService.find(bucketObjectsRequest);
+    return service.find(bucketObjectsRequest);
   }
 
   @Operation(summary = "Get lower and upper headword borders as equal sized buckets in a list")
@@ -139,7 +141,7 @@ public class HeadwordController {
     // TODO: sorting is fix (on label), no filtering (e.g. on locale) available:
     BucketsRequest<Headword> bucketsRequest =
         new BucketsRequest<>(numberOfBuckets, parentBucket, null, null);
-    return headwordService.find(bucketsRequest);
+    return service.find(bucketsRequest);
   }
 
   @Operation(summary = "Get related entities of an headword")
@@ -155,7 +157,7 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.findRelatedEntities(uuid, pageRequest);
+    return service.findRelatedEntities(uuid, pageRequest);
   }
 
   @Operation(summary = "Get related file resources of an headword")
@@ -171,7 +173,7 @@ public class HeadwordController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    return headwordService.findRelatedFileResources(uuid, pageRequest);
+    return service.findRelatedFileResources(uuid, pageRequest);
   }
 
   @Operation(summary = "Get an headword by uuid")
@@ -182,7 +184,7 @@ public class HeadwordController {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Headword> getByUuid(@PathVariable UUID uuid) {
-    Headword result = headwordService.getByUuid(uuid);
+    Headword result = service.getByUuid(uuid);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -192,7 +194,7 @@ public class HeadwordController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Headword> getRandom(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return headwordService.getRandom(count);
+    return service.getRandom(count);
   }
 
   @Operation(summary = "Save a newly created headword")
@@ -201,7 +203,7 @@ public class HeadwordController {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword save(@RequestBody Headword headword, BindingResult errors)
       throws ServiceException {
-    return headwordService.save(headword);
+    return service.save(headword);
   }
 
   @Operation(summary = "Save list of related entities for a given headword")
@@ -215,7 +217,7 @@ public class HeadwordController {
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<Entity> entities) {
-    return headwordService.setRelatedEntities(uuid, entities);
+    return service.setRelatedEntities(uuid, entities);
   }
 
   @Operation(summary = "Save list of related fileresources for a given headword")
@@ -229,7 +231,7 @@ public class HeadwordController {
       @Parameter(example = "", description = "UUID of the headword") @PathVariable("uuid")
           UUID uuid,
       @RequestBody List<FileResource> fileResources) {
-    return headwordService.setRelatedFileResources(uuid, fileResources);
+    return service.setRelatedFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update an headword")
@@ -246,6 +248,11 @@ public class HeadwordController {
       BindingResult errors)
       throws ServiceException {
     assert Objects.equals(uuid, headword.getUuid());
-    return headwordService.update(headword);
+    return service.update(headword);
+  }
+
+  @Override
+  protected UniqueObjectService<Headword> getService() {
+    return service;
   }
 }

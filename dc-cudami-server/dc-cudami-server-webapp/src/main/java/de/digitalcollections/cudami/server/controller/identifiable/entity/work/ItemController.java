@@ -49,13 +49,13 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ItemController.class);
 
   private final DigitalObjectService digitalObjectService;
-  private final ItemService itemService;
+  private final ItemService service;
   private final WorkService workService;
 
   public ItemController(
       DigitalObjectService digitalObjectService, ItemService itemService, WorkService workService) {
     this.digitalObjectService = digitalObjectService;
-    this.itemService = itemService;
+    this.service = itemService;
     this.workService = workService;
   }
 
@@ -76,7 +76,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
           UUID digitalObjectUuid)
       throws ValidationException, ConflictException, ServiceException {
 
-    Item item = itemService.getByUuid(uuid);
+    Item item = service.getByUuid(uuid);
     boolean successful = digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
@@ -88,7 +88,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return itemService.count();
+    return service.count();
   }
 
   @Operation(summary = "Delete an item")
@@ -100,7 +100,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = itemService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -120,7 +120,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Item.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return itemService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get paged list of digital objects of this item")
@@ -139,7 +139,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return itemService.findDigitalObjects(uuid, pageRequest);
+    return service.findDigitalObjects(uuid, pageRequest);
   }
 
   @Operation(
@@ -199,9 +199,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
     Item result;
     if (pLocale == null) {
-      result = itemService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = itemService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -214,7 +214,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return itemService.getLanguages();
+    return service.getLanguages();
   }
 
   @Operation(
@@ -226,12 +226,12 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfDigitalObjects(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return itemService.getLanguagesOfDigitalObjects(uuid);
+    return service.getLanguagesOfDigitalObjects(uuid);
   }
 
   @Override
   protected IdentifiableService<Item> getService() {
-    return itemService;
+    return service;
   }
 
   @Operation(summary = "Get the work embodied in an item")
@@ -253,7 +253,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
       throws ServiceException, ValidationException {
-    itemService.save(item);
+    service.save(item);
     return item;
   }
 
@@ -272,7 +272,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throw new IllegalArgumentException("UUID mismatch of new and existing item");
     }
 
-    itemService.update(item);
+    service.update(item);
     return item;
   }
 }

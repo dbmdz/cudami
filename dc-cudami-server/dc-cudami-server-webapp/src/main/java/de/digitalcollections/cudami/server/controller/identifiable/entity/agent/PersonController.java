@@ -47,17 +47,12 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
-  private final PersonService personService;
+  private final PersonService service;
   private final WorkService workService;
 
   public PersonController(PersonService personService, WorkService workService) {
-    this.personService = personService;
+    this.service = personService;
     this.workService = workService;
-  }
-
-  @Override
-  protected IdentifiableService<Person> getService() {
-    return personService;
   }
 
   @Operation(summary = "count all persons")
@@ -70,7 +65,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return personService.count();
+    return service.count();
   }
 
   @Operation(summary = "Delete a person")
@@ -82,7 +77,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = personService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -102,7 +97,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Person.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return personService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -124,7 +119,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByGeoLocationOfBirth(pageRequest, uuid);
+    return service.findByGeoLocationOfBirth(pageRequest, uuid);
   }
 
   @Operation(summary = "get all persons died at given geo location")
@@ -146,7 +141,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return personService.findByGeoLocationOfDeath(pageRequest, uuid);
+    return service.findByGeoLocationOfDeath(pageRequest, uuid);
   }
 
   @Override
@@ -212,9 +207,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
     Person result;
     if (pLocale == null) {
-      result = personService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = personService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -230,7 +225,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws ServiceException {
-    return personService.getDigitalObjects(uuid);
+    return service.getDigitalObjects(uuid);
   }
 
   @Operation(summary = "Get languages of all persons")
@@ -243,7 +238,12 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return personService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Person> getService() {
+    return service;
   }
 
   @Operation(summary = "Get a person's works")
@@ -265,7 +265,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
       throws ServiceException, ValidationException {
-    personService.save(person);
+    service.save(person);
     return person;
   }
 
@@ -282,7 +282,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, person.getUuid());
-    personService.update(person);
+    service.update(person);
     return person;
   }
 }

@@ -7,10 +7,10 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.age
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.GivenName;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,32 +36,24 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Given name controller")
 public class GivenNameController extends AbstractIdentifiableController<GivenName> {
 
-  private final GivenNameService givenNameService;
+  private final GivenNameService service;
 
   public GivenNameController(GivenNameService givenNameService) {
-    this.givenNameService = givenNameService;
+    this.service = givenNameService;
   }
 
-  @Override
-  protected IdentifiableService<GivenName> getService() {
-    return givenNameService;
-  }
-
-  @Operation(summary = "get all given names")
+  @Operation(summary = "Get all given names as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/givennames"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<GivenName> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return givenNameService.find(pageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(GivenName.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.find(pageRequest);
   }
 
   @Operation(
@@ -115,11 +107,16 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
 
     GivenName result;
     if (pLocale == null) {
-      result = givenNameService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = givenNameService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected IdentifiableService<GivenName> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created givenname")
@@ -128,7 +125,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       produces = MediaType.APPLICATION_JSON_VALUE)
   public GivenName save(@RequestBody GivenName givenName, BindingResult errors)
       throws ServiceException, ValidationException {
-    givenNameService.save(givenName);
+    service.save(givenName);
     return givenName;
   }
 
@@ -143,7 +140,7 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
       @PathVariable("uuid") UUID uuid, @RequestBody GivenName givenName, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, givenName.getUuid());
-    givenNameService.update(givenName);
+    service.update(givenName);
     return givenName;
   }
 }

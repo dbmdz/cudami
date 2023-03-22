@@ -3,14 +3,15 @@ package de.digitalcollections.cudami.server.controller.identifiable.alias;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
+import de.digitalcollections.cudami.server.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,12 +33,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "UrlAlias controller")
-public class UrlAliasController {
+public class UrlAliasController extends AbstractPagingAndSortingController {
 
-  private final UrlAliasService urlAliasService;
+  private final UrlAliasService service;
 
   public UrlAliasController(UrlAliasService urlAliasService) {
-    this.urlAliasService = urlAliasService;
+    this.service = urlAliasService;
   }
 
   @Operation(summary = "Create and persist an UrlAlias")
@@ -52,7 +53,7 @@ public class UrlAliasController {
     }
 
     try {
-      urlAliasService.save(urlAlias);
+      service.save(urlAlias);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -75,7 +76,7 @@ public class UrlAliasController {
       throws CudamiControllerException {
     boolean isDeleted;
     try {
-      isDeleted = urlAliasService.delete(uuid);
+      isDeleted = service.delete(uuid);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -85,27 +86,21 @@ public class UrlAliasController {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(
-      summary =
-          "Find limited amounts of LocalizedUrlAliases. If the searchTerm is used, the slugs to be returned have to match the searchTerm")
+  @Operation(summary = "Get all LocalizedUrlAliases as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<PageResponse<LocalizedUrlAliases>> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws CudamiControllerException {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-
+    PageRequest pageRequest =
+        createPageRequest(LocalizedUrlAliases.class, pageNumber, pageSize, sortBy, filterCriteria);
     PageResponse<LocalizedUrlAliases> result;
     try {
-      result = urlAliasService.find(pageRequest);
+      result = service.find(pageRequest);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -142,7 +137,7 @@ public class UrlAliasController {
 
     String result;
     try {
-      result = urlAliasService.generateSlug(pLocale, label, websiteUuid);
+      result = service.generateSlug(pLocale, label, websiteUuid);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -168,7 +163,7 @@ public class UrlAliasController {
 
     UrlAlias result;
     try {
-      result = urlAliasService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -206,7 +201,7 @@ public class UrlAliasController {
       throws CudamiControllerException {
     LocalizedUrlAliases result;
     try {
-      result = urlAliasService.getPrimaryUrlAliases(websiteUuid, slug, pLocale);
+      result = service.getPrimaryUrlAliases(websiteUuid, slug, pLocale);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -238,7 +233,7 @@ public class UrlAliasController {
 
     UrlAlias result;
     try {
-      urlAliasService.update(urlAlias);
+      service.update(urlAlias);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

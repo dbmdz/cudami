@@ -38,15 +38,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Project controller")
 public class ProjectController extends AbstractIdentifiableController<Project> {
 
-  private final ProjectService projectService;
+  private final ProjectService service;
 
   public ProjectController(ProjectService projectService) {
-    this.projectService = projectService;
-  }
-
-  @Override
-  protected IdentifiableService<Project> getService() {
-    return projectService;
+    this.service = projectService;
   }
 
   @Operation(summary = "Add an existing digital object to an existing project")
@@ -78,7 +73,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = projectService.addDigitalObject(project, digitalObject);
+    boolean successful = service.addDigitalObject(project, digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -101,7 +96,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = projectService.addDigitalObjects(project, digitalObjects);
+    boolean successful = service.addDigitalObjects(project, digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -123,7 +118,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful;
     try {
-      successful = projectService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -143,7 +138,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return projectService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get paged digital objects of a project")
@@ -160,7 +155,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     Project project = new Project();
     project.setUuid(projectUuid);
-    return projectService.findDigitalObjects(project, searchPageRequest);
+    return service.findDigitalObjects(project, searchPageRequest);
   }
 
   @Override
@@ -207,9 +202,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     Project project;
     if (pLocale == null) {
-      project = projectService.getByUuid(uuid);
+      project = service.getByUuid(uuid);
     } else {
-      project = projectService.getByUuidAndLocale(uuid, pLocale);
+      project = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(project, project != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -224,7 +219,12 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return projectService.getLanguages();
+    return service.getLanguages();
+  }
+
+  @Override
+  protected IdentifiableService<Project> getService() {
+    return service;
   }
 
   @Operation(summary = "Remove an existing digital object from an existing project")
@@ -256,7 +256,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(digitalObjectUuid);
 
-    boolean successful = projectService.removeDigitalObject(project, digitalObject);
+    boolean successful = service.removeDigitalObject(project, digitalObject);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -268,7 +268,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project save(@RequestBody Project project, BindingResult errors)
       throws ServiceException, ValidationException {
-    projectService.save(project);
+    service.save(project);
     return project;
   }
 
@@ -289,7 +289,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     Project project = new Project();
     project.setUuid(projectUuid);
 
-    boolean successful = projectService.setDigitalObjects(project, digitalObjects);
+    boolean successful = service.setDigitalObjects(project, digitalObjects);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -307,7 +307,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, project.getUuid());
-    projectService.update(project);
+    service.update(project);
     return project;
   }
 }

@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Webpage HTML controller")
 public class WebpageHtmlController {
 
-  private final WebpageService webpageService;
+  private final WebpageService service;
 
   public WebpageHtmlController(WebpageService webpageService) {
-    this.webpageService = webpageService;
+    this.service = webpageService;
   }
 
   @Operation(summary = "Get a webpage as HTML")
@@ -58,9 +58,9 @@ public class WebpageHtmlController {
       throws ServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = webpageService.getByUuid(uuid);
+      webpage = service.getByUuid(uuid);
     } else {
-      webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
+      webpage = service.getByUuidAndLocale(uuid, pLocale);
       Locale returnedLocale = getLocale(webpage);
       model.addAttribute("locale", returnedLocale);
     }

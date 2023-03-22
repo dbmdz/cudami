@@ -47,25 +47,20 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkController.class);
 
-  private final WorkService workService;
-  private final ItemService itemService;
   private final AgentService agentService;
+  private final ItemService itemService;
   private final ManifestationService manifestationService;
+  private final WorkService service;
 
   public WorkController(
       WorkService workService,
       ItemService itemService,
       AgentService agentService,
       ManifestationService manifestationService) {
-    this.workService = workService;
+    this.service = workService;
     this.itemService = itemService;
     this.agentService = agentService;
     this.manifestationService = manifestationService;
-  }
-
-  @Override
-  protected IdentifiableService<Work> getService() {
-    return workService;
   }
 
   @Operation(summary = "count all works")
@@ -73,7 +68,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/count", "/v5/works/count", "/v2/works/count", "/latest/works/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return workService.count();
+    return service.count();
   }
 
   @Operation(summary = "Get all works as (paged, sorted, filtered) list")
@@ -87,7 +82,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Work.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return workService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Find all children of a work")
@@ -104,7 +99,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return workService.findEmbedded(uuid, pageRequest);
+    return service.findEmbedded(uuid, pageRequest);
   }
 
   @Operation(summary = "Find all manifestations of a work")
@@ -187,9 +182,9 @@ public class WorkController extends AbstractIdentifiableController<Work> {
 
     Work result;
     if (pLocale == null) {
-      result = workService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = workService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -228,7 +223,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       value = {"/v6/works/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return workService.getLanguages();
+    return service.getLanguages();
   }
 
   @Operation(
@@ -243,13 +238,18 @@ public class WorkController extends AbstractIdentifiableController<Work> {
     return manifestationService.getLanguagesOfManifestationsForWork(uuid);
   }
 
+  @Override
+  protected IdentifiableService<Work> getService() {
+    return service;
+  }
+
   @Operation(summary = "save a newly created work")
   @PostMapping(
       value = {"/v6/works", "/v5/works", "/v2/works", "/latest/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {
-    workService.save(work);
+    service.save(work);
     return work;
   }
 
@@ -268,7 +268,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       throw new IllegalArgumentException("UUID mismatch of new and existing work");
     }
 
-    workService.update(work);
+    service.update(work);
     return work;
   }
 }

@@ -49,11 +49,6 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     this.itemService = itemService;
   }
 
-  @Override
-  protected IdentifiableService<Manifestation> getService() {
-    return service;
-  }
-
   @Operation(summary = "Count all manifestations")
   @GetMapping(
       value = {"/v6/manifestations/count"},
@@ -95,24 +90,6 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Find all children of a manifestation")
-  @GetMapping(
-      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<Manifestation> findSubcollections(
-      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
-          UUID uuid,
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
-    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    return service.findChildren(uuid, pageRequest);
-  }
-
   @Operation(summary = "Find all items of a manifestation")
   @GetMapping(
       value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items"},
@@ -130,6 +107,24 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       pageRequest.setSorting(sorting);
     }
     return itemService.findItemsByManifestation(uuid, pageRequest);
+  }
+
+  @Operation(summary = "Find all children of a manifestation")
+  @GetMapping(
+      value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public PageResponse<Manifestation> findSubcollections(
+      @Parameter(example = "", description = "UUID of the manifestation") @PathVariable("uuid")
+          UUID uuid,
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+    PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
+    if (sortBy != null) {
+      Sorting sorting = new Sorting(sortBy);
+      pageRequest.setSorting(sorting);
+    }
+    return service.findChildren(uuid, pageRequest);
   }
 
   @Operation(
@@ -192,6 +187,11 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
           UUID uuid) {
     return itemService.getLanguagesOfItemsForManifestation(uuid);
+  }
+
+  @Override
+  protected IdentifiableService<Manifestation> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created manifestation")

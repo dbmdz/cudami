@@ -148,6 +148,12 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
     return service.getLanguages();
   }
 
+  @Override
+  protected UniqueObjectService<License> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
+  }
+
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     binder.registerCustomEditor(URL.class, new UrlEditor());
@@ -175,11 +181,5 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       throws ServiceException {
     assert Objects.equals(uuid, license.getUuid());
     return service.update(license);
-  }
-
-  @Override
-  protected UniqueObjectService<License> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
   }
 }

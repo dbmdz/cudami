@@ -86,6 +86,11 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
     return new ResponseEntity<>(tag, tag != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
+  @Override
+  protected UniqueObjectService<Tag> getService() {
+    return service;
+  }
+
   @Operation(summary = "Save a newly created tag")
   @PostMapping(
       value = {"/v6/tags"},
@@ -101,10 +106,5 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
   public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors) {
     assert Objects.equals(uuid, tag.getUuid());
     return service.update(tag);
-  }
-
-  @Override
-  protected UniqueObjectService<Tag> getService() {
-    return service;
   }
 }

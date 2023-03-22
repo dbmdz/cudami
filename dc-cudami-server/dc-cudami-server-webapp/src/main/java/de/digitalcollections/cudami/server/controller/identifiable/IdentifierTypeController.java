@@ -31,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Identifier type controller")
 public class IdentifierTypeController extends AbstractUniqueObjectController<IdentifierType> {
 
-  private final IdentifierTypeService identifierTypeService;
+  private final IdentifierTypeService service;
 
   public IdentifierTypeController(IdentifierTypeService identifierTypeService) {
-    this.identifierTypeService = identifierTypeService;
+    this.service = identifierTypeService;
   }
 
   @Operation(summary = "Get all identifier types as (paged, sorted, filtered) list")
@@ -48,7 +48,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(IdentifierType.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return identifierTypeService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "get identifier type by namespace (which is unique)")
@@ -56,7 +56,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       value = {"/v6/identifiertypes/namespace/{namespace}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<IdentifierType> getByNamespace(@PathVariable String namespace) {
-    IdentifierType identifierType = identifierTypeService.getByNamespace(namespace);
+    IdentifierType identifierType = service.getByNamespace(namespace);
     return new ResponseEntity<>(
         identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -71,9 +71,15 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) {
-    IdentifierType identifierType = identifierTypeService.getByUuid(uuid);
+    IdentifierType identifierType = service.getByUuid(uuid);
     return new ResponseEntity<>(
         identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected UniqueObjectService<IdentifierType> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 
   @Operation(summary = "save a newly created identifier type")
@@ -87,7 +93,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors)
       throws ServiceException {
-    identifierTypeService.save(identifierType);
+    service.save(identifierType);
     return identifierType;
   }
 
@@ -104,13 +110,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors)
       throws ServiceException {
     assert Objects.equals(uuid, identifierType.getUuid());
-    identifierTypeService.update(identifierType);
+    service.update(identifierType);
     return identifierType;
-  }
-
-  @Override
-  protected UniqueObjectService<IdentifierType> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
   }
 }

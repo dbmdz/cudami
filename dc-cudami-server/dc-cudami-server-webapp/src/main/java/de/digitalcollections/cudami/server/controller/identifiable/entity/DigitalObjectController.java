@@ -43,15 +43,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Digital object controller")
 public class DigitalObjectController extends AbstractIdentifiableController<DigitalObject> {
 
-  private final DigitalObjectService digitalObjectService;
+  private final DigitalObjectService service;
 
   public DigitalObjectController(DigitalObjectService digitalObjectService) {
-    this.digitalObjectService = digitalObjectService;
-  }
-
-  @Override
-  protected IdentifiableService<DigitalObject> getService() {
-    return digitalObjectService;
+    this.service = digitalObjectService;
   }
 
   @Operation(summary = "Get count of digital objects")
@@ -64,7 +59,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public long count() {
-    return digitalObjectService.count();
+    return service.count();
   }
 
   @Operation(summary = "Delete a digital object with all its relations")
@@ -82,7 +77,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ConflictException {
     boolean successful;
     try {
-      successful = digitalObjectService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -104,7 +99,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return digitalObjectService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get paged projects of a digital objects")
@@ -121,7 +116,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
 
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return digitalObjectService.findProjects(digitalObject, searchPageRequest);
+    return service.findProjects(digitalObject, searchPageRequest);
   }
 
   @Operation(
@@ -136,7 +131,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> getAllReduced() {
-    return digitalObjectService.getAllReduced();
+    return service.getAllReduced();
   }
 
   @Operation(
@@ -160,10 +155,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
 
     DigitalObject digitalObject =
         fillWemi
-            ? digitalObjectService.getByIdentifierWithWEMI(
-                namespaceAndId.getLeft(), namespaceAndId.getRight())
-            : digitalObjectService.getByIdentifier(
-                namespaceAndId.getLeft(), namespaceAndId.getRight());
+            ? service.getByIdentifierWithWEMI(namespaceAndId.getLeft(), namespaceAndId.getRight())
+            : service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -173,7 +166,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       value = {"/v5/digitalobjects/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DigitalObject> getByRefId(@PathVariable long refId) {
-    DigitalObject digitalObject = digitalObjectService.getByRefId(refId);
+    DigitalObject digitalObject = service.getByRefId(refId);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -188,7 +181,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    DigitalObject digitalObject = digitalObjectService.getByUuid(uuid);
+    DigitalObject digitalObject = service.getByUuid(uuid);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -209,9 +202,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return digitalObjectService.findActiveCollections(digitalObject, searchPageRequest);
+      return service.findActiveCollections(digitalObject, searchPageRequest);
     }
-    return digitalObjectService.findCollections(digitalObject, searchPageRequest);
+    return service.findCollections(digitalObject, searchPageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")
@@ -224,7 +217,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<FileResource> getFileResources(@PathVariable UUID uuid) {
-    return digitalObjectService.getFileResources(uuid);
+    return service.getFileResources(uuid);
   }
 
   @Operation(summary = "Get image file resources of a digital object")
@@ -237,7 +230,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
-    return digitalObjectService.getImageFileResources(uuid);
+    return service.getImageFileResources(uuid);
   }
 
   @Operation(summary = "Get item for digital object by digital object uuid")
@@ -250,7 +243,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item getItem(@PathVariable UUID uuid) {
-    return digitalObjectService.getItem(uuid);
+    return service.getItem(uuid);
   }
 
   @Operation(summary = "Get languages of all digital objects")
@@ -266,10 +259,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "parent.uuid", required = false)
           FilterCriterion<UUID> parentUuidFilterCriterion) {
     if (parentUuidFilterCriterion != null) {
-      return digitalObjectService.getLanguagesOfContainedDigitalObjects(
+      return service.getLanguagesOfContainedDigitalObjects(
           (UUID) parentUuidFilterCriterion.getValue());
     }
-    return digitalObjectService.getLanguages();
+    return service.getLanguages();
   }
 
   @Operation(summary = "Get all languages of a digital object's collections")
@@ -280,7 +273,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
-    return this.digitalObjectService.getLanguagesOfCollections(uuid);
+    return this.service.getLanguagesOfCollections(uuid);
   }
 
   @Operation(summary = "Get all languages of a digital object's projects")
@@ -291,7 +284,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
-    return this.digitalObjectService.getLanguagesOfProjects(uuid);
+    return this.service.getLanguagesOfProjects(uuid);
   }
 
   @Operation(summary = "Find limited amount of random digital objects")
@@ -305,7 +298,12 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> getRandomDigitalObjects(
       @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
-    return digitalObjectService.getRandom(count);
+    return service.getRandom(count);
+  }
+
+  @Override
+  protected IdentifiableService<DigitalObject> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created digital object")
@@ -319,7 +317,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws ServiceException, ValidationException {
-    digitalObjectService.save(digitalObject);
+    service.save(digitalObject);
     return digitalObject;
   }
 
@@ -337,7 +335,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestBody List<FileResource> fileResources)
       throws ServiceException {
-    return digitalObjectService.setFileResources(uuid, fileResources);
+    return service.setFileResources(uuid, fileResources);
   }
 
   @Operation(summary = "Update a digital object")
@@ -356,7 +354,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, digitalObject.getUuid());
-    digitalObjectService.update(digitalObject);
+    service.update(digitalObject);
     return digitalObject;
   }
 }

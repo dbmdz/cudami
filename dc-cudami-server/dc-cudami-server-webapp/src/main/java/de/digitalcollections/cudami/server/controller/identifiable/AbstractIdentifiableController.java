@@ -14,16 +14,6 @@ import org.springframework.http.ResponseEntity;
 public abstract class AbstractIdentifiableController<T extends Identifiable>
     extends AbstractUniqueObjectController<T> {
 
-  public ResponseEntity<T> getByIdentifier(HttpServletRequest request)
-      throws ServiceException, ValidationException {
-    Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
-
-    T identifiable =
-        getService().getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
-    return new ResponseEntity<>(
-        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-  }
-
   /**
    * Extract the namespace and identifier from the HttpServletRequest
    *
@@ -41,6 +31,16 @@ public abstract class AbstractIdentifiableController<T extends Identifiable>
           "No namespace and/or id were provided in a colon separated manner");
     }
     return namespaceAndId;
+  }
+
+  public ResponseEntity<T> getByIdentifier(HttpServletRequest request)
+      throws ServiceException, ValidationException {
+    Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
+
+    T identifiable =
+        getService().getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    return new ResponseEntity<>(
+        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Override

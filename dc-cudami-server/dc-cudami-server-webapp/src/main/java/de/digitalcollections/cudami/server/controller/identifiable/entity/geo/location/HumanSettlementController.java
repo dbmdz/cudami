@@ -42,15 +42,10 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HumanSettlementController.class);
 
-  private final HumanSettlementService humanSettlementService;
+  private final HumanSettlementService service;
 
   public HumanSettlementController(HumanSettlementService humanSettlementService) {
-    this.humanSettlementService = humanSettlementService;
-  }
-
-  @Override
-  protected IdentifiableService<HumanSettlement> getService() {
-    return humanSettlementService;
+    this.service = humanSettlementService;
   }
 
   @Operation(summary = "Delete a human settlement")
@@ -63,7 +58,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       throws ConflictException {
     boolean successful;
     try {
-      successful = humanSettlementService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -83,7 +78,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(HumanSettlement.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return humanSettlementService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Override
@@ -149,11 +144,16 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
 
     HumanSettlement result;
     if (pLocale == null) {
-      result = humanSettlementService.getByUuid(uuid);
+      result = service.getByUuid(uuid);
     } else {
-      result = humanSettlementService.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected IdentifiableService<HumanSettlement> getService() {
+    return service;
   }
 
   @Operation(summary = "save a newly created human settlement")
@@ -167,7 +167,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws ServiceException, ValidationException {
-    humanSettlementService.save(humanSettlement);
+    service.save(humanSettlement);
     return humanSettlement;
   }
 
@@ -186,7 +186,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, humanSettlement.getUuid());
-    humanSettlementService.update(humanSettlement);
+    service.update(humanSettlement);
     return humanSettlement;
   }
 }

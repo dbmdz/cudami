@@ -31,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Rendering template controller")
 public class RenderingTemplateController extends AbstractUniqueObjectController<RenderingTemplate> {
 
-  private final RenderingTemplateService renderingTemplateService;
+  private final RenderingTemplateService service;
 
   public RenderingTemplateController(RenderingTemplateService renderingTemplateService) {
-    this.renderingTemplateService = renderingTemplateService;
+    this.service = renderingTemplateService;
   }
 
   @Operation(summary = "Get all rendering templates as (paged, sorted, filtered) list")
@@ -48,7 +48,7 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(RenderingTemplate.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return renderingTemplateService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get rendering template by uuid")
@@ -61,7 +61,7 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<RenderingTemplate> getByUuid(@PathVariable UUID uuid) {
-    RenderingTemplate result = renderingTemplateService.getByUuid(uuid);
+    RenderingTemplate result = service.getByUuid(uuid);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -70,7 +70,13 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       value = {"/v6/renderingtemplates/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return this.renderingTemplateService.getLanguages();
+    return this.service.getLanguages();
+  }
+
+  @Override
+  protected UniqueObjectService<RenderingTemplate> getService() {
+    // FIXME: remove find from inherited. find not used, no need for getService()...
+    return null;
   }
 
   @Operation(summary = "Save a newly created rendering template")
@@ -83,7 +89,7 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate save(@RequestBody RenderingTemplate template, BindingResult errors) {
-    return renderingTemplateService.save(template);
+    return service.save(template);
   }
 
   @Operation(summary = "Update a rendering template")
@@ -98,12 +104,6 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
   public RenderingTemplate update(
       @PathVariable UUID uuid, @RequestBody RenderingTemplate template, BindingResult errors) {
     assert Objects.equals(uuid, template.getUuid());
-    return renderingTemplateService.update(template);
-  }
-
-  @Override
-  protected UniqueObjectService<RenderingTemplate> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service.update(template);
   }
 }

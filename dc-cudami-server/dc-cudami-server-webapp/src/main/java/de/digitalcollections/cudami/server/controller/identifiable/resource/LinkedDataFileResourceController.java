@@ -46,11 +46,6 @@ public class LinkedDataFileResourceController
     this.service = service;
   }
 
-  @Override
-  protected IdentifiableService<LinkedDataFileResource> getService() {
-    return service;
-  }
-
   @Operation(summary = "Get all linkedDataFileResources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/linkeddatafileresources", "/v6/linkeddatafileresources/search"},
@@ -94,6 +89,11 @@ public class LinkedDataFileResourceController
       result = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected IdentifiableService<LinkedDataFileResource> getService() {
+    return service;
   }
 
   @Operation(summary = "Save a newly created linkedDataFileResource")

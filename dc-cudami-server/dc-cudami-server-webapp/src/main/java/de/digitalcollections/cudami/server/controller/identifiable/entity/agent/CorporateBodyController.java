@@ -40,10 +40,10 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
 
   private static final Pattern GNDID_PATTERN = Pattern.compile("(\\d+(-.)?)|(\\d+X)");
 
-  private final CorporateBodyService corporateBodyService;
+  private final CorporateBodyService service;
 
   public CorporateBodyController(CorporateBodyService corporateBodyservice) {
-    this.corporateBodyService = corporateBodyservice;
+    this.service = corporateBodyservice;
   }
 
   @Operation(summary = "Delete a corporate body")
@@ -56,7 +56,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       throws ConflictException {
     boolean successful;
     try {
-      successful = corporateBodyService.delete(uuid);
+      successful = service.delete(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -67,7 +67,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
 
   @Override
   protected IdentifiableService<CorporateBody> getService() {
-    return corporateBodyService;
+    return service;
   }
 
   @Operation(summary = "Fetch a corporate body by GND-ID from external system and save it")
@@ -88,7 +88,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
     if (!GNDID_PATTERN.matcher(gndId).matches()) {
       throw new IllegalArgumentException("Invalid GND ID: " + gndId);
     }
-    CorporateBody corporateBody = corporateBodyService.fetchAndSaveByGndId(gndId);
+    CorporateBody corporateBody = service.fetchAndSaveByGndId(gndId);
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -104,16 +104,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(CorporateBody.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return corporateBodyService.find(pageRequest);
-    // FIXME: remove it and find in super
-    //      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-    //      @RequestParam(name = "label", required = false) String labelTerm,
-    //      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-    //      @RequestParam(name = "name", required = false) String nameTerm,
-    //      @RequestParam(name = "nameLanguage", required = false) Locale nameLanguage) {
-    //    return super.find(
-    //        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, nameTerm,
-    // nameLanguage);
+    return service.find(pageRequest);
   }
 
   @Override
@@ -146,7 +137,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
   public ResponseEntity<CorporateBody> getByRefId(
       @Parameter(example = "", description = "reference id") @PathVariable("refId") long refId)
       throws ServiceException {
-    CorporateBody corporateBody = corporateBodyService.getByRefId(refId);
+    CorporateBody corporateBody = service.getByRefId(refId);
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -177,9 +168,9 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
 
     CorporateBody corporateBody;
     if (pLocale == null) {
-      corporateBody = corporateBodyService.getByUuid(uuid);
+      corporateBody = service.getByUuid(uuid);
     } else {
-      corporateBody = corporateBodyService.getByUuidAndLocale(uuid, pLocale);
+      corporateBody = service.getByUuidAndLocale(uuid, pLocale);
     }
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -195,7 +186,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages() {
-    return corporateBodyService.getLanguages();
+    return service.getLanguages();
   }
 
   @Operation(summary = "Save a newly created corporate body")
@@ -209,7 +200,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws ServiceException, ValidationException {
-    corporateBodyService.save(corporateBody);
+    service.save(corporateBody);
     return corporateBody;
   }
 
@@ -233,7 +224,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       BindingResult errors)
       throws ServiceException, ValidationException {
     assert Objects.equals(uuid, corporateBody.getUuid());
-    corporateBodyService.update(corporateBody);
+    service.update(corporateBody);
     return corporateBody;
   }
 }

@@ -31,10 +31,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "User controller")
 public class UserController extends AbstractUniqueObjectController<User> {
 
-  private final UserService userService;
+  private final UserService service;
 
   public UserController(UserService userService) {
-    this.userService = userService;
+    this.service = userService;
   }
 
   @Operation(summary = "Get all users")
@@ -48,7 +48,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(User.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return userService.find(pageRequest);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Get all users with given role and enabled status")
@@ -59,7 +59,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
   public List<User> getByRoleAndStatus(
       @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
     // FIXME: ignores role, just returns admins? what if we want other role users?
-    return userService.getActiveAdminUsers();
+    return service.getActiveAdminUsers();
   }
 
   @Operation(summary = "Get user by email address")
@@ -68,7 +68,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email) {
-    User result = userService.getByUsername(email);
+    User result = service.getByUsername(email);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -82,8 +82,14 @@ public class UserController extends AbstractUniqueObjectController<User> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) {
-    User result = userService.getByUuid(uuid);
+    User result = service.getByUuid(uuid);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  }
+
+  @Override
+  protected UniqueObjectService<User> getService() {
+    // not used, yet
+    return null;
   }
 
   @Operation(summary = "Save a newly created user")
@@ -91,7 +97,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User save(@RequestBody User user, BindingResult errors) {
-    return userService.save(user, errors);
+    return service.save(user, errors);
   }
 
   @Operation(summary = "Update a user")
@@ -105,12 +111,6 @@ public class UserController extends AbstractUniqueObjectController<User> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
     assert Objects.equals(uuid, user.getUuid());
-    return userService.update(user, errors);
-  }
-
-  @Override
-  protected UniqueObjectService<User> getService() {
-    // not used, yet
-    return null;
+    return service.update(user, errors);
   }
 }
