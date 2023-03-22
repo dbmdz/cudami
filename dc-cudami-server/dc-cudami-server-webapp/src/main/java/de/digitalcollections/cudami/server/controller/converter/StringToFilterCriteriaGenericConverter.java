@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.controller.converter;
 
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.FilterOperation;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,15 +88,15 @@ public class StringToFilterCriteriaGenericConverter<C extends Comparable<C>>
       if (expression.startsWith("[") && expression.endsWith("]")) {
         // native expression marked by surrounding brackets
         isNativeExpression = true;
-        expression = expression.substring(1, expression.length() - 2);
+        expression = expression.substring(1, expression.length() - 1);
       }
       operationAcronym = filterParts[1];
       for (int i = 2; i < filterParts.length; i++) {
         if (i > 2) {
           // add separator again (was part of value and no filter separator)
-          operationValue = operationValue + ":";
+          operationValue = URLDecoder.decode(operationValue, StandardCharsets.UTF_8) + ":";
         }
-        operationValue = operationValue + filterParts[i];
+        operationValue = URLDecoder.decode(operationValue, StandardCharsets.UTF_8) + filterParts[i];
       }
     } else {
       // old style without expression part

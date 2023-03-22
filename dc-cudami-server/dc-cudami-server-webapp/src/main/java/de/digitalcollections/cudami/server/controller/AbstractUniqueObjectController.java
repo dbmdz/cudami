@@ -26,130 +26,6 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
 
   protected abstract UniqueObjectService<U> getService();
 
-  /**
-   * The usual find implementation
-   *
-   * <p>For {@code filterCriteria} we use a varargs parameter instead of a {@code Map<String,
-   * FilterCriterion<?>>}, because the beautiful shorthand {@code Map.of} does not support null
-   * values and so it would make things unnecessary difficult inside the extending class.
-   *
-   * <p>Do not mess things up by passing {@code null} for {@code filterCriteria} if there are not
-   * any. Since it is varargs you can just omit this parameter.
-   *
-   * @param pageNumber
-   * @param pageSize
-   * @param sortBy
-   * @param searchTerm
-   * @param labelTerm
-   * @param labelLanguage
-   * @param filterCriteria must be {@code Pair}s of a {@code String}, the expression, and the
-   *     corresponding {@code FilterCriterion}
-   * @return
-   */
-  //  public PageResponse<U> find(
-  //      int pageNumber,
-  //      int pageSize,
-  //      List<Order> sortBy,
-  //      String searchTerm,
-  //      String labelTerm,
-  //      Locale labelLanguage,
-  //      Pair<String, FilterCriterion<?>>... filterCriteria) {
-  //    return find(
-  //        pageNumber,
-  //        pageSize,
-  //        sortBy,
-  //        searchTerm,
-  //        labelTerm,
-  //        labelLanguage,
-  //        null,
-  //        null,
-  //        filterCriteria);
-  //  }
-
-  // FIXME: remove find with all the deprecated style, use filtering, no need for
-  // getService()...
-  /**
-   * The usual find implementation
-   *
-   * <p>For {@code filterCriteria} we use a varargs parameter instead of a {@code Map<String,
-   * FilterCriterion<?>>}, because the beautiful shorthand {@code Map.of} does not support null
-   * values and so it would make things unnecessary difficult inside the extending class.
-   *
-   * <p>Do not mess things up by passing {@code null} for {@code filterCriteria} if there are not
-   * any. Since it is varargs you can just omit this parameter.
-   *
-   * @param pageNumber
-   * @param pageSize
-   * @param sortBy
-   * @param searchTerm
-   * @param labelTerm
-   * @param labelLanguage
-   * @param nameTerm
-   * @param nameLanguage
-   * @param filterCriteria must be {@code Pair}s of a {@code String}, the expression, and the
-   *     corresponding {@code FilterCriterion}
-   * @return
-   */
-  //  public PageResponse<U> find(
-  //      int pageNumber,
-  //      int pageSize,
-  //      List<Order> sortBy,
-  //      String searchTerm,
-  //      String labelTerm,
-  //      Locale labelLanguage,
-  //      String nameTerm,
-  //      Locale nameLanguage,
-  //      Pair<String, FilterCriterion<?>>... filterCriteria) {
-  //    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-  //    if (sortBy != null) {
-  //      Sorting sorting = new Sorting(sortBy);
-  //      pageRequest.setSorting(sorting);
-  //    }
-  //
-  //    // Since Map.of doesn't support null values we try it this varargs-way.
-  //    for (Pair<String, FilterCriterion<?>> criterionPair : filterCriteria) {
-  //      if (criterionPair.getRight() == null) {
-  //        continue;
-  //      }
-  //      String expression = criterionPair.getLeft();
-  //      FilterCriterion<?> criterion = criterionPair.getRight();
-  //      criterion.setExpression(expression);
-  //      pageRequest.add(new Filtering(List.of(criterion)));
-  //    }
-  //
-  //    // FIXME: move to repository, and only for identifiables, others do not have split columns!
-  //    addLabelFilter(pageRequest, labelTerm, labelLanguage);
-  //    addNameFilter(pageRequest, nameTerm, nameLanguage);
-  //    return getService().find(pageRequest);
-  //  }
-
-  //  protected void addLabelFilter(PageRequest pageRequest, String labelTerm, Locale labelLanguage)
-  // {
-  //    addFilterForSplitField("label", pageRequest, labelTerm, labelLanguage);
-  //  }
-  //
-  //  protected void addNameFilter(PageRequest pageRequest, String nameTerm, Locale nameLanguage) {
-  //    addFilterForSplitField("name", pageRequest, nameTerm, nameLanguage);
-  //  }
-
-  //  private void addFilterForSplitField(
-  //      String expression, PageRequest pageRequest, String term, Locale language) {
-  //    // FIXME: move to repository
-  //    if (expression == null || pageRequest == null || term == null) {
-  //      return;
-  //    }
-  //    term = term.trim();
-  //    if (language != null) {
-  //      expression += "." + language.getLanguage();
-  //    }
-  //    FilterOperation operation = FilterOperation.CONTAINS;
-  //    if (term.matches("\".+\"")) {
-  //      operation = FilterOperation.EQUALS;
-  //    }
-  //    pageRequest.add(
-  //        Filtering.builder().add(new FilterCriterion<>(expression, operation, term)).build());
-  //  }
-
   protected PageRequest createPageRequest(
       Class targetClass,
       int pageNumber,
@@ -171,8 +47,15 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
       // type got lost over http (and list contains eventually different
       // FilterCriterion types)...)
       for (FilterCriterion fc : filterCriteria) {
+        if (filtering == null) {
+          filtering = new Filtering();
+        }
         String expression = fc.getExpression();
         boolean isNativeExpression = fc.isNativeExpression();
+        if (isNativeExpression) {
+          filtering.add(fc);
+          continue;
+        }
         FilterOperation filterOperation = fc.getOperation();
         String operationValue = (String) fc.getValue();
         try {
@@ -181,9 +64,7 @@ public abstract class AbstractUniqueObjectController<U extends UniqueObject> {
             basicExpression = expression.split("_")[0];
           }
           Class<?> fieldClass = getFieldType(targetClass, basicExpression);
-          if (filtering == null) {
-            filtering = new Filtering();
-          }
+
           if (Comparable.class.isAssignableFrom(fieldClass)) {
             FilterCriterion convertedFc =
                 StringToFilterCriteriaGenericConverter.createFilterCriterion(

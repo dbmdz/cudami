@@ -16,6 +16,7 @@ import de.digitalcollections.model.list.filtering.FilterOperation;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -83,7 +84,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v6/linkeddatafileresources/search?pageNumber=0&pageSize=1&uri=eq:http%3A%2F%2Ffoo.bar%2Fbla.xml"
+        "/v6/linkeddatafileresources/search?pageNumber=0&pageSize=1&filter=uri:eq:http://foo.bar/bla.xml"
       })
   public void find(String path) throws Exception {
     PageResponse<LinkedDataFileResource> expected =
@@ -113,7 +114,7 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
     expectedPageRequest.setPageSize(1);
     expectedPageRequest.setPageNumber(0);
     FilterCriterion filterCriterion =
-        new FilterCriterion("uri", FilterOperation.EQUALS, "http://foo.bar/bla.xml");
+        new FilterCriterion("uri", FilterOperation.EQUALS, URI.create("http://foo.bar/bla.xml"));
     Filtering filtering = new Filtering(List.of(filterCriterion));
     expectedPageRequest.setFiltering(filtering);
 

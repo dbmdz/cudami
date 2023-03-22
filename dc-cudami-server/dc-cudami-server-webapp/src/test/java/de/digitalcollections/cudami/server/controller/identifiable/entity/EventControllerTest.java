@@ -182,7 +182,7 @@ class EventControllerTest extends BaseControllerTest {
 
   @DisplayName("shall find a filtered list of events")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/events/?pageNumber=0&pageSize=10&label=foo"})
+  @ValueSource(strings = {"/v6/events/?pageNumber=0&pageSize=10&filter=label:like:foo"})
   public void relatedByPredicate(String path) throws Exception {
     List<Event> events =
         List.of(

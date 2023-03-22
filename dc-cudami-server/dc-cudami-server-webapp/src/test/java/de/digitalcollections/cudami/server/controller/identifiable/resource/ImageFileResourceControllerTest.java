@@ -86,7 +86,9 @@ class ImageFileResourceControllerTest extends BaseControllerTest {
   @DisplayName("can return a filtered and paged list of ImageFileResources")
   @ParameterizedTest
   @ValueSource(
-      strings = {"/v6/imagefileresources/search?pageNumber=0&pageSize=1&filename=eq:bla.jpg"})
+      strings = {
+        "/v6/imagefileresources/search?pageNumber=0&pageSize=1&filter=filename:eq:bla.jpg"
+      })
   public void find(String path) throws Exception {
     PageResponse<ImageFileResource> expected =
         (PageResponse)

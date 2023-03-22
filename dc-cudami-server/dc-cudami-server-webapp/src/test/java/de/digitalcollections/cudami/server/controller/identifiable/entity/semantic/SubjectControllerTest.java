@@ -58,7 +58,7 @@ class SubjectControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/subjects?label=\"Antike und Altertum\"&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/subjects?filter=label_und-Latn:eq:\"Antike und Altertum\""})
   public void findByLocalizedExactLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -69,7 +69,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .isEquals("\"Antike und Altertum\"")
                             .build())
                     .build())
@@ -79,7 +79,7 @@ class SubjectControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/subjects?label=Antike&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/subjects?filter=label_und-Latn:like:Antike"})
   public void findByLocalizedLikeLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -90,7 +90,7 @@ class SubjectControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .contains("Antike")
                             .build())
                     .build())

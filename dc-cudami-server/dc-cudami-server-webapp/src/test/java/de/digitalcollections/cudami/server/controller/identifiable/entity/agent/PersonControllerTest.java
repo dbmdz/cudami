@@ -73,7 +73,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?label=\"Karl Ranseier\"&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -84,7 +84,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -94,7 +94,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' label")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?label=Karl Ranseier&labelLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=label_und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeLabel(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -105,7 +105,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("label.und-latn")
+                            .withExpression("label_und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -115,7 +115,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized exact name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=\"Karl Ranseier\"&nameLanguage=de"})
+  @ValueSource(strings = {"/v6/persons?filter=name_de:eq:\"Karl Ranseier\""})
   public void findByLocalizedExactName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -126,7 +126,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name.de")
+                            .withExpression("name_de")
                             .isEquals("\"Karl Ranseier\"")
                             .build())
                     .build())
@@ -136,7 +136,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by localized 'like' name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=Karl Ranseier&nameLanguage=und-Latn"})
+  @ValueSource(strings = {"/v6/persons?filter=name_und-Latn:like:Karl Ranseier"})
   public void findByLocalizedLikeName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -147,7 +147,7 @@ class PersonControllerTest extends BaseControllerTest {
                 Filtering.builder()
                     .add(
                         FilterCriterion.builder()
-                            .withExpression("name.und-latn")
+                            .withExpression("name_und-Latn")
                             .contains("Karl Ranseier")
                             .build())
                     .build())
@@ -157,7 +157,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by non-localized exact name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=\"Karl Ranseier\""})
+  @ValueSource(strings = {"/v6/persons?filter=name:eq:\"Karl Ranseier\""})
   public void findByNonLocalizedExactName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =
@@ -178,7 +178,7 @@ class PersonControllerTest extends BaseControllerTest {
 
   @DisplayName("can retrieve by non-localized 'like' name")
   @ParameterizedTest
-  @ValueSource(strings = {"/v6/persons?name=Karl Ranseier"})
+  @ValueSource(strings = {"/v6/persons?filter=name:like:Karl Ranseier"})
   public void findByNonLocalizedLikeName(String path) throws Exception {
     testHttpGet(path);
     PageRequest expectedPageRequest =

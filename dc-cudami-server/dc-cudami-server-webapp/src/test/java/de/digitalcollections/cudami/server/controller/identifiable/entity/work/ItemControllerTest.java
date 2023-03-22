@@ -151,7 +151,7 @@ class ItemControllerTest extends BaseControllerTest {
   @Test
   public void filterByPartOfItemUuid() throws Exception {
     UUID uuid = UUID.randomUUID();
-    testHttpGet("/v6/items?pageNumber=0&pageSize=100&part_of_item.uuid=eq:" + uuid);
+    testHttpGet("/v6/items?pageNumber=0&pageSize=100&filter=[part_of_item]:eq:" + uuid);
     PageRequest expectedPageRequest =
         PageRequest.builder()
             .pageNumber(0)
@@ -159,9 +159,9 @@ class ItemControllerTest extends BaseControllerTest {
             .filtering(
                 Filtering.builder()
                     .add(
-                        FilterCriterion.builder()
-                            .withExpression("part_of_item.uuid")
-                            .isEquals(uuid)
+                        FilterCriterion.nativeBuilder()
+                            .withExpression("part_of_item")
+                            .isEquals(uuid.toString())
                             .build())
                     .build())
             .build();
