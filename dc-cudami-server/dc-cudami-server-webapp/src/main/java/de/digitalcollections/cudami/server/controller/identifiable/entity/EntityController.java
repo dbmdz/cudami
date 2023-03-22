@@ -11,12 +11,12 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,7 +61,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
     return entityService.count();
   }
 
-  @Operation(summary = "Get all entities")
+  @Operation(summary = "Get all entities as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,19 +69,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "entityType", required = false)
-          FilterCriterion<String> entityTypeCriterion) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        searchTerm,
-        labelTerm,
-        labelLanguage,
-        Pair.of("entityType", entityTypeCriterion));
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return entityService.find(pageRequest);
   }
 
   @Override

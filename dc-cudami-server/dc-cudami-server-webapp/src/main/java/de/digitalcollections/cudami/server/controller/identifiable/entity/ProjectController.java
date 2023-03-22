@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -131,7 +132,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Get all projects as (sorted, paged) list")
+  @Operation(summary = "Get all projects as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -139,10 +140,10 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return projectService.find(pageRequest);
   }
 
   @Operation(summary = "Get paged digital objects of a project")

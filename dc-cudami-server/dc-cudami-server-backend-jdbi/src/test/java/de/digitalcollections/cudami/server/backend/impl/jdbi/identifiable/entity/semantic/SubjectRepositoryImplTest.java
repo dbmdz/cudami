@@ -156,13 +156,13 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                 .filtering(
                     Filtering.builder()
                         .add(
-                            FilterCriterion.builder()
-                                .withExpression("identifiers_namespace")
+                            FilterCriterion.nativeBuilder()
+                                .withExpression("identifier.namespace")
                                 .isEquals("subject-namespace")
                                 .build())
                         .add(
-                            FilterCriterion.builder()
-                                .withExpression("identifiers_id")
+                            FilterCriterion.nativeBuilder()
+                                .withExpression("identifier.id")
                                 .isEquals("subject-id6")
                                 .build())
                         .add(
@@ -189,13 +189,13 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
                 .filtering(
                     Filtering.builder()
                         .add(
-                            FilterCriterion.builder()
-                                .withExpression("identifiers_namespace")
+                            FilterCriterion.nativeBuilder()
+                                .withExpression("identifier.namespace")
                                 .isEquals("subject-namespace")
                                 .build())
                         .add(
-                            FilterCriterion.builder()
-                                .withExpression("identifiers_id")
+                            FilterCriterion.nativeBuilder()
+                                .withExpression("identifier.id")
                                 .isEquals("nonexistent")
                                 .build())
                         .build())

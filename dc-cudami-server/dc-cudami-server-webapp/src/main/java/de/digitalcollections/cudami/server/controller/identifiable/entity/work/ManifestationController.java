@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +81,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Get all manifestations")
+  @Operation(summary = "Get all manifestations as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/manifestations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,19 +89,10 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        searchTerm,
-        labelTerm,
-        labelLanguage,
-        Pair.of("parent.uuid", parentUuidFilterCriterion));
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Manifestation.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.find(pageRequest);
   }
 
   @Operation(summary = "Find all children of a manifestation")

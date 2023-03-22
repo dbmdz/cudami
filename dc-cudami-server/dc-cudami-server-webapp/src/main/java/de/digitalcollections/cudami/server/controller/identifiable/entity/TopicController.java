@@ -84,7 +84,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
     return topicService.count();
   }
 
-  @Operation(summary = "Get all topics")
+  @Operation(summary = "Get all topics as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,10 +92,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return topicService.find(pageRequest);
   }
 
   @Operation(summary = "Get paged entities of a topic")

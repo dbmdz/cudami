@@ -10,8 +10,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ali
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.IdentifiableServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -68,8 +68,9 @@ public class EntityServiceImpl<E extends Entity>
    * Build a notification url by replacing placeholders in the template with the entity's uuid and
    * type
    */
-  protected URI buildNotificationUrl(String urlTemplate, UUID entityUuid, EntityType entityType) {
-    String url = String.format(urlTemplate, entityUuid, entityType);
+  protected URI buildNotificationUrl(
+      String urlTemplate, UUID entityUuid, IdentifiableObjectType identifiableObjectType) {
+    String url = String.format(urlTemplate, entityUuid, identifiableObjectType);
     try {
       return new URL(url).toURI();
     } catch (MalformedURLException | URISyntaxException e) {
@@ -121,7 +122,7 @@ public class EntityServiceImpl<E extends Entity>
   public void save(E entity) throws ServiceException, ValidationException {
     try {
       super.save(entity);
-      sendNotification("save", "POST", entity.getUuid(), entity.getEntityType());
+      sendNotification("save", "POST", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
       LOGGER.error("Cannot save entity " + entity + ": ", e);
       throw e;
@@ -141,13 +142,13 @@ public class EntityServiceImpl<E extends Entity>
 
   /** Send a notification to an external url when an entity has changed */
   protected void sendNotification(
-      String action, String httpVerb, UUID uuid, EntityType entityType) {
-    Optional<String> hook = hookProperties.getHookForActionAndType(action, entityType);
+      String action, String httpVerb, UUID uuid, IdentifiableObjectType identifiableObjectType) {
+    Optional<String> hook = hookProperties.getHookForActionAndType(action, identifiableObjectType);
     if (hook.isEmpty()) {
       // if no suitable hook is found, do nothing
       return;
     }
-    URI url = buildNotificationUrl(hook.get(), uuid, entityType);
+    URI url = buildNotificationUrl(hook.get(), uuid, identifiableObjectType);
     if (url == null) {
       LOGGER.warn("No url given, ignoring.");
       return;
@@ -177,7 +178,7 @@ public class EntityServiceImpl<E extends Entity>
   public void update(E entity) throws ServiceException, ValidationException {
     try {
       super.update(entity);
-      sendNotification("update", "PUT", entity.getUuid(), entity.getEntityType());
+      sendNotification("update", "PUT", entity.getUuid(), entity.getIdentifiableObjectType());
     } catch (ServiceException e) {
       LOGGER.error("Cannot update identifiable " + entity + ": ", e);
       throw e;

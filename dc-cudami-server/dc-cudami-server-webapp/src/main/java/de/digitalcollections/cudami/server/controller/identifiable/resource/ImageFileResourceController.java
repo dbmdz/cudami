@@ -8,16 +8,12 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,7 +45,7 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
     return service;
   }
 
-  @Operation(summary = "Get a paged and filtered list of ImageFileResources")
+  @Operation(summary = "Get all ImageFileResources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/imagefileresources", "/v6/imagefileresources/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,28 +53,9 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "filename", required = false)
-          FilterCriterion<String> filenameFilterCriterion) {
-
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (filenameFilterCriterion != null) {
-      FilterCriterion<String> filename =
-          new FilterCriterion<>(
-              "filename",
-              filenameFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) filenameFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("filename", filename).build();
-      pageRequest.setFiltering(filtering);
-    }
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
-
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(ImageFileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
   }
 

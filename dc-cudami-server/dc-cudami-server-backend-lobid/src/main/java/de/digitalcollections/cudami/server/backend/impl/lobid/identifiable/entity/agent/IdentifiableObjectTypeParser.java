@@ -2,34 +2,34 @@ package de.digitalcollections.cudami.server.backend.impl.lobid.identifiable.enti
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EntityTypeParser {
+public class IdentifiableObjectTypeParser {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EntityTypeParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IdentifiableObjectTypeParser.class);
 
-  public static EntityType parse(JsonNode rootNode) throws JsonProcessingException {
+  public static IdentifiableObjectType parse(JsonNode rootNode) throws JsonProcessingException {
     Iterator<JsonNode> types = rootNode.get("type").elements();
     while (types.hasNext()) {
       JsonNode type = types.next();
       LOGGER.info("type: {}", type);
       switch (type.asText()) {
         case "CorporateBody":
-          return EntityType.CORPORATE_BODY;
+          return IdentifiableObjectType.CORPORATE_BODY;
         case "DifferentiatedPerson":
-          return EntityType.PERSON;
+          return IdentifiableObjectType.PERSON;
         case "Person":
-          return EntityType.PERSON;
+          return IdentifiableObjectType.PERSON;
         case "Work":
-          return EntityType.WORK;
+          return IdentifiableObjectType.WORK;
         default:
       }
     }
     return null;
   }
 
-  private EntityTypeParser() {}
+  private IdentifiableObjectTypeParser() {}
 }

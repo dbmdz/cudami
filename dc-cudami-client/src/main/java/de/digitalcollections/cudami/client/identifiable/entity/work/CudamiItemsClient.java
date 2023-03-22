@@ -64,7 +64,8 @@ public class CudamiItemsClient extends CudamiEntitiesClient<Item> {
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
-                    .withExpression("part_of_item.uuid")
+                    .withExpression("part_of_item")
+                    .withNativeExpression(true) // is exactly name of field on server side
                     .isEquals(parent.getUuid())
                     .build())
             .build());

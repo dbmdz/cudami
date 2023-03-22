@@ -4,9 +4,9 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.HeadwordEntryRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.HeadwordRepositoryImpl;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.HeadwordEntry;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
@@ -220,8 +220,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
               .map(
                   (entity) -> {
                     // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
-                    EntityType entityType = entity.getEntityType();
-                    switch (entityType) {
+                    IdentifiableObjectType type = entity.getIdentifiableObjectType();
+                    switch (type) {
                       case CORPORATE_BODY:
                         CorporateBody corporateBody = new CorporateBody();
                         corporateBody.setLabel(entity.getLabel());

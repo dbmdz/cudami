@@ -337,8 +337,8 @@ public class ItemRepositoryImplTest
             .filtering(
                 Filtering.builder()
                     .add(
-                        FilterCriterion.builder()
-                            .withExpression("part_of_item.uuid")
+                        FilterCriterion.nativeBuilder()
+                            .withExpression("part_of_item")
                             .isEquals(parentItem.getUuid())
                             .build())
                     .build())

@@ -8,16 +8,12 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -55,66 +51,19 @@ public class LinkedDataFileResourceController
     return service;
   }
 
-  @Operation(summary = "Get a paged list of all linkedDataFileResources")
+  @Operation(summary = "Get all linkedDataFileResources as (paged, sorted, filtered) list")
   @GetMapping(
-      value = {"/v6/linkeddatafileresources"},
+      value = {"/v6/linkeddatafileresources", "/v6/linkeddatafileresources/search"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<LinkedDataFileResource> find(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      pageRequest.setFiltering(filtering);
-    }
-    addLabelFilter(pageRequest, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(
+            LinkedDataFileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
-  }
-
-  @Operation(summary = "Find a limited and filtered amount of LinkedDataFileResources")
-  @GetMapping(
-      value = {"/v6/linkeddatafileresources/search"},
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<LinkedDataFileResource> find(
-      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      searchPageRequest.setFiltering(filtering);
-    }
-
-    return service.find(searchPageRequest);
   }
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")

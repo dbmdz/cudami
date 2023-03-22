@@ -8,6 +8,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +85,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "get all geo locations")
+  @Operation(summary = "Get all geo locations as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/geolocations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,13 +93,10 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "name", required = false) String nameTerm,
-      @RequestParam(name = "nameLanguage", required = false) Locale nameLanguage) {
-    return super.find(
-        pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage, nameTerm, nameLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(GeoLocation.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return geoLocationService.find(pageRequest);
   }
 
   @Override

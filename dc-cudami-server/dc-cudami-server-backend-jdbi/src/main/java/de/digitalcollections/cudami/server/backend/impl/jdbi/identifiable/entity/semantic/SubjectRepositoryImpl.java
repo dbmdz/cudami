@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.DbIdentifierMapper;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
@@ -97,6 +98,12 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
                 .mapTo(Subject.class)
                 .findOne()
                 .orElse(null));
+  }
+
+  @Override
+  protected boolean hasSplitColumn(String basicExpression) {
+    // only label for now
+    return "label".equals(basicExpression);
   }
 
   @Override
@@ -192,14 +199,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList(
-            "created",
-            "label",
-            tableAlias + "_identifier.namespace",
-            tableAlias + "_identifier.id",
-            "type",
-            "lastModified"));
+    return new ArrayList<>(Arrays.asList("created", "label", "type", "lastModified"));
   }
 
   @Override
@@ -214,10 +214,6 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
         return tableAlias + ".label";
       case "lastModified":
         return tableAlias + ".last_modified";
-      case "identifiers_namespace":
-        return tableAlias + "_identifier.namespace";
-      case "identifiers_id":
-        return tableAlias + "_identifier.id";
       case "type":
         return tableAlias + ".type";
       case "uuid":
@@ -233,6 +229,16 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
         super.getJsonbFields();
     linkedHashMap.put("label", i -> Optional.ofNullable(i.getLabel()));
     return linkedHashMap;
+  }
+
+  @Override
+  protected String getTargetExpression(FilterCriterion<?> fc) throws IllegalArgumentException {
+    String givenExpression = fc.getExpression(); // e.g. "identifier.namespace"
+    if (fc.isNativeExpression()) {
+      return getTableAlias() + "_" + givenExpression;
+    } else {
+      return super.getTargetExpression(fc);
+    }
   }
 
   @Override

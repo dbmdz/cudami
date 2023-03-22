@@ -678,9 +678,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   // FIXME: delete when proper jsonb contains search implemented
-  protected boolean isSplitField(String basicExpression) {
+  protected boolean hasSplitColumn(String propertyName) {
     // only label for now
-    return "label".equals(basicExpression);
+    return "label".equals(propertyName);
   }
 
   @Override

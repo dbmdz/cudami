@@ -184,7 +184,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("entityType", "refId"));
+    allowedOrderByFields.addAll(Arrays.asList("identifiableObjectType", "refId"));
     return allowedOrderByFields;
   }
 
@@ -264,6 +264,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     var fields = super.getReturnedFieldsOnInsertUpdate();
     fields.add("refid");
     return fields;
+  }
+
+  @Override
+  protected boolean hasSplitColumn(String propertyName) {
+    if (isRepoForNamedEntity() && "name".equals(propertyName)) {
+      return true;
+    }
+    return super.hasSplitColumn(propertyName);
   }
 
   @Override

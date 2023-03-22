@@ -13,6 +13,7 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
@@ -75,7 +76,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
     return workService.count();
   }
 
-  @Operation(summary = "get all works")
+  @Operation(summary = "Get all works as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/works"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,10 +84,10 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Work.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return workService.find(pageRequest);
   }
 
   @Operation(summary = "Find all children of a work")

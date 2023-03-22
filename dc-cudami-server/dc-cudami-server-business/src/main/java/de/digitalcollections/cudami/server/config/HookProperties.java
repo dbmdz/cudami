@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.config;
 
-import de.digitalcollections.model.identifiable.entity.EntityType;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class HookProperties {
 
   private Map<String, String> hooks = new HashMap<>();
 
-  public Optional<String> getHookForActionAndType(String action, EntityType type) {
+  public Optional<String> getHookForActionAndType(String action, IdentifiableObjectType type) {
     String key = String.format("%s-%s", action, type.toString().toLowerCase());
     return Optional.ofNullable(hooks.get(key));
   }

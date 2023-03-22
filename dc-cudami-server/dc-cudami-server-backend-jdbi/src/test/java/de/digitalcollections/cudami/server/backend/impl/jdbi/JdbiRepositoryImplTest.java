@@ -83,8 +83,9 @@ public class JdbiRepositoryImplTest {
     Filtering filtering =
         Filtering.builder()
             .add(
-                FilterCriterion.builder()
+                FilterCriterion.nativeBuilder()
                     .withExpression(filteringProperty)
+                    .withNativeExpression(true)
                     .contains(List.of(uuid1, uuid2))
                     .build())
             .build();
@@ -127,6 +128,7 @@ public class JdbiRepositoryImplTest {
             .add(
                 FilterCriterion.builder()
                     .withExpression(filteringProperty)
+                    .withNativeExpression(true)
                     .isEquals(List.of(uuid1, uuid2))
                     .build())
             .build();

@@ -27,7 +27,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -110,7 +109,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "get all items")
+  @Operation(summary = "Get all items as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/items"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -118,19 +117,10 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "part_of_item.uuid", required = false)
-          FilterCriterion<UUID> partOfItemUuidFilterCriterion) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        searchTerm,
-        labelTerm,
-        labelLanguage,
-        Pair.of("part_of_item.uuid", partOfItemUuidFilterCriterion));
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Item.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return itemService.find(pageRequest);
   }
 
   @Operation(summary = "Get paged list of digital objects of this item")

@@ -273,13 +273,24 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
-  private String getColumnName(FilterCriterion<?> fc) throws IllegalArgumentException {
+  /**
+   * Map expression to target SQL expression.
+   *
+   * @param fc filter criterion containing given expression
+   * @return target SQL expression used for one operand in WHERE clause
+   * @throws IllegalArgumentException
+   */
+  protected String getTargetExpression(FilterCriterion<?> fc) throws IllegalArgumentException {
     // map expression to column name:
     String givenExpression = fc.getExpression(); // e.g. "label_de"
     String columnName;
     if (fc.isNativeExpression()) {
       // safe (not created using user input)
-      columnName = getTableAlias() + "." + givenExpression;
+      columnName = givenExpression;
+      String tableAlias = getTableAlias();
+      if (tableAlias != null) {
+        columnName = getTableAlias() + "." + columnName;
+      }
     } else {
       String basicExpression = givenExpression;
       if (givenExpression.contains("_")) {
@@ -349,7 +360,15 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           throw new IllegalArgumentException("Value of JSONB field expression must be a string!");
         }
         String value = (String) fc.getValue();
-        switch (fc.getOperation()) {
+
+        FilterOperation operation = fc.getOperation();
+        if (value.matches("\".+\"")) {
+          if (FilterOperation.CONTAINS == operation) {
+            operation = FilterOperation.EQUALS;
+          }
+        }
+
+        switch (operation) {
           case CONTAINS:
             if (argumentMappings.containsKey(SearchTermTemplates.ARRAY_CONTAINS.placeholder)) {
               throw new IllegalArgumentException(
@@ -368,14 +387,16 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
             // 3. implement new CONTAINS search here (JdbiRepository.getWhereClause)
             // 4. remove "split_" columns and code for that (e.g.
             // filterBLocalizedTextFields, filterBySplitField)
-            if (isSplitField(basicExpression)) {
+            if (hasSplitColumn(basicExpression)) {
               argumentMappings.put(
                   SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(value));
               return SearchTermTemplates.ARRAY_CONTAINS.renderTemplate(
                   tableAlias, "split_" + basicExpression);
             } else {
               throw new UnsupportedOperationException(
-                  "Filtering on JSONB field with CONTAINS only supported if split_-column exists (for now)!");
+                  "Filtering on JSONB field CONTAINS only supported if split_-column for "
+                      + basicExpression
+                      + " exists (for now)!");
             }
           case EQUALS:
             if (argumentMappings.containsKey(SearchTermTemplates.JSONB_PATH.placeholder)) {
@@ -400,9 +421,9 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     StringBuilder query = new StringBuilder();
     if (fc != null) {
       // e.g.: "url:like:creativeco"
-      String columnName =
-          getColumnName(
-              fc); // e.g. "url" -> tableAlias + ".url" or native: "parent_uuid" -> tableAlias +
+      String expression =
+          getTargetExpression(fc); // e.g. "url" -> tableAlias + ".url" or native: "parent_uuid" ->
+      // tableAlias +
       // ".parent_uuid
       FilterOperation filterOperation = fc.getOperation(); // e.g. "like" -> "CONTAINS"
 
@@ -418,7 +439,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
             String keyMax = criterionKey + "_max";
             query
                 .append("(")
-                .append(columnName)
+                .append(expression)
                 .append(" BETWEEN ")
                 .append(":")
                 .append(keyMin)
@@ -437,7 +458,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
                 "For 'IN/NOT_IN' operation at least one value is expected");
           }
           // For 'in' or 'nin' operation
-          query.append("(").append(columnName);
+          query.append("(").append(expression);
           if (filterOperation == FilterOperation.NOT_IN) {
             query.append(" NOT");
           }
@@ -466,7 +487,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
                     argumentMappings, criterionKey, valueCollection);
             query
                 .append("(")
-                .append(columnName)
+                .append(expression)
                 .append(" @> ")
                 .append(":")
                 .append(criterionKey)
@@ -477,7 +498,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           } else {
             query
                 .append("(")
-                .append(columnName)
+                .append(expression)
                 .append(" ILIKE '%' || ")
                 .append(":")
                 .append(criterionKey)
@@ -489,7 +510,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-matching.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" ILIKE ")
               .append(":")
               .append(criterionKey)
@@ -506,7 +527,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
 
             query
                 .append("(")
-                .append(columnName)
+                .append(expression)
                 .append(" = ")
                 .append(":")
                 .append(criterionKey)
@@ -516,7 +537,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           } else {
             query
                 .append("(")
-                .append(columnName)
+                .append(expression)
                 .append(" = ")
                 .append(":")
                 .append(criterionKey)
@@ -528,7 +549,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" != ")
               .append(":")
               .append(criterionKey)
@@ -539,7 +560,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" > ")
               .append(":")
               .append(criterionKey)
@@ -550,12 +571,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" > ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(columnName)
+              .append(expression)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -564,7 +585,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" >= ")
               .append(":")
               .append(criterionKey)
@@ -575,7 +596,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" < ")
               .append(":")
               .append(criterionKey)
@@ -586,12 +607,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" < ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(columnName)
+              .append(expression)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -600,7 +621,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
@@ -611,12 +632,12 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" AND ")
-              .append(columnName)
+              .append(expression)
               .append(" IS NOT NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
@@ -625,23 +646,23 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
           query
               .append("(")
-              .append(columnName)
+              .append(expression)
               .append(" <= ")
               .append(":")
               .append(criterionKey)
               .append(" OR ")
-              .append(columnName)
+              .append(expression)
               .append(" IS NULL")
               .append(")");
           argumentMappings.put(criterionKey, fc.getValue());
           break;
         case SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(columnName).append(" IS NOT NULL").append(")");
+          query.append("(").append(expression).append(" IS NOT NULL").append(")");
           break;
         case NOT_SET:
           // @see https://www.postgresql.org/docs/11/functions-comparison.html
-          query.append("(").append(columnName).append(" IS NULL").append(")");
+          query.append("(").append(expression).append(" IS NULL").append(")");
           break;
         default:
           throw new UnsupportedOperationException(filterOperation + " not supported yet");
@@ -671,10 +692,10 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   /**
    * Override this method for check of split fields that exist in the repository's context
    *
-   * @param basicExpression jsonb column name
-   * @return corresponding split-column exists
+   * @param propertName java property name
+   * @return corresponding split-column for property exists
    */
-  protected boolean isSplitField(String basicExpression) {
+  protected boolean hasSplitColumn(String propertName) {
     return false;
   }
 

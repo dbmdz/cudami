@@ -9,6 +9,8 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Event;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +62,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
     return eventService.count();
   }
 
-  @Operation(summary = "get all events")
+  @Operation(summary = "get all events as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/events"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,10 +70,10 @@ public class EventController extends AbstractIdentifiableController<Event> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage) {
-    return super.find(pageNumber, pageSize, sortBy, searchTerm, labelTerm, labelLanguage);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Event.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return eventService.find(pageRequest);
   }
 
   @Operation(summary = "Get an event by uuid")

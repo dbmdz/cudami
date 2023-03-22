@@ -3,10 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ArticleRepository;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Article;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.EntityType;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
@@ -151,8 +151,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
               .map(
                   (entity) -> {
                     // FIXME: use new agentrepositoryimpl (see workrepositoryimpl)
-                    EntityType entityType = entity.getEntityType();
-                    switch (entityType) {
+                    IdentifiableObjectType type = entity.getIdentifiableObjectType();
+                    switch (type) {
                       case CORPORATE_BODY:
                         CorporateBody corporateBody = new CorporateBody();
                         corporateBody.setLabel(entity.getLabel());

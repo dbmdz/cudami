@@ -289,7 +289,9 @@ class DigitalObjectRepositoryImplTest
     PageRequest pageRequest = new PageRequest();
     pageRequest.setFiltering(
         new Filtering(
-            List.of(new FilterCriterion("parent.uuid", FilterOperation.EQUALS, parent.getUuid()))));
+            List.of(
+                new FilterCriterion(
+                    "parent_uuid", true, FilterOperation.EQUALS, parent.getUuid()))));
     PageResponse response = repo.find(pageRequest);
 
     List<DigitalObject> actuals = response.getContent();

@@ -19,12 +19,10 @@ import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +74,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     webpageService.addRelatedFileresource(uuid, fileResourceUuid);
   }
 
-  @Operation(summary = "Get all webpages")
+  @Operation(summary = "Get all webpages as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/webpages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,21 +82,10 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "publicationStart", required = false)
-          FilterCriterion<LocalDate> publicationStart,
-      @RequestParam(name = "publicationEnd", required = false)
-          FilterCriterion<LocalDate> publicationEnd) {
-    return super.find(
-        pageNumber,
-        pageSize,
-        sortBy,
-        null,
-        labelTerm,
-        labelLanguage,
-        Pair.of("publicationStart", publicationStart),
-        Pair.of("publicationEnd", publicationEnd));
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return webpageService.find(pageRequest);
   }
 
   @Operation(summary = "Get (active or all) paged children of a webpage as JSON")

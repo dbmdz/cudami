@@ -116,8 +116,7 @@ class EventControllerTest extends BaseControllerTest {
           "refId": 0,
           "name": {
             "de": "Test"
-          },
-          "entityType": "EVENT"
+          }
         }
         """;
 
@@ -154,7 +153,6 @@ class EventControllerTest extends BaseControllerTest {
           "name": {
             "de": "Test"
           },
-          "entityType": "EVENT",
           "uuid": "09baa24e-0918-4b96-8ab1-f496b02af73a"
         }
         """;

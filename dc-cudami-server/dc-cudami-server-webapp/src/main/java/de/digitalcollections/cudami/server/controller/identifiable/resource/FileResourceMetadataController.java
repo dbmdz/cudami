@@ -12,12 +12,9 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -58,7 +55,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
     return metadataService;
   }
 
-  @Operation(summary = "Get all fileresources")
+  @Operation(summary = "Get all fileresources as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,33 +63,13 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm,
-      @RequestParam(name = "label", required = false) String labelTerm,
-      @RequestParam(name = "labelLanguage", required = false) Locale labelLanguage,
-      @RequestParam(name = "uri", required = false)
-          FilterCriterion<String> encodedUriFilterCriterion) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    if (encodedUriFilterCriterion != null) {
-      FilterCriterion<String> uri =
-          new FilterCriterion<>(
-              "uri",
-              encodedUriFilterCriterion.getOperation(),
-              URLDecoder.decode(
-                  (String) encodedUriFilterCriterion.getValue(), StandardCharsets.UTF_8));
-      Filtering filtering = Filtering.builder().add("uri", uri).build();
-      searchPageRequest.setFiltering(filtering);
-    }
-    addLabelFilter(searchPageRequest, labelTerm, labelLanguage);
-    return metadataService.find(searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return metadataService.find(pageRequest);
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of fileresources of given type containing searchTerm in label or description")
+  @Operation(summary = "Get all fileresources of given type as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/fileresources/type/{type}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,12 +80,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      pageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
 
     String prefix;
     switch (type) {
