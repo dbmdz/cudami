@@ -16,7 +16,6 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -206,9 +205,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of (active or all) collections containing searchTerm in label or description")
+  @Operation(summary = "Get (active or all) collections as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -226,7 +223,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get paged digital objects of a collection")
+  @Operation(summary = "Get all digital objects of a collection as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -235,12 +232,13 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
-    return service.findDigitalObjects(collection, searchPageRequest);
+    return service.findDigitalObjects(collection, pageRequest);
   }
 
   @Operation(
@@ -261,7 +259,8 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     return service.findRelatedCorporateBodies(uuid, filtering);
   }
 
-  @Operation(summary = "Get (active or all) paged subcollections of a collection")
+  @Operation(
+      summary = "Get all (active) subcollections of a collection as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subcollections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -270,21 +269,18 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active) {
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return service.findActiveChildren(collectionUuid, searchPageRequest);
+      return service.findActiveChildren(collectionUuid, pageRequest);
     }
-    return service.findChildren(collectionUuid, searchPageRequest);
+    return service.findChildren(collectionUuid, pageRequest);
   }
 
-  @Operation(summary = "Get all top collections")
+  @Operation(summary = "Get all (active) top collections as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/collections/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)

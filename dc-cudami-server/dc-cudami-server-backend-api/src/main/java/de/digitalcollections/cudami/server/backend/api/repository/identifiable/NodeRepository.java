@@ -46,15 +46,6 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    */
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 
-  default List<N> getChildren(N node) {
-    if (node == null) {
-      return null;
-    }
-    return getChildren(node.getUuid());
-  }
-
-  List<N> getChildren(UUID nodeUuid);
-
   PageResponse<N> findChildren(UUID nodeUuid, PageRequest pageRequest);
 
   N getParent(UUID nodeUuid);

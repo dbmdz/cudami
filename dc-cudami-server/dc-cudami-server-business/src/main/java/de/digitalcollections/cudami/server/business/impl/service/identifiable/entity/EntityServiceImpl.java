@@ -110,12 +110,12 @@ public class EntityServiceImpl<E extends Entity>
 
   @Override
   public List<FileResource> getRelatedFileResources(E entity) {
-    return ((EntityRepository<E>) repository).getRelatedFileResources(entity);
+    return ((EntityRepository<E>) repository).findRelatedFileResources(entity);
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    return ((EntityRepository<E>) repository).getRelatedFileResources(entityUuid);
+    return ((EntityRepository<E>) repository).findRelatedFileResources(entityUuid);
   }
 
   @Override

@@ -225,7 +225,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
+  public List<FileResource> findRelatedFileResources(UUID entityUuid) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
 
@@ -321,7 +321,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
           }
           preparedBatch.execute();
         });
-    return getRelatedFileResources(entityUuid);
+    return findRelatedFileResources(entityUuid);
   }
 
   @Override

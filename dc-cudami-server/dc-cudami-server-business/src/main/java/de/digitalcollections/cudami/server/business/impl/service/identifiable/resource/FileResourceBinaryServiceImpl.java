@@ -46,7 +46,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   @Override
   public FileResource find(String uuid, MimeType mimeType) throws ServiceException {
     try {
-      return binaryRepository.find(uuid, mimeType);
+      return binaryRepository.get(uuid, mimeType);
     } catch (TechnicalException | ResourceNotFoundException ex) {
       throw new ServiceException("File resource " + uuid + " not found.", ex);
     }

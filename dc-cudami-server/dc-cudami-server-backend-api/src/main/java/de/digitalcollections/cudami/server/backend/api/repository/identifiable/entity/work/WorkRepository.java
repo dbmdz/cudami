@@ -10,8 +10,10 @@ import java.util.UUID;
 /** Repository for Work persistence handling. */
 public interface WorkRepository extends EntityRepository<Work> {
 
+  // TODO: remove as work - item is deprecated
   Work getByItemUuid(UUID itemUuid);
 
+  // TODO: replace with find(pagerequest)
   Set<Work> getByPersonUuid(UUID personUuid);
 
   PageResponse<Work> findEmbeddedWorks(UUID uuid, PageRequest pageRequest);

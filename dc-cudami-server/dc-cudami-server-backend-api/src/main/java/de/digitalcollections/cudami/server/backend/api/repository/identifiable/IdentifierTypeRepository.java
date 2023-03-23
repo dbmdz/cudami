@@ -20,8 +20,6 @@ public interface IdentifierTypeRepository extends UniqueObjectRepository<Identif
 
   PageResponse<IdentifierType> find(PageRequest pageRequest);
 
-  List<IdentifierType> findAll() throws RepositoryException;
-
   IdentifierType getByNamespace(String namespace);
 
   IdentifierType save(IdentifierType identifier) throws RepositoryException;

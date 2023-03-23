@@ -141,7 +141,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get paged digital objects of a project")
+  @Operation(summary = "Get all digital objects of a project as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/projects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -150,12 +150,13 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           UUID projectUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
     Project project = new Project();
     project.setUuid(projectUuid);
-    return service.findDigitalObjects(project, searchPageRequest);
+    return service.findDigitalObjects(project, pageRequest);
   }
 
   @Override

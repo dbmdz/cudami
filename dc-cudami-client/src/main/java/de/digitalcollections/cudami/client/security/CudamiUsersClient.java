@@ -18,11 +18,6 @@ public class CudamiUsersClient extends CudamiRestClient<User> {
     return doGetRequestForObjectList(String.format("%s?role=ADMIN&enabled=true", baseEndpoint));
   }
 
-  @Override
-  public List<User> getAll() throws TechnicalException {
-    return doGetRequestForObjectList(API_VERSION_PREFIX + "/users");
-  }
-
   public User getByEmail(String email) throws TechnicalException {
     try {
       return doGetRequestForObject(String.format("%s?email=%s", baseEndpoint, email));

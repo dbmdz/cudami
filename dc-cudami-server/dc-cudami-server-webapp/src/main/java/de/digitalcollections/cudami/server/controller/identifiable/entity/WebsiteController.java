@@ -13,7 +13,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -96,11 +95,11 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
 
   @Operation(
       summary = "Get root pages of a website",
-      description = "Get a paged, filtered and sorted list of root pages of a website",
+      description = "Get all root webpages of a website as (paged, sorted, filtered) list",
       responses = {
         @ApiResponse(
             responseCode = "200",
-            description = "SearchPageResponse&lt;Webpage&gt;",
+            description = "PageResponse&lt;Webpage&gt;",
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -139,18 +138,15 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy,
       @Parameter(
-              name = "searchTerm",
-              description = "the search term, of which the result is filtered (substring match)",
-              example = "Test",
-              schema = @Schema(type = "string"))
-          @RequestParam(name = "searchTerm", required = false)
-          String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return service.findRootWebpages(uuid, searchPageRequest);
+              name = "filter",
+              description = "the filters the result is filtered with",
+              example = "label_de:like:Homepage",
+              schema = @Schema(type = "List<FilterCriterion>"))
+          @RequestParam(name = "filter", required = false)
+          List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findRootWebpages(uuid, pageRequest);
   }
 
   @Operation(

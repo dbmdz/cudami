@@ -13,15 +13,6 @@ import java.util.UUID;
 /** Service for Topic. */
 public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
 
-  default List<Entity> getAllEntities(Topic topic) {
-    if (topic == null) {
-      return null;
-    }
-    return getEntities(topic.getUuid());
-  }
-
-  List<Entity> getEntities(UUID topicUuid);
-
   PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest);
 
   default List<FileResource> getFileResources(Topic topic) {

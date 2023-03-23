@@ -465,7 +465,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID digitalObjectUuid) {
+  public List<FileResource> findFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
     final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
     final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
@@ -491,7 +491,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
+  public List<ImageFileResource> findImageFileResources(UUID digitalObjectUuid) {
     final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
     final String frTableName = imageFileResourceRepositoryImpl.getTableName();
     final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
@@ -636,7 +636,7 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
             preparedBatch.execute();
           });
     }
-    return getFileResources(digitalObjectUuid);
+    return findFileResources(digitalObjectUuid);
   }
 
   public void setGeoLocationRepositoryImpl(

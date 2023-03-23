@@ -1,11 +1,7 @@
 package de.digitalcollections.cudami.client.identifiable.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -15,19 +11,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("The client for DigitalObjects")
 class CudamiDigitalObjectsClientTest
     extends BaseCudamiEntitiesClientTest<DigitalObject, CudamiDigitalObjectsClient> {
-
-  @Test
-  @DisplayName("can retrieve the list of reduced DigitalObjects")
-  public void testFindAllReduced() throws Exception {
-    String bodyJson = "[{\"identifiableObjectType\":\"DIGITAL_OBJECT\"}]";
-    when(httpResponse.body()).thenReturn(bodyJson.getBytes(StandardCharsets.UTF_8));
-
-    List<DigitalObject> actual = client.getAllReduced();
-    assertThat(actual).isNotNull();
-    assertThat(actual.get(0)).isExactlyInstanceOf(DigitalObject.class);
-
-    verifyHttpRequestByMethodAndRelativeURL("get", "/reduced");
-  }
 
   @Test
   @DisplayName("can find a number of random DigitalObjects")

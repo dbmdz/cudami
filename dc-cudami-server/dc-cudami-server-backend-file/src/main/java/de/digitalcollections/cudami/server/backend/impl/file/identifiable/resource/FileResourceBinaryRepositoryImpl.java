@@ -123,7 +123,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public FileResource find(String uuidStr, MimeType mimeType)
+  public FileResource get(String uuidStr, MimeType mimeType)
       throws TechnicalException, ResourceNotFoundException {
     FileResource resource = new FileResource();
 

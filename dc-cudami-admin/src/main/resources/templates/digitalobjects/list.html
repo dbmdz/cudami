@@ -93,6 +93,16 @@
 
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
+      $('#table-digitalobjects').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
       function formatActionsDigitalObjects(value, row) {
         /*[+
          const baseUrl = [[@{'/digitalobjects'}]] + '/' + row.uuid;

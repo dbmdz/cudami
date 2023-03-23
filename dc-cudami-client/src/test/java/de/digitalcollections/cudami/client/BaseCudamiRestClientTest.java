@@ -77,13 +77,6 @@ public abstract class BaseCudamiRestClientTest<
   }
 
   @Test
-  @DisplayName("can find all")
-  public void testFindAll() throws Exception {
-    client.getAll();
-    verifyHttpRequestByMethodAndRelativeURL("get", "/all");
-  }
-
-  @Test
   @DisplayName("can execute the find method with a basic PageRequest")
   public void testFindWithPageRequest1() throws Exception {
     PageRequest pageRequest = new PageRequest();

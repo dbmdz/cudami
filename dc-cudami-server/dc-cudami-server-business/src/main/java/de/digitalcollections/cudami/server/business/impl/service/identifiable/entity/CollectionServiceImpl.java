@@ -88,13 +88,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public List<Collection> find(String searchTerm, int maxResults) {
-    List<Collection> collections = super.find(searchTerm, maxResults);
-    setPublicationStatus(collections);
-    return collections;
-  }
-
-  @Override
   public PageResponse<Collection> findActive(PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
@@ -177,20 +170,6 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     List<Collection> children = findChildren(uuid, pageRequest).getContent();
     setPublicationStatus(children);
     return children;
-  }
-
-  @Override
-  public List<Collection> getAllFull() {
-    List<Collection> collections = super.getAllFull();
-    setPublicationStatus(collections);
-    return collections;
-  }
-
-  @Override
-  public List<Collection> getAllReduced() {
-    List<Collection> collections = super.getAllReduced();
-    setPublicationStatus(collections);
-    return collections;
   }
 
   @Override

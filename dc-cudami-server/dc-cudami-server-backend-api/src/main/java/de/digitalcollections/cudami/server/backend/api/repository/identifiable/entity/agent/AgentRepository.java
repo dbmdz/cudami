@@ -4,19 +4,27 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Work;
-import java.util.Set;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.UUID;
 
 public interface AgentRepository<A extends Agent> extends EntityRepository<A> {
 
-  Set<DigitalObject> getDigitalObjects(UUID uuidAgent);
-
-  default Set<Work> getWorks(A agent) {
+  default PageResponse<DigitalObject> findDigitalObjects(A agent, PageRequest pageRequest) {
     if (agent == null) {
       return null;
     }
-    return getWorks(agent.getUuid());
+    return findDigitalObjects(agent.getUuid(), pageRequest);
   }
 
-  Set<Work> getWorks(UUID uuidAgent);
+  PageResponse<DigitalObject> findDigitalObjects(UUID agentUuid, PageRequest pageRequest);
+
+  default PageResponse<Work> findWorks(A agent, PageRequest pageRequest) {
+    if (agent == null) {
+      return null;
+    }
+    return findWorks(agent.getUuid(), pageRequest);
+  }
+
+  PageResponse<Work> findWorks(UUID agentUuid, PageRequest pageRequest);
 }

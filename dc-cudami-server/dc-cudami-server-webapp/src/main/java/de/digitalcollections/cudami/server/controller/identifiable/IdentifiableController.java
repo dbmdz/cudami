@@ -9,6 +9,10 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +42,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     this.urlAliasService = urlAliasService;
   }
 
-  @Operation(summary = "Find limited amount of identifiables containing searchTerm in label")
+  @Operation(summary = "Get all identifiables as (paged, sorted, filtered) list")
   @GetMapping(
       value = {
         "/v6/identifiables",
@@ -47,11 +51,14 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Identifiable> find(
-      @RequestParam(name = "searchTerm") String searchTerm,
-      @RequestParam(name = "maxResults", required = false, defaultValue = "25") int maxResults) {
-    List<Identifiable> identifiables = service.find(searchTerm, maxResults);
-    return identifiables;
+  public PageResponse<Identifiable> find(
+      @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Identifiable.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.find(pageRequest);
   }
 
   @Operation(

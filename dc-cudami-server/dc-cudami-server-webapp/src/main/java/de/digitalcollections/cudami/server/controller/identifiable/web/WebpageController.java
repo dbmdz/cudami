@@ -14,7 +14,6 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -83,7 +82,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get (active or all) paged children of a webpage as JSON")
+  @Operation(summary = "Get all (active) children of a webpage as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/webpages/{uuid:" + ParameterHelper.UUID_PATTERN + "}/children"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,18 +96,15 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active)
       throws ServiceException {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
+    PageRequest pageRequest =
+        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
     if (active != null) {
-      return service.findActiveChildren(uuid, searchPageRequest);
+      return service.findActiveChildren(uuid, pageRequest);
     }
-    return service.findChildren(uuid, searchPageRequest);
+    return service.findChildren(uuid, pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a webpage")

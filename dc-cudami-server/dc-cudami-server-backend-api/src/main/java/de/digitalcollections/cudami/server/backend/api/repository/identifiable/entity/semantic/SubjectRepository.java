@@ -12,20 +12,20 @@ public interface SubjectRepository extends UniqueObjectRepository<Subject> {
 
   long count();
 
-  Subject getByUuid(UUID uuid);
-
-  void save(Subject subject) throws RepositoryException;
-
-  void update(Subject subject) throws RepositoryException;
+  boolean delete(List<UUID> uuids);
 
   default boolean delete(UUID uuid) {
     return delete(List.of(uuid));
   }
 
-  boolean delete(List<UUID> uuids);
-
   PageResponse<Subject> find(PageRequest pageRequest);
 
   Subject getByTypeAndIdentifier(String type, String namespace, String id)
       throws RepositoryException;
+
+  Subject getByUuid(UUID uuid);
+
+  void save(Subject subject) throws RepositoryException;
+
+  void update(Subject subject) throws RepositoryException;
 }

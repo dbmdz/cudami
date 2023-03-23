@@ -73,10 +73,6 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
     return find(pageRequest);
   }
 
-  public List<DigitalObject> getAllReduced() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/reduced", DigitalObject.class);
-  }
-
   public List<FileResource> getFileResources(UUID uuid) throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/%s/fileresources", baseEndpoint, uuid), FileResource.class);

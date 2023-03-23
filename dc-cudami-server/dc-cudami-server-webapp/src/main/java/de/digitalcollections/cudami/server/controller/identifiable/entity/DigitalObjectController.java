@@ -86,9 +86,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
-  @Operation(
-      summary =
-          "Find limited amount of digital objects containing searchTerm in label or description")
+  @Operation(summary = "Get all digital objects as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/digitalobjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,7 +100,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get paged projects of a digital objects")
+  @Operation(summary = "Get all projects of a digital object as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,27 +109,13 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
-    return service.findProjects(digitalObject, searchPageRequest);
-  }
-
-  @Operation(
-      summary =
-          "Get all digital objects, reduced to their metadata fields (only all identifiers and last modification date)")
-  @GetMapping(
-      value = {
-        "/v6/digitalobjects/reduced",
-        "/v5/digitalobjects/reduced",
-        "/v3/digitalobjects/reduced",
-        "/latest/digitalobjects/reduced"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<DigitalObject> getAllReduced() {
-    return service.getAllReduced();
+    return service.findProjects(digitalObject, pageRequest);
   }
 
   @Operation(
@@ -186,7 +170,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
-  @Operation(summary = "Get (active or all) paged collections of a digital objects")
+  @Operation(
+      summary =
+          "Get all (active) collections of a digital object as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -195,16 +181,17 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "active", required = false) String active,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
+      @RequestParam(name = "active", required = false) String active) {
+    PageRequest pageRequest =
+        createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     DigitalObject digitalObject = new DigitalObject();
     digitalObject.setUuid(uuid);
     if (active != null) {
-      return service.findActiveCollections(digitalObject, searchPageRequest);
+      return service.findActiveCollections(digitalObject, pageRequest);
     }
-    return service.findCollections(digitalObject, searchPageRequest);
+    return service.findCollections(digitalObject, pageRequest);
   }
 
   @Operation(summary = "Get file resources of a digital object")

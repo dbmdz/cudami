@@ -19,34 +19,46 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
 
   default PageResponse<Collection> findCollections(
       DigitalObject digitalObject, PageRequest pageRequest) {
+    if (digitalObject == null) {
+      return null;
+    }
     return findCollections(digitalObject.getUuid(), pageRequest);
   }
 
   PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest);
 
-  default List<FileResource> getFileResources(DigitalObject digitalObject) {
-    return getFileResources(digitalObject.getUuid());
+  default PageResponse<FileResource> findFileResources(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    if (digitalObject == null) {
+      return null;
+    }
+    return findFileResources(digitalObject.getUuid(), pageRequest);
   }
 
-  List<FileResource> getFileResources(UUID digitalObjectUuid);
+  PageResponse<FileResource> findFileResources(UUID digitalObjectUuid, PageRequest pageRequest);
 
-  default List<ImageFileResource> getImageFileResources(DigitalObject digitalObject) {
-    return getImageFileResources(digitalObject.getUuid());
+  default PageResponse<ImageFileResource> findImageFileResources(
+      DigitalObject digitalObject, PageRequest pageRequest) {
+    return findImageFileResources(digitalObject.getUuid(), pageRequest);
   }
 
-  List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid);
+  PageResponse<ImageFileResource> findImageFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest);
+
+  default PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+    if (digitalObject == null) {
+      return null;
+    }
+    return findProjects(digitalObject.getUuid(), pageRequest);
+  }
+
+  PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
   List<Locale> getLanguagesOfCollections(UUID uuid);
 
   List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid);
 
   List<Locale> getLanguagesOfProjects(UUID uuid);
-
-  default PageResponse<Project> getProjects(DigitalObject digitalObject, PageRequest pageRequest) {
-    return findProjects(digitalObject.getUuid(), pageRequest);
-  }
-
-  PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
 
   default List<FileResource> setFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) throws RepositoryException {

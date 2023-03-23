@@ -115,15 +115,6 @@ public class UserServiceImpl implements UserService<User>, InitializingBean {
   }
 
   @Override
-  public List<User> findAll() throws ServiceException {
-    try {
-      return client.getAll();
-    } catch (TechnicalException ex) {
-      throw new ServiceException(ex.getMessage(), ex);
-    }
-  }
-
-  @Override
   public User getByEmail(String email) throws ServiceException {
     try {
       return client.getByEmail(email);

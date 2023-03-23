@@ -331,7 +331,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public List<Item> getItemsForWork(UUID workUuid) {
+  public List<Item> findItemsForWork(UUID workUuid) {
     // TODO
     return null;
   }

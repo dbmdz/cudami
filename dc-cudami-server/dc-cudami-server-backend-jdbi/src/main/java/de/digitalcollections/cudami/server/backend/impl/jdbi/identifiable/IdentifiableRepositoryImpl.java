@@ -369,8 +369,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     };
   }
 
-  @Override
-  public boolean delete(List<UUID> uuids) {
+  public boolean delete(UUID identifiableUuid) {
+    return deleteByUuids(List.of(identifiableUuid)); // same performance as "where uuid = :uuid"
+  }
+
+  public boolean deleteByUuids(List<UUID> uuids) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
@@ -416,7 +419,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
 
-    // FIXME: try to avoid doing this after database select! Delete when jsonb search without
+    // FIXME: try to avoid doing this after database select! Delete when jsonb
+    // search without
     // split-field implemented
     filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
 
@@ -483,30 +487,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<I> getAllFull() {
-    return retrieveList(getSqlSelectAllFields(), null, null, null);
-  }
-
-  @Override
-  public List<I> getAllReduced() {
-    return retrieveList(getSqlSelectReducedFields(), null, null, null);
-  }
-
-  @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(
         Arrays.asList("created", "identifiableObjectType", "label", "lastModified", "type"));
   }
 
   @Override
-  public I getByIdentifier(Identifier identifier) {
-    if (identifier.getIdentifiable() != null) {
-      return getByUuid(identifier.getIdentifiable());
-    }
-
-    String namespace = identifier.getNamespace();
-    String identifierId = identifier.getId();
-
+  public I getByIdentifier(String namespace, String identifierId) {
     UUID identifiableUuid =
         dbi.withHandle(
             h ->
@@ -611,7 +598,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<Entity> getRelatedEntities(UUID identifiableUuid) {
+  public List<Entity> findRelatedEntities(UUID identifiableUuid) {
     String query =
         "SELECT * FROM entities e"
             + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
@@ -629,7 +616,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
+  public List<FileResource> findRelatedFileResources(UUID identifiableUuid) {
     String query =
         "SELECT * FROM fileresources f"
             + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
@@ -974,7 +961,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             preparedBatch.execute();
           });
     }
-    return getRelatedEntities(identifiableUuid);
+    return findRelatedEntities(identifiableUuid);
   }
 
   @Override
@@ -1005,7 +992,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           }
           preparedBatch.execute();
         });
-    return getRelatedFileResources(identifiableUuid);
+    return findRelatedFileResources(identifiableUuid);
   }
 
   @Override

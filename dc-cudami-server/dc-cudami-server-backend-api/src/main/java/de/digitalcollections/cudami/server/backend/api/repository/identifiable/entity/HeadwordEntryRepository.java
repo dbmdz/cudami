@@ -8,7 +8,9 @@ import java.util.UUID;
 /** Repository for HeadwordEntry persistence handling. */
 public interface HeadwordEntryRepository extends EntityRepository<HeadwordEntry> {
 
+  // TODO: replace with find(pagerequest)
   List<HeadwordEntry> getByHeadword(UUID headwordUuid);
 
+  // TODO: replace with find(pagerequest)
   List<Agent> getCreators(UUID headwordEntryUuid);
 }

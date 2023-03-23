@@ -58,13 +58,13 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
-    repository.addRelatedEntity(identifiableUuid, entityUuid);
+  public void addRelatedEntity(I identifiable, Entity entity) {
+    repository.addRelatedEntity(identifiable, entity);
   }
 
   @Override
-  public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid) {
-    repository.addRelatedFileresource(identifiableUuid, fileResourceUuid);
+  public void addRelatedFileresource(I identifiable, FileResource fileResource) {
+    repository.addRelatedFileresource(identifiable, fileResource);
   }
 
   @Override
@@ -106,25 +106,10 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public List<I> find(String searchTerm, int maxResults) {
-    return repository.find(searchTerm, maxResults);
-  }
-
-  @Override
   public PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) {
     PageResponse<I> result = repository.findByLanguageAndInitial(pageRequest, language, initial);
     return result;
-  }
-
-  @Override
-  public List<I> getAllFull() {
-    return repository.getAllFull();
-  }
-
-  @Override
-  public List<I> getAllReduced() {
-    return repository.getAllReduced();
   }
 
   @Override
@@ -133,14 +118,14 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public I getByUuid(UUID uuid) throws ServiceException {
-    return repository.getByUuid(uuid);
+  public I getByIdentifiable(I identifiable) throws ServiceException {
+    return repository.getByIdentifiable(identifiable);
   }
 
   @Override
-  public I getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
+  public I getByIdentifiableAndLocale(I identifiable, Locale locale) throws ServiceException {
     // getByIdentifier identifiable with all translations:
-    I identifiable = getByUuid(uuid);
+    identifiable = getByIdentifiable(identifiable);
     return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
   }
 
@@ -151,12 +136,12 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
 
   @Override
   public List<Entity> getRelatedEntities(UUID identifiableUuid) {
-    return repository.getRelatedEntities(identifiableUuid);
+    return repository.findRelatedEntities(identifiableUuid);
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
-    return repository.getRelatedFileResources(identifiableUuid);
+    return repository.findRelatedFileResources(identifiableUuid);
   }
 
   protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {

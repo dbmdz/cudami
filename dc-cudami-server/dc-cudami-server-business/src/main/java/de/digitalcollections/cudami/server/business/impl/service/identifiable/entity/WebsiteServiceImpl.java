@@ -52,7 +52,7 @@ public class WebsiteServiceImpl extends EntityServiceImpl<Website> implements We
 
   @Override
   public List<Webpage> getRootWebpages(UUID uuid) {
-    List<Webpage> rootWebpages = ((WebsiteRepository) repository).getRootWebpages(uuid);
+    List<Webpage> rootWebpages = ((WebsiteRepository) repository).findRootWebpages(uuid);
     webpageService.setPublicationStatus(rootWebpages);
     return rootWebpages;
   }

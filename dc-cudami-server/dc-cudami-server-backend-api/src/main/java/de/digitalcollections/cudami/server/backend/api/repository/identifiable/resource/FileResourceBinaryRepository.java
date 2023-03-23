@@ -13,7 +13,7 @@ public interface FileResourceBinaryRepository {
   void assertReadability(FileResource resource)
       throws TechnicalException, ResourceNotFoundException;
 
-  FileResource find(String uuid, MimeType mimeType)
+  FileResource get(String uuid, MimeType mimeType)
       throws TechnicalException, ResourceNotFoundException;
 
   byte[] getAsBytes(FileResource resource) throws TechnicalException, ResourceNotFoundException;

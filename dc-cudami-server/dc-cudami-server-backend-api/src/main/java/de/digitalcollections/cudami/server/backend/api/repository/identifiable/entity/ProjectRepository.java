@@ -27,7 +27,7 @@ public interface ProjectRepository extends EntityRepository<Project> {
 
   boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects);
 
-  default PageResponse<DigitalObject> getDigitalObjects(Project project, PageRequest pageRequest) {
+  default PageResponse<DigitalObject> findDigitalObjects(Project project, PageRequest pageRequest) {
     if (project == null) {
       return null;
     }

@@ -38,18 +38,19 @@ public interface EntityRelationRepository {
    */
   PageResponse<EntityRelation> find(PageRequest pageRequest);
 
-  default List<EntityRelation> getBySubject(Entity subjectEntity) {
-    return getBySubject(subjectEntity.getUuid());
+  default PageResponse<EntityRelation> findBySubject(
+      Entity subjectEntity, PageRequest pageRequest) {
+    if (subjectEntity == null) {
+      return null;
+    }
+    return findBySubject(subjectEntity.getUuid(), pageRequest);
   }
 
-  List<EntityRelation> getBySubject(UUID subjectEntityUuid);
+  PageResponse<EntityRelation> findBySubject(UUID subjectEntityUuid, PageRequest pageRequest);
 
   default void save(EntityRelation relation) throws RepositoryException {
     save(List.of(relation));
   }
-
-  void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
-      throws RepositoryException;
 
   /**
    * Persists a list of EntityRelations
@@ -58,4 +59,7 @@ public interface EntityRelationRepository {
    * @throws RepositoryException in case of an error, e.g. a referenced predicate does not yet exist
    */
   void save(List<EntityRelation> entityRelations) throws RepositoryException;
+
+  void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException;
 }

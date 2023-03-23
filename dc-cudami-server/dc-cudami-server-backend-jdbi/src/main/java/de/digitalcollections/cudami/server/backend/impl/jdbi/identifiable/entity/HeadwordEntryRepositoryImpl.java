@@ -251,8 +251,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public List<FileResource> getRelatedFileResources(UUID entityUuid) {
-    return entityRepositoryImpl.getRelatedFileResources(entityUuid);
+  public List<FileResource> findRelatedFileResources(UUID entityUuid) {
+    return entityRepositoryImpl.findRelatedFileResources(entityUuid);
   }
 
   @Override

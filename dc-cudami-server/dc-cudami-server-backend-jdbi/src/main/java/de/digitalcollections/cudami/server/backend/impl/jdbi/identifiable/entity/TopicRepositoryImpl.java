@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
@@ -310,38 +309,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    final String entityTableAlias = entityRepositoryImpl.getTableAlias();
-    final String entityTableName = entityRepositoryImpl.getTableName();
-
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT te.sortindex AS idx, * FROM "
-                + entityTableName
-                + " AS "
-                + entityTableAlias
-                + " INNER JOIN topic_entities te ON "
-                + entityTableAlias
-                + ".uuid = te.entity_uuid"
-                + " WHERE te.topic_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", topicUuid);
-
-    List<Entity> result =
-        entityRepositoryImpl
-            .retrieveList(
-                entityRepositoryImpl.getSqlSelectReducedFields(),
-                innerQuery,
-                argumentMappings,
-                "ORDER BY idx ASC")
-            .stream()
-            .collect(Collectors.toList());
-
-    return result;
-  }
-
-  @Override
   public List<FileResource> getFileResources(UUID topicUuid) {
     PageResponse<FileResource> response;
     PageRequest request = new PageRequest(0, 100);
@@ -452,7 +419,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getTopicsOfEntity(UUID entityUuid) {
+  public List<Topic> findTopicsOfEntity(UUID entityUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -472,7 +439,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) {
+  public List<Topic> findTopicsOfFileResource(UUID fileResourceUuid) {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -535,7 +502,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
                 .bind("uuid", topicUuid)
                 .execute());
 
-    if (entities != null) {
+    if (entities != null && entities.size() > 0) {
       // we assume that the entities are already saved...
       dbi.useHandle(
           handle -> {
@@ -551,8 +518,12 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             }
             preparedBatch.execute();
           });
+      int size = entities.size();
+      PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(size - 1).build();
+      PageResponse<Entity> pageResponse = findEntities(topicUuid, pageRequest);
+      return pageResponse.getContent();
     }
-    return getEntities(topicUuid);
+    return null;
   }
 
   @Override

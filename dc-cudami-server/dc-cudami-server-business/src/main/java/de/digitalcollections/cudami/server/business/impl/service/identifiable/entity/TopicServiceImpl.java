@@ -82,13 +82,8 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
   }
 
   @Override
-  public List<Entity> getEntities(UUID topicUuid) {
-    return ((TopicRepository) repository).getEntities(topicUuid);
-  }
-
-  @Override
   public List<FileResource> getFileResources(UUID topicUuid) {
-    return ((TopicRepository) repository).getFileResources(topicUuid);
+    return ((TopicRepository) repository).findFileResources(topicUuid);
   }
 
   @Override
@@ -118,12 +113,12 @@ public class TopicServiceImpl extends EntityServiceImpl<Topic> implements TopicS
 
   @Override
   public List<Topic> getTopicsOfEntity(UUID entityUuid) {
-    return ((TopicRepository) repository).getTopicsOfEntity(entityUuid);
+    return ((TopicRepository) repository).findTopicsOfEntity(entityUuid);
   }
 
   @Override
   public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) {
-    return ((TopicRepository) repository).getTopicsOfFileResource(fileResourceUuid);
+    return ((TopicRepository) repository).findTopicsOfFileResource(fileResourceUuid);
   }
 
   @Override

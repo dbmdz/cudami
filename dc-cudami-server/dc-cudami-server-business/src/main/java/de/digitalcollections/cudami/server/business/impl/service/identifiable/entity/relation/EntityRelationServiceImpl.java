@@ -57,7 +57,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
 
   @Override
   public List<EntityRelation> getBySubject(UUID subjectEntityUuid) {
-    return repository.getBySubject(subjectEntityUuid);
+    return repository.findBySubject(subjectEntityUuid);
   }
 
   @Override

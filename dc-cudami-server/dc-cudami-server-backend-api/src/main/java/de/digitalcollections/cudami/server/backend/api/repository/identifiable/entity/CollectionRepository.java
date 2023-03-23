@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.N
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
@@ -31,7 +30,7 @@ public interface CollectionRepository
 
   boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
 
-  default PageResponse<DigitalObject> getDigitalObjects(
+  default PageResponse<DigitalObject> findDigitalObjects(
       Collection collection, PageRequest pageRequest) {
     if (collection == null) {
       return null;
@@ -41,7 +40,7 @@ public interface CollectionRepository
 
   PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
 
-  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering);
+  PageResponse<CorporateBody> findRelatedCorporateBodies(UUID uuid, PageRequest pageRequest);
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {

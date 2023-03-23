@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
 
@@ -35,60 +36,68 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
 
   long count();
 
-  default void delete(UUID uuid) {
-    delete(List.of(uuid)); // same performance as "where uuid = :uuid"
+  default boolean delete(I identifiable) {
+    if (identifiable == null) {
+      return true;
+    }
+    return delete(identifiable.getUuid());
   }
 
-  boolean delete(List<UUID> uuids);
+  boolean delete(UUID identifiableUuid);
 
-  default List<I> find(String searchTerm, int maxResults) {
-    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
-    PageResponse<I> response = find(request);
-    return response.getContent();
+  default boolean delete(List<I> identifiables) {
+    if (identifiables == null || identifiables.isEmpty()) {
+      return true;
+    }
+    List<UUID> list = identifiables.stream().map(i -> i.getUuid()).collect(Collectors.toList());
+    return deleteByUuids(list);
   }
 
-  /**
-   * @return list of ALL identifiables with FULL data. USE WITH CARE (only for internal workflow,
-   *     NOT FOR USER INTERACTION!)!!!
-   */
-  List<I> getAllFull();
-
-  /**
-   * Returns a list of all identifiables, reduced to their identifiers and last modification date
-   *
-   * @return partially filled complete list of all identifiables of implementing repository entity
-   *     type
-   */
-  List<I> getAllReduced();
+  boolean deleteByUuids(List<UUID> uuidList);
 
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  I getByIdentifier(Identifier identifier);
-
-  default I getByIdentifier(String namespace, String id) {
-    return getByIdentifier(new Identifier(null, namespace, id));
+  default PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest) {
+    if (identifiable == null) {
+      return null;
+    }
+    return findRelatedEntities(identifiable.getUuid(), pageRequest);
   }
+
+  PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest);
+
+  default PageResponse<FileResource> findRelatedFileResources(
+      I identifiable, PageRequest pageRequest) {
+    if (identifiable == null) {
+      return null;
+    }
+    return findRelatedFileResources(identifiable.getUuid(), pageRequest);
+  }
+
+  PageResponse<FileResource> findRelatedFileResources(
+      UUID identifiableUuid, PageRequest pageRequest);
+
+  default I getByIdentifiable(I identifiable) {
+    if (identifiable == null) {
+      return null;
+    }
+    return getByUuid(identifiable.getUuid());
+  }
+
+  default I getByIdentifier(Identifier identifier) {
+    if (identifier == null) {
+      return null;
+    }
+    if (identifier.getIdentifiable() != null) {
+      return getByUuid(identifier.getIdentifiable());
+    }
+    return getByIdentifier(identifier.getNamespace(), identifier.getId());
+  }
+
+  I getByIdentifier(String namespace, String id);
 
   List<Locale> getLanguages();
-
-  default List<Entity> getRelatedEntities(I identifiable) {
-    if (identifiable == null) {
-      return null;
-    }
-    return getRelatedEntities(identifiable.getUuid());
-  }
-
-  List<Entity> getRelatedEntities(UUID identifiableUuid);
-
-  default List<FileResource> getRelatedFileResources(I identifiable) {
-    if (identifiable == null) {
-      return null;
-    }
-    return getRelatedFileResources(identifiable.getUuid());
-  }
-
-  List<FileResource> getRelatedFileResources(UUID identifiableUuid);
 
   default void save(I identifiable) throws RepositoryException {
     save(identifiable, null);

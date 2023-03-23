@@ -88,7 +88,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     Website website = super.getByIdentifier(identifier);
 
     if (website != null) {
-      website.setRootPages(getRootPages(website));
+      website.setRootPages(findRootPages(website));
     }
     return website;
   }
@@ -98,7 +98,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
     Website website = super.getByUuidAndFiltering(uuid, filtering);
 
     if (website != null) {
-      website.setRootPages(getRootPages(website));
+      website.setRootPages(findRootPages(website));
     }
     return website;
   }
@@ -122,7 +122,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public List<Webpage> getRootWebpages(UUID uuid) {
+  public List<Webpage> findRootWebpages(UUID uuid) {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 

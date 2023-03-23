@@ -13,49 +13,46 @@ import java.util.UUID;
 /** Repository for Topic persistence handling. */
 public interface TopicRepository extends NodeRepository<Topic>, EntityRepository<Topic> {
 
-  default List<Entity> getAllEntities(Topic topic) {
+  default PageResponse<Entity> findEntities(Topic topic, PageRequest pageRequest) {
     if (topic == null) {
       return null;
     }
-    return getEntities(topic.getUuid());
+    return findEntities(topic.getUuid(), pageRequest);
   }
-
-  List<Entity> getEntities(UUID topicUuid);
 
   public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest);
 
-  default List<FileResource> getFileResources(Topic topic) {
+  default PageResponse<FileResource> findFileResources(Topic topic, PageRequest pageRequest) {
     if (topic == null) {
       return null;
     }
-    return getFileResources(topic.getUuid());
+    return findFileResources(topic.getUuid(), pageRequest);
   }
 
-  List<FileResource> getFileResources(UUID topicUuid);
-
   PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest);
+
+  default PageResponse<Topic> findTopicsOfEntity(Entity entity, PageRequest pageRequest) {
+    if (entity == null) {
+      return null;
+    }
+    return findTopicsOfEntity(entity.getUuid(), pageRequest);
+  }
+
+  PageResponse<Topic> findTopicsOfEntity(UUID entityUuid, PageRequest pageRequest);
+
+  default PageResponse<Topic> findTopicsOfFileResource(
+      FileResource fileResource, PageRequest pageRequest) {
+    if (fileResource == null) {
+      return null;
+    }
+    return findTopicsOfFileResource(fileResource.getUuid(), pageRequest);
+  }
+
+  PageResponse<Topic> findTopicsOfFileResource(UUID fileResourceUuid, PageRequest pageRequest);
 
   List<Locale> getLanguagesOfEntities(UUID topicUuid);
 
   List<Locale> getLanguagesOfFileResources(UUID topicUuid);
-
-  default List<Topic> getTopicsOfEntity(Entity entity) {
-    if (entity == null) {
-      return null;
-    }
-    return getTopicsOfEntity(entity.getUuid());
-  }
-
-  List<Topic> getTopicsOfEntity(UUID entityUuid);
-
-  default List<Topic> getTopicsOfFileResource(FileResource fileResource) {
-    if (fileResource == null) {
-      return null;
-    }
-    return getTopicsOfEntity(fileResource.getUuid());
-  }
-
-  List<Topic> getTopicsOfFileResource(UUID fileResourceUuid);
 
   default List<Entity> setEntities(Topic topic, List<Entity> entities) {
     if (topic == null) {

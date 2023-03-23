@@ -11,11 +11,9 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Topic;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -93,7 +91,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
     return service.find(pageRequest);
   }
 
-  @Operation(summary = "Get paged entities of a topic")
+  @Operation(summary = "Get all entities of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,27 +100,30 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           UUID topicUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "entityType", required = false) FilterCriterion<String> entityType) {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, new Sorting());
-    if (entityType != null) {
-      Filtering filtering = Filtering.builder().add("entityType", entityType).build();
-      pageRequest.setFiltering(filtering);
-    }
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.findEntities(topicUuid, pageRequest);
   }
 
-  @Operation(summary = "Get file resources of topic")
+  @Operation(summary = "Get all file resources of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public PageResponse<FileResource> findFileResources(
-      @PathVariable UUID uuid,
+      @Parameter(example = "", description = "UUID of the topic") @PathVariable("uuid")
+          UUID topicUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize) {
-    return service.findFileResources(uuid, new PageRequest(pageNumber, pageSize));
+      @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findFileResources(topicUuid, pageRequest);
   }
 
-  @Operation(summary = "Get paged subtopics of a topic")
+  @Operation(summary = "Get all subtopics of a topic as (paged, sorted, filtered) list")
   @GetMapping(
       value = {
         "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/subtopics",
@@ -134,16 +135,13 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return service.findChildren(topicUuid, searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findChildren(topicUuid, pageRequest);
   }
 
-  @Operation(summary = "Get all top topics")
+  @Operation(summary = "Get all top topics as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/topics/top"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -151,13 +149,10 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "searchTerm", required = false) String searchTerm) {
-    PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
-    if (sortBy != null) {
-      Sorting sorting = new Sorting(sortBy);
-      searchPageRequest.setSorting(sorting);
-    }
-    return service.findRootNodes(searchPageRequest);
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+    PageRequest pageRequest =
+        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
+    return service.findRootNodes(pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a topic")
@@ -258,20 +253,6 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Topic> getChildren(@PathVariable UUID uuid) {
     return service.getChildren(uuid);
-  }
-
-  @Operation(summary = "Get all entities of topic")
-  @GetMapping(
-      value = {
-        "/v6/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/v5/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/v3/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all",
-        "/latest/topics/{uuid:" + ParameterHelper.UUID_PATTERN + "}/entities/all"
-      },
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Entity> getEntities(
-      @Parameter(name = "uuid", description = "The uuid of the topic") @PathVariable UUID uuid) {
-    return service.getEntities(uuid);
   }
 
   @Operation(summary = "Get all languages of entities of a topic")

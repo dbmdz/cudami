@@ -4,7 +4,6 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
-import java.util.List;
 import java.util.UUID;
 
 public interface EntityHeadwordRepository {
@@ -22,17 +21,23 @@ public interface EntityHeadwordRepository {
    * @param headword headword of entities
    * @return result as paged response
    */
-  default PageResponse<Entity> findEntitiesByHeadword(PageRequest pageRequest, Headword headword) {
-    return findEntitiesByHeadword(pageRequest, headword.getUuid());
+  default PageResponse<Entity> findEntitiesByHeadword(Headword headword, PageRequest pageRequest) {
+    if (headword == null) {
+      return null;
+    }
+    return findEntitiesByHeadword(headword.getUuid(), pageRequest);
   }
 
-  PageResponse<Entity> findEntitiesByHeadword(PageRequest pageRequest, UUID headwordUuid);
+  PageResponse<Entity> findEntitiesByHeadword(UUID headwordUuid, PageRequest pageRequest);
 
-  default List<Headword> getHeadwordsForEntity(Entity entity) {
-    return getHeadwordsForEntity(entity.getUuid());
+  default PageResponse<Headword> findHeadwordsForEntity(Entity entity, PageRequest pageRequest) {
+    if (entity == null) {
+      return null;
+    }
+    return findHeadwordsForEntity(entity.getUuid(), pageRequest);
   }
 
-  List<Headword> getHeadwordsForEntity(UUID entityUuid);
+  PageResponse<Headword> findHeadwordsForEntity(UUID entityUuid, PageRequest pageRequest);
 
   default void remove(Entity entity, Headword headword) {
     remove(entity.getUuid(), headword.getUuid());

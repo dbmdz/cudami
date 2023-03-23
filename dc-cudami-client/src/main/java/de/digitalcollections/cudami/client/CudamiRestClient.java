@@ -8,7 +8,6 @@ import de.digitalcollections.model.exception.http.client.ResourceNotFoundExcepti
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.http.HttpClient;
-import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +40,6 @@ public class CudamiRestClient<T extends UniqueObject> extends BaseRestClient<T> 
 
   public PageResponse<T> find(PageRequest pageRequest) throws TechnicalException {
     return doGetRequestForPagedObjectList(baseEndpoint, pageRequest);
-  }
-
-  public List<T> getAll() throws TechnicalException {
-    return doGetRequestForObjectList(baseEndpoint + "/all");
   }
 
   public T getByUuid(UUID uuid) throws TechnicalException {

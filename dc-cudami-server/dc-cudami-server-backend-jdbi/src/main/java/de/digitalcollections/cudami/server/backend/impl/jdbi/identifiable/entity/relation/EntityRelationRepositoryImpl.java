@@ -111,16 +111,16 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<EntityRelation> getBySubject(UUID subjectEntityUuid) {
+  public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
     Entity subjectEntity = entityRepositoryImpl.getByUuid(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
     }
-    return getBySubject(subjectEntity);
+    return findBySubject(subjectEntity);
   }
 
   @Override
-  public List<EntityRelation> getBySubject(Entity subjectEntity) {
+  public List<EntityRelation> findBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
         "SELECT subject_uuid rel_subject, predicate rel_predicate, object_uuid rel_object, additional_predicates rel_addpredicates"

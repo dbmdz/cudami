@@ -59,13 +59,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public List<Webpage> find(String searchTerm, int maxResults) {
-    List<Webpage> webpages = super.find(searchTerm, maxResults);
-    setPublicationStatus(webpages);
-    return webpages;
-  }
-
-  @Override
   public PageResponse<Webpage> findActiveChildren(UUID uuid, PageRequest pageRequest) {
     Filtering filtering = filteringForActive();
     pageRequest.add(filtering);
@@ -142,20 +135,6 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
             .collect(Collectors.toList());
     setPublicationStatus(list);
     return list;
-  }
-
-  @Override
-  public List<Webpage> getAllFull() {
-    List<Webpage> webpages = super.getAllFull();
-    setPublicationStatus(webpages);
-    return webpages;
-  }
-
-  @Override
-  public List<Webpage> getAllReduced() {
-    List<Webpage> webpages = super.getAllReduced();
-    setPublicationStatus(webpages);
-    return webpages;
   }
 
   @Override

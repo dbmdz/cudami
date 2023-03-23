@@ -267,12 +267,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getFileResources(digitalObjectUuid);
+    return ((DigitalObjectRepository) repository).findFileResources(digitalObjectUuid);
   }
 
   @Override
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
+    return ((DigitalObjectRepository) repository).findImageFileResources(digitalObjectUuid);
   }
 
   @Override
