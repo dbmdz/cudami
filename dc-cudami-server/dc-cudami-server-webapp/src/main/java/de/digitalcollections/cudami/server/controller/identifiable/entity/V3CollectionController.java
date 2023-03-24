@@ -184,7 +184,7 @@ public class V3CollectionController {
     if (active != null) {
       response = collectionService.findActiveChildren(collectionUuid, pageRequest);
     } else {
-      response = collectionService.findChildren(collectionUuid, pageRequest);
+      response = collectionService.findSubParts(collectionUuid, pageRequest);
     }
     JSONObject result = fixPageResponse(response);
 

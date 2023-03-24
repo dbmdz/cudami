@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias;
 
+import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -12,26 +13,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public interface UrlAliasRepository {
-
-  /**
-   * Filter the locales by their script and return only those with
-   *
-   * <ul>
-   *   <li>"" (no script)
-   *   <li>"Latn"
-   * </ul>
-   *
-   * @param locales
-   * @return
-   */
-  public static List<Locale> grabLocalesByScript(Collection<Locale> locales) {
-    if (locales == null) return Collections.emptyList();
-    List<String> scripts = List.of("", "Latn");
-    return locales.stream()
-        .filter(l -> l != null && scripts.contains(l.getScript()))
-        .collect(Collectors.toList());
-  }
+public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
 
   /**
    * Returns the language of the passed locale w/o anything else e.g. country or script.
@@ -59,13 +41,23 @@ public interface UrlAliasRepository {
   }
 
   /**
-   * Remove the entries with the provided UUIDs (PK).
+   * Filter the locales by their script and return only those with
    *
-   * @param urlAliasUuids List of aliases' UUIDs to remove
-   * @return count of removed datasets
-   * @throws RepositoryException
+   * <ul>
+   *   <li>"" (no script)
+   *   <li>"Latn"
+   * </ul>
+   *
+   * @param locales
+   * @return
    */
-  int delete(List<UUID> urlAliasUuids) throws RepositoryException;
+  public static List<Locale> grabLocalesByScript(Collection<Locale> locales) {
+    if (locales == null) return Collections.emptyList();
+    List<String> scripts = List.of("", "Latn");
+    return locales.stream()
+        .filter(l -> l != null && scripts.contains(l.getScript()))
+        .collect(Collectors.toList());
+  }
 
   /**
    * Generic request method for getting a parametrized list.
@@ -74,16 +66,8 @@ public interface UrlAliasRepository {
    * @return pagable result list
    * @throws RepositoryException
    */
-  PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest) throws RepositoryException;
-
-  /**
-   * Retrieve all slugs of a link target.
-   *
-   * @param uuid the target's (Webpage, Collection,...) UUID
-   * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
-   * @throws RepositoryException
-   */
-  LocalizedUrlAliases getAllForTarget(UUID uuid) throws RepositoryException;
+  PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
+      throws RepositoryException;
 
   /**
    * Retrieve all primary links corresponding to a slug. The owning website is ignored.
@@ -121,13 +105,13 @@ public interface UrlAliasRepository {
       UUID websiteUuid, String slug, boolean considerLanguage) throws RepositoryException;
 
   /**
-   * Retrieve the {@code UrlAlias} with the supplied UUID (PK).
+   * Retrieve all slugs of a link target.
    *
-   * @param uuid UUID of url alias
-   * @return the found {@code UrlAlias} or {@code null}
+   * @param uuid the target's (Webpage, Collection,...) UUID
+   * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
    * @throws RepositoryException
    */
-  UrlAlias getByUuid(UUID uuid) throws RepositoryException;
+  LocalizedUrlAliases getAllForTarget(UUID uuid) throws RepositoryException;
 
   /**
    * Check whether an entry exists for the passed website UUID, slug and language.
@@ -140,20 +124,4 @@ public interface UrlAliasRepository {
    */
   boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
       throws RepositoryException;
-
-  /**
-   * Save an {@code UrlAlias} object.
-   *
-   * @param urlAlias the object to save
-   * @throws RepositoryException
-   */
-  void save(UrlAlias urlAlias) throws RepositoryException;
-
-  /**
-   * Update an existing object.
-   *
-   * @param urlAlias the existing object with changed properties
-   * @throws RepositoryException
-   */
-  void update(UrlAlias urlAlias) throws RepositoryException;
 }

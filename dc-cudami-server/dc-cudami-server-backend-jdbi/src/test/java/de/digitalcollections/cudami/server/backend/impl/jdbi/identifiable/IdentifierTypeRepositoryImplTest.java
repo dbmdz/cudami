@@ -142,7 +142,7 @@ class IdentifierTypeRepositoryImplTest extends AbstractRepositoryImplTest {
 
     repo.save(initial);
 
-    repo.delete(initial.getUuid());
+    repo.deleteByUuid(initial.getUuid());
 
     IdentifierType actual = repo.getByUuid(initial.getUuid());
     assertThat(actual).isNull();

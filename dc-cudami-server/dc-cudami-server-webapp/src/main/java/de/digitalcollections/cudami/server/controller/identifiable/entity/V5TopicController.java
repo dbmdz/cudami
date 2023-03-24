@@ -118,7 +118,7 @@ public class V5TopicController {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
       searchPageRequest.setSorting(sorting);
     }
-    PageResponse<Topic> pageResponse = topicService.findChildren(topicUuid, searchPageRequest);
+    PageResponse<Topic> pageResponse = topicService.findSubParts(topicUuid, searchPageRequest);
 
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);

@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class AbstractPagingAndSortingRepositoryImplTest {
+public class AbstractPagingSortingFilteringRepositoryImplTest {
 
-  public AbstractPagingAndSortingRepositoryImplTest() {}
+  public AbstractPagingSortingFilteringRepositoryImplTest() {}
 
   @Test
   public void testAddOrderBy() {
@@ -88,7 +88,8 @@ public class AbstractPagingAndSortingRepositoryImplTest {
         query.toString().trim());
   }
 
-  private class PagingAndSortingRepositoryImpl extends AbstractPagingAndSortingRepositoryImpl {
+  private class PagingAndSortingRepositoryImpl
+      extends AbstractPagingSortingFilteringRepositoryImpl {
 
     List<String> allowedOrderByFields = null;
     String columnName = null;

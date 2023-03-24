@@ -75,7 +75,7 @@ class TagRepositoryImplTest {
   @Test
   void saveAndDelete() {
     Tag savedTag = ensureSavedTag("Test");
-    boolean success = repo.delete(savedTag.getUuid());
+    boolean success = repo.deleteByUuid(savedTag.getUuid());
     assertThat(success).isTrue();
 
     Tag nonexistingTag = repo.getByUuid(savedTag.getUuid());

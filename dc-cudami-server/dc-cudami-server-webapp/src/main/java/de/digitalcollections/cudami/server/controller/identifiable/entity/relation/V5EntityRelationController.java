@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -53,7 +53,7 @@ public class V5EntityRelationController {
 
       pageRequest.add(filtering);
     }
-    PageResponse<EntityRelation> pageResponse = entityRelationService.find(pageRequest);
+    PageResponse<EntityToEntityRelation> pageResponse = entityRelationService.find(pageRequest);
 
     try {
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);

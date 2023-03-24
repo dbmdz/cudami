@@ -67,7 +67,7 @@ class V5WebpageControllerTest extends BaseControllerTest {
                 .withoutContent()
                 .build();
 
-    when(webpageService.findChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b_children_empty.json");
   }

@@ -115,7 +115,7 @@ class V5CollectionControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(collectionService.findChildren(any(UUID.class), any(PageRequest.class)))
+    when(collectionService.findSubParts(any(UUID.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path, "/v5/collections/find_with_result.json");

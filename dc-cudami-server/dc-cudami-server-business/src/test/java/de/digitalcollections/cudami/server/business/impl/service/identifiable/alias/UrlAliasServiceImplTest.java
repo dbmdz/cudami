@@ -253,7 +253,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   @Test
   public void deleteForTargetWithUuidNull() throws ServiceException, RepositoryException {
     assertThat(service.deleteAllForTarget(null, true)).isFalse();
-    verify(repo, never()).delete(any());
+    verify(repo, never()).deleteByUuid(any());
   }
 
   @DisplayName("returns false, when no single UrlAlias of a list could be deleted")
@@ -269,7 +269,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   public void deleteNonexistantSingleUrlAlias() throws ServiceException, RepositoryException {
     when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
-    assertThat(service.delete(UUID.randomUUID())).isFalse();
+    assertThat(service.deleteByUuid(UUID.randomUUID())).isFalse();
   }
 
   @DisplayName("returns true when an existant UrlAlias could be deleted")
@@ -277,7 +277,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   public void deleteSingleUrlAlias() throws ServiceException, RepositoryException {
     when(repo.delete(any(List.class))).thenReturn(1);
 
-    assertThat(service.delete(UUID.randomUUID())).isTrue();
+    assertThat(service.deleteByUuid(UUID.randomUUID())).isTrue();
   }
 
   @DisplayName("returns true, when at least one UrlAlias of a list could be deleted")
@@ -285,7 +285,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   public void deleteSomeUrlAliases() throws ServiceException, RepositoryException {
     UUID uuid1 = UUID.randomUUID();
     UUID uuid2 = UUID.randomUUID();
-    when(repo.delete(eq(List.of(uuid1, uuid2)))).thenReturn(1);
+    when(repo.deleteByUuid(eq(List.of(uuid1, uuid2)))).thenReturn(1);
 
     assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
   }

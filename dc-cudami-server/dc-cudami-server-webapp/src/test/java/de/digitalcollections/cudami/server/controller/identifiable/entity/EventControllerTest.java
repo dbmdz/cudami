@@ -78,11 +78,11 @@ class EventControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteEvent(String path) throws Exception {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(eventService.delete(eq(uuid))).thenReturn(true);
+    when(eventService.deleteByUuid(eq(uuid))).thenReturn(true);
 
     testDeleteSuccessful(path);
 
-    verify(eventService, times(1)).delete(eq(uuid));
+    verify(eventService, times(1)).deleteByUuid(eq(uuid));
   }
 
   @DisplayName("can not delete an already deleted event")
@@ -90,7 +90,7 @@ class EventControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/events/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteEventTwice(String path) throws Exception {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(eventService.delete(eq(uuid))).thenReturn(false);
+    when(eventService.deleteByUuid(eq(uuid))).thenReturn(false);
 
     testDeleteNotFound(path);
   }

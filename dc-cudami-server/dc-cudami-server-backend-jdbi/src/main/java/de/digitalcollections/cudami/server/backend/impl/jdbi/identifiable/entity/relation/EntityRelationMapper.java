@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.UUID;
@@ -18,7 +18,7 @@ public class EntityRelationMapper<E extends Entity> {
     this.entityRepository = entityRepository;
   }
 
-  public RowMapper<EntityRelation> getMapper(final E subjectEntity) {
+  public RowMapper<EntityToEntityRelation> getMapper(final E subjectEntity) {
     return (ResultSet rs, StatementContext ctx) -> {
       String subjectUuid = rs.getString("rel_subject");
       String predicate = rs.getString("rel_predicate");
@@ -34,7 +34,7 @@ public class EntityRelationMapper<E extends Entity> {
       }
       Entity object = entityRepository.getByUuid(UUID.fromString(objectUuid));
 
-      EntityRelation result = new EntityRelation();
+      EntityToEntityRelation result = new EntityToEntityRelation();
 
       result.setSubject(subject);
       result.setPredicate(predicate);

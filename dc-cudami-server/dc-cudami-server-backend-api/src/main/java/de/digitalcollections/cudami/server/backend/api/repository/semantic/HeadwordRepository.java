@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.backend.api.repository.semantic;
 
+import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
 import de.digitalcollections.model.list.buckets.BucketObjectsResponse;
 import de.digitalcollections.model.list.buckets.BucketsRequest;
 import de.digitalcollections.model.list.buckets.BucketsResponse;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
@@ -15,13 +15,11 @@ import java.util.Locale;
 import java.util.UUID;
 
 /** Repository for Headwords handling */
-public interface HeadwordRepository {
+public interface HeadwordRepository extends UniqueObjectRepository<Headword> {
 
   void addRelatedEntity(UUID headwordUuid, UUID entityUuid);
 
   void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid);
-
-  long count();
 
   /**
    * Delete a headword.
@@ -29,11 +27,7 @@ public interface HeadwordRepository {
    * @param label label of headword
    * @param locale locale of label
    */
-  void delete(String label, Locale locale);
-
-  void delete(UUID uuid);
-
-  boolean delete(List<UUID> uuids);
+  void deleteByLabelAndLocale(String label, Locale locale);
 
   void deleteRelatedEntities(UUID headwordUuid);
 
@@ -43,41 +37,14 @@ public interface HeadwordRepository {
 
   BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
 
-  /**
-   * Return paged list of headwords
-   *
-   * @param pageRequest request for page
-   * @return page response
-   */
-  PageResponse<Headword> find(PageRequest pageRequest);
-
-  default List<Headword> find(String searchTerm, int maxResults) {
-    PageRequest request = new PageRequest(searchTerm, 0, maxResults, null);
-    PageResponse<Headword> response = find(request);
-    return response.getContent();
-  }
-
-  List<Headword> find(String label, Locale locale);
-
-  /**
-   * Return all headwords
-   *
-   * @return List of all headwords
-   */
-  List<Headword> getAll();
-
-  /**
-   * Returns a list of headwords, if available
-   *
-   * @param label label of headword, e.g. "München" (locale ignored)
-   * @return list of headwords or null
-   */
-  List<Headword> findByLabel(String label);
-
+  // TODO: replace with filtering
   PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
-  List<Headword> getRandom(int count);
+  PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
+
+  PageResponse<FileResource> findRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
+
   /**
    * Returns a headword, if available
    *
@@ -88,32 +55,18 @@ public interface HeadwordRepository {
   Headword getByLabelAndLocale(String label, Locale locale);
 
   default Headword getByUuid(UUID uuid) {
-    return findByUuidAndFiltering(uuid, null);
+    return getByUuidAndFiltering(uuid, null);
   }
-
-  Headword findByUuidAndFiltering(UUID uuid, Filtering filtering);
 
   List<Locale> getLanguages();
 
+  List<Headword> getRandom(int count);
+
   List<Entity> getRelatedEntities(UUID headwordUuid);
 
-  PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
-
   List<FileResource> getRelatedFileResources(UUID headwordUuid);
-
-  PageResponse<FileResource> findRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
-
-  /**
-   * Save a Headword.
-   *
-   * @param headword the headword to be saved
-   * @return the saved headword with updated timestamps
-   */
-  Headword save(Headword headword);
 
   List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
 
   List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
-
-  Headword update(Headword headword);
 }

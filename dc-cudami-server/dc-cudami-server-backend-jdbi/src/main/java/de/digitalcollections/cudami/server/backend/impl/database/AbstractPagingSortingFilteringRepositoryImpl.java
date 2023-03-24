@@ -21,10 +21,10 @@ import org.springframework.util.StringUtils;
  * If result does not fit your use case: implement it yourself and do not use these convenience
  * methods.
  */
-public abstract class AbstractPagingAndSortingRepositoryImpl {
+public abstract class AbstractPagingSortingFilteringRepositoryImpl {
 
   private static final Logger LOGGER =
-      LoggerFactory.getLogger(AbstractPagingAndSortingRepositoryImpl.class);
+      LoggerFactory.getLogger(AbstractPagingSortingFilteringRepositoryImpl.class);
   private static Pattern SELECT_STMT_SPLITTER;
   protected int offsetForAlternativePaging;
 

@@ -344,7 +344,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
     verify(repo, times(2)).getByUuid(eq(uuid));
     verify(repo, times(1)).deleteFileResources(eq(uuid));
-    verify(repo, times(1)).delete(eq(List.of(uuid)));
+    verify(repo, times(1)).deleteByUuid(eq(List.of(uuid)));
     verify(digitalObjectLinkedDataFileResourceService, times(1))
         .deleteLinkedDataFileResources(eq(uuid));
     verify(digitalObjectRenderingFileResourceService, times(1))

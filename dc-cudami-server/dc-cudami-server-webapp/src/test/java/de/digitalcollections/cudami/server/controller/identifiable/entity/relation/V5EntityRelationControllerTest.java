@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -24,8 +24,8 @@ class V5EntityRelationControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/entities/relations?predicate=is_part_of&pageNumber=0&pageSize=1"})
   public void listOfRelatedEntities(String path) throws Exception {
-    PageResponse<EntityRelation> expected =
-        (PageResponse<EntityRelation>)
+    PageResponse<EntityToEntityRelation> expected =
+        (PageResponse<EntityToEntityRelation>)
             PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)

@@ -76,7 +76,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
       throws CudamiControllerException {
     boolean isDeleted;
     try {
-      isDeleted = service.delete(uuid);
+      isDeleted = service.deleteByUuid(uuid);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

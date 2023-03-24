@@ -42,7 +42,7 @@ public class IdentifierTypeServiceImpl
 
   @Override
   public void delete(List<UUID> uuids) {
-    repository.delete(uuids);
+    repository.deleteByUuid(uuids);
   }
 
   @Override

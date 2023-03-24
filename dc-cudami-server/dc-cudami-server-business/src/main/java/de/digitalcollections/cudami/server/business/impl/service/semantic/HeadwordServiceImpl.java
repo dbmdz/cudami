@@ -49,7 +49,7 @@ public class HeadwordServiceImpl implements HeadwordService {
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    return repository.delete(uuids);
+    return repository.deleteByUuid(uuids);
   }
 
   @Override

@@ -112,7 +112,7 @@ class V5TopicControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(topicService.findChildren(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(topicService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/topics/06b8a104-e052-4104-b20a-502866de4deb_subtopics.json");
   }

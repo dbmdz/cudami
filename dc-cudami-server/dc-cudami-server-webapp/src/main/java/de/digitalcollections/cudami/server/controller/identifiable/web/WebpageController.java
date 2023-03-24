@@ -104,7 +104,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     if (active != null) {
       return service.findActiveChildren(uuid, pageRequest);
     }
-    return service.findChildren(uuid, pageRequest);
+    return service.findSubParts(uuid, pageRequest);
   }
 
   @Operation(summary = "Get the breadcrumb for a webpage")

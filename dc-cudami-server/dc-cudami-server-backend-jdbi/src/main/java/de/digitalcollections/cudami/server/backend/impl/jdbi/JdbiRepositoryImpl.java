@@ -1,6 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
-import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingAndSortingRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingSortingFilteringRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class JdbiRepositoryImpl<U extends UniqueObject>
-    extends AbstractPagingAndSortingRepositoryImpl {
+    extends AbstractPagingSortingFilteringRepositoryImpl {
 
   private static final String KEY_PREFIX_FILTERVALUE = "filtervalue_";
   private static final Logger LOGGER = LoggerFactory.getLogger(JdbiRepositoryImpl.class);
@@ -133,11 +133,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    * @return the search term that should be used for the {@link
    *     PageResponse#setExecutedSearchTerm(String)}
    */
-  protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
-    String executedSearchTerm = escapeTermForJsonpath(searchTerm);
-    argumentMappings.put("searchTerm", executedSearchTerm);
-    return executedSearchTerm;
-  }
+  // FIXME: delete
+  //  protected String addSearchTermMappings(String searchTerm, Map<String, Object>
+  // argumentMappings) {
+  //    String executedSearchTerm = escapeTermForJsonpath(searchTerm);
+  //    argumentMappings.put("searchTerm", executedSearchTerm);
+  //    return executedSearchTerm;
+  //  }
 
   public long count() {
     final String sql = "SELECT count(*) FROM " + tableName;
@@ -705,7 +707,7 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
    * alias and column names
    */
   protected void mapFilterExpressionsToOtherTableColumnNames(
-      Filtering filtering, AbstractPagingAndSortingRepositoryImpl otherRepository) {
+      Filtering filtering, AbstractPagingSortingFilteringRepositoryImpl otherRepository) {
     if (filtering != null) {
       List<FilterCriterion> filterCriteria =
           filtering.getFilterCriteria().stream()

@@ -14,7 +14,7 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
 
   @Override
   public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
-    return ((ManifestationRepository) repository).findChildren(uuid, pageRequest);
+    return ((ManifestationRepository) repository).findSubParts(uuid, pageRequest);
   }
 
   @Override
@@ -89,7 +89,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   public void save(Manifestation manifestation) throws ServiceException, ValidationException {
     super.save(manifestation);
     try {
-      List<EntityRelation> entityRelations = manifestation.getRelations();
+      List<EntityToEntityRelation> entityRelations = manifestation.getRelations();
       entityRelationService.persistEntityRelations(manifestation, entityRelations, true);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
@@ -100,7 +100,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   public void update(Manifestation manifestation) throws ServiceException, ValidationException {
     super.update(manifestation);
     try {
-      List<EntityRelation> entityRelations = manifestation.getRelations();
+      List<EntityToEntityRelation> entityRelations = manifestation.getRelations();
       entityRelationService.persistEntityRelations(manifestation, entityRelations, false);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);

@@ -4,7 +4,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
-import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -23,21 +22,10 @@ public interface ItemRepository extends EntityRepository<Item> {
 
   PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
 
-  List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
-
-  // TODO: remove as work - item is deprecated
-  default PageResponse<Item> findItemsForWork(Work work, PageRequest pageRequest) {
-    if (work == null) {
-      return null;
-    }
-    return findItemsForWork(work.getUuid(), pageRequest);
-  }
-
-  // TODO: remove as work - item is deprecated
-  PageResponse<Item> findItemsForWork(UUID workUuid, PageRequest pageRequest);
-
   PageResponse<Item> findItemsByManifestation(UUID manifestationUuid, PageRequest pageRequest)
       throws RepositoryException;
+
+  List<Locale> getLanguagesOfDigitalObjects(UUID uuid);
 
   List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid);
 }

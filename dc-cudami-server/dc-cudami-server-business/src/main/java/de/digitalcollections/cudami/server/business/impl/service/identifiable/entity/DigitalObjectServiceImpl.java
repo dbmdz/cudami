@@ -157,7 +157,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
           e);
     }
 
-    return super.delete(uuid);
+    return super.deleteByUuid(uuid);
   }
 
   private void deleteRenderingResource(UUID digitalObjectUuid) throws ServiceException {

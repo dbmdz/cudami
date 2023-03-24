@@ -77,7 +77,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       throw new ConflictException(
           "Collection cannot be deleted, because it has corresponding digital objects!");
     }
-    return super.delete(uuid);
+    return super.deleteByUuid(uuid);
   }
 
   @Override

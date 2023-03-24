@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.lang.reflect.InvocationTargetException;
@@ -51,17 +51,17 @@ public class EntityRelationServiceImpl implements EntityRelationService {
   }
 
   @Override
-  public PageResponse<EntityRelation> find(PageRequest pageRequest) {
+  public PageResponse<EntityToEntityRelation> find(PageRequest pageRequest) {
     return repository.find(pageRequest);
   }
 
   @Override
-  public List<EntityRelation> getBySubject(UUID subjectEntityUuid) {
+  public List<EntityToEntityRelation> getBySubject(UUID subjectEntityUuid) {
     return repository.findBySubject(subjectEntityUuid);
   }
 
   @Override
-  public void save(List<EntityRelation> entityRelations) throws ServiceException {
+  public void save(List<EntityToEntityRelation> entityRelations) throws ServiceException {
     // We assume, that all referenced predicates, the "normal" and the additional ones
     // are already available in the service. If not, the repository would throw
     // a ForeignKey exception
@@ -74,7 +74,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
 
   @Override
   public void persistEntityRelations(
-      Entity entity, List<EntityRelation> relations, boolean deleteExisting)
+      Entity entity, List<EntityToEntityRelation> relations, boolean deleteExisting)
       throws ServiceException {
     if (deleteExisting) {
       // Check, if there are already persisted EntityRelations for the entity
@@ -83,7 +83,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
     }
 
     // save all entity relations and set the UUID of the object
-    List<EntityRelation> relationsToSave =
+    List<EntityToEntityRelation> relationsToSave =
         relations.stream()
             .map(
                 r -> {

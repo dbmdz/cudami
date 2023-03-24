@@ -86,7 +86,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         throw new ServiceException("Error while removing UrlAliases. Rollback.", e);
       }
     }
-    return repository.delete(uuids);
+    return repository.deleteByUuid(uuids);
   }
 
   private boolean deleteIdentifiers(UUID identifiableUuid) throws ServiceException {
@@ -94,7 +94,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
-    identifierService.delete(identifiable.getIdentifiers());
+    identifierService.deleteByUuid(identifiable.getIdentifiers());
     return true;
   }
 
@@ -266,7 +266,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
               .collect(Collectors.toSet());
 
       if (!obsoleteIdentifiers.isEmpty()) {
-        identifierService.delete(obsoleteIdentifiers);
+        identifierService.deleteByUuid(obsoleteIdentifiers);
       }
 
       if (!missingIdentifiers.isEmpty()) {

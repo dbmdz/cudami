@@ -8,7 +8,7 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Locale;
@@ -28,15 +28,15 @@ public class V3EntityRelationControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v3/entities/relations?predicate=is_part_of&pageNumber=0&pageSize=1"})
   public void listOfRelatedEntities(String path) throws Exception {
-    PageResponse<EntityRelation> expected =
-        (PageResponse<EntityRelation>)
+    PageResponse<EntityToEntityRelation> expected =
+        (PageResponse<EntityToEntityRelation>)
             PageResponse.builder()
                 .forRequestPage(0)
                 .forPageSize(1)
                 .forEqualPredicate("predicate", "is_part_of")
                 .withTotalElements(109)
                 .withContent(
-                    EntityRelation.builder()
+                    EntityToEntityRelation.builder()
                         .object(
                             Collection.builder()
                                 .created("2020-08-12T18:14:26.032971")

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -14,21 +15,21 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   default boolean addChild(N parent, N child) {
     if (parent == null || child == null) {
-      return false;
+      throw new IllegalArgumentException("parent and child must not be null");
     }
     return addChild(parent.getUuid(), child.getUuid());
   }
 
   default boolean addChild(UUID parentUuid, UUID childUuid) {
     if (parentUuid == null || childUuid == null) {
-      return false;
+      throw new IllegalArgumentException("parent and child uuids must not be null");
     }
     return addChildren(parentUuid, Arrays.asList(childUuid));
   }
 
   default boolean addChildren(N parent, List<N> children) {
     if (parent == null || children == null) {
-      return false;
+      throw new IllegalArgumentException("parent and children must not be null");
     }
     List<UUID> childrenUuids =
         children.stream()
@@ -40,37 +41,96 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   boolean addChildren(UUID parentUuid, List<UUID> childrenUUIDs);
 
+  default PageResponse<N> findChildren(N parent, PageRequest pageRequest) {
+    if (parent == null) {
+      throw new IllegalArgumentException("parent must not be null");
+    }
+    return findChildren(parent.getUuid(), pageRequest);
+  }
+
+  PageResponse<N> findChildren(UUID nodeUuid, PageRequest pageRequest);
+
+  PageResponse<N> findRootNodes(PageRequest pageRequest);
+
+  default BreadcrumbNavigation getBreadcrumbNavigation(N node) {
+    if (node == null) {
+      throw new IllegalArgumentException("node must not be null");
+    }
+    return getBreadcrumbNavigation(node.getUuid());
+  }
   /**
    * @param nodeUuid the uuid of the current node
    * @return the breadcrumb navigation
    */
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 
-  PageResponse<N> findChildren(UUID nodeUuid, PageRequest pageRequest);
+  default List<N> getChildren(N node) {
+    if (node == null) {
+      throw new IllegalArgumentException("node must not be null");
+    }
+    return getChildren(node.getUuid());
+  }
+
+  List<N> getChildren(UUID nodeUuid);
+
+  default N getParent(N node) {
+    if (node == null) {
+      throw new IllegalArgumentException("node must not be null");
+    }
+    return getParent(node.getUuid());
+  }
 
   N getParent(UUID nodeUuid);
 
-  List<N> getParents(UUID uuid);
+  default List<N> getParents(N node) {
+    if (node == null) {
+      throw new IllegalArgumentException("node must not be null");
+    }
+    return getParents(node.getUuid());
+  }
 
-  PageResponse<N> findRootNodes(PageRequest pageRequest);
+  List<N> getParents(UUID uuid);
 
   List<Locale> getRootNodesLanguages();
 
   default boolean removeChild(N parent, N child) {
     if (parent == null || child == null) {
-      return false;
+      throw new IllegalArgumentException("parent and child must not be null");
     }
     return removeChild(parent.getUuid(), child.getUuid());
   }
 
   boolean removeChild(UUID parentUuid, UUID childUuid);
 
-  /**
-   * @param childUuid newly created child node
-   * @param parentUUID parent node the new node is child of
-   * @return saved child node
-   */
-  N saveWithParent(UUID childUuid, UUID parentUUID);
+  default N saveWithParent(N child, N parent) throws RepositoryException {
+    if (parent == null) {
+      throw new IllegalArgumentException("parent and child must not be null");
+    }
+    if (child.getUuid() == null) {
+      save(child);
+    }
+    return saveWithParent(child.getUuid(), parent.getUuid());
+  }
 
-  boolean updateChildrenOrder(UUID parentUuid, List<N> children);
+  /**
+   * @param childUuid UUID of (newly created) child node
+   * @param parentUuid parent node the new node is child of
+   * @return saved child node
+   * @throws RepositoryException if saving fails
+   */
+  N saveWithParent(UUID childUuid, UUID parentUUID) throws RepositoryException;
+
+  default boolean updateChildrenOrder(N parent, List<N> children) {
+    if (parent == null || children == null) {
+      throw new IllegalArgumentException("parent and children must not be null");
+    }
+    List<UUID> childrenUuids =
+        children.stream()
+            .filter(c -> c.getUuid() == null)
+            .map(c -> c.getUuid())
+            .collect(Collectors.toList());
+    return updateChildrenOrder(parent.getUuid(), childrenUuids);
+  }
+
+  boolean updateChildrenOrder(UUID parentUuid, List<UUID> children);
 }

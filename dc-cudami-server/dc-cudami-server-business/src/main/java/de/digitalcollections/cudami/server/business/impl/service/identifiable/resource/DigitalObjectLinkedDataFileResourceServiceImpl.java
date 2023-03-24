@@ -68,7 +68,7 @@ public class DigitalObjectLinkedDataFileResourceServiceImpl
 
         // Delete the resource, when no references exist to it
         if (repository.countDigitalObjectsForResource(linkedDataFileResource.getUuid()) == 0) {
-          linkedDataFileResourceService.delete(linkedDataFileResource.getUuid());
+          linkedDataFileResourceService.deleteByUuid(linkedDataFileResource.getUuid());
         }
       } catch (Exception e) {
         throw new ServiceException(

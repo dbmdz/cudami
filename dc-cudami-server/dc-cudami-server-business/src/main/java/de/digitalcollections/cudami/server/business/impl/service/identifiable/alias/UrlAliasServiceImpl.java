@@ -77,7 +77,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   @Override
   public boolean delete(List<UUID> uuids) throws ServiceException {
     try {
-      return repository.delete(uuids) > 0;
+      return repository.deleteByUuid(uuids) > 0;
     } catch (RepositoryException e) {
       throw new ServiceException("Cannot delete UrlAliases by uuids: " + e, e);
     }

@@ -109,10 +109,10 @@ class CollectionControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/collections/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteCollection(String path) throws Exception {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(collectionService.delete(eq(uuid))).thenReturn(true);
+    when(collectionService.deleteByUuid(eq(uuid))).thenReturn(true);
 
     testDeleteSuccessful(path);
 
-    verify(collectionService, times(1)).delete(eq(uuid));
+    verify(collectionService, times(1)).deleteByUuid(eq(uuid));
   }
 }

@@ -138,7 +138,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
     PageRequest pageRequest =
         createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.findChildren(topicUuid, pageRequest);
+    return service.findSubParts(topicUuid, pageRequest);
   }
 
   @Operation(summary = "Get all top topics as (paged, sorted, filtered) list")

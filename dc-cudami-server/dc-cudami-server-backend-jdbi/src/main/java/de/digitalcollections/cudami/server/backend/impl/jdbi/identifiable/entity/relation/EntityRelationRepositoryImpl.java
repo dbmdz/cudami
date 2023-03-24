@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
@@ -72,7 +72,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public PageResponse<EntityRelation> find(PageRequest pageRequest) {
+  public PageResponse<EntityToEntityRelation> find(PageRequest pageRequest) {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
     Map<String, Object> argumentMappings = new HashMap<>(0);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -83,7 +83,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                 + commonSql);
     pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
     addPagingAndSorting(pageRequest, query);
-    List<EntityRelation> result =
+    List<EntityToEntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
@@ -101,7 +101,8 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
                     .findOne()
                     .get());
 
-    PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
+    PageResponse<EntityToEntityRelation> pageResponse =
+        new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }
 
@@ -111,7 +112,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<EntityRelation> findBySubject(UUID subjectEntityUuid) {
+  public List<EntityToEntityRelation> findBySubject(UUID subjectEntityUuid) {
     Entity subjectEntity = entityRepositoryImpl.getByUuid(subjectEntityUuid);
     if (subjectEntity == null) {
       return null;
@@ -120,7 +121,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public List<EntityRelation> findBySubject(Entity subjectEntity) {
+  public List<EntityToEntityRelation> findBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
     String query =
         "SELECT subject_uuid rel_subject, predicate rel_predicate, object_uuid rel_object, additional_predicates rel_addpredicates"
@@ -129,7 +130,7 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
             + " WHERE subject_uuid = :uuid"
             + " ORDER BY sortindex";
 
-    List<EntityRelation> result =
+    List<EntityToEntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query)
@@ -170,11 +171,11 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
     Entity object = new Entity();
     object.setUuid(objectEntityUuid);
 
-    save(List.of(new EntityRelation(subject, predicate, object)));
+    save(List.of(new EntityToEntityRelation(subject, predicate, object)));
   }
 
   @Override
-  public void save(List<EntityRelation> entityRelations) throws RepositoryException {
+  public void save(List<EntityToEntityRelation> entityRelations) throws RepositoryException {
     if (entityRelations == null) {
       return;
     }

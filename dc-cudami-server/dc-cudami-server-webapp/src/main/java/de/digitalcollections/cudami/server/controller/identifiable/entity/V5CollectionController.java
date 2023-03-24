@@ -126,7 +126,7 @@ public class V5CollectionController {
     if (active != null) {
       pageResponse = collectionService.findActiveChildren(collectionUuid, searchPageRequest);
     } else {
-      pageResponse = collectionService.findChildren(collectionUuid, searchPageRequest);
+      pageResponse = collectionService.findSubParts(collectionUuid, searchPageRequest);
     }
 
     try {

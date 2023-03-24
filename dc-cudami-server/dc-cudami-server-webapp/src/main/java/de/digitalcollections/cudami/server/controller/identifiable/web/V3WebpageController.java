@@ -257,7 +257,7 @@ public class V3WebpageController {
     if (active != null) {
       pageResponse = webpageService.findActiveChildren(uuid, pageRequest);
     } else {
-      pageResponse = webpageService.findChildren(uuid, pageRequest);
+      pageResponse = webpageService.findSubParts(uuid, pageRequest);
     }
 
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));

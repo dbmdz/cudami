@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -56,12 +55,6 @@ public interface IdentifiableService<I extends Identifiable> extends UniqueObjec
     }
   }
 
-  long count();
-
-  boolean delete(I identifiable) throws ConflictException, ServiceException;
-
-  boolean delete(List<I> identifiables) throws ConflictException, ServiceException;
-
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
 
@@ -77,13 +70,11 @@ public interface IdentifiableService<I extends Identifiable> extends UniqueObjec
 
   List<Locale> getLanguages();
 
-  void save(I identifiable) throws ValidationException, ServiceException;
+  List<I> getRandom(int count);
 
   List<Entity> setRelatedEntities(I identifiable, List<Entity> entities);
 
   List<FileResource> setRelatedFileResources(I identifiable, List<FileResource> fileResources);
-
-  void update(I identifiable) throws ServiceException, ValidationException;
 
   void validate(I identifiable) throws ServiceException, ValidationException;
 }

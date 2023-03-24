@@ -55,7 +55,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
       throw new ConflictException(
           "Project cannot be deleted, because it has corresponding digital objects!");
     }
-    return super.delete(uuid);
+    return super.deleteByUuid(uuid);
   }
 
   @Override

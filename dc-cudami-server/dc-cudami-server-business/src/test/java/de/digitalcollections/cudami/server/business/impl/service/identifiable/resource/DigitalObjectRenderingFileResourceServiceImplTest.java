@@ -79,7 +79,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     service.deleteRenderingFileResources(uuid);
 
     verify(repo, times(1)).delete(renderingFileResource.getUuid());
-    verify(textFileResourceService, times(1)).delete(renderingFileResource.getUuid());
+    verify(textFileResourceService, times(1)).deleteByUuid(renderingFileResource.getUuid());
   }
 
   @DisplayName("can delete relation only, when the resource is referenced elsewhere")
@@ -102,6 +102,6 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     service.deleteRenderingFileResources(uuid);
 
     verify(repo, times(1)).delete(renderingFileResource.getUuid());
-    verify(textFileResourceService, never()).delete(renderingFileResource.getUuid());
+    verify(textFileResourceService, never()).deleteByUuid(renderingFileResource.getUuid());
   }
 }

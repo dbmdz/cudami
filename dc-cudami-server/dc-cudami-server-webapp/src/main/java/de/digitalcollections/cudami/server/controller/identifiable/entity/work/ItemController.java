@@ -100,7 +100,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.delete(uuid);
+      successful = service.deleteByUuid(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }

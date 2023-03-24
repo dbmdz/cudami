@@ -54,7 +54,7 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
     service.deleteLinkedDataFileResources(uuid);
 
     verify(repo, times(1)).delete(linkedDataFileResource.getUuid());
-    verify(linkedDataFileResourceService, times(1)).delete(linkedDataFileResource.getUuid());
+    verify(linkedDataFileResourceService, times(1)).deleteByUuid(linkedDataFileResource.getUuid());
   }
 
   @DisplayName("can delete relation only, when the resource is referenced elsewhere")
@@ -74,6 +74,6 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
     service.deleteLinkedDataFileResources(uuid);
 
     verify(repo, times(1)).delete(linkedDataFileResource.getUuid());
-    verify(linkedDataFileResourceService, never()).delete(linkedDataFileResource.getUuid());
+    verify(linkedDataFileResourceService, never()).deleteByUuid(linkedDataFileResource.getUuid());
   }
 }

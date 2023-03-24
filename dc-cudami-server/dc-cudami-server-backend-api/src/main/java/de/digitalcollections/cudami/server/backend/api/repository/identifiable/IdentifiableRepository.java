@@ -1,7 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -10,9 +9,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
 
@@ -33,27 +30,6 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
   }
 
   void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid);
-
-  long count();
-
-  default boolean delete(I identifiable) {
-    if (identifiable == null) {
-      return true;
-    }
-    return delete(identifiable.getUuid());
-  }
-
-  boolean delete(UUID identifiableUuid);
-
-  default boolean delete(List<I> identifiables) {
-    if (identifiables == null || identifiables.isEmpty()) {
-      return true;
-    }
-    List<UUID> list = identifiables.stream().map(i -> i.getUuid()).collect(Collectors.toList());
-    return deleteByUuids(list);
-  }
-
-  boolean deleteByUuids(List<UUID> uuidList);
 
   PageResponse<I> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial);
@@ -99,11 +75,7 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
 
   List<Locale> getLanguages();
 
-  default void save(I identifiable) throws RepositoryException {
-    save(identifiable, null);
-  }
-
-  void save(I identifiable, Map<String, Object> bindings) throws RepositoryException;
+  List<I> getRandom(int count);
 
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
@@ -140,10 +112,4 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
 
   List<FileResource> setRelatedFileResources(
       UUID identifiableUuid, List<FileResource> fileResources);
-
-  default void update(I identifiable) throws RepositoryException {
-    update(identifiable, null);
-  }
-
-  void update(I identifiable, Map<String, Object> bindings) throws RepositoryException;
 }

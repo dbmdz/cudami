@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface EntityRelationService {
 
-  default void addRelation(EntityRelation relation) throws ServiceException {
+  default void addRelation(EntityToEntityRelation relation) throws ServiceException {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
@@ -36,21 +36,22 @@ public interface EntityRelationService {
    * @param pageRequest request param container for paging, sorting, filtering
    * @return result as paged response
    */
-  PageResponse<EntityRelation> find(PageRequest pageRequest);
+  PageResponse<EntityToEntityRelation> find(PageRequest pageRequest);
 
-  default List<EntityRelation> getBySubject(Entity subjectEntity) {
+  default List<EntityToEntityRelation> getBySubject(Entity subjectEntity) {
     return getBySubject(subjectEntity.getUuid());
   }
 
-  List<EntityRelation> getBySubject(UUID subjectEntityUuid);
+  List<EntityToEntityRelation> getBySubject(UUID subjectEntityUuid);
 
   /**
    * Save (means create or update) a list of entity relations. This method is idempotent.
    *
    * @param entityRelations a list of entity relations to persist
    */
-  void save(List<EntityRelation> entityRelations) throws ServiceException;
+  void save(List<EntityToEntityRelation> entityRelations) throws ServiceException;
 
-  void persistEntityRelations(Entity entity, List<EntityRelation> relations, boolean deleteExisting)
+  void persistEntityRelations(
+      Entity entity, List<EntityToEntityRelation> relations, boolean deleteExisting)
       throws ServiceException;
 }

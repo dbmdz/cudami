@@ -25,7 +25,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.ProductionI
 import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -404,7 +404,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     if (entityUuid != null) {
       if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
         int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
+        Vector<EntityToEntityRelation> relations = new Vector<>(++maxIndex);
         relations.setSize(maxIndex);
         manifestation.setRelations(relations);
       }
@@ -423,7 +423,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .set(
                 rowView.getColumn(
                     EntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex", Integer.class),
-                EntityRelation.builder()
+                EntityToEntityRelation.builder()
                     .subject(relatedEntity)
                     .predicate(relationPredicate)
                     .additionalPredicates(
@@ -504,7 +504,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest) {
     final String doTableName = "manifestation_manifestations";
     final String doTableAlias = "mms";
 

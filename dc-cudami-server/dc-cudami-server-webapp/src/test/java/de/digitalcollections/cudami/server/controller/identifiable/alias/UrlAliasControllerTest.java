@@ -66,7 +66,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteNonexistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.delete(any(UUID.class))).thenReturn(false);
+    when(urlAliasService.deleteByUuid(any(UUID.class))).thenReturn(false);
 
     testDeleteNotFound(path);
   }
@@ -75,7 +75,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteExistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.delete(any(UUID.class))).thenReturn(true);
+    when(urlAliasService.deleteByUuid(any(UUID.class))).thenReturn(true);
 
     testDeleteSuccessful(path);
   }

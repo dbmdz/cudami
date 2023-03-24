@@ -104,7 +104,7 @@ public class V5WebpageController {
     if (active != null) {
       pageResponse = webpageService.findActiveChildren(uuid, searchPageRequest);
     } else {
-      pageResponse = webpageService.findChildren(uuid, searchPageRequest);
+      pageResponse = webpageService.findSubParts(uuid, searchPageRequest);
     }
 
     try {

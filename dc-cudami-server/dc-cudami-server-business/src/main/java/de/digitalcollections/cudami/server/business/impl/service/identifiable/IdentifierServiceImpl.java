@@ -33,7 +33,7 @@ public class IdentifierServiceImpl implements IdentifierService {
   public void delete(Set<Identifier> identifiers) throws ServiceException {
     try {
       List<UUID> uuids = identifiers.stream().map(i -> i.getUuid()).collect(Collectors.toList());
-      identifierRepository.delete(uuids);
+      identifierRepository.deleteByUuid(uuids);
     } catch (RepositoryException e) {
       throw new ServiceException(e);
     }

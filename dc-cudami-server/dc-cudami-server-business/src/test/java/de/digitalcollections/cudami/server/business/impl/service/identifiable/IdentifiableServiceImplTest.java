@@ -709,7 +709,7 @@ class IdentifiableServiceImplTest {
 
     verify(identifierService, times(1))
         .saveForIdentifiable(any(UUID.class), argThat(set -> set.size() == 1));
-    verify(identifierService, times(1)).delete(eq(Set.of(identifierToDelete)));
+    verify(identifierService, times(1)).deleteByUuid(eq(Set.of(identifierToDelete)));
   }
 
   @DisplayName(
@@ -767,7 +767,7 @@ class IdentifiableServiceImplTest {
     verify(identifierService, times(1))
         .saveForIdentifiable(any(UUID.class), argThat(set -> set.size() == 1));
     // No identifier was deleted at all
-    verify(identifierService, never()).delete(any(Set.class));
+    verify(identifierService, never()).deleteByUuid(any(Set.class));
   }
 
   @DisplayName("throws a ValidationException on save and update when the label is null")

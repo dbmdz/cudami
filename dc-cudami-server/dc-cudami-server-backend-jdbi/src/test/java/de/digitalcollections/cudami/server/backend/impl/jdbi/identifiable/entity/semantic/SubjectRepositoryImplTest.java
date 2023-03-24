@@ -77,13 +77,13 @@ class SubjectRepositoryImplTest extends AbstractRepositoryImplTest {
   void saveAndDelete() throws RepositoryException {
     Subject savedSubject =
         ensureSavedSubject(Locale.GERMAN, "Test", "sbject-namespace", "subject-id2", "type");
-    boolean success = repo.delete(savedSubject.getUuid());
+    boolean success = repo.deleteByUuid(savedSubject.getUuid());
     assertThat(success).isTrue();
 
     Subject nonexistingSubject = repo.getByUuid(savedSubject.getUuid());
     assertThat(nonexistingSubject).isNull();
 
-    boolean nonsuccess = repo.delete(savedSubject.getUuid()); // second attempt must fail!
+    boolean nonsuccess = repo.deleteByUuid(savedSubject.getUuid()); // second attempt must fail!
     assertThat(nonsuccess).isFalse();
   }
 

@@ -19,7 +19,7 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
@@ -267,8 +267,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     Predicate predicate = Predicate.builder().value("is_creator_of").build();
     predicateRepository.save(predicate);
 
-    EntityRelation entityRelation =
-        EntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
+    EntityToEntityRelation entityRelation =
+        EntityToEntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
     Work work =
         Work.builder()
             .label(Locale.GERMAN, "Erstlingswerk")

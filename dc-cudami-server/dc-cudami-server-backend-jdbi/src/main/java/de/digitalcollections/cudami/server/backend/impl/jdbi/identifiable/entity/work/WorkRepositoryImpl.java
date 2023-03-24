@@ -13,7 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -375,7 +375,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
     if (entityUuid != null) {
       if (work.getRelations() == null || work.getRelations().isEmpty()) {
         int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
+        Vector<EntityToEntityRelation> relations = new Vector<>(++maxIndex);
         relations.setSize(maxIndex);
         work.setRelations(relations);
       }
@@ -393,7 +393,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
             .set(
                 rowView.getColumn(
                     EntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex", Integer.class),
-                EntityRelation.builder()
+                EntityToEntityRelation.builder()
                     .subject(relatedEntity)
                     .predicate(relationPredicate)
                     .additionalPredicates(

@@ -20,7 +20,7 @@ import de.digitalcollections.cudami.server.business.impl.service.AbstractService
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.UUID;
@@ -74,14 +74,16 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
     Manifestation manifestationToSave =
         Manifestation.builder()
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(
+                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     Manifestation savedManifestation =
         Manifestation.builder()
             .uuid(UUID.randomUUID())
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(
+                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     doAnswer(
@@ -117,7 +119,8 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
         Manifestation.builder()
             .uuid(uuid)
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(
+                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     doAnswer(

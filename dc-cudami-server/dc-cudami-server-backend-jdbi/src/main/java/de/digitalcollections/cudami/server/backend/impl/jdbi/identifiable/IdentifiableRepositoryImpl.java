@@ -281,11 +281,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 .execute());
   }
 
-  @Override
-  protected String addSearchTermMappings(String searchTerm, Map<String, Object> argumentMappings) {
-    argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder, splitToArray(searchTerm));
-    return super.addSearchTermMappings(searchTerm, argumentMappings);
-  }
+  // FIXME delete
+  //  @Override
+  //  protected String addSearchTermMappings(String searchTerm, Map<String, Object>
+  // argumentMappings) {
+  //    argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+  // splitToArray(searchTerm));
+  //    return super.addSearchTermMappings(searchTerm, argumentMappings);
+  //  }
 
   private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(boolean isForAllFields) {
     return (map, rowView) -> {
@@ -369,17 +372,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     };
   }
 
-  public boolean delete(UUID identifiableUuid) {
-    return deleteByUuids(List.of(identifiableUuid)); // same performance as "where uuid = :uuid"
+  @Override
+  public I create() {
+    return (I) new Identifiable();
   }
 
-  public boolean deleteByUuids(List<UUID> uuids) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-    return true;
+  @Override
+  public int deleteByUuids(List<UUID> uuids) {
+    Integer integer =
+        dbi.withHandle(
+            h ->
+                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
+                    .bindList("uuids", uuids)
+                    .execute());
+    return integer;
   }
 
   /**
@@ -487,6 +493,75 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
+  public PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest) {
+    String commonSql = " FROM " + tableName + " AS " + tableAlias;
+    if (argumentMappings == null) {
+      argumentMappings = new HashMap<>(0);
+    }
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<I> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
+
+    return null;
+  }
+
+  @Override
+  public List<Entity> findRelatedEntities(UUID identifiableUuid) {
+    String query =
+        "SELECT * FROM entities e"
+            + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
+            + " WHERE ref.identifiable_uuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<Entity> list =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(Entity.class)
+                    .list());
+    return list;
+  }
+
+  @Override
+  public PageResponse<FileResource> findRelatedFileResources(
+      UUID identifiableUuid, PageRequest pageRequest) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<FileResource> findRelatedFileResources(UUID identifiableUuid) {
+    String query =
+        "SELECT * FROM fileresources f"
+            + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
+            + " WHERE ref.identifiable_uuid = :identifiableUuid"
+            + " ORDER BY ref.sortindex";
+
+    List<FileResource> result =
+        dbi.withHandle(
+            h ->
+                h.createQuery(query)
+                    .bind("identifiableUuid", identifiableUuid)
+                    .mapToBean(FileResource.class)
+                    .list());
+    return result;
+  }
+
+  @Override
   protected List<String> getAllowedOrderByFields() {
     return new ArrayList<>(
         Arrays.asList("created", "identifiableObjectType", "label", "lastModified", "type"));
@@ -512,6 +587,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     if (identifiableUuid == null) return null;
 
     return getByUuid(identifiableUuid);
+  }
+
+  @Override
+  public I getByUuid(UUID uniqueObjectUuid) {
+    return getByUuidAndFiltering(uniqueObjectUuid, null);
   }
 
   @Override
@@ -575,6 +655,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
+  protected LinkedHashMap<String, Function<I, Optional<Object>>> getJsonbFields() {
+    LinkedHashMap<String, Function<I, Optional<Object>>> jsonbFields = super.getJsonbFields();
+    jsonbFields.put("description", i -> Optional.ofNullable(i.getDescription()));
+    jsonbFields.put("label", i -> Optional.ofNullable(i.getLabel()));
+    jsonbFields.put(
+        "previewImageRenderingHints", i -> Optional.ofNullable(i.getPreviewImageRenderingHints()));
+    return jsonbFields;
+  }
+
+  @Override
   public List<Locale> getLanguages() {
     String query =
         "SELECT DISTINCT jsonb_object_keys("
@@ -588,49 +678,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  protected LinkedHashMap<String, Function<I, Optional<Object>>> getJsonbFields() {
-    LinkedHashMap<String, Function<I, Optional<Object>>> jsonbFields = super.getJsonbFields();
-    jsonbFields.put("description", i -> Optional.ofNullable(i.getDescription()));
-    jsonbFields.put("label", i -> Optional.ofNullable(i.getLabel()));
-    jsonbFields.put(
-        "previewImageRenderingHints", i -> Optional.ofNullable(i.getPreviewImageRenderingHints()));
-    return jsonbFields;
-  }
-
-  @Override
-  public List<Entity> findRelatedEntities(UUID identifiableUuid) {
-    String query =
-        "SELECT * FROM entities e"
-            + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
-            + " WHERE ref.identifiable_uuid = :identifiableUuid"
-            + " ORDER BY ref.sortindex";
-
-    List<Entity> list =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("identifiableUuid", identifiableUuid)
-                    .mapToBean(Entity.class)
-                    .list());
-    return list;
-  }
-
-  @Override
-  public List<FileResource> findRelatedFileResources(UUID identifiableUuid) {
-    String query =
-        "SELECT * FROM fileresources f"
-            + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
-            + " WHERE ref.identifiable_uuid = :identifiableUuid"
-            + " ORDER BY ref.sortindex";
-
-    List<FileResource> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("identifiableUuid", identifiableUuid)
-                    .mapToBean(FileResource.class)
-                    .list());
-    return result;
+  public List<I> getRandom(int count) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
@@ -653,6 +703,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return "uuid";
   }
 
+  // FIXME: delete when proper jsonb contains search implemented
+  protected boolean hasSplitColumn(String propertyName) {
+    // only label for now
+    return "label".equals(propertyName);
+  }
+
   /**
    * After save and update the returned fields (declared in {@link
    * #getReturnedFieldsOnInsertUpdate()}) can be processed here.
@@ -662,12 +718,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
    */
   protected void insertUpdateCallback(I identifiable, Map<String, Object> returnedFields) {
     // can be implemented in derived classes
-  }
-
-  // FIXME: delete when proper jsonb contains search implemented
-  protected boolean hasSplitColumn(String propertyName) {
-    // only label for now
-    return "label".equals(propertyName);
   }
 
   @Override

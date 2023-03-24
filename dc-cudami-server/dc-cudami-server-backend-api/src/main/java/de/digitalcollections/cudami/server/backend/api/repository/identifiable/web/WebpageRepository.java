@@ -5,7 +5,6 @@ import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.List;
 import java.util.UUID;
 
 /** Repository for Webpage persistence handling. */
@@ -25,11 +24,4 @@ public interface WebpageRepository extends NodeRepository<Webpage> {
    * @return saved webpage
    */
   Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUUID);
-
-  default boolean updateChildrenOrder(Webpage webpage, List<Webpage> children) {
-    if (webpage == null || children == null) {
-      return false;
-    }
-    return updateChildrenOrder(webpage.getUuid(), children);
-  }
 }

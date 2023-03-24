@@ -1,16 +1,18 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation;
 
+import de.digitalcollections.cudami.server.backend.api.repository.PagingSortingFilteringRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
-public interface EntityRelationRepository {
+public interface EntityRelationRepository
+    extends PagingSortingFilteringRepository<EntityToEntityRelation> {
 
-  default void addRelation(EntityRelation relation) throws RepositoryException {
+  default void addRelation(EntityToEntityRelation relation) throws RepositoryException {
     addRelation(
         relation.getSubject().getUuid(), relation.getPredicate(), relation.getObject().getUuid());
   }
@@ -30,15 +32,7 @@ public interface EntityRelationRepository {
 
   void deleteBySubject(UUID subjectEntityUuid);
 
-  /**
-   * Get paged, sorted, filtered relations
-   *
-   * @param pageRequest request param container for paging, sorting, filtering
-   * @return result as paged response
-   */
-  PageResponse<EntityRelation> find(PageRequest pageRequest);
-
-  default PageResponse<EntityRelation> findBySubject(
+  default PageResponse<EntityToEntityRelation> findBySubject(
       Entity subjectEntity, PageRequest pageRequest) {
     if (subjectEntity == null) {
       return null;
@@ -46,9 +40,10 @@ public interface EntityRelationRepository {
     return findBySubject(subjectEntity.getUuid(), pageRequest);
   }
 
-  PageResponse<EntityRelation> findBySubject(UUID subjectEntityUuid, PageRequest pageRequest);
+  PageResponse<EntityToEntityRelation> findBySubject(
+      UUID subjectEntityUuid, PageRequest pageRequest);
 
-  default void save(EntityRelation relation) throws RepositoryException {
+  default void save(EntityToEntityRelation relation) throws RepositoryException {
     save(List.of(relation));
   }
 
@@ -58,7 +53,7 @@ public interface EntityRelationRepository {
    * @param entityRelations list of entity-predicate-entity relations to be persisted
    * @throws RepositoryException in case of an error, e.g. a referenced predicate does not yet exist
    */
-  void save(List<EntityRelation> entityRelations) throws RepositoryException;
+  void save(List<EntityToEntityRelation> entityRelations) throws RepositoryException;
 
   void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
       throws RepositoryException;

@@ -196,7 +196,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
 
     boolean successful;
     try {
-      successful = service.delete(uuid);
+      successful = service.deleteByUuid(uuid);
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -277,7 +277,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     if (active != null) {
       return service.findActiveChildren(collectionUuid, pageRequest);
     }
-    return service.findChildren(collectionUuid, pageRequest);
+    return service.findSubParts(collectionUuid, pageRequest);
   }
 
   @Operation(summary = "Get all (active) top collections as (paged, sorted, filtered) list")

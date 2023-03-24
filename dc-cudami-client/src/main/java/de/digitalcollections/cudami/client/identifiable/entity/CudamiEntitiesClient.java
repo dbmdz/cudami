@@ -5,7 +5,7 @@ import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClien
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.exception.http.client.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.net.http.HttpClient;
 import java.util.List;
@@ -44,13 +44,15 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         (E) null);
   }
 
-  public List<EntityRelation> addRelationsForSubject(List relations) throws TechnicalException {
+  public List<EntityToEntityRelation> addRelationsForSubject(List relations)
+      throws TechnicalException {
     return doPutRequestForObjectList(
         String.format(
             "%s/%s/relations",
-            BASE_ENDPOINT_ENTITIES, ((EntityRelation) relations.get(0)).getSubject().getUuid()),
+            BASE_ENDPOINT_ENTITIES,
+            ((EntityToEntityRelation) relations.get(0)).getSubject().getUuid()),
         relations,
-        EntityRelation.class);
+        EntityToEntityRelation.class);
   }
 
   public E getByRefId(long refId) throws TechnicalException {
@@ -72,10 +74,11 @@ public class CudamiEntitiesClient<E extends Entity> extends CudamiIdentifiablesC
         FileResource.class);
   }
 
-  public List<EntityRelation> getRelations(UUID subjectEntityUuid) throws TechnicalException {
+  public List<EntityToEntityRelation> getRelations(UUID subjectEntityUuid)
+      throws TechnicalException {
     return doGetRequestForObjectList(
         String.format("%s/relations/%s", BASE_ENDPOINT_ENTITIES, subjectEntityUuid),
-        EntityRelation.class);
+        EntityToEntityRelation.class);
   }
 
   public List<FileResource> setRelatedFileResources(UUID uuid, List fileResources)

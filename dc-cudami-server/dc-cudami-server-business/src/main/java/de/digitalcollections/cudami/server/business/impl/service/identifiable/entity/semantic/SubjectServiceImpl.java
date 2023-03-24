@@ -52,7 +52,7 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    return repository.delete(uuids);
+    return repository.deleteByUuid(uuids);
   }
 
   @Override

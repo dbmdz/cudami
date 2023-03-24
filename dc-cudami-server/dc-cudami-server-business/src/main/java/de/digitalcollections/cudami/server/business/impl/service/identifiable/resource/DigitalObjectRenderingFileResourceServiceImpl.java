@@ -68,17 +68,17 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       throws ServiceException, ConflictException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
-        return applicationFileResourceService.delete(renderingResource.getUuid());
+        return applicationFileResourceService.deleteByUuid(renderingResource.getUuid());
       case "audio":
-        return audioFileResourceService.delete(renderingResource.getUuid());
+        return audioFileResourceService.deleteByUuid(renderingResource.getUuid());
       case "image":
-        return imageFileResourceService.delete(renderingResource.getUuid());
+        return imageFileResourceService.deleteByUuid(renderingResource.getUuid());
       case "text":
-        return textFileResourceService.delete(renderingResource.getUuid());
+        return textFileResourceService.deleteByUuid(renderingResource.getUuid());
       case "video":
-        return videoFileResourceService.delete(renderingResource.getUuid());
+        return videoFileResourceService.deleteByUuid(renderingResource.getUuid());
       default:
-        return fileResourceMetadataService.delete(renderingResource.getUuid());
+        return fileResourceMetadataService.deleteByUuid(renderingResource.getUuid());
     }
   }
 

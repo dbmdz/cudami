@@ -90,7 +90,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void delete(String label, Locale locale) {
+  public void deleteByLabelAndLocale(String label, Locale locale) {
     dbi.withHandle(
         h ->
             h.createUpdate(
@@ -101,7 +101,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void delete(UUID uuid) {
+  public void deleteByUuid(UUID uuid) {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE uuid = :uuid")
