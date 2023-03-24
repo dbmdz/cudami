@@ -203,7 +203,7 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
     assertThat(actual.getTitles()).size().isEqualTo(5);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
-    assertThat(actual.getParents()).isNull();
+    assertThat(actual.getParents()).isEmpty();
     assertThat(actual.getNavDate()).isNotNull();
     assertThat(actual.getNavDate()).isEqualTo(manifestation.getNavDate());
   }
