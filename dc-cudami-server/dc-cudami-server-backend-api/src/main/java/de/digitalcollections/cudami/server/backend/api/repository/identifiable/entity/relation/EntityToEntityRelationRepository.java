@@ -9,7 +9,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.UUID;
 
-public interface EntityRelationRepository
+public interface EntityToEntityRelationRepository
     extends PagingSortingFilteringRepository<EntityToEntityRelation> {
 
   default void addRelation(EntityToEntityRelation relation) throws RepositoryException {
@@ -21,6 +21,9 @@ public interface EntityRelationRepository
       throws RepositoryException;
 
   default void deleteByObject(Entity objectEntity) {
+    if (objectEntity == null) {
+      throw new IllegalArgumentException("object entity must not be null");
+    }
     deleteByObject(objectEntity.getUuid());
   }
 
@@ -35,7 +38,7 @@ public interface EntityRelationRepository
   default PageResponse<EntityToEntityRelation> findBySubject(
       Entity subjectEntity, PageRequest pageRequest) {
     if (subjectEntity == null) {
-      return null;
+      throw new IllegalArgumentException("subject entity must not be null");
     }
     return findBySubject(subjectEntity.getUuid(), pageRequest);
   }

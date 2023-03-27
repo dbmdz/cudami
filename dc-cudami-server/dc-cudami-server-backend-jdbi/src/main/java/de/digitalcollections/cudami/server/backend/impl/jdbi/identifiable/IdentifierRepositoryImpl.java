@@ -3,8 +3,10 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements IdentifierRepository {
+public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identifier>
+    implements IdentifierRepository {
 
   public static final String MAPPING_PREFIX = "id";
 
@@ -43,26 +46,6 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     // Hint: as repo is no extension of IdentifiableRepositoryImpl (registering mapper for
     // Identifiable in constructor), we have to register row mapper on ourselves
     dbi.registerRowMapper(BeanMapper.factory(Identifier.class, MAPPING_PREFIX));
-  }
-
-  @Override
-  public void delete(List<UUID> uuids) throws RepositoryException {
-    if (uuids == null || uuids.isEmpty()) {
-      return;
-    }
-    try {
-      dbi.withHandle(
-          h ->
-              h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                  .bindList("uuids", uuids)
-                  .execute());
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
   }
 
   @Override
@@ -140,6 +123,17 @@ public class IdentifierRepositoryImpl extends JdbiRepositoryImpl implements Iden
     } catch (JdbiException e) {
       throw new RepositoryException(e);
     }
+  }
+
+  @Override
+  public Identifier getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+    if (filtering == null) {
+      filtering = Filtering.builder().build();
+    }
+    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
+
+    Identifier result = retrieveOne(getSqlSelectAllFields(), filtering, null);
+    return result;
   }
 
   @Override

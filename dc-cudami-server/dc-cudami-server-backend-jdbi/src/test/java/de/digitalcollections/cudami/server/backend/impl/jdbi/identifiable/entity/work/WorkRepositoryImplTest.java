@@ -10,7 +10,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.PersonRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityToEntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -53,7 +53,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Autowired AgentRepositoryImpl<Agent> agentRepository;
   @Autowired SubjectRepository subjectRepository;
   @Autowired PersonRepositoryImpl personRepository;
-  @Autowired EntityRelationRepositoryImpl entityRelationRepository;
+  @Autowired EntityToEntityRelationRepositoryImpl entityRelationRepository;
   @Autowired ItemRepositoryImpl itemRepository;
   @Autowired ManifestationRepositoryImpl manifestationRepository;
   @Autowired PredicateRepository predicateRepository;

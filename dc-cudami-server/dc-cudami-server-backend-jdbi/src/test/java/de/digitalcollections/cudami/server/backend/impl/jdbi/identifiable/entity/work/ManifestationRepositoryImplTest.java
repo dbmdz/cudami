@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
@@ -64,7 +64,7 @@ class ManifestationRepositoryImplTest
   @Autowired CorporateBodyRepositoryImpl corporateBodyRepository;
   @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired PredicateRepository predicateRepository;
-  @Autowired EntityRelationRepository entityRelationRepository;
+  @Autowired EntityToEntityRelationRepository entityRelationRepository;
   @Autowired SubjectRepository subjectRepository;
   @Autowired ExpressionTypeMapper expressionTypeMapper;
   @Autowired LocalDateRangeMapper localDateRangeMapper;
@@ -99,10 +99,10 @@ class ManifestationRepositoryImplTest
     corporateBodyRepository.save(someoneElse);
 
     // predicates
-    Predicate isEditorOf =
-        predicateRepository.save(Predicate.builder().value("is_editor_of").build());
-    Predicate isSomethingElseOf =
-        predicateRepository.save(Predicate.builder().value("is_somethingelse_of").build());
+    Predicate isEditorOf = Predicate.builder().value("is_editor_of").build();
+    predicateRepository.save(isEditorOf);
+    Predicate isSomethingElseOf = Predicate.builder().value("is_somethingelse_of").build();
+    predicateRepository.save(isSomethingElseOf);
 
     // subjects
     Subject subject = ensurePersistedSubject();

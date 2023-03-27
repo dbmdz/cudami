@@ -69,49 +69,39 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
-  public String getSqlInsertFields() {
-    return """
-        uuid, created, description, identifiable_objecttype,
-        identifiable_type, label, last_modified, previewfileresource,
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", "
+        + """
+        description, identifiable_objecttype,
+        identifiable_type, label, previewfileresource,
         preview_hints, split_label, tags_uuids, subjects_uuids
         """;
   }
 
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  public String getSqlInsertValues() {
-    return """
-        :uuid, :created, :description::JSONB, :identifiableObjectType,
-        :type, :label::JSONB, :lastModified, :previewFileResource,
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertFields()
+        + ", "
+        + """
+        :description::JSONB, :identifiableObjectType,
+        :type, :label::JSONB, :previewFileResource,
         :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[], :subjects_uuids::UUID[]
         """;
   }
 
-  public String getSqlSelectAllFields() {
-    return getSqlSelectAllFields(tableAlias, mappingPrefix);
-  }
-
+  @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  protected String getSqlSelectAllFieldsJoins() {
-    return "";
-  }
-
-  public String getSqlSelectReducedFields() {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return " "
-        + tableAlias
-        + ".uuid "
-        + mappingPrefix
-        + "_uuid, "
-        + tableAlias
-        + ".created "
-        + mappingPrefix
-        + "_created, "
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
         + tableAlias
         + ".description "
         + mappingPrefix
@@ -129,49 +119,24 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         + mappingPrefix
         + "_label, "
         + tableAlias
-        + ".last_modified "
-        + mappingPrefix
-        + "_lastModified, "
-        + tableAlias
         + ".preview_hints "
         + mappingPrefix
         + "_previewImageRenderingHints";
   }
 
-  protected String getSqlSelectReducedFieldsJoins() {
-    return "";
-  }
-
+  @Override
   public String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
-    // uuid, created, identifiable_type
-    return " description=:description::JSONB, label=:label::JSONB, last_modified=:lastModified, previewfileresource=:previewFileResource, "
+    // identifiable_type
+    return super.getSqlUpdateFieldValues()
+        + ", description=:description::JSONB, label=:label::JSONB, previewfileresource=:previewFileResource, "
         + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]"
         + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
   }
 
-  /**
-   * On insert or update these fields will be returned to be processed by {@link
-   * #insertUpdateCallback(Identifiable, Map)}.
-   *
-   * @return modifiable list of fields, please do not return null
-   */
-  protected List<String> getReturnedFieldsOnInsertUpdate() {
-    return new ArrayList<>(0);
-  }
-
-  /*
-   * BiFunction for reducing rows (related objects) of joins not already part of
-   * identifiable (Identifier, preview image ImageFileResource).
-   */
-  public BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer = (map, rowView) -> {};
-  public final BiConsumer<Map<UUID, I>, RowView> basicReduceRowsBiConsumer;
-  public final BiConsumer<Map<UUID, I>, RowView> fullReduceRowsBiConsumer;
-  protected final Class<? extends Identifiable> identifiableImplClass;
-
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    this(
+    super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
@@ -186,54 +151,21 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       String tableAlias,
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
+      BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
-    this(
+    super(
         dbi,
         tableName,
         tableAlias,
         mappingPrefix,
         identifiableImplClass,
-        null,
         offsetForAlternativePaging);
-  }
-
-  protected IdentifiableRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Identifiable> identifiableImplClass,
-      BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
-      int offsetForAlternativePaging) {
-    super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
     // register row mapper for given class and mapping prefix
     // (until now everywhere BeanMapper.factory... was used. If this changes, row
-    // mapper
-    // registration may be moved back into each repository impl?)
-    dbi.registerRowMapper(BeanMapper.factory(identifiableImplClass, mappingPrefix));
+    // mapper registration may be moved back into each repository impl?)
     dbi.registerRowMapper(
         BeanMapper.factory(UrlAlias.class, UrlAliasRepositoryImpl.MAPPING_PREFIX));
-
-    // set basic reduce rows biconsumer for reduced selects (lists, paging)
-    // note: it turned out, that we also want identifiers and previewimage for
-    // reduced selects. So
-    // currently there is no difference to full, except that we do not want tags and
-    // subjects in
-    // reduced selects.
-    this.basicReduceRowsBiConsumer = createReduceRowsBiConsumer(false);
-
-    // set full reduce rows biconsumer for full selects (find one)
-    this.fullReduceRowsBiConsumer = createReduceRowsBiConsumer(true);
-
-    // for detailes select (only used in find one, not lists): if additional objects
-    // should be
-    // "joined" into instance, set bi function for doing this:
-    if (additionalReduceRowsBiConsumer != null) {
-      this.additionalReduceRowsBiConsumer = additionalReduceRowsBiConsumer;
-    }
-
-    this.identifiableImplClass = identifiableImplClass;
   }
 
   protected String addCrossTablePagingAndSorting(
@@ -250,7 +182,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) {
+  public void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) throws RepositoryException {
     Integer sortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "rel_identifiable_entities", "identifiable_uuid", identifiableUuid);
@@ -266,7 +198,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid) {
+  public void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid)
+      throws RepositoryException {
     Integer sortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "rel_identifiable_fileresources", "identifiable_uuid", identifiableUuid);
@@ -281,111 +214,136 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 .execute());
   }
 
-  // FIXME delete
-  //  @Override
-  //  protected String addSearchTermMappings(String searchTerm, Map<String, Object>
-  // argumentMappings) {
-  //    argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-  // splitToArray(searchTerm));
-  //    return super.addSearchTermMappings(searchTerm, argumentMappings);
-  //  }
+  @Override
+  protected BiConsumer<Map<UUID, I>, RowView> createAdditionalReduceRowsBiConsumer() {
+    if (additionalReduceRowsBiConsumer == null) {
+      return super.createAdditionalReduceRowsBiConsumer();
+    }
+    return additionalReduceRowsBiConsumer;
+  }
 
-  private BiConsumer<Map<UUID, I>, RowView> createReduceRowsBiConsumer(boolean isForAllFields) {
+  // FIXME delete
+  // @Override
+  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
+  // argumentMappings) {
+  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+  // splitToArray(searchTerm));
+  // return super.addSearchTermMappings(searchTerm, argumentMappings);
+  // }
+
+  @Override
+  protected BiConsumer<Map<UUID, I>, RowView> createBasicReduceRowsBiConsumer() {
     return (map, rowView) -> {
       I identifiable =
           map.computeIfAbsent(
               rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
               fn -> {
-                return (I) rowView.getRow(identifiableImplClass);
+                return (I) rowView.getRow(uniqueObjectImplClass);
               });
 
-      // preview image
-      if (rowView.getColumn("pi_uuid", UUID.class) != null) {
-        // see definition in
-        // FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
-        // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
-        // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
-
-        // TODO workaround as long at is not possible to register two RowMappers for one
-        // type
-        // but for different prefixes (unitl now the first takes precedence),
-        // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
-        ImageFileResource previewImage = new ImageFileResource();
-        previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
-        previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
-        previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
-        previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));
-        previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
-        identifiable.setPreviewImage(previewImage);
-      }
-
-      // identifiers
-      if (rowView.getColumn("id_uuid", UUID.class) != null) {
-        Identifier dbIdentifier = rowView.getRow(Identifier.class);
-        identifiable.addIdentifier(dbIdentifier);
-      }
-
-      // urlaliases
-      if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
-        UUID websiteUuid =
-            rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
-        if (websiteUuid != null) {
-          Website website =
-              new Website(
-                  rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
-          website.setUuid(websiteUuid);
-          website.setLabel(
-              rowView.getColumn(
-                  UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
-          urlAlias.setWebsite(website);
-        }
-        if (identifiable.getLocalizedUrlAliases() == null) {
-          identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
-        } else if (!identifiable.getLocalizedUrlAliases().containsUrlAlias(urlAlias)) {
-          identifiable.getLocalizedUrlAliases().add(urlAlias);
-        }
-      }
-
-      if (isForAllFields) {
-        // tags
-        if (rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-          Tag tag = rowView.getRow(Tag.class);
-          if (tag != null) {
-            identifiable.addTag(tag);
-          }
-        }
-
-        // subjects
-        UUID subjectUuid =
-            rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-        if (subjectUuid != null
-            && (identifiable.getSubjects() == null
-                || !identifiable.getSubjects().stream()
-                    .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
-          Subject subject = rowView.getRow(Subject.class);
-          identifiable.addSubject(subject);
-        }
-      }
+      setPreviewImageFromRowView(rowView, identifiable);
+      setIdentifiersFromRowView(rowView, identifiable);
+      setLocalizedUrlAliasesFromRowView(rowView, identifiable);
 
       extendReducedIdentifiable(identifiable, rowView);
     };
   }
 
-  @Override
-  public I create() {
-    return (I) new Identifiable();
+  private void setLocalizedUrlAliasesFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
+      UUID websiteUuid =
+          rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
+      if (websiteUuid != null) {
+        Website website =
+            new Website(
+                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+        website.setUuid(websiteUuid);
+        website.setLabel(
+            rowView.getColumn(
+                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+        urlAlias.setWebsite(website);
+      }
+      if (identifiable.getLocalizedUrlAliases() == null) {
+        identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
+      } else if (!identifiable.getLocalizedUrlAliases().containsUrlAlias(urlAlias)) {
+        identifiable.getLocalizedUrlAliases().add(urlAlias);
+      }
+    }
+  }
+
+  private void setIdentifiersFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn("id_uuid", UUID.class) != null) {
+      Identifier dbIdentifier = rowView.getRow(Identifier.class);
+      identifiable.addIdentifier(dbIdentifier);
+    }
+  }
+
+  private void setPreviewImageFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+      // see definition in
+      // FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
+      // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
+      // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
+
+      // TODO workaround as long at is not possible to register two RowMappers for one
+      // type
+      // but for different prefixes (unitl now the first takes precedence),
+      // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
+      ImageFileResource previewImage = new ImageFileResource();
+      previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
+      previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
+      previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
+      previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));
+      previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
+      identifiable.setPreviewImage(previewImage);
+    }
+  }
+
+  protected BiConsumer<Map<UUID, I>, RowView> createFullReduceRowsBiConcumer() {
+    return (map, rowView) -> {
+      I identifiable =
+          map.computeIfAbsent(
+              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
+              fn -> {
+                return (I) rowView.getRow(uniqueObjectImplClass);
+              });
+
+      setPreviewImageFromRowView(rowView, identifiable);
+      setIdentifiersFromRowView(rowView, identifiable);
+      setLocalizedUrlAliasesFromRowView(rowView, identifiable);
+
+      setTagsFromRowView(rowView, identifiable);
+      setSubjectsFromRowView(rowView, identifiable);
+
+      extendReducedIdentifiable(identifiable, rowView);
+    };
+  }
+
+  private void setSubjectsFromRowView(RowView rowView, I identifiable) {
+    UUID subjectUuid =
+        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+    if (subjectUuid != null
+        && (identifiable.getSubjects() == null
+            || !identifiable.getSubjects().stream()
+                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+      Subject subject = rowView.getRow(Subject.class);
+      identifiable.addSubject(subject);
+    }
+  }
+
+  private void setTagsFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      Tag tag = rowView.getRow(Tag.class);
+      if (tag != null) {
+        identifiable.addTag(tag);
+      }
+    }
   }
 
   @Override
-  public int deleteByUuids(List<UUID> uuids) {
-    Integer integer =
-        dbi.withHandle(
-            h ->
-                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                    .bindList("uuids", uuids)
-                    .execute());
-    return integer;
+  public I create() throws RepositoryException {
+    return (I) new Identifiable();
   }
 
   /**
@@ -398,32 +356,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // do nothing by default
   }
 
-  protected PageResponse<I> find(PageRequest pageRequest, Map<String, Object> argumentMappings) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
-    return find(pageRequest, commonSql, argumentMappings);
-  }
-
+  @Override
   protected PageResponse<I> find(
-      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings) {
-    if (argumentMappings == null) {
-      argumentMappings = new HashMap<>(0);
-    }
-    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<I> result =
-        retrieveList(
-            getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
+      PageRequest pageRequest, String commonSql, Map<String, Object> argumentMappings)
+      throws RepositoryException {
+    PageResponse<I> pageResponse = super.find(pageRequest, commonSql, argumentMappings);
 
     // FIXME: try to avoid doing this after database select! Delete when jsonb
     // search without
@@ -433,22 +370,13 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return pageResponse;
   }
 
-  protected PageResponse<I> find(PageRequest pageRequest, String commonSql) {
-    return find(pageRequest, commonSql, null);
-  }
-
-  @Override
-  public PageResponse<I> find(PageRequest pageRequest) {
-    return find(pageRequest, (Map<String, Object>) null);
-  }
-
   @Override
   @Deprecated
   /**
    * @deprecated use method with PageRequest signature instead
    */
   public PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
+      PageRequest pageRequest, String language, String initial) throws RepositoryException {
     // add special filter
     Filtering filtering = pageRequest.getFiltering();
     if (filtering == null) {
@@ -493,82 +421,64 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest) {
-    String commonSql = " FROM " + tableName + " AS " + tableAlias;
-    if (argumentMappings == null) {
-      argumentMappings = new HashMap<>(0);
-    }
-    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
+  public PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest)
+      throws RepositoryException {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM entities e"
+                + " INNER JOIN rel_identifiable_entities rel ON e.uuid=rel.entity_uuid"
+                + " WHERE rel.identifiable_uuid = :identifiableUuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("identifiableUuid", identifiableUuid);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<I> result =
-        retrieveList(
-            getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
+    StringBuilder query = new StringBuilder("SELECT rel.sortindex AS idx, *" + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "idx")));
+    addPagingAndSorting(pageRequest, query);
+    List<Entity> list =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(Entity.class).list());
 
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    PageResponse<I> pageResponse = new PageResponse<>(result, pageRequest, total);
-
-    return null;
-  }
-
-  @Override
-  public List<Entity> findRelatedEntities(UUID identifiableUuid) {
-    String query =
-        "SELECT * FROM entities e"
-            + " INNER JOIN rel_identifiable_entities ref ON e.uuid=ref.entity_uuid"
-            + " WHERE ref.identifiable_uuid = :identifiableUuid"
-            + " ORDER BY ref.sortindex";
-
-    List<Entity> list =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("identifiableUuid", identifiableUuid)
-                    .mapToBean(Entity.class)
-                    .list());
-    return list;
+    PageResponse<Entity> pageResponse = new PageResponse<>(list, pageRequest, total);
+    return pageResponse;
   }
 
   @Override
   public PageResponse<FileResource> findRelatedFileResources(
-      UUID identifiableUuid, PageRequest pageRequest) {
-    // TODO Auto-generated method stub
-    return null;
-  }
+      UUID identifiableUuid, PageRequest pageRequest) throws RepositoryException {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM FROM fileresources f"
+                + " INNER JOIN rel_identifiable_fileresources rel ON f.uuid=rel.fileresource_uuid"
+                + " WHERE rel.identifiable_uuid = :identifiableUuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("identifiableUuid", identifiableUuid);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-  @Override
-  public List<FileResource> findRelatedFileResources(UUID identifiableUuid) {
-    String query =
-        "SELECT * FROM fileresources f"
-            + " INNER JOIN rel_identifiable_fileresources ref ON f.uuid=ref.fileresource_uuid"
-            + " WHERE ref.identifiable_uuid = :identifiableUuid"
-            + " ORDER BY ref.sortindex";
+    StringBuilder query = new StringBuilder("SELECT rel.sortindex AS idx, *" + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "idx")));
+    addPagingAndSorting(pageRequest, query);
+    List<FileResource> list =
+        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(FileResource.class).list());
 
-    List<FileResource> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(query)
-                    .bind("identifiableUuid", identifiableUuid)
-                    .mapToBean(FileResource.class)
-                    .list());
-    return result;
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<FileResource> pageResponse = new PageResponse<>(list, pageRequest, total);
+    return pageResponse;
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList("created", "identifiableObjectType", "label", "lastModified", "type"));
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("identifiableObjectType", "label", "type"));
+    return allowedOrderByFields;
   }
 
   @Override
-  public I getByIdentifier(String namespace, String identifierId) {
+  public I getByIdentifier(String namespace, String identifierId) throws RepositoryException {
     UUID identifiableUuid =
         dbi.withHandle(
             h ->
@@ -590,12 +500,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public I getByUuid(UUID uniqueObjectUuid) {
-    return getByUuidAndFiltering(uniqueObjectUuid, null);
-  }
-
-  @Override
-  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     if (filtering == null) {
       filtering = Filtering.builder().build();
     }
@@ -665,7 +570,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws RepositoryException {
     String query =
         "SELECT DISTINCT jsonb_object_keys("
             + tableAlias
@@ -678,7 +583,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<I> getRandom(int count) {
+  public List<I> getRandom(int count) throws RepositoryException {
     // TODO Auto-generated method stub
     return null;
   }
@@ -696,11 +601,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
     templates.add(SearchTermTemplates.JSONB_PATH.renderTemplate(tableAlias, "description", "**"));
     return templates;
-  }
-
-  @Override
-  protected String getUniqueField() {
-    return "uuid";
   }
 
   // FIXME: delete when proper jsonb contains search implemented
@@ -721,7 +621,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+  public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings)
+      throws RepositoryException {
     long total =
         dbi.withHandle(
             h ->
@@ -733,20 +634,14 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return total;
   }
 
-  public List<I> retrieveList(
-      String fieldsSql,
-      StringBuilder innerQuery,
-      final Map<String, Object> argumentMappings,
-      String orderBy) {
-    return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
-  }
-
-  public List<I> retrieveList(
+  @Override
+  protected List<I> retrieveList(
       String fieldsSql,
       String fieldsSqlAdditionalJoins,
       StringBuilder innerQuery,
       final Map<String, Object> argumentMappings,
-      String orderBy) {
+      String orderBy)
+      throws RepositoryException {
     final String sql =
         "SELECT "
             + fieldsSql
@@ -813,7 +708,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
-  public I retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins) {
+  public I retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins)
+      throws RepositoryException {
     Map<String, Object> argumentMappings = new HashMap<>(0);
     return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings);
   }
@@ -822,7 +718,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       String fieldsSql,
       Filtering filtering,
       String sqlAdditionalJoins,
-      Map<String, Object> argumentMappings) {
+      Map<String, Object> argumentMappings)
+      throws RepositoryException {
     return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
   }
 
@@ -831,7 +728,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       Filtering filtering,
       String sqlAdditionalJoins,
       Map<String, Object> argumentMappings,
-      String innerSelect) {
+      String innerSelect)
+      throws RepositoryException {
     StringBuilder sql =
         new StringBuilder(
             "SELECT"
@@ -914,7 +812,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   private void execInsertUpdate(
-      final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback) {
+      final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback)
+      throws RepositoryException {
     // because of a significant difference in execution duration it makes sense to
     // distinguish here
     if (withCallback) {
@@ -941,7 +840,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public void save(
       I identifiable,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -985,7 +885,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
+  public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -1011,12 +912,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             preparedBatch.execute();
           });
     }
-    return findRelatedEntities(identifiableUuid);
+    return findRelatedEntities(identifiableUuid, new PageRequest(0, entities.size())).getContent();
   }
 
   @Override
   public List<FileResource> setRelatedFileResources(
-      UUID identifiableUuid, List<FileResource> fileResources) {
+      UUID identifiableUuid, List<FileResource> fileResources) throws RepositoryException {
     if (fileResources == null) {
       return null;
     }
@@ -1042,7 +943,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
           }
           preparedBatch.execute();
         });
-    return findRelatedFileResources(identifiableUuid);
+    return findRelatedFileResources(identifiableUuid, new PageRequest(0, fileResources.size()))
+        .getContent();
   }
 
   @Override
@@ -1063,7 +965,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public void update(
       I identifiable,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }

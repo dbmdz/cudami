@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
-public class EntityRelationMapper<E extends Entity> {
+public class EntityToEntityRelationMapper<E extends Entity> {
 
   private final EntityRepository<E> entityRepository;
 
-  public EntityRelationMapper(EntityRepository<E> entityRepository) {
+  public EntityToEntityRelationMapper(EntityRepository<E> entityRepository) {
     this.entityRepository = entityRepository;
   }
 

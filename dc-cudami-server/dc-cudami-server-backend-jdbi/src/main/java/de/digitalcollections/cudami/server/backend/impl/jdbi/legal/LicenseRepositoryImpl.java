@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.legal;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.legal.LicenseRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
+public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
     implements LicenseRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicenseRepositoryImpl.class);
@@ -59,24 +59,6 @@ public class LicenseRepositoryImpl extends JdbiRepositoryImpl<License>
         h ->
             h.createUpdate("DELETE FROM " + tableName + " WHERE url = :url")
                 .bind("url", url)
-                .execute());
-  }
-
-  @Override
-  public void deleteByUuid(UUID uuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid = :uuid")
-                .bind("uuid", uuid)
-                .execute());
-  }
-
-  @Override
-  public void deleteByUuids(List<UUID> uuids) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
                 .execute());
   }
 

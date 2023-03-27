@@ -36,12 +36,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-    classes = EntityRelationRepositoryImpl.class)
+    classes = EntityToEntityRelationRepositoryImpl.class)
 @ContextConfiguration(classes = SpringConfigBackendTestDatabase.class)
-@DisplayName("The EntityRelationRepository")
+@DisplayName("The EntityToEntityRelationRepository")
 @Sql(scripts = "classpath:cleanup_database.sql")
-public class EntityRelationRepositoryTest {
-  EntityRelationRepositoryImpl repository;
+public class EntityToEntityRelationRepositoryTest {
+  EntityToEntityRelationRepositoryImpl repository;
 
   @Autowired PostgreSQLContainer postgreSQLContainer;
   @Autowired Jdbi jdbi;
@@ -55,7 +55,7 @@ public class EntityRelationRepositoryTest {
 
   @BeforeEach
   public void beforeEach() {
-    repository = new EntityRelationRepositoryImpl(jdbi, entityRepository, cudamiConfig);
+    repository = new EntityToEntityRelationRepositoryImpl(jdbi, entityRepository, cudamiConfig);
   }
 
   @Test
@@ -71,29 +71,32 @@ public class EntityRelationRepositoryTest {
           InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
-    EntityToEntityRelation entityRelation =
+    EntityToEntityRelation expectedRelation =
         TestModelFixture.createEntityRelation(
             Map.of(Locale.ENGLISH, "subject entity label"),
             Map.of(Locale.ENGLISH, "object entity label"),
             predicate.getValue());
-    entityRelation.setAdditionalPredicates(List.of("addPred1", "addPred2"));
-    entityRepository.save(entityRelation.getSubject());
-    entityRepository.save(entityRelation.getObject());
+    expectedRelation.setAdditionalPredicates(List.of("addPred1", "addPred2"));
+    entityRepository.save(expectedRelation.getSubject());
+    entityRepository.save(expectedRelation.getObject());
     predicateRepository.save(predicate);
-    repository.save(List.of(entityRelation));
+    repository.save(List.of(expectedRelation));
 
-    List<EntityToEntityRelation> actual = repository.findBySubject(entityRelation.getSubject());
+    PageResponse<EntityToEntityRelation> actual =
+        repository.findBySubject(expectedRelation.getSubject(), new PageRequest(0, 10));
     assertThat(actual).hasSize(1);
-    assertThat(actual.get(0).getPredicate()).isEqualTo(entityRelation.getPredicate());
-    assertThat(actual.get(0).getSubject().getLabel().getText(Locale.ENGLISH))
-        .isEqualTo(entityRelation.getSubject().getLabel().getText(Locale.ENGLISH));
-    assertThat(actual.get(0).getSubject().getUuid())
-        .isEqualTo(entityRelation.getSubject().getUuid());
-    assertThat(actual.get(0).getObject().getLabel().getText(Locale.ENGLISH))
-        .isEqualTo(entityRelation.getObject().getLabel().getText(Locale.ENGLISH));
-    assertThat(actual.get(0).getObject().getUuid()).isEqualTo(entityRelation.getObject().getUuid());
-    assertThat(actual.get(0).getAdditionalPredicates())
-        .isEqualTo(entityRelation.getAdditionalPredicates());
+    EntityToEntityRelation actualRelation = actual.getContent().get(0);
+    assertThat(actualRelation.getPredicate()).isEqualTo(expectedRelation.getPredicate());
+    assertThat(actualRelation.getSubject().getLabel().getText(Locale.ENGLISH))
+        .isEqualTo(expectedRelation.getSubject().getLabel().getText(Locale.ENGLISH));
+    assertThat(actualRelation.getSubject().getUuid())
+        .isEqualTo(expectedRelation.getSubject().getUuid());
+    assertThat(actualRelation.getObject().getLabel().getText(Locale.ENGLISH))
+        .isEqualTo(expectedRelation.getObject().getLabel().getText(Locale.ENGLISH));
+    assertThat(actualRelation.getObject().getUuid())
+        .isEqualTo(expectedRelation.getObject().getUuid());
+    assertThat(actualRelation.getAdditionalPredicates())
+        .isEqualTo(expectedRelation.getAdditionalPredicates());
   }
 
   @Test
@@ -103,37 +106,40 @@ public class EntityRelationRepositoryTest {
           InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
-    EntityToEntityRelation entityRelation =
+    EntityToEntityRelation expectedRelation =
         TestModelFixture.createEntityRelation(
             Map.of(Locale.ENGLISH, "subject entity label"),
             Map.of(Locale.ENGLISH, "object entity label"),
             predicate.getValue());
-    entityRelation.setAdditionalPredicates(List.of("addPred1"));
-    entityRepository.save(entityRelation.getSubject());
-    entityRelation.setSubject(entityRepository.getByUuid(entityRelation.getSubject().getUuid()));
-    entityRepository.save(entityRelation.getObject());
-    entityRelation.setObject(entityRepository.getByUuid(entityRelation.getObject().getUuid()));
+    expectedRelation.setAdditionalPredicates(List.of("addPred1"));
+    entityRepository.save(expectedRelation.getSubject());
+    expectedRelation.setSubject(
+        entityRepository.getByUuid(expectedRelation.getSubject().getUuid()));
+    entityRepository.save(expectedRelation.getObject());
+    expectedRelation.setObject(entityRepository.getByUuid(expectedRelation.getObject().getUuid()));
     predicateRepository.save(predicate);
 
     Predicate predicate2 = new Predicate();
     predicate2.setValue("is_test_2");
-    EntityToEntityRelation entityRelation2 =
+    EntityToEntityRelation expectedRelation2 =
         new EntityToEntityRelation(
-            entityRelation.getSubject(),
+            expectedRelation.getSubject(),
             predicate2.getValue(),
             TestModelFixture.createEntity(
                 Entity.class, Map.of(Locale.GERMAN, "Label"), Collections.emptyMap()));
-    entityRelation2.setAdditionalPredicates(List.of("addPred2"));
-    entityRepository.save(entityRelation2.getObject());
-    entityRelation2.setObject(entityRepository.getByUuid(entityRelation2.getObject().getUuid()));
+    expectedRelation2.setAdditionalPredicates(List.of("addPred2"));
+    entityRepository.save(expectedRelation2.getObject());
+    expectedRelation2.setObject(
+        entityRepository.getByUuid(expectedRelation2.getObject().getUuid()));
     predicateRepository.save(predicate2);
 
-    repository.save(List.of(entityRelation, entityRelation2));
+    repository.save(List.of(expectedRelation, expectedRelation2));
 
-    List<EntityToEntityRelation> actual = repository.findBySubject(entityRelation.getSubject());
+    PageResponse<EntityToEntityRelation> actual =
+        repository.findBySubject(expectedRelation.getSubject(), new PageRequest(0, 10));
     assertThat(actual).hasSize(2);
-    assertThat(actual.get(0)).isEqualTo(entityRelation);
-    assertThat(actual.get(1)).isEqualTo(entityRelation2);
+    assertThat(actual.getContent().get(0)).isEqualTo(expectedRelation);
+    assertThat(actual.getContent().get(1)).isEqualTo(expectedRelation2);
   }
 
   @Test
@@ -143,32 +149,33 @@ public class EntityRelationRepositoryTest {
           InvocationTargetException, NoSuchMethodException, SecurityException, RepositoryException {
     Predicate predicate = new Predicate();
     predicate.setValue("is_test");
-    EntityToEntityRelation entityRelation =
+    EntityToEntityRelation expectedRelation =
         TestModelFixture.createEntityRelation(
             Map.of(Locale.ENGLISH, "subject entity label"),
             Map.of(Locale.ENGLISH, "object entity label"),
             predicate.getValue());
-    entityRepository.save(entityRelation.getSubject());
-    entityRepository.save(entityRelation.getObject());
-    entityRelation =
+    entityRepository.save(expectedRelation.getSubject());
+    entityRepository.save(expectedRelation.getObject());
+    expectedRelation =
         new EntityToEntityRelation(
-            entityRepository.getByUuid(entityRelation.getSubject().getUuid()),
+            entityRepository.getByUuid(expectedRelation.getSubject().getUuid()),
             predicate.getValue(),
-            entityRepository.getByUuid(entityRelation.getObject().getUuid()));
-    entityRelation.setAdditionalPredicates(List.of("addPred1"));
+            entityRepository.getByUuid(expectedRelation.getObject().getUuid()));
+    expectedRelation.setAdditionalPredicates(List.of("addPred1"));
     predicateRepository.save(predicate);
 
-    repository.save(entityRelation);
+    repository.save(expectedRelation);
 
     // now lets change the additional predicate(s)
-    entityRelation.setAdditionalPredicates(List.of("predicate1", "predicate2", "predicate3"));
-    repository.save(entityRelation);
+    expectedRelation.setAdditionalPredicates(List.of("predicate1", "predicate2", "predicate3"));
+    repository.save(expectedRelation);
 
-    List<EntityToEntityRelation> actual =
-        repository.findBySubject(entityRelation.getSubject().getUuid());
+    PageResponse<EntityToEntityRelation> actual =
+        repository.findBySubject(expectedRelation.getSubject().getUuid(), new PageRequest(0, 10));
     assertThat(actual).hasSize(1);
-    assertThat(actual.get(0)).isEqualTo(entityRelation);
-    assertThat(actual.get(0).getAdditionalPredicates())
+    EntityToEntityRelation actualRelation = actual.getContent().get(0);
+    assertThat(actualRelation).isEqualTo(expectedRelation);
+    assertThat(actualRelation.getAdditionalPredicates())
         .containsExactly("predicate1", "predicate2", "predicate3");
   }
 
@@ -183,9 +190,9 @@ public class EntityRelationRepositoryTest {
     IntStream.range(0, 20)
         .forEach(
             i -> {
-              EntityToEntityRelation entityRelation;
+              EntityToEntityRelation relation;
               try {
-                entityRelation =
+                relation =
                     TestModelFixture.createEntityRelation(
                         Map.of(Locale.ENGLISH, "subject entity label " + i),
                         Map.of(Locale.ENGLISH, "object entity label " + i),
@@ -196,9 +203,9 @@ public class EntityRelationRepositoryTest {
                   | InvocationTargetException
                   | NoSuchMethodException
                   | SecurityException e) {
-                entityRelation = null;
+                relation = null;
               }
-              relations.add(entityRelation);
+              relations.add(relation);
             });
     relations.forEach(
         rel -> {

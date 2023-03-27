@@ -16,14 +16,14 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    *
    * @return the count of {@code UniqueObject}s
    */
-  long count();
+  long count() throws RepositoryException;
 
   /**
    * Create a new instance of {@code UniqueObject}
    *
    * @return new instance of {@code UniqueObject}
    */
-  U create();
+  U create() throws RepositoryException;
 
   /**
    * Delete a list of {@code UniqueObject}s
@@ -76,9 +76,11 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    * @return the found {@code UniqueObject} or {@code null}
    * @throws RepositoryException
    */
-  U getByUuid(UUID uniqueObjectUuid);
+  default U getByUuid(UUID uniqueObjectUuid) throws RepositoryException {
+    return getByUuidAndFiltering(uniqueObjectUuid, null);
+  }
 
-  U getByUuidAndFiltering(UUID uniqueObjectUuid, Filtering filtering);
+  U getByUuidAndFiltering(UUID uniqueObjectUuid, Filtering filtering) throws RepositoryException;
 
   /**
    * Save an {@code UniqueObject} object.

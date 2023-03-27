@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location.HumanSettlementRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityRelationRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation.EntityToEntityRelationRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.LocalDateRangeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.MainSubTypeMapper.ExpressionTypeMapper;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
@@ -174,8 +174,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
           %1$s.additional_predicates %2$s_additionalPredicates,
           max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
             .formatted(
-                EntityRelationRepositoryImpl.TABLE_ALIAS,
-                EntityRelationRepositoryImpl.MAPPING_PREFIX,
+                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
+                EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX,
                 tableAlias)
         + entityRepository.getSqlSelectReducedFields();
   }
@@ -195,8 +195,8 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       """
             .formatted(
                 tableAlias,
-                /*2-3*/ EntityRelationRepositoryImpl.TABLE_NAME,
-                EntityRelationRepositoryImpl.TABLE_ALIAS,
+                /*2-3*/ EntityToEntityRelationRepositoryImpl.TABLE_NAME,
+                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
                 /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
                 EntityRepositoryImpl.TABLE_ALIAS,
                 /*6-7*/ WorkRepositoryImpl.TABLE_NAME,
@@ -410,7 +410,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       }
       String relationPredicate =
           rowView.getColumn(
-              EntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
+              EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
       if (!manifestation.getRelations().stream()
           .anyMatch(
               relation ->
@@ -422,13 +422,15 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
             .getRelations()
             .set(
                 rowView.getColumn(
-                    EntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex", Integer.class),
+                    EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
+                    Integer.class),
                 EntityToEntityRelation.builder()
                     .subject(relatedEntity)
                     .predicate(relationPredicate)
                     .additionalPredicates(
                         rowView.getColumn(
-                            EntityRelationRepositoryImpl.MAPPING_PREFIX + "_additionalPredicates",
+                            EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX
+                                + "_additionalPredicates",
                             new GenericType<List<String>>() {}))
                     .build());
       }

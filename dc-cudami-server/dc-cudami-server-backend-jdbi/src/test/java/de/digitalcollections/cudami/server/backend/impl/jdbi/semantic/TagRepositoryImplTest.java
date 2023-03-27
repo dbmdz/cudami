@@ -73,7 +73,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and successfully delete")
   @Test
-  void saveAndDelete() {
+  void saveAndDelete() throws RepositoryException {
     Tag savedTag = ensureSavedTag("Test");
     boolean success = repo.deleteByUuid(savedTag.getUuid());
     assertThat(success).isTrue();

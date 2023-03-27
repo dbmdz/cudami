@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -20,10 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = {Exception.class})
 public class EntityRelationServiceImpl implements EntityRelationService {
 
-  private final EntityRelationRepository repository;
+  private final EntityToEntityRelationRepository repository;
 
   @Autowired
-  public EntityRelationServiceImpl(EntityRelationRepository repository) {
+  public EntityRelationServiceImpl(EntityToEntityRelationRepository repository) {
     this.repository = repository;
   }
 

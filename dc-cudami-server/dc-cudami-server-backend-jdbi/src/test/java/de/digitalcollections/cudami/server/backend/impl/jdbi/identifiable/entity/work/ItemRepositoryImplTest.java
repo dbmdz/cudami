@@ -354,7 +354,7 @@ public class ItemRepositoryImplTest
   @DisplayName("can return an empty set of connected digital objects for an null item")
   void digitalObjectsForNullItem() {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
-    assertThat(repo.findDigitalObjects(null, pageRequest)).isEmpty();
+    assertThat(repo.findDigitalObjects((UUID) null, pageRequest)).isEmpty();
   }
 
   @Test

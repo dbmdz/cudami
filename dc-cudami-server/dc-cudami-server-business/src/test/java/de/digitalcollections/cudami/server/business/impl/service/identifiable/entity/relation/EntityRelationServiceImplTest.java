@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
@@ -21,11 +21,11 @@ import org.junit.jupiter.api.Test;
 class EntityRelationServiceImplTest extends AbstractServiceImplTest {
 
   private EntityRelationService entityRelationService;
-  private EntityRelationRepository entityRelationRepository;
+  private EntityToEntityRelationRepository entityRelationRepository;
 
   @BeforeEach
   public void beforeEach() {
-    entityRelationRepository = mock(EntityRelationRepository.class);
+    entityRelationRepository = mock(EntityToEntityRelationRepository.class);
     entityRelationService = new EntityRelationServiceImpl(entityRelationRepository);
   }
 

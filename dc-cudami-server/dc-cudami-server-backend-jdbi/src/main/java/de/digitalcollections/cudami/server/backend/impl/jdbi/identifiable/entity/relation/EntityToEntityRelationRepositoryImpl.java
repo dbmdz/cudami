@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityRelationRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -26,25 +26,25 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
-    implements EntityRelationRepository {
+public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
+    implements EntityToEntityRelationRepository {
 
   public static final String MAPPING_PREFIX = "rel";
   public static final String TABLE_ALIAS = "rel";
   public static final String TABLE_NAME = "rel_entity_entities";
 
+  private final EntityToEntityRelationMapper<Entity> entityRelationMapper;
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
-  private final EntityRelationMapper<Entity> entityRelationMapper;
 
   @Autowired
-  public EntityRelationRepositoryImpl(
+  public EntityToEntityRelationRepositoryImpl(
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
       CudamiConfig cudamiConfig) {
     super(
         dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
-    this.entityRelationMapper = new EntityRelationMapper<Entity>(entityRepositoryImpl);
+    this.entityRelationMapper = new EntityToEntityRelationMapper<Entity>(entityRepositoryImpl);
   }
 
   @Override
@@ -107,37 +107,42 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("subject", "predicate", "object"));
-  }
+  public PageResponse<EntityToEntityRelation> findBySubject(
+      UUID subjectUuid, PageRequest pageRequest) {
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM " + tableName + " AS " + tableAlias + " WHERE subject_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("uuid", subjectUuid);
+    addFiltering(pageRequest, commonSql, argumentMappings);
 
-  @Override
-  public List<EntityToEntityRelation> findBySubject(UUID subjectEntityUuid) {
-    Entity subjectEntity = entityRepositoryImpl.getByUuid(subjectEntityUuid);
-    if (subjectEntity == null) {
-      return null;
-    }
-    return findBySubject(subjectEntity);
-  }
-
-  @Override
-  public List<EntityToEntityRelation> findBySubject(Entity subjectEntity) {
     // query predicate and object entity (subject entity is given)
-    String query =
-        "SELECT subject_uuid rel_subject, predicate rel_predicate, object_uuid rel_object, additional_predicates rel_addpredicates"
-            + " FROM "
-            + tableName
-            + " WHERE subject_uuid = :uuid"
-            + " ORDER BY sortindex";
-
-    List<EntityToEntityRelation> result =
+    StringBuilder query =
+        new StringBuilder(
+            "SELECT rel.subject_uuid rel_subject, rel.predicate rel_predicate, rel.object_uuid rel_object, rel.additional_predicates rel_addpredicates"
+                + commonSql);
+    pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
+    addPagingAndSorting(pageRequest, query);
+    List<EntityToEntityRelation> list =
         dbi.withHandle(
             h ->
-                h.createQuery(query)
-                    .bind("uuid", subjectEntity.getUuid())
-                    .map(entityRelationMapper.getMapper(subjectEntity))
+                h.createQuery(query.toString())
+                    .bindMap(argumentMappings)
+                    .bind("uuid", subjectUuid)
+                    .map(entityRelationMapper.getMapper(null))
                     .list());
-    return result;
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<EntityToEntityRelation> pageResponse =
+        new PageResponse<>(list, pageRequest, total);
+    return pageResponse;
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    return new ArrayList<>(Arrays.asList("subject", "predicate", "object"));
   }
 
   @Override
@@ -160,18 +165,6 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
   @Override
   protected String getUniqueField() {
     return null;
-  }
-
-  @Override
-  public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
-      throws RepositoryException {
-    Entity subject = new Entity();
-    subject.setUuid(subjectEntityUuid);
-
-    Entity object = new Entity();
-    object.setUuid(objectEntityUuid);
-
-    save(List.of(new EntityToEntityRelation(subject, predicate, object)));
   }
 
   @Override
@@ -206,6 +199,18 @@ public class EntityRelationRepositoryImpl extends JdbiRepositoryImpl
           }
           preparedBatch.execute();
         });
+  }
+
+  @Override
+  public void save(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
+      throws RepositoryException {
+    Entity subject = new Entity();
+    subject.setUuid(subjectEntityUuid);
+
+    Entity object = new Entity();
+    object.setUuid(objectEntityUuid);
+
+    save(List.of(new EntityToEntityRelation(subject, predicate, object)));
   }
 
   @Override

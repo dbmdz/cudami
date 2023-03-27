@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 
@@ -10,5 +11,5 @@ public interface PagingSortingFilteringRepository<O extends Object> {
    * @param pageRequest request param container for paging, sorting, filtering
    * @return result as paged response
    */
-  PageResponse<O> find(PageRequest pageRequest);
+  PageResponse<O> find(PageRequest pageRequest) throws RepositoryException;
 }

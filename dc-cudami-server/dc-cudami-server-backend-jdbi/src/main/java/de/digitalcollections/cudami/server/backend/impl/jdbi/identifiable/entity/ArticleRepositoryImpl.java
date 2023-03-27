@@ -11,7 +11,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.HashMap;
 import java.util.List;
@@ -179,11 +178,6 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     }
 
     return agents;
-  }
-
-  @Override
-  public List<FileResource> findRelatedFileResources(UUID entityUuid) {
-    return entityRepositoryImpl.findRelatedFileResources(entityUuid);
   }
 
   @Override

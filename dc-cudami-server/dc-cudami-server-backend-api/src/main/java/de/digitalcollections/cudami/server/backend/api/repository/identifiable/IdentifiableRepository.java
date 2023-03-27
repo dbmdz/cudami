@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -13,57 +14,61 @@ import java.util.UUID;
 
 public interface IdentifiableRepository<I extends Identifiable> extends UniqueObjectRepository<I> {
 
-  default void addRelatedEntity(I identifiable, Entity entity) {
+  default void addRelatedEntity(I identifiable, Entity entity) throws RepositoryException {
     if (identifiable == null || entity == null) {
-      return;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     addRelatedEntity(identifiable.getUuid(), entity.getUuid());
   }
 
-  void addRelatedEntity(UUID identifiableUuid, UUID entityUuid);
+  void addRelatedEntity(UUID identifiableUuid, UUID entityUuid) throws RepositoryException;
 
-  default void addRelatedFileresource(I identifiable, FileResource fileResource) {
+  default void addRelatedFileresource(I identifiable, FileResource fileResource)
+      throws RepositoryException {
     if (identifiable == null || fileResource == null) {
-      return;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     addRelatedFileresource(identifiable.getUuid(), fileResource.getUuid());
   }
 
-  void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid);
+  void addRelatedFileresource(UUID identifiableUuid, UUID fileResourceUuid)
+      throws RepositoryException;
 
-  PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial);
+  PageResponse<I> findByLanguageAndInitial(PageRequest pageRequest, String language, String initial)
+      throws RepositoryException;
 
-  default PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest) {
+  default PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest)
+      throws RepositoryException {
     if (identifiable == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given identifiable must not be null");
     }
     return findRelatedEntities(identifiable.getUuid(), pageRequest);
   }
 
-  PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(UUID identifiableUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   default PageResponse<FileResource> findRelatedFileResources(
-      I identifiable, PageRequest pageRequest) {
+      I identifiable, PageRequest pageRequest) throws RepositoryException {
     if (identifiable == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given identifiable must not be null");
     }
     return findRelatedFileResources(identifiable.getUuid(), pageRequest);
   }
 
   PageResponse<FileResource> findRelatedFileResources(
-      UUID identifiableUuid, PageRequest pageRequest);
+      UUID identifiableUuid, PageRequest pageRequest) throws RepositoryException;
 
-  default I getByIdentifiable(I identifiable) {
+  default I getByIdentifiable(I identifiable) throws RepositoryException {
     if (identifiable == null) {
-      return null;
+      throw new IllegalArgumentException("get failed: given identifiable must not be null");
     }
     return getByUuid(identifiable.getUuid());
   }
 
-  default I getByIdentifier(Identifier identifier) {
+  default I getByIdentifier(Identifier identifier) throws RepositoryException {
     if (identifier == null) {
-      return null;
+      throw new IllegalArgumentException("get failed: given identifier must not be null");
     }
     if (identifier.getIdentifiable() != null) {
       return getByUuid(identifier.getIdentifiable());
@@ -71,11 +76,11 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
     return getByIdentifier(identifier.getNamespace(), identifier.getId());
   }
 
-  I getByIdentifier(String namespace, String id);
+  I getByIdentifier(String namespace, String id) throws RepositoryException;
 
-  List<Locale> getLanguages();
+  List<Locale> getLanguages() throws RepositoryException;
 
-  List<I> getRandom(int count);
+  List<I> getRandom(int count) throws RepositoryException;
 
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
@@ -85,14 +90,16 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
    * @param entities the entities that are related to the identifiable
    * @return the list of the related entities
    */
-  default List<Entity> setRelatedEntities(I identifiable, List<Entity> entities) {
+  default List<Entity> setRelatedEntities(I identifiable, List<Entity> entities)
+      throws RepositoryException {
     if (identifiable == null || entities == null) {
-      return null;
+      throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setRelatedEntities(identifiable.getUuid(), entities);
   }
 
-  List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities);
+  List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities)
+      throws RepositoryException;
 
   /**
    * Save list of file resources related to an entity. Prerequisite: file resources have been saved
@@ -103,13 +110,13 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
    * @return the list of the related file resources
    */
   default List<FileResource> setRelatedFileResources(
-      I identifiable, List<FileResource> fileResources) {
+      I identifiable, List<FileResource> fileResources) throws RepositoryException {
     if (identifiable == null || fileResources == null) {
-      return null;
+      throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setRelatedFileResources(identifiable.getUuid(), fileResources);
   }
 
   List<FileResource> setRelatedFileResources(
-      UUID identifiableUuid, List<FileResource> fileResources);
+      UUID identifiableUuid, List<FileResource> fileResources) throws RepositoryException;
 }

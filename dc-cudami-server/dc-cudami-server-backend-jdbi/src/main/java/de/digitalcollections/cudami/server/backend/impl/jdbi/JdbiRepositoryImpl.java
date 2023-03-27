@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.AbstractPagingSortingFilteringRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.UniqueObject;
@@ -141,13 +142,14 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   //    return executedSearchTerm;
   //  }
 
-  public long count() {
+  public long count() throws RepositoryException {
     final String sql = "SELECT count(*) FROM " + tableName;
     long count = dbi.withHandle(h -> h.createQuery(sql).mapTo(Long.class).findOne().get());
     return count;
   }
 
-  public long count(String commonSql, Map<String, Object> argumentMappings) {
+  public long count(String commonSql, Map<String, Object> argumentMappings)
+      throws RepositoryException {
     final String sql = "SELECT count(*) " + commonSql;
     return dbi.withHandle(
         h -> h.createQuery(sql).bindMap(argumentMappings).mapTo(Long.class).findOne().get());
@@ -178,18 +180,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
       term = term.replaceAll("\"", "\\\\\"");
     }
     return term;
-  }
-
-  protected UUID[] extractUuids(Collection<? extends UniqueObject> uniqueObjects) {
-    if (uniqueObjects == null || uniqueObjects.isEmpty()) {
-      return new UUID[0];
-    }
-    return uniqueObjects.stream()
-        .collect(
-            ArrayList<UUID>::new,
-            (result, uniqueObject) -> result.add(uniqueObject.getUuid()),
-            ArrayList::addAll)
-        .toArray(new UUID[1]);
   }
 
   protected void filterByLocalizedTextFields(
@@ -722,7 +712,8 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     }
   }
 
-  protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
+  protected long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings)
+      throws RepositoryException {
     long total =
         dbi.withHandle(
             h ->
@@ -735,7 +726,8 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   }
 
   protected Integer retrieveNextSortIndexForParentChildren(
-      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid) {
+      Jdbi dbi, String tableName, String columNameParentUuid, UUID parentUuid)
+      throws RepositoryException {
     // first child: max gets no results (= null)):
     Integer sortIndex =
         dbi.withHandle(
