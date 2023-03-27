@@ -95,7 +95,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\",\n"
+            + "  \"objectType\": \"URL_ALIAS\"\n"
             + "}";
 
     testPostJsonWithState("/v5/urlaliases", body, 422);
@@ -133,7 +134,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
             + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\",\n"
+            + "  \"objectType\": \"URL_ALIAS\"\n"
             + "}";
 
     testPostJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
@@ -179,7 +181,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "     \"entityType\":\"WEBSITE\",\n"
             + "     \"identifiableObjectType\":\"WEBSITE\",\n"
             + "     \"refId\":0\n"
-            + "  }\n"
+            + "  },\n"
+            + "  \"objectType\": \"URL_ALIAS\"\n"
             + "}";
 
     testPutJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
@@ -199,7 +202,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
             + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
             + "  \"targetEntityType\": \"COLLECTION\",\n"
             + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
+            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\",\n"
+            + "  \"objectType\": \"URL_ALIAS\"\n"
             + "}";
 
     testPutJsonWithState("/v5/urlaliases/12345678-1234-1234-1234-123456789012", body, 422);
@@ -210,8 +214,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/urlaliases"})
   public void findWithEmptyResult(String path) throws Exception {
     PageResponse<LocalizedUrlAliases> expected =
-        (PageResponse<LocalizedUrlAliases>)
-            PageResponse.builder().forPageSize(1).withTotalElements(0).build();
+        PageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
     when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
@@ -223,29 +226,27 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/urlaliases?pageNumber=0&pageSize=1"})
   public void findWithFilledResult(String path) throws Exception {
     PageResponse<LocalizedUrlAliases> expected =
-        (PageResponse<LocalizedUrlAliases>)
-            PageResponse.builder()
-                .forPageSize(1)
-                .withTotalElements(319)
-                .withContent(
-                    List.of(
-                        new LocalizedUrlAliases(
-                            UrlAlias.builder()
-                                .created("2021-08-17T15:18:01.000001")
-                                .lastPublished("2021-08-17T15:18:01.000001")
-                                .isPrimary()
-                                .slug("hurz")
-                                .targetLanguage("de")
-                                .targetType(
-                                    IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-                                .targetUuid("23456789-2345-2345-2345-234567890123")
-                                .uuid("12345678-1234-1234-1234-123456789012")
-                                .website(
-                                    Website.builder()
-                                        .uuid("87654321-4321-4321-4321-876543210987")
-                                        .build())
-                                .build())))
-                .build();
+        PageResponse.builder()
+            .forPageSize(1)
+            .withTotalElements(319)
+            .withContent(
+                List.of(
+                    new LocalizedUrlAliases(
+                        UrlAlias.builder()
+                            .created("2021-08-17T15:18:01.000001")
+                            .lastPublished("2021-08-17T15:18:01.000001")
+                            .isPrimary()
+                            .slug("hurz")
+                            .targetLanguage("de")
+                            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
+                            .targetUuid("23456789-2345-2345-2345-234567890123")
+                            .uuid("12345678-1234-1234-1234-123456789012")
+                            .website(
+                                Website.builder()
+                                    .uuid("87654321-4321-4321-4321-876543210987")
+                                    .build())
+                            .build())))
+            .build();
 
     when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
 
