@@ -77,7 +77,8 @@ public class V5MigrationHelper {
       JSONArray content = jsonObject.getJSONArray("content");
       content.forEach(
           obj -> {
-            if (obj instanceof JSONObject item) {
+            if (obj instanceof JSONObject) {
+              JSONObject item = (JSONObject) obj;
               if (item.has("entityType")) {
                 switch (item.getString("entityType")) {
                   case "DIGITAL_OBJECT":
