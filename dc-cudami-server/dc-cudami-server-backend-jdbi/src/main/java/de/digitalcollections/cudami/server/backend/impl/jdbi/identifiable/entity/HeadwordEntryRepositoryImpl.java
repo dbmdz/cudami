@@ -12,7 +12,6 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Family;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -40,94 +38,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   public static final String TABLE_ALIAS = "he";
   public static final String TABLE_NAME = "headwordentries";
 
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + " LEFT JOIN "
-        + HeadwordRepositoryImpl.TABLE_NAME
-        + " AS "
-        + HeadwordRepositoryImpl.TABLE_ALIAS
-        + " ON "
-        + HeadwordRepositoryImpl.TABLE_ALIAS
-        + ".uuid = he.headword";
-  }
-
-  private static BiConsumer<Map<UUID, HeadwordEntry>, RowView> ADDITIONAL_REDUCEROWS_BICONSUMER =
-      (map, rowView) -> {
-        // entity should be already in map, as we here just add additional data
-        HeadwordEntry headwordEntry =
-            map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-
-        if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-            != null) {
-          UUID headwordUuid =
-              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-          String label =
-              rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
-          final Headword headword = new Headword();
-          headword.setUuid(headwordUuid);
-          headword.setLabel(label);
-          headwordEntry.setHeadword(headword);
-        }
-      };
-
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", date_published, text, timevalue_published, headword";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB, :headword";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    final String sql =
-        getSqlSelectReducedFields(tableAlias, mappingPrefix)
-            + ", "
-            + tableAlias
-            + ".text "
-            + mappingPrefix
-            + "_text"
-            + ", "
-            + HeadwordRepositoryImpl.TABLE_ALIAS
-            + ".uuid "
-            + HeadwordRepositoryImpl.MAPPING_PREFIX
-            + "_uuid"
-            + ", "
-            + HeadwordRepositoryImpl.TABLE_ALIAS
-            + ".label "
-            + HeadwordRepositoryImpl.MAPPING_PREFIX
-            + "_label";
-    return sql;
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".date_published "
-        + mappingPrefix
-        + "_datePublished, "
-        + tableAlias
-        + ".timevalue_published "
-        + mappingPrefix
-        + "_timeValuePublished";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB, headword=:headword";
-  }
-
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
 
-  @Autowired
   public HeadwordEntryRepositoryImpl(
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
@@ -138,13 +50,32 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
         TABLE_ALIAS,
         MAPPING_PREFIX,
         HeadwordEntry.class,
-        ADDITIONAL_REDUCEROWS_BICONSUMER,
         cudamiConfig.getOffsetForAlternativePaging());
     this.entityRepositoryImpl = entityRepositoryImpl;
   }
 
   @Override
-  public List<HeadwordEntry> getByHeadword(UUID headwordUuid) {
+  protected BiConsumer<Map<UUID, HeadwordEntry>, RowView> createAdditionalReduceRowsBiConsumer() {
+    return (map, rowView) -> {
+      // entity should be already in map, as we here just add additional data
+      HeadwordEntry headwordEntry =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+
+      if (rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        UUID headwordUuid =
+            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+        String label =
+            rowView.getColumn(HeadwordRepositoryImpl.MAPPING_PREFIX + "_label", String.class);
+        final Headword headword = new Headword();
+        headword.setUuid(headwordUuid);
+        headword.setLabel(label);
+        headwordEntry.setHeadword(headword);
+      }
+    };
+  }
+
+  @Override
+  public List<HeadwordEntry> getByHeadword(UUID headwordUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -165,7 +96,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByIdentifier(Identifier identifier) {
+  public HeadwordEntry getByIdentifier(Identifier identifier) throws RepositoryException {
     HeadwordEntry headwordEntry = super.getByIdentifier(identifier);
 
     if (headwordEntry != null) {
@@ -175,7 +106,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByRefId(long refId) {
+  public HeadwordEntry getByRefId(long refId) throws RepositoryException {
     HeadwordEntry headwordEntry = super.getByRefId(refId);
 
     if (headwordEntry != null) {
@@ -185,7 +116,8 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public HeadwordEntry getByUuidAndFiltering(UUID uuid, Filtering filtering)
+      throws RepositoryException {
     HeadwordEntry headwordEntry = super.getByUuidAndFiltering(uuid, filtering);
 
     if (headwordEntry != null) {
@@ -196,7 +128,7 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public List<Agent> getCreators(UUID headwordEntryUuid) {
+  public List<Agent> getCreators(UUID headwordEntryUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT hec.sortindex AS idx, * FROM "
@@ -251,8 +183,69 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
-  public List<FileResource> findRelatedFileResources(UUID entityUuid) {
-    return entityRepositoryImpl.findRelatedFileResources(entityUuid);
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", date_published, text, timevalue_published, headword";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB, :headword";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    final String sql =
+        getSqlSelectReducedFields(tableAlias, mappingPrefix)
+            + ", "
+            + tableAlias
+            + ".text "
+            + mappingPrefix
+            + "_text"
+            + ", "
+            + HeadwordRepositoryImpl.TABLE_ALIAS
+            + ".uuid "
+            + HeadwordRepositoryImpl.MAPPING_PREFIX
+            + "_uuid"
+            + ", "
+            + HeadwordRepositoryImpl.TABLE_ALIAS
+            + ".label "
+            + HeadwordRepositoryImpl.MAPPING_PREFIX
+            + "_label";
+    return sql;
+  }
+
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + " LEFT JOIN "
+        + HeadwordRepositoryImpl.TABLE_NAME
+        + " AS "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + " ON "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".uuid = he.headword";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB, headword=:headword";
   }
 
   @Override

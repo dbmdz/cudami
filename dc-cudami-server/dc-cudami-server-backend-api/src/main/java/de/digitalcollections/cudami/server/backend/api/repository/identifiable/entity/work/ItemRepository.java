@@ -13,14 +13,16 @@ import java.util.UUID;
 /** Repository for Item persistence handling. */
 public interface ItemRepository extends EntityRepository<Item> {
 
-  default PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest) {
+  default PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest)
+      throws RepositoryException {
     if (item == null) {
       return null;
     }
     return findDigitalObjects(item.getUuid(), pageRequest);
   }
 
-  PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest);
+  PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   PageResponse<Item> findItemsByManifestation(UUID manifestationUuid, PageRequest pageRequest)
       throws RepositoryException;

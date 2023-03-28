@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -10,21 +11,27 @@ import java.util.UUID;
 /** Repository for Website persistence handling. */
 public interface WebsiteRepository extends EntityRepository<Website> {
 
-  default PageResponse<Webpage> findRootPages(Website website, PageRequest pageRequest) {
+  default PageResponse<Webpage> findRootWebpages(Website website, PageRequest pageRequest)
+      throws RepositoryException {
     if (website == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given website must not be null");
     }
     return findRootWebpages(website.getUuid(), pageRequest);
   }
 
-  PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest);
+  // FIXME: replace with pagerequest method
+  List<Webpage> findRootWebpages(UUID uuid) throws RepositoryException;
 
-  default boolean updateRootWebpagesOrder(Website website, List<Webpage> rootPages) {
+  PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException;
+
+  boolean updateRootWebpagesOrder(UUID website, List<Webpage> rootPages) throws RepositoryException;
+
+  default boolean updateRootWebpagesOrder(Website website, List<Webpage> rootPages)
+      throws RepositoryException {
     if (website == null || rootPages == null) {
-      return false;
+      throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     return updateRootWebpagesOrder(website.getUuid(), rootPages);
   }
-
-  boolean updateRootWebpagesOrder(UUID website, List<Webpage> rootPages);
 }

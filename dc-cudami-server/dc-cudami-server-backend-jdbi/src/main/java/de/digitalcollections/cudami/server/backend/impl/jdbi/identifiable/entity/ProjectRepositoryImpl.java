@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -29,50 +30,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   public static final String TABLE_ALIAS = "p";
   public static final String TABLE_NAME = "projects";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", end_date, start_date, text";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".end_date "
-        + mappingPrefix
-        + "_endDate, "
-        + tableAlias
-        + ".start_date "
-        + mappingPrefix
-        + "_startDate";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", end_date=:endDate, start_date=:startDate, text=:text::JSONB";
-  }
-
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
-  @Autowired
   public ProjectRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -84,7 +43,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+  public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
+      throws RepositoryException {
     if (projectUuid != null && digitalObjects != null) {
       // get max sortIndex of existing
       Integer nextSortIndex =
@@ -113,7 +73,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
+  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String digitalObjectTableAlias = digitalObjectRepositoryImpl.getTableAlias();
@@ -159,7 +120,49 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) {
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", end_date, start_date, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :endDate, :startDate, :text::JSONB";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".end_date "
+        + mappingPrefix
+        + "_endDate, "
+        + tableAlias
+        + ".start_date "
+        + mappingPrefix
+        + "_startDate";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", end_date=:endDate, start_date=:startDate, text=:text::JSONB";
+  }
+
+  @Override
+  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid)
+      throws RepositoryException {
     if (projectUuid != null && digitalObjectUuid != null) {
       // delete relation to project
       String query =
@@ -177,7 +180,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid) {
+  public boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid)
+      throws RepositoryException {
     if (digitalObjectUuid == null) {
       return false;
     }
@@ -190,7 +194,8 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
-  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
+  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->

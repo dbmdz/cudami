@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.relation;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
@@ -9,8 +10,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntityToEntityRelationMapper<E extends Entity> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(EntityToEntityRelationMapper.class);
 
   private final EntityRepository<E> entityRepository;
 
@@ -30,9 +35,18 @@ public class EntityToEntityRelationMapper<E extends Entity> {
 
       Entity subject = subjectEntity;
       if (subjectEntity == null) {
-        subject = entityRepository.getByUuid(UUID.fromString(subjectUuid));
+        try {
+          subject = entityRepository.getByUuid(UUID.fromString(subjectUuid));
+        } catch (RepositoryException e) {
+          LOGGER.error("can not get entity by UUID: " + subjectUuid, e);
+        }
       }
-      Entity object = entityRepository.getByUuid(UUID.fromString(objectUuid));
+      Entity object = null;
+      try {
+        object = entityRepository.getByUuid(UUID.fromString(objectUuid));
+      } catch (RepositoryException e) {
+        LOGGER.error("can not get entity by UUID: " + objectUuid, e);
+      }
 
       EntityToEntityRelation result = new EntityToEntityRelation();
 

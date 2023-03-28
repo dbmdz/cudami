@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
@@ -40,79 +40,10 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "items";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields()
-        + ", exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", :exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + """
-          , %1$s.exemplifies_manifestation %2$s_exemplifies_manifestation,
-          poi.label poi_label,
-          %3$s.label %2$s_manifestation_label
-          """
-            .formatted(tableAlias, mappingPrefix, ManifestationRepositoryImpl.TABLE_ALIAS);
-  }
-
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + """
-        LEFT JOIN %1$s poi ON %2$s.part_of_item = poi.uuid
-        LEFT JOIN %3$s %4$s ON %4$s.uuid = %2$s.manifestation
-        """
-            .formatted(
-                tableName,
-                tableAlias,
-                ManifestationRepositoryImpl.TABLE_NAME,
-                ManifestationRepositoryImpl.TABLE_ALIAS);
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".part_of_item "
-        + mappingPrefix
-        + "_part_of_item_uuid, "
-        + tableAlias
-        + ".manifestation "
-        + mappingPrefix
-        + "_manifestation_uuid, "
-        + agentRepository.getSqlSelectReducedFields(
-            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
-  }
-
-  @Override
-  protected String getSqlSelectReducedFieldsJoins() {
-    return super.getSqlSelectReducedFieldsJoins()
-        + """
-        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY(%1$s.holder_uuids)
-        """
-            .formatted(tableAlias, AgentRepositoryImpl.TABLE_NAME, "holdertable");
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
-  }
-
-  private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
   private final AgentRepositoryImpl agentRepository;
 
-  @Autowired
+  private final DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
+
   public ItemRepositoryImpl(
       Jdbi dbi,
       @Lazy DigitalObjectRepositoryImpl digitalObjectRepositoryImpl,
@@ -124,30 +55,33 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Item.class,
-        ItemRepositoryImpl::additionalReduceRows,
         cudamiConfig.getOffsetForAlternativePaging());
     this.digitalObjectRepositoryImpl = digitalObjectRepositoryImpl;
     this.agentRepository = agentRepository;
   }
 
-  private static void additionalReduceRows(Map<UUID, Item> map, RowView rowView) {
-    // must not be null; otherwise something went wrong earlier
-    Item item = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-    // the super item is created and filled with its UUID in extendReducedIdentifiable
-    // if there is none then we will not do anything
-    if (item.getPartOfItem() != null) {
-      if (item.getPartOfItem().getLabel() != null) return;
-      LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
-      item.getPartOfItem().setLabel(partOfItemLabel);
-    }
+  @Override
+  protected BiConsumer<Map<UUID, Item>, RowView> createAdditionalReduceRowsBiConsumer() {
+    return (map, rowView) -> {
+      // must not be null; otherwise something went wrong earlier
+      Item item = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+      // the super item is created and filled with its UUID in
+      // extendReducedIdentifiable
+      // if there is none then we will not do anything
+      if (item.getPartOfItem() != null) {
+        if (item.getPartOfItem().getLabel() != null) return;
+        LocalizedText partOfItemLabel = rowView.getColumn("poi_label", LocalizedText.class);
+        item.getPartOfItem().setLabel(partOfItemLabel);
+      }
 
-    // same for manifestation
-    if (item.getManifestation() != null) {
-      if (item.getManifestation().getLabel() != null) return;
-      LocalizedText manifestationLabel =
-          rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
-      item.getManifestation().setLabel(manifestationLabel);
-    }
+      // same for manifestation
+      if (item.getManifestation() != null) {
+        if (item.getManifestation().getLabel() != null) return;
+        LocalizedText manifestationLabel =
+            rowView.getColumn(MAPPING_PREFIX + "_manifestation_label", LocalizedText.class);
+        item.getManifestation().setLabel(manifestationLabel);
+      }
+    };
   }
 
   @Override
@@ -189,7 +123,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
-  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
+  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String doTableAlias = digitalObjectRepositoryImpl.getTableAlias();
     final String doTableName = digitalObjectRepositoryImpl.getTableName();
 
@@ -206,7 +141,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     argumentMappings.put("uuid", itemUuid);
 
     Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (digitalobject) than this repository (item)
+    // as filtering has other target object type (digitalobject) than this
+    // repository (item)
     // we have to rename filter field names to target table alias and column names:
     mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -245,7 +181,8 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     argumentMappings.put("uuid", manifestationUuid);
 
     Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (item) than this repository (manifestation)
+    // as filtering has other target object type (item) than this repository
+    // (manifestation)
     // we have to rename filter field names to target table alias and column names:
     mapFilterExpressionsToOtherTableColumnNames(filtering, this);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -317,6 +254,75 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", exemplifies_manifestation, manifestation, holder_uuids, part_of_item";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :exemplifiesManifestation, :manifestation?.uuid, :holder_uuids::UUID[], :partOfItem?.uuid";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + """
+        , %1$s.exemplifies_manifestation %2$s_exemplifies_manifestation,
+        poi.label poi_label,
+        %3$s.label %2$s_manifestation_label
+        """
+            .formatted(tableAlias, mappingPrefix, ManifestationRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN %1$s poi ON %2$s.part_of_item = poi.uuid
+        LEFT JOIN %3$s %4$s ON %4$s.uuid = %2$s.manifestation
+        """
+            .formatted(
+                tableName,
+                tableAlias,
+                ManifestationRepositoryImpl.TABLE_NAME,
+                ManifestationRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".part_of_item "
+        + mappingPrefix
+        + "_part_of_item_uuid, "
+        + tableAlias
+        + ".manifestation "
+        + mappingPrefix
+        + "_manifestation_uuid, "
+        + agentRepository.getSqlSelectReducedFields(
+            "holdertable", AgentRepositoryImpl.MAPPING_PREFIX);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + """
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY(%1$s.holder_uuids)
+        """
+            .formatted(tableAlias, AgentRepositoryImpl.TABLE_NAME, "holdertable");
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", exemplifies_manifestation=:exemplifiesManifestation, manifestation=:manifestation?.uuid, holder_uuids=:holder_uuids, part_of_item=:partOfItem?.uuid";
+  }
+
+  @Override
   public void save(Item item) throws RepositoryException {
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
@@ -328,11 +334,5 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     HashMap<String, Object> bindings = new HashMap<>();
     bindings.put("holder_uuids", extractUuids(item.getHolders()));
     super.update(item, bindings);
-  }
-
-  @Override
-  public List<Item> findItemsForWork(UUID workUuid) {
-    // TODO
-    return null;
   }
 }

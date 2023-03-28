@@ -117,6 +117,14 @@ public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<Ide
   }
 
   @Override
+  protected String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created
+    return super.getSqlUpdateFieldValues()
+        + ", label=:label, namespace=:namespace, pattern=:pattern";
+  }
+
+  @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "label":

@@ -21,7 +21,6 @@ import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
 import org.jdbi.v3.core.statement.PreparedBatch;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -36,7 +35,6 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
   private final EntityToEntityRelationMapper<Entity> entityRelationMapper;
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
 
-  @Autowired
   public EntityToEntityRelationRepositoryImpl(
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
@@ -108,7 +106,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
 
   @Override
   public PageResponse<EntityToEntityRelation> findBySubject(
-      UUID subjectUuid, PageRequest pageRequest) {
+      UUID subjectUuid, PageRequest pageRequest) throws RepositoryException {
     StringBuilder commonSql =
         new StringBuilder(
             " FROM " + tableName + " AS " + tableAlias + " WHERE subject_uuid = :uuid");

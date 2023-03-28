@@ -20,6 +20,48 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "geolocations";
 
+  @Autowired
+  public GeoLocationRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    this(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        GeoLocation.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  public GeoLocationRepositoryImpl(
+      Jdbi dbi,
+      String tableName,
+      String tableAlias,
+      String mappingPrefix,
+      Class<? extends GeoLocation> geoLocationImplClass,
+      int offsetForAlternativePaging) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        geoLocationImplClass,
+        offsetForAlternativePaging);
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "coordinateLocation":
+        return tableAlias + ".coordinate_location";
+      case "geoLocationType":
+        return tableAlias + ".geolocation_type";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
   @Override
   public String getSqlInsertFields() {
     return super.getSqlInsertFields() + ", coordinate_location, geolocation_type";
@@ -54,26 +96,5 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", coordinate_location=:coordinateLocation::JSONB";
-  }
-
-  @Autowired
-  public GeoLocationRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    this(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        GeoLocation.class,
-        cudamiConfig.getOffsetForAlternativePaging());
-  }
-
-  public GeoLocationRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends GeoLocation> entityImplClass,
-      int offsetForAlternativePaging) {
-    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
   }
 }

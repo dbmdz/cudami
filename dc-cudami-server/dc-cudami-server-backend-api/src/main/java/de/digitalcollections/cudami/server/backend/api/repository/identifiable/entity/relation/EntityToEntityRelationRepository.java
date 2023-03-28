@@ -20,23 +20,23 @@ public interface EntityToEntityRelationRepository
   void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
       throws RepositoryException;
 
-  default void deleteByObject(Entity objectEntity) {
+  default void deleteByObject(Entity objectEntity) throws RepositoryException {
     if (objectEntity == null) {
       throw new IllegalArgumentException("object entity must not be null");
     }
     deleteByObject(objectEntity.getUuid());
   }
 
-  void deleteByObject(UUID objectEntityUuid);
+  void deleteByObject(UUID objectEntityUuid) throws RepositoryException;
 
-  default void deleteBySubject(Entity subjectEntity) {
+  default void deleteBySubject(Entity subjectEntity) throws RepositoryException {
     deleteBySubject(subjectEntity.getUuid());
   }
 
-  void deleteBySubject(UUID subjectEntityUuid);
+  void deleteBySubject(UUID subjectEntityUuid) throws RepositoryException;
 
   default PageResponse<EntityToEntityRelation> findBySubject(
-      Entity subjectEntity, PageRequest pageRequest) {
+      Entity subjectEntity, PageRequest pageRequest) throws RepositoryException {
     if (subjectEntity == null) {
       throw new IllegalArgumentException("subject entity must not be null");
     }
@@ -44,7 +44,7 @@ public interface EntityToEntityRelationRepository
   }
 
   PageResponse<EntityToEntityRelation> findBySubject(
-      UUID subjectEntityUuid, PageRequest pageRequest);
+      UUID subjectEntityUuid, PageRequest pageRequest) throws RepositoryException;
 
   default void save(EntityToEntityRelation relation) throws RepositoryException {
     save(List.of(relation));

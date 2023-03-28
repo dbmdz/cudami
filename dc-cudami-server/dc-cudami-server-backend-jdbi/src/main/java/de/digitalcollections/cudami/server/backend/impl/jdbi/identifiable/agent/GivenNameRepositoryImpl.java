@@ -27,7 +27,6 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
         TABLE_ALIAS,
         MAPPING_PREFIX,
         GivenName.class,
-        null,
         cudamiConfig.getOffsetForAlternativePaging());
   }
 

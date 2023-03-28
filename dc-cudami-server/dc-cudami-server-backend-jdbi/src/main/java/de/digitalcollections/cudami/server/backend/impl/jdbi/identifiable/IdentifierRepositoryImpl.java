@@ -77,7 +77,7 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
     }
     switch (modelProperty) {
       case "id":
-        return tableAlias + ".id";
+        return tableAlias + ".identifier";
       case "identifiable":
         return tableAlias + ".identifiable";
       case "namespace":
@@ -123,6 +123,14 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
         + ".identifier "
         + mappingPrefix
         + "_id";
+  }
+
+  @Override
+  protected String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created
+    return super.getSqlUpdateFieldValues()
+        + ", identifiable=:identifiable, namespace=:namespace, identifier=:id";
   }
 
   @Override

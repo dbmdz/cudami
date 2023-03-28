@@ -48,77 +48,431 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalObjectRepositoryImpl.class);
 
-  public static final String TABLE_NAME = "digitalobjects";
   public static final String MAPPING_PREFIX = "do";
   public static final String TABLE_ALIAS = "d";
+  public static final String TABLE_NAME = "digitalobjects";
 
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + " LEFT JOIN "
-        + LicenseRepositoryImpl.TABLE_NAME
-        + " AS "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + " ON "
-        + TABLE_ALIAS
-        + ".license_uuid = "
-        + LicenseRepositoryImpl.TABLE_ALIAS
-        + ".uuid";
+  @Lazy @Autowired private EntityRepositoryImpl<Agent> agentEntityRepositoryImpl;
+
+  @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
+
+  @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
+
+  @Lazy @Autowired
+  private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
+
+  @Lazy @Autowired private EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl;
+
+  @Lazy @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
+
+  @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
+
+  @Lazy @Autowired
+  private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
+
+  @Lazy @Autowired private PersonRepositoryImpl personRepositoryImpl;
+
+  @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
+
+  public DigitalObjectRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        DigitalObject.class,
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override
-  protected String getSqlSelectReducedFieldsJoins() {
-    return super.getSqlSelectReducedFieldsJoins()
-        + " LEFT JOIN %1$s %2$s ON %2$s.uuid = %3$s.item_uuid"
-            .formatted(ItemRepositoryImpl.TABLE_NAME, ItemRepositoryImpl.TABLE_ALIAS, TABLE_ALIAS);
+  protected BiConsumer<Map<UUID, DigitalObject>, RowView> createAdditionalReduceRowsBiConsumer() {
+    return (map, rowView) -> {
+      DigitalObject digitalObject =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+
+      // Try to fill license subresource with uuid, url and label
+      License license = rowView.getRow(License.class);
+      if (license.getUuid() != null) {
+        digitalObject.setLicense(license);
+      }
+
+      // Try to fill UUID of geolocation of creator
+      UUID creationCreatorUuid =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
+      LocalDate creationDate =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
+      UUID creationGeolocationUuid =
+          rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
+
+      // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date
+      // is set,
+      // We must build the CreationInfo object
+      if (creationCreatorUuid != null || creationDate != null || creationGeolocationUuid != null) {
+        CreationInfo creationInfo = new CreationInfo();
+        if (creationCreatorUuid != null) {
+          creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
+        }
+        if (creationDate != null) {
+          creationInfo.setDate(creationDate);
+        }
+        if (creationGeolocationUuid != null) {
+          creationInfo.setGeoLocation(GeoLocation.builder().uuid(creationGeolocationUuid).build());
+        }
+        digitalObject.setCreationInfo(creationInfo);
+      }
+
+      Integer numberOfBinaryResources =
+          rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
+      if (numberOfBinaryResources != null) {
+        digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
+      }
+    };
   }
 
-  private static final BiConsumer<Map<UUID, DigitalObject>, RowView>
-      ADDITIONAL_REDUCE_ROWS_BICONSUMER =
-          (map, rowView) -> {
-            DigitalObject digitalObject =
-                map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+  @Override
+  public void deleteFileResources(UUID digitalObjectUuid) {
+    dbi.withHandle(
+        h ->
+            h.createUpdate(
+                    "DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
+                .bind("uuid", digitalObjectUuid)
+                .execute());
+  }
 
-            // Try to fill license subresource with uuid, url and label
-            License license = rowView.getRow(License.class);
-            if (license.getUuid() != null) {
-              digitalObject.setLicense(license);
-            }
+  @Override
+  protected void extendReducedIdentifiable(DigitalObject identifiable, RowView rowView) {
+    super.extendReducedIdentifiable(identifiable, rowView);
 
-            // Try to fill UUID of geolocation of creator
-            UUID creationCreatorUuid =
-                rowView.getColumn(MAPPING_PREFIX + "_creation_creator_uuid", UUID.class);
-            LocalDate creationDate =
-                rowView.getColumn(MAPPING_PREFIX + "_creation_date", LocalDate.class);
-            UUID creationGeolocationUuid =
-                rowView.getColumn(MAPPING_PREFIX + "_creation_geolocation_uuid", UUID.class);
+    // Fill the parent (empty, only with uuid), if present.
+    UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      identifiable.setParent(DigitalObject.builder().uuid(parentUuid).build());
+    }
 
-            // If any of creation.creator.uuid, creation.geolocation.uuid or creation.date
-            // is set,
-            // We must build the CreationInfo object
-            if (creationCreatorUuid != null
-                || creationDate != null
-                || creationGeolocationUuid != null) {
-              CreationInfo creationInfo = new CreationInfo();
-              if (creationCreatorUuid != null) {
-                creationInfo.setCreator(Agent.builder().uuid(creationCreatorUuid).build());
-              }
-              if (creationDate != null) {
-                creationInfo.setDate(creationDate);
-              }
-              if (creationGeolocationUuid != null) {
-                creationInfo.setGeoLocation(
-                    GeoLocation.builder().uuid(creationGeolocationUuid).build());
-              }
-              digitalObject.setCreationInfo(creationInfo);
-            }
+    // set item UUID and label only
+    UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
+    LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
+    if (itemUuid != null) {
+      identifiable.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
+    }
+  }
 
-            Integer numberOfBinaryResources =
-                rowView.getColumn(MAPPING_PREFIX + "_number_binaryresources", Integer.class);
-            if (numberOfBinaryResources != null) {
-              digitalObject.setNumberOfBinaryResources(numberOfBinaryResources);
-            }
-          };
+  private void fillAttributes(DigitalObject digitalObject) throws RepositoryException {
+    if (digitalObject == null) {
+      return;
+    }
+
+    // Fill the previewImage
+    UUID previewImageUuid =
+        digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;
+    if (previewImageUuid != null) {
+      digitalObject.setPreviewImage(imageFileResourceRepositoryImpl.getByUuid(previewImageUuid));
+    }
+
+    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their
+    // objects
+    CreationInfo creationInfo = digitalObject.getCreationInfo();
+    if (creationInfo != null) {
+      UUID creatorUuid =
+          creationInfo.getCreator() != null ? creationInfo.getCreator().getUuid() : null;
+      if (creatorUuid != null) {
+        // Can be either a CorporateBody or a Person
+        Agent creatorEntity = agentEntityRepositoryImpl.getByUuid(creatorUuid);
+        if (creatorEntity != null) {
+          switch (creatorEntity.getIdentifiableObjectType()) {
+            case CORPORATE_BODY:
+              creationInfo.setCreator(corporateBodyRepositoryImpl.getByUuid(creatorUuid));
+              break;
+            case PERSON:
+              creationInfo.setCreator(personRepositoryImpl.getByUuid(creatorUuid));
+              break;
+            default:
+              creationInfo.setCreator(creatorEntity);
+          }
+        }
+      }
+
+      UUID geolocationUuid =
+          creationInfo.getGeoLocation() != null ? creationInfo.getGeoLocation().getUuid() : null;
+      if (geolocationUuid != null) {
+        // Can be a GeoLocation or a HumanSettlement at the moment
+        GeoLocation geolocationEntity = geolocationEntityRepositoryImpl.getByUuid(geolocationUuid);
+        if (geolocationEntity != null) {
+          switch (geolocationEntity.getIdentifiableObjectType()) {
+              // FIXME: Why no HUMAN_SETTLEMENT here?
+            default:
+              creationInfo.setGeoLocation(geoLocationRepositoryImpl.getByUuid(geolocationUuid));
+          }
+        }
+      }
+
+      UUID parentUuid =
+          digitalObject.getParent() != null ? digitalObject.getParent().getUuid() : null;
+      if (parentUuid != null) {
+        DigitalObject parent = getByUuid(parentUuid);
+        if (parent != null) {
+          digitalObject.setParent(parent);
+        }
+      }
+    }
+  }
+
+  @Override
+  public PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException {
+    final String crossTableAlias = "xtable";
+
+    final String collectionTableAlias = collectionRepositoryImpl.getTableAlias();
+    final String collectionTableName = collectionRepositoryImpl.getTableName();
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + collectionTableName
+                + " AS "
+                + collectionTableAlias
+                + " INNER JOIN collection_digitalobjects AS "
+                + crossTableAlias
+                + " ON "
+                + collectionTableAlias
+                + ".uuid = "
+                + crossTableAlias
+                + ".collection_uuid"
+                + " WHERE "
+                + crossTableAlias
+                + ".digitalobject_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("uuid", digitalObjectUuid);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (collection) than this repository
+    // (digitalobject)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, collectionRepositoryImpl);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    List<Collection> result =
+        collectionRepositoryImpl.retrieveList(
+            collectionRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  public List<FileResource> findFileResources(UUID digitalObjectUuid) throws RepositoryException {
+    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
+    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT df.sortindex AS idx, * FROM "
+                + frTableName
+                + " AS "
+                + frTableAlias
+                + " INNER JOIN digitalobject_fileresources AS df ON "
+                + frTableAlias
+                + ".uuid = df.fileresource_uuid"
+                + " WHERE df.digitalobject_uuid = :uuid"
+                + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<FileResource> fileResources =
+        fileResourceMetadataRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return fileResources;
+  }
+
+  @Override
+  public PageResponse<FileResource> findFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public List<ImageFileResource> findImageFileResources(UUID digitalObjectUuid)
+      throws RepositoryException {
+    final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
+    final String frTableName = imageFileResourceRepositoryImpl.getTableName();
+    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT df.sortindex AS idx, * FROM "
+                + frTableName
+                + " AS "
+                + frTableAlias
+                + " INNER JOIN digitalobject_fileresources AS df ON "
+                + frTableAlias
+                + ".uuid = df.fileresource_uuid"
+                + " WHERE df.digitalobject_uuid = :uuid"
+                + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<ImageFileResource> fileResources =
+        imageFileResourceRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return fileResources;
+  }
+
+  @Override
+  public PageResponse<ImageFileResource> findImageFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException {
+    final String crossTableAlias = "xtable";
+
+    final String prTableAlias = projectRepositoryImpl.getTableAlias();
+    final String prTableName = projectRepositoryImpl.getTableName();
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + prTableName
+                + " AS "
+                + prTableAlias
+                + " INNER JOIN project_digitalobjects AS "
+                + crossTableAlias
+                + " ON "
+                + prTableAlias
+                + ".uuid = "
+                + crossTableAlias
+                + ".project_uuid"
+                + " WHERE "
+                + crossTableAlias
+                + ".digitalobject_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+    argumentMappings.put("uuid", digitalObjectUuid);
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (project) than this repository
+    // (digitalobject)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, projectRepositoryImpl);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery =
+        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
+    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    List<Project> result =
+        projectRepositoryImpl.retrieveList(
+            projectRepositoryImpl.getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            orderBy);
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  /**
+   * Returns the fully filled DigitalObject including all of its direct attributes.
+   *
+   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
+   * UUID set, and the client is responsible for retrieving the whole item object!
+   */
+  public DigitalObject getByIdentifier(Identifier identifier) throws RepositoryException {
+    DigitalObject digitalObject = super.getByIdentifier(identifier);
+    fillAttributes(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  /**
+   * Returns the fully filled DigitalObject including all of its direct attributes.
+   *
+   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
+   * UUID set, and the client is responsible for retrieving the whole item object!
+   */
+  public DigitalObject getByUuidAndFiltering(UUID uuid, Filtering filtering)
+      throws RepositoryException {
+    DigitalObject digitalObject = super.getByUuidAndFiltering(uuid, filtering);
+    fillAttributes(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    if (super.getColumnName(modelProperty) != null) {
+      return super.getColumnName(modelProperty);
+    }
+    return null;
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfCollections(UUID uuid) {
+    String collectionTable = this.collectionRepositoryImpl.getTableName();
+    String collectionAlias = this.collectionRepositoryImpl.getTableAlias();
+
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + collectionAlias
+            + ".label) as languages"
+            + " FROM "
+            + collectionTable
+            + " AS "
+            + collectionAlias
+            + " INNER JOIN collection_digitalobjects AS cd ON "
+            + collectionAlias
+            + ".uuid = cd.collection_uuid"
+            + " WHERE cd.digitalobject_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) {
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + tableAlias
+            + ".label)"
+            + " FROM "
+            + tableName
+            + " AS "
+            + tableAlias
+            + String.format(" WHERE %s.parent_uuid = :uuid;", tableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfProjects(UUID uuid) {
+    String projectTable = this.projectRepositoryImpl.getTableName();
+    String projectAlias = this.projectRepositoryImpl.getTableAlias();
+
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + projectAlias
+            + ".label) as languages"
+            + " FROM "
+            + projectTable
+            + " AS "
+            + projectAlias
+            + " INNER JOIN project_digitalobjects AS pd ON "
+            + projectAlias
+            + ".uuid = pd.project_uuid"
+            + " WHERE pd.digitalobject_uuid = :uuid";
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
+  }
 
   @Override
   public String getSqlInsertFields() {
@@ -191,6 +545,20 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + " LEFT JOIN "
+        + LicenseRepositoryImpl.TABLE_NAME
+        + " AS "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + " ON "
+        + TABLE_ALIAS
+        + ".license_uuid = "
+        + LicenseRepositoryImpl.TABLE_ALIAS
+        + ".uuid";
+  }
+
+  @Override
   public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
         + """
@@ -198,6 +566,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         %1$s.item_uuid %2$s_item_uuid,
         %3$s.label item_label"""
             .formatted(tableAlias, mappingPrefix, ItemRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + " LEFT JOIN %1$s %2$s ON %2$s.uuid = %3$s.item_uuid"
+            .formatted(ItemRepositoryImpl.TABLE_NAME, ItemRepositoryImpl.TABLE_ALIAS, TABLE_ALIAS);
   }
 
   @Override
@@ -210,367 +585,6 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         + ", license_uuid=:license?.uuid"
         + ", number_binaryresources=:numberOfBinaryResources"
         + ", parent_uuid=:parent?.uuid";
-  }
-
-  @Lazy @Autowired private EntityRepositoryImpl<Agent> agentEntityRepositoryImpl;
-
-  @Lazy @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
-
-  @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
-
-  @Lazy @Autowired
-  private FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepositoryImpl;
-
-  @Lazy @Autowired private GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl;
-  @Lazy @Autowired private EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl;
-
-  @Lazy @Autowired private ImageFileResourceRepositoryImpl imageFileResourceRepositoryImpl;
-
-  @Lazy @Autowired
-  private LinkedDataFileResourceRepositoryImpl linkedDataFileResourceRepositoryImpl;
-
-  @Lazy @Autowired private PersonRepositoryImpl personRepositoryImpl;
-
-  @Lazy @Autowired private ProjectRepositoryImpl projectRepositoryImpl;
-
-  @Autowired
-  public DigitalObjectRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        DigitalObject.class,
-        ADDITIONAL_REDUCE_ROWS_BICONSUMER,
-        cudamiConfig.getOffsetForAlternativePaging());
-  }
-
-  @Override
-  public void deleteFileResources(UUID digitalObjectUuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate(
-                    "DELETE FROM digitalobject_fileresources WHERE digitalobject_uuid = :uuid")
-                .bind("uuid", digitalObjectUuid)
-                .execute());
-  }
-
-  @Override
-  protected void extendReducedIdentifiable(DigitalObject identifiable, RowView rowView) {
-    super.extendReducedIdentifiable(identifiable, rowView);
-
-    // Fill the parent (empty, only with uuid), if present.
-    UUID parentUuid = rowView.getColumn(MAPPING_PREFIX + "_parent_uuid", UUID.class);
-    if (parentUuid != null) {
-      identifiable.setParent(DigitalObject.builder().uuid(parentUuid).build());
-    }
-
-    // set item UUID and label only
-    UUID itemUuid = rowView.getColumn(MAPPING_PREFIX + "_item_uuid", UUID.class);
-    LocalizedText itemLabel = rowView.getColumn("item_label", LocalizedText.class);
-    if (itemUuid != null) {
-      identifiable.setItem(Item.builder().uuid(itemUuid).label(itemLabel).build());
-    }
-  }
-
-  private void fillAttributes(DigitalObject digitalObject) {
-    if (digitalObject == null) {
-      return;
-    }
-
-    // Fill the previewImage
-    UUID previewImageUuid =
-        digitalObject.getPreviewImage() != null ? digitalObject.getPreviewImage().getUuid() : null;
-    if (previewImageUuid != null) {
-      digitalObject.setPreviewImage(imageFileResourceRepositoryImpl.getByUuid(previewImageUuid));
-    }
-
-    // If CreationInfo is set, retrieve the UUIDs of agent and place and fill their
-    // objects
-    CreationInfo creationInfo = digitalObject.getCreationInfo();
-    if (creationInfo != null) {
-      UUID creatorUuid =
-          creationInfo.getCreator() != null ? creationInfo.getCreator().getUuid() : null;
-      if (creatorUuid != null) {
-        // Can be either a CorporateBody or a Person
-        Agent creatorEntity = agentEntityRepositoryImpl.getByUuid(creatorUuid);
-        if (creatorEntity != null) {
-          switch (creatorEntity.getIdentifiableObjectType()) {
-            case CORPORATE_BODY:
-              creationInfo.setCreator(corporateBodyRepositoryImpl.getByUuid(creatorUuid));
-              break;
-            case PERSON:
-              creationInfo.setCreator(personRepositoryImpl.getByUuid(creatorUuid));
-              break;
-            default:
-              creationInfo.setCreator(creatorEntity);
-          }
-        }
-      }
-
-      UUID geolocationUuid =
-          creationInfo.getGeoLocation() != null ? creationInfo.getGeoLocation().getUuid() : null;
-      if (geolocationUuid != null) {
-        // Can be a GeoLocation or a HumanSettlement at the moment
-        GeoLocation geolocationEntity = geolocationEntityRepositoryImpl.getByUuid(geolocationUuid);
-        if (geolocationEntity != null) {
-          switch (geolocationEntity.getIdentifiableObjectType()) {
-              // FIXME: Why no HUMAN_SETTLEMENT here?
-            default:
-              creationInfo.setGeoLocation(geoLocationRepositoryImpl.getByUuid(geolocationUuid));
-          }
-        }
-      }
-
-      UUID parentUuid =
-          digitalObject.getParent() != null ? digitalObject.getParent().getUuid() : null;
-      if (parentUuid != null) {
-        DigitalObject parent = getByUuid(parentUuid);
-        if (parent != null) {
-          digitalObject.setParent(parent);
-        }
-      }
-    }
-  }
-
-  @Override
-  public PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
-    final String crossTableAlias = "xtable";
-
-    final String collectionTableAlias = collectionRepositoryImpl.getTableAlias();
-    final String collectionTableName = collectionRepositoryImpl.getTableName();
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + collectionTableName
-                + " AS "
-                + collectionTableAlias
-                + " INNER JOIN collection_digitalobjects AS "
-                + crossTableAlias
-                + " ON "
-                + collectionTableAlias
-                + ".uuid = "
-                + crossTableAlias
-                + ".collection_uuid"
-                + " WHERE "
-                + crossTableAlias
-                + ".digitalobject_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-    argumentMappings.put("uuid", digitalObjectUuid);
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (collection) than this repository
-    // (digitalobject)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, collectionRepositoryImpl);
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery =
-        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
-    List<Collection> result =
-        collectionRepositoryImpl.retrieveList(
-            collectionRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
-    final String crossTableAlias = "xtable";
-
-    final String prTableAlias = projectRepositoryImpl.getTableAlias();
-    final String prTableName = projectRepositoryImpl.getTableName();
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + prTableName
-                + " AS "
-                + prTableAlias
-                + " INNER JOIN project_digitalobjects AS "
-                + crossTableAlias
-                + " ON "
-                + prTableAlias
-                + ".uuid = "
-                + crossTableAlias
-                + ".project_uuid"
-                + " WHERE "
-                + crossTableAlias
-                + ".digitalobject_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-    argumentMappings.put("uuid", digitalObjectUuid);
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (project) than this repository
-    // (digitalobject)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, projectRepositoryImpl);
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery =
-        new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
-    List<Project> result =
-        projectRepositoryImpl.retrieveList(
-            projectRepositoryImpl.getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            orderBy);
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  /**
-   * Returns the fully filled DigitalObject including all of its direct attributes.
-   *
-   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
-   * UUID set, and the client is responsible for retrieving the whole item object!
-   */
-  public DigitalObject getByIdentifier(Identifier identifier) {
-    DigitalObject digitalObject = super.getByIdentifier(identifier);
-    fillAttributes(digitalObject);
-    return digitalObject;
-  }
-
-  @Override
-  /**
-   * Returns the fully filled DigitalObject including all of its direct attributes.
-   *
-   * <p>If a belonging item exists for this DigitalObject, the Item is returned with nothing but its
-   * UUID set, and the client is responsible for retrieving the whole item object!
-   */
-  public DigitalObject getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    DigitalObject digitalObject = super.getByUuidAndFiltering(uuid, filtering);
-    fillAttributes(digitalObject);
-    return digitalObject;
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
-    return null;
-  }
-
-  @Override
-  public List<FileResource> findFileResources(UUID digitalObjectUuid) {
-    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
-    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT df.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN digitalobject_fileresources AS df ON "
-                + frTableAlias
-                + ".uuid = df.fileresource_uuid"
-                + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<FileResource> fileResources =
-        fileResourceMetadataRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return fileResources;
-  }
-
-  @Override
-  public List<ImageFileResource> findImageFileResources(UUID digitalObjectUuid) {
-    final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
-    final String frTableName = imageFileResourceRepositoryImpl.getTableName();
-    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT df.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN digitalobject_fileresources AS df ON "
-                + frTableAlias
-                + ".uuid = df.fileresource_uuid"
-                + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<ImageFileResource> fileResources =
-        imageFileResourceRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return fileResources;
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfCollections(UUID uuid) {
-    String collectionTable = this.collectionRepositoryImpl.getTableName();
-    String collectionAlias = this.collectionRepositoryImpl.getTableAlias();
-
-    String sql =
-        "SELECT DISTINCT jsonb_object_keys("
-            + collectionAlias
-            + ".label) as languages"
-            + " FROM "
-            + collectionTable
-            + " AS "
-            + collectionAlias
-            + " INNER JOIN collection_digitalobjects AS cd ON "
-            + collectionAlias
-            + ".uuid = cd.collection_uuid"
-            + " WHERE cd.digitalobject_uuid = :uuid";
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) {
-    String sql =
-        "SELECT DISTINCT jsonb_object_keys("
-            + tableAlias
-            + ".label)"
-            + " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + String.format(" WHERE %s.parent_uuid = :uuid;", tableAlias);
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfProjects(UUID uuid) {
-    String projectTable = this.projectRepositoryImpl.getTableName();
-    String projectAlias = this.projectRepositoryImpl.getTableAlias();
-
-    String sql =
-        "SELECT DISTINCT jsonb_object_keys("
-            + projectAlias
-            + ".label) as languages"
-            + " FROM "
-            + projectTable
-            + " AS "
-            + projectAlias
-            + " INNER JOIN project_digitalobjects AS pd ON "
-            + projectAlias
-            + ".uuid = pd.project_uuid"
-            + " WHERE pd.digitalobject_uuid = :uuid";
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Locale.class).list());
   }
 
   @Override
@@ -639,14 +653,14 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     return findFileResources(digitalObjectUuid);
   }
 
-  public void setGeoLocationRepositoryImpl(
-      GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl) {
-    this.geoLocationRepositoryImpl = geoLocationRepositoryImpl;
-  }
-
   public void setGeolocationEntityRepositoryImpl(
       EntityRepositoryImpl<GeoLocation> geolocationEntityRepositoryImpl) {
     this.geolocationEntityRepositoryImpl = geolocationEntityRepositoryImpl;
+  }
+
+  public void setGeoLocationRepositoryImpl(
+      GeoLocationRepositoryImpl<GeoLocation> geoLocationRepositoryImpl) {
+    this.geoLocationRepositoryImpl = geoLocationRepositoryImpl;
   }
 
   public void setLinkedDataFileResourceRepository(
@@ -656,10 +670,5 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
   public void setPersonRepository(PersonRepositoryImpl personRepositoryImpl) {
     this.personRepositoryImpl = personRepositoryImpl;
-  }
-
-  @Override
-  public void update(DigitalObject digitalObject) throws RepositoryException {
-    super.update(digitalObject);
   }
 }

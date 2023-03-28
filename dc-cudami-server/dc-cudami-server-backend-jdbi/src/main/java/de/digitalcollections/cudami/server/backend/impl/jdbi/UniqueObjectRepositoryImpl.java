@@ -331,7 +331,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   /**
    * @return SQL for fields of full field set of {@code UniqueObject}
    */
-  protected String getSqlSelectAllFields() {
+  public String getSqlSelectAllFields() {
     return getSqlSelectAllFields(tableAlias, mappingPrefix);
   }
 

@@ -21,15 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -42,8 +39,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
-  @Autowired
-  private EntityRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public EntityRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     this(
         dbi,
         TABLE_NAME,
@@ -53,39 +49,14 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         cudamiConfig.getOffsetForAlternativePaging());
   }
 
-  protected EntityRepositoryImpl(
-      Jdbi dbi,
-      String tableName,
-      String tableAlias,
-      String mappingPrefix,
-      Class<? extends Entity> entityImplClass,
-      BiConsumer<Map<UUID, E>, RowView> additionalReduceRowsBiConsumer,
-      int offsetForAlternativePaging) {
-    super(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        additionalReduceRowsBiConsumer,
-        offsetForAlternativePaging);
-  }
-
-  protected EntityRepositoryImpl(
+  public EntityRepositoryImpl(
       Jdbi dbi,
       String tableName,
       String tableAlias,
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
       int offsetForAlternativePaging) {
-    this(
-        dbi,
-        tableName,
-        tableAlias,
-        mappingPrefix,
-        entityImplClass,
-        null,
-        offsetForAlternativePaging);
+    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
   }
 
   @Override
@@ -182,6 +153,18 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
         return tableAlias + ".navdate";
       case "refId":
         return tableAlias + ".refid";
+      case "name":
+        if (this instanceof NamedEntity) {
+          return "name";
+        } else {
+          return null;
+        }
+      case "nameLocalesOfOriginalScripts":
+        if (this instanceof NamedEntity) {
+          return "name_locales_original_scripts";
+        } else {
+          return null;
+        }
       case "notes":
         return tableAlias + ".notes";
       default:
@@ -201,7 +184,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public List<E> getRandom(int count) throws RepositoryException {
-    // Warning: could be very slow if random is used on tables with many million records
+    // Warning: could be very slow if random is used on tables with many million
+    // records
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
         new StringBuilder("SELECT * FROM " + tableName + " ORDER BY RANDOM() LIMIT " + count);

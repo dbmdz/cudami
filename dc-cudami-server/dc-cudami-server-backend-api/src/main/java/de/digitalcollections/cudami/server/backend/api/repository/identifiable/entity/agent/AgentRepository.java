@@ -1,11 +1,13 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import java.util.Set;
 import java.util.UUID;
 
 public interface AgentRepository<A extends Agent> extends EntityRepository<A> {
@@ -27,4 +29,10 @@ public interface AgentRepository<A extends Agent> extends EntityRepository<A> {
   }
 
   PageResponse<Work> findWorks(UUID agentUuid, PageRequest pageRequest);
+
+  // FIXME: replace with pagerequest method
+  Set<DigitalObject> getDigitalObjects(UUID uuidAgent) throws RepositoryException;
+
+  // FIXME: replace with pagerequest method
+  Set<Work> getWorks(UUID uuidAgent);
 }

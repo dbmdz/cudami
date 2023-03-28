@@ -151,7 +151,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       String tableAlias,
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
-      BiConsumer<Map<UUID, I>, RowView> additionalReduceRowsBiConsumer,
       int offsetForAlternativePaging) {
     super(
         dbi,

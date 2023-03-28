@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+// FIXME: move to a repo?, no "helper/util" classes, please
 public class TitleSqlHelper {
 
   public static BiFunction<String, Map<String, Object>, String> buildTitleSql(

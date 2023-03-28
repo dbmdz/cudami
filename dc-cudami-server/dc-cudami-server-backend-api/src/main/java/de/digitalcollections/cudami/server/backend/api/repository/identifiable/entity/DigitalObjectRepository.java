@@ -18,41 +18,51 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   void deleteFileResources(UUID digitalObjectUuid);
 
   default PageResponse<Collection> findCollections(
-      DigitalObject digitalObject, PageRequest pageRequest) {
+      DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     if (digitalObject == null) {
       return null;
     }
     return findCollections(digitalObject.getUuid(), pageRequest);
   }
 
-  PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest);
+  PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   default PageResponse<FileResource> findFileResources(
-      DigitalObject digitalObject, PageRequest pageRequest) {
+      DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     if (digitalObject == null) {
       return null;
     }
     return findFileResources(digitalObject.getUuid(), pageRequest);
   }
 
-  PageResponse<FileResource> findFileResources(UUID digitalObjectUuid, PageRequest pageRequest);
+  // FIXME: replace with pagerequest method
+  List<FileResource> findFileResources(UUID digitalObjectUuid) throws RepositoryException;
+
+  PageResponse<FileResource> findFileResources(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   default PageResponse<ImageFileResource> findImageFileResources(
-      DigitalObject digitalObject, PageRequest pageRequest) {
+      DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     return findImageFileResources(digitalObject.getUuid(), pageRequest);
   }
 
-  PageResponse<ImageFileResource> findImageFileResources(
-      UUID digitalObjectUuid, PageRequest pageRequest);
+  // FIXME: replace with pagerequest method
+  List<ImageFileResource> findImageFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
-  default PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest) {
+  PageResponse<ImageFileResource> findImageFileResources(
+      UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException;
+
+  default PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
+      throws RepositoryException {
     if (digitalObject == null) {
       return null;
     }
     return findProjects(digitalObject.getUuid(), pageRequest);
   }
 
-  PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest);
+  PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   List<Locale> getLanguagesOfCollections(UUID uuid);
 

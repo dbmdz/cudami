@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.TopicRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -25,7 +26,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,7 +40,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
   private final FileResourceMetadataRepositoryImpl fileResourceMetadataRepositoryImpl;
 
-  @Autowired
   public TopicRepositoryImpl(
       Jdbi dbi,
       EntityRepositoryImpl entityRepositoryImpl,
@@ -58,7 +57,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) throws RepositoryException {
     if (parentUuid == null || childrenUuids == null) {
       return false;
     }
@@ -86,7 +85,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     StringBuilder commonSql =
@@ -123,7 +123,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<Entity> findEntities(UUID topicUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String entityTableAlias = entityRepositoryImpl.getTableAlias();
@@ -169,7 +170,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest) {
+  public PageResponse<FileResource> findFileResources(UUID topicUuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
@@ -215,7 +217,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<Topic> findRootNodes(PageRequest pageRequest) throws RepositoryException {
     String commonSql =
         " FROM "
             + tableName
@@ -225,6 +227,56 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
             + tableAlias
             + ".uuid)";
     return find(pageRequest, commonSql);
+  }
+
+  @Override
+  public List<Topic> findTopicsOfEntity(UUID entityUuid) throws RepositoryException {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_entities te ON "
+                + tableAlias
+                + ".uuid = te.topic_uuid"
+                + " WHERE te.entity_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", entityUuid);
+
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
+    return result;
+  }
+
+  @Override
+  public PageResponse<Topic> findTopicsOfEntity(UUID entityUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public List<Topic> findTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT * FROM "
+                + tableName
+                + " AS "
+                + tableAlias
+                + " INNER JOIN topic_fileresources tf ON "
+                + tableAlias
+                + ".uuid = tf.topic_uuid"
+                + " WHERE tf.fileresource_uuid = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", fileResourceUuid);
+    List<Topic> result =
+        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
+    return result;
+  }
+
+  @Override
+  public PageResponse<Topic> findTopicsOfFileResource(
+      UUID fileResourceUuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -268,7 +320,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getByIdentifier(Identifier identifier) {
+  public Topic getByIdentifier(Identifier identifier) throws RepositoryException {
     Topic topic = super.getByIdentifier(identifier);
 
     if (topic != null) {
@@ -278,7 +330,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Topic getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Topic topic = super.getByUuidAndFiltering(uuid, filtering);
 
     if (topic != null) {
@@ -288,7 +340,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getChildren(UUID uuid) {
+  public List<Topic> getChildren(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT tt.sortindex AS idx, * FROM "
@@ -309,7 +361,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID topicUuid) {
+  public List<FileResource> getFileResources(UUID topicUuid) throws RepositoryException {
     PageResponse<FileResource> response;
     PageRequest request = new PageRequest(0, 100);
     Set<FileResource> fileResources = new HashSet<>();
@@ -364,7 +416,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic getParent(UUID nodeUuid) {
+  public Topic getParent(UUID nodeUuid) throws RepositoryException {
     String sqlAdditionalJoins =
         " INNER JOIN topic_topics tt ON " + tableAlias + ".uuid = tt.parent_topic_uuid";
 
@@ -383,7 +435,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> getParents(UUID uuid) {
+  public List<Topic> getParents(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -419,45 +471,6 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> findTopicsOfEntity(UUID entityUuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN topic_entities te ON "
-                + tableAlias
-                + ".uuid = te.topic_uuid"
-                + " WHERE te.entity_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", entityUuid);
-
-    List<Topic> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
-    return result;
-  }
-
-  @Override
-  public List<Topic> findTopicsOfFileResource(UUID fileResourceUuid) {
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT * FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + " INNER JOIN topic_fileresources tf ON "
-                + tableAlias
-                + ".uuid = tf.topic_uuid"
-                + " WHERE tf.fileresource_uuid = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", fileResourceUuid);
-    List<Topic> result =
-        retrieveList(getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
-    return result;
-  }
-
-  @Override
   public boolean removeChild(UUID parentUuid, UUID childUuid) {
     if (parentUuid == null || childUuid == null) {
       return false;
@@ -475,7 +488,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public Topic saveWithParent(UUID childUuid, UUID parentUuid) {
+  public Topic saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "topic_topics", "parent_topic_uuid", parentUuid);
@@ -494,7 +507,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities) {
+  public List<Entity> setEntities(UUID topicUuid, List<Entity> entities)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -527,7 +541,8 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources) {
+  public List<FileResource> setFileResources(UUID topicUuid, List<FileResource> fileResources)
+      throws RepositoryException {
     // as we store the whole list new: delete old entries
     dbi.withHandle(
         h ->
@@ -556,9 +571,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Topic> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) {
     if (parentUuid == null || children == null) {
-      return false;
+      throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     String query =
         "UPDATE topic_topics"
@@ -568,10 +583,10 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
         h -> {
           PreparedBatch batch = h.prepareBatch(query);
           int idx = 0;
-          for (Topic child : children) {
+          for (UUID uuidChild : children) {
             batch
                 .bind("idx", idx++)
-                .bind("childUuid", child.getUuid())
+                .bind("childUuid", uuidChild)
                 .bind("parentUuid", parentUuid)
                 .add();
           }

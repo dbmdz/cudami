@@ -10,66 +10,85 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Subject;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 @Repository
 public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     implements SubjectRepository {
 
-  public static final String TABLE_NAME = "subjects";
-  public static final String TABLE_ALIAS = "subj";
   public static final String MAPPING_PREFIX = "subj";
-
-  public static final String SQL_INSERT_FIELDS =
-      " uuid, label, type, identifiers, created, last_modified, split_label";
-  public static final String SQL_INSERT_VALUES =
-      " :uuid, :label::JSONB, :type, :identifiers, :created, :lastModified, :split_label";
-  public static final String SQL_REDUCED_FIELDS_SUBJECTS =
-      String.format(
-          " %1$s.uuid as %2$s_uuid, %1$s.label as %2$s_label, %1$s.identifiers as %2$s_identifiers, %1$s.type as %2$s_type, %1$s.created as %2$s_created, %1$s.last_modified as %2$s_last_modified",
-          TABLE_ALIAS, MAPPING_PREFIX);
-  public static final String SQL_FULL_FIELDS_SUBJECTS = SQL_REDUCED_FIELDS_SUBJECTS;
+  public static final String TABLE_ALIAS = "subj";
+  public static final String TABLE_NAME = "subjects";
 
   public SubjectRepositoryImpl(
       Jdbi dbi, CudamiConfig cudamiConfig, DbIdentifierMapper dbIdentifierMapper) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
-    this.dbi.registerRowMapper(BeanMapper.factory(Subject.class, MAPPING_PREFIX));
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Subject.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+
+    dbi.registerRowMapper(BeanMapper.factory(Subject.class, MAPPING_PREFIX));
     this.dbi.registerArrayType(dbIdentifierMapper);
     this.dbi.registerColumnMapper(Identifier.class, dbIdentifierMapper);
   }
 
   @Override
-  public Subject getByUuid(UUID uuid) {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_SUBJECTS
-            + " FROM "
+  public Subject create() throws RepositoryException {
+    return new Subject();
+  }
+
+  @Override
+  public PageResponse<Subject> find(PageRequest pageRequest) throws RepositoryException {
+    Map argumentMappings = new HashMap<>(0);
+    String commonSql =
+        " FROM "
             + tableName
             + " AS "
             + tableAlias
-            + " WHERE uuid = :uuid";
+            + " left join unnest(subj.identifiers) as "
+            + tableAlias
+            + "_identifier on true";
+    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
+    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
 
-    Subject subject =
-        dbi.withHandle(
-            h -> h.createQuery(sql).bind("uuid", uuid).mapTo(Subject.class).findOne().orElse(null));
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<Subject> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
 
-    return subject;
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    PageResponse<Subject> pageResponse = new PageResponse<>(result, pageRequest, total);
+
+    // FIXME: try to avoid doing this after database select! Delete when jsonb
+    // search without split-field implemented
+    filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
+
+    return pageResponse;
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("label", "type"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -77,7 +96,7 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
       throws RepositoryException {
     final String sql =
         "SELECT "
-            + SQL_FULL_FIELDS_SUBJECTS
+            + getSqlSelectAllFields()
             + " FROM "
             + tableName
             + " "
@@ -101,125 +120,17 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  protected boolean hasSplitColumn(String basicExpression) {
-    // only label for now
-    return "label".equals(basicExpression);
-  }
-
-  @Override
-  public void save(Subject subject) throws RepositoryException {
-    subject.setUuid(UUID.randomUUID());
-    subject.setCreated(LocalDateTime.now());
-    subject.setLastModified(LocalDateTime.now());
-
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + SQL_INSERT_FIELDS
-            + ")"
-            + " VALUES ("
-            + SQL_INSERT_VALUES
-            + ")";
-
-    dbi.useHandle(
-        h ->
-            h.createUpdate(sql)
-                .bindBean(subject)
-                .bind("split_label", splitToArray(subject.getLabel()))
-                .execute());
-  }
-
-  @Override
-  public void update(Subject subject) throws RepositoryException {
-    subject.setLastModified(LocalDateTime.now());
-
-    final String sql =
-        "UPDATE "
-            + tableName
-            + " SET label=:label::JSONB, last_modified=:lastModified, identifiers=:identifiers, type=:type, split_label=:split_label WHERE uuid=:uuid";
-
-    dbi.useHandle(
-        h ->
-            h.createUpdate(sql)
-                .bindBean(subject)
-                .bind("split_label", splitToArray(subject.getLabel()))
-                .execute());
-  }
-
-  @Override
-  public boolean delete(List<UUID> uuids) {
-    if (uuids == null || uuids.isEmpty()) {
-      return true;
-    }
-
-    int deletions =
-        dbi.withHandle(
-            h ->
-                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                    .bindList("uuids", uuids)
-                    .execute());
-    return deletions == uuids.size();
-  }
-
-  @Override
-  public PageResponse<Subject> find(PageRequest pageRequest) {
-    Map argumentMappings = new HashMap<>(0);
-    String commonSql =
-        " FROM "
-            + tableName
-            + " AS "
-            + tableAlias
-            + " left join unnest(subj.identifiers) as "
-            + tableAlias
-            + "_identifier on true";
-    StringBuilder commonSqlBuilder = new StringBuilder(commonSql);
-    addFiltering(pageRequest, commonSqlBuilder, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSqlBuilder);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<Subject> result =
-        retrieveList(
-            SQL_REDUCED_FIELDS_SUBJECTS,
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSqlBuilder);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    PageResponse<Subject> pageResponse = new PageResponse<>(result, pageRequest, total);
-
-    // FIXME: try to avoid doing this after database select! Delete when jsonb search without
-    // split-field implemented
-    filterByLocalizedTextFields(pageRequest, pageResponse, getJsonbFields());
-
-    return pageResponse;
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "type", "lastModified"));
-  }
-
-  @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "label":
         return tableAlias + ".label";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "type":
         return tableAlias + ".type";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
@@ -229,6 +140,53 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
         super.getJsonbFields();
     linkedHashMap.put("label", i -> Optional.ofNullable(i.getLabel()));
     return linkedHashMap;
+  }
+
+  @Override
+  public List<Subject> getRandom(int count) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", identifiers, label, split_label, type";
+  }
+
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :identifiers, :label::JSONB, :split_label, :type";
+  }
+
+  @Override
+  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".identifiers "
+        + mappingPrefix
+        + "_identifiers, "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".type "
+        + mappingPrefix
+        + "_type";
+  }
+
+  @Override
+  protected String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // uuid, created
+    return super.getSqlUpdateFieldValues()
+        + ", identifiers=:identifiers, label=:label::JSONB, split_label=:split_label, type=:type";
+    // TODO?: in IdentifiableRepoImpl it is "split_label=:split_label::TEXT[]"...?
   }
 
   @Override
@@ -242,8 +200,16 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
+  protected boolean hasSplitColumn(String basicExpression) {
+    // only label for now
+    return "label".equals(basicExpression);
+  }
+
+  @Override
+  public void save(Subject subject) throws RepositoryException {
+    HashMap<String, Object> bindings = new HashMap<>(0);
+    bindings.put("split_label", splitToArray(subject.getLabel()));
+    super.save(subject, bindings);
   }
 
   @Override
@@ -261,30 +227,10 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
     }
   }
 
-  private List<Subject> retrieveList(
-      String fieldsSql,
-      StringBuilder innerQuery,
-      final Map<String, Object> argumentMappings,
-      String orderBy) {
-    final String sql =
-        "SELECT "
-            + fieldsSql
-            + " FROM "
-            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
-            + " AS "
-            + tableAlias
-            + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
-                ? " " + orderBy
-                : (StringUtils.hasText(orderBy) ? " ORDER BY " + orderBy : ""));
-
-    List<Subject> result =
-        dbi.withHandle(
-            (Handle handle) ->
-                handle
-                    .createQuery(sql)
-                    .bindMap(argumentMappings)
-                    .mapTo(Subject.class)
-                    .collect(Collectors.toList()));
-    return result;
+  @Override
+  public void update(Subject subject) throws RepositoryException {
+    HashMap<String, Object> bindings = new HashMap<>(0);
+    bindings.put("split_label", splitToArray(subject.getLabel()));
+    super.update(subject, bindings);
   }
 }
