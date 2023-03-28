@@ -123,6 +123,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   public void testSave() throws Exception {
     String jsonBody =
         "{\n"
+            + "  \"objectType\": \"LICENSE\",\n"
             + "  \"acronym\": \"InC-NC 1.0\",\n"
             + "  \"label\": {\n"
             + "    \"en\": \"IN COPYRIGHT - NON-COMMERCIAL USE PERMITTED\"\n"
@@ -139,6 +140,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   public void testUpdate() throws Exception {
     String jsonBody =
         "{\n"
+            + "  \"objectType\": \"LICENSE\",\n"
             + "  \"acronym\": \"InC-NC 1.0\",\n"
             + "  \"label\": {\n"
             + "    \"en\": \"IN COPYRIGHT - NON-COMMERCIAL USE PERMITTED\"\n"
