@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.CorporateBodyRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
@@ -37,52 +38,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   public static final String TABLE_ALIAS = "c";
   public static final String TABLE_NAME = "collections";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", publication_end, publication_start, text";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues() + ", :publicationEnd, :publicationStart, :text::JSONB";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".publication_start "
-        + mappingPrefix
-        + "_publicationStart, "
-        + tableAlias
-        + ".publication_end "
-        + mappingPrefix
-        + "_publicationEnd";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", publication_end=:publicationEnd, publication_start=:publicationStart, text=:text::JSONB";
-  }
-
   @Lazy @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
 
   @Lazy @Autowired private DigitalObjectRepositoryImpl digitalObjectRepositoryImpl;
 
-  @Autowired
   public CollectionRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -94,7 +53,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
+  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) throws RepositoryException {
     if (parentUuid == null || childrenUuids == null) {
       return false;
     }
@@ -122,7 +81,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
+  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
+      throws RepositoryException {
     if (collectionUuid != null && digitalObjects != null) {
       Integer nextSortIndex =
           retrieveNextSortIndexForParentChildren(
@@ -150,7 +110,13 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> findChildren(UUID uuid, PageRequest pageRequest) {
+  public Collection create() throws RepositoryException {
+    return new Collection();
+  }
+
+  @Override
+  public PageResponse<Collection> findChildren(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     StringBuilder commonSql =
@@ -188,7 +154,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
 
   @Override
   public PageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, PageRequest pageRequest) {
+      UUID collectionUuid, PageRequest pageRequest) throws RepositoryException {
     final String crossTableAlias = "xtable";
 
     final String digitalObjectTableAlias = digitalObjectRepositoryImpl.getTableAlias();
@@ -212,7 +178,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
     Map<String, Object> argumentMappings = new HashMap<>(0);
     argumentMappings.put("uuid", collectionUuid);
     Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (digitalobject) than this repository (collection)
+    // as filtering has other target object type (digitalobject) than this
+    // repository (collection)
     // we have to rename filter field names to target table alias and column names:
     mapFilterExpressionsToOtherTableColumnNames(filtering, digitalObjectRepositoryImpl);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -234,15 +201,18 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
+  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
+      throws RepositoryException {
     final String cbTableAlias = corporateBodyRepositoryImpl.getTableAlias();
     final String cbTableName = corporateBodyRepositoryImpl.getTableName();
 
     // We do a double join with "rel_entity_entities" because we have two different
     // predicates:
-    // - one is fix ("is_part_of"): defines the relation between collection and project
-    // - the other one is given as part of the parameter "filtering" for defining relation
-    //   between corporatebody and project
+    // - one is fix ("is_part_of"): defines the relation between collection and
+    // project
+    // - the other one is given as part of the parameter "filtering" for defining
+    // relation
+    // between corporatebody and project
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -274,7 +244,14 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<CorporateBody> findRelatedCorporateBodies(
+      UUID uuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public PageResponse<Collection> findRootNodes(PageRequest pageRequest)
+      throws RepositoryException {
     String commonSql =
         " FROM "
             + tableName
@@ -335,7 +312,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection getByIdentifier(Identifier identifier) {
+  public Collection getByIdentifier(Identifier identifier) throws RepositoryException {
     Collection collection = super.getByIdentifier(identifier);
 
     if (collection != null) {
@@ -345,7 +322,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection getByRefId(long refId) {
+  public Collection getByRefId(long refId) throws RepositoryException {
     Collection collection = super.getByRefId(refId);
 
     if (collection != null) {
@@ -355,7 +332,8 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Collection getByUuidAndFiltering(UUID uuid, Filtering filtering)
+      throws RepositoryException {
     Collection collection = super.getByUuidAndFiltering(uuid, filtering);
 
     if (collection != null) {
@@ -365,7 +343,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public List<Collection> getChildren(UUID uuid) {
+  public List<Collection> getChildren(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT cc.sortindex AS idx, * FROM "
@@ -404,7 +382,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection getParent(UUID uuid) {
+  public Collection getParent(UUID uuid) throws RepositoryException {
     String sqlAdditionalJoins =
         " INNER JOIN collection_collections cc ON "
             + tableAlias
@@ -424,7 +402,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public List<Collection> getParents(UUID uuid) {
+  public List<Collection> getParents(UUID uuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -459,6 +437,47 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
             + ".uuid)";
     List<Locale> result = dbi.withHandle(h -> h.createQuery(query).mapTo(Locale.class).list());
     return result;
+  }
+
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", publication_end, publication_start, text";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :publicationEnd, :publicationStart, :text::JSONB";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".publication_start "
+        + mappingPrefix
+        + "_publicationStart, "
+        + tableAlias
+        + ".publication_end "
+        + mappingPrefix
+        + "_publicationEnd";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", publication_end=:publicationEnd, publication_start=:publicationStart, text=:text::JSONB";
   }
 
   @Override
@@ -512,7 +531,7 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public Collection saveWithParent(UUID childUuid, UUID parentUuid) {
+  public Collection saveWithParent(UUID childUuid, UUID parentUuid) throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "collection_collections", "parent_collection_uuid", parentUuid);
@@ -561,9 +580,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
+  public boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) {
     if (parentUuid == null || children == null) {
-      return false;
+      throw new IllegalArgumentException("update failed: given objects must not be null");
     }
     String query =
         "UPDATE collection_collections"
@@ -573,10 +592,10 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         h -> {
           PreparedBatch batch = h.prepareBatch(query);
           int idx = 0;
-          for (Collection collection : children) {
+          for (UUID uuidChild : children) {
             batch
                 .bind("idx", idx++)
-                .bind("childUuid", collection.getUuid())
+                .bind("childUuid", uuidChild)
                 .bind("parentUuid", parentUuid)
                 .add();
           }

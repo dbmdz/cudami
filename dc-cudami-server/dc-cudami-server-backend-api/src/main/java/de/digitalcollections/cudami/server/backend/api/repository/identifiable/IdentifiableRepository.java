@@ -80,8 +80,6 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
 
   List<Locale> getLanguages() throws RepositoryException;
 
-  List<I> getRandom(int count) throws RepositoryException;
-
   /**
    * Save list of entities related to an identifiable.Prerequisite: entities have been saved before
    * (exist already)

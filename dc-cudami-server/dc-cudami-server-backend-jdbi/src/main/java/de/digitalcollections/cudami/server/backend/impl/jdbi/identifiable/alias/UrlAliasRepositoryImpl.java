@@ -5,7 +5,7 @@ import static de.digitalcollections.cudami.server.backend.api.repository.identif
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -13,11 +13,9 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,12 +30,13 @@ import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.StatementException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAliasRepository {
+// FIXME: class UrlAliasRepositoryImpl is non standard in any ways! try to stream line it!
+public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
+    implements UrlAliasRepository {
 
   public static final String MAPPING_PREFIX = "ua";
   private static final Map<String, String> PROPERTY_COLUMN_MAPPING;
@@ -82,29 +81,20 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     return selectFields.collect(Collectors.joining(", "));
   }
 
-  @Autowired
   public UrlAliasRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        null,
+        cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerRowMapper(BeanMapper.factory(UrlAlias.class, MAPPING_PREFIX));
   }
 
   @Override
-  public int delete(List<UUID> urlAliasUuids) throws RepositoryException {
-    if (urlAliasUuids.isEmpty()) {
-      return 0;
-    }
-    String sql = "DELETE FROM " + tableName + " WHERE uuid in (<aliasUuids>);";
-    try {
-      return dbi.withHandle(
-          h -> h.createUpdate(sql).bindList("aliasUuids", urlAliasUuids).execute());
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+  public UrlAlias create() throws RepositoryException {
+    return new UrlAlias();
   }
 
   private UUID extractWebsiteUuid(UrlAlias urlAlias) {
@@ -114,70 +104,72 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
     return urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid() : null;
   }
 
-  @Override
-  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
-      throws RepositoryException {
-    StringBuilder commonSql =
-        new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
-
-    FilterCriterion slug =
-        StringUtils.hasText(pageRequest.getSearchTerm())
-            ? FilterCriterion.builder()
-                .withExpression("slug")
-                .contains(pageRequest.getSearchTerm())
-                .build()
-            : null;
-
-    Filtering filtering = pageRequest.getFiltering();
-    if (filtering == null) {
-      filtering = Filtering.builder().add(slug).build();
-    } else {
-      filtering.add(slug);
-    }
-    Map<String, Object> bindings = new HashMap<>(0);
-    addFiltering(filtering, commonSql, bindings);
-
-    long count;
-    try {
-      count =
-          dbi.withHandle(
-              h ->
-                  h.createQuery("SELECT count(*) " + commonSql.toString())
-                      .bindMap(bindings)
-                      .mapTo(Long.class)
-                      .findOne()
-                      .orElse(0L));
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
-
-    if (!pageRequest.hasSorting()) {
-      pageRequest.setSorting(new Sorting("slug"));
-    }
-    commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
-    addPagingAndSorting(pageRequest, commonSql);
-
-    try {
-      UrlAlias[] resultset =
-          dbi.withHandle(
-              h ->
-                  h.createQuery(commonSql.toString())
-                      .bindMap(bindings)
-                      .reduceRows(this::mapRowToUrlAlias)
-                      .toArray(UrlAlias[]::new));
-      return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)), pageRequest, count);
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
-  }
+  // FIXME: use standard find method with filtering set before (not searchTerm anymore!)!
+  //  @Override
+  //  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
+  //      throws RepositoryException {
+  //    StringBuilder commonSql =
+  //        new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
+  //
+  //    FilterCriterion slug =
+  //        StringUtils.hasText(pageRequest.getSearchTerm())
+  //            ? FilterCriterion.builder()
+  //                .withExpression("slug")
+  //                .contains(pageRequest.getSearchTerm())
+  //                .build()
+  //            : null;
+  //
+  //    Filtering filtering = pageRequest.getFiltering();
+  //    if (filtering == null) {
+  //      filtering = Filtering.builder().add(slug).build();
+  //    } else {
+  //      filtering.add(slug);
+  //    }
+  //    Map<String, Object> bindings = new HashMap<>(0);
+  //    addFiltering(filtering, commonSql, bindings);
+  //
+  //    long count;
+  //    try {
+  //      count =
+  //          dbi.withHandle(
+  //              h ->
+  //                  h.createQuery("SELECT count(*) " + commonSql.toString())
+  //                      .bindMap(bindings)
+  //                      .mapTo(Long.class)
+  //                      .findOne()
+  //                      .orElse(0L));
+  //    } catch (StatementException e) {
+  //      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+  //      throw new RepositoryException(
+  //          String.format("The SQL statement is defective: %s", detailMessage), e);
+  //    } catch (JdbiException e) {
+  //      throw new RepositoryException(e);
+  //    }
+  //
+  //    if (!pageRequest.hasSorting()) {
+  //      pageRequest.setSorting(new Sorting("slug"));
+  //    }
+  //    commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
+  //    addPagingAndSorting(pageRequest, commonSql);
+  //
+  //    try {
+  //      UrlAlias[] resultset =
+  //          dbi.withHandle(
+  //              h ->
+  //                  h.createQuery(commonSql.toString())
+  //                      .bindMap(bindings)
+  //                      .reduceRows(this::mapRowToUrlAlias)
+  //                      .toArray(UrlAlias[]::new));
+  //      return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)), pageRequest,
+  // count);
+  //    } catch (StatementException e) {
+  //      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+  //      throw new RepositoryException(
+  //          String.format("The SQL statement is defective: %s", detailMessage), e);
+  //    } catch (JdbiException e) {
+  //      throw new RepositoryException(e);
+  //    }
+  //  }
 
   @Override
   public LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException {
@@ -185,6 +177,13 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
       return new LocalizedUrlAliases();
     }
     return findMainLinks(false, null, slug, false);
+  }
+
+  @Override
+  public PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
+      throws RepositoryException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   private LocalizedUrlAliases findMainLinks(
@@ -299,8 +298,10 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(
-        Arrays.asList("created", "lastPublished", "\"primary\"", "slug", "targetLanguage"));
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(
+        Arrays.asList("lastPublished", "\"primary\"", "slug", "targetLanguage"));
+    return allowedOrderByFields;
   }
 
   private String getAssignmentsForUpdate() {
@@ -370,8 +371,8 @@ public class UrlAliasRepositoryImpl extends JdbiRepositoryImpl implements UrlAli
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
+  public List<UrlAlias> getRandom(int count) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override

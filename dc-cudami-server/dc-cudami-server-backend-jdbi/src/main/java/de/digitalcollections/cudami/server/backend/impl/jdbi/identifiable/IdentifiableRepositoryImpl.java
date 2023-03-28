@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
-import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID;
 import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.FileResourceMetadataRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
@@ -32,7 +31,6 @@ import de.digitalcollections.model.semantic.Tag;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,6 +67,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
+  @Autowired protected IdentifierRepositoryImpl identifierRepositoryImpl;
+
   @Override
   protected String getSqlInsertFields() {
     return super.getSqlInsertFields()
@@ -82,7 +82,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   protected String getSqlInsertValues() {
-    return super.getSqlInsertFields()
+    return super.getSqlInsertValues()
         + ", "
         + """
         :description::JSONB, :identifiableObjectType,
@@ -500,63 +500,24 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public I getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
-    if (filtering == null) {
-      filtering = Filtering.builder().build();
-    }
-    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
-
-    I result = retrieveOne(getSqlSelectAllFields(), filtering, null);
-    return result;
-  }
-
-  @Override
   public String getColumnName(String modelProperty) {
     if (modelProperty == null) {
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "description":
         return tableAlias + ".description";
       case "identifiableObjectType":
         return tableAlias + ".identifiable_objecttype";
       case "label":
         return tableAlias + ".label";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "previewImage":
         return tableAlias + ".previewfileresource";
       case "type":
         return tableAlias + ".identifiable_type";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
-  }
-
-  public int getIndex(List<? extends Identifiable> list, Identifiable identifiable) {
-    int pos = -1;
-    for (Identifiable idf : list) {
-      pos += 1;
-      if (idf.getUuid().equals(identifiable.getUuid())) {
-        return pos;
-      }
-    }
-    return -1;
-  }
-
-  public int getIndex(List<UUID> list, UUID uuid) {
-    int pos = -1;
-    for (UUID u : list) {
-      pos += 1;
-      if (u.equals(uuid)) {
-        return pos;
-      }
-    }
-    return -1;
   }
 
   @Override
@@ -584,8 +545,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
   @Override
   public List<I> getRandom(int count) throws RepositoryException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -609,32 +569,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return "label".equals(propertyName);
   }
 
+  @Override
   /**
-   * After save and update the returned fields (declared in {@link
-   * #getReturnedFieldsOnInsertUpdate()}) can be processed here.
-   *
-   * @param identifiable the object that was passed to save/update
-   * @param returnedFields returned fields in a map of column names to values
+   * Override super.retrieveList because of always joining identifiers, preview image and url
+   * aliases for {@Identifiable}.
    */
-  protected void insertUpdateCallback(I identifiable, Map<String, Object> returnedFields) {
-    // can be implemented in derived classes
-  }
-
-  @Override
-  public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings)
-      throws RepositoryException {
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-    return total;
-  }
-
-  @Override
   protected List<I> retrieveList(
       String fieldsSql,
       String fieldsSqlAdditionalJoins,
@@ -646,7 +585,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         "SELECT "
             + fieldsSql
             + ","
-            + SQL_FULL_FIELDS_ID
+            + identifierRepositoryImpl.getSqlSelectAllFields(
+                IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
@@ -708,21 +648,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
-  public I retrieveOne(String fieldsSql, Filtering filtering, String sqlAdditionalJoins)
-      throws RepositoryException {
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings);
-  }
-
-  public I retrieveOne(
-      String fieldsSql,
-      Filtering filtering,
-      String sqlAdditionalJoins,
-      Map<String, Object> argumentMappings)
-      throws RepositoryException {
-    return retrieveOne(fieldsSql, filtering, sqlAdditionalJoins, argumentMappings, null);
-  }
-
+  @Override
+  /**
+   * Override super.retrieveOne because of always joining identifiers, preview image, url aliases,
+   * tags and subjects for {@Identifiable}.
+   */
   public I retrieveOne(
       String fieldsSql,
       Filtering filtering,
@@ -735,7 +665,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             "SELECT"
                 + fieldsSql
                 + ","
-                + IdentifierRepositoryImpl.SQL_FULL_FIELDS_ID
+                + identifierRepositoryImpl.getSqlSelectAllFields(
+                    IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
                 + ","
                 + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
@@ -811,32 +742,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return result;
   }
 
-  private void execInsertUpdate(
-      final String sql, I identifiable, final Map<String, Object> bindings, boolean withCallback)
-      throws RepositoryException {
-    // because of a significant difference in execution duration it makes sense to
-    // distinguish here
-    if (withCallback) {
-      Map<String, Object> returnedFields =
-          dbi.withHandle(
-              h ->
-                  h.createQuery(sql)
-                      .bindMap(bindings)
-                      .bindBean(identifiable)
-                      .mapToMap()
-                      .findOne()
-                      .orElse(Collections.emptyMap()));
-      insertUpdateCallback(identifiable, returnedFields);
-    } else {
-      dbi.withHandle(h -> h.createUpdate(sql).bindMap(bindings).bindBean(identifiable).execute());
-    }
-  }
-
-  @Override
-  public void save(I identifiable, Map<String, Object> bindings) throws RepositoryException {
-    save(identifiable, bindings, null);
-  }
-
   public void save(
       I identifiable,
       Map<String, Object> bindings,
@@ -854,34 +759,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
-    if (identifiable.getUuid() == null) {
-      // in case of fileresource the uuid is created on binary upload (before metadata
-      // save)
-      // to make saving on storage using uuid is possible
-      identifiable.setUuid(UUID.randomUUID());
-    }
-    if (identifiable.getCreated() == null) {
-      identifiable.setCreated(LocalDateTime.now());
-    }
-    if (identifiable.getLastModified() == null) {
-      identifiable.setLastModified(LocalDateTime.now());
-    }
-    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
-    String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + getSqlInsertFields()
-            + ") VALUES ("
-            + getSqlInsertValues()
-            + ")"
-            + (hasReturningStmt
-                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
-                : "");
-    if (sqlModifier != null) {
-      sql = sqlModifier.apply(sql, bindings);
-    }
-    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
+    super.save(identifiable, bindings, sqlModifier);
   }
 
   @Override
@@ -957,11 +835,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     }
   }
 
-  @Override
-  public void update(I identifiable, Map<String, Object> bindings) throws RepositoryException {
-    update(identifiable, bindings, null);
-  }
-
   public void update(
       I identifiable,
       Map<String, Object> bindings,
@@ -978,24 +851,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
-    identifiable.setLastModified(LocalDateTime.now());
+    super.update(identifiable, bindings, sqlModifier);
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
-
-    boolean hasReturningStmt = !getReturnedFieldsOnInsertUpdate().isEmpty();
-    String sql =
-        "UPDATE "
-            + tableName
-            + " SET"
-            + getSqlUpdateFieldValues()
-            + " WHERE uuid=:uuid"
-            + (hasReturningStmt
-                ? " RETURNING " + String.join(", ", getReturnedFieldsOnInsertUpdate())
-                : "");
-
-    if (sqlModifier != null) {
-      sql = sqlModifier.apply(sql, bindings);
-    }
-    execInsertUpdate(sql, identifiable, bindings, hasReturningStmt);
   }
 }

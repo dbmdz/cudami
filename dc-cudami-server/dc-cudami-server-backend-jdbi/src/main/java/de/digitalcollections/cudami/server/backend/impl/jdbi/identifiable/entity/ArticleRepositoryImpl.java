@@ -21,7 +21,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
@@ -35,51 +34,8 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   public static final String TABLE_ALIAS = "a";
   public static final String TABLE_NAME = "articles";
 
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields() + ", date_published, text, timevalue_published";
-  }
-
-  /* Do not change order! Must match order in getSqlInsertFields!!! */
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".text "
-        + mappingPrefix
-        + "_text";
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".date_published "
-        + mappingPrefix
-        + "_datePublished, "
-        + tableAlias
-        + ".timevalue_published "
-        + mappingPrefix
-        + "_timeValuePublished";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
-  }
-
   private final EntityRepositoryImpl<Entity> entityRepositoryImpl;
 
-  @Autowired
   public ArticleRepositoryImpl(
       Jdbi dbi,
       @Qualifier("entityRepositoryImpl") EntityRepositoryImpl<Entity> entityRepositoryImpl,
@@ -95,7 +51,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByIdentifier(Identifier identifier) {
+  public Article getByIdentifier(Identifier identifier) throws RepositoryException {
     Article article = super.getByIdentifier(identifier);
 
     if (article != null) {
@@ -105,7 +61,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByRefId(long refId) {
+  public Article getByRefId(long refId) throws RepositoryException {
     Article article = super.getByRefId(refId);
 
     if (article != null) {
@@ -115,7 +71,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) {
+  public Article getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
     Article article = super.getByUuidAndFiltering(uuid, filtering);
 
     if (article != null) {
@@ -126,7 +82,7 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
-  public List<Agent> getCreators(UUID articleUuid) {
+  public List<Agent> getCreators(UUID articleUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT ac.sortindex AS idx, * FROM "
@@ -178,6 +134,48 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
     }
 
     return agents;
+  }
+
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", date_published, text, timevalue_published";
+  }
+
+  /* Do not change order! Must match order in getSqlInsertFields!!! */
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :datePublished, :text::JSONB, :timeValuePublished::JSONB";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text";
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".date_published "
+        + mappingPrefix
+        + "_datePublished, "
+        + tableAlias
+        + ".timevalue_published "
+        + mappingPrefix
+        + "_timeValuePublished";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", date_published=:datePublished, text=:text::JSONB, timevalue_published=:timeValuePublished::JSONB";
   }
 
   @Override

@@ -82,6 +82,8 @@ public interface UniqueObjectRepository<U extends UniqueObject>
 
   U getByUuidAndFiltering(UUID uniqueObjectUuid, Filtering filtering) throws RepositoryException;
 
+  List<U> getRandom(int count) throws RepositoryException;
+
   /**
    * Save an {@code UniqueObject} object.
    *

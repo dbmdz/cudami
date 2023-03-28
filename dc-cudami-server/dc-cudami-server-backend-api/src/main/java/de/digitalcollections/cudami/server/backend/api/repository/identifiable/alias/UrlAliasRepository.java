@@ -60,6 +60,15 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
   }
 
   /**
+   * Retrieve all primary links corresponding to a slug. The owning website is ignored.
+   *
+   * @param slug the slug to retrieve the primary aliases for
+   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
+   * @throws RepositoryException
+   */
+  LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException;
+
+  /**
    * Generic request method for getting a parametrized list.
    *
    * @param pageRequest request params for list
@@ -68,15 +77,6 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
    */
   PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
       throws RepositoryException;
-
-  /**
-   * Retrieve all primary links corresponding to a slug. The owning website is ignored.
-   *
-   * @param slug the slug to retrieve the primary aliases for
-   * @return all {@code UrlAlias}es with {@code isPrimary() == true}
-   * @throws RepositoryException
-   */
-  LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException;
 
   /**
    * Retrieve the primary links corresponding to a slug and the target's language.

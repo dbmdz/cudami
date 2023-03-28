@@ -1,9 +1,11 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Arrays;
@@ -14,37 +16,45 @@ import java.util.UUID;
 public interface CollectionRepository
     extends NodeRepository<Collection>, EntityRepository<Collection> {
 
-  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject) {
+  default boolean addDigitalObject(Collection collection, DigitalObject digitalObject)
+      throws RepositoryException {
     if (collection == null || digitalObject == null) {
-      return false;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     return addDigitalObjects(collection.getUuid(), Arrays.asList(digitalObject));
   }
 
-  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects)
+      throws RepositoryException {
     if (collection == null || digitalObjects == null) {
-      return false;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     return addDigitalObjects(collection.getUuid(), digitalObjects);
   }
 
-  boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+  boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
+      throws RepositoryException;
 
   default PageResponse<DigitalObject> findDigitalObjects(
-      Collection collection, PageRequest pageRequest) {
+      Collection collection, PageRequest pageRequest) throws RepositoryException {
     if (collection == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given collection must not be null");
     }
     return findDigitalObjects(collection.getUuid(), pageRequest);
   }
 
-  PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest);
+  PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
+      throws RepositoryException;
+
+  // FIXME: remove it, just use PageRequest
+  List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
+      throws RepositoryException;
 
   PageResponse<CorporateBody> findRelatedCorporateBodies(UUID uuid, PageRequest pageRequest);
 
   default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
     if (collection == null || digitalObject == null) {
-      return false;
+      throw new IllegalArgumentException("remove failed: given objects must not be null");
     }
     return removeDigitalObject(collection.getUuid(), digitalObject.getUuid());
   }
@@ -61,7 +71,7 @@ public interface CollectionRepository
 
   default boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
     if (collection == null || digitalObjects == null) {
-      return false;
+      throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setDigitalObjects(collection.getUuid(), digitalObjects);
   }

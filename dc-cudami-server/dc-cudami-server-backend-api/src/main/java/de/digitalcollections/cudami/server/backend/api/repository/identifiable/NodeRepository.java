@@ -13,21 +13,21 @@ import java.util.stream.Collectors;
 
 public interface NodeRepository<N extends Identifiable> extends IdentifiableRepository<N> {
 
-  default boolean addChild(N parent, N child) {
+  default boolean addChild(N parent, N child) throws RepositoryException {
     if (parent == null || child == null) {
       throw new IllegalArgumentException("parent and child must not be null");
     }
     return addChild(parent.getUuid(), child.getUuid());
   }
 
-  default boolean addChild(UUID parentUuid, UUID childUuid) {
+  default boolean addChild(UUID parentUuid, UUID childUuid) throws RepositoryException {
     if (parentUuid == null || childUuid == null) {
       throw new IllegalArgumentException("parent and child uuids must not be null");
     }
     return addChildren(parentUuid, Arrays.asList(childUuid));
   }
 
-  default boolean addChildren(N parent, List<N> children) {
+  default boolean addChildren(N parent, List<N> children) throws RepositoryException {
     if (parent == null || children == null) {
       throw new IllegalArgumentException("parent and children must not be null");
     }
@@ -39,18 +39,19 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     return addChildren(parent.getUuid(), childrenUuids);
   }
 
-  boolean addChildren(UUID parentUuid, List<UUID> childrenUUIDs);
+  boolean addChildren(UUID parentUuid, List<UUID> childrenUUIDs) throws RepositoryException;
 
-  default PageResponse<N> findChildren(N parent, PageRequest pageRequest) {
+  default PageResponse<N> findChildren(N parent, PageRequest pageRequest)
+      throws RepositoryException {
     if (parent == null) {
       throw new IllegalArgumentException("parent must not be null");
     }
     return findChildren(parent.getUuid(), pageRequest);
   }
 
-  PageResponse<N> findChildren(UUID nodeUuid, PageRequest pageRequest);
+  PageResponse<N> findChildren(UUID nodeUuid, PageRequest pageRequest) throws RepositoryException;
 
-  PageResponse<N> findRootNodes(PageRequest pageRequest);
+  PageResponse<N> findRootNodes(PageRequest pageRequest) throws RepositoryException;
 
   default BreadcrumbNavigation getBreadcrumbNavigation(N node) {
     if (node == null) {
@@ -64,32 +65,32 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    */
   BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
 
-  default List<N> getChildren(N node) {
+  default List<N> getChildren(N node) throws RepositoryException {
     if (node == null) {
       throw new IllegalArgumentException("node must not be null");
     }
     return getChildren(node.getUuid());
   }
 
-  List<N> getChildren(UUID nodeUuid);
+  List<N> getChildren(UUID nodeUuid) throws RepositoryException;
 
-  default N getParent(N node) {
+  default N getParent(N node) throws RepositoryException {
     if (node == null) {
       throw new IllegalArgumentException("node must not be null");
     }
     return getParent(node.getUuid());
   }
 
-  N getParent(UUID nodeUuid);
+  N getParent(UUID nodeUuid) throws RepositoryException;
 
-  default List<N> getParents(N node) {
+  default List<N> getParents(N node) throws RepositoryException {
     if (node == null) {
       throw new IllegalArgumentException("node must not be null");
     }
     return getParents(node.getUuid());
   }
 
-  List<N> getParents(UUID uuid);
+  List<N> getParents(UUID uuid) throws RepositoryException;
 
   List<Locale> getRootNodesLanguages();
 

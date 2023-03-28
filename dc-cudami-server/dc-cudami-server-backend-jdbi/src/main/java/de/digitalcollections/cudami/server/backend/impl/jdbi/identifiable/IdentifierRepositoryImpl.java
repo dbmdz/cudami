@@ -5,19 +5,13 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.jdbi.v3.core.statement.StatementException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jdbi.v3.core.statement.Update;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,115 +19,55 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
     implements IdentifierRepository {
 
   public static final String MAPPING_PREFIX = "id";
-
-  public static final String SQL_INSERT_FIELDS =
-      " uuid, created, identifiable, namespace, identifier, last_modified";
-  public static final String SQL_INSERT_VALUES =
-      " :uuid, :created, :identifiable, :namespace, :id, :lastModified";
   public static final String TABLE_ALIAS = "id";
-  public static final String SQL_REDUCED_FIELDS_ID =
-      String.format(
-          " %1$s.uuid %2$s_uuid, %1$s.created %2$s_created, %1$s.identifiable %2$s_identifiable, %1$s.namespace %2$s_namespace, %1$s.identifier %2$s_id, %1$s.last_modified %2$s_lastModified",
-          TABLE_ALIAS, MAPPING_PREFIX);
-  public static final String SQL_FULL_FIELDS_ID = SQL_REDUCED_FIELDS_ID;
   public static final String TABLE_NAME = "identifiers";
 
-  @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Identifier.class,
+        cudamiConfig.getOffsetForAlternativePaging());
 
-    // Hint: as repo is no extension of IdentifiableRepositoryImpl (registering mapper for
-    // Identifiable in constructor), we have to register row mapper on ourselves
+    // registering row mapper for Identifier
     dbi.registerRowMapper(BeanMapper.factory(Identifier.class, MAPPING_PREFIX));
   }
 
   @Override
+  public Identifier create() throws RepositoryException {
+    return new Identifier();
+  }
+
+  @Override
   public int deleteByIdentifiable(UUID identifiableUuid) throws RepositoryException {
-    try {
-      return dbi.withHandle(
-          h ->
-              h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
-                  .bind("uuid", identifiableUuid)
-                  .execute());
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+    Update update =
+        dbi.withHandle(
+            h ->
+                h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
+                    .bind("uuid", identifiableUuid));
+    return execDelete(update);
   }
 
   @Override
   public List<Identifier> findByIdentifiable(UUID uuidIdentifiable) throws RepositoryException {
     final String sql =
         "SELECT "
-            + SQL_FULL_FIELDS_ID
+            + getSqlSelectReducedFields()
             + " FROM "
             + tableName
             + " "
             + tableAlias
             + " WHERE identifiable = :uuid";
-
-    try {
-      return dbi.withHandle(
-          h ->
-              h.createQuery(sql)
-                  .bind("uuid", uuidIdentifiable)
-                  .mapTo(Identifier.class)
-                  .collect(Collectors.toList()));
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+    return execSelectForList(sql, Map.of("uuid", uuidIdentifiable));
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("id", "identifiable", "namespace"));
-  }
-
-  @Override
-  public Identifier getByUuid(UUID identifierUuid) throws RepositoryException {
-    final String sql =
-        "SELECT "
-            + SQL_FULL_FIELDS_ID
-            + " FROM "
-            + tableName
-            + " "
-            + tableAlias
-            + " WHERE uuid = :uuid";
-
-    try {
-      return dbi.withHandle(
-          h ->
-              h.createQuery(sql)
-                  .bind("uuid", identifierUuid)
-                  .mapTo(Identifier.class)
-                  .findOne()
-                  .orElse(null));
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
-  }
-
-  @Override
-  public Identifier getByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    if (filtering == null) {
-      filtering = Filtering.builder().build();
-    }
-    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
-
-    Identifier result = retrieveOne(getSqlSelectAllFields(), filtering, null);
-    return result;
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("id", "identifiable", "namespace"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -142,56 +76,53 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "id":
         return tableAlias + ".id";
       case "identifiable":
         return tableAlias + ".identifiable";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "namespace":
         return tableAlias + ".namespace";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
+  public List<Identifier> getRandom(int count) throws RepositoryException {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
-  public void save(Identifier identifier) throws RepositoryException {
-    identifier.setUuid(UUID.randomUUID());
-    identifier.setCreated(LocalDateTime.now());
-    identifier.setLastModified(LocalDateTime.now());
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", identifiable, namespace, identifier";
+  }
 
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "( "
-            + SQL_INSERT_FIELDS
-            + " )"
-            + " VALUES ( "
-            + SQL_INSERT_VALUES
-            + " )";
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :identifiable, :namespace, :id";
+  }
 
-    try {
-      int affected = dbi.withHandle(h -> h.createUpdate(sql).bindBean(identifier).execute());
-      if (affected != 1)
-        throw new RepositoryException(
-            "Insert into table identifiers failed for %s".formatted(identifier));
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+  @Override
+  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".identifiable "
+        + mappingPrefix
+        + "_identifiable, "
+        + tableAlias
+        + ".namespace "
+        + mappingPrefix
+        + "_namespace, "
+        + tableAlias
+        + ".identifier "
+        + mappingPrefix
+        + "_id";
   }
 
   @Override

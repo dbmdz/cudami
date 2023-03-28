@@ -89,7 +89,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid) {
+  public void addRelatedFileresource(UUID entityUuid, UUID fileResourceUuid)
+      throws RepositoryException {
     Integer nextSortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "rel_entity_fileresources", "entity_uuid", entityUuid);
@@ -105,7 +106,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public PageResponse<Entity> findRelatedEntities(UUID entityUuid, PageRequest pageRequest) {
+  public PageResponse<Entity> findRelatedEntities(UUID entityUuid, PageRequest pageRequest)
+      throws RepositoryException {
     StringBuilder commonSql =
         new StringBuilder(
             " FROM entities e"
@@ -130,7 +132,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public PageResponse<FileResource> findRelatedFileResources(
-      UUID entityUuid, PageRequest pageRequest) {
+      UUID entityUuid, PageRequest pageRequest) throws RepositoryException {
     StringBuilder commonSql =
         new StringBuilder(
             " FROM FROM fileresources f"
@@ -161,7 +163,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public E getByRefId(long refId) {
+  public E getByRefId(long refId) throws RepositoryException {
     Filtering filtering =
         Filtering.builder()
             .add(FilterCriterion.builder().withExpression("refId").isEquals(refId).build())
@@ -198,7 +200,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   }
 
   @Override
-  public List<E> getRandom(int count) {
+  public List<E> getRandom(int count) throws RepositoryException {
     // Warning: could be very slow if random is used on tables with many million records
     // see https://www.gab.lc/articles/bigdata_postgresql_order_by_random/
     StringBuilder innerQuery =
@@ -297,14 +299,15 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
    * {@code NamedEntity} so the additional fields are being added properly.
    */
   protected boolean isRepoForNamedEntity() {
-    return NamedEntity.class.isAssignableFrom(identifiableImplClass);
+    return NamedEntity.class.isAssignableFrom(uniqueObjectImplClass);
   }
 
   @Override
   public void save(
       E entity,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -316,7 +319,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
 
   @Override
   public List<FileResource> setRelatedFileResources(
-      UUID entityUuid, List<FileResource> fileResources) {
+      UUID entityUuid, List<FileResource> fileResources) throws RepositoryException {
     if (fileResources == null) {
       return null;
     }
@@ -354,7 +357,8 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public void update(
       E entity,
       Map<String, Object> bindings,
-      BiFunction<String, Map<String, Object>, String> sqlModifier) {
+      BiFunction<String, Map<String, Object>, String> sqlModifier)
+      throws RepositoryException {
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }

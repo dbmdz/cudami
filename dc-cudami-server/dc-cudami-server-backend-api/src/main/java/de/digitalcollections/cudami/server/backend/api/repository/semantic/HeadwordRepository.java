@@ -54,10 +54,6 @@ public interface HeadwordRepository extends UniqueObjectRepository<Headword> {
    */
   Headword getByLabelAndLocale(String label, Locale locale);
 
-  default Headword getByUuid(UUID uuid) {
-    return getByUuidAndFiltering(uuid, null);
-  }
-
   List<Locale> getLanguages();
 
   List<Headword> getRandom(int count);
