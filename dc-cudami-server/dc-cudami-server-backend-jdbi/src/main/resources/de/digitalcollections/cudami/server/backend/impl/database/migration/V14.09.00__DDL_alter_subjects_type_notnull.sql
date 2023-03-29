@@ -1,0 +1,2 @@
+ALTER TABLE subjects ALTER COLUMN "type" SET NOT NULL;
+
