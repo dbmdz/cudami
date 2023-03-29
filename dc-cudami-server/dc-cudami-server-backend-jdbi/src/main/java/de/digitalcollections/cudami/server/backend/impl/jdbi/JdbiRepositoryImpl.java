@@ -29,7 +29,6 @@ import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.statement.StatementException;
-import org.jdbi.v3.core.statement.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +64,13 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
   protected final String tableAlias;
 
   protected final String tableName;
+
+  protected JdbiRepositoryImpl() {
+    this.dbi = null;
+    this.mappingPrefix = "";
+    this.tableAlias = "";
+    this.tableName = "";
+  }
 
   public JdbiRepositoryImpl(
       Jdbi dbi,
@@ -185,9 +191,23 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     return term;
   }
 
-  protected int execDelete(Update update) throws RepositoryException {
+  protected int execUpdateWithList(final String sql, final String key, final List values)
+      throws RepositoryException {
     try {
-      return update.execute();
+      return dbi.withHandle(h -> h.createUpdate(sql).bindList(key, values).execute());
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
+  }
+
+  protected int execUpdateWithMap(final String sql, Map<String, Object> bindings)
+      throws RepositoryException {
+    try {
+      return dbi.withHandle(h -> h.createUpdate(sql).bindMap(bindings).execute());
     } catch (StatementException e) {
       String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
       throw new RepositoryException(

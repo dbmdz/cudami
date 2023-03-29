@@ -1,10 +1,11 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable;
 
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -37,7 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class IdentifiableRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
 
-  @Autowired SubjectRepository subjectRepository;
+  @Autowired SubjectRepositoryImpl subjectRepositoryImpl;
 
   @BeforeEach
   public void beforeEach() {
@@ -61,7 +62,7 @@ class IdentifiableRepositoryImplTest
   }
 
   @Test
-  @DisplayName("retrieve one digital object")
+  @DisplayName("retrieve one identifiable")
   void testGetByUuid() throws RepositoryException {
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(UUID.randomUUID());
@@ -70,10 +71,10 @@ class IdentifiableRepositoryImplTest
     identifiable.setLabel("test");
     identifiable.setLastModified(LocalDateTime.now());
 
-    this.repo.save(identifiable);
+    repo.save(identifiable);
 
-    Identifiable actual = (Identifiable) this.repo.getByUuid(identifiable.getUuid());
-    assertThat(actual).isEqualTo(identifiable);
+    Identifiable actual = (Identifiable) repo.getByUuid(identifiable.getUuid());
+    assertThat(actual.equals(identifiable));
   }
 
   @Test
@@ -131,7 +132,7 @@ class IdentifiableRepositoryImplTest
             .identifier(Identifier.builder().namespace("test").id("12345").build())
             .type("SUBJECT_TYPE")
             .build();
-    subjectRepository.save(subject);
+    subjectRepositoryImpl.save(subject);
 
     Identifiable identifiable =
         Identifiable.builder()

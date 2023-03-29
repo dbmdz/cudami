@@ -25,7 +25,6 @@ import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.StatementException;
-import org.jdbi.v3.core.statement.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -43,6 +42,14 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
   protected final BiConsumer<Map<UUID, U>, RowView> basicReduceRowsBiConsumer;
   protected final BiConsumer<Map<UUID, U>, RowView> fullReduceRowsBiConsumer;
   protected final Class<? extends UniqueObject> uniqueObjectImplClass;
+
+  protected UniqueObjectRepositoryImpl() {
+    super();
+    this.additionalReduceRowsBiConsumer = null;
+    this.basicReduceRowsBiConsumer = null;
+    this.fullReduceRowsBiConsumer = null;
+    this.uniqueObjectImplClass = null;
+  }
 
   protected UniqueObjectRepositoryImpl(
       Jdbi dbi,
@@ -113,12 +120,8 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
 
   @Override
   public int deleteByUuids(List<UUID> uuids) throws RepositoryException {
-    Update update =
-        dbi.withHandle(
-            h ->
-                h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                    .bindList("uuids", uuids));
-    return execDelete(update);
+    final String sql = "DELETE FROM " + tableName + " WHERE uuid in (<uuids>)";
+    return execUpdateWithList(sql, "uuids", uuids);
   }
 
   private void execInsertUpdate(

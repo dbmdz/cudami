@@ -67,10 +67,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
-  @Autowired protected IdentifierRepositoryImpl identifierRepositoryImpl;
-  @Autowired protected SubjectRepositoryImpl subjectRepositoryImpl;
-  @Autowired protected TagRepositoryImpl tagRepositoryImpl;
-
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
@@ -450,10 +446,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -514,8 +508,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         "SELECT "
             + fieldsSql
             + ","
-            + identifierRepositoryImpl.getSqlSelectAllFields(
-                IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
+            + IdentifierRepositoryImpl.getSqlSelectAllFieldsStatic()
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
@@ -594,16 +587,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             "SELECT"
                 + fieldsSql
                 + ","
-                + identifierRepositoryImpl.getSqlSelectAllFields(
-                    IdentifierRepositoryImpl.TABLE_ALIAS, IdentifierRepositoryImpl.MAPPING_PREFIX)
+                + IdentifierRepositoryImpl.getSqlSelectAllFieldsStatic()
                 + ","
                 + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
                 + UrlAliasRepositoryImpl.getSelectFields(true)
                 + ", "
-                + tagRepositoryImpl.getSqlSelectReducedFields()
+                + TagRepositoryImpl.getSqlSelectReducedFieldsStatic()
                 + ", "
-                + subjectRepositoryImpl.getSqlSelectReducedFields()
+                + SubjectRepositoryImpl.getSqlSelectReducedFieldsStatic()
                 + " FROM "
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
@@ -753,6 +745,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 .bind("identifiableUuid", identifiableUuid)
                 .execute());
 
+    int pageSize = 10;
     if (entities != null) {
       // we assume that the entities are already saved...
       dbi.useHandle(
@@ -769,8 +762,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             }
             preparedBatch.execute();
           });
+      pageSize = entities.size();
     }
-    return findRelatedEntities(identifiableUuid, new PageRequest(0, entities.size())).getContent();
+    return findRelatedEntities(identifiableUuid, new PageRequest(0, pageSize)).getContent();
   }
 
   @Override

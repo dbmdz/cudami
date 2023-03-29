@@ -31,7 +31,7 @@ class WebsiteRepositoryImplTest
 
   @BeforeEach
   public void beforeEach() {
-    repo = new WebsiteRepositoryImpl(jdbi, webpageRepository, cudamiConfig);
+    repo = new WebsiteRepositoryImpl(jdbi, cudamiConfig, webpageRepository);
   }
 
   @Test

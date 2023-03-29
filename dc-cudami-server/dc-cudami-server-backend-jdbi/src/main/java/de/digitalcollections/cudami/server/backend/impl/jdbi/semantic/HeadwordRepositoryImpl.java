@@ -421,9 +421,7 @@ public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

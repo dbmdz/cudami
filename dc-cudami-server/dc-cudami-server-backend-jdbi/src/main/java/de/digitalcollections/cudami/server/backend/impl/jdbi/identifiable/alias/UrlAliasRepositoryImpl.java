@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -104,72 +105,76 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     return urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid() : null;
   }
 
-  // FIXME: use standard find method with filtering set before (not searchTerm anymore!)!
-  //  @Override
-  //  public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
-  //      throws RepositoryException {
-  //    StringBuilder commonSql =
-  //        new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
+  // FIXME: use standard find method with filtering set before (not searchTerm
+  // anymore!)!
+  // @Override
+  // public PageResponse<LocalizedUrlAliases> find(PageRequest pageRequest)
+  // throws RepositoryException {
+  // StringBuilder commonSql =
+  // new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
   //
-  //    FilterCriterion slug =
-  //        StringUtils.hasText(pageRequest.getSearchTerm())
-  //            ? FilterCriterion.builder()
-  //                .withExpression("slug")
-  //                .contains(pageRequest.getSearchTerm())
-  //                .build()
-  //            : null;
+  // FilterCriterion slug =
+  // StringUtils.hasText(pageRequest.getSearchTerm())
+  // ? FilterCriterion.builder()
+  // .withExpression("slug")
+  // .contains(pageRequest.getSearchTerm())
+  // .build()
+  // : null;
   //
-  //    Filtering filtering = pageRequest.getFiltering();
-  //    if (filtering == null) {
-  //      filtering = Filtering.builder().add(slug).build();
-  //    } else {
-  //      filtering.add(slug);
-  //    }
-  //    Map<String, Object> bindings = new HashMap<>(0);
-  //    addFiltering(filtering, commonSql, bindings);
+  // Filtering filtering = pageRequest.getFiltering();
+  // if (filtering == null) {
+  // filtering = Filtering.builder().add(slug).build();
+  // } else {
+  // filtering.add(slug);
+  // }
+  // Map<String, Object> bindings = new HashMap<>(0);
+  // addFiltering(filtering, commonSql, bindings);
   //
-  //    long count;
-  //    try {
-  //      count =
-  //          dbi.withHandle(
-  //              h ->
-  //                  h.createQuery("SELECT count(*) " + commonSql.toString())
-  //                      .bindMap(bindings)
-  //                      .mapTo(Long.class)
-  //                      .findOne()
-  //                      .orElse(0L));
-  //    } catch (StatementException e) {
-  //      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-  //      throw new RepositoryException(
-  //          String.format("The SQL statement is defective: %s", detailMessage), e);
-  //    } catch (JdbiException e) {
-  //      throw new RepositoryException(e);
-  //    }
+  // long count;
+  // try {
+  // count =
+  // dbi.withHandle(
+  // h ->
+  // h.createQuery("SELECT count(*) " + commonSql.toString())
+  // .bindMap(bindings)
+  // .mapTo(Long.class)
+  // .findOne()
+  // .orElse(0L));
+  // } catch (StatementException e) {
+  // String detailMessage = e.getCause() != null ? e.getCause().getMessage() :
+  // e.getMessage();
+  // throw new RepositoryException(
+  // String.format("The SQL statement is defective: %s", detailMessage), e);
+  // } catch (JdbiException e) {
+  // throw new RepositoryException(e);
+  // }
   //
-  //    if (!pageRequest.hasSorting()) {
-  //      pageRequest.setSorting(new Sorting("slug"));
-  //    }
-  //    commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
-  //    addPagingAndSorting(pageRequest, commonSql);
+  // if (!pageRequest.hasSorting()) {
+  // pageRequest.setSorting(new Sorting("slug"));
+  // }
+  // commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
+  // addPagingAndSorting(pageRequest, commonSql);
   //
-  //    try {
-  //      UrlAlias[] resultset =
-  //          dbi.withHandle(
-  //              h ->
-  //                  h.createQuery(commonSql.toString())
-  //                      .bindMap(bindings)
-  //                      .reduceRows(this::mapRowToUrlAlias)
-  //                      .toArray(UrlAlias[]::new));
-  //      return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)), pageRequest,
+  // try {
+  // UrlAlias[] resultset =
+  // dbi.withHandle(
+  // h ->
+  // h.createQuery(commonSql.toString())
+  // .bindMap(bindings)
+  // .reduceRows(this::mapRowToUrlAlias)
+  // .toArray(UrlAlias[]::new));
+  // return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)),
+  // pageRequest,
   // count);
-  //    } catch (StatementException e) {
-  //      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-  //      throw new RepositoryException(
-  //          String.format("The SQL statement is defective: %s", detailMessage), e);
-  //    } catch (JdbiException e) {
-  //      throw new RepositoryException(e);
-  //    }
-  //  }
+  // } catch (StatementException e) {
+  // String detailMessage = e.getCause() != null ? e.getCause().getMessage() :
+  // e.getMessage();
+  // throw new RepositoryException(
+  // String.format("The SQL statement is defective: %s", detailMessage), e);
+  // } catch (JdbiException e) {
+  // throw new RepositoryException(e);
+  // }
+  // }
 
   @Override
   public LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException {
@@ -182,8 +187,66 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   @Override
   public PageResponse<LocalizedUrlAliases> findLocalizedUrlAliases(PageRequest pageRequest)
       throws RepositoryException {
-    // TODO Auto-generated method stub
-    return null;
+    StringBuilder commonSql =
+        new StringBuilder(" FROM " + tableName + " AS " + tableAlias + WEBSITESJOIN);
+
+    FilterCriterion slug =
+        StringUtils.hasText(pageRequest.getSearchTerm())
+            ? FilterCriterion.builder()
+                .withExpression("slug")
+                .contains(pageRequest.getSearchTerm())
+                .build()
+            : null;
+
+    Filtering filtering = pageRequest.getFiltering();
+    if (filtering == null) {
+      filtering = Filtering.builder().add(slug).build();
+    } else {
+      filtering.add(slug);
+    }
+    Map<String, Object> bindings = new HashMap<>(0);
+    addFiltering(filtering, commonSql, bindings);
+
+    long count;
+    try {
+      count =
+          dbi.withHandle(
+              h ->
+                  h.createQuery("SELECT count(*) " + commonSql.toString())
+                      .bindMap(bindings)
+                      .mapTo(Long.class)
+                      .findOne()
+                      .orElse(0L));
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
+
+    if (!pageRequest.hasSorting()) {
+      pageRequest.setSorting(new Sorting("slug"));
+    }
+    commonSql.insert(0, String.format("SELECT %s ", getSelectFields(true)));
+    addPagingAndSorting(pageRequest, commonSql);
+
+    try {
+      UrlAlias[] resultset =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(commonSql.toString())
+                      .bindMap(bindings)
+                      .reduceRows(this::mapRowToUrlAlias)
+                      .toArray(UrlAlias[]::new));
+      return new PageResponse<>(List.of(new LocalizedUrlAliases(resultset)), pageRequest, count);
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   private LocalizedUrlAliases findMainLinks(

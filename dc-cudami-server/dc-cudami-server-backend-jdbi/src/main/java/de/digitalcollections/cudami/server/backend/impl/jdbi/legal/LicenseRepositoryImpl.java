@@ -128,9 +128,7 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override
@@ -149,6 +147,11 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
         + ".url "
         + mappingPrefix
         + "_url";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", acronym=:acronym, label=:label::JSONB, url=:url";
   }
 
   @Override

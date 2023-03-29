@@ -402,7 +402,7 @@ class DigitalObjectRepositoryImplTest
    * @throws RepositoryException
    */
   @Test
-  @DisplayName("can update a DigitalObject iwht its directly embedded resources")
+  @DisplayName("can update a DigitalObject with its directly embedded resources")
   void update() throws RepositoryException {
     // Insert a license with uuid
     ensureLicense(EXISTING_LICENSE);

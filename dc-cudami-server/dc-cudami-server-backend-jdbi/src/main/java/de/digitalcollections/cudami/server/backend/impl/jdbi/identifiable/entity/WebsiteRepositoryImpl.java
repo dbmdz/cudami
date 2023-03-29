@@ -36,7 +36,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   private final WebpageRepositoryImpl webpageRepositoryImpl;
 
   public WebsiteRepositoryImpl(
-      Jdbi dbi, WebpageRepositoryImpl webpageRepositoryImpl, CudamiConfig cudamiConfig) {
+      Jdbi dbi, CudamiConfig cudamiConfig, WebpageRepositoryImpl webpageRepositoryImpl) {
     super(
         dbi,
         TABLE_NAME,

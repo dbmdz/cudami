@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,6 +19,17 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
   public static final String TABLE_ALIAS = "tags";
   public static final String TABLE_NAME = "tags";
 
+  private static TagRepositoryImpl SINGLETON_INSTANCE = new TagRepositoryImpl();
+
+  /**
+   * constructor for static methods to make access possible to instance fields that do not use
+   * further dependencies, see {@link #getSqlSelectAllFieldsStatic()}
+   */
+  private TagRepositoryImpl() {
+    super();
+  }
+
+  @Autowired
   public TagRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -83,9 +95,11 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectAllFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
@@ -96,6 +110,10 @@ public class TagRepositoryImpl extends UniqueObjectRepositoryImpl<Tag> implement
         + ".value "
         + mappingPrefix
         + "_value";
+  }
+
+  public static String getSqlSelectReducedFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

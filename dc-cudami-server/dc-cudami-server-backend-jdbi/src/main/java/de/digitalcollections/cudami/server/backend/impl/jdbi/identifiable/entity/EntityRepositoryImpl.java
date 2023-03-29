@@ -27,6 +27,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.statement.PreparedBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -39,6 +40,7 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_ALIAS = "e";
   public static final String TABLE_NAME = "entities";
 
+  @Autowired
   public EntityRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     this(
         dbi,

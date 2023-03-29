@@ -69,7 +69,7 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   protected BiConsumer<Map<UUID, Person>, RowView> createAdditionalReduceRowsBiConsumer() {
     return (map, rowView) -> {
       // entity should be already in map, as we here just add additional data
-      Person person = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+      Person person = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
 
       if (rowView.getColumn("glbirth_uuid", UUID.class) != null) {
         UUID glBirthUuid = rowView.getColumn("glbirth_uuid", UUID.class);

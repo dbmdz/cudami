@@ -94,7 +94,7 @@ class TagRepositoryImplTest {
             .build();
     repo.update(tagToUpdate);
 
-    assertThat(savedTag).isEqualTo(tagToUpdate);
+    assertThat(savedTag.equals(tagToUpdate));
   }
 
   @DisplayName("can retrieve all tags with paging")

@@ -101,9 +101,7 @@ public class RenderingTemplateRepositoryImpl extends UniqueObjectRepositoryImpl<
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
   @Override

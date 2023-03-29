@@ -6,12 +6,13 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
-import org.jdbi.v3.core.statement.Update;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,6 +23,17 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
   public static final String TABLE_ALIAS = "id";
   public static final String TABLE_NAME = "identifiers";
 
+  private static IdentifierRepositoryImpl SINGLETON_INSTANCE = new IdentifierRepositoryImpl();
+
+  /**
+   * constructor for static methods to make access possible to instance fields that do not use
+   * further dependencies, see {@link #getSqlSelectAllFieldsStatic()}
+   */
+  private IdentifierRepositoryImpl() {
+    super();
+  }
+
+  @Autowired
   public IdentifierRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
         dbi,
@@ -42,12 +54,10 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
 
   @Override
   public int deleteByIdentifiable(UUID identifiableUuid) throws RepositoryException {
-    Update update =
-        dbi.withHandle(
-            h ->
-                h.createUpdate("DELETE FROM " + tableName + " WHERE identifiable = :uuid")
-                    .bind("uuid", identifiableUuid));
-    return execDelete(update);
+    final String sql = "DELETE FROM " + tableName + " WHERE identifiable = :uuid";
+    HashMap<String, Object> bindings = new HashMap<>(0);
+    bindings.put("uuid", identifiableUuid);
+    return execUpdateWithMap(sql, bindings);
   }
 
   @Override
@@ -104,7 +114,11 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
 
   @Override
   protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectAllFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
@@ -123,6 +137,10 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
         + ".identifier "
         + mappingPrefix
         + "_id";
+  }
+
+  public static String getSqlSelectReducedFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

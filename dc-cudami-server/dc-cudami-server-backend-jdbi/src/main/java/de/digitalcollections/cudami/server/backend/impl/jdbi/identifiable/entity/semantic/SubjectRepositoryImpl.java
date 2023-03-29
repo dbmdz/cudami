@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -29,6 +30,17 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
   public static final String TABLE_ALIAS = "subj";
   public static final String TABLE_NAME = "subjects";
 
+  private static SubjectRepositoryImpl SINGLETON_INSTANCE = new SubjectRepositoryImpl();
+
+  /**
+   * constructor for static methods to make access possible to instance fields that do not use
+   * further dependencies, see {@link #getSqlSelectAllFieldsStatic()}
+   */
+  private SubjectRepositoryImpl() {
+    super();
+  }
+
+  @Autowired
   public SubjectRepositoryImpl(
       Jdbi dbi, CudamiConfig cudamiConfig, DbIdentifierMapper dbIdentifierMapper) {
     super(
@@ -159,7 +171,11 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
 
   @Override
   protected String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix);
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  public static String getSqlSelectAllFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override
@@ -178,6 +194,10 @@ public class SubjectRepositoryImpl extends UniqueObjectRepositoryImpl<Subject>
         + ".type "
         + mappingPrefix
         + "_type";
+  }
+
+  public static String getSqlSelectReducedFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
   }
 
   @Override

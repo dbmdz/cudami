@@ -201,24 +201,22 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
 
   @Override
   public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    final String sql =
-        getSqlSelectReducedFields(tableAlias, mappingPrefix)
-            + ", "
-            + tableAlias
-            + ".text "
-            + mappingPrefix
-            + "_text"
-            + ", "
-            + HeadwordRepositoryImpl.TABLE_ALIAS
-            + ".uuid "
-            + HeadwordRepositoryImpl.MAPPING_PREFIX
-            + "_uuid"
-            + ", "
-            + HeadwordRepositoryImpl.TABLE_ALIAS
-            + ".label "
-            + HeadwordRepositoryImpl.MAPPING_PREFIX
-            + "_label";
-    return sql;
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".text "
+        + mappingPrefix
+        + "_text"
+        + ", "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".uuid "
+        + HeadwordRepositoryImpl.MAPPING_PREFIX
+        + "_uuid"
+        + ", "
+        + HeadwordRepositoryImpl.TABLE_ALIAS
+        + ".label "
+        + HeadwordRepositoryImpl.MAPPING_PREFIX
+        + "_label";
   }
 
   @Override

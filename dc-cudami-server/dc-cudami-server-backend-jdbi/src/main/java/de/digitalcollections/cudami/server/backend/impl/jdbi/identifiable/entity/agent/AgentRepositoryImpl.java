@@ -15,6 +15,7 @@ import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /** Repository for Agent persistence handling. No own table, using entities table. */
@@ -28,6 +29,7 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
   public static final String TABLE_ALIAS = "ag";
   public static final String TABLE_NAME = "agents";
 
+  @Autowired
   public AgentRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     this(
         dbi,
