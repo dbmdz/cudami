@@ -46,7 +46,8 @@ public abstract class AbstractIdentifiableRepositoryImplTest<R extends Identifia
   }
 
   protected <I extends Identifiable> void assertInDatabaseIsEqualToUpdateable(
-      I identifiable, I identifiableBeforeUpdate, Function<I, I> additionalFilling) {
+      I identifiable, I identifiableBeforeUpdate, Function<I, I> additionalFilling)
+      throws RepositoryException {
     I actual = (I) repo.getByUuid(identifiable.getUuid());
     actual = additionalFilling.apply(actual);
 

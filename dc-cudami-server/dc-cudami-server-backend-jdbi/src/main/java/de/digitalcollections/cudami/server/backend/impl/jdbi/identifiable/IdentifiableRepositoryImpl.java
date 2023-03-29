@@ -68,71 +68,8 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_NAME = "identifiables";
 
   @Autowired protected IdentifierRepositoryImpl identifierRepositoryImpl;
-
-  @Override
-  protected String getSqlInsertFields() {
-    return super.getSqlInsertFields()
-        + ", "
-        + """
-        description, identifiable_objecttype,
-        identifiable_type, label, previewfileresource,
-        preview_hints, split_label, tags_uuids, subjects_uuids
-        """;
-  }
-
-  @Override
-  protected String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + ", "
-        + """
-        :description::JSONB, :identifiableObjectType,
-        :type, :label::JSONB, :previewFileResource,
-        :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[], :subjects_uuids::UUID[]
-        """;
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
-        + ", "
-        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
-  }
-
-  @Override
-  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + ", "
-        + tableAlias
-        + ".description "
-        + mappingPrefix
-        + "_description, "
-        + tableAlias
-        + ".identifiable_objecttype "
-        + mappingPrefix
-        + "_identifiableObjectType, "
-        + tableAlias
-        + ".identifiable_type "
-        + mappingPrefix
-        + "_type, "
-        + tableAlias
-        + ".label "
-        + mappingPrefix
-        + "_label, "
-        + tableAlias
-        + ".preview_hints "
-        + mappingPrefix
-        + "_previewImageRenderingHints";
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    // do not update/left out from statement (not changed since insert):
-    // identifiable_type
-    return super.getSqlUpdateFieldValues()
-        + ", description=:description::JSONB, label=:label::JSONB, previewfileresource=:previewFileResource, "
-        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]"
-        + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
-  }
+  @Autowired protected SubjectRepositoryImpl subjectRepositoryImpl;
+  @Autowired protected TagRepositoryImpl tagRepositoryImpl;
 
   @Autowired
   protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
@@ -214,21 +151,17 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   @Override
+  public I create() throws RepositoryException {
+    return (I) new Identifiable();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, I>, RowView> createAdditionalReduceRowsBiConsumer() {
     if (additionalReduceRowsBiConsumer == null) {
       return super.createAdditionalReduceRowsBiConsumer();
     }
     return additionalReduceRowsBiConsumer;
   }
-
-  // FIXME delete
-  // @Override
-  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
-  // argumentMappings) {
-  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
-  // splitToArray(searchTerm));
-  // return super.addSearchTermMappings(searchTerm, argumentMappings);
-  // }
 
   @Override
   protected BiConsumer<Map<UUID, I>, RowView> createBasicReduceRowsBiConsumer() {
@@ -246,57 +179,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
       extendReducedIdentifiable(identifiable, rowView);
     };
-  }
-
-  private void setLocalizedUrlAliasesFromRowView(RowView rowView, I identifiable) {
-    if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-      UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
-      UUID websiteUuid =
-          rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
-      if (websiteUuid != null) {
-        Website website =
-            new Website(
-                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
-        website.setUuid(websiteUuid);
-        website.setLabel(
-            rowView.getColumn(
-                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
-        urlAlias.setWebsite(website);
-      }
-      if (identifiable.getLocalizedUrlAliases() == null) {
-        identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
-      } else if (!identifiable.getLocalizedUrlAliases().containsUrlAlias(urlAlias)) {
-        identifiable.getLocalizedUrlAliases().add(urlAlias);
-      }
-    }
-  }
-
-  private void setIdentifiersFromRowView(RowView rowView, I identifiable) {
-    if (rowView.getColumn("id_uuid", UUID.class) != null) {
-      Identifier dbIdentifier = rowView.getRow(Identifier.class);
-      identifiable.addIdentifier(dbIdentifier);
-    }
-  }
-
-  private void setPreviewImageFromRowView(RowView rowView, I identifiable) {
-    if (rowView.getColumn("pi_uuid", UUID.class) != null) {
-      // see definition in
-      // FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
-      // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
-      // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
-
-      // TODO workaround as long at is not possible to register two RowMappers for one
-      // type
-      // but for different prefixes (unitl now the first takes precedence),
-      // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
-      ImageFileResource previewImage = new ImageFileResource();
-      previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
-      previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
-      previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
-      previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));
-      previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
-      identifiable.setPreviewImage(previewImage);
-    }
   }
 
   protected BiConsumer<Map<UUID, I>, RowView> createFullReduceRowsBiConcumer() {
@@ -317,32 +199,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
       extendReducedIdentifiable(identifiable, rowView);
     };
-  }
-
-  private void setSubjectsFromRowView(RowView rowView, I identifiable) {
-    UUID subjectUuid =
-        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-    if (subjectUuid != null
-        && (identifiable.getSubjects() == null
-            || !identifiable.getSubjects().stream()
-                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
-      Subject subject = rowView.getRow(Subject.class);
-      identifiable.addSubject(subject);
-    }
-  }
-
-  private void setTagsFromRowView(RowView rowView, I identifiable) {
-    if (rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-      Tag tag = rowView.getRow(Tag.class);
-      if (tag != null) {
-        identifiable.addTag(tag);
-      }
-    }
-  }
-
-  @Override
-  public I create() throws RepositoryException {
-    return (I) new Identifiable();
   }
 
   /**
@@ -368,6 +224,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
 
     return pageResponse;
   }
+
+  // FIXME delete
+  // @Override
+  // protected String addSearchTermMappings(String searchTerm, Map<String, Object>
+  // argumentMappings) {
+  // argumentMappings.put(SearchTermTemplates.ARRAY_CONTAINS.placeholder,
+  // splitToArray(searchTerm));
+  // return super.addSearchTermMappings(searchTerm, argumentMappings);
+  // }
 
   @Override
   @Deprecated
@@ -562,6 +427,71 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     return templates;
   }
 
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", "
+        + """
+        description, identifiable_objecttype,
+        identifiable_type, label, previewfileresource,
+        preview_hints, split_label, tags_uuids, subjects_uuids
+        """;
+  }
+
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", "
+        + """
+        :description::JSONB, :identifiableObjectType,
+        :type, :label::JSONB, :previewFileResource,
+        :previewImageRenderingHints::JSONB, :split_label::TEXT[], :tags_uuids::UUID[], :subjects_uuids::UUID[]
+        """;
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".description "
+        + mappingPrefix
+        + "_description, "
+        + tableAlias
+        + ".identifiable_objecttype "
+        + mappingPrefix
+        + "_identifiableObjectType, "
+        + tableAlias
+        + ".identifiable_type "
+        + mappingPrefix
+        + "_type, "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".preview_hints "
+        + mappingPrefix
+        + "_previewImageRenderingHints";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    // do not update/left out from statement (not changed since insert):
+    // identifiable_type
+    return super.getSqlUpdateFieldValues()
+        + ", description=:description::JSONB, label=:label::JSONB, previewfileresource=:previewFileResource, "
+        + "preview_hints=:previewImageRenderingHints::JSONB, split_label=:split_label::TEXT[]"
+        + ", tags_uuids=:tags_uuids::UUID[], subjects_uuids=:subjects_uuids::UUID[]";
+  }
+
   // FIXME: delete when proper jsonb contains search implemented
   protected boolean hasSplitColumn(String propertyName) {
     // only label for now
@@ -671,9 +601,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + ", "
                 + UrlAliasRepositoryImpl.getSelectFields(true)
                 + ", "
-                + TagRepositoryImpl.SQL_REDUCED_FIELDS_TAGS
+                + tagRepositoryImpl.getSqlSelectReducedFields()
                 + ", "
-                + SubjectRepositoryImpl.SQL_REDUCED_FIELDS_SUBJECTS
+                + subjectRepositoryImpl.getSqlSelectReducedFields()
                 + " FROM "
                 + (StringUtils.hasText(innerSelect) ? innerSelect : tableName)
                 + " AS "
@@ -761,6 +691,57 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     super.save(identifiable, bindings, sqlModifier);
   }
 
+  private void setIdentifiersFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn("id_uuid", UUID.class) != null) {
+      Identifier dbIdentifier = rowView.getRow(Identifier.class);
+      identifiable.addIdentifier(dbIdentifier);
+    }
+  }
+
+  private void setLocalizedUrlAliasesFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
+      UUID websiteUuid =
+          rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
+      if (websiteUuid != null) {
+        Website website =
+            new Website(
+                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+        website.setUuid(websiteUuid);
+        website.setLabel(
+            rowView.getColumn(
+                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+        urlAlias.setWebsite(website);
+      }
+      if (identifiable.getLocalizedUrlAliases() == null) {
+        identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
+      } else if (!identifiable.getLocalizedUrlAliases().containsUrlAlias(urlAlias)) {
+        identifiable.getLocalizedUrlAliases().add(urlAlias);
+      }
+    }
+  }
+
+  private void setPreviewImageFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn("pi_uuid", UUID.class) != null) {
+      // see definition in
+      // FileResourceMetadataRepositoryimpl.SQL_PREVIEW_IMAGE_FIELDS_PI:
+      // file.uuid pi_uuid, file.filename pi_filename, file.mimetype pi_mimeType,
+      // file.uri pi_uri, file.http_base_url pi_httpBaseUrl
+
+      // TODO workaround as long at is not possible to register two RowMappers for one
+      // type
+      // but for different prefixes (unitl now the first takes precedence),
+      // see discussion https://groups.google.com/g/jdbi/c/UhVygrtoH0U
+      ImageFileResource previewImage = new ImageFileResource();
+      previewImage.setUuid(rowView.getColumn("pi_uuid", UUID.class));
+      previewImage.setFilename(rowView.getColumn("pi_filename", String.class));
+      previewImage.setHttpBaseUrl(rowView.getColumn("pi_httpBaseUrl", URL.class));
+      previewImage.setMimeType(rowView.getColumn("pi_mimeType", MimeType.class));
+      previewImage.setUri(rowView.getColumn("pi_uri", URI.class));
+      identifiable.setPreviewImage(previewImage);
+    }
+  }
+
   @Override
   public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities)
       throws RepositoryException {
@@ -822,6 +803,27 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         });
     return findRelatedFileResources(identifiableUuid, new PageRequest(0, fileResources.size()))
         .getContent();
+  }
+
+  private void setSubjectsFromRowView(RowView rowView, I identifiable) {
+    UUID subjectUuid =
+        rowView.getColumn(SubjectRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+    if (subjectUuid != null
+        && (identifiable.getSubjects() == null
+            || !identifiable.getSubjects().stream()
+                .anyMatch(subj -> Objects.equals(subj.getUuid(), subjectUuid)))) {
+      Subject subject = rowView.getRow(Subject.class);
+      identifiable.addSubject(subject);
+    }
+  }
+
+  private void setTagsFromRowView(RowView rowView, I identifiable) {
+    if (rowView.getColumn(TagRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+      Tag tag = rowView.getRow(Tag.class);
+      if (tag != null) {
+        identifiable.addTag(tag);
+      }
+    }
   }
 
   @Override

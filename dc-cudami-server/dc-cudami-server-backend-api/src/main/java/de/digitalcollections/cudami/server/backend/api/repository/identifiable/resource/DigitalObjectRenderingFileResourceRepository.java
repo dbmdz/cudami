@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -32,4 +33,6 @@ public interface DigitalObjectRenderingFileResourceRepository {
 
   public void saveRenderingFileResources(
       UUID digitalObjectUuid, List<FileResource> renderingResources);
+
+  List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) throws RepositoryException;
 }

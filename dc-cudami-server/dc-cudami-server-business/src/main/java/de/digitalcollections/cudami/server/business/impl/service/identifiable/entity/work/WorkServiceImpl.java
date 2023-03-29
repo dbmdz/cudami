@@ -11,7 +11,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -67,7 +67,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   public void save(Work work) throws ServiceException, ValidationException {
     super.save(work);
     try {
-      List<EntityToEntityRelation> entityRelations = work.getRelations();
+      List<EntityRelation> entityRelations = work.getRelations();
       entityRelationService.persistEntityRelations(work, entityRelations, true);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
@@ -79,7 +79,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   public void update(Work work) throws ServiceException, ValidationException {
     super.update(work);
     try {
-      List<EntityToEntityRelation> entityRelations = work.getRelations();
+      List<EntityRelation> entityRelations = work.getRelations();
       entityRelationService.persistEntityRelations(work, entityRelations, false);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {

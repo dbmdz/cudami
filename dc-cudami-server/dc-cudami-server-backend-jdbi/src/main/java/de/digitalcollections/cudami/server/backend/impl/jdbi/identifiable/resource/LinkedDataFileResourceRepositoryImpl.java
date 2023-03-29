@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.LinkedDataFileResourceRepository;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import java.util.Arrays;
 import java.util.List;
 import org.jdbi.v3.core.Jdbi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,6 +17,43 @@ public class LinkedDataFileResourceRepositoryImpl
   public static final String MAPPING_PREFIX = "fr";
   public static final String TABLE_ALIAS = "f";
   public static final String TABLE_NAME = "fileresources_linkeddata";
+
+  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+    super(
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        LinkedDataFileResource.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  @Override
+  public LinkedDataFileResource create() throws RepositoryException {
+    return new LinkedDataFileResource();
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("context", "objectType"));
+    return allowedOrderByFields;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "context":
+        return tableAlias + ".context";
+      case "objectType":
+        return tableAlias + ".object_type";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
 
   @Override
   public String getSqlInsertFields() {
@@ -46,41 +83,5 @@ public class LinkedDataFileResourceRepositoryImpl
   @Override
   public String getSqlUpdateFieldValues() {
     return super.getSqlUpdateFieldValues() + ", context=:context, object_type=:objectType";
-  }
-
-  @Autowired
-  public LinkedDataFileResourceRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
-        dbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        LinkedDataFileResource.class,
-        cudamiConfig.getOffsetForAlternativePaging());
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("context", "objectType"));
-    return allowedOrderByFields;
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    if (super.getColumnName(modelProperty) != null) {
-      return super.getColumnName(modelProperty);
-    }
-    switch (modelProperty) {
-      case "context":
-        return tableAlias + ".context";
-      case "objectType":
-        return tableAlias + ".object_type";
-      default:
-        return null;
-    }
   }
 }

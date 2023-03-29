@@ -19,7 +19,7 @@ import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.relation.Predicate;
 import de.digitalcollections.model.semantic.Subject;
@@ -77,13 +77,13 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
 
   @DisplayName("Returns null when retrieve by uuid finds no match")
   @Test
-  public void noRetrieveByUuid() {
+  public void noRetrieveByUuid() throws RepositoryException {
     assertThat(repo.getByUuid(UUID.randomUUID())).isNull();
   }
 
   @DisplayName("Returns null when retrieve by identifier finds no match")
   @Test
-  public void noRetrieveByIdentifier() {
+  public void noRetrieveByIdentifier() throws RepositoryException {
     assertThat(
             repo.getByIdentifier(Identifier.builder().namespace("gnd").id("1234-5678-9").build()))
         .isNull();
@@ -267,8 +267,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     Predicate predicate = Predicate.builder().value("is_creator_of").build();
     predicateRepository.save(predicate);
 
-    EntityToEntityRelation entityRelation =
-        EntityToEntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
+    EntityRelation entityRelation =
+        EntityRelation.builder().subject(person).predicate(predicate.getValue()).build();
     Work work =
         Work.builder()
             .label(Locale.GERMAN, "Erstlingswerk")

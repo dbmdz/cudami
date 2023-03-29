@@ -17,7 +17,8 @@ public interface ManifestationRepository extends EntityRepository<Manifestation>
   // TODO: documentation: no parent - child relation; is modelled as
   // List<RelationSpecification<Manifestation>> parents ("partOf");
   // so maybe rename to "findSubParts"? (volumes of a multi-volume manifestation like lexika)
-  PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest);
+  PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid);
 }

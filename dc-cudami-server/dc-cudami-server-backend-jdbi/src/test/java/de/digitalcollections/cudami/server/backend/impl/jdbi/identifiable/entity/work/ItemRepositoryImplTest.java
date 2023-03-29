@@ -352,14 +352,14 @@ public class ItemRepositoryImplTest
 
   @Test
   @DisplayName("can return an empty set of connected digital objects for an null item")
-  void digitalObjectsForNullItem() {
+  void digitalObjectsForNullItem() throws RepositoryException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     assertThat(repo.findDigitalObjects((UUID) null, pageRequest)).isEmpty();
   }
 
   @Test
   @DisplayName("can return an empty set of connected digital objects for an nonexisting item")
-  void digitalObjectsForNonexistingItem() {
+  void digitalObjectsForNonexistingItem() throws RepositoryException {
     PageRequest pageRequest = PageRequest.builder().pageSize(25).pageNumber(0).build();
     assertThat(repo.findDigitalObjects(UUID.randomUUID(), pageRequest)).isEmpty();
   }

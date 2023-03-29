@@ -48,6 +48,11 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
+  public Website create() throws RepositoryException {
+    return new Website();
+  }
+
+  @Override
   public List<Webpage> findRootWebpages(UUID uuid) throws RepositoryException {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();

@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.backend.impl.model;
 
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.text.LocalizedStructuredContent;
 import de.digitalcollections.model.text.LocalizedText;
@@ -44,7 +44,7 @@ public class TestModelFixture {
     return createEntity(DigitalObject.class, labelMap, descriptionMap);
   }
 
-  public static EntityToEntityRelation createEntityRelation(
+  public static EntityRelation createEntityRelation(
       Map<Locale, String> subjectLabels, Map<Locale, String> objectLabels, String predicate)
       throws InstantiationException, IllegalAccessException, IllegalArgumentException,
           InvocationTargetException, NoSuchMethodException, SecurityException {
@@ -52,7 +52,7 @@ public class TestModelFixture {
     subject.setUuid(UUID.randomUUID());
     Entity object = createEntity(Entity.class, objectLabels, Map.of());
     object.setUuid(UUID.randomUUID());
-    return new EntityToEntityRelation(subject, predicate, object);
+    return new EntityRelation(subject, predicate, object);
   }
 
   public static License createLicense(

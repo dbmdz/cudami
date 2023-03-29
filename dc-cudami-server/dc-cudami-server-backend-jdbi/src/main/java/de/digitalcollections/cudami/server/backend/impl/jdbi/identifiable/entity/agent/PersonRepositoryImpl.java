@@ -61,6 +61,11 @@ public class PersonRepositoryImpl extends AgentRepositoryImpl<Person> implements
   }
 
   @Override
+  public Person create() throws RepositoryException {
+    return new Person();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, Person>, RowView> createAdditionalReduceRowsBiConsumer() {
     return (map, rowView) -> {
       // entity should be already in map, as we here just add additional data

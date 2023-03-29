@@ -13,7 +13,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.type.TitleMapper;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -48,13 +48,255 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   public static final String TABLE_ALIAS = "w";
   public static final String TABLE_NAME = "works";
 
-  private EntityRepositoryImpl<Entity> entityRepository;
   private AgentRepositoryImpl<Agent> agentRepository;
+  private EntityToEntityRelationRepositoryImpl entityRelationRepository;
+  private EntityRepositoryImpl<Entity> entityRepository;
   private HumanSettlementRepositoryImpl humanSettlementRepository;
   private ItemRepositoryImpl itemRepository;
   private ManifestationRepositoryImpl manifestationRepository;
   private PersonRepositoryImpl personRepository;
-  private EntityToEntityRelationRepositoryImpl entityRelationRepository;
+
+  public WorkRepositoryImpl(
+      Jdbi jdbi,
+      CudamiConfig cudamiConfig,
+      LocalDateRangeMapper dateRangeMapper,
+      TitleMapper titleMapper,
+      EntityRepositoryImpl<Entity> entityRepository,
+      AgentRepositoryImpl<Agent> agentRepository,
+      HumanSettlementRepositoryImpl humanSettlementRepository,
+      ManifestationRepositoryImpl manifestationRepository,
+      ItemRepositoryImpl itemRepository,
+      PersonRepositoryImpl personRepository,
+      EntityToEntityRelationRepositoryImpl entityRelationRepository) {
+    super(
+        jdbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Work.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+    dbi.registerArgument(dateRangeMapper);
+    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
+    dbi.registerColumnMapper(Title.class, titleMapper);
+
+    this.entityRepository = entityRepository;
+    this.agentRepository = agentRepository;
+    this.humanSettlementRepository = humanSettlementRepository;
+    this.manifestationRepository = manifestationRepository;
+    this.itemRepository = itemRepository;
+    this.personRepository = personRepository;
+    this.entityRelationRepository = entityRelationRepository;
+  }
+
+  @Override
+  public Work create() throws RepositoryException {
+    return new Work();
+  }
+
+  @Override
+  protected void extendReducedIdentifiable(Work work, RowView rowView) {
+    // parents
+    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
+    if (parentUuid != null) {
+      if (work.getParents() == null) {
+        work.setParents(new ArrayList<>(1));
+      }
+      if (!work.getParents().stream()
+          .anyMatch(relSpec -> Objects.equals(relSpec.getUuid(), parentUuid))) {
+        Work parent =
+            Work.builder()
+                .uuid(parentUuid)
+                .label(rowView.getColumn("parent_label", LocalizedText.class))
+                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
+                .refId(rowView.getColumn("parent_refId", Integer.class))
+                .notes(
+                    rowView.getColumn(
+                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
+                .created(rowView.getColumn("parent_created", LocalDateTime.class))
+                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
+                .identifiableObjectType(
+                    rowView.getColumn(
+                        "parent_identifiableObjectType", IdentifiableObjectType.class))
+                .build();
+        work.getParents().add(parent);
+      }
+    }
+
+    // relations
+    UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
+    if (entityUuid != null) {
+      if (work.getRelations() == null || work.getRelations().isEmpty()) {
+        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
+        relations.setSize(maxIndex);
+        work.setRelations(relations);
+      }
+      String relationPredicate =
+          rowView.getColumn(
+              EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
+      if (!work.getRelations().stream()
+          .anyMatch(
+              relation ->
+                  relation != null
+                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
+                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
+        Entity relatedEntity = rowView.getRow(Entity.class);
+        work.getRelations()
+            .set(
+                rowView.getColumn(
+                    EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
+                    Integer.class),
+                EntityRelation.builder()
+                    .subject(relatedEntity)
+                    .predicate(relationPredicate)
+                    .additionalPredicates(
+                        rowView.getColumn(
+                            EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX
+                                + "_additionalPredicates",
+                            new GenericType<List<String>>() {}))
+                    .build());
+      }
+    }
+  }
+
+  @Override
+  public PageResponse<Work> findByPerson(UUID personUuid) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  public PageResponse<Work> findEmbeddedWorks(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
+    final String workWorksTableName = "work_works";
+    final String workWorksTableAlias = "wws";
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + workWorksTableName
+                + " AS "
+                + workWorksTableAlias
+                + " INNER JOIN "
+                + tableName
+                + " "
+                + tableAlias
+                + " ON "
+                + workWorksTableAlias
+                + ".object_uuid = "
+                + tableAlias
+                + ".uuid"
+                + " WHERE "
+                + workWorksTableAlias
+                + ".subject_uuid = :subject_uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("subject_uuid", uuid);
+
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<Work> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> orderByFields = super.getAllowedOrderByFields();
+    return orderByFields;
+  }
+
+  @Override
+  public Work getByItemUuid(UUID itemUuid) throws RepositoryException {
+    String innerSelect =
+        " (SELECT w.* FROM "
+            + getTableName()
+            + " "
+            + getTableAlias()
+            + ", "
+            + manifestationRepository.getTableName()
+            + " "
+            + manifestationRepository.getTableAlias()
+            + ", "
+            + itemRepository.getTableName()
+            + " "
+            + itemRepository.getTableAlias()
+            + " WHERE "
+            + itemRepository.getTableAlias()
+            + ".uuid = :item_uuid"
+            + " AND "
+            + itemRepository.getTableAlias()
+            + ".manifestation="
+            + manifestationRepository.getTableAlias()
+            + ".uuid"
+            + " AND "
+            + manifestationRepository.getTableAlias()
+            + ".work="
+            + getTableAlias()
+            + ".uuid)";
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("item_uuid", itemUuid);
+
+    return retrieveOne(getSqlSelectAllFields(), null, null, argumentMappings, innerSelect);
+  }
+
+  @Override
+  public Set<Work> getByPersonUuid(UUID personUuid) throws RepositoryException {
+    StringBuilder innerSelect =
+        new StringBuilder(
+            " SELECT "
+                + getTableAlias()
+                + ".* FROM "
+                + getTableName()
+                + " "
+                + getTableAlias()
+                + ", "
+                + personRepository.getTableName()
+                + " "
+                + personRepository.getTableAlias()
+                + ", "
+                + entityRelationRepository.getTableName()
+                + " "
+                + entityRelationRepository.getTableAlias()
+                + " WHERE "
+                + personRepository.getTableAlias()
+                + ".uuid = :person_uuid"
+                + " AND "
+                + entityRelationRepository.getTableAlias()
+                + ".subject_uuid="
+                + personRepository.getTableAlias()
+                + ".uuid"
+                + " AND "
+                + entityRelationRepository.getTableAlias()
+                + ".object_uuid="
+                + getTableAlias()
+                + ".uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("person_uuid", personUuid);
+    return new HashSet<>(
+        retrieveList(getSqlSelectReducedFields(), innerSelect, argumentMappings, null));
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    switch (modelProperty) {
+      case "titles":
+        return modelProperty;
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
 
   @Override
   public String getSqlInsertFields() {
@@ -111,17 +353,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + ", creation_daterange=:creationDateRange::daterange"
-        + ", creation_timevalue=:creationTimeValue::JSONB"
-        + ", first_appeared_date=:firstAppearedDate"
-        + ", first_appeared_presentation=:firstAppearedDatePresentation"
-        + ", first_appeared_timevalue=:firstAppearedTimeValue::JSONB"
-        + ", titles={{titles}}";
-  }
-
-  @Override
   protected String getSqlSelectReducedFieldsJoins() {
     return super.getSqlSelectReducedFieldsJoins()
         + """
@@ -141,154 +372,15 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
                 EntityRepositoryImpl.TABLE_ALIAS);
   }
 
-  public WorkRepositoryImpl(
-      Jdbi jdbi,
-      CudamiConfig cudamiConfig,
-      LocalDateRangeMapper dateRangeMapper,
-      TitleMapper titleMapper,
-      EntityRepositoryImpl<Entity> entityRepository,
-      AgentRepositoryImpl<Agent> agentRepository,
-      HumanSettlementRepositoryImpl humanSettlementRepository,
-      ManifestationRepositoryImpl manifestationRepository,
-      ItemRepositoryImpl itemRepository,
-      PersonRepositoryImpl personRepository,
-      EntityToEntityRelationRepositoryImpl entityRelationRepository) {
-    super(
-        jdbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        Work.class,
-        null,
-        cudamiConfig.getOffsetForAlternativePaging());
-    dbi.registerArgument(dateRangeMapper);
-    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
-    dbi.registerColumnMapper(Title.class, titleMapper);
-
-    this.entityRepository = entityRepository;
-    this.agentRepository = agentRepository;
-    this.humanSettlementRepository = humanSettlementRepository;
-    this.manifestationRepository = manifestationRepository;
-    this.itemRepository = itemRepository;
-    this.personRepository = personRepository;
-    this.entityRelationRepository = entityRelationRepository;
-  }
-
   @Override
-  public PageResponse<Work> findEmbeddedWorks(UUID uuid, PageRequest pageRequest) {
-    final String workWorksTableName = "work_works";
-    final String workWorksTableAlias = "wws";
-
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + workWorksTableName
-                + " AS "
-                + workWorksTableAlias
-                + " INNER JOIN "
-                + tableName
-                + " "
-                + tableAlias
-                + " ON "
-                + workWorksTableAlias
-                + ".object_uuid = "
-                + tableAlias
-                + ".uuid"
-                + " WHERE "
-                + workWorksTableAlias
-                + ".subject_uuid = :subject_uuid");
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("subject_uuid", uuid);
-
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<Work> result =
-        retrieveList(
-            getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public Work getByItemUuid(UUID itemUuid) {
-    String innerSelect =
-        " (SELECT w.* FROM "
-            + getTableName()
-            + " "
-            + getTableAlias()
-            + ", "
-            + manifestationRepository.getTableName()
-            + " "
-            + manifestationRepository.getTableAlias()
-            + ", "
-            + itemRepository.getTableName()
-            + " "
-            + itemRepository.getTableAlias()
-            + " WHERE "
-            + itemRepository.getTableAlias()
-            + ".uuid = :item_uuid"
-            + " AND "
-            + itemRepository.getTableAlias()
-            + ".manifestation="
-            + manifestationRepository.getTableAlias()
-            + ".uuid"
-            + " AND "
-            + manifestationRepository.getTableAlias()
-            + ".work="
-            + getTableAlias()
-            + ".uuid)";
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("item_uuid", itemUuid);
-
-    return retrieveOne(getSqlSelectAllFields(), null, null, argumentMappings, innerSelect);
-  }
-
-  @Override
-  public Set<Work> getByPersonUuid(UUID personUuid) {
-    StringBuilder innerSelect =
-        new StringBuilder(
-            " SELECT "
-                + getTableAlias()
-                + ".* FROM "
-                + getTableName()
-                + " "
-                + getTableAlias()
-                + ", "
-                + personRepository.getTableName()
-                + " "
-                + personRepository.getTableAlias()
-                + ", "
-                + entityRelationRepository.getTableName()
-                + " "
-                + entityRelationRepository.getTableAlias()
-                + " WHERE "
-                + personRepository.getTableAlias()
-                + ".uuid = :person_uuid"
-                + " AND "
-                + entityRelationRepository.getTableAlias()
-                + ".subject_uuid="
-                + personRepository.getTableAlias()
-                + ".uuid"
-                + " AND "
-                + entityRelationRepository.getTableAlias()
-                + ".object_uuid="
-                + getTableAlias()
-                + ".uuid");
-
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("person_uuid", personUuid);
-    return new HashSet<>(
-        retrieveList(getSqlSelectReducedFields(), innerSelect, argumentMappings, null));
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", creation_daterange=:creationDateRange::daterange"
+        + ", creation_timevalue=:creationTimeValue::JSONB"
+        + ", first_appeared_date=:firstAppearedDate"
+        + ", first_appeared_presentation=:firstAppearedDatePresentation"
+        + ", first_appeared_timevalue=:firstAppearedTimeValue::JSONB"
+        + ", titles={{titles}}";
   }
 
   @Override
@@ -297,15 +389,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       bindings = new HashMap<>(3);
     }
     super.save(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
-    saveParents(work);
-  }
-
-  @Override
-  public void update(Work work, Map<String, Object> bindings) throws RepositoryException {
-    if (bindings == null) {
-      bindings = new HashMap<>(3);
-    }
-    super.update(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
     saveParents(work);
   }
 
@@ -342,88 +425,6 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  protected void extendReducedIdentifiable(Work work, RowView rowView) {
-    // parents
-    UUID parentUuid = rowView.getColumn("parent_uuid", UUID.class);
-    if (parentUuid != null) {
-      if (work.getParents() == null) {
-        work.setParents(new ArrayList<>(1));
-      }
-      if (!work.getParents().stream()
-          .anyMatch(relSpec -> Objects.equals(relSpec.getUuid(), parentUuid))) {
-        Work parent =
-            Work.builder()
-                .uuid(parentUuid)
-                .label(rowView.getColumn("parent_label", LocalizedText.class))
-                .titles(rowView.getColumn("parent_titles", new GenericType<List<Title>>() {}))
-                .refId(rowView.getColumn("parent_refId", Integer.class))
-                .notes(
-                    rowView.getColumn(
-                        "parent_notes", new GenericType<List<LocalizedStructuredContent>>() {}))
-                .created(rowView.getColumn("parent_created", LocalDateTime.class))
-                .lastModified(rowView.getColumn("parent_lastModified", LocalDateTime.class))
-                .identifiableObjectType(
-                    rowView.getColumn(
-                        "parent_identifiableObjectType", IdentifiableObjectType.class))
-                .build();
-        work.getParents().add(parent);
-      }
-    }
-
-    // relations
-    UUID entityUuid = rowView.getColumn(entityRepository.getMappingPrefix() + "_uuid", UUID.class);
-    if (entityUuid != null) {
-      if (work.getRelations() == null || work.getRelations().isEmpty()) {
-        int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityToEntityRelation> relations = new Vector<>(++maxIndex);
-        relations.setSize(maxIndex);
-        work.setRelations(relations);
-      }
-      String relationPredicate =
-          rowView.getColumn(
-              EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_predicate", String.class);
-      if (!work.getRelations().stream()
-          .anyMatch(
-              relation ->
-                  relation != null
-                      && Objects.equals(entityUuid, relation.getSubject().getUuid())
-                      && Objects.equals(relationPredicate, relation.getPredicate()))) {
-        Entity relatedEntity = rowView.getRow(Entity.class);
-        work.getRelations()
-            .set(
-                rowView.getColumn(
-                    EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
-                    Integer.class),
-                EntityToEntityRelation.builder()
-                    .subject(relatedEntity)
-                    .predicate(relationPredicate)
-                    .additionalPredicates(
-                        rowView.getColumn(
-                            EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX
-                                + "_additionalPredicates",
-                            new GenericType<List<String>>() {}))
-                    .build());
-      }
-    }
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    switch (modelProperty) {
-      case "titles":
-        return modelProperty;
-      default:
-        return super.getColumnName(modelProperty);
-    }
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> orderByFields = super.getAllowedOrderByFields();
-    return orderByFields;
-  }
-
-  @Override
   protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
     switch (modelProperty) {
       case "firstAppearedDatePresentation":
@@ -431,5 +432,14 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
       default:
         return super.supportsCaseSensitivityForProperty(modelProperty);
     }
+  }
+
+  @Override
+  public void update(Work work, Map<String, Object> bindings) throws RepositoryException {
+    if (bindings == null) {
+      bindings = new HashMap<>(3);
+    }
+    super.update(work, bindings, TitleSqlHelper.buildTitleSql(work.getTitles()));
+    saveParents(work);
   }
 }

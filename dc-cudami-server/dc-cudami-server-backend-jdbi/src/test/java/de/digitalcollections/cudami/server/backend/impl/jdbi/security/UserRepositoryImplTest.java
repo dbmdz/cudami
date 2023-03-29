@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -46,24 +47,24 @@ public class UserRepositoryImplTest {
 
   @Test
   @DisplayName("can find users")
-  void find() {
+  void find() throws RepositoryException {
     User user1 = new User();
     user1.setEmail("homer@simpson.de");
     user1.setFirstname("Homer");
     user1.setLastname("Simpson");
-    user1 = repo.save(user1);
+    repo.save(user1);
 
     User user2 = new User();
     user2.setEmail("marge@simpson.de");
     user2.setFirstname("Marjorie");
     user2.setLastname("Simpson");
-    user2 = repo.save(user2);
+    repo.save(user2);
 
     User user3 = new User();
     user3.setEmail("wiggum@police-springfield.gov");
     user3.setFirstname("Clancy");
     user3.setLastname("Wiggum");
-    user3 = repo.save(user3);
+    repo.save(user3);
 
     Filtering filtering =
         Filtering.builder()

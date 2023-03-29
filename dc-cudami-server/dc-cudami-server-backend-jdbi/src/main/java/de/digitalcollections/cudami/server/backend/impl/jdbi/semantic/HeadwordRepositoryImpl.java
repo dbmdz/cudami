@@ -1,8 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.semantic;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.semantic.HeadwordRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -19,7 +20,6 @@ import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.semantic.Headword;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,37 +28,34 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
+public class HeadwordRepositoryImpl extends UniqueObjectRepositoryImpl<Headword>
     implements HeadwordRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordRepositoryImpl.class);
 
   public static final String MAPPING_PREFIX = "hw";
-  public static final String SQL_INSERT_FIELDS = " uuid, created, label, locale, last_modified";
-  public static final String SQL_INSERT_VALUES = " :uuid, :created, :label, :locale, :lastModified";
-  public static final String SQL_REDUCED_FIELDS_HW =
-      " hw.uuid, hw.label, hw.locale, hw.created, hw.last_modified";
-  public static final String SQL_FULL_FIELDS_HW = SQL_REDUCED_FIELDS_HW;
   public static final String TABLE_ALIAS = "hw";
   public static final String TABLE_NAME = "headwords";
 
-  @Autowired
   public HeadwordRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
-        dbi, TABLE_NAME, TABLE_ALIAS, MAPPING_PREFIX, cudamiConfig.getOffsetForAlternativePaging());
+        dbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Headword.class,
+        cudamiConfig.getOffsetForAlternativePaging());
   }
 
   @Override
-  public void addRelatedEntity(UUID headwordUuid, UUID entityUuid) {
+  public void addRelatedEntity(UUID headwordUuid, UUID entityUuid) throws RepositoryException {
     Integer sortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "headword_entities", "headword_uuid", headwordUuid);
@@ -74,7 +71,8 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid) {
+  public void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid)
+      throws RepositoryException {
     Integer sortIndex =
         retrieveNextSortIndexForParentChildren(
             dbi, "headword_fileresources", "headword_uuid", headwordUuid);
@@ -90,7 +88,33 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void deleteByLabelAndLocale(String label, Locale locale) {
+  public Headword create() throws RepositoryException {
+    return new Headword();
+  }
+
+  @Override
+  public int deleteByUuids(List<UUID> uuids) throws RepositoryException {
+    // delete related data
+    uuids.stream()
+        .forEach(
+            (u) -> {
+              try {
+                deleteRelatedEntities(u);
+              } catch (RepositoryException e) {
+                LOGGER.error("Can not delete related entities of headword " + u, e);
+              }
+              try {
+                deleteRelatedFileresources(u);
+              } catch (RepositoryException e) {
+                LOGGER.error("Can not delete related fileresources of headword " + u, e);
+              }
+            });
+
+    return super.deleteByUuids(uuids);
+  }
+
+  @Override
+  public void deleteByLabelAndLocale(String label, Locale locale) throws RepositoryException {
     dbi.withHandle(
         h ->
             h.createUpdate(
@@ -101,34 +125,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void deleteByUuid(UUID uuid) {
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid = :uuid")
-                .bind("uuid", uuid)
-                .execute());
-  }
-
-  @Override
-  public boolean delete(List<UUID> uuids) {
-    // delete related data
-    uuids.stream()
-        .forEach(
-            (u) -> {
-              deleteRelatedEntities(u);
-              deleteRelatedFileresources(u);
-            });
-
-    dbi.withHandle(
-        h ->
-            h.createUpdate("DELETE FROM " + tableName + " WHERE uuid in (<uuids>)")
-                .bindList("uuids", uuids)
-                .execute());
-    return true;
-  }
-
-  @Override
-  public void deleteRelatedEntities(UUID headwordUuid) {
+  public void deleteRelatedEntities(UUID headwordUuid) throws RepositoryException {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM headword_entities WHERE headword_uuid = :uuid")
@@ -137,7 +134,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public void deleteRelatedFileresources(UUID headwordUuid) {
+  public void deleteRelatedFileresources(UUID headwordUuid) throws RepositoryException {
     dbi.withHandle(
         h ->
             h.createUpdate("DELETE FROM headword_fileresources WHERE headword_uuid = :uuid")
@@ -146,125 +143,8 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public PageResponse<Headword> find(PageRequest pageRequest) {
-    StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<Headword> result =
-        retrieveList(
-            SQL_REDUCED_FIELDS_HW,
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery =
-        new StringBuilder("SELECT count(" + tableAlias + ".uuid)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
-  }
-
-  @Override
-  public List<Headword> find(String label, Locale locale) {
-    Filtering filtering =
-        Filtering.builder()
-            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
-            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
-            .build();
-
-    // TODO make PageRequest able to return all items (one page)
-    PageRequest request =
-        new PageRequest(
-            0,
-            10000,
-            Sorting.builder().order(new Order(Direction.ASC, "label")).build(),
-            filtering);
-    PageResponse<Headword> response = find(request);
-    return response.getContent();
-  }
-
-  @Override
-  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) {
-    Map<String, Object> argumentMappings = new HashMap<>(0);
-
-    int numberOfBuckets = bucketsRequest.getNumberOfBuckets();
-    argumentMappings.put("numberOfBuckets", numberOfBuckets);
-
-    /*
-    - get an alphabetically sorted (ASC: A-Z) and numbered list,
-    - divide it in e.g. 100 (numberOfBuckets) same sized sublists (buckets),
-    - get first and last result of each bucket (lower and upper border)
-     */
-    StringBuilder sqlQuery = new StringBuilder(0);
-    Bucket<Headword> parentBucket = bucketsRequest.getParentBucket();
-    if (parentBucket != null) {
-      UUID startUuid = parentBucket.getStartObject().getUuid();
-      UUID endUuid = parentBucket.getEndObject().getUuid();
-      argumentMappings.put("startUuid", startUuid);
-      argumentMappings.put("endUuid", endUuid);
-
-      sqlQuery.append(
-          "WITH"
-              + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
-              + tableName
-              + "),"
-              + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]')),");
-    } else {
-      sqlQuery.append(
-          "WITH"
-              + " hws AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
-              + tableName
-              + "),");
-    }
-    sqlQuery.append(
-        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) AS tile_number FROM hws),"
-            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, tile_number FROM buckets GROUP BY tile_number ORDER BY tile_number)"
-            + " SELECT num, uuid, label, tile_number FROM buckets"
-            + " WHERE num IN (SELECT minNum FROM buckets_borders_nums UNION SELECT maxNum FROM buckets_borders_nums)");
-
-    List<Map<String, Object>> rows =
-        dbi.withHandle(
-            (Handle handle) -> {
-              return handle
-                  .createQuery(sqlQuery.toString())
-                  .bindMap(argumentMappings)
-                  .mapToMap()
-                  .list();
-            });
-
-    // analyze the pairs with same ntile id and create lower and upper border using their values
-    // create a bucket java instance for each pair of this lower and upper borders
-    List<Bucket<Headword>> content = new ArrayList<>(0);
-    for (int i = 0; i < rows.size(); i += 2) {
-      Map<String, Object> lowerBorder = rows.get(i);
-      Map<String, Object> upperBorder;
-      if ((i + 1) < rows.size()) {
-        upperBorder = rows.get(i + 1);
-      } else {
-        upperBorder = lowerBorder;
-      }
-
-      Headword lowerHeadword = new Headword();
-      lowerHeadword.setUuid((UUID) lowerBorder.get("uuid"));
-      lowerHeadword.setLabel((String) lowerBorder.get("label"));
-
-      Headword upperHeadword = new Headword();
-      upperHeadword.setUuid((UUID) upperBorder.get("uuid"));
-      upperHeadword.setLabel((String) upperBorder.get("label"));
-
-      Bucket<Headword> bucket = new Bucket<>(lowerHeadword, upperHeadword);
-      content.add(bucket);
-    }
-
-    BucketsResponse<Headword> bucketsResponse = new BucketsResponse<>(bucketsRequest, content);
-    return bucketsResponse;
-  }
-
-  @Override
-  public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest) {
+  public BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest)
+      throws RepositoryException {
     Map<String, Object> argumentMappings = new HashMap<>(0);
 
     // bucket
@@ -321,7 +201,105 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  public List<Headword> findByLabel(String label) {
+  public BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest)
+      throws RepositoryException {
+    Map<String, Object> argumentMappings = new HashMap<>(0);
+
+    int numberOfBuckets = bucketsRequest.getNumberOfBuckets();
+    argumentMappings.put("numberOfBuckets", numberOfBuckets);
+
+    /*
+     * - get an alphabetically sorted (ASC: A-Z) and numbered list, - divide it in
+     * e.g. 100 (numberOfBuckets) same sized sublists (buckets), - get first and
+     * last result of each bucket (lower and upper border)
+     */
+    StringBuilder sqlQuery = new StringBuilder(0);
+    Bucket<Headword> parentBucket = bucketsRequest.getParentBucket();
+    if (parentBucket != null) {
+      UUID startUuid = parentBucket.getStartObject().getUuid();
+      UUID endUuid = parentBucket.getEndObject().getUuid();
+      argumentMappings.put("startUuid", startUuid);
+      argumentMappings.put("endUuid", endUuid);
+
+      sqlQuery.append(
+          "WITH"
+              + " headwords_list AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
+              + tableName
+              + "),"
+              + " hws AS (SELECT * FROM headwords_list WHERE num <@ int8range((SELECT num FROM headwords_list WHERE uuid = :startUuid), (SELECT num FROM headwords_list WHERE uuid = :endUuid), '[]')),");
+    } else {
+      sqlQuery.append(
+          "WITH"
+              + " hws AS (SELECT row_number() OVER (ORDER BY label) AS num, uuid, label FROM "
+              + tableName
+              + "),");
+    }
+    sqlQuery.append(
+        " buckets AS (SELECT num, uuid, label, ntile(:numberOfBuckets) OVER (ORDER BY label ASC) AS tile_number FROM hws),"
+            + " buckets_borders_nums AS (SELECT min(num) AS minNum, max(num) AS maxNum, tile_number FROM buckets GROUP BY tile_number ORDER BY tile_number)"
+            + " SELECT num, uuid, label, tile_number FROM buckets"
+            + " WHERE num IN (SELECT minNum FROM buckets_borders_nums UNION SELECT maxNum FROM buckets_borders_nums)");
+
+    List<Map<String, Object>> rows =
+        dbi.withHandle(
+            (Handle handle) -> {
+              return handle
+                  .createQuery(sqlQuery.toString())
+                  .bindMap(argumentMappings)
+                  .mapToMap()
+                  .list();
+            });
+
+    // analyze the pairs with same ntile id and create lower and upper border using
+    // their values
+    // create a bucket java instance for each pair of this lower and upper borders
+    List<Bucket<Headword>> content = new ArrayList<>(0);
+    for (int i = 0; i < rows.size(); i += 2) {
+      Map<String, Object> lowerBorder = rows.get(i);
+      Map<String, Object> upperBorder;
+      if ((i + 1) < rows.size()) {
+        upperBorder = rows.get(i + 1);
+      } else {
+        upperBorder = lowerBorder;
+      }
+
+      Headword lowerHeadword = new Headword();
+      lowerHeadword.setUuid((UUID) lowerBorder.get("uuid"));
+      lowerHeadword.setLabel((String) lowerBorder.get("label"));
+
+      Headword upperHeadword = new Headword();
+      upperHeadword.setUuid((UUID) upperBorder.get("uuid"));
+      upperHeadword.setLabel((String) upperBorder.get("label"));
+
+      Bucket<Headword> bucket = new Bucket<>(lowerHeadword, upperHeadword);
+      content.add(bucket);
+    }
+
+    BucketsResponse<Headword> bucketsResponse = new BucketsResponse<>(bucketsRequest, content);
+    return bucketsResponse;
+  }
+
+  @Override
+  public List<Headword> find(String label, Locale locale) throws RepositoryException {
+    Filtering filtering =
+        Filtering.builder()
+            .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
+            .add(FilterCriterion.builder().withExpression("locale").isEquals(locale).build())
+            .build();
+
+    // TODO make PageRequest able to return all items (one page)
+    PageRequest request =
+        new PageRequest(
+            0,
+            10000,
+            Sorting.builder().order(new Order(Direction.ASC, "label")).build(),
+            filtering);
+    PageResponse<Headword> response = find(request);
+    return response.getContent();
+  }
+
+  @Override
+  public List<Headword> findByLabel(String label) throws RepositoryException {
     Filtering filtering =
         Filtering.builder()
             .add(FilterCriterion.builder().withExpression("label").isEquals(label).build())
@@ -340,58 +318,25 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   @Override
   public PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public Headword findByUuidAndFiltering(UUID uuid, Filtering filtering) {
-    // basic query
-    StringBuilder sqlQuery =
-        new StringBuilder(
-            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
-
-    // add filtering
-    if (filtering == null) {
-      filtering = Filtering.builder().build();
-    }
-    filtering.add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build());
-    Map<String, Object> argumentMappings = new HashMap<>();
-    addFiltering(filtering, sqlQuery, argumentMappings);
-
-    // get it
-    Map<String, Object> bindMap = Map.copyOf(argumentMappings);
-    Optional<Headword> result =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlQuery.toString())
-                    .bindMap(bindMap)
-                    .mapToBean(Headword.class)
-                    .findFirst());
-    return result.orElse(null);
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public PageResponse<FileResource> findRelatedFileResources(
       UUID headwordUuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
-  }
-
-  @Override
-  public List<Headword> getAll() {
-    return retrieveList(SQL_REDUCED_FIELDS_HW, null, null);
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   protected List<String> getAllowedOrderByFields() {
-    return new ArrayList<>(Arrays.asList("created", "label", "locale", "lastModified"));
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("label", "locale"));
+    return allowedOrderByFields;
   }
 
   @Override
@@ -399,7 +344,7 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
     // basic query
     StringBuilder sqlQuery =
         new StringBuilder(
-            "SELECT " + SQL_FULL_FIELDS_HW + " FROM " + tableName + " AS " + tableAlias);
+            "SELECT " + getSqlSelectAllFields() + " FROM " + tableName + " AS " + tableAlias);
 
     // add filtering
     Filtering filtering =
@@ -428,18 +373,12 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
       return null;
     }
     switch (modelProperty) {
-      case "created":
-        return tableAlias + ".created";
       case "label":
         return tableAlias + ".label";
-      case "lastModified":
-        return tableAlias + ".last_modified";
       case "locale":
         return tableAlias + ".locale";
-      case "uuid":
-        return tableAlias + ".uuid";
       default:
-        return null;
+        return super.getColumnName(modelProperty);
     }
   }
 
@@ -452,20 +391,17 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
 
   @Override
   public List<Headword> getRandom(int count) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public List<Entity> getRelatedEntities(UUID headwordUuid) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public List<FileResource> getRelatedFileResources(UUID headwordUuid) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -474,99 +410,50 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
   }
 
   @Override
-  protected String getUniqueField() {
-    return "uuid";
-  }
-
-  public long retrieveCount(StringBuilder sqlCount, final Map<String, Object> argumentMappings) {
-    long total =
-        dbi.withHandle(
-            h ->
-                h.createQuery(sqlCount.toString())
-                    .bindMap(argumentMappings)
-                    .mapTo(Long.class)
-                    .findOne()
-                    .get());
-    return total;
-  }
-
-  public List<Headword> retrieveList(String fieldsSql, StringBuilder innerQuery, String orderBy) {
-    final String sql =
-        "SELECT "
-            + fieldsSql
-            + " FROM "
-            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
-            + " AS "
-            + tableAlias
-            + (orderBy != null ? " " + orderBy : "");
-
-    List<Headword> result =
-        dbi.withHandle(
-            (Handle handle) -> {
-              return handle.createQuery(sql).mapToBean(Headword.class).collect(Collectors.toList());
-            });
-    return result;
-  }
-
-  private List<Headword> retrieveList(
-      String fieldsSql,
-      StringBuilder innerQuery,
-      Map<String, Object> argumentMappings,
-      String orderBy) {
-    final String sql =
-        "SELECT "
-            + fieldsSql
-            + " FROM "
-            + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
-            + " AS "
-            + tableAlias
-            + (orderBy != null ? " ORDER BY " + orderBy : "");
-
-    List<Headword> result =
-        dbi.withHandle(
-            (Handle handle) -> {
-              return handle
-                  .createQuery(sql)
-                  .bindMap(argumentMappings)
-                  .mapToBean(Headword.class)
-                  .collect(Collectors.toList());
-            });
-    return result;
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields() + ", label, locale";
   }
 
   @Override
-  public Headword save(Headword headword) {
-    if (headword.getUuid() == null) {
-      headword.setUuid(UUID.randomUUID());
-    }
-    headword.setCreated(LocalDateTime.now());
-    headword.setLastModified(LocalDateTime.now());
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues() + ", :label, :locale";
+  }
 
-    final String sql =
-        "INSERT INTO "
-            + tableName
-            + "("
-            + SQL_INSERT_FIELDS
-            + ") VALUES ("
-            + SQL_INSERT_VALUES
-            + ")";
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectAllFields(tableAlias, mappingPrefix)
+        + ", "
+        + getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
 
-    dbi.withHandle(h -> h.createUpdate(sql).bindBean(headword).execute());
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".label "
+        + mappingPrefix
+        + "_label, "
+        + tableAlias
+        + ".locale "
+        + mappingPrefix
+        + "_locale";
+  }
 
-    return headword;
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues() + ", label=:label, locale=:locale";
   }
 
   @Override
   public List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
   public List<FileResource> setRelatedFileResources(
       UUID headwordUuid, List<FileResource> fileResources) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
@@ -578,11 +465,5 @@ public class HeadwordRepositoryImpl extends JdbiRepositoryImpl<Headword>
       default:
         return false;
     }
-  }
-
-  @Override
-  public Headword update(Headword headword) {
-    throw new UnsupportedOperationException(
-        "Not supported yet."); // To change body of generated methods, choose Tools | Templates.
   }
 }

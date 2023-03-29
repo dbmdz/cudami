@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EventRepository;
 import de.digitalcollections.model.identifiable.entity.Event;
 import java.util.List;
@@ -22,6 +23,11 @@ public class EventRepositoryImpl extends EntityRepositoryImpl<Event> implements 
         MAPPING_PREFIX,
         Event.class,
         cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  @Override
+  public Event create() throws RepositoryException {
+    return new Event();
   }
 
   @Override

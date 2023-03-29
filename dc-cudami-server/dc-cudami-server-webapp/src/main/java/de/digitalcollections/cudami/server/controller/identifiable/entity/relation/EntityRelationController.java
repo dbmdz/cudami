@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.relat
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -34,7 +34,7 @@ public class EntityRelationController {
   @GetMapping(
       value = {"/v6/entities/relations"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public PageResponse<EntityToEntityRelation> findByPredicate(
+  public PageResponse<EntityRelation> findByPredicate(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "predicate", required = false) String predicate) {
@@ -61,7 +61,7 @@ public class EntityRelationController {
         "/latest/entities/relations"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  List<EntityToEntityRelation> save(@RequestBody List<EntityToEntityRelation> entityRelations)
+  List<EntityRelation> save(@RequestBody List<EntityRelation> entityRelations)
       throws ServiceException {
     service.save(entityRelations);
     return entityRelations;
@@ -82,9 +82,9 @@ public class EntityRelationController {
   /**
    * @deprecated use {@link #saveEntityRelations(List)} instead}
    */
-  List<EntityToEntityRelation> saveEntityRelationsForSubject(
+  List<EntityRelation> saveEntityRelationsForSubject(
       @PathVariable("subjectuuid") UUID subjectUuid,
-      @RequestBody List<EntityToEntityRelation> entityRelations)
+      @RequestBody List<EntityRelation> entityRelations)
       throws ServiceException {
     if (!subjectUuid.equals(entityRelations.get(0).getSubject().getUuid())) {
       throw new IllegalArgumentException(

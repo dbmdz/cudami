@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.HumanSettlementRepository;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import org.jdbi.v3.core.Jdbi;
@@ -26,6 +27,11 @@ public class HumanSettlementRepositoryImpl extends GeoLocationRepositoryImpl<Hum
         MAPPING_PREFIX,
         HumanSettlement.class,
         cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  @Override
+  public HumanSettlement create() throws RepositoryException {
+    return new HumanSettlement();
   }
 
   @Override

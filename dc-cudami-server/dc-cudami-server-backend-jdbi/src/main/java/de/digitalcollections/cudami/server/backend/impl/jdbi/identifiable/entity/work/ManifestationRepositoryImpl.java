@@ -25,7 +25,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.ProductionI
 import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublishingInfo;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -46,6 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.generic.GenericType;
@@ -60,176 +61,9 @@ import org.springframework.stereotype.Repository;
 public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestation>
     implements ManifestationRepository {
 
-  public static final String TABLE_NAME = "manifestations";
-  public static final String TABLE_ALIAS = "mf";
   public static final String MAPPING_PREFIX = "mf";
-
-  private EntityRepositoryImpl<Entity> entityRepository;
-  private AgentRepositoryImpl<Agent> agentRepository;
-  private HumanSettlementRepositoryImpl humanSettlementRepository;
-
-  @Override
-  public String getSqlInsertFields() {
-    return super.getSqlInsertFields()
-        + """
-        , composition, dimensions, expressiontypes,
-        language, manifestationtype, manufacturingtype,
-        mediatypes, otherlanguages,
-        scale, version, work, titles,
-        publication_info, publication_nav_date,
-        production_info, production_nav_date,
-        distribution_info, distribution_nav_date,
-        publishing_info_agent_uuids, publishing_info_locations_uuids
-        """;
-  }
-
-  @Override
-  public String getSqlInsertValues() {
-    return super.getSqlInsertValues()
-        + """
-        , :composition, :dimensions, :expressionTypes::mainsubtype[],
-        :language, :manifestationType, :manufacturingType,
-        :mediaTypes::varchar[], :otherLanguages::varchar[],
-        :scale, :version, :work?.uuid, {{titles}},
-        :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
-        :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
-        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange,
-        :publishingInfoAgentUuids, :publishingInfoLocationsUuids
-        """;
-  }
-
-  @Override
-  public String getSqlUpdateFieldValues() {
-    return super.getSqlUpdateFieldValues()
-        + """
-        , composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[],
-        language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType,
-        mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[],
-        scale=:scale, version=:version, work=:work?.uuid, titles={{titles}},
-        publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
-        production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
-        distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange,
-        publishing_info_agent_uuids=:publishingInfoAgentUuids, publishing_info_locations_uuids=:publishingInfoLocationsUuids
-        """;
-  }
-
-  @Override
-  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
-    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + """
-          , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
-          %1$s.scale %2$s_scale, %1$s.version %2$s_version,
-          %1$s.publication_info %2$s_publicationInfo, %1$s.production_info %2$s_productionInfo,
-          %1$s.distribution_info %2$s_distributionInfo,
-          """
-            .formatted(tableAlias, mappingPrefix)
-        // publishers
-        + "%s, %s"
-            .formatted(
-                agentRepository.getSqlSelectReducedFields(),
-                humanSettlementRepository.getSqlSelectReducedFields());
-  }
-
-  @Override
-  protected String getSqlSelectAllFieldsJoins() {
-    return super.getSqlSelectAllFieldsJoins()
-        + """
-        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
-        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
-        """
-            .formatted(
-                tableAlias,
-                /*2-3 Publisher agents*/
-                AgentRepositoryImpl.TABLE_NAME,
-                AgentRepositoryImpl.TABLE_ALIAS,
-                /*4-5 Publisher locations*/
-                HumanSettlementRepositoryImpl.TABLE_NAME,
-                HumanSettlementRepositoryImpl.TABLE_ALIAS);
-  }
-
-  @Override
-  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
-    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
-        + """
-            , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
-            %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
-            %1$s.titles %2$s_titles,
-            %3$s.uuid %4$s_uuid, %3$s.label %4$s_label,
-            """
-            .formatted(
-                tableAlias,
-                mappingPrefix,
-                WorkRepositoryImpl.TABLE_ALIAS,
-                WorkRepositoryImpl.MAPPING_PREFIX)
-        // parents
-        + """
-            mms.title parent_title, mms.sortKey parent_sortKey,
-            parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
-            parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
-            parent.identifiable_objecttype parent_identifiableObjectType,
-            """
-        // relations
-        + """
-          %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
-          %1$s.additional_predicates %2$s_additionalPredicates,
-          max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
-            .formatted(
-                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
-                EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX,
-                tableAlias)
-        + entityRepository.getSqlSelectReducedFields();
-  }
-
-  @Override
-  protected String getSqlSelectReducedFieldsJoins() {
-    return super.getSqlSelectReducedFieldsJoins()
-        + """
-      LEFT JOIN (
-        manifestation_manifestations mms INNER JOIN manifestations parent
-        ON parent.uuid = mms.subject_uuid
-      ) ON mms.object_uuid = %1$s.uuid
-      LEFT JOIN (
-        %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
-      ) ON %3$s.object_uuid = %1$s.uuid
-      LEFT JOIN %6$s %7$s ON %7$s.uuid = %1$s.work
-      """
-            .formatted(
-                tableAlias,
-                /*2-3*/ EntityToEntityRelationRepositoryImpl.TABLE_NAME,
-                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
-                /*4-5*/ EntityRepositoryImpl.TABLE_NAME,
-                EntityRepositoryImpl.TABLE_ALIAS,
-                /*6-7*/ WorkRepositoryImpl.TABLE_NAME,
-                WorkRepositoryImpl.TABLE_ALIAS);
-  }
-
-  public ManifestationRepositoryImpl(
-      Jdbi jdbi,
-      CudamiConfig cudamiConfig,
-      ExpressionTypeMapper expressionTypeMapper,
-      LocalDateRangeMapper dateRangeMapper,
-      TitleMapper titleMapper,
-      EntityRepositoryImpl<Entity> entityRepository,
-      AgentRepositoryImpl<Agent> agentRepository,
-      HumanSettlementRepositoryImpl humanSettlementRepository) {
-    super(
-        jdbi,
-        TABLE_NAME,
-        TABLE_ALIAS,
-        MAPPING_PREFIX,
-        Manifestation.class,
-        ManifestationRepositoryImpl::additionalReduceRowsBiConsumer,
-        cudamiConfig.getOffsetForAlternativePaging());
-    dbi.registerArrayType(expressionTypeMapper);
-    dbi.registerArgument(dateRangeMapper);
-    dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
-    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
-    dbi.registerColumnMapper(Title.class, titleMapper);
-
-    this.entityRepository = entityRepository;
-    this.agentRepository = agentRepository;
-    this.humanSettlementRepository = humanSettlementRepository;
-  }
+  public static final String TABLE_ALIAS = "mf";
+  public static final String TABLE_NAME = "manifestations";
 
   private static void fillPublishers(
       List<Publisher> publishers, final Agent publAgent, final HumanSettlement publPlace) {
@@ -272,90 +106,75 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     }
   }
 
-  @Override
-  public PageResponse<Manifestation> findManifestationsByWork(
-      UUID workUuid, PageRequest pageRequest) throws RepositoryException {
-    final String manifestationTableAlias = getTableAlias();
-    final String manifestationTableName = getTableName();
+  private AgentRepositoryImpl<Agent> agentRepository;
+  private EntityRepositoryImpl<Entity> entityRepository;
 
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + manifestationTableName
-                + " AS "
-                + manifestationTableAlias
-                + " WHERE "
-                + manifestationTableAlias
-                + ".work = :uuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", workUuid);
+  private HumanSettlementRepositoryImpl humanSettlementRepository;
 
-    Filtering filtering = pageRequest.getFiltering();
-    // as filtering has other target object type (item) than this repository (manifestation)
-    // we have to rename filter field names to target table alias and column names:
-    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
-    addFiltering(pageRequest, commonSql, argumentMappings);
+  public ManifestationRepositoryImpl(
+      Jdbi jdbi,
+      CudamiConfig cudamiConfig,
+      ExpressionTypeMapper expressionTypeMapper,
+      LocalDateRangeMapper dateRangeMapper,
+      TitleMapper titleMapper,
+      EntityRepositoryImpl<Entity> entityRepository,
+      AgentRepositoryImpl<Agent> agentRepository,
+      HumanSettlementRepositoryImpl humanSettlementRepository) {
+    super(
+        jdbi,
+        TABLE_NAME,
+        TABLE_ALIAS,
+        MAPPING_PREFIX,
+        Manifestation.class,
+        cudamiConfig.getOffsetForAlternativePaging());
+    dbi.registerArrayType(expressionTypeMapper);
+    dbi.registerArgument(dateRangeMapper);
+    dbi.registerColumnMapper(ExpressionType.class, expressionTypeMapper);
+    dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
+    dbi.registerColumnMapper(Title.class, titleMapper);
 
-    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<Manifestation> result =
-        retrieveList(
-            getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
+    this.entityRepository = entityRepository;
+    this.agentRepository = agentRepository;
+    this.humanSettlementRepository = humanSettlementRepository;
   }
 
   @Override
-  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
-    String manifestationTableAlias = getTableAlias();
-    String manifestationTableName = getTableName();
-    String sql =
-        "SELECT DISTINCT jsonb_object_keys("
-            + manifestationTableAlias
-            + ".label) as languages"
-            + " FROM "
-            + manifestationTableName
-            + " AS "
-            + manifestationTableAlias
-            + String.format(" WHERE %s.work = :work_uuid;", manifestationTableAlias);
-    return this.dbi.withHandle(
-        h -> h.createQuery(sql).bind("work_uuid", workUuid).mapTo(Locale.class).list());
+  public Manifestation create() throws RepositoryException {
+    return new Manifestation();
   }
 
-  protected static void additionalReduceRowsBiConsumer(
-      Map<UUID, Manifestation> map, RowView rowView) {
-    Manifestation manifestation = map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
-    // This object should exist already. If not, the mistake is somewhere in IdentifiableRepo.
+  @Override
+  protected BiConsumer<Map<UUID, Manifestation>, RowView> createAdditionalReduceRowsBiConsumer() {
+    return (map, rowView) -> {
+      Manifestation manifestation =
+          map.get(rowView.getColumn(MAPPING_PREFIX + "_uuid", UUID.class));
+      // This object should exist already. If not, the mistake is somewhere in
+      // IdentifiableRepo.
 
-    // publishers
-    Agent publAgent = null;
-    if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-      Agent ag = rowView.getRow(Agent.class);
-      publAgent =
-          switch (ag.getIdentifiableObjectType()) {
-            case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
-            case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
-            case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
-            default -> ag;
-          };
-    }
-    HumanSettlement publPlace =
-        rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
-                != null
-            ? rowView.getRow(HumanSettlement.class)
-            : null;
-    if (manifestation.getDistributionInfo() != null)
-      fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
-    if (manifestation.getProductionInfo() != null)
-      fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
-    if (manifestation.getPublicationInfo() != null)
-      fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
+      // publishers
+      Agent publAgent = null;
+      if (rowView.getColumn(AgentRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        Agent ag = rowView.getRow(Agent.class);
+        publAgent =
+            switch (ag.getIdentifiableObjectType()) {
+              case CORPORATE_BODY -> DerivedAgentBuildHelper.build(ag, CorporateBody.class);
+              case PERSON -> DerivedAgentBuildHelper.build(ag, Person.class);
+              case FAMILY -> DerivedAgentBuildHelper.build(ag, Family.class);
+              default -> ag;
+            };
+      }
+      HumanSettlement publPlace =
+          rowView.getColumn(HumanSettlementRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class)
+                  != null
+              ? rowView.getRow(HumanSettlement.class)
+              : null;
+      if (manifestation.getDistributionInfo() != null)
+        fillPublishers(manifestation.getDistributionInfo().getPublishers(), publAgent, publPlace);
+      if (manifestation.getProductionInfo() != null)
+        fillPublishers(manifestation.getProductionInfo().getPublishers(), publAgent, publPlace);
+      if (manifestation.getPublicationInfo() != null)
+        fillPublishers(manifestation.getPublicationInfo().getPublishers(), publAgent, publPlace);
+    };
   }
 
   @Override
@@ -404,7 +223,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     if (entityUuid != null) {
       if (manifestation.getRelations() == null || manifestation.getRelations().isEmpty()) {
         int maxIndex = rowView.getColumn("relation_max_sortindex", Integer.class);
-        Vector<EntityToEntityRelation> relations = new Vector<>(++maxIndex);
+        Vector<EntityRelation> relations = new Vector<>(++maxIndex);
         relations.setSize(maxIndex);
         manifestation.setRelations(relations);
       }
@@ -424,7 +243,7 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
                 rowView.getColumn(
                     EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX + "_sortindex",
                     Integer.class),
-                EntityToEntityRelation.builder()
+                EntityRelation.builder()
                     .subject(relatedEntity)
                     .predicate(relationPredicate)
                     .additionalPredicates(
@@ -441,6 +260,271 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
       Work work = rowView.getRow(Work.class);
       if (work != null && work.getUuid() != null) manifestation.setWork(work);
     }
+  }
+
+  @Override
+  public PageResponse<Manifestation> findManifestationsByWork(
+      UUID workUuid, PageRequest pageRequest) throws RepositoryException {
+    final String manifestationTableAlias = getTableAlias();
+    final String manifestationTableName = getTableName();
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + manifestationTableName
+                + " AS "
+                + manifestationTableAlias
+                + " WHERE "
+                + manifestationTableAlias
+                + ".work = :uuid");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", workUuid);
+
+    Filtering filtering = pageRequest.getFiltering();
+    // as filtering has other target object type (item) than this repository
+    // (manifestation)
+    // we have to rename filter field names to target table alias and column names:
+    mapFilterExpressionsToOtherTableColumnNames(filtering, this);
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<Manifestation> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  public PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException {
+    final String doTableName = "manifestation_manifestations";
+    final String doTableAlias = "mms";
+
+    StringBuilder commonSql =
+        new StringBuilder(
+            " FROM "
+                + doTableName
+                + " AS "
+                + doTableAlias
+                + " INNER JOIN "
+                + tableName
+                + " "
+                + tableAlias
+                + " ON "
+                + doTableAlias
+                + ".object_uuid = "
+                + tableAlias
+                + ".uuid"
+                + " WHERE "
+                + doTableAlias
+                + ".subject_uuid = :subject_uuid");
+
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("subject_uuid", uuid);
+
+    addFiltering(pageRequest, commonSql, argumentMappings);
+
+    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
+    addPagingAndSorting(pageRequest, innerQuery);
+    List<Manifestation> result =
+        retrieveList(
+            getSqlSelectReducedFields(),
+            innerQuery,
+            argumentMappings,
+            getOrderBy(pageRequest.getSorting()));
+
+    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
+    long total = retrieveCount(countQuery, argumentMappings);
+
+    return new PageResponse<>(result, pageRequest, total);
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> orderByFields = super.getAllowedOrderByFields();
+    return orderByFields;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    switch (modelProperty) {
+      case "composition":
+      case "dimensions":
+      case "language":
+      case "scale":
+      case "titles":
+      case "version":
+      case "work":
+        return modelProperty;
+      case "expressionTypes":
+      case "manifestationType":
+      case "manufacturingType":
+      case "mediaTypes":
+      case "otherLanguages":
+        return modelProperty.toLowerCase();
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
+  @Override
+  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
+    String manifestationTableAlias = getTableAlias();
+    String manifestationTableName = getTableName();
+    String sql =
+        "SELECT DISTINCT jsonb_object_keys("
+            + manifestationTableAlias
+            + ".label) as languages"
+            + " FROM "
+            + manifestationTableName
+            + " AS "
+            + manifestationTableAlias
+            + String.format(" WHERE %s.work = :work_uuid;", manifestationTableAlias);
+    return this.dbi.withHandle(
+        h -> h.createQuery(sql).bind("work_uuid", workUuid).mapTo(Locale.class).list());
+  }
+
+  @Override
+  public String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + """
+        , composition, dimensions, expressiontypes,
+        language, manifestationtype, manufacturingtype,
+        mediatypes, otherlanguages,
+        scale, version, work, titles,
+        publication_info, publication_nav_date,
+        production_info, production_nav_date,
+        distribution_info, distribution_nav_date,
+        publishing_info_agent_uuids, publishing_info_locations_uuids
+        """;
+  }
+
+  @Override
+  public String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + """
+        , :composition, :dimensions, :expressionTypes::mainsubtype[],
+        :language, :manifestationType, :manufacturingType,
+        :mediaTypes::varchar[], :otherLanguages::varchar[],
+        :scale, :version, :work?.uuid, {{titles}},
+        :publicationInfo::jsonb, :publicationInfo?.navDateRange::daterange,
+        :productionInfo::jsonb, :productionInfo?.navDateRange::daterange,
+        :distributionInfo::jsonb, :distributionInfo?.navDateRange::daterange,
+        :publishingInfoAgentUuids, :publishingInfoLocationsUuids
+        """;
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + """
+        , %1$s.composition %2$s_composition, %1$s.dimensions %2$s_dimensions, %1$s.otherlanguages %2$s_otherLanguages,
+        %1$s.scale %2$s_scale, %1$s.version %2$s_version,
+        %1$s.publication_info %2$s_publicationInfo, %1$s.production_info %2$s_productionInfo,
+        %1$s.distribution_info %2$s_distributionInfo,
+        """
+            .formatted(tableAlias, mappingPrefix)
+        // publishers
+        + "%s, %s"
+            .formatted(
+                agentRepository.getSqlSelectReducedFields(),
+                humanSettlementRepository.getSqlSelectReducedFields());
+  }
+
+  @Override
+  protected String getSqlSelectAllFieldsJoins() {
+    return super.getSqlSelectAllFieldsJoins()
+        + """
+        LEFT JOIN %2$s %3$s ON %3$s.uuid = ANY (%1$s.publishing_info_agent_uuids)
+        LEFT JOIN %4$s %5$s ON %5$s.uuid = ANY (%1$s.publishing_info_locations_uuids)
+        """
+            .formatted(
+                tableAlias,
+                /* 2-3 Publisher agents */
+                AgentRepositoryImpl.TABLE_NAME,
+                AgentRepositoryImpl.TABLE_ALIAS,
+                /* 4-5 Publisher locations */
+                HumanSettlementRepositoryImpl.TABLE_NAME,
+                HumanSettlementRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  public String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + """
+            , %1$s.expressiontypes %2$s_expressionTypes, %1$s.language %2$s_language, %1$s.manifestationtype %2$s_manifestationType,
+            %1$s.manufacturingtype %2$s_manufacturingType, %1$s.mediatypes %2$s_mediaTypes,
+            %1$s.titles %2$s_titles,
+            %3$s.uuid %4$s_uuid, %3$s.label %4$s_label,
+            """
+            .formatted(
+                tableAlias,
+                mappingPrefix,
+                WorkRepositoryImpl.TABLE_ALIAS,
+                WorkRepositoryImpl.MAPPING_PREFIX)
+        // parents
+        + """
+            mms.title parent_title, mms.sortKey parent_sortKey,
+            parent.uuid parent_uuid, parent.label parent_label, parent.titles parent_titles, parent.manifestationtype parent_manifestationType,
+            parent.refid parent_refId, parent.notes parent_notes, parent.created parent_created, parent.last_modified parent_lastModified,
+            parent.identifiable_objecttype parent_identifiableObjectType,
+            """
+        // relations
+        + """
+            %1$s.predicate %2$s_predicate, %1$s.sortindex %2$s_sortindex,
+            %1$s.additional_predicates %2$s_additionalPredicates,
+            max(%1$s.sortindex) OVER (PARTITION BY %3$s.uuid) relation_max_sortindex, """
+            .formatted(
+                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
+                EntityToEntityRelationRepositoryImpl.MAPPING_PREFIX,
+                tableAlias)
+        + entityRepository.getSqlSelectReducedFields();
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + """
+        LEFT JOIN (
+          manifestation_manifestations mms INNER JOIN manifestations parent
+          ON parent.uuid = mms.subject_uuid
+        ) ON mms.object_uuid = %1$s.uuid
+        LEFT JOIN (
+          %2$s %3$s INNER JOIN %4$s %5$s ON %3$s.subject_uuid = %5$s.uuid
+        ) ON %3$s.object_uuid = %1$s.uuid
+        LEFT JOIN %6$s %7$s ON %7$s.uuid = %1$s.work
+        """
+            .formatted(
+                tableAlias, /* 2-3 */
+                EntityToEntityRelationRepositoryImpl.TABLE_NAME,
+                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS, /* 4-5 */
+                EntityRepositoryImpl.TABLE_NAME,
+                EntityRepositoryImpl.TABLE_ALIAS, /* 6-7 */
+                WorkRepositoryImpl.TABLE_NAME,
+                WorkRepositoryImpl.TABLE_ALIAS);
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + """
+            , composition=:composition, dimensions=:dimensions, expressiontypes=:expressionTypes::mainsubtype[],
+            language=:language, manifestationtype=:manifestationType, manufacturingtype=:manufacturingType,
+            mediatypes=:mediaTypes::varchar[], otherlanguages=:otherLanguages::varchar[],
+            scale=:scale, version=:version, work=:work?.uuid, titles={{titles}},
+            publication_info=:publicationInfo::jsonb, publication_nav_date=:publicationInfo?.navDateRange::daterange,
+            production_info=:productionInfo::jsonb, production_nav_date=:productionInfo?.navDateRange::daterange,
+            distribution_info=:distributionInfo::jsonb, distribution_nav_date=:distributionInfo?.navDateRange::daterange,
+            publishing_info_agent_uuids=:publishingInfoAgentUuids, publishing_info_locations_uuids=:publishingInfoLocationsUuids
+            """;
   }
 
   @SuppressWarnings("unchecked")
@@ -506,53 +590,33 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public PageResponse<Manifestation> findSubParts(UUID uuid, PageRequest pageRequest) {
-    final String doTableName = "manifestation_manifestations";
-    final String doTableAlias = "mms";
+  public void save(Manifestation manifestation, Map<String, Object> bindings)
+      throws RepositoryException {
+    if (bindings == null) {
+      bindings = new HashMap<>(3);
+    }
 
-    StringBuilder commonSql =
-        new StringBuilder(
-            " FROM "
-                + doTableName
-                + " AS "
-                + doTableAlias
-                + " INNER JOIN "
-                + tableName
-                + " "
-                + tableAlias
-                + " ON "
-                + doTableAlias
-                + ".object_uuid = "
-                + tableAlias
-                + ".uuid"
-                + " WHERE "
-                + doTableAlias
-                + ".subject_uuid = :subject_uuid");
+    DistributionInfo distributionInfo = manifestation.getDistributionInfo();
+    manifestation.setDistributionInfo(reducePublisher(distributionInfo));
+    ProductionInfo productionInfo = manifestation.getProductionInfo();
+    manifestation.setProductionInfo(reducePublisher(productionInfo));
+    PublicationInfo publicationInfo = manifestation.getPublicationInfo();
+    manifestation.setPublicationInfo(reducePublisher(publicationInfo));
 
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("subject_uuid", uuid);
+    setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
+    super.save(manifestation, bindings, TitleSqlHelper.buildTitleSql(manifestation.getTitles()));
+    saveParents(manifestation);
 
-    addFiltering(pageRequest, commonSql, argumentMappings);
-
-    StringBuilder innerQuery = new StringBuilder("SELECT " + tableAlias + ".* " + commonSql);
-    addPagingAndSorting(pageRequest, innerQuery);
-    List<Manifestation> result =
-        retrieveList(
-            getSqlSelectReducedFields(),
-            innerQuery,
-            argumentMappings,
-            getOrderBy(pageRequest.getSorting()));
-
-    StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
-    long total = retrieveCount(countQuery, argumentMappings);
-
-    return new PageResponse<>(result, pageRequest, total);
+    manifestation.setDistributionInfo(distributionInfo);
+    manifestation.setProductionInfo(productionInfo);
+    manifestation.setPublicationInfo(publicationInfo);
   }
 
   private void saveParents(Manifestation manifestation) {
     if (manifestation == null) return;
-    /* - subject (subject_uuid) is the parent (superior manifestation)
-     * - object (object_uuid) is the child, i.e. this manifestation parameter
+    /*
+     * - subject (subject_uuid) is the parent (superior manifestation) - object
+     * (object_uuid) is the child, i.e. this manifestation parameter
      */
     dbi.useHandle(
         h ->
@@ -616,26 +680,20 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
   }
 
   @Override
-  public void save(Manifestation manifestation, Map<String, Object> bindings)
-      throws RepositoryException {
-    if (bindings == null) {
-      bindings = new HashMap<>(3);
+  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
+    switch (modelProperty) {
+      case "composition":
+      case "dimensions":
+      case "language":
+      case "manifestationType":
+      case "manufacturingType":
+      case "publishingDatePresentation":
+      case "scale":
+      case "version":
+        return true;
+      default:
+        return super.supportsCaseSensitivityForProperty(modelProperty);
     }
-
-    DistributionInfo distributionInfo = manifestation.getDistributionInfo();
-    manifestation.setDistributionInfo(reducePublisher(distributionInfo));
-    ProductionInfo productionInfo = manifestation.getProductionInfo();
-    manifestation.setProductionInfo(reducePublisher(productionInfo));
-    PublicationInfo publicationInfo = manifestation.getPublicationInfo();
-    manifestation.setPublicationInfo(reducePublisher(publicationInfo));
-
-    setPublishingInfoBindings(bindings, distributionInfo, productionInfo, publicationInfo);
-    super.save(manifestation, bindings, TitleSqlHelper.buildTitleSql(manifestation.getTitles()));
-    saveParents(manifestation);
-
-    manifestation.setDistributionInfo(distributionInfo);
-    manifestation.setProductionInfo(productionInfo);
-    manifestation.setPublicationInfo(publicationInfo);
   }
 
   @Override
@@ -659,50 +717,5 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
     manifestation.setDistributionInfo(distributionInfo);
     manifestation.setProductionInfo(productionInfo);
     manifestation.setPublicationInfo(publicationInfo);
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    switch (modelProperty) {
-      case "composition":
-      case "dimensions":
-      case "language":
-      case "scale":
-      case "titles":
-      case "version":
-      case "work":
-        return modelProperty;
-      case "expressionTypes":
-      case "manifestationType":
-      case "manufacturingType":
-      case "mediaTypes":
-      case "otherLanguages":
-        return modelProperty.toLowerCase();
-      default:
-        return super.getColumnName(modelProperty);
-    }
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> orderByFields = super.getAllowedOrderByFields();
-    return orderByFields;
-  }
-
-  @Override
-  protected boolean supportsCaseSensitivityForProperty(String modelProperty) {
-    switch (modelProperty) {
-      case "composition":
-      case "dimensions":
-      case "language":
-      case "manifestationType":
-      case "manufacturingType":
-      case "publishingDatePresentation":
-      case "scale":
-      case "version":
-        return true;
-      default:
-        return super.supportsCaseSensitivityForProperty(modelProperty);
-    }
   }
 }

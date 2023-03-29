@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import org.jdbi.v3.core.Jdbi;
@@ -26,6 +27,11 @@ public class CorporateBodyRepositoryImpl extends AgentRepositoryImpl<CorporateBo
         MAPPING_PREFIX,
         CorporateBody.class,
         cudamiConfig.getOffsetForAlternativePaging());
+  }
+
+  @Override
+  public CorporateBody create() throws RepositoryException {
+    return new CorporateBody();
   }
 
   @Override

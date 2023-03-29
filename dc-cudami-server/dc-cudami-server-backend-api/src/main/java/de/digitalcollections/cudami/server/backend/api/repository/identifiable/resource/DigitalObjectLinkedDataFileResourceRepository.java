@@ -30,6 +30,9 @@ public interface DigitalObjectLinkedDataFileResourceRepository {
   PageResponse<LinkedDataFileResource> findLinkedDataFileResources(
       UUID digitalObjectUuid, PageRequest pageRequest);
 
+  List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid)
+      throws RepositoryException;
+
   List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
       throws RepositoryException;

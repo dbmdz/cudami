@@ -73,6 +73,11 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
   }
 
   @Override
+  public Project create() throws RepositoryException {
+    return new Project();
+  }
+
+  @Override
   public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest)
       throws RepositoryException {
     final String crossTableAlias = "xtable";

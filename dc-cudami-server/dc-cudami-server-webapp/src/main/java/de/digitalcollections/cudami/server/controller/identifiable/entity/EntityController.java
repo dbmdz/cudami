@@ -8,7 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -166,7 +166,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<EntityToEntityRelation> getRelations(@PathVariable UUID uuid) {
+  public List<EntityRelation> getRelations(@PathVariable UUID uuid) {
     return entityRelationService.getBySubject(uuid);
   }
 

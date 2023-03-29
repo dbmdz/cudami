@@ -61,6 +61,11 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
   }
 
   @Override
+  public Item create() throws RepositoryException {
+    return new Item();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, Item>, RowView> createAdditionalReduceRowsBiConsumer() {
     return (map, rowView) -> {
       // must not be null; otherwise something went wrong earlier

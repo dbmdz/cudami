@@ -148,7 +148,8 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
+    Tag tag = Tag.builder().value("foo").build();
+    tagRepository.save(tag);
 
     var noteText = new Text("a note to a digital object");
     var noteContent = new StructuredContent();
@@ -225,7 +226,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("should return properly sized pages on search")
-  void testSearchPageSize() {
+  void testSearchPageSize() throws RepositoryException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(
@@ -334,7 +335,7 @@ class DigitalObjectRepositoryImplTest
 
   @Test
   @DisplayName("can return null, when getByIdentifier finds no DigitalObject")
-  void returnNullByGetByIdentifier() {
+  void returnNullByGetByIdentifier() throws RepositoryException {
     assertThat(repo.getByIdentifier(new Identifier(null, "namespace", "nonexisting"))).isNull();
   }
 
@@ -397,6 +398,9 @@ class DigitalObjectRepositoryImplTest
         .containsAll(List.of(Locale.GERMAN, Locale.ENGLISH, Locale.KOREAN));
   }
 
+  /**
+   * @throws RepositoryException
+   */
   @Test
   @DisplayName("can update a DigitalObject iwht its directly embedded resources")
   void update() throws RepositoryException {
@@ -432,7 +436,8 @@ class DigitalObjectRepositoryImplTest
     DigitalObject parent = DigitalObject.builder().label(Locale.GERMAN, "Parent").build();
     repo.save(parent);
 
-    Tag tag = tagRepository.save(Tag.builder().value("foo").build());
+    Tag tag = Tag.builder().value("foo").build();
+    tagRepository.save(tag);
 
     DigitalObject digitalObject =
         DigitalObject.builder()
@@ -469,7 +474,7 @@ class DigitalObjectRepositoryImplTest
   }
 
   // -----------------------------------------------------------------
-  private void ensureLicense(License license) {
+  private void ensureLicense(License license) throws RepositoryException {
     if (licenseRepository.getByUuid(license.getUuid()) == null) {
       licenseRepository.save(license);
     }

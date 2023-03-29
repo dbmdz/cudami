@@ -56,19 +56,18 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and retrieve by uuid")
   @Test
-  void saveAndRetrieveByUuid() {
+  void saveAndRetrieveByUuid() throws RepositoryException {
     Tag tag = Tag.builder().value("foo").build();
+    repo.save(tag);
 
-    Tag savedTag = repo.save(tag);
+    assertThat(tag.getValue()).isEqualTo(tag.getValue());
+    assertThat(tag.getUuid()).isNotNull();
+    assertThat(tag.getCreated()).isNotNull();
+    assertThat(tag.getLastModified()).isNotNull();
 
-    assertThat(savedTag.getValue()).isEqualTo(tag.getValue());
-    assertThat(savedTag.getUuid()).isNotNull();
-    assertThat(savedTag.getCreated()).isNotNull();
-    assertThat(savedTag.getLastModified()).isNotNull();
+    Tag retrievedTag = repo.getByUuid(tag.getUuid());
 
-    Tag retrievedTag = repo.getByUuid(savedTag.getUuid());
-
-    assertThat(retrievedTag).isEqualTo(savedTag);
+    assertThat(retrievedTag).isEqualTo(tag);
   }
 
   @DisplayName("can save and successfully delete")
@@ -84,7 +83,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can save and update")
   @Test
-  void saveAndUpdate() {
+  void saveAndUpdate() throws RepositoryException {
     Tag savedTag = ensureSavedTag("Test");
 
     Tag tagToUpdate =
@@ -93,15 +92,14 @@ class TagRepositoryImplTest {
             .uuid(savedTag.getUuid())
             .created(savedTag.getCreated())
             .build();
+    repo.update(tagToUpdate);
 
-    Tag updatedTag = repo.update(tagToUpdate);
-
-    assertThat(updatedTag).isEqualTo(tagToUpdate);
+    assertThat(savedTag).isEqualTo(tagToUpdate);
   }
 
   @DisplayName("can retrieve all tags with paging")
   @Test
-  void findAllPaged() {
+  void findAllPaged() throws RepositoryException {
     Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -111,7 +109,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can retrieve all tags with sorting")
   @Test
-  void findAllPagedAndSorted() {
+  void findAllPagedAndSorted() throws RepositoryException {
     Tag savedTag1 = ensureSavedTag("Test1");
     Tag savedTag2 = ensureSavedTag("Test2");
 
@@ -130,7 +128,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can retrieve tags with filtering")
   @Test
-  void findFiltered() {
+  void findFiltered() throws RepositoryException {
     Tag savedTag = ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -152,7 +150,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can return an empty filtered set when no matches are found")
   @Test
-  void noMatches() {
+  void noMatches() throws RepositoryException {
     ensureSavedTag("Test");
 
     PageResponse<Tag> pageResponse =
@@ -174,7 +172,7 @@ class TagRepositoryImplTest {
 
   @DisplayName("can return by value")
   @Test
-  void getByValue() {
+  void getByValue() throws RepositoryException {
     Tag savedTag = ensureSavedTag("foo");
     Tag foundTag = repo.getByValue("foo");
     assertThat(foundTag).isEqualTo(savedTag);
@@ -205,9 +203,9 @@ class TagRepositoryImplTest {
   }
 
   // ------------------------------------------------------------------------------------------
-  private Tag ensureSavedTag(String value) {
+  private Tag ensureSavedTag(String value) throws RepositoryException {
     Tag tag = Tag.builder().value(value).build();
-
-    return repo.save(tag);
+    repo.save(tag);
+    return tag;
   }
 }

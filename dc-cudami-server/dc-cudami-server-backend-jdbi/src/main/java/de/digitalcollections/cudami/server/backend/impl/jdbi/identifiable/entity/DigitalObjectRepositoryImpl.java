@@ -85,6 +85,11 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
+  public DigitalObject create() throws RepositoryException {
+    return new DigitalObject();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, DigitalObject>, RowView> createAdditionalReduceRowsBiConsumer() {
     return (map, rowView) -> {
       DigitalObject digitalObject =

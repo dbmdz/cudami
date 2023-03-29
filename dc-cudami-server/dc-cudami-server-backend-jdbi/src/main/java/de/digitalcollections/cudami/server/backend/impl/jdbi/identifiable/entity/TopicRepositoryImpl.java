@@ -85,6 +85,11 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
+  public Topic create() throws RepositoryException {
+    return new Topic();
+  }
+
+  @Override
   public PageResponse<Topic> findChildren(UUID uuid, PageRequest pageRequest)
       throws RepositoryException {
     final String crossTableAlias = "xtable";

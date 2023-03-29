@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
@@ -66,15 +67,15 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
     Event savedEvent = Event.builder().label(label).name(label).build();
     eventRepository.save(savedEvent);
 
-    boolean success = eventRepository.delete(List.of(savedEvent.getUuid()));
-    assertThat(success).isTrue();
+    int affected = eventRepository.deleteByUuids(List.of(savedEvent.getUuid()));
+    assertEquals(1, affected);
 
     Event nonexistingEvent = eventRepository.getByUuid(savedEvent.getUuid());
     assertThat(nonexistingEvent).isNull();
 
-    boolean nonsuccess =
-        eventRepository.delete(List.of(savedEvent.getUuid())); // second attempt must fail!
-    assertThat(nonsuccess).isFalse();
+    affected =
+        eventRepository.deleteByUuids(List.of(savedEvent.getUuid())); // second attempt must fail!
+    assertEquals(0, affected);
   }
 
   @DisplayName("can save and update")

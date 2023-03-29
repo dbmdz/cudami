@@ -20,7 +20,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
@@ -98,16 +98,14 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
     Work workToSave =
         Work.builder()
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(
-                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     Work savedWork =
         Work.builder()
             .uuid(UUID.randomUUID())
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(
-                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     doAnswer(
@@ -165,8 +163,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
         Work.builder()
             .uuid(uuid)
             .label(Locale.GERMAN, "Erstlingswerk")
-            .relation(
-                EntityToEntityRelation.builder().subject(author).predicate("is_creator_of").build())
+            .relation(EntityRelation.builder().subject(author).predicate("is_creator_of").build())
             .build();
 
     doAnswer(

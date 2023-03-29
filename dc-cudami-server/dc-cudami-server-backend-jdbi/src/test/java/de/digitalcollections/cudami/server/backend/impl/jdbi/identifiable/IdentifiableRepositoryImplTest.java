@@ -191,7 +191,7 @@ class IdentifiableRepositoryImplTest
 
   @Test
   @DisplayName("returns properly sized pages on search")
-  void testSearchPageSize() {
+  void testSearchPageSize() throws RepositoryException {
     // Insert a bunch of DigitalObjects with labels
     IntStream.range(0, 20)
         .forEach(

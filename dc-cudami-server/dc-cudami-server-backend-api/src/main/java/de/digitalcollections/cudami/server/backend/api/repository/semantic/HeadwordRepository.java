@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.semantic;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.buckets.BucketObjectsRequest;
@@ -17,9 +18,9 @@ import java.util.UUID;
 /** Repository for Headwords handling */
 public interface HeadwordRepository extends UniqueObjectRepository<Headword> {
 
-  void addRelatedEntity(UUID headwordUuid, UUID entityUuid);
+  void addRelatedEntity(UUID headwordUuid, UUID entityUuid) throws RepositoryException;
 
-  void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid);
+  void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid) throws RepositoryException;
 
   /**
    * Delete a headword.
@@ -27,23 +28,33 @@ public interface HeadwordRepository extends UniqueObjectRepository<Headword> {
    * @param label label of headword
    * @param locale locale of label
    */
-  void deleteByLabelAndLocale(String label, Locale locale);
+  void deleteByLabelAndLocale(String label, Locale locale) throws RepositoryException;
 
-  void deleteRelatedEntities(UUID headwordUuid);
+  void deleteRelatedEntities(UUID headwordUuid) throws RepositoryException;
 
-  void deleteRelatedFileresources(UUID headwordUuid);
+  void deleteRelatedFileresources(UUID headwordUuid) throws RepositoryException;
 
-  BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest);
+  BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest)
+      throws RepositoryException;
 
-  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
+  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest)
+      throws RepositoryException;
+
+  // FIXME: replace by pagerequest with filtering
+  List<Headword> find(String label, Locale locale) throws RepositoryException;
+
+  // FIXME: replace by pagerequest with filtering
+  List<Headword> findByLabel(String label) throws RepositoryException;
 
   // TODO: replace with filtering
   PageResponse<Headword> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial);
+      PageRequest pageRequest, String language, String initial) throws RepositoryException;
 
-  PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(UUID headwordUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
-  PageResponse<FileResource> findRelatedFileResources(UUID headwordUuid, PageRequest pageRequest);
+  PageResponse<FileResource> findRelatedFileResources(UUID headwordUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   /**
    * Returns a headword, if available
@@ -52,17 +63,17 @@ public interface HeadwordRepository extends UniqueObjectRepository<Headword> {
    * @param locale locale of label, e.g. "de"
    * @return Headword or null
    */
-  Headword getByLabelAndLocale(String label, Locale locale);
+  Headword getByLabelAndLocale(String label, Locale locale) throws RepositoryException;
 
-  List<Locale> getLanguages();
+  List<Locale> getLanguages() throws RepositoryException;
 
-  List<Headword> getRandom(int count);
+  List<Entity> getRelatedEntities(UUID headwordUuid) throws RepositoryException;
 
-  List<Entity> getRelatedEntities(UUID headwordUuid);
+  List<FileResource> getRelatedFileResources(UUID headwordUuid) throws RepositoryException;
 
-  List<FileResource> getRelatedFileResources(UUID headwordUuid);
+  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities)
+      throws RepositoryException;
 
-  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
-
-  List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
+  List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources)
+      throws RepositoryException;
 }

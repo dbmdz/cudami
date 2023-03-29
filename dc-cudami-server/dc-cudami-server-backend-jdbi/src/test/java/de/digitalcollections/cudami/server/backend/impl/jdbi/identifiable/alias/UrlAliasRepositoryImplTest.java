@@ -297,7 +297,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
                     .build())
             .build());
 
-    PageResponse<LocalizedUrlAliases> pageResponse = repo.find(pageRequest);
+    PageResponse<LocalizedUrlAliases> pageResponse = repo.findLocalizedUrlAliases(pageRequest);
     assertTrue(pageResponse.hasContent());
     assertThat(pageResponse.getTotalElements()).isEqualTo(1);
     assertThat(pageResponse.getContent().size()).isEqualTo(1);
@@ -351,7 +351,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
             .targetUuid(webpage.getUuid().toString())
             .build();
     repo.save(urlAliasWithoutWebsite);
-    int count = repo.delete(List.of(urlAliasWithoutWebsite.getUuid()));
+    int count = repo.deleteByUuids(List.of(urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
   }
 

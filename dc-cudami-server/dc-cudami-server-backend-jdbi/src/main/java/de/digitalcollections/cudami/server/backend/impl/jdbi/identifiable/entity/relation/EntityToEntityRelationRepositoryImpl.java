@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.backend.impl.jdbi.JdbiRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
@@ -70,7 +70,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public PageResponse<EntityToEntityRelation> find(PageRequest pageRequest) {
+  public PageResponse<EntityRelation> find(PageRequest pageRequest) {
     StringBuilder commonSql = new StringBuilder(" FROM " + tableName + " AS " + tableAlias);
     Map<String, Object> argumentMappings = new HashMap<>(0);
     addFiltering(pageRequest, commonSql, argumentMappings);
@@ -81,7 +81,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
                 + commonSql);
     pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
     addPagingAndSorting(pageRequest, query);
-    List<EntityToEntityRelation> result =
+    List<EntityRelation> result =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
@@ -99,14 +99,13 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
                     .findOne()
                     .get());
 
-    PageResponse<EntityToEntityRelation> pageResponse =
-        new PageResponse<>(result, pageRequest, count);
+    PageResponse<EntityRelation> pageResponse = new PageResponse<>(result, pageRequest, count);
     return pageResponse;
   }
 
   @Override
-  public PageResponse<EntityToEntityRelation> findBySubject(
-      UUID subjectUuid, PageRequest pageRequest) throws RepositoryException {
+  public PageResponse<EntityRelation> findBySubject(UUID subjectUuid, PageRequest pageRequest)
+      throws RepositoryException {
     StringBuilder commonSql =
         new StringBuilder(
             " FROM " + tableName + " AS " + tableAlias + " WHERE subject_uuid = :uuid");
@@ -121,7 +120,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
                 + commonSql);
     pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "rel.sortindex")));
     addPagingAndSorting(pageRequest, query);
-    List<EntityToEntityRelation> list =
+    List<EntityRelation> list =
         dbi.withHandle(
             h ->
                 h.createQuery(query.toString())
@@ -133,8 +132,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
 
-    PageResponse<EntityToEntityRelation> pageResponse =
-        new PageResponse<>(list, pageRequest, total);
+    PageResponse<EntityRelation> pageResponse = new PageResponse<>(list, pageRequest, total);
     return pageResponse;
   }
 
@@ -166,7 +164,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
   }
 
   @Override
-  public void save(List<EntityToEntityRelation> entityRelations) throws RepositoryException {
+  public void save(List<EntityRelation> entityRelations) throws RepositoryException {
     if (entityRelations == null) {
       return;
     }
@@ -208,7 +206,7 @@ public class EntityToEntityRelationRepositoryImpl extends JdbiRepositoryImpl
     Entity object = new Entity();
     object.setUuid(objectEntityUuid);
 
-    save(List.of(new EntityToEntityRelation(subject, predicate, object)));
+    save(List.of(new EntityRelation(subject, predicate, object)));
   }
 
   @Override

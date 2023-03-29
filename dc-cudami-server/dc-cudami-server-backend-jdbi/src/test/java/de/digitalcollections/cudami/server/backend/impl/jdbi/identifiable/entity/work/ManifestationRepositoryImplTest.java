@@ -27,7 +27,7 @@ import de.digitalcollections.model.identifiable.entity.manifestation.Manifestati
 import de.digitalcollections.model.identifiable.entity.manifestation.ProductionInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.PublicationInfo;
 import de.digitalcollections.model.identifiable.entity.manifestation.Publisher;
-import de.digitalcollections.model.identifiable.entity.relation.EntityToEntityRelation;
+import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -121,9 +121,9 @@ class ManifestationRepositoryImplTest
     workRepository.save(work);
 
     Manifestation manifestation = prepareManifestation(subject, parent, titles);
-    manifestation.addRelation(new EntityToEntityRelation(editor, "is_editor_of", manifestation));
+    manifestation.addRelation(new EntityRelation(editor, "is_editor_of", manifestation));
     manifestation.addRelation(
-        EntityToEntityRelation.builder()
+        EntityRelation.builder()
             .subject(someoneElse)
             .predicate("is_somethingelse_of")
             .object(manifestation)
@@ -142,10 +142,10 @@ class ManifestationRepositoryImplTest
 
     assertThat(actual.getRelations()).size().isEqualTo(2);
     assertThat(actual.getRelations().get(0))
-        .isEqualTo(new EntityToEntityRelation(editor, "is_editor_of", null));
+        .isEqualTo(new EntityRelation(editor, "is_editor_of", null));
     assertThat(actual.getRelations().get(1))
         .isEqualTo(
-            EntityToEntityRelation.builder()
+            EntityRelation.builder()
                 .subject(someoneElse)
                 .predicate("is_somethingelse_of")
                 .additionalPredicate("additional predicate")

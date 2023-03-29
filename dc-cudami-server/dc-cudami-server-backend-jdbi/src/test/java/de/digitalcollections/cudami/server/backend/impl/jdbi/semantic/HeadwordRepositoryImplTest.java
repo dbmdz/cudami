@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.list.buckets.Bucket;
 import de.digitalcollections.model.list.buckets.BucketsRequest;
@@ -54,19 +55,18 @@ class HeadwordRepositoryImplTest {
 
   @Test
   @DisplayName("can save and retrieve")
-  void saveHeadword() {
+  void saveHeadword() throws RepositoryException {
     Headword headword = new Headword("Eiffelturm", Locale.GERMAN);
+    repo.save(headword);
 
-    Headword actual = repo.save(headword);
-
-    assertThat(actual.getUuid()).isNotNull();
-    assertThat(actual.getCreated()).isNotNull();
-    assertThat(actual.getLastModified()).isNotNull();
+    assertThat(headword.getUuid()).isNotNull();
+    assertThat(headword.getCreated()).isNotNull();
+    assertThat(headword.getLastModified()).isNotNull();
   }
 
   @Test
   @DisplayName("get buckets")
-  void findBuckets() {
+  void findBuckets() throws RepositoryException {
     // save 100 headwords
     for (int i = 1; i <= 100; i++) {
       Headword headword =

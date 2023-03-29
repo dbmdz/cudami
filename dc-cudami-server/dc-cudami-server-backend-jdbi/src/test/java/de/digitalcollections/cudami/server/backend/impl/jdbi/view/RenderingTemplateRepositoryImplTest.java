@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.view;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -46,13 +47,13 @@ public class RenderingTemplateRepositoryImplTest {
 
   @Test
   @DisplayName("can find rendering templates")
-  void find() {
+  void find() throws RepositoryException {
     String name1 = "my-first-template";
     String name2 = "my-second-template";
 
     RenderingTemplate template1 = new RenderingTemplate();
     template1.setName(name1);
-    template1 = repo.save(template1);
+    repo.save(template1);
 
     RenderingTemplate template2 = new RenderingTemplate();
     template2.setName(name2);

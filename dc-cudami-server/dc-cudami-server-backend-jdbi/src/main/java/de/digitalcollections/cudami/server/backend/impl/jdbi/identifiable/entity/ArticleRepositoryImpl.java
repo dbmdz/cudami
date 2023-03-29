@@ -51,6 +51,11 @@ public class ArticleRepositoryImpl extends EntityRepositoryImpl<Article>
   }
 
   @Override
+  public Article create() throws RepositoryException {
+    return new Article();
+  }
+
+  @Override
   public Article getByIdentifier(Identifier identifier) throws RepositoryException {
     Article article = super.getByIdentifier(identifier);
 

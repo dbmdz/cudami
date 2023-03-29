@@ -55,6 +55,11 @@ public class HeadwordEntryRepositoryImpl extends EntityRepositoryImpl<HeadwordEn
   }
 
   @Override
+  public HeadwordEntry create() throws RepositoryException {
+    return new HeadwordEntry();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, HeadwordEntry>, RowView> createAdditionalReduceRowsBiConsumer() {
     return (map, rowView) -> {
       // entity should be already in map, as we here just add additional data

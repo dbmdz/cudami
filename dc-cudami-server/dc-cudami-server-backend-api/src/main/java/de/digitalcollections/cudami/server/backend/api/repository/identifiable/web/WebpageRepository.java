@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.backend.api.repository.identifiable.web;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
@@ -10,7 +11,8 @@ import java.util.UUID;
 /** Repository for Webpage persistence handling. */
 public interface WebpageRepository extends NodeRepository<Webpage> {
 
-  PageResponse<Webpage> findRootWebpagesForWebsite(UUID websiteUuid, PageRequest pageRequest);
+  PageResponse<Webpage> findRootWebpagesForWebsite(UUID websiteUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
   /**
    * @param rootWebpageUuid uuid of a webpage (webpage must be a top level webpage of the website)
@@ -22,6 +24,8 @@ public interface WebpageRepository extends NodeRepository<Webpage> {
    * @param webpageUuid UUID of newly created webpage to be saved
    * @param parentWebsiteUUID website the (root) webpage belongs to
    * @return saved webpage
+   * @throws RepositoryException
    */
-  Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUUID);
+  Webpage saveWithParentWebsite(UUID webpageUuid, UUID parentWebsiteUUID)
+      throws RepositoryException;
 }
