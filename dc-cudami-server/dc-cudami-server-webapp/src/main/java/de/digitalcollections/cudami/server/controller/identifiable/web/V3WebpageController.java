@@ -98,9 +98,9 @@ public class V3WebpageController {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
-        webpage = webpageService.getActive(uuid);
+        webpage = webpageService.getByExampleAndActive(uuid);
       } else {
-        webpage = webpageService.getActive(uuid, pLocale);
+        webpage = webpageService.getByExampleAndActiveAndLocale(uuid, pLocale);
       }
     } else {
       if (pLocale == null) {

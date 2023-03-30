@@ -6,11 +6,11 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 /** Service for UrlAliasses */
 public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
@@ -24,8 +24,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    *     existed at all and thus nothing could be deleted
    * @throws ServiceException
    */
-  default boolean deleteAllForTarget(Identifiable targetIdentifiable) throws ServiceException {
-    return deleteAllForTarget(targetIdentifiable, false);
+  default boolean deleteByIdentifiable(Identifiable targetIdentifiable) throws ServiceException {
+    return deleteByIdentifiable(targetIdentifiable, false);
   }
 
   /**
@@ -37,7 +37,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    *     existed at all and thus nothing could be deleted
    * @throws ServiceException
    */
-  boolean deleteAllForTarget(Identifiable targetIdentifiable, boolean force)
+  boolean deleteByIdentifiable(Identifiable targetIdentifiable, boolean force)
       throws ServiceException;
 
   /**
@@ -64,7 +64,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @return slug as String, or null, if no website under the provided websiteUuid exists
    * @throws ServiceException
    */
-  String generateSlug(Locale pLocale, String label, UUID websiteUuid) throws ServiceException;
+  String generateSlug(Locale pLocale, String label, Website website) throws ServiceException;
 
   /**
    * Returns the LocalizedUrlAliases for an identifiable, identified by its UUID
@@ -73,7 +73,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @return the LocalizedUrlAliases, if found, or null
    * @throws ServiceException in case of an error
    */
-  LocalizedUrlAliases getLocalizedUrlAliases(UUID uuid) throws ServiceException;
+  LocalizedUrlAliases getByIdentifiable(Identifiable identifiable) throws ServiceException;
 
   /**
    * Returns the primary Links (one per language) as LocalizedUrlAliases for a given slug for a
@@ -87,7 +87,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @return LocalizedUrlAliases, if a primary link exists; otherwise: null.
    * @throws ServiceException in case of an error
    */
-  LocalizedUrlAliases getPrimaryUrlAliases(UUID websiteUuid, String slug, Locale pLocale)
+  LocalizedUrlAliases getPrimaryUrlAliases(Website website, String slug, Locale pLocale)
       throws ServiceException;
 
   /**
@@ -97,7 +97,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @return {@code List}, not {@code null}
    * @throws ServiceException in case of an error
    */
-  List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws ServiceException;
+  List<UrlAlias> getPrimaryUrlAliasesByIdentifiable(Identifiable identifiable)
+      throws ServiceException;
 
   /**
    * Validates the given localizedUrlAliases according to the following criteria:
@@ -110,5 +111,6 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @param localizedUrlAliases the LocalizedUrlAliases to validate
    * @throws ValidationException when the critera are not met
    */
-  void validate(LocalizedUrlAliases localizedUrlAliases) throws ValidationException;
+  void validate(LocalizedUrlAliases localizedUrlAliases)
+      throws ServiceException, ValidationException;
 }

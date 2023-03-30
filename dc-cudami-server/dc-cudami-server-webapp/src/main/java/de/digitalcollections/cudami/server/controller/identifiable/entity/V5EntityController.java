@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -28,13 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity controller")
 public class V5EntityController<E extends Entity> {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
   private final EntityService<Entity> entityService;
 
   private final ObjectMapper objectMapper;
 
   public V5EntityController(
-      EntityRelationService entityRelationService,
+      EntityToEntityRelationService entityRelationService,
       @Qualifier("entityService") EntityService<Entity> entityService,
       ObjectMapper objectMapper) {
     this.entityRelationService = entityRelationService;

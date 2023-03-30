@@ -77,7 +77,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public boolean addItemToDigitalObject(Item item, UUID digitalObjectUuid)
+  public boolean addItem(UUID digitalObjectUuid, Item item)
       throws ConflictException, ValidationException, ServiceException {
     // If the item does not exist, return false
     if (item == null) {
@@ -186,7 +186,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     }
 
     // Look for rendering resources. If they exist, fill the object
-    List<FileResource> renderingResources = getRenderingResources(digitalObject.getUuid());
+    List<FileResource> renderingResources = getRenderingFileResources(digitalObject.getUuid());
     if (renderingResources != null && !renderingResources.isEmpty()) {
       digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
     }
@@ -267,12 +267,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public List<FileResource> getFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).findFileResources(digitalObjectUuid);
+    return ((DigitalObjectRepository) repository).getFileResources(digitalObjectUuid);
   }
 
   @Override
   public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).findImageFileResources(digitalObjectUuid);
+    return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -316,12 +316,12 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public List<FileResource> getRenderingResources(UUID digitalObjectUuid) {
+  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
     return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
-  public List<FileResource> getRenderingResources(DigitalObject digitalObject)
+  public List<FileResource> getRenderingFileResources(DigitalObject digitalObject)
       throws ServiceException {
     return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObject);
   }

@@ -15,12 +15,19 @@ import java.util.UUID;
 /** Repository for Digital object persistence handling. */
 public interface DigitalObjectRepository extends EntityRepository<DigitalObject> {
 
-  void deleteFileResources(UUID digitalObjectUuid);
+  default void deleteFileResources(DigitalObject digitalObject) throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("delete failed: given object must not be null");
+    }
+    deleteFileResources(digitalObject.getUuid());
+  }
+
+  void deleteFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
   default PageResponse<Collection> findCollections(
       DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     if (digitalObject == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findCollections(digitalObject.getUuid(), pageRequest);
   }
@@ -31,24 +38,21 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   default PageResponse<FileResource> findFileResources(
       DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     if (digitalObject == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findFileResources(digitalObject.getUuid(), pageRequest);
   }
-
-  // FIXME: replace with pagerequest method
-  List<FileResource> findFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
   PageResponse<FileResource> findFileResources(UUID digitalObjectUuid, PageRequest pageRequest)
       throws RepositoryException;
 
   default PageResponse<ImageFileResource> findImageFileResources(
       DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("find failed: given object must not be null");
+    }
     return findImageFileResources(digitalObject.getUuid(), pageRequest);
   }
-
-  // FIXME: replace with pagerequest method
-  List<ImageFileResource> findImageFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
   PageResponse<ImageFileResource> findImageFileResources(
       UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException;
@@ -56,7 +60,7 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   default PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
       throws RepositoryException {
     if (digitalObject == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findProjects(digitalObject.getUuid(), pageRequest);
   }
@@ -64,16 +68,62 @@ public interface DigitalObjectRepository extends EntityRepository<DigitalObject>
   PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest)
       throws RepositoryException;
 
-  List<Locale> getLanguagesOfCollections(UUID uuid);
+  default List<FileResource> getFileResources(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getFileResources(digitalObject.getUuid());
+  }
 
-  List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid);
+  // FIXME: replace with pagerequest method
+  List<FileResource> getFileResources(UUID digitalObjectUuid) throws RepositoryException;
 
-  List<Locale> getLanguagesOfProjects(UUID uuid);
+  default List<ImageFileResource> getImageFileResources(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getImageFileResources(digitalObject.getUuid());
+  }
+
+  // FIXME: replace with pagerequest method
+  List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) throws RepositoryException;
+
+  default List<Locale> getLanguagesOfCollections(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getLanguagesOfCollections(digitalObject.getUuid());
+  }
+
+  List<Locale> getLanguagesOfCollections(UUID uuid) throws RepositoryException;
+
+  default List<Locale> getLanguagesOfContainedDigitalObjects(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getLanguagesOfContainedDigitalObjects(digitalObject.getUuid());
+  }
+
+  List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) throws RepositoryException;
+
+  default List<Locale> getLanguagesOfProjects(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getLanguagesOfProjects(digitalObject.getUuid());
+  }
+
+  List<Locale> getLanguagesOfProjects(UUID uuid) throws RepositoryException;
 
   default List<FileResource> setFileResources(
       DigitalObject digitalObject, List<FileResource> fileResources) throws RepositoryException {
-    if (fileResources == null) {
-      return null;
+    if (digitalObject == null || fileResources == null) {
+      throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setFileResources(digitalObject.getUuid(), fileResources);
   }

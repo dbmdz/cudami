@@ -11,27 +11,44 @@ import java.util.UUID;
 /** Repository for LinkedDataFileResource persistence handling. */
 public interface DigitalObjectLinkedDataFileResourceRepository {
 
-  int countDigitalObjectsForResource(UUID uuid);
+  int countDigitalObjectsForResource(UUID uuid) throws RepositoryException;
 
-  int delete(List<UUID> uuids);
+  int delete(List<UUID> uuids) throws RepositoryException;
 
-  default int delete(UUID uuid) {
+  default int delete(UUID uuid) throws RepositoryException {
     return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
   }
 
   default PageResponse<LinkedDataFileResource> findLinkedDataFileResources(
-      DigitalObject digitalObject, PageRequest pageRequest) {
+      DigitalObject digitalObject, PageRequest pageRequest) throws RepositoryException {
     if (digitalObject == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findLinkedDataFileResources(digitalObject.getUuid(), pageRequest);
   }
 
   PageResponse<LinkedDataFileResource> findLinkedDataFileResources(
-      UUID digitalObjectUuid, PageRequest pageRequest);
+      UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException;
+
+  default List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getLinkedDataFileResources(digitalObject.getUuid());
+  }
 
   List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid)
       throws RepositoryException;
+
+  default List<LinkedDataFileResource> setLinkedDataFileResources(
+      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
+      throws RepositoryException {
+    if (digitalObject == null || linkedDataFileResources == null) {
+      throw new IllegalArgumentException("set failed: given objects must not be null");
+    }
+    return setLinkedDataFileResources(digitalObject.getUuid(), linkedDataFileResources);
+  }
 
   List<LinkedDataFileResource> setLinkedDataFileResources(
       UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)

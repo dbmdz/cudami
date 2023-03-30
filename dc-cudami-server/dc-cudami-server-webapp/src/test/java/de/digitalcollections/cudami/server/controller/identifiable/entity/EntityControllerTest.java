@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -32,7 +32,7 @@ class EntityControllerTest extends BaseControllerTest {
   @Qualifier("entityService")
   private EntityService<Entity> entityService;
 
-  @MockBean private EntityRelationService entityRelationService;
+  @MockBean private EntityToEntityRelationService entityRelationService;
 
   @DisplayName("returns an entity, e.g. a collection, by its refid")
   @ParameterizedTest

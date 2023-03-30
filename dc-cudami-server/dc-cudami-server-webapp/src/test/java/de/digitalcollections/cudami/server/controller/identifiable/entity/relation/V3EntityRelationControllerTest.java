@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity.relat
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @DisplayName("The V3 EntityRelationController")
 public class V3EntityRelationControllerTest extends BaseControllerTest {
 
-  @MockBean private EntityRelationService entityRelationService;
+  @MockBean private EntityToEntityRelationService entityRelationService;
 
   @DisplayName("shall return a list of related entities with a predicate")
   @ParameterizedTest

@@ -3,7 +3,7 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable.e
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(rollbackFor = {Exception.class})
-public class EntityRelationServiceImpl implements EntityRelationService {
+public class EntityRelationServiceImpl implements EntityToEntityRelationService {
 
   private final EntityToEntityRelationRepository repository;
 
@@ -73,7 +73,7 @@ public class EntityRelationServiceImpl implements EntityRelationService {
   }
 
   @Override
-  public void persistEntityRelations(
+  public void setEntityRelations(
       Entity entity, List<EntityRelation> relations, boolean deleteExisting)
       throws ServiceException {
     if (deleteExisting) {

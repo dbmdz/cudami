@@ -195,13 +195,13 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Test
   public void getByItemUuidReturnsNull() throws RepositoryException {
     // First test: Query for nonexisting item must return null
-    assertThat(repo.getByItemUuid(UUID.randomUUID())).isNull();
+    assertThat(repo.getByItem(UUID.randomUUID())).isNull();
 
     // Second test: Query for existing item with no connection to a
     // manifestation must return null;
     Item item = Item.builder().label(Locale.GERMAN, "Item").build();
     itemRepository.save(item);
-    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+    assertThat(repo.getByItem(item.getUuid())).isNull();
   }
 
   @DisplayName("can return the work, connected to an item")
@@ -226,12 +226,12 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     // First test: Item with no manifestation must not return any work
     Item item = Item.builder().label(Locale.GERMAN, "Erstexemplar").build();
     itemRepository.save(item);
-    assertThat(repo.getByItemUuid(item.getUuid())).isNull();
+    assertThat(repo.getByItem(item.getUuid())).isNull();
 
     // Second test: Item with existing manifestation->work chain must return the work
     item.setManifestation(manifestation);
     itemRepository.update(item);
-    Work actual = repo.getByItemUuid(item.getUuid());
+    Work actual = repo.getByItem(item.getUuid());
     assertThat(actual).isEqualTo(work);
   }
 
@@ -240,7 +240,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
   @Test
   public void getByPersonUuidReturnsEmptySet() throws RepositoryException {
     // First test: Query for nonexisting person must return null
-    assertThat(repo.getByPersonUuid(UUID.randomUUID())).isEmpty();
+    assertThat(repo.getByPerson(UUID.randomUUID())).isEmpty();
 
     // Second test: Query for existing person with no connection to a
     // work must return null;
@@ -251,7 +251,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
             .build();
     personRepository.save(person);
 
-    assertThat(repo.getByPersonUuid(person.getUuid())).isEmpty();
+    assertThat(repo.getByPerson(person.getUuid())).isEmpty();
   }
 
   @DisplayName("can return the set of connected persons for a work")
@@ -282,7 +282,7 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
     entityRelationRepository.save(entityRelation);
     entityRelation.setObject(null); // to avoid recursion
 
-    Set<Work> actual = repo.getByPersonUuid(person.getUuid());
+    Set<Work> actual = repo.getByPerson(person.getUuid());
 
     assertThat(actual).containsExactly(work);
   }

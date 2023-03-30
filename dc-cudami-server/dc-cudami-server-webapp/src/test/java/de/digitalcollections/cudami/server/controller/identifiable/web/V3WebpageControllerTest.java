@@ -36,8 +36,9 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnActive(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getActive(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndActive(any(UUID.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndActiveAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(expected);
     testJson(path);
   }
 
@@ -109,8 +110,9 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true&pLocale=de_DE"
       })
   public void returnNoNonActive(String path) throws Exception {
-    when(webpageService.getActive(any(UUID.class))).thenReturn(null);
-    when(webpageService.getActive(any(UUID.class), any(Locale.class))).thenReturn(null);
+    when(webpageService.getByExampleAndActive(any(UUID.class))).thenReturn(null);
+    when(webpageService.getByExampleAndActiveAndLocale(any(UUID.class), any(Locale.class)))
+        .thenReturn(null);
     testNotFound(path);
   }
 

@@ -7,7 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WorkServiceImpl.class);
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
 
   public WorkServiceImpl(
       @Qualifier("workRepository") WorkRepository repository,
@@ -36,7 +36,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
-      EntityRelationService entityRelationService,
+      EntityToEntityRelationService entityRelationService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
@@ -49,18 +49,18 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
   }
 
   @Override
-  public PageResponse<Work> findEmbedded(UUID uuid, PageRequest pageRequest) {
+  public PageResponse<Work> findEmbeddedWorks(UUID uuid, PageRequest pageRequest) {
     return ((WorkRepository) repository).findEmbeddedWorks(uuid, pageRequest);
   }
 
   @Override
-  public Work getForItem(UUID itemUuid) {
-    return ((WorkRepository) repository).getByItemUuid(itemUuid);
+  public Work getByItem(UUID itemUuid) {
+    return ((WorkRepository) repository).getByItem(itemUuid);
   }
 
   @Override
-  public Set<Work> getForPerson(UUID personUuid) {
-    return ((WorkRepository) repository).getByPersonUuid(personUuid);
+  public Set<Work> getByPerson(UUID personUuid) {
+    return ((WorkRepository) repository).getByPerson(personUuid);
   }
 
   @Override
@@ -68,7 +68,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.save(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, true);
+      entityRelationService.setEntityRelations(work, entityRelations, true);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Work=" + work + ": " + e, e);
@@ -80,7 +80,7 @@ public class WorkServiceImpl extends EntityServiceImpl<Work> implements WorkServ
     super.update(work);
     try {
       List<EntityRelation> entityRelations = work.getRelations();
-      entityRelationService.persistEntityRelations(work, entityRelations, false);
+      entityRelationService.setEntityRelations(work, entityRelations, false);
       work.setRelations(entityRelations);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Work=" + work + ": " + e, e);

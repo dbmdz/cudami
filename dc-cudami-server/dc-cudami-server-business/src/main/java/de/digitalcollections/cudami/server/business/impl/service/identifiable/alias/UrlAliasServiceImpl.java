@@ -89,7 +89,7 @@ public class UrlAliasServiceImpl implements UrlAliasService {
     if (uuid == null) {
       return false;
     }
-    LocalizedUrlAliases urlAliases = getLocalizedUrlAliases(uuid);
+    LocalizedUrlAliases urlAliases = getByIdentifiable(uuid);
     return delete(
         urlAliases.flatten().stream()
             .filter(ua -> force || ua.getLastPublished() == null)
@@ -196,9 +196,9 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public LocalizedUrlAliases getLocalizedUrlAliases(UUID targetUuid) throws ServiceException {
+  public LocalizedUrlAliases getByIdentifiable(UUID targetUuid) throws ServiceException {
     try {
-      return repository.getAllForTarget(targetUuid);
+      return repository.getByIdentifiable(targetUuid);
     } catch (Exception e) {
       throw new ServiceException(
           "Cannot find LocalizedUrlAliases for identifiable with uuid=" + targetUuid + ": " + e, e);
@@ -241,9 +241,10 @@ public class UrlAliasServiceImpl implements UrlAliasService {
   }
 
   @Override
-  public List<UrlAlias> getPrimaryUrlAliasesForTarget(UUID targetUuid) throws ServiceException {
+  public List<UrlAlias> getPrimaryUrlAliasesByIdentifiable(UUID targetUuid)
+      throws ServiceException {
     try {
-      LocalizedUrlAliases localizedUrlAliases = repository.getAllForTarget(targetUuid);
+      LocalizedUrlAliases localizedUrlAliases = repository.getByIdentifiable(targetUuid);
       if (localizedUrlAliases == null) {
         return new ArrayList<>(0);
       }

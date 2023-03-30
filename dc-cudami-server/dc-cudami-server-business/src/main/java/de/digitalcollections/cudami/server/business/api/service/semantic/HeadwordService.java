@@ -13,83 +13,45 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.semantic.Headword;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 /** Service for Headword. */
 public interface HeadwordService extends UniqueObjectService<Headword> {
 
-  default void addRelatedEntity(Headword headword, Entity entity) {
-    if (headword == null || entity == null) {
-      return;
-    }
-    addRelatedEntity(headword.getUuid(), entity.getUuid());
-  }
+  void addRelatedEntity(Headword headword, Entity entity) throws ServiceException;
 
-  void addRelatedEntity(UUID headwordUuid, UUID entityUuid);
+  void addRelatedFileresource(Headword headword, FileResource fileResource) throws ServiceException;
 
-  default void addRelatedFileresource(Headword headword, FileResource fileResource) {
-    if (headword == null || fileResource == null) {
-      return;
-    }
-    addRelatedFileresource(headword.getUuid(), fileResource.getUuid());
-  }
+  BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest)
+      throws ServiceException;
 
-  void addRelatedFileresource(UUID headwordUuid, UUID fileResourceUuid);
+  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) throws ServiceException;
 
-  long count();
-
-  boolean delete(List<UUID> uuids);
-
-  default boolean delete(UUID uuid) {
-    return delete(List.of(uuid)); // same performance as "where uuid = :uuid"
-  }
-
-  BucketObjectsResponse<Headword> find(BucketObjectsRequest<Headword> bucketObjectsRequest);
-
-  BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest);
-
-  List<Headword> find(String searchTerm, int maxResults);
-
-  List<Headword> findByLabelAndLocale(String label, Locale locale);
+  List<Headword> find(String searchTerm, int maxResults) throws ServiceException;
 
   PageResponse<Headword> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial);
+      PageRequest pageRequest, String language, String initial) throws ServiceException;
 
-  PageResponse<Entity> findRelatedEntities(UUID uuid, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(Headword headword, PageRequest pageRequest)
+      throws ServiceException;
 
-  PageResponse<FileResource> findRelatedFileResources(UUID uuid, PageRequest pageRequest);
+  PageResponse<FileResource> findRelatedFileResources(Headword headword, PageRequest pageRequest)
+      throws ServiceException;
 
   /**
    * @return list of ALL headwords. USE WITH CARE (only for internal workflow, NOT FOR USER
    *     INTERACTION!)!!!
    */
-  List<Headword> getAll();
+  List<Headword> getAll() throws ServiceException;
 
-  Headword getByUuid(UUID uuid);
+  List<Headword> getByLabelAndLocale(String label, Locale locale) throws ServiceException;
 
-  List<Locale> getLanguages();
+  List<Locale> getLanguages() throws ServiceException;
 
-  List<Headword> getRandom(int count);
+  List<Headword> getRandom(int count) throws ServiceException;
 
-  default List<Entity> getRelatedEntities(Headword headword) {
-    if (headword == null) {
-      return null;
-    }
-    return getRelatedEntities(headword.getUuid());
-  }
+  List<Entity> getRelatedEntities(Headword headword) throws ServiceException;
 
-  List<Entity> getRelatedEntities(UUID headwordUuid);
-
-  default List<FileResource> getRelatedFileResources(Headword headword) {
-    if (headword == null) {
-      return null;
-    }
-    return getRelatedFileResources(headword.getUuid());
-  }
-
-  List<FileResource> getRelatedFileResources(UUID headwordUuid);
-
-  Headword save(Headword headword) throws ServiceException;
+  List<FileResource> getRelatedFileResources(Headword headword) throws ServiceException;
 
   /**
    * Save list of entities related to an Headword. Prerequisite: entities have been saved before
@@ -99,12 +61,7 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
    * @param entities the entities that are related to the headword
    * @return the list of the related entities
    */
-  default List<Entity> saveRelatedEntities(Headword headword, List<Entity> entities) {
-    if (headword == null || entities == null) {
-      return null;
-    }
-    return setRelatedEntities(headword.getUuid(), entities);
-  }
+  List<Entity> setRelatedEntities(Headword headword, List<Entity> entities) throws ServiceException;
 
   /**
    * Save list of file resources related to an Headword. Prerequisite: file resources have been
@@ -114,17 +71,6 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
    * @param fileResources the file resources that are related to the entity part
    * @return the list of the related file resources
    */
-  default List<FileResource> saveRelatedFileResources(
-      Headword headword, List<FileResource> fileResources) {
-    if (headword == null || fileResources == null) {
-      return null;
-    }
-    return setRelatedFileResources(headword.getUuid(), fileResources);
-  }
-
-  List<Entity> setRelatedEntities(UUID headwordUuid, List<Entity> entities);
-
-  List<FileResource> setRelatedFileResources(UUID headwordUuid, List<FileResource> fileResources);
-
-  Headword update(Headword headword) throws ServiceException;
+  List<FileResource> setRelatedFileResources(Headword headword, List<FileResource> fileResources)
+      throws ServiceException;
 }

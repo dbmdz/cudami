@@ -1,41 +1,21 @@
 package de.digitalcollections.cudami.server.business.api.service.relation;
 
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.relation.Predicate;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 /** Service for predicates */
-public interface PredicateService {
+public interface PredicateService extends UniqueObjectService<Predicate> {
 
-  long count();
-
-  boolean delete(UUID uuid);
-
-  boolean delete(String value);
-
-  /**
-   * Return all predicates paged.
-   *
-   * @param pageRequest the paging parameters
-   * @return Paged list of all predicates
-   */
-  PageResponse<Predicate> find(PageRequest pageRequest);
+  boolean deleteByValue(String value) throws ServiceException;
 
   /**
    * @return list of all predicates
    */
-  List<Predicate> getAll();
-
-  /**
-   * Return predicate with uuid
-   *
-   * @param uuid the uuid of the predicate
-   * @return The found predicate
-   */
-  Predicate getByUuid(UUID uuid);
+  List<Predicate> getAll() throws ServiceException;
 
   /**
    * Returns a predicate, if available
@@ -43,43 +23,22 @@ public interface PredicateService {
    * @param value unique value of predicate, e.g. "is_part_of"
    * @return Predicate or null
    */
-  Predicate getByValue(String value);
+  Predicate getByValue(String value) throws ServiceException;
 
   /**
    * Return list of languages of all predicates
    *
    * @return list of languages
    */
-  List<Locale> getLanguages();
-
-  /**
-   * Saves a predicate. It can either be created or updated
-   *
-   * @param predicate
-   * @return the predicate
-   */
-  Predicate save(Predicate predicate);
+  List<Locale> getLanguages() throws ServiceException;
 
   /**
    * Update an existing or insert a new predicate.
    *
    * @param predicate the predicate to be updated or inserted
    * @return the updated or inserted predicate
+   * @throws ServiceException
+   * @throws ValidationException
    */
-  default Predicate saveOrUpdate(Predicate predicate) {
-    UUID uuid = predicate.getUuid();
-    if (uuid != null) {
-      return update(predicate);
-    } else {
-      return save(predicate);
-    }
-  }
-
-  /**
-   * Update a predicate.
-   *
-   * @param predicate the predicate to be updated
-   * @return the updated predicate
-   */
-  Predicate update(Predicate predicate);
+  void saveOrUpdate(Predicate predicate) throws ValidationException, ServiceException;
 }

@@ -11,11 +11,12 @@ public interface FileResourceBinaryService {
 
   void assertReadability(FileResource resource) throws ServiceException;
 
-  FileResource find(String uuid, MimeType mimeType) throws ServiceException;
-
   byte[] getAsBytes(FileResource resource) throws ServiceException;
 
   Document getAsDocument(FileResource resource) throws ServiceException;
+
+  FileResource getByExampleAndMimetype(FileResource resource, MimeType mimeType)
+      throws ServiceException;
 
   InputStream getInputStream(FileResource resource) throws ServiceException;
 

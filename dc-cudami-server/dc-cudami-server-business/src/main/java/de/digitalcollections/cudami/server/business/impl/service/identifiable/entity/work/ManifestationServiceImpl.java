@@ -8,7 +8,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     implements ManifestationService {
 
-  private EntityRelationService entityRelationService;
+  private EntityToEntityRelationService entityRelationService;
 
   public ManifestationServiceImpl(
       ManifestationRepository repository,
@@ -34,7 +34,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
       UrlAliasService urlAliasService,
       HookProperties hookProperties,
       LocaleService localeService,
-      EntityRelationService entityRealationService,
+      EntityToEntityRelationService entityRealationService,
       CudamiConfig cudamiConfig) {
     super(
         repository,
@@ -90,7 +90,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.save(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      entityRelationService.persistEntityRelations(manifestation, entityRelations, true);
+      entityRelationService.setEntityRelations(manifestation, entityRelations, true);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot save Manifestation=" + manifestation + ": " + e, e);
     }
@@ -101,7 +101,7 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
     super.update(manifestation);
     try {
       List<EntityRelation> entityRelations = manifestation.getRelations();
-      entityRelationService.persistEntityRelations(manifestation, entityRelations, false);
+      entityRelationService.setEntityRelations(manifestation, entityRelations, false);
     } catch (ServiceException e) {
       throw new ServiceException("Cannot update Manifestation=" + manifestation + ": " + e, e);
     }

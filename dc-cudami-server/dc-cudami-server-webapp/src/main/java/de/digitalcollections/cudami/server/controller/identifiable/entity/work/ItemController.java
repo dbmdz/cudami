@@ -77,7 +77,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throws ValidationException, ConflictException, ServiceException {
 
     Item item = service.getByUuid(uuid);
-    boolean successful = digitalObjectService.addItemToDigitalObject(item, digitalObjectUuid);
+    boolean successful = digitalObjectService.setItem(digitalObjectUuid, item);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -244,7 +244,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return Set.of(workService.getForItem(uuid));
+    return Set.of(workService.getByItem(uuid));
   }
 
   @Operation(summary = "save a newly created item")

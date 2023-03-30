@@ -184,7 +184,7 @@ class DigitalObjectLinkedDataFileResourceRepositoryImplTest {
 
   @DisplayName("returns zero, when nothing was deleted")
   @Test
-  void noDeletionReturnsZero() {
+  void noDeletionReturnsZero() throws RepositoryException {
     assertThat(repo.delete(UUID.randomUUID())).isEqualTo(0);
   }
 

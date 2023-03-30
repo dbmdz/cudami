@@ -235,7 +235,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> findTopicsOfEntity(UUID entityUuid) throws RepositoryException {
+  public List<Topic> getTopicsOfEntity(UUID entityUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "
@@ -260,7 +260,7 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
   }
 
   @Override
-  public List<Topic> findTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
+  public List<Topic> getTopicsOfFileResource(UUID fileResourceUuid) throws RepositoryException {
     StringBuilder innerQuery =
         new StringBuilder(
             "SELECT * FROM "

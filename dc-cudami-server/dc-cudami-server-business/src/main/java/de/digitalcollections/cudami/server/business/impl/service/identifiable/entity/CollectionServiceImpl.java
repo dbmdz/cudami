@@ -143,7 +143,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getActive(UUID uuid) {
+  public Collection getByExampleAndActive(UUID uuid) {
     Filtering filtering = filteringForActive();
     Collection collection =
         ((CollectionRepository) repository).getByUuidAndFiltering(uuid, filtering);
@@ -155,8 +155,8 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection getActive(UUID uuid, Locale pLocale) {
-    Collection collection = getActive(uuid);
+  public Collection getByExampleAndActiveAndLocale(UUID uuid, Locale pLocale) {
+    Collection collection = getByExampleAndActive(uuid);
     collection = reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
     setPublicationStatus(collection);
     return collection;

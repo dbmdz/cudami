@@ -119,7 +119,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     }
 
     try {
-      return new ResponseEntity<>(urlAliasService.getLocalizedUrlAliases(uuid), HttpStatus.OK);
+      return new ResponseEntity<>(urlAliasService.getByIdentifiable(uuid), HttpStatus.OK);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

@@ -4,7 +4,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity controller")
 public class EntityController<E extends Entity> extends AbstractIdentifiableController<Entity> {
 
-  private final EntityRelationService entityRelationService;
+  private final EntityToEntityRelationService entityRelationService;
   private final EntityService<Entity> service;
 
   public EntityController(
-      EntityRelationService entityRelationService,
+      EntityToEntityRelationService entityRelationService,
       @Qualifier("entityService") EntityService<Entity> entityService) {
     this.entityRelationService = entityRelationService;
     this.service = entityService;

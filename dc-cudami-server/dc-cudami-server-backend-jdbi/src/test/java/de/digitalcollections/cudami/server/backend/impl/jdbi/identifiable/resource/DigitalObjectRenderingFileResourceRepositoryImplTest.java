@@ -79,7 +79,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .build();
     textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
+    repo.setRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
     List<FileResource> persisted = repo.getRenderingFileResources(digitalObject.getUuid());
 
     repo.delete(persisted.stream().map(FileResource::getUuid).collect(Collectors.toList()));
@@ -118,14 +118,14 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .build();
     textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
+    repo.setRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
 
     assertThat(repo.countDigitalObjectsForResource(renderingFileResource.getUuid())).isEqualTo(1);
   }
 
   @DisplayName("returns zero, when nothing was deleted")
   @Test
-  void noDeletionReturnsZero() {
+  void noDeletionReturnsZero() throws RepositoryException {
     assertThat(repo.delete(UUID.randomUUID())).isEqualTo(0);
   }
 
@@ -157,7 +157,7 @@ class DigitalObjectRenderingFileResourceRepositoryImplTest {
             .build();
     textFileResourceMetadataRepository.save(renderingFileResource);
 
-    repo.saveRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
+    repo.setRenderingFileResources(digitalObject.getUuid(), List.of(renderingFileResource));
 
     assertThat(repo.delete(renderingFileResource.getUuid())).isEqualTo(1);
   }

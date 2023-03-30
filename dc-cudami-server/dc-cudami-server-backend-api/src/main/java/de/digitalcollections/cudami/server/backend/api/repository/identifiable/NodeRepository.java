@@ -53,7 +53,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   PageResponse<N> findRootNodes(PageRequest pageRequest) throws RepositoryException;
 
-  default BreadcrumbNavigation getBreadcrumbNavigation(N node) {
+  default BreadcrumbNavigation getBreadcrumbNavigation(N node) throws RepositoryException {
     if (node == null) {
       throw new IllegalArgumentException("node must not be null");
     }
@@ -63,7 +63,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    * @param nodeUuid the uuid of the current node
    * @return the breadcrumb navigation
    */
-  BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid);
+  BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) throws RepositoryException;
 
   default List<N> getChildren(N node) throws RepositoryException {
     if (node == null) {
@@ -92,16 +92,16 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
 
   List<N> getParents(UUID uuid) throws RepositoryException;
 
-  List<Locale> getRootNodesLanguages();
+  List<Locale> getRootNodesLanguages() throws RepositoryException;
 
-  default boolean removeChild(N parent, N child) {
+  default boolean removeChild(N parent, N child) throws RepositoryException {
     if (parent == null || child == null) {
       throw new IllegalArgumentException("parent and child must not be null");
     }
     return removeChild(parent.getUuid(), child.getUuid());
   }
 
-  boolean removeChild(UUID parentUuid, UUID childUuid);
+  boolean removeChild(UUID parentUuid, UUID childUuid) throws RepositoryException;
 
   default N saveWithParent(N child, N parent) throws RepositoryException {
     if (parent == null) {
@@ -121,7 +121,7 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
    */
   N saveWithParent(UUID childUuid, UUID parentUUID) throws RepositoryException;
 
-  default boolean updateChildrenOrder(N parent, List<N> children) {
+  default boolean updateChildrenOrder(N parent, List<N> children) throws RepositoryException {
     if (parent == null || children == null) {
       throw new IllegalArgumentException("parent and children must not be null");
     }
@@ -133,5 +133,5 @@ public interface NodeRepository<N extends Identifiable> extends IdentifiableRepo
     return updateChildrenOrder(parent.getUuid(), childrenUuids);
   }
 
-  boolean updateChildrenOrder(UUID parentUuid, List<UUID> children);
+  boolean updateChildrenOrder(UUID parentUuid, List<UUID> children) throws RepositoryException;
 }

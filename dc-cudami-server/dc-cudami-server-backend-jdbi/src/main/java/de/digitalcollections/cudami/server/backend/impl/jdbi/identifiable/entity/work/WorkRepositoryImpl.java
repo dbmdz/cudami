@@ -216,7 +216,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Work getByItemUuid(UUID itemUuid) throws RepositoryException {
+  public Work getByItem(UUID itemUuid) throws RepositoryException {
     String innerSelect =
         " (SELECT w.* FROM "
             + getTableName()
@@ -251,7 +251,7 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   }
 
   @Override
-  public Set<Work> getByPersonUuid(UUID personUuid) throws RepositoryException {
+  public Set<Work> getByPerson(UUID personUuid) throws RepositoryException {
     StringBuilder innerSelect =
         new StringBuilder(
             " SELECT "

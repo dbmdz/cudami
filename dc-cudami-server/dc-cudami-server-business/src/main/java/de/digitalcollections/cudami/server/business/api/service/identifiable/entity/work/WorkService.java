@@ -1,17 +1,19 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work;
 
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
+import de.digitalcollections.model.identifiable.entity.agent.Person;
+import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Set;
-import java.util.UUID;
 
 public interface WorkService extends EntityService<Work> {
 
-  Work getForItem(UUID itemUuid);
+  PageResponse<Work> findEmbeddedWorks(Work work, PageRequest pageRequest) throws ServiceException;
 
-  Set<Work> getForPerson(UUID personUuid);
+  Work getByItem(Item item) throws ServiceException;
 
-  PageResponse<Work> findEmbedded(UUID uuid, PageRequest pageRequest);
+  Set<Work> getByPerson(Person person) throws ServiceException;
 }

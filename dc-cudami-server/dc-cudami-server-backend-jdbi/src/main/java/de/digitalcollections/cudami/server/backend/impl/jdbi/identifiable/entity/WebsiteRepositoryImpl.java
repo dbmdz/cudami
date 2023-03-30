@@ -53,7 +53,54 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
   }
 
   @Override
-  public List<Webpage> findRootWebpages(UUID uuid) throws RepositoryException {
+  public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
+  }
+
+  @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(Arrays.asList("url"));
+    return allowedOrderByFields;
+  }
+
+  @Override
+  public Website getByIdentifier(Identifier identifier) throws RepositoryException {
+    Website website = super.getByIdentifier(identifier);
+
+    if (website != null) {
+      website.setRootPages(getRootWebpages(website.getUuid()));
+    }
+    return website;
+  }
+
+  @Override
+  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
+    Website website = super.getByUuidAndFiltering(uuid, filtering);
+
+    if (website != null) {
+      website.setRootPages(getRootWebpages(website.getUuid()));
+    }
+    return website;
+  }
+
+  @Override
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
+      return null;
+    }
+    switch (modelProperty) {
+      case "url":
+        return tableAlias + ".url";
+      case "registrationDate":
+        return tableAlias + ".registration_date";
+      default:
+        return super.getColumnName(modelProperty);
+    }
+  }
+
+  @Override
+  public List<Webpage> getRootWebpages(UUID uuid) throws RepositoryException {
     final String wpTableAlias = webpageRepositoryImpl.getTableAlias();
     final String wpTableName = webpageRepositoryImpl.getTableName();
 
@@ -74,53 +121,6 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
         webpageRepositoryImpl.retrieveList(
             webpageRepositoryImpl.getSqlSelectReducedFields(), innerQuery, argumentMappings, null);
     return result;
-  }
-
-  @Override
-  public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("url"));
-    return allowedOrderByFields;
-  }
-
-  @Override
-  public Website getByIdentifier(Identifier identifier) throws RepositoryException {
-    Website website = super.getByIdentifier(identifier);
-
-    if (website != null) {
-      website.setRootPages(findRootWebpages(website.getUuid()));
-    }
-    return website;
-  }
-
-  @Override
-  public Website getByUuidAndFiltering(UUID uuid, Filtering filtering) throws RepositoryException {
-    Website website = super.getByUuidAndFiltering(uuid, filtering);
-
-    if (website != null) {
-      website.setRootPages(findRootWebpages(website.getUuid()));
-    }
-    return website;
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    if (modelProperty == null) {
-      return null;
-    }
-    switch (modelProperty) {
-      case "url":
-        return tableAlias + ".url";
-      case "registrationDate":
-        return tableAlias + ".registration_date";
-      default:
-        return super.getColumnName(modelProperty);
-    }
   }
 
   @Override

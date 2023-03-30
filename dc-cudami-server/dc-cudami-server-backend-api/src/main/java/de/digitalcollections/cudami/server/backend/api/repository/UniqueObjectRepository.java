@@ -70,9 +70,39 @@ public interface UniqueObjectRepository<U extends UniqueObject>
   int deleteByUuids(List<UUID> uuidList) throws RepositoryException;
 
   /**
+   * Retrieve one {@code UniqueObject} by given properties in example instance.
+   *
+   * @param uniqueObject example instance containing unique property (PK: UUID)
+   * @return the found {@code UniqueObject} or {@code null}
+   * @throws RepositoryException in case of technical problems
+   */
+  default U getByExample(U uniqueObject) throws RepositoryException {
+    if (uniqueObject == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getByUuid(uniqueObject.getUuid());
+  }
+
+  /**
+   * Retrieve one {@code UniqueObject} by given properties in example instance and given filtering.
+   *
+   * @param uniqueObject example instance containing unique property
+   * @param filtering filtering params
+   * @return the found {@code UniqueObject} or {@code null}
+   * @throws ServiceException in case of problems
+   */
+  default U getByExampleAndFiltering(U uniqueObject, Filtering filtering)
+      throws RepositoryException {
+    if (uniqueObject == null || filtering == null) {
+      throw new IllegalArgumentException("get failed: given objects must not be null");
+    }
+    return getByUuidAndFiltering(uniqueObject.getUuid(), filtering);
+  }
+
+  /**
    * Retrieve the {@code UniqueObject} with the supplied UUID (PK).
    *
-   * @param uuid UUID of unique object
+   * @param uniqueObjectUuid UUID of unique object
    * @return the found {@code UniqueObject} or {@code null}
    * @throws RepositoryException
    */
@@ -99,6 +129,15 @@ public interface UniqueObjectRepository<U extends UniqueObject>
 
   // FIXME: get rid of this (mappings are implementation specific?)
   void save(U uniqueObject, Map<String, Object> bindings) throws RepositoryException;
+
+  default void saveOrUpdate(U uniqueObject) throws RepositoryException {
+    UUID uuid = uniqueObject.getUuid();
+    if (uuid != null) {
+      update(uniqueObject);
+    } else {
+      save(uniqueObject);
+    }
+  }
 
   /**
    * Update an existing {@code UniqueObject} object.

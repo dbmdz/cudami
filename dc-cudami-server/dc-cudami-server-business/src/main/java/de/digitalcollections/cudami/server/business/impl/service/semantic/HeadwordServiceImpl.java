@@ -60,7 +60,7 @@ public class HeadwordServiceImpl implements HeadwordService {
 
   @Override
   public List<Headword> find(String searchTerm, int maxResults) {
-    return repository.find(searchTerm, maxResults);
+    return repository.getByExampleAndMimetype(searchTerm, maxResults);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class HeadwordServiceImpl implements HeadwordService {
   }
 
   @Override
-  public List<Headword> findByLabelAndLocale(String label, Locale locale) {
+  public List<Headword> getByLabelAndLocale(String label, Locale locale) {
     return repository.find(label, locale);
   }
 

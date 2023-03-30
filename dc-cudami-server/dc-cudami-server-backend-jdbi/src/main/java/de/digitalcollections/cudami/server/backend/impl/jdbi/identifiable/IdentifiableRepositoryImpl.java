@@ -197,6 +197,32 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     };
   }
 
+  @Override
+  public int deleteByUuids(List<UUID> identifiablesUuids) throws RepositoryException {
+    for (UUID identifiableUuid : identifiablesUuids) {
+      try {
+        deleteIdentifiers(identifiableUuid);
+      } catch (ServiceException e) {
+        throw new ServiceException("Error while removing Identifiers. Rollback.", e);
+      }
+      try {
+        urlAliasService.deleteByIdentifiable(identifiableUuid, true);
+      } catch (ServiceException e) {
+        throw new ServiceException("Error while removing UrlAliases. Rollback.", e);
+      }
+    }
+    return deleteByUuid(identifiablesUuids);
+  }
+
+  private boolean deleteIdentifiers(UUID identifiableUuid) throws RepositoryException {
+    I identifiable = getByUuid(identifiableUuid);
+    if (identifiable == null || identifiable.getIdentifiers() == null) {
+      return false;
+    }
+    identifierService.deleteByUuid(identifiable.getIdentifiers());
+    return true;
+  }
+
   /**
    * Extend the reduced Identifiable by the contents of the provided RowView
    *

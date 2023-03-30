@@ -239,7 +239,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
     targetLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
 
-    when(repo.getAllForTarget(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
+    when(repo.getByIdentifiable(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
     when(repo.delete(any(List.class))).thenReturn(1);
 
     assertThat(service.deleteAllForTarget(targetUuid, true)).isTrue();
@@ -252,7 +252,7 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   @DisplayName("deleteForTarget with unset uuid deletes nothing and returns false")
   @Test
   public void deleteForTargetWithUuidNull() throws ServiceException, RepositoryException {
-    assertThat(service.deleteAllForTarget(null, true)).isFalse();
+    assertThat(service.deleteByIdentifiable(null, true)).isFalse();
     verify(repo, never()).deleteByUuid(any());
   }
 
@@ -359,8 +359,9 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
     UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, targetUuid, null);
     UrlAlias ua3 = createUrlAlias("npslug", true, "de", false, targetUuid, null);
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(ua1, ua2, ua3);
-    when(repo.getAllForTarget(eq(targetUuid))).thenReturn(localizedUrlAliases);
-    assertThat(service.getPrimaryUrlAliasesForTarget(targetUuid)).containsAll(List.of(ua1, ua2));
+    when(repo.getByIdentifiable(eq(targetUuid))).thenReturn(localizedUrlAliases);
+    assertThat(service.getPrimaryUrlAliasesByIdentifiable(targetUuid))
+        .containsAll(List.of(ua1, ua2));
   }
 
   @DisplayName("generates slugs with numeric suffix for default locale")
@@ -533,12 +534,12 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException()
       throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).getAllForTarget(any(UUID.class));
+    doThrow(NullPointerException.class).when(repo).getByIdentifiable(any(UUID.class));
 
     assertThrows(
         ServiceException.class,
         () -> {
-          service.getLocalizedUrlAliases(UUID.randomUUID());
+          service.getByIdentifiable(UUID.randomUUID());
         });
   }
 
@@ -784,9 +785,9 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
     expected.add(urlAlias);
 
-    when(repo.getAllForTarget(any(UUID.class))).thenReturn(expected);
+    when(repo.getByIdentifiable(any(UUID.class))).thenReturn(expected);
 
-    assertThat(service.getLocalizedUrlAliases(UUID.randomUUID())).isEqualTo(expected);
+    assertThat(service.getByIdentifiable(UUID.randomUUID())).isEqualTo(expected);
   }
 
   @DisplayName("can return primary links")

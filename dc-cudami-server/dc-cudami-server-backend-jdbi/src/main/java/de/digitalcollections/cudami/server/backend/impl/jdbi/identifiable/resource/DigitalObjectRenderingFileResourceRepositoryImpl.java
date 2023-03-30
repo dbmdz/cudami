@@ -146,8 +146,8 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
   }
 
   @Override
-  public void saveRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) {
+  public List<FileResource> setRenderingFileResources(
+      UUID digitalObjectUuid, List<FileResource> renderingResources) throws RepositoryException {
     dbi.useHandle(
         handle -> {
           PreparedBatch preparedBatch =
@@ -167,6 +167,7 @@ public class DigitalObjectRenderingFileResourceRepositoryImpl extends JdbiReposi
           }
           preparedBatch.execute();
         });
+    return getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override

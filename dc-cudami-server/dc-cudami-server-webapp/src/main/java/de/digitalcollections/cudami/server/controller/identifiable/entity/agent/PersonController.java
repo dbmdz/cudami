@@ -256,7 +256,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
-    return workService.getForPerson(uuid);
+    return workService.getByPerson(uuid);
   }
 
   @Operation(summary = "save a newly created person")

@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("The EntityRelation service")
 class EntityRelationServiceImplTest extends AbstractServiceImplTest {
 
-  private EntityRelationService entityRelationService;
+  private EntityToEntityRelationService entityRelationService;
   private EntityToEntityRelationRepository entityRelationRepository;
 
   @BeforeEach
@@ -44,7 +44,7 @@ class EntityRelationServiceImplTest extends AbstractServiceImplTest {
     manifestation.setRelations(List.of(relation));
 
     List<EntityRelation> relations = manifestation.getRelations();
-    entityRelationService.persistEntityRelations(manifestation, relations, true);
+    entityRelationService.setEntityRelations(manifestation, relations, true);
     manifestation.setRelations(relations);
 
     Manifestation manifestionWithUUIDOnly = Manifestation.builder().uuid(uuid).build();

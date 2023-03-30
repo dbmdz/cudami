@@ -1,37 +1,23 @@
 package de.digitalcollections.cudami.server.business.api.service.security;
 
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.security.User;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.validation.Errors;
 
-/**
- * Service for User.
- *
- * @param <T> domain object
- */
-public interface UserService<T extends User> {
+/** Service for User. */
+public interface UserService extends UniqueObjectService<User> {
 
-  T activate(UUID uuid);
+  User activate(User user) throws ServiceException;
 
-  T createAdminUser();
+  User createAdminUser() throws ServiceException;
 
-  T deactivate(UUID uuid);
+  User deactivate(User user) throws ServiceException;
 
-  boolean doesActiveAdminUserExist();
+  boolean doesActiveAdminUserExist() throws ServiceException;
 
-  PageResponse<T> find(PageRequest pageRequest);
+  List<User> getActiveAdminUsers() throws ServiceException;
 
-  List<T> getActiveAdminUsers();
-
-  T getByUuid(UUID uuid);
-
-  T getByUsername(String string) throws UsernameNotFoundException;
-
-  T save(T user, Errors results);
-
-  T update(T user, Errors results);
+  User getByUsername(String username) throws ServiceException, UsernameNotFoundException;
 }

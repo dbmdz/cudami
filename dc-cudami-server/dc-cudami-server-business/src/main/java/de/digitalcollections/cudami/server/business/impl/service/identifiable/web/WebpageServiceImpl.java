@@ -100,7 +100,7 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public Webpage getActive(UUID uuid) {
+  public Webpage getByExampleAndActive(UUID uuid) {
     Filtering filtering = filteringForActive();
     Webpage webpage = ((WebpageRepository) repository).getByUuidAndFiltering(uuid, filtering);
     if (webpage != null) {
@@ -111,8 +111,8 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
-  public Webpage getActive(UUID uuid, Locale pLocale) {
-    Webpage webpage = getActive(uuid);
+  public Webpage getByExampleAndActiveAndLocale(UUID uuid, Locale pLocale) {
+    Webpage webpage = getByExampleAndActive(uuid);
     webpage = reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
     setPublicationStatus(webpage);
     return webpage;

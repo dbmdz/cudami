@@ -11,6 +11,9 @@ import java.util.UUID;
 /** Repository for Website persistence handling. */
 public interface WebsiteRepository extends EntityRepository<Website> {
 
+  PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException;
+
   default PageResponse<Webpage> findRootWebpages(Website website, PageRequest pageRequest)
       throws RepositoryException {
     if (website == null) {
@@ -19,11 +22,14 @@ public interface WebsiteRepository extends EntityRepository<Website> {
     return findRootWebpages(website.getUuid(), pageRequest);
   }
 
-  // FIXME: replace with pagerequest method
-  List<Webpage> findRootWebpages(UUID uuid) throws RepositoryException;
+  List<Webpage> getRootWebpages(UUID uuid) throws RepositoryException;
 
-  PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest)
-      throws RepositoryException;
+  default List<Webpage> getRootWebpages(Website website) throws RepositoryException {
+    if (website == null) {
+      throw new IllegalArgumentException("get failed: given website must not be null");
+    }
+    return getRootWebpages(website.getUuid());
+  }
 
   boolean updateRootWebpagesOrder(UUID website, List<Webpage> rootPages) throws RepositoryException;
 

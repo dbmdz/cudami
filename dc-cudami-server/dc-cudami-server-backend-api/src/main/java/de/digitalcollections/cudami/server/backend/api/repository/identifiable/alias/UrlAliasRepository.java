@@ -111,7 +111,7 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
    * @return {@code LocalizedUrlAliases} containing all {@code UrlAlias} objects for that target
    * @throws RepositoryException
    */
-  LocalizedUrlAliases getAllForTarget(UUID uuid) throws RepositoryException;
+  LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException;
 
   /**
    * Check whether an entry exists for the passed website UUID, slug and language.

@@ -42,7 +42,7 @@ public class IdentifierTypeRepositoryImpl extends UniqueObjectRepositoryImpl<Ide
   }
 
   @Override
-  public IdentifierType getByNamespace(String namespace) {
+  public IdentifierType getByNamespace(String namespace) throws RepositoryException {
     final String sql = "SELECT * FROM " + tableName + " WHERE namespace = :namespace";
 
     IdentifierType identifierType =

@@ -90,6 +90,7 @@ public class IdentifierServiceImpl implements IdentifierService {
 
   @Override
   public void validate(Set<Identifier> identifiers) throws ValidationException, ServiceException {
+    // FIXME: do not get cache, get complete list of identifierTypes
     Map<String, String> identifierTypes = identifierTypeService.getIdentifierTypeCache();
     List<String> namespacesNotFound = new ArrayList<>(0);
     List<String> idsNotMatchingPattern = new ArrayList<>(0);
@@ -98,6 +99,8 @@ public class IdentifierServiceImpl implements IdentifierService {
       String namespace = identifier.getNamespace();
       String pattern = identifierTypes.get(namespace);
       if (pattern == null && !cacheUpdated) {
+        // FIXME: should not result in update! the repo has to update the cache every time
+        // inserts/updates/deletes happen!
         identifierTypes = identifierTypeService.updateIdentifierTypeCache();
         cacheUpdated = true;
         pattern = identifierTypes.get(namespace);

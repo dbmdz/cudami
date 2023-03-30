@@ -32,7 +32,7 @@ public class PredicateServiceImpl implements PredicateService {
   }
 
   @Override
-  public boolean delete(String value) {
+  public boolean deleteByValue(String value) {
     return repository.deleteByValue(value);
   }
 

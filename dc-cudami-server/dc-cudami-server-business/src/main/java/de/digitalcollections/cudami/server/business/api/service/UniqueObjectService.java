@@ -7,29 +7,39 @@ import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public interface UniqueObjectService<U extends UniqueObject>
     extends PagingSortingFilteringService<U> {
 
+  /**
+   * @return the count of all unique objects
+   */
   long count() throws ServiceException;
 
-  boolean delete(List<U> uniqueObjects) throws ConflictException, ServiceException;
+  U create() throws ServiceException;
+
+  int delete(List<U> uniqueObjects) throws ConflictException, ServiceException;
 
   boolean delete(U uniqueObject) throws ConflictException, ServiceException;
 
   /**
-   * Retrieve one {@code UniqueObject} by its UUID
+   * Retrieve one {@code UniqueObject} by given properties in example instance.
    *
-   * @param uniqueObjectUuid the UUID
-   * @return the {@code UniqueObject} or null
-   * @throws ServiceException in case of an error
+   * @param uniqueObject example instance containing unique property
+   * @return the found {@code UniqueObject} or {@code null}
+   * @throws ServiceException in case of problems
    */
-  default U getByUuid(UUID uniqueObjectUuid) throws ServiceException {
-    return getByUuidAndFiltering(uniqueObjectUuid, null);
-  }
+  U getByExample(U uniqueObject) throws ServiceException;
 
-  U getByUuidAndFiltering(UUID uniqueObjectUuid, Filtering filtering) throws ServiceException;
+  /**
+   * Retrieve one {@code UniqueObject} by given properties in example instance and given filtering.
+   *
+   * @param uniqueObject example instance containing unique property
+   * @param filtering filtering params
+   * @return the found {@code UniqueObject} or {@code null}
+   * @throws ServiceException in case of problems
+   */
+  U getByExampleAndFiltering(U uniqueObject, Filtering filtering) throws ServiceException;
 
   /**
    * Persist an {@code UniqueObject} (with validation)

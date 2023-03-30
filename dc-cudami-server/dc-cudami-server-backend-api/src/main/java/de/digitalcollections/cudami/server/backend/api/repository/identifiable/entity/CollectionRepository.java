@@ -46,20 +46,39 @@ public interface CollectionRepository
   PageResponse<DigitalObject> findDigitalObjects(UUID collectionUuid, PageRequest pageRequest)
       throws RepositoryException;
 
+  default List<CorporateBody> findRelatedCorporateBodies(Collection collection, Filtering filtering)
+      throws RepositoryException {
+    if (collection == null) {
+      throw new IllegalArgumentException("find failed: given collection must not be null");
+    }
+    return findRelatedCorporateBodies(collection.getUuid(), filtering);
+  }
+
   // FIXME: remove it, just use PageRequest
   List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering)
       throws RepositoryException;
 
-  PageResponse<CorporateBody> findRelatedCorporateBodies(UUID uuid, PageRequest pageRequest);
+  PageResponse<CorporateBody> findRelatedCorporateBodies(UUID uuid, PageRequest pageRequest)
+      throws RepositoryException;
 
-  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject) {
+  default boolean removeDigitalObject(Collection collection, DigitalObject digitalObject)
+      throws RepositoryException {
     if (collection == null || digitalObject == null) {
       throw new IllegalArgumentException("remove failed: given objects must not be null");
     }
     return removeDigitalObject(collection.getUuid(), digitalObject.getUuid());
   }
 
-  boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid);
+  boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid)
+      throws RepositoryException;
+
+  default boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("remove failed: given object must not be null");
+    }
+    return removeDigitalObjectFromAllCollections(digitalObject.getUuid());
+  }
 
   /**
    * Removes a digitalObject from all collections, to which is was connected to
@@ -67,14 +86,16 @@ public interface CollectionRepository
    * @param digitalObject the DigitalObject
    * @return boolean value for success
    */
-  boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject);
+  boolean removeDigitalObjectFromAllCollections(UUID digitalObjectUuid) throws RepositoryException;
 
-  default boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects) {
+  default boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects)
+      throws RepositoryException {
     if (collection == null || digitalObjects == null) {
       throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setDigitalObjects(collection.getUuid(), digitalObjects);
   }
 
-  boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects);
+  boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects)
+      throws RepositoryException;
 }

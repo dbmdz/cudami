@@ -193,7 +193,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
             .build();
     repo.save(urlAlias2);
 
-    LocalizedUrlAliases actual = repo.getAllForTarget(webpage.getUuid());
+    LocalizedUrlAliases actual = repo.getByIdentifiable(webpage.getUuid());
     LocalizedUrlAliases expected = new LocalizedUrlAliases(urlAlias1, urlAlias2);
     assertThat(actual).isEqualTo(expected);
   }
@@ -245,7 +245,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
             .build();
     repo.save(mainLinkInGerman);
 
-    LocalizedUrlAliases allLinks = repo.getAllForTarget(webpageWirUeberUns.getUuid()),
+    LocalizedUrlAliases allLinks = repo.getByIdentifiable(webpageWirUeberUns.getUuid()),
         mainLinksWithWebsite =
             repo.findPrimaryLinksForWebsite(website.getUuid(), "wir_ueber_uns", false),
         mainLinksConsideringLang =

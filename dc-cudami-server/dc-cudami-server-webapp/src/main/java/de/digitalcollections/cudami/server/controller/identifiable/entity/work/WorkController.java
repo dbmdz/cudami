@@ -99,7 +99,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findEmbedded(uuid, pageRequest);
+    return service.findEmbeddedWorks(uuid, pageRequest);
   }
 
   @Operation(summary = "Find all manifestations of a work")

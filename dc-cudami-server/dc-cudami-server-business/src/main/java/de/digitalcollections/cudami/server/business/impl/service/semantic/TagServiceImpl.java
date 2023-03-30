@@ -28,7 +28,7 @@ public class TagServiceImpl extends UniqueObjectServiceImpl<Tag, TagRepository>
 
   @Override
   public boolean delete(List<UUID> uuids) {
-    return repository.delete(uuids);
+    return repository.deleteByValue(uuids);
   }
 
   @Override

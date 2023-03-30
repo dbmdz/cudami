@@ -15,9 +15,9 @@ import java.util.Locale;
 
 public interface IdentifiableService<I extends Identifiable> extends UniqueObjectService<I> {
 
-  void addRelatedEntity(I identifiable, Entity entity);
+  void addRelatedEntity(I identifiable, Entity entity) throws ServiceException;
 
-  void addRelatedFileresource(I identifiable, FileResource fileResource);
+  void addRelatedFileresource(I identifiable, FileResource fileResource) throws ServiceException;
 
   default void cleanupLabelFromUnwantedLocales(
       Locale locale, Locale fallbackLocale, LocalizedText label) {
@@ -55,26 +55,28 @@ public interface IdentifiableService<I extends Identifiable> extends UniqueObjec
     }
   }
 
-  PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial);
+  // TODO: replace with filtering
+  PageResponse<I> findByLanguageAndInitial(PageRequest pageRequest, String language, String initial)
+      throws ServiceException;
 
-  PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest);
+  PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest)
+      throws ServiceException;
 
-  PageResponse<FileResource> findRelatedFileResources(I identifiable, PageRequest pageRequest);
+  PageResponse<FileResource> findRelatedFileResources(I identifiable, PageRequest pageRequest)
+      throws ServiceException;
 
-  I getByIdentifiable(I identifiable) throws ServiceException;
+  I getByExampleAndLocale(I identifiable, Locale locale) throws ServiceException;
 
-  I getByIdentifiableAndLocale(I identifiable, Locale locale) throws ServiceException;
+  I getByIdentifier(Identifier identifier) throws ServiceException;
 
-  I getByIdentifier(Identifier identifier);
+  List<Locale> getLanguages() throws ServiceException;
 
-  List<Locale> getLanguages();
+  List<I> getRandom(int count) throws ServiceException;
 
-  List<I> getRandom(int count);
+  List<Entity> setRelatedEntities(I identifiable, List<Entity> entities) throws ServiceException;
 
-  List<Entity> setRelatedEntities(I identifiable, List<Entity> entities);
-
-  List<FileResource> setRelatedFileResources(I identifiable, List<FileResource> fileResources);
+  List<FileResource> setRelatedFileResources(I identifiable, List<FileResource> fileResources)
+      throws ServiceException;
 
   void validate(I identifiable) throws ServiceException, ValidationException;
 }

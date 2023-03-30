@@ -134,7 +134,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       }
 
       // Persist the new relations
-      digitalObjectRenderingFileResourceRepository.saveRenderingFileResources(
+      digitalObjectRenderingFileResourceRepository.setRenderingFileResources(
           digitalObjectUuid, savedRenderingResources);
     }
 

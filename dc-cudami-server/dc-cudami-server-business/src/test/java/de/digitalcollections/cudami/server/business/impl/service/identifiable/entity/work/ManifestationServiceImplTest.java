@@ -15,7 +15,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 class ManifestationServiceImplTest extends AbstractServiceImplTest {
 
   private ManifestationRepository manifestationRepository;
-  private EntityRelationService entityRelationService;
+  private EntityToEntityRelationService entityRelationService;
   private IdentifierService identifierService;
   private LocaleService localeService;
   private ManifestationServiceImpl manifestationService;
@@ -43,7 +43,7 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
   public void beforeEach() throws Exception {
     super.beforeEach();
     manifestationRepository = mock(ManifestationRepository.class);
-    entityRelationService = mock(EntityRelationService.class);
+    entityRelationService = mock(EntityToEntityRelationService.class);
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
     hookProperties = mock(HookProperties.class);
@@ -96,7 +96,7 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
     manifestationService.save(manifestationToSave);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(
+        .setEntityRelations(
             eq(savedManifestation), eq(manifestationToSave.getRelations()), eq(true));
   }
 
@@ -133,7 +133,7 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
     assertThat(manifestationToUpdate).isEqualTo(manifestationToUpdate);
 
     verify(entityRelationService, times(1))
-        .persistEntityRelations(
+        .setEntityRelations(
             eq(manifestationToUpdate), eq(manifestationToUpdate.getRelations()), eq(false));
   }
 }

@@ -354,7 +354,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   @Test
   @DisplayName("returns false when the given item is null")
   public void addToNullItem() throws ConflictException, ServiceException, ValidationException {
-    assertThat(service.addItemToDigitalObject(null, UUID.randomUUID())).isFalse();
+    assertThat(service.addItem(UUID.randomUUID(), null)).isFalse();
   }
 
   @Test
@@ -365,7 +365,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
     when(service.getByUuid(eq(uuid))).thenReturn(null);
 
-    assertThat(service.addItemToDigitalObject(Item.builder().build(), uuid)).isFalse();
+    assertThat(service.addItem(uuid, Item.builder().build())).isFalse();
   }
 
   @Test
@@ -378,7 +378,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
     when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
-    assertThat(service.addItemToDigitalObject(item, digitalObject.getUuid())).isTrue();
+    assertThat(service.addItem(digitalObject.getUuid(), item)).isTrue();
   }
 
   @Test
@@ -394,7 +394,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     assertThrows(
         ConflictException.class,
         () -> {
-          service.addItemToDigitalObject(item, digitalObject.getUuid());
+          service.addItem(digitalObject.getUuid(), item);
         });
   }
 
@@ -411,7 +411,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
 
     when(service.getByUuid(eq(digitalObject.getUuid()))).thenReturn(digitalObject);
 
-    assertThat(service.addItemToDigitalObject(item, digitalObject.getUuid())).isTrue();
+    assertThat(service.addItem(digitalObject.getUuid(), item)).isTrue();
   }
 
   /*

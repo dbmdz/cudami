@@ -517,16 +517,12 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
   }
 
   @Override
-  public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject) {
-    if (digitalObject == null) {
-      return false;
-    }
-
+  public boolean removeDigitalObjectFromAllCollections(UUID digitalObjectUuid)
+      throws RepositoryException {
     final String sql =
         "DELETE FROM collection_digitalobjects WHERE digitalobject_uuid=:digitalObjectUuid";
 
-    dbi.withHandle(
-        h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObject.getUuid()).execute());
+    dbi.withHandle(h -> h.createUpdate(sql).bind("digitalObjectUuid", digitalObjectUuid).execute());
     return true;
   }
 

@@ -12,27 +12,44 @@ import java.util.UUID;
 
 public interface AgentRepository<A extends Agent> extends EntityRepository<A> {
 
-  default PageResponse<DigitalObject> findDigitalObjects(A agent, PageRequest pageRequest) {
+  default PageResponse<DigitalObject> findDigitalObjects(A agent, PageRequest pageRequest)
+      throws RepositoryException {
     if (agent == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findDigitalObjects(agent.getUuid(), pageRequest);
   }
 
-  PageResponse<DigitalObject> findDigitalObjects(UUID agentUuid, PageRequest pageRequest);
+  PageResponse<DigitalObject> findDigitalObjects(UUID agentUuid, PageRequest pageRequest)
+      throws RepositoryException;
 
-  default PageResponse<Work> findWorks(A agent, PageRequest pageRequest) {
+  default PageResponse<Work> findWorks(A agent, PageRequest pageRequest)
+      throws RepositoryException {
     if (agent == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findWorks(agent.getUuid(), pageRequest);
   }
 
-  PageResponse<Work> findWorks(UUID agentUuid, PageRequest pageRequest);
+  PageResponse<Work> findWorks(UUID agentUuid, PageRequest pageRequest) throws RepositoryException;
+
+  default Set<DigitalObject> getDigitalObjects(A agent) throws RepositoryException {
+    if (agent == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getDigitalObjects(agent.getUuid());
+  }
 
   // FIXME: replace with pagerequest method
   Set<DigitalObject> getDigitalObjects(UUID uuidAgent) throws RepositoryException;
 
+  default Set<Work> getWorks(A agent) throws RepositoryException {
+    if (agent == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getWorks(agent.getUuid());
+  }
+
   // FIXME: replace with pagerequest method
-  Set<Work> getWorks(UUID uuidAgent);
+  Set<Work> getWorks(UUID uuidAgent) throws RepositoryException;
 }

@@ -52,7 +52,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
                   "UUID of the predicate, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid) {
-    boolean successful = service.delete(uuid);
+    boolean successful = service.deleteByValue(uuid);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);

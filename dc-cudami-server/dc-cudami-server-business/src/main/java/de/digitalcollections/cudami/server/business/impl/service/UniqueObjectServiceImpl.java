@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.business.impl.service;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -20,10 +22,14 @@ public abstract class UniqueObjectServiceImpl<
   }
 
   @Override
-  public PageResponse<U> find(PageRequest pageRequest) {
+  public PageResponse<U> find(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
-    PageResponse<U> response = repository.find(pageRequest);
-    return response;
+    try {
+      PageResponse<U> response = repository.find(pageRequest);
+      return response;
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   protected void setDefaultSorting(PageRequest pageRequest) {

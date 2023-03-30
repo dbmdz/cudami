@@ -15,7 +15,7 @@ public interface ProjectRepository extends EntityRepository<Project> {
   default boolean addDigitalObject(Project project, DigitalObject digitalObject)
       throws RepositoryException {
     if (project == null || digitalObject == null) {
-      return false;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     return addDigitalObjects(project.getUuid(), Arrays.asList(digitalObject));
   }
@@ -23,7 +23,7 @@ public interface ProjectRepository extends EntityRepository<Project> {
   default boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects)
       throws RepositoryException {
     if (project == null || digitalObjects == null) {
-      return false;
+      throw new IllegalArgumentException("add failed: given objects must not be null");
     }
     return addDigitalObjects(project.getUuid(), digitalObjects);
   }
@@ -34,7 +34,7 @@ public interface ProjectRepository extends EntityRepository<Project> {
   default PageResponse<DigitalObject> findDigitalObjects(Project project, PageRequest pageRequest)
       throws RepositoryException {
     if (project == null) {
-      return null;
+      throw new IllegalArgumentException("find failed: given object must not be null");
     }
     return findDigitalObjects(project.getUuid(), pageRequest);
   }
@@ -45,19 +45,27 @@ public interface ProjectRepository extends EntityRepository<Project> {
   default boolean removeDigitalObject(Project project, DigitalObject digitalObject)
       throws RepositoryException {
     if (project == null || digitalObject == null) {
-      return false;
+      throw new IllegalArgumentException("remove failed: given objects must not be null");
     }
     return removeDigitalObject(project.getUuid(), digitalObject.getUuid());
   }
 
   boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) throws RepositoryException;
 
+  default boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject)
+      throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("remove failed: given object must not be null");
+    }
+    return removeDigitalObjectFromAllProjects(digitalObject.getUuid());
+  }
+
   boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid) throws RepositoryException;
 
   default boolean setDigitalObjects(Project project, List<DigitalObject> digitalObjects)
       throws RepositoryException {
     if (project == null || digitalObjects == null) {
-      return false;
+      throw new IllegalArgumentException("set failed: given objects must not be null");
     }
     return setDigitalObjects(project.getUuid(), digitalObjects);
   }

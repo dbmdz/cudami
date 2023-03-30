@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityRelationService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Entity relation controller")
 public class EntityRelationController {
 
-  private final EntityRelationService service;
+  private final EntityToEntityRelationService service;
 
-  public EntityRelationController(EntityRelationService entityRelationservice) {
+  public EntityRelationController(EntityToEntityRelationService entityRelationservice) {
     this.service = entityRelationservice;
   }
 

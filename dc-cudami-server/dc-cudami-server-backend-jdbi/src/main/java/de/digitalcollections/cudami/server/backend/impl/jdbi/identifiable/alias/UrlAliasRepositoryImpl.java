@@ -322,7 +322,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
-  public LocalizedUrlAliases getAllForTarget(UUID uuid) throws RepositoryException {
+  public LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException {
     if (uuid == null) {
       return new LocalizedUrlAliases();
     }

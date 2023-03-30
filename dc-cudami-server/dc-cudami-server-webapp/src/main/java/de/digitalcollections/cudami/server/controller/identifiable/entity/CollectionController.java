@@ -401,9 +401,9 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     Collection collection;
     if (active != null) {
       if (pLocale == null) {
-        collection = service.getActive(uuid);
+        collection = service.getByExampleAndActive(uuid);
       } else {
-        collection = service.getActive(uuid, pLocale);
+        collection = service.getByExampleAndActiveAndLocale(uuid, pLocale);
       }
     } else {
       if (pLocale == null) {

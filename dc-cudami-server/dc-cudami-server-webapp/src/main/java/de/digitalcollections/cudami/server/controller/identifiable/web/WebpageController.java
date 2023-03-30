@@ -174,9 +174,9 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
-        webpage = service.getActive(uuid);
+        webpage = service.getByExampleAndActive(uuid);
       } else {
-        webpage = service.getActive(uuid, pLocale);
+        webpage = service.getByExampleAndActiveAndLocale(uuid, pLocale);
       }
     } else {
       if (pLocale == null) {
