@@ -6,11 +6,22 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public interface DigitalObjectRenderingFileResourceRepository {
 
   int countDigitalObjectsForResource(UUID uuid) throws RepositoryException;
+
+  default int delete(FileResource fileResource) throws RepositoryException {
+    return delete(Set.of(fileResource)); // same performance as "where uuid = :uuid"
+  }
+
+  default int delete(Set<FileResource> fileResources) throws RepositoryException {
+    List<UUID> list = fileResources.stream().map(i -> i.getUuid()).collect(Collectors.toList());
+    return delete(list);
+  }
 
   int delete(List<UUID> uuids) throws RepositoryException;
 
@@ -38,6 +49,13 @@ public interface DigitalObjectRenderingFileResourceRepository {
   }
 
   List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) throws RepositoryException;
+
+  default int removeByDigitalObject(DigitalObject digitalObject) throws RepositoryException {
+    if (digitalObject == null) {
+      throw new IllegalArgumentException("remove failed: given object must not be null");
+    }
+    return removeByDigitalObject(digitalObject.getUuid());
+  }
 
   public int removeByDigitalObject(UUID digitalObjectUuid) throws RepositoryException;
 

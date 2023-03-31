@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.content.ManagedContentService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
@@ -30,7 +31,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -77,69 +77,29 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public boolean addItem(UUID digitalObjectUuid, Item item)
-      throws ConflictException, ValidationException, ServiceException {
-    // If the item does not exist, return false
-    if (item == null) {
-      return false;
-    }
-
-    // Retrieve the DigitalObject
-    DigitalObject digitalObject = getByUuid(digitalObjectUuid);
-    if (digitalObject == null) {
-      return false;
-    }
-
-    // Ensure, that the DigitalObject is either not connected with any item or already belongs to
-    // the item
-    Item digitalObjectItem = digitalObject.getItem();
-    if (digitalObjectItem != null && digitalObjectItem.getUuid().equals(item.getUuid())) {
-      return true; // nothing to do
-    }
-    if (digitalObjectItem != null && !digitalObjectItem.getUuid().equals(item.getUuid())) {
-      LOGGER.warn(
-          "Trying to connect DigitalObject "
-              + digitalObjectUuid
-              + " to item "
-              + item.getUuid()
-              + ", but it already belongs to item "
-              + digitalObjectItem.getUuid());
-      throw new ConflictException(
-          "DigitalObject "
-              + digitalObject.getUuid()
-              + " already belongs to item "
-              + digitalObject.getItem().getUuid());
-    }
-
-    digitalObject.setItem(item);
-    update(digitalObject);
-    return true;
-  }
-
-  @Override
-  public boolean delete(UUID uuid) throws ServiceException, ConflictException {
+  public boolean delete(DigitalObject digitalObject) throws ServiceException, ConflictException {
     // Check for existance. If not given, return false.
-    DigitalObject existingDigitalObject = getByUuid(uuid);
-    if (existingDigitalObject == null) {
+    DigitalObject digitalObjectFromRepo = getByExample(digitalObject);
+    if (digitalObjectFromRepo == null) {
       return false;
     }
 
     // Remove connection to collections
-    collectionService.removeDigitalObjectFromAllCollections(existingDigitalObject);
+    collectionService.removeDigitalObjectFromAllCollections(digitalObjectFromRepo);
 
     // Remove connection to projects
-    projectService.removeDigitalObjectFromAllProjects(existingDigitalObject);
+    projectService.removeDigitalObjectFromAllProjects(digitalObjectFromRepo);
 
     // Remove preview images
-    deleteFileResources(existingDigitalObject.getUuid());
+    deleteFileResources(digitalObjectFromRepo);
 
     // Remove LinkedDataFileResources (relation, and, if possible, resource)
     try {
-      deleteLinkedDatafileResources(existingDigitalObject.getUuid());
+      deleteLinkedDatafileResources(digitalObjectFromRepo);
     } catch (ServiceException e) {
       throw new ServiceException(
-          "Cannot remove LinkedDataFileResource from digitalObject with uuid="
-              + existingDigitalObject.getUuid()
+          "Cannot remove LinkedDataFileResource from digitalObject="
+              + digitalObjectFromRepo
               + ": "
               + e,
           e);
@@ -147,46 +107,50 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
     // Remove RenderingResources (relation, and, if possible, resource)
     try {
-      deleteRenderingResource(existingDigitalObject.getUuid());
+      deleteRenderingResource(digitalObjectFromRepo);
     } catch (ServiceException e) {
       throw new ServiceException(
-          "Cannot remove RenderingFileResource from digitalObject with uuid="
-              + existingDigitalObject.getUuid()
+          "Cannot remove RenderingFileResource from digitalObject="
+              + digitalObjectFromRepo
               + ": "
               + e,
           e);
     }
 
-    return super.deleteByUuid(uuid);
-  }
-
-  private void deleteRenderingResource(UUID digitalObjectUuid) throws ServiceException {
-    digitalObjectRenderingFileResourceService.deleteRenderingFileResources(digitalObjectUuid);
-  }
-
-  private void deleteLinkedDatafileResources(UUID digitalObjectUuid) throws ServiceException {
-    digitalObjectLinkedDataFileResourceService.deleteLinkedDataFileResources(digitalObjectUuid);
+    return super.delete(digitalObjectFromRepo);
   }
 
   @Override
-  public void deleteFileResources(UUID digitalObjectUuid) {
-    ((DigitalObjectRepository) repository).deleteFileResources(digitalObjectUuid);
+  public void deleteFileResources(DigitalObject digitalObject) throws ServiceException {
+    try {
+      ((DigitalObjectRepository) repository).deleteFileResources(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
-  private void fillDigitalObject(DigitalObject digitalObject) {
+  private void deleteLinkedDatafileResources(DigitalObject digitalObject) throws ServiceException {
+    digitalObjectLinkedDataFileResourceService.deleteLinkedDataFileResources(digitalObject);
+  }
+
+  private void deleteRenderingResource(DigitalObject digitalObject) throws ServiceException {
+    digitalObjectRenderingFileResourceService.deleteRenderingFileResources(digitalObject);
+  }
+
+  private void fillDigitalObject(DigitalObject digitalObject) throws ServiceException {
     if (digitalObject == null) {
       return;
     }
 
     // Look for linked data file resources. If they exist, fill the DigitalObject
     List<LinkedDataFileResource> linkedDataFileResources =
-        getLinkedDataFileResources(digitalObject.getUuid());
+        getLinkedDataFileResources(digitalObject);
     if (linkedDataFileResources != null && !linkedDataFileResources.isEmpty()) {
       digitalObject.setLinkedDataResources(new ArrayList<>(linkedDataFileResources));
     }
 
     // Look for rendering resources. If they exist, fill the object
-    List<FileResource> renderingResources = getRenderingFileResources(digitalObject.getUuid());
+    List<FileResource> renderingResources = getRenderingFileResources(digitalObject);
     if (renderingResources != null && !renderingResources.isEmpty()) {
       digitalObject.setRenderingResources(new ArrayList<>(renderingResources));
     }
@@ -194,44 +158,66 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
   @Override
   public PageResponse<Collection> findActiveCollections(
-      DigitalObject digitalObject, PageRequest pageRequest) {
-    Filtering filtering = filteringForActive();
+      DigitalObject digitalObject, PageRequest pageRequest) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     pageRequest.add(filtering);
-    return ((DigitalObjectRepository) repository).findCollections(digitalObject, pageRequest);
+    try {
+      return ((DigitalObjectRepository) repository).findCollections(digitalObject, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Collection> findCollections(UUID digitalObjectUuid, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).findCollections(digitalObjectUuid, pageRequest);
+  public PageResponse<Collection> findCollections(
+      DigitalObject digitalObject, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).findCollections(digitalObject, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Project> findProjects(UUID digitalObjectUuid, PageRequest pageRequest) {
-    return ((DigitalObjectRepository) repository).findProjects(digitalObjectUuid, pageRequest);
+  public PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).findProjects(digitalObject, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public DigitalObject getByIdentifier(Identifier identifier) {
+  public DigitalObject getByExample(DigitalObject example) throws ServiceException {
+    DigitalObject digitalObject = super.getByExample(example);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  public DigitalObject getByExampleAndLocale(DigitalObject example, Locale locale)
+      throws ServiceException {
+    DigitalObject digitalObject = super.getByExampleAndLocale(example, locale);
+    fillDigitalObject(digitalObject);
+    return digitalObject;
+  }
+
+  @Override
+  public DigitalObject getByIdentifier(Identifier identifier) throws ServiceException {
     DigitalObject digitalObject = super.getByIdentifier(identifier);
     fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
   @Override
-  public DigitalObject getByIdentifier(String namespace, String id) {
-    Identifier identifier = new Identifier(null, namespace, id);
-    return getByIdentifier(identifier);
-  }
-
-  @Override
-  public DigitalObject getByIdentifierWithWEMI(String namespace, String id)
-      throws ServiceException {
-    DigitalObject digitalObject = getByIdentifier(namespace, id);
+  public DigitalObject getByIdentifierWithWEMI(Identifier identifier) throws ServiceException {
+    DigitalObject digitalObject = getByIdentifier(identifier);
     if (digitalObject == null) {
       return null;
     }
     if (digitalObject.getItem() != null) {
-      Item item = itemService.getByUuid(digitalObject.getItem().getUuid());
+      Item item = itemService.getByExample(digitalObject.getItem());
 
       // for later:
       if (item.getManifestation() != null) {
@@ -245,79 +231,90 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
   }
 
   @Override
-  public DigitalObject getByRefId(long refId) {
+  public DigitalObject getByRefId(long refId) throws ServiceException {
     DigitalObject digitalObject = super.getByRefId(refId);
     fillDigitalObject(digitalObject);
     return digitalObject;
   }
 
   @Override
-  public DigitalObject getByUuid(UUID uuid) throws ServiceException {
-    DigitalObject digitalObject = super.getByUuid(uuid);
-    fillDigitalObject(digitalObject);
-    return digitalObject;
+  public List<FileResource> getFileResources(DigitalObject digitalObject) throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).getFileResources(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public DigitalObject getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
-    DigitalObject digitalObject = super.getByUuidAndLocale(uuid, locale);
-    fillDigitalObject(digitalObject);
-    return digitalObject;
+  public List<ImageFileResource> getImageFileResources(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).getImageFileResources(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid) {
-    return ((DigitalObjectRepository) repository).getImageFileResources(digitalObjectUuid);
-  }
-
-  @Override
-  public Item getItem(UUID digitalObjectUuid) {
-    DigitalObject digitalObject = repository.getByUuid(digitalObjectUuid);
+  public Item getItem(DigitalObject example) throws ServiceException {
+    DigitalObject digitalObject = getByExample(example);
     if (digitalObject == null) {
       return null;
     }
-
     return digitalObject.getItem();
   }
 
   @Override
-  public List<Locale> getLanguagesOfCollections(UUID uuid) {
-    return ((DigitalObjectRepository) repository).getLanguagesOfCollections(uuid);
+  public List<Locale> getLanguagesOfCollections(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).getLanguagesOfCollections(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Locale> getLanguagesOfContainedDigitalObjects(UUID uuid) {
-    return ((DigitalObjectRepository) repository).getLanguagesOfContainedDigitalObjects(uuid);
+  public List<Locale> getLanguagesOfContainedDigitalObjects(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository)
+          .getLanguagesOfContainedDigitalObjects(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Locale> getLanguagesOfProjects(UUID uuid) {
-    return ((DigitalObjectRepository) repository).getLanguagesOfProjects(uuid);
+  public List<Locale> getLanguagesOfProjects(DigitalObject digitalObject) throws ServiceException {
+    try {
+      return ((DigitalObjectRepository) repository).getLanguagesOfProjects(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<LinkedDataFileResource> getLinkedDataFileResources(UUID digitalObjectUuid) {
-    return digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(digitalObjectUuid);
+  public List<LinkedDataFileResource> getLinkedDataFileResources(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return digitalObjectLinkedDataFileResourceService.getLinkedDataFileResources(digitalObject);
+    } catch (ServiceException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<DigitalObject> getRandom(int count) {
+  public List<DigitalObject> getRandom(int count) throws ServiceException {
     List<DigitalObject> digitalObjects = super.getRandom(count);
     if (digitalObjects == null || digitalObjects.isEmpty()) {
       return digitalObjects;
     }
-    digitalObjects.stream().forEach(this::fillDigitalObject);
+    for (DigitalObject digitalObject : digitalObjects) {
+      fillDigitalObject(digitalObject);
+    }
     return digitalObjects;
-  }
-
-  @Override
-  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
-    return digitalObjectRenderingFileResourceService.getRenderingFileResources(digitalObjectUuid);
   }
 
   @Override
@@ -342,35 +339,68 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     try {
       setRenderingFileResources(digitalObject, renderingResources);
     } catch (ServiceException e) {
-      throw new ServiceException("Cannot update DigitalObject: " + e, e);
+      throw new ServiceException("Cannot save DigitalObject: " + e, e);
     }
     fillDigitalObject(digitalObject);
   }
 
   @Override
   public List<FileResource> setFileResources(
-      UUID digitalObjectUuid, List<FileResource> fileResources) throws ServiceException {
+      DigitalObject digitalObject, List<FileResource> fileResources) throws ServiceException {
     try {
-      return ((DigitalObjectRepository) repository)
-          .setFileResources(digitalObjectUuid, fileResources);
+      return ((DigitalObjectRepository) repository).setFileResources(digitalObject, fileResources);
     } catch (RepositoryException e) {
-      throw new ServiceException("Cannot set file resources", e);
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public List<LinkedDataFileResource> setLinkedDataFileResources(
-      UUID digitalObjectUuid, List<LinkedDataFileResource> linkedDataFileResources)
-      throws ServiceException {
-    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
-        digitalObjectUuid, linkedDataFileResources);
+  public boolean setItem(DigitalObject digitalObject, Item item)
+      throws ConflictException, ValidationException, ServiceException {
+    // If the item does not exist, return false
+    if (item == null) {
+      return false;
+    }
+
+    // Retrieve the DigitalObject
+    DigitalObject digitalObjectFromRepo = getByExample(digitalObject);
+    if (digitalObjectFromRepo == null) {
+      return false;
+    }
+
+    // Ensure, that the DigitalObject is either not connected with any item or
+    // already belongs to
+    // the item
+    Item digitalObjectItem = digitalObjectFromRepo.getItem();
+    if (digitalObjectItem != null && digitalObjectItem.getUuid().equals(item.getUuid())) {
+      return true; // nothing to do
+    }
+    if (digitalObjectItem != null && !digitalObjectItem.getUuid().equals(item.getUuid())) {
+      LOGGER.warn(
+          "Trying to connect DigitalObject "
+              + digitalObject
+              + " to item "
+              + item.getUuid()
+              + ", but it already belongs to item "
+              + digitalObjectItem.getUuid());
+      throw new ConflictException(
+          "DigitalObject "
+              + digitalObjectFromRepo.getUuid()
+              + " already belongs to item "
+              + digitalObjectFromRepo.getItem().getUuid());
+    }
+
+    digitalObjectFromRepo.setItem(item);
+    update(digitalObjectFromRepo);
+    return true;
   }
 
   @Override
-  public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingFileResources) throws ServiceException {
-    return digitalObjectRenderingFileResourceService.setRenderingFileResources(
-        digitalObjectUuid, renderingFileResources);
+  public List<LinkedDataFileResource> setLinkedDataFileResources(
+      DigitalObject digitalObject, List<LinkedDataFileResource> linkedDataFileResources)
+      throws ServiceException {
+    return digitalObjectLinkedDataFileResourceService.setLinkedDataFileResources(
+        digitalObject, linkedDataFileResources);
   }
 
   @Override

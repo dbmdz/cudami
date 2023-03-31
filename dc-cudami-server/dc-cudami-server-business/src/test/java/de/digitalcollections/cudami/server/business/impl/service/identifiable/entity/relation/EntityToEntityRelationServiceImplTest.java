@@ -18,7 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The EntityRelation service")
-class EntityRelationServiceImplTest extends AbstractServiceImplTest {
+class EntityToEntityRelationServiceImplTest extends AbstractServiceImplTest {
 
   private EntityToEntityRelationService entityRelationService;
   private EntityToEntityRelationRepository entityRelationRepository;
@@ -26,7 +26,7 @@ class EntityRelationServiceImplTest extends AbstractServiceImplTest {
   @BeforeEach
   public void beforeEach() {
     entityRelationRepository = mock(EntityToEntityRelationRepository.class);
-    entityRelationService = new EntityRelationServiceImpl(entityRelationRepository);
+    entityRelationService = new EntityToEntityRelationServiceImpl(entityRelationRepository);
   }
 
   @DisplayName(

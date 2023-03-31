@@ -13,6 +13,7 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +65,29 @@ public abstract class UniqueObjectServiceImpl<
   public PageResponse<U> find(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
     return super.find(pageRequest);
+  }
+
+  @Override
+  public Set<U> getAll() throws ServiceException {
+    Set<U> allIdentifierTypes = new HashSet<>(1);
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(100).build();
+    try {
+      return getAll(allIdentifierTypes, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  private Set<U> getAll(Set<U> allIdentifierTypes, PageRequest pageRequest)
+      throws RepositoryException {
+    PageResponse<U> pageResponse = repository.find(pageRequest);
+    if (pageResponse.hasContent()) {
+      allIdentifierTypes.addAll(pageResponse.getContent());
+    }
+    if (pageResponse.hasNext()) {
+      getAll(allIdentifierTypes, pageResponse.nextPageRequest());
+    }
+    return allIdentifierTypes;
   }
 
   @Override

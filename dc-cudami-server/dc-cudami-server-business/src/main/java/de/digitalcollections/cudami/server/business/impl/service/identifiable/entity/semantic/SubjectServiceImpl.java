@@ -5,11 +5,8 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.e
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.semantic.Subject;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,51 +20,13 @@ public class SubjectServiceImpl extends UniqueObjectServiceImpl<Subject, Subject
   }
 
   @Override
-  public long count() {
-    return repository.count();
-  }
-
-  @Override
-  public Subject getByUuid(UUID uuid) {
-    return repository.getByUuid(uuid);
-  }
-
-  @Override
-  public void save(Subject subject) throws ServiceException {
-    try {
-      repository.save(subject);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Cannot save subject " + subject.toString(), e);
-    }
-  }
-
-  @Override
-  public void update(Subject subject) throws ServiceException {
-    try {
-      repository.update(subject);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Cannot update subject " + subject.toString(), e);
-    }
-  }
-
-  @Override
-  public boolean delete(List<UUID> uuids) {
-    return repository.deleteByUuid(uuids);
-  }
-
-  @Override
-  public PageResponse<Subject> find(PageRequest pageRequest) {
-    return super.find(pageRequest);
-  }
-
-  @Override
-  public Subject getByTypeAndIdentifier(String type, String namespace, String id)
+  public Subject getByTypeAndIdentifier(String type, Identifier identifier)
       throws ServiceException {
     try {
-      return repository.getByTypeAndIdentifier(type, namespace, id);
+      return repository.getByTypeAndIdentifier(type, identifier);
     } catch (RepositoryException e) {
       throw new ServiceException(
-          "cannot get by type=" + type + ", namespace=" + namespace + ", id=" + id + ": " + e, e);
+          "cannot get by type=" + type + ", identifier=" + identifier + ": " + e, e);
     }
   }
 }

@@ -5,12 +5,13 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import java.util.List;
 import java.util.Set;
 
 public interface IdentifierService extends UniqueObjectService<Identifier> {
   int deleteByIdentifiable(Identifiable identifiable) throws ServiceException;
 
-  Set<Identifier> findByIdentifiable(Identifiable identifiable) throws ServiceException;
+  List<Identifier> findByIdentifiable(Identifiable identifiable) throws ServiceException;
 
   Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
       throws ServiceException;

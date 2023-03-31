@@ -12,14 +12,13 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.EntityServiceImpl;
 import de.digitalcollections.cudami.server.config.HookProperties;
-import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
+import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,42 +46,33 @@ public class ManifestationServiceImpl extends EntityServiceImpl<Manifestation>
   }
 
   @Override
-  public PageResponse<Manifestation> findChildren(UUID uuid, PageRequest pageRequest) {
-    return ((ManifestationRepository) repository).findSubParts(uuid, pageRequest);
-  }
-
-  @Override
-  public PageResponse<Manifestation> findManifestationsByWork(
-      UUID workUuid, PageRequest pageRequest) throws ServiceException {
+  public PageResponse<Manifestation> findManifestationsByWork(Work work, PageRequest pageRequest)
+      throws ServiceException {
     try {
-      return ((ManifestationRepository) repository).findManifestationsByWork(workUuid, pageRequest);
+      return ((ManifestationRepository) repository).findManifestationsByWork(work, pageRequest);
     } catch (RepositoryException e) {
       throw new ServiceException(
-          "Cannot retrieve manifestations for work with uuid=" + workUuid + ": " + e, e);
+          "Cannot retrieve manifestations for work with uuid=" + work + ": " + e, e);
     }
   }
 
   @Override
-  public Manifestation getByUuid(UUID uuid) throws ServiceException {
-    Manifestation manifestation = super.getByUuid(uuid);
-    return manifestation;
+  public PageResponse<Manifestation> findSubParts(
+      Manifestation manifestation, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository).findSubParts(manifestation, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public Manifestation getByIdentifier(Identifier identifier) {
-    // TODO Auto-generated method stub
-    return super.getByIdentifier(identifier);
-  }
-
-  @Override
-  public Manifestation getByRefId(long refId) {
-    // TODO Auto-generated method stub
-    return super.getByRefId(refId);
-  }
-
-  @Override
-  public List<Locale> getLanguagesOfManifestationsForWork(UUID workUuid) {
-    return ((ManifestationRepository) repository).getLanguagesOfManifestationsForWork(workUuid);
+  public List<Locale> getLanguagesOfManifestationsForWork(Work work) throws ServiceException {
+    try {
+      return ((ManifestationRepository) repository).getLanguagesOfManifestationsForWork(work);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override

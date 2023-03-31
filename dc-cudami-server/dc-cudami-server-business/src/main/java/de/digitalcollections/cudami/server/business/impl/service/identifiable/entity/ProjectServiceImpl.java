@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.ProjectRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
@@ -14,7 +15,6 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,39 +42,74 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
   }
 
   @Override
-  public boolean addDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
-    return ((ProjectRepository) repository).addDigitalObjects(projectUuid, digitalObjects);
+  public boolean addDigitalObject(Project project, DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).addDigitalObject(project, digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean delete(UUID uuid) throws ConflictException, ServiceException {
-    List<DigitalObject> digitalObjects =
-        findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
-            .getContent();
-    if (!digitalObjects.isEmpty()) {
+  public boolean addDigitalObjects(Project project, List<DigitalObject> digitalObjects)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).addDigitalObjects(project, digitalObjects);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean delete(Project project) throws ConflictException, ServiceException {
+    long amountDigitalObjects =
+        findDigitalObjects(project, PageRequest.builder().pageNumber(0).pageSize(1).build())
+            .getTotalElements();
+    if (amountDigitalObjects > 0) {
       throw new ConflictException(
           "Project cannot be deleted, because it has corresponding digital objects!");
     }
-    return super.deleteByUuid(uuid);
+    return super.delete(project);
   }
 
   @Override
-  public PageResponse<DigitalObject> findDigitalObjects(UUID projectUuid, PageRequest pageRequest) {
-    return ((ProjectRepository) repository).findDigitalObjects(projectUuid, pageRequest);
+  public PageResponse<DigitalObject> findDigitalObjects(Project project, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).findDigitalObjects(project, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeDigitalObject(UUID projectUuid, UUID digitalObjectUuid) {
-    return ((ProjectRepository) repository).removeDigitalObject(projectUuid, digitalObjectUuid);
+  public boolean removeDigitalObject(Project project, DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).removeDigitalObject(project, digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeDigitalObjectFromAllProjects(UUID digitalObjectUuid) {
-    return ((ProjectRepository) repository).removeDigitalObjectFromAllProjects(digitalObjectUuid);
+  public boolean removeDigitalObjectFromAllProjects(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).removeDigitalObjectFromAllProjects(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean setDigitalObjects(UUID projectUuid, List<DigitalObject> digitalObjects) {
-    return ((ProjectRepository) repository).setDigitalObjects(projectUuid, digitalObjects);
+  public boolean setDigitalObjects(Project project, List<DigitalObject> digitalObjects)
+      throws ServiceException {
+    try {
+      return ((ProjectRepository) repository).setDigitalObjects(project, digitalObjects);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

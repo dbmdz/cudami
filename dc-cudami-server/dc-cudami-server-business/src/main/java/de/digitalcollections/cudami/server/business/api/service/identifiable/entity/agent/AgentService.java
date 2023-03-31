@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface AgentService<A extends Agent> extends EntityService<A> {
 
-  List<Agent> getCreatorsForWork(Work work) throws ServiceException;
+  List<A> getCreatorsForWork(Work work) throws ServiceException;
 
   Set<DigitalObject> getDigitalObjects(A agent) throws ServiceException;
 

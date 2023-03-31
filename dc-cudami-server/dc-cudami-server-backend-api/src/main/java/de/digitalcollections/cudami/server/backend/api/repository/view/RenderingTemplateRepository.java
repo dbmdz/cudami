@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.backend.api.repository.view;
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.model.view.RenderingTemplate;
 import java.util.List;
 import java.util.Locale;
@@ -13,5 +14,5 @@ public interface RenderingTemplateRepository extends UniqueObjectRepository<Rend
    *
    * @return list of languages
    */
-  List<Locale> getLanguages();
+  List<Locale> getLanguages() throws RepositoryException;
 }

@@ -10,7 +10,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,51 +17,87 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(rollbackFor = {Exception.class})
-public class EntityRelationServiceImpl implements EntityToEntityRelationService {
+public class EntityToEntityRelationServiceImpl implements EntityToEntityRelationService {
 
   private final EntityToEntityRelationRepository repository;
 
   @Autowired
-  public EntityRelationServiceImpl(EntityToEntityRelationRepository repository) {
+  public EntityToEntityRelationServiceImpl(EntityToEntityRelationRepository repository) {
     this.repository = repository;
   }
 
   @Override
-  public void addRelation(UUID subjectEntityUuid, String predicate, UUID objectEntityUuid)
-      throws ServiceException {
+  public void addRelation(EntityRelation relation) throws ServiceException {
     try {
-      repository.addRelation(subjectEntityUuid, predicate, objectEntityUuid);
+      repository.addRelation(relation);
     } catch (RepositoryException e) {
       throw new ServiceException(
           "Cannot add the relation: %s %s %s"
-              .formatted(subjectEntityUuid, predicate, objectEntityUuid),
+              .formatted(relation.getSubject(), relation.getPredicate(), relation.getObject()),
           e);
     }
   }
 
   @Override
-  public void deleteBySubject(UUID subjectEntityUuid) {
-    repository.deleteBySubject(subjectEntityUuid);
+  public void deleteByObject(Entity objectEntity) throws ServiceException {
+    try {
+      repository.deleteByObject(objectEntity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public void deleteByObject(UUID objectEntityUuid) {
-    repository.deleteByObject(objectEntityUuid);
+  public void deleteBySubject(Entity subjectEntity) throws ServiceException {
+    try {
+      repository.deleteBySubject(subjectEntity);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  private Entity extractEntityWithUuidOnly(Entity entity) {
+    Entity entityWithUuidOnly;
+
+    try {
+      entityWithUuidOnly = entity.getClass().getConstructor().newInstance();
+      entityWithUuidOnly.setUuid(entity.getUuid());
+    } catch (NoSuchMethodException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException e) {
+      // For whatever reason, we cannot construct the entity, so
+      // as a fallback, we construct an Entity object manually
+      // and set the UUID
+      entityWithUuidOnly = Entity.builder().uuid(entity.getUuid()).build();
+    }
+
+    return entityWithUuidOnly;
   }
 
   @Override
-  public PageResponse<EntityRelation> find(PageRequest pageRequest) {
-    return repository.find(pageRequest);
+  public PageResponse<EntityRelation> find(PageRequest pageRequest) throws ServiceException {
+    try {
+      return repository.find(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<EntityRelation> getBySubject(UUID subjectEntityUuid) {
-    return repository.findBySubject(subjectEntityUuid);
+  public PageResponse<EntityRelation> findBySubject(Entity subjectEntity, PageRequest pageRequest)
+      throws ServiceException {
+    try {
+      return repository.findBySubject(subjectEntity, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public void save(List<EntityRelation> entityRelations) throws ServiceException {
-    // We assume, that all referenced predicates, the "normal" and the additional ones
+    // We assume, that all referenced predicates, the "normal" and the additional
+    // ones
     // are already available in the service. If not, the repository would throw
     // a ForeignKey exception
     try {
@@ -92,24 +127,5 @@ public class EntityRelationServiceImpl implements EntityToEntityRelationService 
                 })
             .collect(Collectors.toList());
     save(relationsToSave);
-  }
-
-  private Entity extractEntityWithUuidOnly(Entity entity) {
-    Entity entityWithUuidOnly;
-
-    try {
-      entityWithUuidOnly = entity.getClass().getConstructor().newInstance();
-      entityWithUuidOnly.setUuid(entity.getUuid());
-    } catch (NoSuchMethodException
-        | InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException e) {
-      // For whatever reason, we cannot construct the entity, so
-      // as a fallback, we construct an Entity object manually
-      // and set the UUID
-      entityWithUuidOnly = Entity.builder().uuid(entity.getUuid()).build();
-    }
-
-    return entityWithUuidOnly;
   }
 }

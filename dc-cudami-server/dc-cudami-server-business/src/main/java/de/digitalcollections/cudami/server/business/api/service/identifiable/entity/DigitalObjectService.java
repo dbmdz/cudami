@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.business.api.service.identifiable.en
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -29,7 +30,7 @@ public interface DigitalObjectService extends EntityService<DigitalObject> {
   PageResponse<Project> findProjects(DigitalObject digitalObject, PageRequest pageRequest)
       throws ServiceException;
 
-  DigitalObject getByIdentifierWithWEMI(String namespace, String id) throws ServiceException;
+  DigitalObject getByIdentifierWithWEMI(Identifier identifier) throws ServiceException;
 
   List<FileResource> getFileResources(DigitalObject digitalObject) throws ServiceException;
 

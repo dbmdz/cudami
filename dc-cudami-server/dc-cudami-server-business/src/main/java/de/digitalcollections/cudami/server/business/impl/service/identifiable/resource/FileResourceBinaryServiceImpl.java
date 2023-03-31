@@ -1,12 +1,12 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceBinaryService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import java.io.InputStream;
@@ -38,18 +38,8 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public void assertReadability(FileResource resource) throws ServiceException {
     try {
       binaryRepository.assertReadability(resource);
-    } catch (TechnicalException | ResourceNotFoundException ex) {
+    } catch (ResourceNotFoundException | RepositoryException ex) {
       throw new ServiceException("File resource " + resource.getUri() + " not readable.", ex);
-    }
-  }
-
-  @Override
-  public FileResource getByExampleAndMimetype(String uuid, MimeType mimeType)
-      throws ServiceException {
-    try {
-      return binaryRepository.getByExampleAndMimetype(uuid, mimeType);
-    } catch (TechnicalException | ResourceNotFoundException ex) {
-      throw new ServiceException("File resource " + uuid + " not found.", ex);
     }
   }
 
@@ -57,7 +47,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public byte[] getAsBytes(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getAsBytes(resource);
-    } catch (TechnicalException | ResourceNotFoundException ex) {
+    } catch (ResourceNotFoundException | RepositoryException ex) {
       throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as bytes.", ex);
     }
@@ -67,9 +57,19 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public Document getAsDocument(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getAsDocument(resource);
-    } catch (TechnicalException | ResourceNotFoundException ex) {
+    } catch (ResourceNotFoundException | RepositoryException ex) {
       throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as document.", ex);
+    }
+  }
+
+  @Override
+  public FileResource getByExampleAndMimetype(FileResource example, MimeType mimeType)
+      throws ServiceException {
+    try {
+      return binaryRepository.getByExampleAndMimetype(example, mimeType);
+    } catch (ResourceNotFoundException | RepositoryException ex) {
+      throw new ServiceException("File resource " + example + " not found.", ex);
     }
   }
 
@@ -77,7 +77,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
   public InputStream getInputStream(FileResource resource) throws ServiceException {
     try {
       return binaryRepository.getInputStream(resource);
-    } catch (TechnicalException | ResourceNotFoundException ex) {
+    } catch (ResourceNotFoundException | RepositoryException ex) {
       throw new ServiceException(
           "Can not return file resource " + resource.getUri() + " as inputstream.", ex);
     }
@@ -89,7 +89,7 @@ public class FileResourceBinaryServiceImpl implements FileResourceBinaryService 
     try {
       binaryRepository.save(fileResource, binaryData);
       metadataService.save(fileResource);
-    } catch (TechnicalException e) {
+    } catch (RepositoryException e) {
       LOGGER.error("Cannot save fileResource " + fileResource.getFilename() + ": ", e);
       throw new ServiceException(e.getMessage());
     }

@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.resource;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -12,6 +13,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.LinkedDataFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.TextFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.resource.ApplicationFileResource;
 import de.digitalcollections.model.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -20,7 +22,6 @@ import de.digitalcollections.model.identifiable.resource.TextFileResource;
 import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -64,28 +65,80 @@ public class DigitalObjectRenderingFileResourceServiceImpl
         digitalObjectRenderingFileResourceRepository;
   }
 
+  @Override
+  public void deleteRenderingFileResources(DigitalObject digitalObject) throws ServiceException {
+    List<FileResource> renderingFileResources = getRenderingFileResources(digitalObject);
+    if (renderingFileResources == null || renderingFileResources.isEmpty()) {
+      return;
+    }
+
+    for (FileResource renderingFileResource : renderingFileResources) {
+      try {
+        // Delete the relation
+        int amountDeletedRelations;
+        try {
+          amountDeletedRelations =
+              digitalObjectRenderingFileResourceRepository.delete(renderingFileResource);
+        } catch (RepositoryException e) {
+          throw new ServiceException("Backend failure", e);
+        }
+        if (amountDeletedRelations != 1) {
+          throw new ServiceException(
+              "Could not delete relation for RenderingFileResource="
+                  + renderingFileResource
+                  + " for DigitalObject with uuid="
+                  + digitalObject);
+        }
+
+        // Delete the resource, when no references exist to it
+        try {
+          if (digitalObjectRenderingFileResourceRepository.countDigitalObjectsForResource(
+                  renderingFileResource.getUuid())
+              == 0) {
+            deleteRenderingResource(renderingFileResource);
+          }
+        } catch (RepositoryException e) {
+          throw new ServiceException("Backend failure", e);
+        }
+      } catch (ConflictException | ServiceException e) {
+        throw new ServiceException(
+            "Cannot delete RenderingFileResource="
+                + renderingFileResource
+                + " for DigitalObject="
+                + digitalObject
+                + ": "
+                + e,
+            e);
+      }
+    }
+  }
+
   private boolean deleteRenderingResource(FileResource renderingResource)
       throws ServiceException, ConflictException {
     switch (renderingResource.getMimeType().getPrimaryType()) {
       case "application":
-        return applicationFileResourceService.deleteByUuid(renderingResource.getUuid());
+        return applicationFileResourceService.delete((ApplicationFileResource) renderingResource);
       case "audio":
-        return audioFileResourceService.deleteByUuid(renderingResource.getUuid());
+        return audioFileResourceService.delete((AudioFileResource) renderingResource);
       case "image":
-        return imageFileResourceService.deleteByUuid(renderingResource.getUuid());
+        return imageFileResourceService.delete((ImageFileResource) renderingResource);
       case "text":
-        return textFileResourceService.deleteByUuid(renderingResource.getUuid());
+        return textFileResourceService.delete((TextFileResource) renderingResource);
       case "video":
-        return videoFileResourceService.deleteByUuid(renderingResource.getUuid());
+        return videoFileResourceService.delete((VideoFileResource) renderingResource);
       default:
-        return fileResourceMetadataService.deleteByUuid(renderingResource.getUuid());
+        return fileResourceMetadataService.delete(renderingResource);
     }
   }
 
   @Override
-  public List<FileResource> getRenderingFileResources(UUID digitalObjectUuid) {
-    return digitalObjectRenderingFileResourceRepository.getRenderingFileResources(
-        digitalObjectUuid);
+  public List<FileResource> getRenderingFileResources(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return digitalObjectRenderingFileResourceRepository.getRenderingFileResources(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   private void saveRenderingFileResource(FileResource renderingResource)
@@ -103,10 +156,10 @@ public class DigitalObjectRenderingFileResourceServiceImpl
 
   @Override
   public List<FileResource> setRenderingFileResources(
-      UUID digitalObjectUuid, List<FileResource> renderingResources) throws ServiceException {
+      DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException {
 
     // Remove the old rendering resources, if present
-    List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObjectUuid);
+    List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
         deleteRenderingResource(existingRenderingResource);
@@ -117,7 +170,11 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     }
 
     // Remove the old relations
-    digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObjectUuid);
+    try {
+      digitalObjectRenderingFileResourceRepository.removeByDigitalObject(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
 
     // Persist the new rendering resources
     if (renderingResources != null) {
@@ -134,49 +191,14 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       }
 
       // Persist the new relations
-      digitalObjectRenderingFileResourceRepository.setRenderingFileResources(
-          digitalObjectUuid, savedRenderingResources);
+      try {
+        digitalObjectRenderingFileResourceRepository.setRenderingFileResources(
+            digitalObject, savedRenderingResources);
+      } catch (RepositoryException e) {
+        throw new ServiceException("Backend failure", e);
+      }
     }
 
     return renderingResources;
-  }
-
-  @Override
-  public void deleteRenderingFileResources(UUID digitalObjectUuid) throws ServiceException {
-    List<FileResource> renderingFileResources = getRenderingFileResources(digitalObjectUuid);
-    if (renderingFileResources == null || renderingFileResources.isEmpty()) {
-      return;
-    }
-
-    for (FileResource renderingFileResource : renderingFileResources) {
-      try {
-        // Delete the relation
-        int amountDeletedRelations =
-            digitalObjectRenderingFileResourceRepository.delete(renderingFileResource.getUuid());
-        if (amountDeletedRelations != 1) {
-          throw new ServiceException(
-              "Could not delete relation for RenderingFileResource="
-                  + renderingFileResource
-                  + " for DigitalObject with uuid="
-                  + digitalObjectUuid);
-        }
-
-        // Delete the resource, when no references exist to it
-        if (digitalObjectRenderingFileResourceRepository.countDigitalObjectsForResource(
-                renderingFileResource.getUuid())
-            == 0) {
-          deleteRenderingResource(renderingFileResource);
-        }
-      } catch (ConflictException | ServiceException e) {
-        throw new ServiceException(
-            "Cannot delete RenderingFileResource="
-                + renderingFileResource
-                + " for DigitalObject with uuid="
-                + digitalObjectUuid
-                + ": "
-                + e,
-            e);
-      }
-    }
   }
 }

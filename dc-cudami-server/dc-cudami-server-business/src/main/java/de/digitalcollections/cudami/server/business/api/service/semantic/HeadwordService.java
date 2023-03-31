@@ -26,8 +26,6 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
 
   BucketsResponse<Headword> find(BucketsRequest<Headword> bucketsRequest) throws ServiceException;
 
-  List<Headword> find(String searchTerm, int maxResults) throws ServiceException;
-
   PageResponse<Headword> findByLanguageAndInitial(
       PageRequest pageRequest, String language, String initial) throws ServiceException;
 
@@ -36,12 +34,6 @@ public interface HeadwordService extends UniqueObjectService<Headword> {
 
   PageResponse<FileResource> findRelatedFileResources(Headword headword, PageRequest pageRequest)
       throws ServiceException;
-
-  /**
-   * @return list of ALL headwords. USE WITH CARE (only for internal workflow, NOT FOR USER
-   *     INTERACTION!)!!!
-   */
-  List<Headword> getAll() throws ServiceException;
 
   List<Headword> getByLabelAndLocale(String label, Locale locale) throws ServiceException;
 

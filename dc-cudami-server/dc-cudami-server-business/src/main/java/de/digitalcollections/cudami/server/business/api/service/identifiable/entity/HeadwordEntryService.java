@@ -10,5 +10,5 @@ public interface HeadwordEntryService extends EntityService<HeadwordEntry> {
 
   public List<HeadwordEntry> getByHeadword(Headword headword) throws ServiceException;
 
-  List<Agent> getCreators(HeadwordEntry headwordEntry);
+  List<Agent> getCreators(HeadwordEntry headwordEntry) throws ServiceException;
 }

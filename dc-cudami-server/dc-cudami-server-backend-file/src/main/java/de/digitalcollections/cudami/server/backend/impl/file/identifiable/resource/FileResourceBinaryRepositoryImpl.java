@@ -1,9 +1,9 @@
 package de.digitalcollections.cudami.server.backend.impl.file.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceBinaryRepository;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
-import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.ImageFileResource;
@@ -76,17 +76,14 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   @Override
   public void assertReadability(FileResource resource)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     try (InputStream is = getInputStream(resource)) {
       if (is.available() <= 0) {
-        throw new TechnicalException("Cannot read " + resource.getFilename() + ": Empty file");
+        throw new RepositoryException("Cannot read " + resource.getFilename() + ": Empty file");
       }
-    } catch (TechnicalException e) {
-      throw new TechnicalException("Cannot read " + resource.getFilename() + ": Empty file");
-    } catch (ResourceNotFoundException e) {
-      throw e;
     } catch (Exception e) {
-      throw new TechnicalException("Cannot read " + resource.getFilename() + ": " + e.getMessage());
+      throw new RepositoryException(
+          "Cannot read " + resource.getFilename() + ": " + e.getMessage());
     }
   }
 
@@ -123,16 +120,14 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public FileResource getByExampleAndMimetype(String uuidStr, MimeType mimeType)
-      throws TechnicalException, ResourceNotFoundException {
+  public FileResource getByExampleAndMimetype(UUID uuid, MimeType mimeType)
+      throws RepositoryException, ResourceNotFoundException {
     FileResource resource = new FileResource();
-
-    final UUID uuid = UUID.fromString(uuidStr);
     resource.setUuid(uuid);
 
     URI uri = createUri(uuid, mimeType);
     if (!resourceLoader.getResource(uri.toString()).isReadable()) {
-      throw new TechnicalException("File resource at uri " + uri + " is not readable");
+      throw new RepositoryException("File resource at uri " + uri + " is not readable");
     }
     resource.setUri(uri);
 
@@ -162,20 +157,20 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
 
   @Override
   public byte[] getAsBytes(FileResource resource)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     try {
       assertReadability(resource);
       return IOUtils.toByteArray(this.getInputStream(resource));
     } catch (IOException ex) {
       String msg = "Could not read bytes from resource: " + resource;
       LOGGER.error(msg, ex);
-      throw new TechnicalException(msg, ex);
+      throw new RepositoryException(msg, ex);
     }
   }
 
   @Override
   public Document getAsDocument(FileResource resource)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     Document doc = null;
     try {
       // get InputStream on resource
@@ -191,7 +186,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
         LOGGER.debug("Got document: " + doc);
       }
     } catch (IOException | ParserConfigurationException | SAXException ex) {
-      throw new TechnicalException(
+      throw new RepositoryException(
           "Cannot read document from resolved resource '" + resource.getUri().toString() + "'", ex);
     }
     return doc;
@@ -214,7 +209,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   public InputStream getInputStream(URI resourceUri)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     try {
       String location = resourceUri.toString();
       if (LOGGER.isDebugEnabled()) {
@@ -226,13 +221,13 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       }
       return resource.getInputStream();
     } catch (IOException e) {
-      throw new TechnicalException(e);
+      throw new RepositoryException(e);
     }
   }
 
   @Override
   public InputStream getInputStream(FileResource resource)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     return getInputStream(resource.getUri());
   }
 
@@ -248,7 +243,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   public Reader getReader(FileResource resource, Charset charset)
-      throws TechnicalException, ResourceNotFoundException {
+      throws RepositoryException, ResourceNotFoundException {
     return new InputStreamReader(this.getInputStream(resource), charset);
   }
 
@@ -272,13 +267,13 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public void save(FileResource fileResource, InputStream binaryData) throws TechnicalException {
+  public void save(FileResource fileResource, InputStream binaryData) throws RepositoryException {
     Assert.notNull(fileResource, "fileResource must not be null");
     Assert.notNull(binaryData, "binaryData must not be null");
 
     try {
       if (fileResource.isReadonly()) {
-        throw new TechnicalException(
+        throw new RepositoryException(
             "fileResource is read only, does not support write-operations.");
       }
 
@@ -292,7 +287,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       //      }
       final Path parentDirectory = Paths.get(uri).getParent();
       if (parentDirectory == null) {
-        throw new TechnicalException("No parent directory defined for uri: " + uri);
+        throw new RepositoryException("No parent directory defined for uri: " + uri);
       }
       Files.createDirectories(parentDirectory);
       if (LOGGER.isDebugEnabled()) {
@@ -304,7 +299,7 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
       fillAttributes(fileResource);
     } catch (IOException ex) {
       String msg = "Error writing binary data of fileresource " + fileResource.getUuid().toString();
-      throw new TechnicalException(msg, ex);
+      throw new RepositoryException(msg, ex);
     }
   }
 
@@ -320,13 +315,14 @@ public class FileResourceBinaryRepositoryImpl implements FileResourceBinaryRepos
   }
 
   @Override
-  public void save(FileResource resource, String input, Charset charset) throws TechnicalException {
+  public void save(FileResource resource, String input, Charset charset)
+      throws RepositoryException {
     try (InputStream in = new ReaderInputStream(new StringReader(input), charset)) {
       save(resource, in);
     } catch (IOException ex) {
       String msg = "Could not write data to uri " + String.valueOf(resource.getUri());
       LOGGER.error(msg, ex);
-      throw new TechnicalException(msg, ex);
+      throw new RepositoryException(msg, ex);
     }
   }
 

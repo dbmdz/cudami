@@ -12,11 +12,11 @@ import de.digitalcollections.cudami.server.business.impl.service.identifiable.en
 import de.digitalcollections.cudami.server.config.HookProperties;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,33 +46,42 @@ public class ItemServiceImpl extends EntityServiceImpl<Item> implements ItemServ
   }
 
   @Override
-  public PageResponse<DigitalObject> findDigitalObjects(UUID itemUuid, PageRequest pageRequest) {
-    return ((ItemRepository) repository).findDigitalObjects(itemUuid, pageRequest);
-  }
-
-  @Override
-  public PageResponse<Item> findItemsByManifestation(
-      UUID manifestationUuid, PageRequest pageRequest) throws ServiceException {
+  public PageResponse<DigitalObject> findDigitalObjects(Item item, PageRequest pageRequest)
+      throws ServiceException {
     try {
-      return ((ItemRepository) repository).findItemsByManifestation(manifestationUuid, pageRequest);
+      return ((ItemRepository) repository).findDigitalObjects(item, pageRequest);
     } catch (RepositoryException e) {
-      throw new ServiceException(
-          "Cannot retrieve items for manifestation with uuid=" + manifestationUuid + ": " + e, e);
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public List<Locale> getLanguagesOfDigitalObjects(UUID uuid) {
-    return ((ItemRepository) repository).getLanguagesOfDigitalObjects(uuid);
+  public PageResponse<Item> findItemsByManifestation(
+      Manifestation manifestation, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((ItemRepository) repository).findItemsByManifestation(manifestation, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException(
+          "Cannot retrieve items for manifestation with uuid=" + manifestation + ": " + e, e);
+    }
   }
 
   @Override
-  public List<Locale> getLanguagesOfItemsForManifestation(UUID manifestationUuid) {
-    return ((ItemRepository) repository).getLanguagesOfItemsForManifestation(manifestationUuid);
+  public List<Locale> getLanguagesOfDigitalObjects(Item item) throws ServiceException {
+    try {
+      return ((ItemRepository) repository).getLanguagesOfDigitalObjects(item);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<Item> getItemsForWork(UUID workUuid) {
-    return ((ItemRepository) repository).findItemsForWork(workUuid);
+  public List<Locale> getLanguagesOfItemsForManifestation(Manifestation manifestation)
+      throws ServiceException {
+    try {
+      return ((ItemRepository) repository).getLanguagesOfItemsForManifestation(manifestation);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

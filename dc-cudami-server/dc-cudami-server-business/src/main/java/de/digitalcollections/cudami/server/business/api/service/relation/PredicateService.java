@@ -13,11 +13,6 @@ public interface PredicateService extends UniqueObjectService<Predicate> {
   boolean deleteByValue(String value) throws ServiceException;
 
   /**
-   * @return list of all predicates
-   */
-  List<Predicate> getAll() throws ServiceException;
-
-  /**
    * Returns a predicate, if available
    *
    * @param value unique value of predicate, e.g. "is_part_of"

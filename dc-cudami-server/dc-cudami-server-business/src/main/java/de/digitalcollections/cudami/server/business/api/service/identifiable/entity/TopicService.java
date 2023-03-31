@@ -25,7 +25,7 @@ public interface TopicService extends NodeService<Topic>, EntityService<Topic> {
   List<Locale> getLanguagesOfFileResources(Topic topic) throws ServiceException;
 
   // TODO: move to entityservice?
-  List<Topic> getTopicsOfEntity(Entity entity);
+  List<Topic> getTopicsOfEntity(Entity entity) throws ServiceException;
 
   // TODO: move to fileresourceservice?
   List<Topic> getTopicsOfFileResource(FileResource fileResource) throws ServiceException;

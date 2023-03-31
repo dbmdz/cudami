@@ -9,7 +9,7 @@ public interface DigitalObjectRenderingFileResourceService {
 
   void deleteRenderingFileResources(DigitalObject digitalObject) throws ServiceException;
 
-  List<FileResource> getRenderingFileResources(DigitalObject digitalObject);
+  List<FileResource> getRenderingFileResources(DigitalObject digitalObject) throws ServiceException;
 
   List<FileResource> setRenderingFileResources(
       DigitalObject digitalObject, List<FileResource> renderingResources) throws ServiceException;

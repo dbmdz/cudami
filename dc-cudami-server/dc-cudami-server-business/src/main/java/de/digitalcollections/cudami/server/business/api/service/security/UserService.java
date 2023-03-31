@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.model.security.User;
 import java.util.List;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.Errors;
 
 /** Service for User. */
 public interface UserService extends UniqueObjectService<User> {
@@ -20,4 +21,8 @@ public interface UserService extends UniqueObjectService<User> {
   List<User> getActiveAdminUsers() throws ServiceException;
 
   User getByUsername(String username) throws ServiceException, UsernameNotFoundException;
+
+  User save(User user, Errors results) throws ServiceException;
+
+  User update(User user, Errors results) throws ServiceException;
 }

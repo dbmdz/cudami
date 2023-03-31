@@ -22,6 +22,9 @@ public interface UniqueObjectService<U extends UniqueObject>
 
   boolean delete(U uniqueObject) throws ConflictException, ServiceException;
 
+  // FIXME: dangerous... but uses paging under the hood... Remove?
+  Set<U> getAll() throws ServiceException;
+
   /**
    * Retrieve one {@code UniqueObject} by given properties in example instance.
    *

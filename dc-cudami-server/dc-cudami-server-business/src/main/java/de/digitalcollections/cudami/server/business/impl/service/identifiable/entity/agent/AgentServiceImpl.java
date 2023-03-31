@@ -1,8 +1,10 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity.agent;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.AgentService;
@@ -13,7 +15,6 @@ import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObje
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,25 +45,25 @@ public class AgentServiceImpl<A extends Agent> extends EntityServiceImpl<A>
   }
 
   @Override
-  public Set<DigitalObject> getDigitalObjects(UUID uuidAgent) {
-    return ((AgentRepository<A>) repository).getDigitalObjects(uuidAgent);
+  public List<A> getCreatorsForWork(Work work) {
+    throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
   @Override
-  public Set<Work> getWorks(UUID uuidAgent) {
-    return ((AgentRepository<A>) repository).getWorks(uuidAgent);
-  }
-
-  @Override
-  public Set<Work> getWorks(A agent) {
-    if (agent == null) {
-      return null;
+  public Set<DigitalObject> getDigitalObjects(A agent) throws ServiceException {
+    try {
+      return ((AgentRepository<A>) repository).getDigitalObjects(agent);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    return ((AgentRepository<A>) repository).getWorks(agent.getUuid());
   }
 
   @Override
-  public List<Agent> getCreatorsForWork(UUID uuid) {
-    return null;
+  public Set<Work> getWorks(A agent) throws ServiceException {
+    try {
+      return ((AgentRepository<A>) repository).getWorks(agent);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

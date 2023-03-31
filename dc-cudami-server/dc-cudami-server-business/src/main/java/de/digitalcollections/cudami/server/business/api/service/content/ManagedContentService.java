@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface ManagedContentService<T extends ManagedContent> {
 
-  default Filtering filteringForActive() {
+  static Filtering filteringForActive() {
     // business logic that defines, what "active" means
     LocalDate now = LocalDate.now();
     Filtering filtering =

@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable.entity;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.NodeRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.CollectionRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
@@ -22,7 +23,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -51,19 +51,47 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean addChildren(UUID parentUuid, List<UUID> childrenUuids) {
-    return ((NodeRepository<Collection>) repository).addChildren(parentUuid, childrenUuids);
+  public boolean addChild(Collection parent, Collection child) throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).addChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean addDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
-    return ((CollectionRepository) repository).addDigitalObjects(collectionUuid, digitalObjects);
+  public boolean addChildren(Collection parent, List<Collection> children) throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).addChildren(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean delete(UUID uuid) throws ConflictException, ServiceException {
+  public boolean addDigitalObject(Collection collection, DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).addDigitalObject(collection, digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean addDigitalObjects(Collection collection, List<DigitalObject> digitalObjects)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).addDigitalObjects(collection, digitalObjects);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+  }
+
+  @Override
+  public boolean delete(Collection collection) throws ConflictException, ServiceException {
     long amountChildrenCollections =
-        findChildren(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
+        findChildren(collection, PageRequest.builder().pageNumber(0).pageSize(1).build())
             .getTotalElements();
     if (amountChildrenCollections > 0) {
       throw new ConflictException(
@@ -71,43 +99,47 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
     }
 
     long amountDigitalObjects =
-        findDigitalObjects(uuid, PageRequest.builder().pageNumber(0).pageSize(1).build())
+        findDigitalObjects(collection, PageRequest.builder().pageNumber(0).pageSize(1).build())
             .getTotalElements();
     if (amountDigitalObjects > 0) {
       throw new ConflictException(
           "Collection cannot be deleted, because it has corresponding digital objects!");
     }
-    return super.deleteByUuid(uuid);
+    return super.delete(collection);
   }
 
   @Override
-  public PageResponse<Collection> find(PageRequest pageRequest) {
-    PageResponse<Collection> pageResponse = super.find(pageRequest);
+  public PageResponse<Collection> find(PageRequest pageRequest) throws ServiceException {
+    PageResponse<Collection> pageResponse;
+    try {
+      pageResponse = super.find(pageRequest);
+    } catch (ServiceException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
 
   @Override
-  public PageResponse<Collection> findActive(PageRequest pageRequest) {
-    Filtering filtering = filteringForActive();
+  public PageResponse<Collection> findActive(PageRequest pageRequest) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     pageRequest.add(filtering);
     PageResponse<Collection> pageResponse = find(pageRequest);
-    setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
 
   @Override
-  public PageResponse<Collection> findActiveChildren(UUID uuid, PageRequest pageRequest) {
-    Filtering filtering = filteringForActive();
+  public PageResponse<Collection> findActiveChildren(Collection collection, PageRequest pageRequest)
+      throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     pageRequest.add(filtering);
-    PageResponse<Collection> pageResponse = findChildren(uuid, pageRequest);
-    setPublicationStatus(pageResponse.getContent());
+    PageResponse<Collection> pageResponse = findChildren(collection, pageRequest);
     return pageResponse;
   }
 
   @Override
   public PageResponse<Collection> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
+      PageRequest pageRequest, String language, String initial) throws ServiceException {
     PageResponse<Collection> pageResponse =
         super.findByLanguageAndInitial(pageRequest, language, initial);
     setPublicationStatus(pageResponse.getContent());
@@ -115,143 +147,205 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public PageResponse<Collection> findChildren(UUID nodeUuid, PageRequest pageRequest) {
-    PageResponse<Collection> pageResponse =
-        ((NodeRepository<Collection>) repository).findChildren(nodeUuid, pageRequest);
+  public PageResponse<Collection> findChildren(Collection collection, PageRequest pageRequest)
+      throws ServiceException {
+    PageResponse<Collection> pageResponse;
+    try {
+      pageResponse =
+          ((NodeRepository<Collection>) repository).findChildren(collection, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
 
   @Override
   public PageResponse<DigitalObject> findDigitalObjects(
-      UUID collectionUuid, PageRequest pageRequest) {
-    return ((CollectionRepository) repository).findDigitalObjects(collectionUuid, pageRequest);
+      Collection collection, PageRequest pageRequest) throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).findDigitalObjects(collection, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public List<CorporateBody> findRelatedCorporateBodies(UUID uuid, Filtering filtering) {
-    return ((CollectionRepository) repository).findRelatedCorporateBodies(uuid, filtering);
+  public List<CorporateBody> findRelatedCorporateBodies(Collection collection, Filtering filtering)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).findRelatedCorporateBodies(collection, filtering);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) {
+  public PageResponse<Collection> findRootNodes(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
-    PageResponse<Collection> pageResponse =
-        ((NodeRepository<Collection>) repository).findRootNodes(pageRequest);
+    PageResponse<Collection> pageResponse;
+    try {
+      pageResponse = ((NodeRepository<Collection>) repository).findRootNodes(pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(pageResponse.getContent());
     return pageResponse;
   }
 
   @Override
-  public Collection getByExampleAndActive(UUID uuid) {
-    Filtering filtering = filteringForActive();
-    Collection collection =
-        ((CollectionRepository) repository).getByUuidAndFiltering(uuid, filtering);
-    if (collection != null) {
-      collection.setChildren(getActiveChildren(uuid));
-      setPublicationStatus(collection);
-    }
-    return collection;
-  }
-
-  @Override
-  public Collection getByExampleAndActiveAndLocale(UUID uuid, Locale pLocale) {
-    Collection collection = getByExampleAndActive(uuid);
-    collection = reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
-    setPublicationStatus(collection);
-    return collection;
-  }
-
-  @Override
-  public List<Collection> getActiveChildren(UUID uuid) {
-    Filtering filtering = filteringForActive();
+  public List<Collection> getActiveChildren(Collection collection) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
     PageRequest pageRequest = new PageRequest();
     pageRequest.add(filtering);
-    List<Collection> children = findChildren(uuid, pageRequest).getContent();
+    List<Collection> children = findChildren(collection, pageRequest).getContent();
     setPublicationStatus(children);
     return children;
   }
 
   @Override
-  public BreadcrumbNavigation getBreadcrumbNavigation(UUID nodeUuid) {
-    return ((NodeRepository<Collection>) repository).getBreadcrumbNavigation(nodeUuid);
+  public BreadcrumbNavigation getBreadcrumbNavigation(Collection collection)
+      throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).getBreadcrumbNavigation(collection);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public Collection getByIdentifier(Identifier identifier) {
+  public Collection getByExample(Collection example) throws ServiceException {
+    Collection collection = super.getByExample(example);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByExampleAndActive(Collection example) throws ServiceException {
+    Filtering filtering = ManagedContentService.filteringForActive();
+    Collection collection;
+    try {
+      collection = ((CollectionRepository) repository).getByExampleAndFiltering(example, filtering);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
+    if (collection != null) {
+      setPublicationStatus(collection);
+      collection.setChildren(getActiveChildren(collection));
+    }
+    return collection;
+  }
+
+  @Override
+  public Collection getByExampleAndActiveAndLocale(Collection example, Locale pLocale)
+      throws ServiceException {
+    Collection collection = getByExampleAndActive(example);
+    collection = reduceMultilanguageFieldsToGivenLocale(collection, pLocale);
+    return collection;
+  }
+
+  @Override
+  public Collection getByExampleAndLocale(Collection example, Locale locale)
+      throws ServiceException {
+    Collection collection = super.getByExampleAndLocale(example, locale);
+    setPublicationStatus(collection);
+    return collection;
+  }
+
+  @Override
+  public Collection getByIdentifier(Identifier identifier) throws ServiceException {
     Collection collection = super.getByIdentifier(identifier);
     setPublicationStatus(collection);
     return collection;
   }
 
   @Override
-  public Collection getByRefId(long refId) {
+  public Collection getByRefId(long refId) throws ServiceException {
     Collection collection = super.getByRefId(refId);
     setPublicationStatus(collection);
     return collection;
   }
 
   @Override
-  public Collection getByUuid(UUID uuid) throws ServiceException {
-    Collection collection = super.getByUuid(uuid);
-    setPublicationStatus(collection);
-    return collection;
-  }
-
-  @Override
-  public Collection getByUuidAndLocale(UUID uuid, Locale locale) throws ServiceException {
-    Collection collection = super.getByUuidAndLocale(uuid, locale);
-    setPublicationStatus(collection);
-    return collection;
-  }
-
-  @Override
-  public List<Collection> getChildren(UUID nodeUuid) {
-    List<Collection> children = ((NodeRepository<Collection>) repository).getChildren(nodeUuid);
+  public List<Collection> getChildren(Collection collection) throws ServiceException {
+    List<Collection> children;
+    try {
+      children = ((NodeRepository<Collection>) repository).getChildren(collection);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(children);
     return children;
   }
 
   @Override
-  public Collection getParent(UUID nodeUuid) {
-    Collection parent = ((NodeRepository<Collection>) repository).getParent(nodeUuid);
+  public Collection getParent(Collection collection) throws ServiceException {
+    Collection parent;
+    try {
+      parent = ((NodeRepository<Collection>) repository).getParent(collection);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(parent);
     return parent;
   }
 
   @Override
-  public List<Collection> getParents(UUID uuid) {
-    List<Collection> parents = ((CollectionRepository) repository).getParents(uuid);
+  public List<Collection> getParents(Collection collection) throws ServiceException {
+    List<Collection> parents;
+    try {
+      parents = ((NodeRepository) repository).getParents(collection);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     setPublicationStatus(parents);
     return parents;
   }
 
   @Override
-  public List<Collection> getRandom(int count) {
+  public List<Collection> getRandom(int count) throws ServiceException {
     List<Collection> collections = super.getRandom(count);
     setPublicationStatus(collections);
     return collections;
   }
 
   @Override
-  public List<Locale> getRootNodesLanguages() {
-    return ((NodeRepository<Collection>) repository).getRootNodesLanguages();
+  public List<Locale> getRootNodesLanguages() throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).getRootNodesLanguages();
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeChild(UUID parentUuid, UUID childUuid) {
-    return ((NodeRepository<Collection>) repository).removeChild(parentUuid, childUuid);
+  public boolean removeChild(Collection parent, Collection child) throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).removeChild(parent, child);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeDigitalObject(UUID collectionUuid, UUID digitalObjectUuid) {
-    return ((CollectionRepository) repository)
-        .removeDigitalObject(collectionUuid, digitalObjectUuid);
+  public boolean removeDigitalObject(Collection collection, DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).removeDigitalObject(collection, digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject) {
-    return ((CollectionRepository) repository).removeDigitalObjectFromAllCollections(digitalObject);
+  public boolean removeDigitalObjectFromAllCollections(DigitalObject digitalObject)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository)
+          .removeDigitalObjectFromAllCollections(digitalObject);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -261,21 +355,26 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public Collection saveWithParent(UUID childUuid, UUID parentUuid) throws ServiceException {
+  public Collection saveWithParent(Collection child, Collection parent) throws ServiceException {
     try {
       Collection collection =
-          ((CollectionRepository) repository).saveWithParent(childUuid, parentUuid);
+          ((NodeRepository<Collection>) repository).saveWithParent(child, parent);
       setPublicationStatus(collection);
       return collection;
     } catch (Exception e) {
-      LOGGER.error("Cannot save collection " + childUuid + ": ", e);
+      LOGGER.error("Cannot save collection " + child + ": ", e);
       throw new ServiceException(e.getMessage());
     }
   }
 
   @Override
-  public boolean setDigitalObjects(UUID collectionUuid, List<DigitalObject> digitalObjects) {
-    return ((CollectionRepository) repository).setDigitalObjects(collectionUuid, digitalObjects);
+  public boolean setDigitalObjects(Collection collection, List<DigitalObject> digitalObjects)
+      throws ServiceException {
+    try {
+      return ((CollectionRepository) repository).setDigitalObjects(collection, digitalObjects);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -285,7 +384,12 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
   }
 
   @Override
-  public boolean updateChildrenOrder(UUID parentUuid, List<Collection> children) {
-    return ((NodeRepository<Collection>) repository).updateChildrenOrder(parentUuid, children);
+  public boolean updateChildrenOrder(Collection parent, List<Collection> children)
+      throws ServiceException {
+    try {
+      return ((NodeRepository<Collection>) repository).updateChildrenOrder(parent, children);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 }

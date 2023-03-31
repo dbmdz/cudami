@@ -42,7 +42,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
   }
 
   @Override
-  public boolean deleteByValue(String value) {
+  public boolean deleteByValue(String value) throws RepositoryException {
     int count =
         dbi.withHandle(
             h ->
@@ -60,7 +60,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
   }
 
   @Override
-  public Predicate getByValue(String value) {
+  public Predicate getByValue(String value) throws RepositoryException {
     String query =
         "SELECT "
             + getSqlSelectAllFields()
@@ -102,7 +102,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
   }
 
   @Override
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws RepositoryException {
     String query =
         "SELECT DISTINCT jsonb_object_keys("
             + tableAlias

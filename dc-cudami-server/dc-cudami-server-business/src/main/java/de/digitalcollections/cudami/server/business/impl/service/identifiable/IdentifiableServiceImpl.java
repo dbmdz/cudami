@@ -254,13 +254,13 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   public void update(I identifiable) throws ServiceException, ValidationException {
     validate(identifiable);
 
-    I identifiableInDb;
+    I identifiableFromRepo;
     try {
-      identifiableInDb = repository.getByUuid(identifiable.getUuid());
+      identifiableFromRepo = repository.getByUuid(identifiable.getUuid());
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
-    if (identifiableInDb == null) {
+    if (identifiableFromRepo == null) {
       throw new ResourceNotFoundException(
           "No "
               + identifiable.getClass().getSimpleName()
@@ -275,7 +275,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     }
 
     try {
-      Set<Identifier> existingIdentifiers = identifiableInDb.getIdentifiers();
+      Set<Identifier> existingIdentifiers = identifiableFromRepo.getIdentifiers();
       Set<Identifier> providedIdentifiers = identifiable.getIdentifiers();
       Set<Identifier> obsoleteIdentifiers =
           existingIdentifiers.stream()
@@ -316,7 +316,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
 
       // UrlAliases
       IdentifiableUrlAliasAlignHelper.alignForUpdate(
-          identifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);
+          identifiable, identifiableFromRepo, cudamiConfig, urlAliasService::generateSlug);
       try {
         urlAliasService.deleteByIdentifiable(identifiable);
       } catch (ConflictException e) {
@@ -334,7 +334,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
       if (identifiable.getLocalizedUrlAliases() != null) {
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           if (urlAlias.getUuid() != null && urlAlias.getLastPublished() != null) {
-            // these haven't been removed from DB so we must update them
+            // these haven't been removed from repo so we must update them
             urlAliasService.update(urlAlias);
           } else {
             urlAliasService.save(urlAlias, true);
