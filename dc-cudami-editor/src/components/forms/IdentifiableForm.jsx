@@ -228,6 +228,7 @@ class IdentifiableForm extends Component {
       website?.uuid,
     )
     return {
+      objectType: 'URL_ALIAS',
       primary: true,
       slug,
       targetIdentifiableObjectType: identifiableObjectType,
