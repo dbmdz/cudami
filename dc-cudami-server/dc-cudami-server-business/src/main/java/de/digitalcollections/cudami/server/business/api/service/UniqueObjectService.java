@@ -6,7 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public interface UniqueObjectService<U extends UniqueObject>
     extends PagingSortingFilteringService<U> {
@@ -18,7 +18,7 @@ public interface UniqueObjectService<U extends UniqueObject>
 
   U create() throws ServiceException;
 
-  int delete(List<U> uniqueObjects) throws ConflictException, ServiceException;
+  int delete(Set<U> uniqueObjects) throws ConflictException, ServiceException;
 
   boolean delete(U uniqueObject) throws ConflictException, ServiceException;
 
@@ -41,32 +41,20 @@ public interface UniqueObjectService<U extends UniqueObject>
    */
   U getByExampleAndFiltering(U uniqueObject, Filtering filtering) throws ServiceException;
 
+  List<U> getRandom(int count) throws ServiceException;
+
   /**
    * Persist an {@code UniqueObject} (with validation)
    *
-   * @param uniqueObject the {@code UniqueObject} (with yet empty UUID)
+   * @param uniqueObject the {@code UniqueObject} (not yet stored)
    * @throws ServiceException in case of an error
    * @throws ValidationException in case of a validation error
    */
-  default U save(U uniqueObject) throws ValidationException, ServiceException {
-    if (uniqueObject == null) {
-      throw new ServiceException("null object can not be saved");
-    }
-    return save(uniqueObject, false);
-  }
+  void save(U uniqueObject) throws ValidationException, ServiceException;
 
-  /**
-   * Persist an {@code UniqueObject} (with optional validation)
-   *
-   * @param uniqueObject the {@code UniqueObject} (with yet empty UUID)
-   * @throws ServiceException in case of an error
-   * @throws ValidationException in case of a validation error
-   */
-  // FIXME: UseCase?!!! Never skip validation! get rid of this method...
-  U save(U uniqueObject, boolean skipValidation) throws ValidationException, ServiceException;
-
-  // FIXME: bindings?!!! try to get rid of this method...
-  U save(U uniqueObject, Map<String, Object> bindings) throws ValidationException, ServiceException;
+  //  // FIXME: bindings?!!! try to get rid of this method...
+  //  void save(U uniqueObject, Map<String, Object> bindings) throws ValidationException,
+  // ServiceException;
 
   /**
    * Updates an persisted {@code UniqueObject}
@@ -75,10 +63,12 @@ public interface UniqueObjectService<U extends UniqueObject>
    * @throws ServiceException in case of an error
    * @throws ValidationException in case of a validation error
    */
-  default U update(U uniqueObject) throws ValidationException, ServiceException {
-    return update(uniqueObject, null);
-  }
+  void update(U uniqueObject) throws ValidationException, ServiceException;
 
-  // FIXME: bindings?!!! try to get rid of this method...
-  U update(U uniqueObject, Map<String, Object> bindings) throws ServiceException;
+  //  default void update(U uniqueObject) throws ValidationException, ServiceException {
+  //    update(uniqueObject, null);
+  //  }
+
+  //  // FIXME: bindings?!!! try to get rid of this method...
+  //  void update(U uniqueObject, Map<String, Object> bindings) throws ServiceException;
 }

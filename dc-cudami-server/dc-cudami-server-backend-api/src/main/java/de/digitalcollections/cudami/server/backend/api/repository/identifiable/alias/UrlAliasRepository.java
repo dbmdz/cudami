@@ -2,8 +2,10 @@ package de.digitalcollections.cudami.server.backend.api.repository.identifiable.
 
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.Collection;
@@ -59,6 +61,16 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
         .collect(Collectors.toList());
   }
 
+  default boolean deleteByIdentifiable(Identifiable identifiable, boolean force)
+      throws RepositoryException {
+    if (identifiable == null) {
+      throw new IllegalArgumentException("delete failed: given object must not be null");
+    }
+    return deleteByIdentifiable(identifiable.getUuid(), force);
+  }
+
+  boolean deleteByIdentifiable(UUID identifiableUuid, boolean force) throws RepositoryException;
+
   /**
    * Retrieve all primary links corresponding to a slug. The owning website is ignored.
    *
@@ -104,6 +116,23 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
   LocalizedUrlAliases findPrimaryLinksForWebsite(
       UUID websiteUuid, String slug, boolean considerLanguage) throws RepositoryException;
 
+  default LocalizedUrlAliases findPrimaryLinksForWebsite(
+      Website website, String slug, boolean considerLanguage) throws RepositoryException {
+    UUID websiteUuid = null;
+    if (website != null) {
+      websiteUuid = website.getUuid();
+    }
+    return findPrimaryLinksForWebsite(websiteUuid, slug, considerLanguage);
+  }
+
+  default LocalizedUrlAliases getByIdentifiable(Identifiable identifiable)
+      throws RepositoryException {
+    if (identifiable == null) {
+      throw new IllegalArgumentException("get failed: given object must not be null");
+    }
+    return getByIdentifiable(identifiable.getUuid());
+  }
+
   /**
    * Retrieve all slugs of a link target.
    *
@@ -124,4 +153,12 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
    */
   boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
       throws RepositoryException;
+
+  default boolean hasUrlAlias(String slug, Website website, Locale targetLanguage)
+      throws RepositoryException {
+    if (website == null) {
+      throw new IllegalArgumentException("check failed: given object must not be null");
+    }
+    return hasUrlAlias(slug, website.getUuid(), targetLanguage);
+  }
 }

@@ -71,8 +71,6 @@ public interface IdentifiableService<I extends Identifiable> extends UniqueObjec
 
   List<Locale> getLanguages() throws ServiceException;
 
-  List<I> getRandom(int count) throws ServiceException;
-
   List<Entity> setRelatedEntities(I identifiable, List<Entity> entities) throws ServiceException;
 
   List<FileResource> setRelatedFileResources(I identifiable, List<FileResource> fileResources)

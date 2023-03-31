@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.business.api.service.identifiable.alias;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.model.identifiable.Identifiable;
@@ -24,7 +25,8 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    *     existed at all and thus nothing could be deleted
    * @throws ServiceException
    */
-  default boolean deleteByIdentifiable(Identifiable targetIdentifiable) throws ServiceException {
+  default boolean deleteByIdentifiable(Identifiable targetIdentifiable)
+      throws ServiceException, ConflictException {
     return deleteByIdentifiable(targetIdentifiable, false);
   }
 
@@ -38,7 +40,7 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    * @throws ServiceException
    */
   boolean deleteByIdentifiable(Identifiable targetIdentifiable, boolean force)
-      throws ServiceException;
+      throws ServiceException, ConflictException;
 
   /**
    * Find UrlAliases
@@ -99,6 +101,31 @@ public interface UrlAliasService extends UniqueObjectService<UrlAlias> {
    */
   List<UrlAlias> getPrimaryUrlAliasesByIdentifiable(Identifiable identifiable)
       throws ServiceException;
+
+  /**
+   * Persist an {@code UniqueObject} (with validation)
+   *
+   * @param uniqueObject the {@code UniqueObject} (with yet empty UUID)
+   * @throws ServiceException in case of an error
+   * @throws ValidationException in case of a validation error
+   */
+  // FIXME: UseCase?!!! Never skip validation! get rid of parametrized call and default...
+  default void save(UrlAlias urlAlias) throws ValidationException, ServiceException {
+    if (urlAlias == null) {
+      throw new ServiceException("null object can not be saved");
+    }
+    save(urlAlias, false);
+  }
+
+  /**
+   * Persist an {@code UrlAlias} (with optional validation)
+   *
+   * @param urlAlias the {@code UrlAlias} (not yet stored)
+   * @throws ServiceException in case of an error
+   * @throws ValidationException in case of a validation error
+   */
+  // FIXME: UseCase?!!! Never skip validation! get rid of this method...
+  void save(UrlAlias urlAlias, boolean skipValidation) throws ValidationException, ServiceException;
 
   /**
    * Validates the given localizedUrlAliases according to the following criteria:

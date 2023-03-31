@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.WorkRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
@@ -59,6 +61,8 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
   public WorkRepositoryImpl(
       Jdbi jdbi,
       CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository,
       LocalDateRangeMapper dateRangeMapper,
       TitleMapper titleMapper,
       EntityRepositoryImpl<Entity> entityRepository,
@@ -74,7 +78,9 @@ public class WorkRepositoryImpl extends EntityRepositoryImpl<Work> implements Wo
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Work.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
     dbi.registerArgument(dateRangeMapper);
     dbi.registerColumnMapper(LocalDateRange.class, dateRangeMapper);
     dbi.registerColumnMapper(Title.class, titleMapper);

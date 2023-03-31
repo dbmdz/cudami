@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.CorporateBodyRepository;
@@ -48,26 +50,35 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 public class ItemRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<ItemRepositoryImpl> {
 
-  @Autowired CorporateBodyRepository corporateBodyRepository;
+  @Autowired private CorporateBodyRepository corporateBodyRepository;
 
   @Autowired
   @Qualifier("agentRepository")
-  AgentRepository<Agent> agentRepository;
+  private AgentRepository<Agent> agentRepository;
 
-  @Autowired PersonRepository personRepository;
+  @Autowired private PersonRepository personRepository;
 
-  @Autowired ManifestationRepository manifestationRepository;
+  @Autowired private ManifestationRepository manifestationRepository;
 
   private DigitalObjectRepository digitalObjectRepository;
 
   @BeforeEach
   void setup(
       @Autowired Jdbi jdbi,
+      @Autowired CudamiConfig config,
+      @Autowired IdentifierRepository identifierRepository,
+      @Autowired UrlAliasRepository urlAliasRepository,
       @Autowired DigitalObjectRepositoryImpl digitalObjectRepository,
-      @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository,
-      @Autowired CudamiConfig config) {
+      @Autowired @Qualifier("agentRepository") AgentRepositoryImpl<Agent> agentRepository) {
     this.digitalObjectRepository = digitalObjectRepository;
-    repo = new ItemRepositoryImpl(jdbi, digitalObjectRepository, agentRepository, config);
+    repo =
+        new ItemRepositoryImpl(
+            jdbi,
+            config,
+            identifierRepository,
+            urlAliasRepository,
+            digitalObjectRepository,
+            agentRepository);
   }
 
   @Test

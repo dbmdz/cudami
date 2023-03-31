@@ -98,11 +98,16 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     return new UrlAlias();
   }
 
-  private UUID extractWebsiteUuid(UrlAlias urlAlias) {
-    if (urlAlias == null) {
-      return null;
-    }
-    return urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid() : null;
+  @Override
+  public boolean deleteByIdentifiable(UUID identifiableUuid, boolean force)
+      throws RepositoryException {
+    LocalizedUrlAliases urlAliases = getByIdentifiable(identifiableUuid);
+    return delete(
+            urlAliases.flatten().stream()
+                .filter(ua -> force || ua.getLastPublished() == null)
+                .map(ua -> UrlAlias.builder().uuid(ua.getUuid()).build())
+                .collect(Collectors.toSet()))
+        > 0;
   }
 
   // FIXME: use standard find method with filtering set before (not searchTerm
@@ -175,6 +180,13 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   // throw new RepositoryException(e);
   // }
   // }
+
+  private UUID extractWebsiteUuid(UrlAlias urlAlias) {
+    if (urlAlias == null) {
+      return null;
+    }
+    return urlAlias.getWebsite() != null ? urlAlias.getWebsite().getUuid() : null;
+  }
 
   @Override
   public LocalizedUrlAliases findAllPrimaryLinks(String slug) throws RepositoryException {
@@ -322,6 +334,25 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
+  protected List<String> getAllowedOrderByFields() {
+    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
+    allowedOrderByFields.addAll(
+        Arrays.asList("lastPublished", "\"primary\"", "slug", "targetLanguage"));
+    return allowedOrderByFields;
+  }
+
+  private String getAssignmentsForUpdate() {
+    return PROPERTY_COLUMN_MAPPING.entrySet().stream()
+        .filter(e -> !(e.getKey().equals("created") || e.getKey().equals("uuid")))
+        .map(
+            e ->
+                String.format(
+                    "%s = :%s",
+                    e.getValue().equals("primary") ? "\"primary\"" : e.getValue(), e.getKey()))
+        .collect(Collectors.joining(", "));
+  }
+
+  @Override
   public LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException {
     if (uuid == null) {
       return new LocalizedUrlAliases();
@@ -357,25 +388,6 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     } catch (JdbiException e) {
       throw new RepositoryException(e);
     }
-  }
-
-  @Override
-  protected List<String> getAllowedOrderByFields() {
-    List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(
-        Arrays.asList("lastPublished", "\"primary\"", "slug", "targetLanguage"));
-    return allowedOrderByFields;
-  }
-
-  private String getAssignmentsForUpdate() {
-    return PROPERTY_COLUMN_MAPPING.entrySet().stream()
-        .filter(e -> !(e.getKey().equals("created") || e.getKey().equals("uuid")))
-        .map(
-            e ->
-                String.format(
-                    "%s = :%s",
-                    e.getValue().equals("primary") ? "\"primary\"" : e.getValue(), e.getKey()))
-        .collect(Collectors.joining(", "));
   }
 
   @Override

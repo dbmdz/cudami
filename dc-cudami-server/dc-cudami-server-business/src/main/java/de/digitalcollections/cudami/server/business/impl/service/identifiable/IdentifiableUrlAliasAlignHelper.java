@@ -126,10 +126,12 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         actualIdentifiable.setLocalizedUrlAliases(new LocalizedUrlAliases());
       }
       for (UrlAlias primaryFromDb : primariesFromDb) {
+        // TODO: do not work with UUID in business layer
         final UUID websiteUuid =
             primaryFromDb.getWebsite() != null ? primaryFromDb.getWebsite().getUuid() : null;
         String newSlug =
-            slugGeneratorService.apply(langFromDbForAlias, labelInIdentifiable, websiteUuid);
+            slugGeneratorService.apply(
+                langFromDbForAlias, labelInIdentifiable, primaryFromDb.getWebsite());
         // if this slug already exists in the identifiable then we must silently go on, otherwise we
         // will add it
         if (actualIdentifiable.getLocalizedUrlAliases().flatten().stream()
@@ -324,6 +326,6 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
   // We do not want to have any services in this class but we need the slug generator.
   // It can easyly be passed into a parameter of this functional interface type.
   public interface SlugGeneratorService {
-    String apply(Locale locale, String label, UUID website) throws ServiceException;
+    String apply(Locale locale, String label, Website website) throws ServiceException;
   }
 }

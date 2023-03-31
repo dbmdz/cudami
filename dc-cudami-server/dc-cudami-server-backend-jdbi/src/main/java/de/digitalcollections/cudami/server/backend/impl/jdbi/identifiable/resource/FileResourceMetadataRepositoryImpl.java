@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.SearchTermTemplates;
@@ -28,14 +30,20 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
   public static final String TABLE_NAME = "fileresources";
 
   @Autowired
-  public FileResourceMetadataRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public FileResourceMetadataRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         FileResource.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   protected FileResourceMetadataRepositoryImpl(
@@ -44,14 +52,18 @@ public class FileResourceMetadataRepositoryImpl<F extends FileResource>
       String tableAlias,
       String mappingPrefix,
       Class fileResourceImplClass,
-      int offsetForAlternativePaging) {
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         tableName,
         tableAlias,
         mappingPrefix,
         fileResourceImplClass,
-        offsetForAlternativePaging);
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override

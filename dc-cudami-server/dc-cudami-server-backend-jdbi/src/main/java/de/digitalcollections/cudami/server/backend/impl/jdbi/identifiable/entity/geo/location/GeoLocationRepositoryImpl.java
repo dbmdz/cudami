@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.geo.location;
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.geo.location.GeoLocationRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
@@ -21,14 +23,20 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
   public static final String TABLE_NAME = "geolocations";
 
   @Autowired
-  public GeoLocationRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public GeoLocationRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         GeoLocation.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   public GeoLocationRepositoryImpl(
@@ -37,14 +45,18 @@ public class GeoLocationRepositoryImpl<G extends GeoLocation> extends EntityRepo
       String tableAlias,
       String mappingPrefix,
       Class<? extends GeoLocation> geoLocationImplClass,
-      int offsetForAlternativePaging) {
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         tableName,
         tableAlias,
         mappingPrefix,
         geoLocationImplClass,
-        offsetForAlternativePaging);
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override

@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.agent.AgentRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.EntityRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -30,14 +32,20 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
   public static final String TABLE_NAME = "agents";
 
   @Autowired
-  public AgentRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public AgentRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Agent.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   public AgentRepositoryImpl(
@@ -46,8 +54,18 @@ public class AgentRepositoryImpl<A extends Agent> extends EntityRepositoryImpl<A
       String tableAlias,
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
-      int offsetForAlternativePaging) {
-    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        entityImplClass,
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override

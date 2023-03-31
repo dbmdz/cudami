@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,13 +42,13 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The UrlAlias Repository")
 public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
-  UrlAliasRepositoryImpl repo;
+  private UrlAliasRepositoryImpl repo;
   @Autowired WebpageRepository webpageRepository;
   @Autowired WebsiteRepository websiteRepository;
 
   @BeforeEach
   public void beforeEach() {
-    this.repo = new UrlAliasRepositoryImpl(this.jdbi, cudamiConfig);
+    repo = new UrlAliasRepositoryImpl(jdbi, cudamiConfig);
   }
 
   @DisplayName("can save and retrieve an UrlAlias for a webpage with website")
@@ -333,7 +334,8 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
         RepositoryException.class, () -> repo.hasUrlAlias("", website.getUuid(), Locale.ROOT));
     assertThat(repo.hasUrlAlias(urlAliasWithWebsite.getSlug(), website.getUuid(), Locale.ROOT))
         .isFalse();
-    assertThat(repo.hasUrlAlias(urlAliasWithoutWebsite.getSlug(), null, Locale.GERMAN)).isTrue();
+    assertThat(repo.hasUrlAlias(urlAliasWithoutWebsite.getSlug(), (UUID) null, Locale.GERMAN))
+        .isTrue();
     assertThat(repo.hasUrlAlias(urlAliasWithWebsite.getSlug(), website.getUuid(), Locale.GERMAN))
         .isTrue();
     assertThat(repo.hasUrlAlias("does_not_exist", website.getUuid(), Locale.ROOT)).isFalse();

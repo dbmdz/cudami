@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAssertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.work.ItemRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifierRepositoryImpl;
@@ -67,6 +69,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class DigitalObjectRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<DigitalObjectRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
+
   @Autowired private CollectionRepositoryImpl collectionRepositoryImpl;
 
   @Autowired private CorporateBodyRepositoryImpl corporateBodyRepositoryImpl;
@@ -102,7 +107,9 @@ class DigitalObjectRepositoryImplTest
 
   @BeforeEach
   public void beforeEach() {
-    repo = new DigitalObjectRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new DigitalObjectRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     repo.setAgentEntityRepository(agentEntityRepositoryImpl);
     repo.setCollectionRepository(collectionRepositoryImpl);
     repo.setCorporateBodyRepository(corporateBodyRepositoryImpl);
@@ -127,14 +134,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
@@ -415,14 +423,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Build a CreationInfo object with the formerly persisted contents
@@ -492,14 +501,15 @@ class DigitalObjectRepositoryImplTest
             .label(Locale.ENGLISH, "Corporate Body")
             .build();
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     // Insert a geolocation with UUID
     GeoLocation creationPlace =
         GeoLocation.builder().uuid(UUID.randomUUID()).label(Locale.GERMAN, "Ort").build();
     GeoLocationRepositoryImpl geoLocationRepository =
-        new GeoLocationRepositoryImpl(jdbi, cudamiConfig);
+        new GeoLocationRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     geoLocationRepository.save(creationPlace);
 
     // Insert a LinkedDataFileResource
@@ -523,7 +533,8 @@ class DigitalObjectRepositoryImplTest
     renderingResource.setFilename("foo.jpg");
     renderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Zeichnung"));
     FileResourceMetadataRepositoryImpl<FileResource> fileResourceMetadataRepository =
-        new FileResourceMetadataRepositoryImpl<FileResource>(jdbi, cudamiConfig);
+        new FileResourceMetadataRepositoryImpl<FileResource>(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     fileResourceMetadataRepository.save(renderingResource);
 
     // Build a CreationInfo object with the formerly persisted contents

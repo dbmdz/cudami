@@ -4,8 +4,10 @@ import static de.digitalcollections.cudami.server.backend.impl.asserts.CudamiAss
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -38,11 +40,15 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class IdentifiableRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<IdentifiableRepositoryImpl> {
 
-  @Autowired SubjectRepositoryImpl subjectRepositoryImpl;
+  @Autowired private SubjectRepository subjectRepository;
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new IdentifiableRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new IdentifiableRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
   }
 
   private DigitalObject createDigitalObjectWithLabels(String label) {
@@ -132,7 +138,7 @@ class IdentifiableRepositoryImplTest
             .identifier(Identifier.builder().namespace("test").id("12345").build())
             .type("SUBJECT_TYPE")
             .build();
-    subjectRepositoryImpl.save(subject);
+    subjectRepository.save(subject);
 
     Identifiable identifiable =
         Identifiable.builder()

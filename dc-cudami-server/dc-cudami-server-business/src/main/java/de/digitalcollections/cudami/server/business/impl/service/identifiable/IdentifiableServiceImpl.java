@@ -18,15 +18,15 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.list.sorting.Direction;
+import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,127 +80,67 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public long count() throws ServiceException {
-    try {
-      return repository.count();
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  @Override
-  public I create() throws ServiceException {
-    try {
-      return repository.create();
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  @Override
-  public boolean delete(I uniqueObject) throws ConflictException, ServiceException {
-    try {
-      return repository.delete(uniqueObject);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  @Override
-  public int delete(List<I> uniqueObjects) throws ConflictException, ServiceException {
-    try {
-      return repository.delete(uniqueObjects);
-    } catch (RepositoryException e) {
-      throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  @Override
-  public PageResponse<I> find(PageRequest pageRequest) {
+  public PageResponse<I> find(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
-    PageResponse<I> response;
     try {
-      response = repository.find(pageRequest);
-    } catch (RepositoryException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      return super.find(pageRequest);
+    } catch (ServiceException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    return response;
   }
 
   @Override
   public PageResponse<I> findByLanguageAndInitial(
-      PageRequest pageRequest, String language, String initial) {
-    PageResponse<I> result = repository.findByLanguageAndInitial(pageRequest, language, initial);
-    return result;
+      PageRequest pageRequest, String language, String initial) throws ServiceException {
+    try {
+      return repository.findByLanguageAndInitial(pageRequest, language, initial);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public PageResponse<Entity> findRelatedEntities(I identifiable, PageRequest pageRequest)
       throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      return repository.findRelatedEntities(identifiable, pageRequest);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public PageResponse<FileResource> findRelatedFileResources(
       I identifiable, PageRequest pageRequest) throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public I getByExample(I identifiable) throws ServiceException {
     try {
-      return repository.getByIdentifiable(identifiable);
+      return repository.findRelatedFileResources(identifiable, pageRequest);
     } catch (RepositoryException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
-  public I getByExampleAndFiltering(I uniqueObject, Filtering filtering) throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public I getByExampleAndLocale(I identifiable, Locale locale) throws ServiceException {
-    // getByIdentifier identifiable with all translations:
-    identifiable = getByIdentifiable(identifiable);
+    identifiable = getByExample(identifiable);
     return reduceMultilanguageFieldsToGivenLocale(identifiable, locale);
   }
 
   @Override
-  public I getByIdentifiable(I identifiable) throws ServiceException {
-    return repository.getByIdentifiable(identifiable);
+  public I getByIdentifier(Identifier identifier) throws ServiceException {
+    try {
+      return repository.getByIdentifier(identifier);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
-  public I getByIdentifier(Identifier identifier) {
-    return repository.getByIdentifier(identifier);
-  }
-
-  @Override
-  public List<Locale> getLanguages() {
-    return repository.getLanguages();
-  }
-
-  @Override
-  public List<I> getRandom(int count) throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<Entity> getRelatedEntities(UUID identifiableUuid) {
-    return repository.findRelatedEntities(identifiableUuid);
-  }
-
-  @Override
-  public List<FileResource> getRelatedFileResources(UUID identifiableUuid) {
-    return repository.findRelatedFileResources(identifiableUuid);
+  public List<Locale> getLanguages() throws ServiceException {
+    try {
+      return repository.getLanguages();
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   protected I reduceMultilanguageFieldsToGivenLocale(I identifiable, Locale locale) {
@@ -248,8 +188,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
 
     try {
       identifiable.setIdentifiers(
-          identifierService.saveForIdentifiable(
-              identifiable.getUuid(), identifiable.getIdentifiers()));
+          identifierService.saveForIdentifiable(identifiable, identifiable.getIdentifiers()));
     } catch (ServiceException e) {
       LOGGER.error(
           String.format(
@@ -283,49 +222,44 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   }
 
   @Override
-  public I save(I uniqueObject, boolean skipValidation)
-      throws ValidationException, ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public I save(I uniqueObject, Map<String, Object> bindings)
-      throws ValidationException, ServiceException {
-    // TODO Auto-generated method stub
-    return null;
+  protected void setDefaultSorting(PageRequest pageRequest) {
+    // business logic: default sorting if no other sorting given: label ascending
+    if (!pageRequest.hasSorting()) {
+      Sorting sorting = new Sorting(new Order(Direction.ASC, "label"));
+      pageRequest.setSorting(sorting);
+    }
   }
 
   @Override
   public List<Entity> setRelatedEntities(I identifiable, List<Entity> entities)
       throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<Entity> setRelatedEntities(UUID identifiableUuid, List<Entity> entities) {
-    return repository.setRelatedEntities(identifiableUuid, entities);
+    try {
+      return repository.setRelatedEntities(identifiable, entities);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public List<FileResource> setRelatedFileResources(
       I identifiable, List<FileResource> fileResources) throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public List<FileResource> setRelatedFileResources(
-      UUID identifiableUuid, List<FileResource> fileResources) {
-    return repository.setRelatedFileResources(identifiableUuid, fileResources);
+    try {
+      return repository.setRelatedFileResources(identifiable, fileResources);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
   public void update(I identifiable) throws ServiceException, ValidationException {
     validate(identifiable);
 
-    I identifiableInDb = repository.getByUuid(identifiable.getUuid());
+    I identifiableInDb;
+    try {
+      identifiableInDb = repository.getByUuid(identifiable.getUuid());
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
     if (identifiableInDb == null) {
       throw new ResourceNotFoundException(
           "No "
@@ -353,13 +287,17 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
               .collect(Collectors.toSet());
 
       if (!obsoleteIdentifiers.isEmpty()) {
-        identifierService.deleteByUuid(obsoleteIdentifiers);
+        try {
+          identifierService.delete(obsoleteIdentifiers);
+        } catch (ConflictException e) {
+          throw new ServiceException("Can not delete obsolete identifiers", e);
+        }
       }
 
       if (!missingIdentifiers.isEmpty()) {
         providedIdentifiers.removeAll(missingIdentifiers);
         Set<Identifier> savedIdentifiers =
-            identifierService.saveForIdentifiable(identifiable.getUuid(), missingIdentifiers);
+            identifierService.saveForIdentifiable(identifiable, missingIdentifiers);
         providedIdentifiers.addAll(savedIdentifiers);
       }
     } catch (ServiceException e) {
@@ -379,7 +317,11 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
       // UrlAliases
       IdentifiableUrlAliasAlignHelper.alignForUpdate(
           identifiable, identifiableInDb, cudamiConfig, urlAliasService::generateSlug);
-      urlAliasService.deleteByIdentifiable(identifiable.getUuid());
+      try {
+        urlAliasService.deleteByIdentifiable(identifiable);
+      } catch (ConflictException e) {
+        throw new ServiceException("Can not delete url alias by identifiable", e);
+      }
 
       // Validate again, because the default aliases insurance above can alter
       // the data
@@ -403,12 +345,6 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
       LOGGER.error("Error while updating URL aliases for " + identifiable, e);
       throw e;
     }
-  }
-
-  @Override
-  public I update(I uniqueObject, Map<String, Object> bindings) throws ServiceException {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   @Override

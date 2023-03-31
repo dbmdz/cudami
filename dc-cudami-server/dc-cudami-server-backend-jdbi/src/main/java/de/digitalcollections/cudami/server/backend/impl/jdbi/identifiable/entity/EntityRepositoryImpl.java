@@ -2,6 +2,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.EntityRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.entity.Entity;
@@ -41,14 +43,20 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
   public static final String TABLE_NAME = "entities";
 
   @Autowired
-  public EntityRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public EntityRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Entity.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   public EntityRepositoryImpl(
@@ -57,8 +65,18 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
       String tableAlias,
       String mappingPrefix,
       Class<? extends Entity> entityImplClass,
-      int offsetForAlternativePaging) {
-    super(dbi, tableName, tableAlias, mappingPrefix, entityImplClass, offsetForAlternativePaging);
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    super(
+        dbi,
+        tableName,
+        tableAlias,
+        mappingPrefix,
+        entityImplClass,
+        offsetForAlternativePaging,
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override
@@ -180,7 +198,10 @@ public class EntityRepositoryImpl<E extends Entity> extends IdentifiableReposito
     // An Entity might be a NamedEntity, too:
     jsonbFields.put(
         "name",
-        i -> i instanceof NamedEntity ne ? Optional.ofNullable(ne.getName()) : Optional.empty());
+        i ->
+            i instanceof NamedEntity
+                ? Optional.ofNullable(((NamedEntity) i).getName())
+                : Optional.empty());
     return jsonbFields;
   }
 

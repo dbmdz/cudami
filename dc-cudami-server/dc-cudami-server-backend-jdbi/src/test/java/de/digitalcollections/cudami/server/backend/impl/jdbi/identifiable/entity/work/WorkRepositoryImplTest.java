@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
@@ -46,6 +48,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The Work Repository")
 class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<WorkRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
   @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired LocalDateRangeMapper localDateRangeMapper;
   @Autowired TitleMapper titleMapper;
@@ -64,6 +68,8 @@ class WorkRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<Work
         new WorkRepositoryImpl(
             jdbi,
             cudamiConfig,
+            identifierRepository,
+            urlAliasRepository,
             localDateRangeMapper,
             titleMapper,
             entityRepository,

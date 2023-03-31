@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.relation.EntityToEntityRelationRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.semantic.SubjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.relation.PredicateRepository;
@@ -61,6 +63,8 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 class ManifestationRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<ManifestationRepositoryImpl> {
 
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
   @Autowired CorporateBodyRepositoryImpl corporateBodyRepository;
   @Autowired HumanSettlementRepositoryImpl humanSettlementRepository;
   @Autowired PredicateRepository predicateRepository;
@@ -80,6 +84,8 @@ class ManifestationRepositoryImplTest
         new ManifestationRepositoryImpl(
             jdbi,
             cudamiConfig,
+            identifierRepository,
+            urlAliasRepository,
             expressionTypeMapper,
             localDateRangeMapper,
             titleMapper,
@@ -203,7 +209,7 @@ class ManifestationRepositoryImplTest
     assertThat(actual.getLabel()).isEqualTo(manifestation.getLabel());
     assertThat(actual.getTitles()).size().isEqualTo(5);
     assertThat(actual.getTitles()).isEqualTo(manifestation.getTitles());
-    assertThat(actual.getParents()).isNull();
+    assertThat(actual.getParents()).isEmpty();
     assertThat(actual.getNavDate()).isNotNull();
     assertThat(actual.getNavDate()).isEqualTo(manifestation.getNavDate());
   }

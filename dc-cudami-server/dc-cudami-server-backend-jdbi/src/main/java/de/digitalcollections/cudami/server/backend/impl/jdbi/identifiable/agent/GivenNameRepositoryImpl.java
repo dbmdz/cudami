@@ -2,7 +2,9 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.agent
 
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.agent.GivenNameRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.IdentifiableRepositoryImpl;
 import de.digitalcollections.model.identifiable.agent.GivenName;
 import org.jdbi.v3.core.Jdbi;
@@ -20,14 +22,20 @@ public class GivenNameRepositoryImpl extends IdentifiableRepositoryImpl<GivenNam
   public static final String TABLE_ALIAS = "g";
   public static final String TABLE_NAME = "givennames";
 
-  public GivenNameRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
+  public GivenNameRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         GivenName.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   @Override

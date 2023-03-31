@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.entity.Event;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -19,6 +21,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
@@ -26,13 +29,14 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
     webEnvironment = WebEnvironment.MOCK,
     classes = {EventRepositoryImpl.class})
 @DisplayName("The Event Repository")
-class EventRepositoryImplTest extends AbstractRepositoryImplTest {
+class EventRepositoryImplTest extends AbstractIdentifiableRepositoryImplTest<EventRepositoryImpl> {
 
-  private EventRepositoryImpl eventRepository;
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
 
   @BeforeEach
   public void beforeEach() {
-    eventRepository = new EventRepositoryImpl(jdbi, cudamiConfig);
+    repo = new EventRepositoryImpl(jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
   }
 
   @Test
@@ -47,7 +51,7 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event event = Event.builder().label(label).name(label).build();
 
-    eventRepository.save(event);
+    repo.save(event);
 
     assertThat(event.getUuid()).isNotNull();
     assertThat(event.getCreated()).isNotNull();
@@ -55,7 +59,7 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
     assertThat(event.getLabel()).isEqualTo(label);
     assertThat(event.getName()).isEqualTo(label);
 
-    Event retrievedEvent = eventRepository.getByUuid(event.getUuid());
+    Event retrievedEvent = repo.getByUuid(event.getUuid());
 
     assertThat(retrievedEvent).isEqualTo(event);
   }
@@ -65,16 +69,15 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void saveAndDelete() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
-    eventRepository.save(savedEvent);
+    repo.save(savedEvent);
 
-    int affected = eventRepository.deleteByUuids(List.of(savedEvent.getUuid()));
+    int affected = repo.deleteByUuids(List.of(savedEvent.getUuid()));
     assertEquals(1, affected);
 
-    Event nonexistingEvent = eventRepository.getByUuid(savedEvent.getUuid());
+    Event nonexistingEvent = repo.getByUuid(savedEvent.getUuid());
     assertThat(nonexistingEvent).isNull();
 
-    affected =
-        eventRepository.deleteByUuids(List.of(savedEvent.getUuid())); // second attempt must fail!
+    affected = repo.deleteByUuids(List.of(savedEvent.getUuid())); // second attempt must fail!
     assertEquals(0, affected);
   }
 
@@ -83,13 +86,13 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void saveAndUpdate() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event event = Event.builder().label(label).name(label).build();
-    eventRepository.save(event);
+    repo.save(event);
 
     final LocalizedText newName = new LocalizedText(Locale.GERMAN, "aktualisierter Test");
     event.setName(newName);
-    eventRepository.update(event);
+    repo.update(event);
 
-    Event actual = eventRepository.getByUuid(event.getUuid());
+    Event actual = repo.getByUuid(event.getUuid());
 
     assertThat(actual).isEqualTo(event);
   }
@@ -99,10 +102,10 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void findAllPaged() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
-    eventRepository.save(savedEvent);
+    repo.save(savedEvent);
 
     PageResponse<Event> pageResponse =
-        eventRepository.find(PageRequest.builder().pageNumber(0).pageSize(99).build());
+        repo.find(PageRequest.builder().pageNumber(0).pageSize(99).build());
     assertThat(pageResponse.getContent()).containsExactly(savedEvent);
   }
 
@@ -111,14 +114,14 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void findAllPagedAndSorted() throws RepositoryException {
     final LocalizedText label1 = new LocalizedText(Locale.GERMAN, "Test 1");
     Event savedEvent1 = Event.builder().label(label1).name(label1).build();
-    eventRepository.save(savedEvent1);
+    repo.save(savedEvent1);
 
     final LocalizedText label2 = new LocalizedText(Locale.GERMAN, "Test 2");
     Event savedEvent2 = Event.builder().label(label2).name(label2).build();
-    eventRepository.save(savedEvent2);
+    repo.save(savedEvent2);
 
     PageResponse<Event> pageResponse =
-        eventRepository.find(
+        repo.find(
             PageRequest.builder()
                 .pageNumber(0)
                 .pageSize(99)
@@ -135,10 +138,10 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void findFiltered() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
-    eventRepository.save(savedEvent);
+    repo.save(savedEvent);
 
     PageResponse<Event> pageResponse =
-        eventRepository.find(
+        repo.find(
             PageRequest.builder()
                 .pageNumber(0)
                 .pageSize(99)
@@ -159,10 +162,10 @@ class EventRepositoryImplTest extends AbstractRepositoryImplTest {
   void noMatches() throws RepositoryException {
     final LocalizedText label = new LocalizedText(Locale.GERMAN, "Test");
     Event savedEvent = Event.builder().label(label).name(label).build();
-    eventRepository.save(savedEvent);
+    repo.save(savedEvent);
 
     PageResponse<Event> pageResponse =
-        eventRepository.find(
+        repo.find(
             PageRequest.builder()
                 .pageNumber(0)
                 .pageSize(99)

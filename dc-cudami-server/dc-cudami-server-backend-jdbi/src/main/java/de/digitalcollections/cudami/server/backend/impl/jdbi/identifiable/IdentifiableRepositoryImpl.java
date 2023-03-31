@@ -5,6 +5,8 @@ import static de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
@@ -67,15 +69,24 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_ALIAS = "i";
   public static final String TABLE_NAME = "identifiables";
 
+  private final IdentifierRepository identifierRepository;
+  private final UrlAliasRepository urlAliasRepository;
+
   @Autowired
-  protected IdentifiableRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
-    super(
+  protected IdentifiableRepositoryImpl(
+      Jdbi dbi,
+      CudamiConfig cudamiConfig,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
+    this(
         dbi,
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
         Identifiable.class,
-        cudamiConfig.getOffsetForAlternativePaging());
+        cudamiConfig.getOffsetForAlternativePaging(),
+        identifierRepository,
+        urlAliasRepository);
   }
 
   protected IdentifiableRepositoryImpl(
@@ -84,7 +95,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       String tableAlias,
       String mappingPrefix,
       Class<? extends Identifiable> identifiableImplClass,
-      int offsetForAlternativePaging) {
+      int offsetForAlternativePaging,
+      IdentifierRepository identifierRepository,
+      UrlAliasRepository urlAliasRepository) {
     super(
         dbi,
         tableName,
@@ -92,6 +105,9 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         mappingPrefix,
         identifiableImplClass,
         offsetForAlternativePaging);
+
+    this.identifierRepository = identifierRepository;
+    this.urlAliasRepository = urlAliasRepository;
 
     // register row mapper for given class and mapping prefix
     // (until now everywhere BeanMapper.factory... was used. If this changes, row
@@ -202,16 +218,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     for (UUID identifiableUuid : identifiablesUuids) {
       try {
         deleteIdentifiers(identifiableUuid);
-      } catch (ServiceException e) {
-        throw new ServiceException("Error while removing Identifiers. Rollback.", e);
+      } catch (RepositoryException e) {
+        throw new RepositoryException("Error while removing Identifiers. Rollback.", e);
       }
       try {
-        urlAliasService.deleteByIdentifiable(identifiableUuid, true);
-      } catch (ServiceException e) {
-        throw new ServiceException("Error while removing UrlAliases. Rollback.", e);
+        urlAliasRepository.deleteByIdentifiable(identifiableUuid, true);
+      } catch (RepositoryException e) {
+        throw new RepositoryException("Error while removing UrlAliases. Rollback.", e);
       }
     }
-    return deleteByUuid(identifiablesUuids);
+    return super.deleteByUuids(identifiablesUuids);
   }
 
   private boolean deleteIdentifiers(UUID identifiableUuid) throws RepositoryException {
@@ -219,7 +235,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     if (identifiable == null || identifiable.getIdentifiers() == null) {
       return false;
     }
-    identifierService.deleteByUuid(identifiable.getIdentifiers());
+    identifierRepository.delete(identifiable.getIdentifiers());
     return true;
   }
 

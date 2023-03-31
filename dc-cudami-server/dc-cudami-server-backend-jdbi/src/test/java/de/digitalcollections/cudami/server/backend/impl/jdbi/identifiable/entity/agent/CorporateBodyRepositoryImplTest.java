@@ -3,6 +3,8 @@ package de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entit
 import static org.assertj.core.api.Assertions.assertThat;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiableRepositoryImplTest;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -17,6 +19,7 @@ import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
@@ -26,10 +29,14 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 @DisplayName("The CorporateBody Repository")
 class CorporateBodyRepositoryImplTest
     extends AbstractIdentifiableRepositoryImplTest<CorporateBodyRepositoryImpl> {
+  @Autowired private IdentifierRepository identifierRepository;
+  @Autowired private UrlAliasRepository urlAliasRepository;
 
   @BeforeEach
   public void beforeEach() {
-    repo = new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+    repo =
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
   }
 
   @Test
@@ -75,7 +82,8 @@ class CorporateBodyRepositoryImplTest
             .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
 
     CorporateBody actual = corporateBodyRepository.getByUuid(creator.getUuid());
@@ -94,7 +102,8 @@ class CorporateBodyRepositoryImplTest
             .build();
 
     CorporateBodyRepositoryImpl corporateBodyRepository =
-        new CorporateBodyRepositoryImpl(jdbi, cudamiConfig);
+        new CorporateBodyRepositoryImpl(
+            jdbi, cudamiConfig, identifierRepository, urlAliasRepository);
     corporateBodyRepository.save(creator);
     PageResponse<CorporateBody> byName =
         corporateBodyRepository.find(

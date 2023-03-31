@@ -5,6 +5,7 @@ import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.Filtering;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,7 +33,7 @@ public interface UniqueObjectRepository<U extends UniqueObject>
    * @return count of removed datasets
    * @throws RepositoryException
    */
-  default int delete(List<U> uniqueObjects) throws RepositoryException {
+  default int delete(Set<U> uniqueObjects) throws RepositoryException {
     if (uniqueObjects == null) {
       throw new IllegalArgumentException("delete failed: given object must not be null");
     }
