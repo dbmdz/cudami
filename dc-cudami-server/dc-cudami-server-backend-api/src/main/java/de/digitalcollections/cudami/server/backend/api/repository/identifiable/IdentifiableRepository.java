@@ -71,9 +71,6 @@ public interface IdentifiableRepository<I extends Identifiable> extends UniqueOb
     if (identifier == null) {
       throw new IllegalArgumentException("get failed: given identifier must not be null");
     }
-    if (identifier.getIdentifiable() != null) {
-      return getByUuid(identifier.getIdentifiable());
-    }
     return getByIdentifier(identifier.getNamespace(), identifier.getId());
   }
 

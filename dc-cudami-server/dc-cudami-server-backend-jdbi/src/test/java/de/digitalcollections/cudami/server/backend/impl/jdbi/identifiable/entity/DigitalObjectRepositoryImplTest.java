@@ -316,26 +316,23 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName("returns all identifiers for a DigitalObject")
   void returnIdentifiers() throws RepositoryException {
-    // Step1: Create the DigitalObject
+    // Step1: Create and persist a DigitalObject with two identifiers
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
+    Identifier identifier1 = new Identifier("namespace1", "1");
+    digitalObject.addIdentifier(identifier1);
+    Identifier identifier2 = new Identifier("namespace2", "2");
+    digitalObject.addIdentifier(identifier2);
     repo.save(digitalObject);
 
-    // Step2: Create the identifiers and connect with with the DigitalObject
-    Identifier identifier1 = new Identifier(digitalObject.getUuid(), "namespace1", "1");
-    identifierRepositoryImpl.save(identifier1);
-    Identifier identifier2 = new Identifier(digitalObject.getUuid(), "namespace2", "2");
-    identifierRepositoryImpl.save(identifier2);
-
-    // Step3: Create and persist an identifier for another DigitalObject
+    // Step2: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
         DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
+    otherDigitalObject.addIdentifier(new Identifier("namespace1", "other"));
     repo.save(otherDigitalObject);
-    identifierRepositoryImpl.save(
-        new Identifier(otherDigitalObject.getUuid(), "namespace1", "other"));
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
-    Identifier demandedIdentifier = new Identifier(null, "namespace1", "1");
+    Identifier demandedIdentifier = new Identifier("namespace1", "1");
     DigitalObject actual = repo.getByIdentifier(demandedIdentifier);
 
     assertThat(actual.getIdentifiers()).containsExactly(identifier1, identifier2);
@@ -344,17 +341,17 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName("can return null, when getByIdentifier finds no DigitalObject")
   void returnNullByGetByIdentifier() throws RepositoryException {
-    assertThat(repo.getByIdentifier(new Identifier(null, "namespace", "nonexisting"))).isNull();
+    assertThat(repo.getByIdentifier(new Identifier("namespace", "nonexisting"))).isNull();
   }
 
   @Test
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
+    digitalObject.addIdentifier(new Identifier("namespace", "key"));
     repo.save(digitalObject);
-    identifierRepositoryImpl.save(new Identifier(digitalObject.getUuid(), "namespace", "key"));
 
-    DigitalObject actual = repo.getByIdentifier(new Identifier(null, "namespace", "key"));
+    DigitalObject actual = repo.getByIdentifier(new Identifier("namespace", "key"));
 
     CreationInfo actualCreationInfo = actual.getCreationInfo();
     assertThat(actualCreationInfo).isNotNull();

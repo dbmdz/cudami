@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Servi
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractUniqueObjectServiceImplTest;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The Identifier Service")
-public class IdentifierServiceImplTest {
+public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   private IdentifierService service;
   private IdentifierRepository repo;

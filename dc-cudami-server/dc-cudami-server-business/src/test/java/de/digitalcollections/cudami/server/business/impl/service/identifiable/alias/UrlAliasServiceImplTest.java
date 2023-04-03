@@ -12,6 +12,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
 import de.digitalcollections.commons.web.SlugGenerator;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
@@ -19,6 +32,8 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.impl.service.AbstractServiceImplTest;
+import de.digitalcollections.cudami.server.business.impl.service.AbstractUniqueObjectServiceImplTest;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
@@ -26,19 +41,9 @@ import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 @DisplayName("The UrlAliasService implementation")
-class UrlAliasServiceImplTest extends AbstractServiceImplTest {
+class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   private LocaleService localeService;
 
@@ -46,18 +51,6 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   private UrlAliasServiceImpl service;
 
   private SlugGenerator slugGenerator;
-
-  @BeforeEach
-  public void beforeEach() throws Exception {
-    super.beforeEach();
-    repo = mock(UrlAliasRepository.class);
-    localeService = mock(LocaleService.class);
-    when(localeService.getDefaultLanguage()).thenReturn("en");
-    when(localeService.getDefaultLocale()).thenReturn(Locale.ENGLISH);
-    slugGenerator = mock(SlugGenerator.class);
-    when(slugGenerator.generateSlug(any(String.class))).thenReturn("slug");
-    service = new UrlAliasServiceImpl(repo, slugGenerator, localeService);
-  }
 
   @DisplayName("can successfully validate an empty LocalizedUrlAlias")
   @Test
@@ -101,6 +94,18 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
     localizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", true, UUID.randomUUID(), UUID.randomUUID()));
     service.validate(localizedUrlAliases);
+  }
+
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    super.beforeEach();
+    repo = mock(UrlAliasRepository.class);
+    localeService = mock(LocaleService.class);
+    when(localeService.getDefaultLanguage()).thenReturn("en");
+    when(localeService.getDefaultLocale()).thenReturn(Locale.ENGLISH);
+    slugGenerator = mock(SlugGenerator.class);
+    when(slugGenerator.generateSlug(any(String.class))).thenReturn("slug");
+    service = new UrlAliasServiceImpl(repo, slugGenerator, localeService);
   }
 
   @DisplayName("checkPublication does not override an existing publication date")
@@ -195,58 +200,22 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
         });
   }
 
-  // -------------------------------------------------------------------------
-  private UrlAlias createUrlAlias(
-      String slug,
-      boolean setUuid,
-      String language,
-      boolean primary,
-      UUID targetUuid,
-      UUID websiteUuid) {
-    UrlAlias urlAlias = new UrlAlias();
-    if (setUuid) {
-      urlAlias.setUuid(UUID.randomUUID());
-    }
-    urlAlias.setPrimary(primary);
-    urlAlias.setTargetUuid(targetUuid);
-    urlAlias.setSlug(slug);
-    urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
-    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
-    urlAlias.setLastPublished(LocalDateTime.now());
-    urlAlias.setCreated(LocalDateTime.now());
-    urlAlias.setTargetLanguage(Locale.forLanguageTag(language));
-    urlAlias.setWebsite(createWebsite(websiteUuid));
-    return urlAlias;
-  }
-
-  private Website createWebsite(UUID uuid) {
-    Website website = new Website();
-    website.setUuid(uuid);
-    String dummyUrl = "http://" + uuid + "/";
-    try {
-      website.setUrl(new URL(dummyUrl));
-    } catch (MalformedURLException e) {
-      throw new RuntimeException("Cannot create dummy URL=" + dummyUrl + ": " + e, e);
-    }
-    return website;
-  }
-
   @DisplayName("deleteForTarget with force deletes everything")
   @Test
   public void deleteForTargetWithForce() throws ServiceException, RepositoryException {
-    UUID targetUuid = UUID.randomUUID();
+    Identifiable targetIdentifiable = createIdentifiable();
     LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
     targetLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
 
-    when(repo.getByIdentifiable(eq(targetUuid))).thenReturn(targetLocalizedUrlAliases);
-    when(repo.delete(any(List.class))).thenReturn(1);
+    when(repo.getByIdentifiable(eq(targetIdentifiable))).thenReturn(targetLocalizedUrlAliases);
+    when(repo.delete(any(Set.class))).thenReturn(1);
 
-    assertThat(service.deleteAllForTarget(targetUuid, true)).isTrue();
+    assertThat(service.deleteByIdentifiable(targetIdentifiable, true)).isTrue();
 
-    ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    verify(repo, times(1)).delete(listArgumentCaptor.capture());
-    assertThat(listArgumentCaptor.getValue()).hasSize(1);
+    ArgumentCaptor<Set> setArgumentCaptor = ArgumentCaptor.forClass(Set.class);
+    verify(repo, times(1)).delete(setArgumentCaptor.capture());
+    assertThat(setArgumentCaptor.getValue()).hasSize(1);
   }
 
   @DisplayName("deleteForTarget with unset uuid deletes nothing and returns false")
@@ -256,38 +225,39 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
     verify(repo, never()).deleteByUuid(any());
   }
 
-  @DisplayName("returns false, when no single UrlAlias of a list could be deleted")
-  @Test
-  public void deleteNoUrlAliasesAtAll() throws ServiceException, RepositoryException {
-    when(repo.delete(any(List.class))).thenReturn(0);
-
-    assertThat(service.delete(List.of(UUID.randomUUID(), UUID.randomUUID()))).isFalse();
-  }
-
   @DisplayName("returns false when trying to delete a nonexistant UrlAlias by its uuid")
   @Test
   public void deleteNonexistantSingleUrlAlias() throws ServiceException, RepositoryException {
+    Identifiable targetIdentifiable = createIdentifiable();
     when(repo.getByUuid(any(UUID.class))).thenReturn(null);
 
-    assertThat(service.deleteByUuid(UUID.randomUUID())).isFalse();
+    assertThat(service.deleteByIdentifiable(targetIdentifiable)).isFalse();
+  }
+
+  @DisplayName("returns 0, when no single UrlAlias of a list could be deleted")
+  @Test
+  public void deleteNoUrlAliasesAtAll() throws ServiceException, RepositoryException {
+    when(repo.delete(any(Set.class))).thenReturn(0);
+
+    assertThat(service.delete(Set.of(createUrlAlias(), createUrlAlias())) == 0);
   }
 
   @DisplayName("returns true when an existant UrlAlias could be deleted")
   @Test
   public void deleteSingleUrlAlias() throws ServiceException, RepositoryException {
-    when(repo.delete(any(List.class))).thenReturn(1);
+    when(repo.delete(any(Set.class))).thenReturn(1);
 
-    assertThat(service.deleteByUuid(UUID.randomUUID())).isTrue();
+    assertThat(service.delete(createUrlAlias())).isTrue();
   }
 
-  @DisplayName("returns true, when at least one UrlAlias of a list could be deleted")
+  @DisplayName("returns > 0, when at least one UrlAlias of a list could be deleted")
   @Test
   public void deleteSomeUrlAliases() throws ServiceException, RepositoryException {
-    UUID uuid1 = UUID.randomUUID();
-    UUID uuid2 = UUID.randomUUID();
-    when(repo.deleteByUuid(eq(List.of(uuid1, uuid2)))).thenReturn(1);
+    UrlAlias alias1 = createUrlAlias();
+    UrlAlias alias2 = createUrlAlias();
+    when(repo.delete(eq(Set.of(alias1, alias2)))).thenReturn(1);
 
-    assertThat(service.delete(List.of(uuid1, uuid2))).isTrue();
+    assertThat(service.delete(Set.of(alias1, alias2)) > 0);
   }
 
   @DisplayName("filters according target language, when it exists")
@@ -354,13 +324,13 @@ class UrlAliasServiceImplTest extends AbstractServiceImplTest {
   @DisplayName("retrieve primary links of a target as List<UrlAlias>")
   @Test
   public void findPrimaryLinksForTarget() throws ServiceException, RepositoryException {
-    UUID targetUuid = UUID.randomUUID();
-    UrlAlias ua1 = createUrlAlias("slug1", true, "de", true, targetUuid, null);
-    UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, targetUuid, null);
-    UrlAlias ua3 = createUrlAlias("npslug", true, "de", false, targetUuid, null);
+    Identifiable target = createIdentifiable();
+    UrlAlias ua1 = createUrlAlias("slug1", true, "de", true, target.getUuid(), null);
+    UrlAlias ua2 = createUrlAlias("slug2", true, "en", true, target.getUuid(), null);
+    UrlAlias ua3 = createUrlAlias("npslug", true, "de", false, target.getUuid(), null);
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(ua1, ua2, ua3);
-    when(repo.getByIdentifiable(eq(targetUuid))).thenReturn(localizedUrlAliases);
-    assertThat(service.getPrimaryUrlAliasesByIdentifiable(targetUuid))
+    when(repo.getByIdentifiable(eq(target))).thenReturn(localizedUrlAliases);
+    assertThat(service.getPrimaryUrlAliasesByIdentifiable(target))
         .containsAll(List.of(ua1, ua2));
   }
 

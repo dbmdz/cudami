@@ -5,6 +5,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.exceptions.Rep
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface IdentifierRepository extends UniqueObjectRepository<Identifier> {
@@ -34,4 +35,13 @@ public interface IdentifierRepository extends UniqueObjectRepository<Identifier>
     }
     return getByUuid(identifier.getUuid());
   }
+
+  @Override
+  default void save(Identifier uniqueObject) throws RepositoryException {
+    throw new UnsupportedOperationException(
+        "saving without related Identifiable not supported - use saveForIdentifiable instead.");
+  }
+
+  Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
+      throws RepositoryException;
 }

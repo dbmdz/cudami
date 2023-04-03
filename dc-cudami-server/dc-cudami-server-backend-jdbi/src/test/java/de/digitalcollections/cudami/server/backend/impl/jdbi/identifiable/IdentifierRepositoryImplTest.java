@@ -53,14 +53,13 @@ class IdentifierRepositoryImplTest {
   @Test
   @DisplayName("can save and return the saved object")
   void checkSave() throws RepositoryException {
-    UUID identifiableUuid = UUID.randomUUID();
-    saveIdentifiable(identifiableUuid);
-    Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
+    Webpage webpage = createWebpage();
+    Identifier identifier = new Identifier("namespace", "id");
+    webpage.addIdentifier(identifier);
+    webpageRepository.save(webpage);
 
-    repo.save(identifier);
     Identifier persisted = repo.getByUuid(identifier.getUuid());
-    assertThat(persisted.getUuid()).isNotNull();
-    assertThat(persisted.getIdentifiable()).isEqualTo(identifiableUuid);
+    assertThat(persisted.isPersisted()).isTrue();
     assertThat(persisted.getNamespace()).isEqualTo("namespace");
     assertThat(persisted.getId()).isEqualTo("id");
   }
@@ -74,14 +73,14 @@ class IdentifierRepositoryImplTest {
   @Test
   @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
   void identifiersForIdentifiable() throws RepositoryException {
-    UUID identifiableUuid = UUID.randomUUID();
-    saveIdentifiable(identifiableUuid);
-    Identifier identifier1 = new Identifier(identifiableUuid, "namespace", "1");
-    Identifier identifier2 = new Identifier(identifiableUuid, "namespace", "2");
-    repo.save(identifier1);
-    repo.save(identifier2);
+    Webpage webpage = createWebpage();
+    Identifier identifier1 = new Identifier("namespace", "1");
+    Identifier identifier2 = new Identifier("namespace", "2");
+    webpage.addIdentifier(identifier1);
+    webpage.addIdentifier(identifier2);
+    webpageRepository.save(webpage);
 
-    List<Identifier> actual = repo.findByIdentifiable(identifiableUuid);
+    List<Identifier> actual = repo.findByIdentifiable(webpage);
     assertThat(actual).hasSize(2);
     assertThat(actual).containsExactly(identifier1, identifier2);
   }
@@ -89,12 +88,10 @@ class IdentifierRepositoryImplTest {
   @Test
   @DisplayName("can return an identifier by its uuid")
   void getByUuid() throws RepositoryException {
-    // Persist an identifier
-    UUID identifiableUuid = UUID.randomUUID();
-    saveIdentifiable(identifiableUuid);
-    Identifier identifier = new Identifier(identifiableUuid, "namespace", "id");
-
-    repo.save(identifier);
+    Webpage webpage = createWebpage();
+    Identifier identifier = new Identifier("namespace", "id");
+    webpage.addIdentifier(identifier);
+    webpageRepository.save(webpage);
 
     UUID identifierUuid = identifier.getUuid();
     assertThat(identifierUuid).isNotNull();
@@ -104,12 +101,13 @@ class IdentifierRepositoryImplTest {
     assertThat(actual).isEqualTo(identifier);
   }
 
-  private void saveIdentifiable(UUID uuid) throws RepositoryException {
+  private Webpage createWebpage() {
+    UUID uuid = UUID.randomUUID();
     Webpage webpage =
         Webpage.builder()
             .label(Locale.GERMAN, String.valueOf(uuid.getMostSignificantBits()))
             .uuid(uuid)
             .build();
-    webpageRepository.save(webpage);
+    return webpage;
   }
 }

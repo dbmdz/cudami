@@ -6,6 +6,9 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
@@ -450,6 +453,14 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     throw new UnsupportedOperationException(); // TODO: not yet implemented
   }
 
+  private Map<String, Object> getSpecialBindings(UrlAlias urlAlias) {
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("targetIdentifiableObjectType", urlAlias.getTarget().getIdentifiableObjectType());
+    bindings.put("targetIdentifiableType", urlAlias.getTarget().getType());
+    bindings.put("targetUuid", urlAlias.getTarget().getUuid());
+    return bindings;
+  }
+
   @Override
   public boolean hasUrlAlias(String slug, UUID websiteUuid, Locale targetLanguage)
       throws RepositoryException {
@@ -495,6 +506,16 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
         map.compute(
             row.getColumn(mappingPrefix + "_uuid", UUID.class),
             (uuid, urlAlias) -> urlAlias != null ? urlAlias : row.getRow(UrlAlias.class));
+    if (alias != null && row.getColumn(mappingPrefix + "_targetuuid", UUID.class) != null) {
+      Identifiable target = new Identifiable();
+      target.setIdentifiableObjectType(
+          row.getColumn(
+              mappingPrefix + "_targetidentifiableobjecttype", IdentifiableObjectType.class));
+      target.setType(
+          row.getColumn(mappingPrefix + "_targetidentifiabletype", IdentifiableType.class));
+      target.setUuid(row.getColumn(mappingPrefix + "_targetuuid", UUID.class));
+      alias.setTarget(target);
+    }
     if (alias != null && row.getColumn(WEBSITESALIAS + "_uuid", UUID.class) != null) {
       Website website = new Website(row.getColumn(WEBSITESALIAS + "_url", URL.class));
       website.setUuid(row.getColumn(WEBSITESALIAS + "_uuid", UUID.class));
@@ -514,6 +535,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     if (urlAlias.getCreated() == null) {
       urlAlias.setCreated(LocalDateTime.now());
     }
+
     String sql =
         "INSERT INTO "
             + tableName
@@ -526,6 +548,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
       dbi.useHandle(
           h ->
               h.createUpdate(sql)
+                  .bindMap(getSpecialBindings(urlAlias))
                   .bindBean(urlAlias)
                   .bind("websiteUuid", extractWebsiteUuid(urlAlias))
                   .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
@@ -556,6 +579,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
           dbi.withHandle(
               h ->
                   h.createUpdate(sql)
+                      .bindMap(getSpecialBindings(urlAlias))
                       .bindBean(urlAlias)
                       .bind("websiteUuid", extractWebsiteUuid(urlAlias))
                       .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))

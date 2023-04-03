@@ -4,11 +4,14 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
+import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
@@ -20,10 +23,18 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
     implements IdentifierRepository {
 
   public static final String MAPPING_PREFIX = "id";
+  private static IdentifierRepositoryImpl SINGLETON_INSTANCE = new IdentifierRepositoryImpl();
   public static final String TABLE_ALIAS = "id";
+
   public static final String TABLE_NAME = "identifiers";
 
-  private static IdentifierRepositoryImpl SINGLETON_INSTANCE = new IdentifierRepositoryImpl();
+  public static String getSqlSelectAllFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
+  }
+
+  public static String getSqlSelectReducedFieldsStatic() {
+    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
+  }
 
   /**
    * constructor for static methods to make access possible to instance fields that do not use
@@ -117,10 +128,6 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
     return getSqlSelectReducedFields(tableAlias, mappingPrefix);
   }
 
-  public static String getSqlSelectAllFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectAllFields(TABLE_ALIAS, MAPPING_PREFIX);
-  }
-
   @Override
   protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
     return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
@@ -139,16 +146,33 @@ public class IdentifierRepositoryImpl extends UniqueObjectRepositoryImpl<Identif
         + "_id";
   }
 
-  public static String getSqlSelectReducedFieldsStatic() {
-    return SINGLETON_INSTANCE.getSqlSelectReducedFields(TABLE_ALIAS, MAPPING_PREFIX);
-  }
-
   @Override
   protected String getSqlUpdateFieldValues() {
     // do not update/left out from statement (not changed since insert):
     // uuid, created
     return super.getSqlUpdateFieldValues()
         + ", identifiable=:identifiable, namespace=:namespace, identifier=:id";
+  }
+
+  @Override
+  public Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
+      throws RepositoryException {
+    if (identifiers == null) {
+      return new HashSet<>(0);
+    }
+    Set<Identifier> savedIdentifiers = new HashSet<>(identifiers.size());
+    for (Identifier identifier : identifiers) {
+      if (identifier.getUuid() == null) {
+        Map<String, Object> bindings = new HashMap<>();
+        bindings.put("identifiable", identifiable.getUuid());
+        save(identifier, bindings);
+        savedIdentifiers.add(identifier);
+      } else {
+        Identifier dbIdentifier = getByUuid(identifier.getUuid());
+        savedIdentifiers.add(dbIdentifier);
+      }
+    }
+    return savedIdentifiers;
   }
 
   @Override

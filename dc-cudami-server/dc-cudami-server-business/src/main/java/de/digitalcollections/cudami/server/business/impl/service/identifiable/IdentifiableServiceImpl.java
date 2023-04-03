@@ -26,8 +26,6 @@ import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -187,18 +185,6 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     }
 
     try {
-      identifiable.setIdentifiers(
-          identifierService.saveForIdentifiable(identifiable, identifiable.getIdentifiers()));
-    } catch (ServiceException e) {
-      LOGGER.error(
-          String.format(
-              "Cannot save Identifiers %s: %s for %s",
-              identifiable.getIdentifiers(), e.getMessage(), identifiable),
-          e);
-      throw e;
-    }
-
-    try {
       IdentifiableUrlAliasAlignHelper.checkDefaultAliases(
           identifiable, cudamiConfig, urlAliasService::generateSlug);
       urlAliasService.validate(identifiable.getLocalizedUrlAliases());
@@ -209,7 +195,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
           // the targetUuid must be set at this point
-          urlAlias.setTargetUuid(identifiable.getUuid());
+          urlAlias.setTarget(identifiable);
           urlAliasService.save(urlAlias);
           savedUrlAliases.add(urlAlias);
         }
@@ -254,6 +240,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
   public void update(I identifiable) throws ServiceException, ValidationException {
     validate(identifiable);
 
+    // get actual status of identifiable from repo
     I identifiableFromRepo;
     try {
       identifiableFromRepo = repository.getByUuid(identifiable.getUuid());
@@ -268,46 +255,14 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
               + identifiable.getUuid());
     }
 
+    // update identifiable
     try {
       repository.update(identifiable);
     } catch (RepositoryException e) {
       throw new ServiceException("Cannot update identifiable " + identifiable + ": " + e, e);
     }
 
-    try {
-      Set<Identifier> existingIdentifiers = identifiableFromRepo.getIdentifiers();
-      Set<Identifier> providedIdentifiers = identifiable.getIdentifiers();
-      Set<Identifier> obsoleteIdentifiers =
-          existingIdentifiers.stream()
-              .filter(i -> !providedIdentifiers.contains(i))
-              .collect(Collectors.toSet());
-      Set<Identifier> missingIdentifiers =
-          providedIdentifiers.stream()
-              .filter(i -> !existingIdentifiers.contains(i))
-              .collect(Collectors.toSet());
-
-      if (!obsoleteIdentifiers.isEmpty()) {
-        try {
-          identifierService.delete(obsoleteIdentifiers);
-        } catch (ConflictException e) {
-          throw new ServiceException("Can not delete obsolete identifiers", e);
-        }
-      }
-
-      if (!missingIdentifiers.isEmpty()) {
-        providedIdentifiers.removeAll(missingIdentifiers);
-        Set<Identifier> savedIdentifiers =
-            identifierService.saveForIdentifiable(identifiable, missingIdentifiers);
-        providedIdentifiers.addAll(savedIdentifiers);
-      }
-    } catch (ServiceException e) {
-      LOGGER.error(
-          String.format(
-              "Cannot save Identifiers %s: %s for %s",
-              identifiable.getIdentifiers(), e.getMessage(), identifiable),
-          e);
-      throw e;
-    }
+    // update localized url aliases
     try {
       // If we do not want any UrlAliases for this kind of identifiable, we return early
       if (IdentifiableUrlAliasAlignHelper.checkIdentifiableExcluded(identifiable, cudamiConfig)) {

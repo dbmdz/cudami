@@ -1,5 +1,13 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -9,22 +17,14 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierService")
-@Transactional(rollbackFor = {Exception.class})
+@Transactional(rollbackFor = { Exception.class })
 public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, IdentifierRepository>
     implements IdentifierService {
   private final IdentifierTypeService identifierTypeService;
 
-  public IdentifierServiceImpl(
-      IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
+  public IdentifierServiceImpl(IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
     super(identifierRepository);
     this.identifierTypeService = identifierTypeService;
   }
@@ -43,33 +43,18 @@ public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, I
     try {
       return repository.findByIdentifiable(identifiable);
     } catch (RepositoryException e) {
-      throw new ServiceException(e);
+      throw new ServiceException("Backend failure", e);
     }
   }
 
   @Override
   public Set<Identifier> saveForIdentifiable(Identifiable identifiable, Set<Identifier> identifiers)
       throws ServiceException {
-    if (identifiers == null) {
-      return new HashSet<>(0);
+    try {
+      return repository.saveForIdentifiable(identifiable, identifiers);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    Set<Identifier> savedIdentifiers = new HashSet<>(identifiers.size());
-    for (Identifier identifier : identifiers) {
-      try {
-        // TODO: model should not work with uuid. Identifiable should be the type!
-        identifier.setIdentifiable(identifiable.getUuid());
-        if (identifier.getUuid() == null) {
-          repository.save(identifier);
-          savedIdentifiers.add(identifier);
-        } else {
-          Identifier dbIdentifier = repository.getByUuid(identifier.getUuid());
-          savedIdentifiers.add(dbIdentifier);
-        }
-      } catch (RepositoryException e) {
-        throw new ServiceException("Cannot save identifier " + identifier + ": " + e, e);
-      }
-    }
-    return savedIdentifiers;
   }
 
   @Override
@@ -102,10 +87,7 @@ public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, I
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
       return;
     }
-    throw new ValidationException(
-        "Validation of identifiers failed: namespacesNotFound="
-            + namespacesNotFound
-            + ", idsNotMatchingPattern="
-            + idsNotMatchingPattern);
+    throw new ValidationException("Validation of identifiers failed: namespacesNotFound=" + namespacesNotFound
+        + ", idsNotMatchingPattern=" + idsNotMatchingPattern);
   }
 }

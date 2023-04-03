@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -723,6 +724,19 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
     super.save(identifiable, bindings, sqlModifier);
+
+    // save Identifiers
+    try {
+      identifiable.setIdentifiers(
+          identifierRepository.saveForIdentifiable(identifiable, identifiable.getIdentifiers()));
+    } catch (RepositoryException e) {
+      LOGGER.error(
+          String.format(
+              "Cannot save Identifiers %s: %s for %s",
+              identifiable.getIdentifiers(), e.getMessage(), identifiable),
+          e);
+      throw e;
+    }
   }
 
   private void setIdentifiersFromRowView(RowView rowView, I identifiable) {
@@ -888,8 +902,46 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     bindings.put("tags_uuids", extractUuids(identifiable.getTags()));
     bindings.put("subjects_uuids", extractUuids(identifiable.getSubjects()));
 
+    I identifiableFromRepo = getByUuid(identifiable.getUuid());
+
     super.update(identifiable, bindings, sqlModifier);
     // do not update/left out from statement (not changed since insert):
     // uuid, created, identifiable_type, identifiable_objecttype, refid
+
+    // update list of identifiers
+    try {
+      Set<Identifier> existingIdentifiers = identifiableFromRepo.getIdentifiers();
+      Set<Identifier> providedIdentifiers = identifiable.getIdentifiers();
+      Set<Identifier> obsoleteIdentifiers =
+          existingIdentifiers.stream()
+              .filter(i -> !providedIdentifiers.contains(i))
+              .collect(Collectors.toSet());
+      Set<Identifier> missingIdentifiers =
+          providedIdentifiers.stream()
+              .filter(i -> !existingIdentifiers.contains(i))
+              .collect(Collectors.toSet());
+
+      if (!obsoleteIdentifiers.isEmpty()) {
+        try {
+          identifierRepository.delete(obsoleteIdentifiers);
+        } catch (RepositoryException e) {
+          throw new RepositoryException("Can not delete obsolete identifiers", e);
+        }
+      }
+
+      if (!missingIdentifiers.isEmpty()) {
+        providedIdentifiers.removeAll(missingIdentifiers);
+        Set<Identifier> savedIdentifiers =
+            identifierRepository.saveForIdentifiable(identifiable, missingIdentifiers);
+        providedIdentifiers.addAll(savedIdentifiers);
+      }
+    } catch (RepositoryException e) {
+      LOGGER.error(
+          String.format(
+              "Cannot save Identifiers %s: %s for %s",
+              identifiable.getIdentifiers(), e.getMessage(), identifiable),
+          e);
+      throw e;
+    }
   }
 }

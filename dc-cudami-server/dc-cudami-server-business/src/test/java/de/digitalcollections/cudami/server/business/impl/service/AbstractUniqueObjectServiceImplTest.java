@@ -7,6 +7,14 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.UniqueObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -14,21 +22,14 @@ import de.digitalcollections.cudami.server.business.api.service.UniqueObjectServ
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.model.UniqueObject;
-import java.util.Set;
-import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-@DisplayName("The Identifiable Service")
-class AbstractUniqueObjectServiceImplTest {
+public abstract class AbstractUniqueObjectServiceImplTest extends AbstractServiceImplTest {
 
   protected UniqueObjectRepository repo;
   protected UniqueObjectService service;
 
   @BeforeEach
-  public void beforeEach() throws ServiceException {
+  public void beforeEach() throws ServiceException, Exception {
     repo = mock(UniqueObjectRepository.class);
     CudamiConfig cudamiConfig = Mockito.mock(CudamiConfig.class);
     when(cudamiConfig.getOffsetForAlternativePaging()).thenReturn(5000);
@@ -44,7 +45,7 @@ class AbstractUniqueObjectServiceImplTest {
   @DisplayName(
       "throws an exception to trigger the rollback, when an exception during deletion happens")
   @Test
-  public void throwExceptionWhenDeletionFails() throws ServiceException, ConflictException {
+  public void throwExceptionWhenDeletionFails() throws ConflictException, ServiceException  {
     when(service.delete(any(Set.class))).thenThrow(new ServiceException("boo"));
     assertThrows(
         ServiceException.class,
