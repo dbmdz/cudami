@@ -26,6 +26,7 @@ import de.digitalcollections.model.text.contentblock.Paragraph;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,6 +66,21 @@ class IdentifiableRepositoryImplTest
     description.put(Locale.ENGLISH, structuredContent);
     digitalObject.setDescription(description);
     return digitalObject;
+  }
+
+  @DisplayName("deletes UrlAliases, too")
+  @Test
+  public void deleteIncludesUrlAliases() throws Exception {
+    Identifiable identifiable1 = createIdentifiable();
+    Identifiable identifiable2 = createIdentifiable();
+    Set<Identifiable> identifiables = Set.of(identifiable1, identifiable2);
+    repo.save(identifiable1);
+    repo.save(identifiable2);
+
+    repo.delete(identifiables);
+
+    assertThat(urlAliasRepository.getByIdentifiable(identifiable1)).isNullOrEmpty();
+    assertThat(urlAliasRepository.getByIdentifiable(identifiable2)).isNullOrEmpty();
   }
 
   @Test
@@ -179,7 +195,8 @@ class IdentifiableRepositoryImplTest
     repo.update(identifiable);
     LocalDateTime timestampAfterUpdate = LocalDateTime.now();
 
-    // The last modified timestamp must be modified and must be between the time before and
+    // The last modified timestamp must be modified and must be between the time
+    // before and
     // after the uodate
     assertThat(identifiable.getLastModified()).isAfter(timestampBeforeUpdate);
     assertThat(identifiable.getLastModified()).isBefore(timestampAfterUpdate);

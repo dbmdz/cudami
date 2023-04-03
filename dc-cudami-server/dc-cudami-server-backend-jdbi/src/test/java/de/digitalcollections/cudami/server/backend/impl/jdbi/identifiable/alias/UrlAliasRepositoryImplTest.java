@@ -6,6 +6,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.list.filtering.FilterCriterion;
+import de.digitalcollections.model.list.filtering.Filtering;
+import de.digitalcollections.model.list.paging.PageRequest;
+import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.MalformedURLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -13,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,23 +38,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-
-import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
-import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
-import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.identifiable.IdentifiableObjectType;
-import de.digitalcollections.model.identifiable.IdentifiableType;
-import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
-import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.Collection;
-import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.web.Webpage;
-import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = UrlAliasRepositoryImpl.class)
 @DisplayName("The UrlAlias Repository")

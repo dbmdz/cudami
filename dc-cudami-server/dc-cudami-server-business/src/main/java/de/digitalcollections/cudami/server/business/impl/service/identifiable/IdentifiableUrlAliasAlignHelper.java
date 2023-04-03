@@ -147,10 +147,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         }
         UrlAlias newAlias = new UrlAlias();
         newAlias.setSlug(newSlug);
-        newAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+        newAlias.setTarget(actualIdentifiable);
         newAlias.setTargetLanguage(langFromDbForAlias);
-        newAlias.setTargetUuid(actualIdentifiable.getUuid());
-        newAlias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
         if (websiteUuid != null) {
           Website ws = new Website();
           ws.setUuid(websiteUuid);
@@ -202,10 +200,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // if there is not any label of the supported scripts then an alias is made of the UUID
       Locale urlAliasLang = new Locale("und");
       UrlAlias alias = new UrlAlias();
-      alias.setTargetIdentifiableType(actualIdentifiable.getType());
+      alias.setTarget(actualIdentifiable);
       alias.setTargetLanguage(urlAliasLang);
-      alias.setTargetUuid(actualIdentifiable.getUuid());
-      alias.setTargetIdentifiableObjectType(actualIdentifiable.getIdentifiableObjectType());
       alias.setPrimary(!urlAliases.containsKey(urlAliasLang));
       alias.setSlug(actualIdentifiable.getUuid().toString());
       urlAliases.add(alias);
@@ -221,11 +217,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
                   .allMatch(alias -> alias.getWebsite() != null))) {
         // there is not any default alias (w/o website); create one.
         UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTargetIdentifiableType(actualIdentifiable.getType());
+        defaultAlias.setTarget(actualIdentifiable);
         defaultAlias.setTargetLanguage(urlAliasLang);
-        defaultAlias.setTargetUuid(actualIdentifiable.getUuid());
-        defaultAlias.setTargetIdentifiableObjectType(
-            actualIdentifiable.getIdentifiableObjectType());
         defaultAlias.setPrimary(!urlAliases.containsKey(urlAliasLang));
         try {
           String labelText = actualIdentifiable.getLabel().getText(labelLang);

@@ -5,7 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,5 +45,13 @@ public class AbstractRepositoryImplTest {
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Cannot serialize/deserialize " + object + ": " + e, e);
     }
+  }
+
+  protected Identifiable createIdentifiable() {
+    Identifiable identifiable = new Identifiable();
+    identifiable.setUuid(UUID.randomUUID());
+    identifiable.setType(IdentifiableType.ENTITY);
+    identifiable.setLabel("label");
+    return identifiable;
   }
 }

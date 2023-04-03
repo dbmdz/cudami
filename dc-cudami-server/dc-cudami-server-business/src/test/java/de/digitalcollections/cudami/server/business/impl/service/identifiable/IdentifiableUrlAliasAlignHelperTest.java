@@ -95,9 +95,9 @@ public class IdentifiableUrlAliasAlignHelperTest {
     assertThat(actual.getLastPublished()).isNull(); // is set by the repository
     assertThat(actual.isPrimary()).isTrue();
     assertThat(actual.getCreated()).isNull(); // is set by the repository
-    assertThat(actual.getTargetUuid()).isEqualTo(expectedTargetUuid);
-    assertThat(actual.getTargetIdentifiableType()).isEqualTo(entity.getType());
-    assertThat(actual.getTargetIdentifiableObjectType())
+    assertThat(actual.getTarget().getUuid()).isEqualTo(expectedTargetUuid);
+    assertThat(actual.getTarget().getType()).isEqualTo(entity.getType());
+    assertThat(actual.getTarget().getIdentifiableObjectType())
         .isEqualTo(entity.getIdentifiableObjectType());
     assertThat(actual.getWebsite()).isNull(); // no default website given
     assertThat(actual.getSlug()).isEqualTo("hallo-welt");
@@ -144,7 +144,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
     germanUrlAlias.setPrimary(true);
     germanUrlAlias.setSlug("hallo-welt");
     germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-    germanUrlAlias.setTargetUuid(expectedTargetUuid);
+    germanUrlAlias.setTarget(entity);
     LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases(germanUrlAlias);
     entity.setLocalizedUrlAliases(localizedUrlALiases);
 
@@ -201,7 +201,7 @@ public class IdentifiableUrlAliasAlignHelperTest {
     germanUrlAlias.setPrimary(false);
     germanUrlAlias.setSlug("hallo-welt");
     germanUrlAlias.setTargetLanguage(Locale.GERMAN);
-    germanUrlAlias.setTargetUuid(expectedTargetUuid);
+    germanUrlAlias.setTarget(entity);
     LocalizedUrlAliases localizedUrlALiases = new LocalizedUrlAliases(germanUrlAlias);
     entity.setLocalizedUrlAliases(localizedUrlALiases);
 
@@ -830,13 +830,16 @@ public class IdentifiableUrlAliasAlignHelperTest {
     verify(slugGeneratorService, never()).apply(any(), any(), any());
   }
 
-  private LocalizedUrlAliases createAliases(UUID target, SlugPrimaryTuple... slugTuples) {
+  private LocalizedUrlAliases createAliases(UUID targetUuid, SlugPrimaryTuple... slugTuples) {
+    Identifiable target = new Identifiable();
+    target.setUuid(targetUuid);
+
     LocalizedUrlAliases aliases = new LocalizedUrlAliases();
     for (SlugPrimaryTuple tuple : slugTuples) {
       UrlAlias alias = new UrlAlias();
       alias.setSlug(tuple.slug);
       alias.setPrimary(tuple.isPrimary);
-      alias.setTargetUuid(target);
+      alias.setTarget(target);
       alias.setTargetLanguage(tuple.lang);
       alias.setUuid(tuple.uuid);
       aliases.add(alias);

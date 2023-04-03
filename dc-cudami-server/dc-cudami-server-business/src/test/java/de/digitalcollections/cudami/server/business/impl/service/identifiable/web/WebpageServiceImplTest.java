@@ -122,8 +122,10 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   @Test
   @DisplayName("fills all children, when the children tree is requested")
-  public void fillChildrentree() {
-    UUID parentUuid = UUID.randomUUID();
+  public void fillChildrentree() throws RepositoryException, ServiceException {
+    Webpage parent = createWebpage();
+    UUID parentUuid = parent.getUuid();
+
     UUID child1Uuid = UUID.randomUUID();
     UUID child2Uuid = UUID.randomUUID();
     UUID child2Child1Uuid = UUID.randomUUID();
@@ -149,15 +151,18 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     // Parent Webpage has got two children.
     when(repo.getChildren(eq(parentUuid))).thenReturn(List.of(child1, child2));
 
-    List<Webpage> actual = service.getChildrenTree(parentUuid);
+    List<Webpage> actual = service.getChildrenTree(parent);
     assertThat(actual.get(0).getChildren()).isNotEmpty();
     assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
   }
 
   @Test
   @DisplayName("fills all active children, when the children tree is requested")
-  public void fillActiveChildrentree() {
+  public void fillActiveChildrentree() throws RepositoryException, ServiceException {
+    Webpage parent = createWebpage();
     UUID parentUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    parent.setUuid(parentUuid);
+
     UUID child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000000011");
     UUID child1Child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000000111");
     UUID child2Uuid = UUID.fromString("00000000-0000-0000-0000-000000000012");
@@ -202,7 +207,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     when(parentPageResponse.getContent()).thenReturn(List.of(child1, child2));
     when(repo.findChildren(eq(parentUuid), any(PageRequest.class))).thenReturn(parentPageResponse);
 
-    List<Webpage> actual = service.getActiveChildrenTree(parentUuid);
+    List<Webpage> actual = service.getActiveChildrenTree(parent);
     assertThat(actual.get(0).getChildren()).isNotEmpty();
     assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
   }

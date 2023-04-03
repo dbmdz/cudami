@@ -80,7 +80,8 @@ class EventServiceImplTest extends AbstractServiceImplTest {
         .save(eq(savedEvent));
 
     when(eventRepository.getByUuid(eq(uuid))).thenReturn(savedEvent);
-    when(identifierService.saveForIdentifiable(eq(uuid), any())).thenReturn(Set.of(identifier));
+    when(identifierService.saveForIdentifiable(eq(savedEvent), any()))
+        .thenReturn(Set.of(identifier));
 
     eventService.save(savedEvent);
 
@@ -88,13 +89,13 @@ class EventServiceImplTest extends AbstractServiceImplTest {
     // the identifiable, we have add it do the set of identifiers-to-be-checked
     Set<Identifier> actualIdentifiersToPersist =
         savedEvent.getIdentifiers().stream()
-            .map(i -> new Identifier(null, i.getNamespace(), i.getId()))
+            .map(i -> new Identifier(i.getNamespace(), i.getId()))
             .collect(Collectors.toSet());
     verify(identifierService, times(1)).validate(any());
     verify(identifierService, times(1))
-        .saveForIdentifiable(eq(uuid), eq(actualIdentifiersToPersist));
+        .saveForIdentifiable(eq(savedEvent), eq(actualIdentifiersToPersist));
 
-    Event actual = eventService.getByUuid(savedEvent.getUuid());
+    Event actual = eventService.getByExample(savedEvent);
 
     assertThat(actual).isEqualTo(savedEvent);
   }
@@ -121,7 +122,8 @@ class EventServiceImplTest extends AbstractServiceImplTest {
 
     when(eventRepository.getByUuid(eq(uuid))).thenReturn(savedEvent);
     when(eventRepository.getByIdentifier(eq(identifier))).thenReturn(savedEvent);
-    when(identifierService.saveForIdentifiable(eq(uuid), any())).thenReturn(Set.of(identifier));
+    when(identifierService.saveForIdentifiable(eq(savedEvent), any()))
+        .thenReturn(Set.of(identifier));
 
     eventService.save(savedEvent);
 

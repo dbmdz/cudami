@@ -300,7 +300,7 @@ public class UrlAliasServiceImpl extends UniqueObjectServiceImpl<UrlAlias, UrlAl
               String key =
                   (u.getWebsite() != null ? u.getWebsite().getUuid() : "default")
                       + "-"
-                      + u.getTargetUuid()
+                      + u.getTarget().getUuid()
                       + "-"
                       + grabLanguage(u.getTargetLanguage());
               Integer primariesPerTuple = primaries.getOrDefault(key, 0);
@@ -337,7 +337,7 @@ public class UrlAliasServiceImpl extends UniqueObjectServiceImpl<UrlAlias, UrlAl
                 + ", website="
                 + u.getWebsite()
                 + ", target="
-                + u.getTargetUuid()
+                + u.getTarget().getUuid()
                 + " in "
                 + tuples
                 + " of "

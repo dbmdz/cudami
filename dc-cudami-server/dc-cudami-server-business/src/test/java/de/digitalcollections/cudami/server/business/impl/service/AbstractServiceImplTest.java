@@ -4,26 +4,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Collection;
+import de.digitalcollections.model.identifiable.entity.Entity;
+import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.item.Item;
+import de.digitalcollections.model.identifiable.resource.FileResource;
+import de.digitalcollections.model.identifiable.web.Webpage;
+import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import de.digitalcollections.cudami.model.config.CudamiConfig;
-import de.digitalcollections.model.identifiable.Identifiable;
-import de.digitalcollections.model.identifiable.IdentifiableObjectType;
-import de.digitalcollections.model.identifiable.IdentifiableType;
-import de.digitalcollections.model.identifiable.alias.UrlAlias;
-import de.digitalcollections.model.identifiable.entity.Entity;
-import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
 
 public abstract class AbstractServiceImplTest {
 
@@ -56,12 +57,24 @@ public abstract class AbstractServiceImplTest {
     }
   }
 
+  protected Collection createCollection() {
+    Collection collection = new Collection();
+    collection.setUuid(UUID.randomUUID());
+    return collection;
+  }
+
+  protected DigitalObject createDigitalObject() {
+    DigitalObject digitalObject = new DigitalObject();
+    digitalObject.setUuid(UUID.randomUUID());
+    return digitalObject;
+  }
+
   protected Entity createEntity() {
     Entity entity = new Entity();
     entity.setUuid(UUID.randomUUID());
     return entity;
   }
-  
+
   protected FileResource createFileResource() {
     FileResource fileResource = new FileResource();
     fileResource.setUuid(UUID.randomUUID());
@@ -73,13 +86,31 @@ public abstract class AbstractServiceImplTest {
     identifiable.setUuid(UUID.randomUUID());
     return identifiable;
   }
-  
+
+  protected Item createItem() {
+    Item item = new Item();
+    item.setUuid(UUID.randomUUID());
+    return item;
+  }
+
   protected UrlAlias createUrlAlias() {
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setUuid(UUID.randomUUID());
     return urlAlias;
   }
-  
+
+  protected Webpage createWebpage() {
+    Webpage webpage = new Webpage();
+    webpage.setUuid(UUID.randomUUID());
+    return webpage;
+  }
+
+  protected Website createWebsite() {
+    Website website = new Website();
+    website.setUuid(UUID.randomUUID());
+    return website;
+  }
+
   protected UrlAlias createUrlAlias(
       String slug,
       boolean setUuid,
@@ -87,15 +118,17 @@ public abstract class AbstractServiceImplTest {
       boolean primary,
       UUID targetUuid,
       UUID websiteUuid) {
+    Identifiable target = createIdentifiable();
+    target.setIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
+    target.setType(IdentifiableType.ENTITY);
+
     UrlAlias urlAlias = new UrlAlias();
     if (setUuid) {
       urlAlias.setUuid(UUID.randomUUID());
     }
     urlAlias.setPrimary(primary);
-    urlAlias.setTargetUuid(targetUuid);
+    urlAlias.setTarget(target);
     urlAlias.setSlug(slug);
-    urlAlias.setTargetIdentifiableType(IdentifiableType.ENTITY);
-    urlAlias.setTargetIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
     urlAlias.setLastPublished(LocalDateTime.now());
     urlAlias.setCreated(LocalDateTime.now());
     urlAlias.setTargetLanguage(Locale.forLanguageTag(language));

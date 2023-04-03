@@ -1,13 +1,5 @@
 package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifierRepository;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -17,14 +9,21 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.impl.service.UniqueObjectServiceImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service("identifierService")
-@Transactional(rollbackFor = { Exception.class })
+@Transactional(rollbackFor = {Exception.class})
 public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, IdentifierRepository>
     implements IdentifierService {
   private final IdentifierTypeService identifierTypeService;
 
-  public IdentifierServiceImpl(IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
+  public IdentifierServiceImpl(
+      IdentifierRepository identifierRepository, IdentifierTypeService identifierTypeService) {
     super(identifierRepository);
     this.identifierTypeService = identifierTypeService;
   }
@@ -87,7 +86,10 @@ public class IdentifierServiceImpl extends UniqueObjectServiceImpl<Identifier, I
     if (namespacesNotFound.isEmpty() && idsNotMatchingPattern.isEmpty()) {
       return;
     }
-    throw new ValidationException("Validation of identifiers failed: namespacesNotFound=" + namespacesNotFound
-        + ", idsNotMatchingPattern=" + idsNotMatchingPattern);
+    throw new ValidationException(
+        "Validation of identifiers failed: namespacesNotFound="
+            + namespacesNotFound
+            + ", idsNotMatchingPattern="
+            + idsNotMatchingPattern);
   }
 }

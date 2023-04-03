@@ -151,8 +151,7 @@ public class CollectionServiceImpl extends EntityServiceImpl<Collection>
       throws ServiceException {
     PageResponse<Collection> pageResponse;
     try {
-      pageResponse =
-          ((NodeRepository<Collection>) repository).findChildren(collection, pageRequest);
+      pageResponse = ((CollectionRepository) repository).findChildren(collection, pageRequest);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }
