@@ -26,9 +26,11 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.manifestation.Manifestation;
+import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,14 +62,14 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void addRelatedEntity() throws Exception {
     service.addRelatedEntity(createIdentifiable(), createEntity());
-    verify(repo, times(1)).addRelatedEntity(any(UUID.class), any(UUID.class));
+    verify(repo, times(1)).addRelatedEntity(any(Identifiable.class), any(Entity.class));
   }
 
   @DisplayName("can add related fileresources by delegating it to the repository")
   @Test
   public void addRelatedFileResources() throws Exception {
     service.addRelatedFileresource(createIdentifiable(), createFileResource());
-    verify(repo, times(1)).addRelatedFileresource(any(UUID.class), any(UUID.class));
+    verify(repo, times(1)).addRelatedFileresource(any(Identifiable.class), any(FileResource.class));
   }
 
   @DisplayName("allows two primary entries for different (website,target,language) tuples")

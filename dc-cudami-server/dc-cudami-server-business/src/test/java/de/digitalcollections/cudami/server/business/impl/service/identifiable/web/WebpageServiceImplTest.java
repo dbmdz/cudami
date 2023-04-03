@@ -35,14 +35,14 @@ import org.junit.jupiter.api.Test;
 @DisplayName("The webservice implementation")
 class WebpageServiceImplTest extends AbstractServiceImplTest {
 
-  WebpageServiceImpl service;
-
-  WebpageRepository repo;
+  private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
 
   IdentifierService identifierService;
-  UrlAliasService urlAliasService;
 
-  private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
+  WebpageRepository repo;
+  WebpageServiceImpl service;
+
+  UrlAliasService urlAliasService;
 
   @Override
   @BeforeEach
@@ -56,6 +56,85 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     service =
         new WebpageServiceImpl(
             repo, identifierService, urlAliasService, localeService, cudamiConfig);
+  }
+
+  @Test
+  @DisplayName("fills all active children, when the children tree is requested")
+  public void fillActiveChildrentree() throws RepositoryException, ServiceException {
+    Webpage parent = createWebpage("00000000-0000-0000-0000-000000000001");
+
+    Webpage child1 = createWebpage("00000000-0000-0000-0000-000000000011");
+    parent.addChild(child1);
+    Webpage child1Child1 = createWebpage("00000000-0000-0000-0000-000000000111");
+    child1.addChild(child1Child1);
+
+    Webpage child2 = createWebpage("00000000-0000-0000-0000-000000000012");
+    parent.addChild(child2);
+    Webpage child2Child1 = createWebpage("00000000-0000-0000-0000-000000000121");
+    child2.addChild(child2Child1);
+    Webpage child2Child1Child1 = createWebpage("00000000-0000-0000-0000-000000001211");
+    child2Child1.addChild(child2Child1Child1);
+
+    // Child 1 has got one or more subchildren
+    PageResponse<Webpage> child1childrenPageResponse = mock(PageResponse.class);
+    when(child1childrenPageResponse.getContent()).thenReturn(List.of(child1Child1));
+    when(repo.findChildren(eq(child1), any(PageRequest.class)))
+        .thenReturn(child1childrenPageResponse);
+    when(repo.findChildren(eq(child1Child1), any(PageRequest.class)))
+        .thenReturn(mock(PageResponse.class));
+
+    // Child 2 has got one or more subchildren, of which the first child has got children, too
+    PageResponse<Webpage> child2childrenPageResponse = mock(PageResponse.class);
+    when(child2childrenPageResponse.getContent()).thenReturn(List.of(child2Child1));
+    when(repo.findChildren(eq(child2), any(PageRequest.class)))
+        .thenReturn(child2childrenPageResponse);
+    PageResponse<Webpage> child2Child1childrenPageResponse = mock(PageResponse.class);
+    when(child2Child1childrenPageResponse.getContent()).thenReturn(List.of(child2Child1Child1));
+    when(repo.findChildren(eq(child2Child1), any(PageRequest.class)))
+        .thenReturn(child2Child1childrenPageResponse);
+    when(repo.findChildren(eq(child2Child1Child1), any(PageRequest.class)))
+        .thenReturn(mock(PageResponse.class));
+
+    // Parent Webpage has got two children.
+    PageResponse<Webpage> parentPageResponse = mock(PageResponse.class);
+    when(parentPageResponse.getContent()).thenReturn(List.of(child1, child2));
+    when(repo.findChildren(eq(parent), any(PageRequest.class))).thenReturn(parentPageResponse);
+
+    List<Webpage> actual = service.getActiveChildrenTree(parent);
+    assertThat(actual.get(0).getChildren()).isNotEmpty();
+    assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
+  }
+
+  @Test
+  @DisplayName("fills all children, when the children tree is requested")
+  public void fillChildrentree() throws RepositoryException, ServiceException {
+    Webpage parent = createWebpage();
+
+    Webpage child1 = createWebpage();
+    parent.addChild(child1);
+    Webpage child1Child1 = createWebpage();
+    child1.addChild(child1Child1);
+
+    Webpage child2 = createWebpage();
+    parent.addChild(child2);
+    Webpage child2Child1 = createWebpage();
+    child2.addChild(child2Child1);
+    Webpage child2Child1Child1 = createWebpage();
+    child2Child1.addChild(child2Child1Child1);
+
+    // Child 1 has got one or more subchildren
+    when(repo.getChildren(eq(child1))).thenReturn(List.of(child1Child1));
+
+    // Child 2 has got one or more subchildren, of which the first child has got children, too
+    when(repo.getChildren(eq(child2))).thenReturn(List.of(child2Child1));
+    when(repo.getChildren(eq(child2Child1))).thenReturn(List.of(child2Child1Child1));
+
+    // Parent Webpage has got two children.
+    when(repo.getChildren(eq(parent))).thenReturn(List.of(child1, child2));
+
+    List<Webpage> actual = service.getChildrenTree(parent);
+    assertThat(actual.get(0).getChildren()).isNotEmpty();
+    assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
   }
 
   @Test
@@ -78,138 +157,32 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
   }
 
   @Test
-  @DisplayName("shall use the fallback locale for a localized label, if possible")
-  public void useFallbackLocale() {
-    Node node = new Node();
-    LocalizedText label = new LocalizedText();
-    label.setText(FALLBACK_LOCALE, "Test");
+  @DisplayName("rejects UrlAliases with empty webpage at save and update")
+  public void rejectsEmptyWebpage() {
+    Webpage webpage = new Webpage();
+    UrlAlias urlAlias1 = new UrlAlias();
+    urlAlias1.setSlug("foo");
+    urlAlias1.setPrimary(true);
+    Website website = new Website();
+    website.setUuid(UUID.randomUUID());
+    urlAlias1.setWebsite(website);
+    UrlAlias urlAlias2 = new UrlAlias();
+    urlAlias2.setSlug("bar");
+    urlAlias2.setPrimary(false);
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(urlAlias1, urlAlias2);
+    webpage.setLocalizedUrlAliases(localizedUrlAliases);
 
-    node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
-    assertThat(node.getLabel()).isEqualTo(label);
-  }
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.save(webpage);
+        });
 
-  @Test
-  @DisplayName(
-      "shall use the first locale (alphabetically) as fallback for a localized label, if possible")
-  public void useFirstLocaleAsFallback() {
-    LocalizedText expectedFirstLocaleLabel = new LocalizedText(Locale.FRENCH, "faux");
-
-    Node node = new Node();
-    LocalizedText label = new LocalizedText();
-    label.setText(Locale.ITALIAN, "vero");
-    label.setText(Locale.FRENCH, "faux");
-
-    node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
-    assertThat(node.getLabel()).isEqualTo(expectedFirstLocaleLabel);
-  }
-
-  @Test
-  @DisplayName("shall return a label in the desired locale, if possible")
-  public void useDesiredLocale() {
-    LocalizedText expectedGermanLabel = new LocalizedText(Locale.GERMAN, "richtig");
-
-    Node node = new Node();
-    LocalizedText label = new LocalizedText();
-    label.setText(FALLBACK_LOCALE, "falsch");
-    label.setText(Locale.GERMAN, "richtig");
-
-    node.setLabel(label);
-    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
-    assertThat(node.getLabel()).isEqualTo(expectedGermanLabel);
-  }
-
-  @Test
-  @DisplayName("fills all children, when the children tree is requested")
-  public void fillChildrentree() throws RepositoryException, ServiceException {
-    Webpage parent = createWebpage();
-    UUID parentUuid = parent.getUuid();
-
-    UUID child1Uuid = UUID.randomUUID();
-    UUID child2Uuid = UUID.randomUUID();
-    UUID child2Child1Uuid = UUID.randomUUID();
-
-    // Child 1 has got one or more subchildren
-    Webpage child1 = mock(Webpage.class);
-    when(child1.getUuid()).thenReturn(child1Uuid);
-    Webpage child1child1 = mock(Webpage.class);
-    when(child1.getChildren()).thenReturn(List.of(child1child1));
-    when(repo.getChildren(eq(child1Uuid))).thenReturn(List.of(child1child1));
-
-    // Child 2 has got one or more subchildren, of which the first child has got children, too
-    Webpage child2 = mock(Webpage.class);
-    when(child2.getUuid()).thenReturn(child2Uuid);
-    Webpage child2child1 = mock(Webpage.class);
-    Webpage child2child1child1 = mock(Webpage.class);
-    when(child2child1.getUuid()).thenReturn(child2Child1Uuid);
-    when(child2child1.getChildren()).thenReturn(List.of(child2child1child1));
-    when(child2.getChildren()).thenReturn(List.of(child2child1));
-    when(repo.getChildren(eq(child2Uuid))).thenReturn(List.of(child2child1));
-    when(repo.getChildren(eq(child2Child1Uuid))).thenReturn(List.of(child2child1child1));
-
-    // Parent Webpage has got two children.
-    when(repo.getChildren(eq(parentUuid))).thenReturn(List.of(child1, child2));
-
-    List<Webpage> actual = service.getChildrenTree(parent);
-    assertThat(actual.get(0).getChildren()).isNotEmpty();
-    assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
-  }
-
-  @Test
-  @DisplayName("fills all active children, when the children tree is requested")
-  public void fillActiveChildrentree() throws RepositoryException, ServiceException {
-    Webpage parent = createWebpage();
-    UUID parentUuid = UUID.fromString("00000000-0000-0000-0000-000000000001");
-    parent.setUuid(parentUuid);
-
-    UUID child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000000011");
-    UUID child1Child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000000111");
-    UUID child2Uuid = UUID.fromString("00000000-0000-0000-0000-000000000012");
-    UUID child2Child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000000121");
-    UUID child2Child1Child1Uuid = UUID.fromString("00000000-0000-0000-0000-000000001211");
-
-    // Child 1 has got one or more subchildren
-    Webpage child1 = mock(Webpage.class);
-    when(child1.getUuid()).thenReturn(child1Uuid);
-    Webpage child1child1 = mock(Webpage.class);
-    when(child1child1.getUuid()).thenReturn(child1Child1Uuid);
-    when(child1.getChildren()).thenReturn(List.of(child1child1));
-    PageResponse<Webpage> child1childrenPageResponse = mock(PageResponse.class);
-    when(child1childrenPageResponse.getContent()).thenReturn(List.of(child1child1));
-    when(repo.findChildren(eq(child1Uuid), any(PageRequest.class)))
-        .thenReturn(child1childrenPageResponse);
-    when(repo.findChildren(eq(child1Child1Uuid), any(PageRequest.class)))
-        .thenReturn(mock(PageResponse.class));
-
-    // Child 2 has got one or more subchildren, of which the first child has got children, too
-    Webpage child2 = mock(Webpage.class);
-    when(child2.getUuid()).thenReturn(child2Uuid);
-    Webpage child2child1 = mock(Webpage.class);
-    Webpage child2child1child1 = mock(Webpage.class);
-    when(child2child1child1.getUuid()).thenReturn(child2Child1Child1Uuid);
-    when(child2child1.getUuid()).thenReturn(child2Child1Uuid);
-    when(child2child1.getChildren()).thenReturn(List.of(child2child1child1));
-    when(child2.getChildren()).thenReturn(List.of(child2child1));
-    PageResponse<Webpage> child2childrenPageResponse = mock(PageResponse.class);
-    when(child2childrenPageResponse.getContent()).thenReturn(List.of(child2child1));
-    when(repo.findChildren(eq(child2Uuid), any(PageRequest.class)))
-        .thenReturn(child2childrenPageResponse);
-    PageResponse<Webpage> child2Child1childrenPageResponse = mock(PageResponse.class);
-    when(child2Child1childrenPageResponse.getContent()).thenReturn(List.of(child2child1child1));
-    when(repo.findChildren(eq(child2Child1Uuid), any(PageRequest.class)))
-        .thenReturn(child2Child1childrenPageResponse);
-    when(repo.findChildren(eq(child2Child1Child1Uuid), any(PageRequest.class)))
-        .thenReturn(mock(PageResponse.class));
-
-    // Parent Webpage has got two children.
-    PageResponse<Webpage> parentPageResponse = mock(PageResponse.class);
-    when(parentPageResponse.getContent()).thenReturn(List.of(child1, child2));
-    when(repo.findChildren(eq(parentUuid), any(PageRequest.class))).thenReturn(parentPageResponse);
-
-    List<Webpage> actual = service.getActiveChildrenTree(parent);
-    assertThat(actual.get(0).getChildren()).isNotEmpty();
-    assertThat(actual.get(1).getChildren().get(0).getChildren()).isNotEmpty();
+    assertThrows(
+        ValidationException.class,
+        () -> {
+          service.update(webpage);
+        });
   }
 
   @Test
@@ -253,31 +226,45 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
   }
 
   @Test
-  @DisplayName("rejects UrlAliases with empty webpage at save and update")
-  public void rejectsEmptyWebpage() {
-    Webpage webpage = new Webpage();
-    UrlAlias urlAlias1 = new UrlAlias();
-    urlAlias1.setSlug("foo");
-    urlAlias1.setPrimary(true);
-    Website website = new Website();
-    website.setUuid(UUID.randomUUID());
-    urlAlias1.setWebsite(website);
-    UrlAlias urlAlias2 = new UrlAlias();
-    urlAlias2.setSlug("bar");
-    urlAlias2.setPrimary(false);
-    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases(urlAlias1, urlAlias2);
-    webpage.setLocalizedUrlAliases(localizedUrlAliases);
+  @DisplayName("shall return a label in the desired locale, if possible")
+  public void useDesiredLocale() {
+    LocalizedText expectedGermanLabel = new LocalizedText(Locale.GERMAN, "richtig");
 
-    assertThrows(
-        ValidationException.class,
-        () -> {
-          service.save(webpage);
-        });
+    Node node = new Node();
+    LocalizedText label = new LocalizedText();
+    label.setText(FALLBACK_LOCALE, "falsch");
+    label.setText(Locale.GERMAN, "richtig");
 
-    assertThrows(
-        ValidationException.class,
-        () -> {
-          service.update(webpage);
-        });
+    node.setLabel(label);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
+    assertThat(node.getLabel()).isEqualTo(expectedGermanLabel);
+  }
+
+  @Test
+  @DisplayName("shall use the fallback locale for a localized label, if possible")
+  public void useFallbackLocale() {
+    Node node = new Node();
+    LocalizedText label = new LocalizedText();
+    label.setText(FALLBACK_LOCALE, "Test");
+
+    node.setLabel(label);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
+    assertThat(node.getLabel()).isEqualTo(label);
+  }
+
+  @Test
+  @DisplayName(
+      "shall use the first locale (alphabetically) as fallback for a localized label, if possible")
+  public void useFirstLocaleAsFallback() {
+    LocalizedText expectedFirstLocaleLabel = new LocalizedText(Locale.FRENCH, "faux");
+
+    Node node = new Node();
+    LocalizedText label = new LocalizedText();
+    label.setText(Locale.ITALIAN, "vero");
+    label.setText(Locale.FRENCH, "faux");
+
+    node.setLabel(label);
+    service.cleanupLabelFromUnwantedLocales(Locale.GERMAN, FALLBACK_LOCALE, node.getLabel());
+    assertThat(node.getLabel()).isEqualTo(expectedFirstLocaleLabel);
   }
 }

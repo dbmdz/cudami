@@ -36,7 +36,7 @@ public abstract class AbstractUniqueObjectServiceImplTest extends AbstractServic
       "throws an exception to trigger the rollback, when an exception during deletion happens")
   @Test
   public void throwExceptionWhenDeletionFails() throws ConflictException, ServiceException {
-    when(service.delete(any(Set.class))).thenThrow(new ServiceException("boo"));
+    doThrow(new ServiceException("boo")).when(service).delete(any(Set.class));
     assertThrows(
         ServiceException.class,
         () -> {

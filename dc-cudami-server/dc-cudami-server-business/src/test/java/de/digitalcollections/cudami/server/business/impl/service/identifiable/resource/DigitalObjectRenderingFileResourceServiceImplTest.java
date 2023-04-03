@@ -74,13 +74,14 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
-    when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.getRenderingFileResources(eq(digitalObject)))
+        .thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(0);
-    when(repo.delete(any(UUID.class))).thenReturn(1);
+    when(repo.delete(any(TextFileResource.class))).thenReturn(1);
 
     service.deleteRenderingFileResources(digitalObject);
 
-    verify(repo, times(1)).delete(renderingFileResource.getUuid());
+    verify(repo, times(1)).delete(renderingFileResource);
     verify(textFileResourceService, times(1)).delete(renderingFileResource);
   }
 
@@ -97,13 +98,14 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
 
     digitalObject.setRenderingResources(List.of(renderingFileResource));
 
-    when(repo.getRenderingFileResources(eq(uuid))).thenReturn(List.of(renderingFileResource));
+    when(repo.getRenderingFileResources(eq(digitalObject)))
+        .thenReturn(List.of(renderingFileResource));
     when(repo.countDigitalObjectsForResource(eq(renderingFileResource.getUuid()))).thenReturn(1);
-    when(repo.delete(any(UUID.class))).thenReturn(1);
+    when(repo.delete(any(TextFileResource.class))).thenReturn(1);
 
     service.deleteRenderingFileResources(digitalObject);
 
-    verify(repo, times(1)).delete(renderingFileResource.getUuid());
+    verify(repo, times(1)).delete(renderingFileResource);
     verify(textFileResourceService, never()).delete(renderingFileResource);
   }
 }

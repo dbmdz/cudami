@@ -105,6 +105,12 @@ public abstract class AbstractServiceImplTest {
     return webpage;
   }
 
+  protected Webpage createWebpage(String uuid) {
+    Webpage webpage = new Webpage();
+    webpage.setUuid(UUID.fromString(uuid));
+    return webpage;
+  }
+
   protected Website createWebsite() {
     Website website = new Website();
     website.setUuid(UUID.randomUUID());

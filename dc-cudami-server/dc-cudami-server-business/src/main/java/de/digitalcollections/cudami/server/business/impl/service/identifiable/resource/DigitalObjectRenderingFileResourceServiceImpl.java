@@ -86,7 +86,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
           throw new ServiceException(
               "Could not delete relation for RenderingFileResource="
                   + renderingFileResource
-                  + " for DigitalObject with uuid="
+                  + " for DigitalObject ="
                   + digitalObject);
         }
 

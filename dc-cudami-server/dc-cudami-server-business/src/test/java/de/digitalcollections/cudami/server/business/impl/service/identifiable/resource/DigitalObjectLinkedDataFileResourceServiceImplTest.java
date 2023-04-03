@@ -49,7 +49,8 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
 
     digitalObject.setLinkedDataResources(List.of(linkedDataFileResource));
 
-    when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
+    when(repo.getLinkedDataFileResources(eq(digitalObject)))
+        .thenReturn(List.of(linkedDataFileResource));
     when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(0);
     when(repo.delete(any(UUID.class))).thenReturn(1);
 
@@ -69,7 +70,8 @@ class DigitalObjectLinkedDataFileResourceServiceImplTest {
 
     digitalObject.setLinkedDataResources(List.of(linkedDataFileResource));
 
-    when(repo.getLinkedDataFileResources(eq(uuid))).thenReturn(List.of(linkedDataFileResource));
+    when(repo.getLinkedDataFileResources(eq(digitalObject)))
+        .thenReturn(List.of(linkedDataFileResource));
     when(repo.countDigitalObjectsForResource(eq(linkedDataFileResource.getUuid()))).thenReturn(1);
     when(repo.delete(any(UUID.class))).thenReturn(1);
 
