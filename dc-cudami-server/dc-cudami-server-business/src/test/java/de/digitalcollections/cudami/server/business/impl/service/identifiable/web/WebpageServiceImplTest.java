@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("The webservice implementation")
+@DisplayName("The WebpageService")
 class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   private static final Locale FALLBACK_LOCALE = Locale.ENGLISH;
@@ -46,7 +46,8 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
 
   @Override
   @BeforeEach
-  public void beforeEach() {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     repo = mock(WebpageRepository.class);
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);
@@ -208,7 +209,7 @@ class WebpageServiceImplTest extends AbstractServiceImplTest {
     Webpage dbWebpage = new Webpage();
     dbWebpage.setUuid(webpageUuid);
     dbWebpage.setLabel("test");
-    when(repo.getByUuid(eq(webpageUuid))).thenReturn(dbWebpage);
+    when(repo.getByExample(eq(dbWebpage))).thenReturn(dbWebpage);
 
     Webpage webpage = new Webpage();
     webpage.setLabel("test");

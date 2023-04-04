@@ -39,7 +39,7 @@ class SubjectServiceImplTest {
       "throws a ServiceException at getByTypeAndIdentifier when an exception happens in the repository")
   @Test
   public void testCudamiServiceExceptionAtGetByTypeAndIdentifier() throws RepositoryException {
-    when(subjectRepository.getByTypeAndIdentifier(any(), any(), any()))
+    when(subjectRepository.getByTypeAndIdentifier(any(), any()))
         .thenThrow(new RepositoryException("boo"));
 
     assertThrows(

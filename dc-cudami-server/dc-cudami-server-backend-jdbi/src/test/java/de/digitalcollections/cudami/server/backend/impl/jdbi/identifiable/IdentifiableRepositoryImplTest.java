@@ -12,6 +12,8 @@ import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
+import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -72,7 +74,23 @@ class IdentifiableRepositoryImplTest
   @Test
   public void deleteIncludesUrlAliases() throws Exception {
     Identifiable identifiable1 = createIdentifiable();
+    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
+    UrlAlias urlAlias = new UrlAlias();
+    urlAlias.setPrimary(true);
+    urlAlias.setSlug("label1");
+    urlAlias.setTarget(identifiable1);
+    localizedUrlAliases.add(urlAlias);
+    identifiable1.setLocalizedUrlAliases(localizedUrlAliases);
+
     Identifiable identifiable2 = createIdentifiable();
+    LocalizedUrlAliases localizedUrlAliases2 = new LocalizedUrlAliases();
+    UrlAlias urlAlias2 = new UrlAlias();
+    urlAlias.setPrimary(true);
+    urlAlias.setSlug("label2");
+    urlAlias.setTarget(identifiable2);
+    localizedUrlAliases2.add(urlAlias2);
+    identifiable2.setLocalizedUrlAliases(localizedUrlAliases2);
+
     Set<Identifiable> identifiables = Set.of(identifiable1, identifiable2);
     repo.save(identifiable1);
     repo.save(identifiable2);

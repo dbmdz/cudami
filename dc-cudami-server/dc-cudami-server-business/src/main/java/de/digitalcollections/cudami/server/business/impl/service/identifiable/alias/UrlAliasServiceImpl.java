@@ -53,7 +53,6 @@ public class UrlAliasServiceImpl extends UniqueObjectServiceImpl<UrlAlias, UrlAl
 
   protected void checkPublication(UrlAlias urlAlias) throws ServiceException {
     if (urlAlias.getLastPublished() != null) {
-      // TODO: do not work with uuid in service layer
       if (urlAlias.getUuid() != null) {
         UrlAlias publishedAlias = getByExample(urlAlias);
         if (!publishedAlias.isPrimary() && urlAlias.isPrimary()) {

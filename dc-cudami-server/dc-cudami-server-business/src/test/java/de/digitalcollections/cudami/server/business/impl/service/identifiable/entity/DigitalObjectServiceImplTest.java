@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.DigitalObjectRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectLinkedDataFileResourceRepository;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.DigitalObjectRenderingFileResourceRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
@@ -37,7 +38,6 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,6 +59,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
   private UrlAliasService urlAliasService;
   private DigitalObjectLinkedDataFileResourceRepository
       digitalObjectLinkedDataFileResourceRepository;
+  private DigitalObjectRenderingFileResourceRepository digitalObjectRenderingFileResourceRepository;
 
   @Override
   @BeforeEach
@@ -79,6 +80,8 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
     urlAliasService = mock(UrlAliasService.class);
     digitalObjectLinkedDataFileResourceRepository =
         mock(DigitalObjectLinkedDataFileResourceRepository.class);
+    digitalObjectRenderingFileResourceRepository =
+        mock(DigitalObjectRenderingFileResourceRepository.class);
 
     service =
         new DigitalObjectServiceImpl(
@@ -138,15 +141,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .description(Locale.ENGLISH, "description")
             .build();
 
-    DigitalObject.builder()
-        .uuid(uuid)
-        .label(Locale.GERMAN, "deutschsprachiges Label")
-        .label(Locale.ENGLISH, "english label")
-        .description(Locale.GERMAN, "Beschreibung")
-        .description(Locale.ENGLISH, "description")
-        .build();
-
-    when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
+    when(repo.getByExample(eq(persistedDigitalObject))).thenReturn(persistedDigitalObject);
 
     LinkedDataFileResource persistedLinkedDataFileResource =
         LinkedDataFileResource.builder()
@@ -204,7 +199,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    when(repo.getByUuid(eq(uuid))).thenReturn(persistedDigitalObject);
+    when(repo.getByExample(eq(persistedDigitalObject))).thenReturn(persistedDigitalObject);
 
     FileResource persistedRenderingResource = new TextFileResource();
     persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
@@ -270,7 +265,7 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .description(Locale.GERMAN, "Beschreibung")
             .description(Locale.ENGLISH, "description")
             .build();
-    when(repo.getByUuid(any(UUID.class))).thenReturn(persistedDigitalObject);
+    when(repo.getByExample(any(DigitalObject.class))).thenReturn(persistedDigitalObject);
 
     FileResource persistedRenderingResource = new TextFileResource();
     persistedRenderingResource.setLabel(new LocalizedText(Locale.GERMAN, "Linked Data"));
@@ -339,14 +334,14 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .linkedDataResources(List.of(LinkedDataFileResource.builder().build()))
             .refId(42)
             .build();
-    when(repo.getByUuid(any(UUID.class))).thenReturn(persistedDigitalObject);
-    when(repo.delete(any(Set.class))).thenReturn(1);
+    when(repo.getByExample(any(DigitalObject.class))).thenReturn(persistedDigitalObject);
+    when(repo.delete(any(DigitalObject.class))).thenReturn(true);
 
     assertThat(service.delete(persistedDigitalObject)).isTrue();
 
-    verify(repo, times(2)).getByUuid(eq(uuid));
-    verify(repo, times(1)).deleteFileResources(eq(uuid));
-    verify(repo, times(1)).delete(eq(Set.of(persistedDigitalObject)));
+    verify(repo, times(1)).getByExample(eq(persistedDigitalObject));
+    verify(repo, times(1)).deleteFileResources(eq(persistedDigitalObject));
+    verify(repo, times(1)).delete(eq(persistedDigitalObject));
     verify(digitalObjectLinkedDataFileResourceService, times(1))
         .deleteLinkedDataFileResources(eq(persistedDigitalObject));
     verify(digitalObjectRenderingFileResourceService, times(1))
@@ -409,7 +404,6 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             .uuid(UUID.randomUUID())
             .label(LocalizedText.builder().text(Locale.ITALY, "Viva Italia!").build())
             .build();
-
     when(service.getByExample(eq(digitalObject))).thenReturn(digitalObject);
 
     assertThat(service.setItem(digitalObject, item)).isTrue();

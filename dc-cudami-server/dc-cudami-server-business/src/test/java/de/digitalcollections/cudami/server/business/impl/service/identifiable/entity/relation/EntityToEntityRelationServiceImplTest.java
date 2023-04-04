@@ -24,7 +24,8 @@ class EntityToEntityRelationServiceImplTest extends AbstractServiceImplTest {
   private EntityToEntityRelationRepository entityRelationRepository;
 
   @BeforeEach
-  public void beforeEach() {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     entityRelationRepository = mock(EntityToEntityRelationRepository.class);
     entityRelationService = new EntityToEntityRelationServiceImpl(entityRelationRepository);
   }

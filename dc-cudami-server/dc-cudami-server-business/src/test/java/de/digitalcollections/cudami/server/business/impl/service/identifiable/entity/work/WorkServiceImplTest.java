@@ -136,7 +136,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
             })
         .when(workRepository)
         .update(eq(workToUpdate));
-    when(workRepository.getByUuid(eq(uuid))).thenReturn(workToUpdate);
+    when(workRepository.getByExample(eq(workToUpdate))).thenReturn(workToUpdate);
 
     workService.update(workToUpdate);
 
@@ -172,7 +172,7 @@ class WorkServiceImplTest extends AbstractServiceImplTest {
             })
         .when(workRepository)
         .update(eq(workToUpdate));
-    when(workRepository.getByUuid(eq(uuid))).thenReturn(workToUpdate);
+    when(workRepository.getByExample(eq(workToUpdate))).thenReturn(workToUpdate);
 
     workService.update(workToUpdate);
 

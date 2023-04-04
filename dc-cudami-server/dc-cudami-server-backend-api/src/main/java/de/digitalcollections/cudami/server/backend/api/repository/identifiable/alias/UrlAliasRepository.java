@@ -103,6 +103,14 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
     return findPrimaryLinksForWebsite(websiteUuid, slug, true);
   }
 
+  default LocalizedUrlAliases findPrimaryLinksForWebsite(Website website, String slug)
+      throws RepositoryException {
+    if (website == null) {
+      throw new IllegalArgumentException("find failed: given object must not be null");
+    }
+    return findPrimaryLinksForWebsite(website.getUuid(), slug, true);
+  }
+
   /**
    * Retrieve the primary links corresponding to a slug.
    *

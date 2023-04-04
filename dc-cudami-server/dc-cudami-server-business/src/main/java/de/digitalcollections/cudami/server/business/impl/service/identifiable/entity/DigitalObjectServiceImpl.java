@@ -107,7 +107,7 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
 
     // Remove RenderingResources (relation, and, if possible, resource)
     try {
-      deleteRenderingResource(digitalObjectFromRepo);
+      deleteRenderingFileResourceResource(digitalObjectFromRepo);
     } catch (ServiceException e) {
       throw new ServiceException(
           "Cannot remove RenderingFileResource from digitalObject="
@@ -133,7 +133,8 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
     digitalObjectLinkedDataFileResourceService.deleteLinkedDataFileResources(digitalObject);
   }
 
-  private void deleteRenderingResource(DigitalObject digitalObject) throws ServiceException {
+  private void deleteRenderingFileResourceResource(DigitalObject digitalObject)
+      throws ServiceException {
     digitalObjectRenderingFileResourceService.deleteRenderingFileResources(digitalObject);
   }
 

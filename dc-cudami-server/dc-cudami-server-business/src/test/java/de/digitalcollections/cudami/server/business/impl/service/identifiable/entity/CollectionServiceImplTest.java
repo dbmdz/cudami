@@ -33,7 +33,8 @@ class CollectionServiceImplTest extends AbstractServiceImplTest {
   private LocaleService localeService;
 
   @BeforeEach
-  public void beforeEach() {
+  public void beforeEach() throws Exception {
+    super.beforeEach();
     collectionRepository = mock(CollectionRepository.class);
     identifierService = mock(IdentifierService.class);
     urlAliasService = mock(UrlAliasService.class);

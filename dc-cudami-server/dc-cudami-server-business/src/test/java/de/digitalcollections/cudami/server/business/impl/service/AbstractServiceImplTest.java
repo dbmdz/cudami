@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
+import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -28,9 +29,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractServiceImplTest {
 
-  protected CudamiConfig cudamiConfig;
+  protected CudamiConfig cudamiConfig = mock(CudamiConfig.class);
 
-  private DigitalCollectionsObjectMapper mapper;
+  protected DigitalCollectionsObjectMapper mapper = new DigitalCollectionsObjectMapper();
 
   @BeforeEach
   protected void beforeEach() throws Exception {
@@ -50,7 +51,7 @@ public abstract class AbstractServiceImplTest {
       String serializedObject = mapper.writeValueAsString(object);
       O copy = (O) mapper.readValue(serializedObject, object.getClass());
 
-      assertThat(copy).isEqualTo(object);
+      assertThat(copy.equals(object));
       return copy;
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Cannot serialize/deserialize " + object + ": " + e, e);
@@ -93,6 +94,12 @@ public abstract class AbstractServiceImplTest {
     return item;
   }
 
+  protected UniqueObject createUniqueObject() {
+    UniqueObject uniqueObject = new UniqueObject() {};
+    uniqueObject.setUuid(UUID.randomUUID());
+    return uniqueObject;
+  }
+
   protected UrlAlias createUrlAlias() {
     UrlAlias urlAlias = new UrlAlias();
     urlAlias.setUuid(UUID.randomUUID());
@@ -125,6 +132,7 @@ public abstract class AbstractServiceImplTest {
       UUID targetUuid,
       UUID websiteUuid) {
     Identifiable target = createIdentifiable();
+    target.setUuid(targetUuid);
     target.setIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
     target.setType(IdentifiableType.ENTITY);
 

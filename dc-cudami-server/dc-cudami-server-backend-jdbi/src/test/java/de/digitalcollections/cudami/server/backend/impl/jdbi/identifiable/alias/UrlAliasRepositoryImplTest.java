@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
+import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.entity.WebsiteRepository;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.web.WebpageRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractRepositoryImplTest;
@@ -44,6 +45,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
   private UrlAliasRepositoryImpl repo;
+  @Autowired IdentifiableRepository<Identifiable> identifiableRepository;
   @Autowired WebpageRepository webpageRepository;
   @Autowired WebsiteRepository websiteRepository;
 
@@ -344,6 +346,21 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
     repo.save(urlAliasWithoutWebsite);
     int count = repo.deleteByUuids(List.of(urlAliasWithoutWebsite.getUuid()));
     assertThat(count).isEqualTo(1);
+  }
+
+  @DisplayName("deleteByIdentifiable with force deletes everything")
+  @Test
+  public void deleteByIdentifiableWithForce() throws RepositoryException {
+    Identifiable targetIdentifiable = createIdentifiable();
+    LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
+    targetLocalizedUrlAliases.add(
+        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
+    identifiableRepository.save(targetIdentifiable);
+
+    repo.deleteByIdentifiable(targetIdentifiable, true);
+    LocalizedUrlAliases localizedUrlAliases = repo.getByIdentifiable(targetIdentifiable);
+
+    assertThat(localizedUrlAliases).hasSize(0);
   }
 
   private static Stream<Arguments> testGrabLanguage() {

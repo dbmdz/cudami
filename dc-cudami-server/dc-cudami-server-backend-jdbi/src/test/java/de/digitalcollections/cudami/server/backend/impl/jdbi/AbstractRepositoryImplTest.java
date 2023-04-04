@@ -6,8 +6,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.impl.database.config.SpringConfigBackendTestDatabase;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.jackson.DigitalCollectionsObjectMapper;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.DisplayName;
@@ -53,5 +60,43 @@ public class AbstractRepositoryImplTest {
     identifiable.setType(IdentifiableType.ENTITY);
     identifiable.setLabel("label");
     return identifiable;
+  }
+
+  protected UrlAlias createUrlAlias(
+      String slug,
+      boolean setUuid,
+      String language,
+      boolean primary,
+      UUID targetUuid,
+      UUID websiteUuid) {
+    Identifiable target = createIdentifiable();
+    target.setUuid(targetUuid);
+    target.setIdentifiableObjectType(IdentifiableObjectType.COLLECTION);
+    target.setType(IdentifiableType.ENTITY);
+
+    UrlAlias urlAlias = new UrlAlias();
+    if (setUuid) {
+      urlAlias.setUuid(UUID.randomUUID());
+    }
+    urlAlias.setPrimary(primary);
+    urlAlias.setTarget(target);
+    urlAlias.setSlug(slug);
+    urlAlias.setLastPublished(LocalDateTime.now());
+    urlAlias.setCreated(LocalDateTime.now());
+    urlAlias.setTargetLanguage(Locale.forLanguageTag(language));
+    urlAlias.setWebsite(createWebsite(websiteUuid));
+    return urlAlias;
+  }
+
+  protected Website createWebsite(UUID uuid) {
+    Website website = new Website();
+    website.setUuid(uuid);
+    String dummyUrl = "http://" + uuid + "/";
+    try {
+      website.setUrl(new URL(dummyUrl));
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Cannot create dummy URL=" + dummyUrl + ": " + e, e);
+    }
+    return website;
   }
 }

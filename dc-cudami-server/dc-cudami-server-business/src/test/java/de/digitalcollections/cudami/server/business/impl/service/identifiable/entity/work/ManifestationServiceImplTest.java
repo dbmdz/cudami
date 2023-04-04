@@ -126,7 +126,8 @@ class ManifestationServiceImplTest extends AbstractServiceImplTest {
             })
         .when(manifestationRepository)
         .update(eq(manifestationToUpdate));
-    when(manifestationRepository.getByUuid(eq(uuid))).thenReturn(manifestationToUpdate);
+    when(manifestationRepository.getByExample(eq(manifestationToUpdate)))
+        .thenReturn(manifestationToUpdate);
 
     manifestationService.update(manifestationToUpdate);
 

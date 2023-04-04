@@ -19,10 +19,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("The Identifier Service")
-public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTest {
+public class IdentifierServiceImplTest
+    extends AbstractUniqueObjectServiceImplTest<
+        Identifier, IdentifierRepository, IdentifierService> {
 
-  private IdentifierService service;
-  private IdentifierRepository repo;
   private IdentifierTypeService identifierTypeService;
 
   @BeforeEach
@@ -37,7 +37,7 @@ public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTe
   public void validationSuccess() {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("id", "namespace"));
+    Set<Identifier> identifiers = Set.of(new Identifier("namespace", "id"));
 
     assertThatCode(() -> service.validate(identifiers)).doesNotThrowAnyException();
   }
@@ -49,7 +49,7 @@ public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTe
     when(identifierTypeService.updateIdentifierTypeCache())
         .thenReturn(Map.of("namespace1", "id1", "namespace2", "id2"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("id2", "namespace2"));
+    Set<Identifier> identifiers = Set.of(new Identifier("namespace2", "id2"));
 
     assertThatCode(() -> service.validate(identifiers)).doesNotThrowAnyException();
   }
@@ -60,7 +60,7 @@ public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTe
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("id2", "namespace2"));
+    Set<Identifier> identifiers = Set.of(new Identifier("namespace2", "id2"));
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))
@@ -73,7 +73,7 @@ public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTe
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("id2", "namespace"));
+    Set<Identifier> identifiers = Set.of(new Identifier("namespace", "id2"));
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))
@@ -86,7 +86,7 @@ public class IdentifierServiceImplTest extends AbstractUniqueObjectServiceImplTe
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier(null, "namespace"));
+    Set<Identifier> identifiers = Set.of(new Identifier("namespace", null));
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))

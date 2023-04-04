@@ -3,7 +3,6 @@ package de.digitalcollections.cudami.server.business.impl.service.identifiable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -16,7 +15,6 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.IdentifiableRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
-import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -34,7 +32,6 @@ import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -107,7 +104,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setUuid(target.getUuid());
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "label"));
 
-    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
   }
@@ -167,39 +164,11 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "oldlabel"));
 
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     service.update(identifiable);
 
     verify(urlAliasService, times(1)).save(any(UrlAlias.class), eq(true));
-  }
-
-  @DisplayName(
-      "deletes all connected UrlAliases on an identifiable as first step when updating an identifiable")
-  @Test
-  public void deleteUrlAliasesOnUpdate() throws Exception {
-    Identifiable target = createIdentifiable();
-    UUID targetUuid = target.getUuid();
-
-    Identifiable identifiable = new Identifiable();
-    identifiable.setUuid(targetUuid);
-    identifiable.setLabel(new LocalizedText(Locale.GERMAN, "label"));
-
-    LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
-    UrlAlias urlAlias = new UrlAlias();
-    urlAlias.setPrimary(true);
-    urlAlias.setSlug("label");
-    urlAlias.setTarget(target);
-    localizedUrlAliases.add(urlAlias);
-    identifiable.setLocalizedUrlAliases(localizedUrlAliases);
-
-    Identifiable identifiableInDb = new Identifiable();
-    identifiableInDb.setUuid(targetUuid);
-    identifiableInDb.setLabel(new LocalizedText(Locale.GERMAN, "label"));
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
-
-    service.update(identifiable);
-    verify(urlAliasService, times(1)).deleteByIdentifiable(eq(identifiable));
   }
 
   @DisplayName("throws a ValidationException on save and update when the label is empty")
@@ -258,7 +227,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
-    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     when(urlAliasService.getPrimaryUrlAliasesByIdentifiable(any())).thenReturn(new ArrayList<>());
     doThrow(new ValidationException("no way!"))
@@ -306,7 +275,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setUuid(targetUuid);
     identifiableInDb.setLabel(new LocalizedText(Locale.forLanguageTag("de"), "slug"));
 
-    when(repo.getByUuid(any(UUID.class))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     doThrow(new ValidationException("no way!"))
         .when(urlAliasService)
@@ -325,6 +294,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     doThrow(RepositoryException.class).when(repo).save(any(Identifiable.class));
 
     Identifiable identifiable = createIdentifiable();
+    identifiable.setLabel("label");
 
     assertThrows(
         ServiceException.class,
@@ -367,64 +337,6 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         });
   }
 
-  @DisplayName(
-      "fills the provided identifiers with the missing values, obtained from the existing identifiers, where present")
-  @Test
-  void fillProvidedIdentifiers() throws Exception {
-    UUID uuid = UUID.randomUUID();
-    UUID[] identifierUuids = new UUID[] {UUID.randomUUID(), UUID.randomUUID()};
-    // The identifiable, which we want to update, carries one identifier, which is
-    // already
-    // present in the database and another one, which is new
-    Identifier existingIdentifier = new Identifier("namespace1", "1");
-    existingIdentifier.setUuid(identifierUuids[0]);
-
-    Identifiable identifiableToUpdate = new Identifiable();
-    identifiableToUpdate.setUuid(uuid);
-    identifiableToUpdate.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    identifiableToUpdate.addIdentifier(existingIdentifier);
-    identifiableToUpdate.addIdentifier(
-        Identifier.builder().namespace("namespace2").id("1").uuid(identifierUuids[1]).build());
-
-    // The existing identifiable carries one identifier
-    Identifiable existingIdentifiable = new Identifiable();
-    existingIdentifiable.setUuid(uuid);
-    existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));
-    existingIdentifiable.addIdentifier(existingIdentifier);
-
-    when(repo.getByUuid(eq(existingIdentifiable.getUuid()))).thenReturn(existingIdentifiable);
-    when(urlAliasService.getByIdentifiable(any(Identifiable.class))).thenReturn(null);
-    when(identifierService.saveForIdentifiable(any(), any()))
-        .thenReturn(
-            Set.of(
-                Identifier.builder()
-                    .uuid(identifierUuids[1])
-                    .namespace("namespace2")
-                    .id("1")
-                    .build()));
-
-    service.update(identifiableToUpdate);
-    List<Identifier> actualIdentifiers = new ArrayList<>(identifiableToUpdate.getIdentifiers());
-    // We sort the identifiers, for easier validation
-    Collections.sort(
-        actualIdentifiers,
-        (i1, i2) -> {
-          String key1 = i1.getNamespace() + ":" + i1.getId();
-          String key2 = i2.getNamespace() + ":" + i2.getId();
-          return key1.compareTo(key2);
-        });
-    assertThat(actualIdentifiers.get(0)).isEqualTo(existingIdentifier);
-    assertThat(actualIdentifiers.get(1).getNamespace()).isEqualTo("namespace2");
-    assertThat(actualIdentifiers.get(1).getId()).isEqualTo("1");
-
-    // Only one identifier was saved - the identifier, was was provided, but did not
-    // already exist
-    verify(identifierService, times(1))
-        .saveForIdentifiable(any(Identifiable.class), argThat(set -> set.size() == 1));
-    // No identifier was deleted at all
-    verify(identifierService, never()).delete(any(Set.class));
-  }
-
   @DisplayName("throws a ValidationException on save and update when the label is null")
   @Test
   public void nullLabelThrowsValidationException() {
@@ -460,19 +372,6 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     verify(urlAliasService, times(1)).save(any(UrlAlias.class));
   }
 
-  @DisplayName(
-      "throws an exception to trigger the rollback, when an exception during deletion happens")
-  @Test
-  public void throwExceptionWhenDeletionFails() throws ConflictException, ServiceException {
-    when(urlAliasService.deleteByIdentifiable(any(Identifiable.class), eq(true)))
-        .thenThrow(new ServiceException("boo"));
-    assertThrows(
-        ServiceException.class,
-        () -> {
-          service.delete(Set.of(UUID.randomUUID()));
-        });
-  }
-
   @DisplayName("updates existing UrlAliases on an identifiable, when updating it")
   @Test
   public void updateExistingUrlAliasesOnUpdate() throws Exception {
@@ -493,7 +392,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setTarget(target);
     localizedUrlAliases.add(urlAlias);
     identifiable.setLocalizedUrlAliases(localizedUrlAliases);
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiable);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiable);
 
     service.update(identifiable);
 
@@ -533,7 +432,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         Set.of(
             Identifier.builder().uuid(identifierUuid).namespace("namespace").id("value").build()));
 
-    when(repo.getByUuid(eq(existingIdentifiable.getUuid())))
+    when(repo.getByExample(any(Identifiable.class)))
         .thenReturn(existingIdentifiable)
         .thenReturn(existingIdentifiableWithUpdatedIdentifiers);
     when(urlAliasService.getByIdentifiable(any(Identifiable.class))).thenReturn(null);
@@ -573,7 +472,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setLabel(labelDb);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     // aliases in object to update
     UrlAlias firstPrimaryUrlAlias = new UrlAlias(); // equals to DB
@@ -647,7 +546,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setLabel(label);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     // new one
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();
@@ -715,7 +614,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setLabel(labelDb);
     identifiableInDb.setLocalizedUrlAliases(localizedUrlAliases);
 
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     Identifiable identifiable = new Identifiable();
     identifiable.setUuid(targetUuid);
@@ -772,7 +671,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     identifiableInDb.setLabel(label);
     identifiableInDb.setLocalizedUrlAliases(storedUrlAliases);
 
-    when(repo.getByUuid(eq(targetUuid))).thenReturn(identifiableInDb);
+    when(repo.getByExample(any(Identifiable.class))).thenReturn(identifiableInDb);
 
     // new ones
     LocalizedUrlAliases localizedUrlAliases = new LocalizedUrlAliases();

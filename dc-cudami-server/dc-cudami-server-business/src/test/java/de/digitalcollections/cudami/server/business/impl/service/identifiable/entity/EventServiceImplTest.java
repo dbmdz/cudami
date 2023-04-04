@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
@@ -24,7 +22,6 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,21 +76,9 @@ class EventServiceImplTest extends AbstractServiceImplTest {
         .when(eventRepository)
         .save(eq(savedEvent));
 
-    when(eventRepository.getByUuid(eq(uuid))).thenReturn(savedEvent);
-    when(identifierService.saveForIdentifiable(eq(savedEvent), any()))
-        .thenReturn(Set.of(identifier));
+    when(eventRepository.getByExample(eq(savedEvent))).thenReturn(savedEvent);
 
     eventService.save(savedEvent);
-
-    // Verify, that the identifiers were also persisted. Since they don't yet carry the UUID of
-    // the identifiable, we have add it do the set of identifiers-to-be-checked
-    Set<Identifier> actualIdentifiersToPersist =
-        savedEvent.getIdentifiers().stream()
-            .map(i -> new Identifier(i.getNamespace(), i.getId()))
-            .collect(Collectors.toSet());
-    verify(identifierService, times(1)).validate(any());
-    verify(identifierService, times(1))
-        .saveForIdentifiable(eq(savedEvent), eq(actualIdentifiersToPersist));
 
     Event actual = eventService.getByExample(savedEvent);
 
@@ -120,7 +105,7 @@ class EventServiceImplTest extends AbstractServiceImplTest {
         .when(eventRepository)
         .save(eq(savedEvent));
 
-    when(eventRepository.getByUuid(eq(uuid))).thenReturn(savedEvent);
+    when(eventRepository.getByExample(eq(savedEvent))).thenReturn(savedEvent);
     when(eventRepository.getByIdentifier(eq(identifier))).thenReturn(savedEvent);
     when(identifierService.saveForIdentifiable(eq(savedEvent), any()))
         .thenReturn(Set.of(identifier));

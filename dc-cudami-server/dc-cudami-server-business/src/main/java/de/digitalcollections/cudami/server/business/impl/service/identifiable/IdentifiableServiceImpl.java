@@ -243,7 +243,7 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     // get actual status of identifiable from repo
     I identifiableFromRepo;
     try {
-      identifiableFromRepo = repository.getByUuid(identifiable.getUuid());
+      identifiableFromRepo = repository.getByExample(identifiable);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
     }

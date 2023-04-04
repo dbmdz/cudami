@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +33,6 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 @DisplayName("The UrlAliasService implementation")
 class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
@@ -92,7 +90,6 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   @BeforeEach
   public void beforeEach() throws Exception {
-    super.beforeEach();
     repo = mock(UrlAliasRepository.class);
     localeService = mock(LocaleService.class);
     when(localeService.getDefaultLanguage()).thenReturn("en");
@@ -111,8 +108,8 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
 
-    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
     service.checkPublication(urlAlias);
 
     LocalDateTime expectedPublicationDate = truncatedToMicros(publicationDate);
@@ -127,7 +124,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(false);
@@ -149,7 +146,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(false);
     LocalDateTime publicationDate = LocalDateTime.now().minusDays(1);
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setPrimary(true);
@@ -183,7 +180,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setPrimary(true);
     LocalDateTime publicationDate = LocalDateTime.now();
     urlAlias.setLastPublished(publicationDate);
-    when(repo.getByUuid(eq(urlAlias.getUuid()))).thenReturn(urlAlias);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(urlAlias);
 
     UrlAlias changedUrlAlias = createDeepCopy(urlAlias);
     changedUrlAlias.setSlug("foo");
@@ -193,25 +190,6 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         () -> {
           service.checkPublication(changedUrlAlias);
         });
-  }
-
-  @DisplayName("deleteForTarget with force deletes everything")
-  @Test
-  public void deleteForTargetWithForce()
-      throws ServiceException, RepositoryException, ConflictException {
-    Identifiable targetIdentifiable = createIdentifiable();
-    LocalizedUrlAliases targetLocalizedUrlAliases = new LocalizedUrlAliases();
-    targetLocalizedUrlAliases.add(
-        createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-
-    when(repo.getByIdentifiable(eq(targetIdentifiable))).thenReturn(targetLocalizedUrlAliases);
-    when(repo.delete(any(Set.class))).thenReturn(1);
-
-    assertThat(service.deleteByIdentifiable(targetIdentifiable, true)).isTrue();
-
-    ArgumentCaptor<Set> setArgumentCaptor = ArgumentCaptor.forClass(Set.class);
-    verify(repo, times(1)).delete(setArgumentCaptor.capture());
-    assertThat(setArgumentCaptor.getValue()).hasSize(1);
   }
 
   @DisplayName("deleteForTarget with unset uuid deletes nothing and returns false")
@@ -227,7 +205,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   public void deleteNonexistantSingleUrlAlias()
       throws ServiceException, RepositoryException, ConflictException {
     Identifiable targetIdentifiable = createIdentifiable();
-    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(null);
 
     assertThat(service.deleteByIdentifiable(targetIdentifiable)).isFalse();
   }
@@ -245,7 +223,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void deleteSingleUrlAlias()
       throws ServiceException, RepositoryException, ConflictException {
-    when(repo.delete(any(Set.class))).thenReturn(1);
+    when(repo.delete(any(UrlAlias.class))).thenReturn(true);
 
     assertThat(service.delete(createUrlAlias())).isTrue();
   }
@@ -341,12 +319,11 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     String expected = "label-2";
 
     Website website = createWebsite();
-    UUID websiteUuid = website.getUuid();
 
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq("label"), eq(websiteUuid), any(Locale.class))).thenReturn(true);
-    when(repo.hasUrlAlias(eq("label-1"), eq(websiteUuid), any(Locale.class))).thenReturn(true);
-    when(repo.hasUrlAlias(eq("label-2"), eq(websiteUuid), any(Locale.class))).thenReturn(false);
+    when(repo.hasUrlAlias(eq("label"), eq(website), any(Locale.class))).thenReturn(true);
+    when(repo.hasUrlAlias(eq("label-1"), eq(website), any(Locale.class))).thenReturn(true);
+    when(repo.hasUrlAlias(eq("label-2"), eq(website), any(Locale.class))).thenReturn(false);
 
     assertThat(service.generateSlug(Locale.GERMAN, "label", website)).isEqualTo(expected);
   }
@@ -356,10 +333,9 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   public void generateSlugWithoutSuffix() throws ServiceException, RepositoryException {
     String expected = "label";
     Website website = createWebsite();
-    UUID websiteUuid = website.getUuid();
 
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq("label"), eq(websiteUuid), any(Locale.class))).thenReturn(false);
+    when(repo.hasUrlAlias(eq("label"), eq(website), any(Locale.class))).thenReturn(false);
 
     assertThat(service.generateSlug(Locale.GERMAN, "label", website)).isEqualTo(expected);
   }
@@ -373,10 +349,10 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         createUrlAlias("hurz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
     expectedLocalizedUrlAliases.add(
         createUrlAlias("hurz", true, "en", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(eq((UUID) null), eq("hurz"), eq(false)))
+    when(repo.findPrimaryLinksForWebsite(eq((Website) null), eq("hurz"), eq(false)))
         .thenReturn(expectedLocalizedUrlAliases);
 
-    LocalizedUrlAliases actual = service.getPrimaryUrlAliases(null, "hurz", null);
+    LocalizedUrlAliases actual = service.getPrimaryUrlAliases((Website) null, "hurz", null);
 
     assertThat(actual).isEqualTo(expectedLocalizedUrlAliases);
   }
@@ -395,11 +371,11 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     LocalizedUrlAliases localizedUrlAliasesToPersist = new LocalizedUrlAliases();
     localizedUrlAliasesToPersist.add(germanUrlAlias);
     localizedUrlAliasesToPersist.add(englishUrlAlias);
-    when(repo.findPrimaryLinksForWebsite(eq((UUID) null), eq("hurz"), eq(true)))
+    when(repo.findPrimaryLinksForWebsite(eq((Website) null), eq("hurz"), eq(true)))
         .thenReturn(localizedUrlAliasesToPersist);
 
     LocalizedUrlAliases actual =
-        service.getPrimaryUrlAliases(null, "hurz", Locale.forLanguageTag("de"));
+        service.getPrimaryUrlAliases((Website) null, "hurz", Locale.forLanguageTag("de"));
 
     LocalizedUrlAliases expectedLocalizedUrlAliases = new LocalizedUrlAliases();
     expectedLocalizedUrlAliases.add(germanUrlAlias);
@@ -412,16 +388,15 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   public void genericPrimaryLinksForPrimaryLinksWithMissingUuid()
       throws ServiceException, RepositoryException {
     Website website = createWebsite();
-    UUID websiteUuid = website.getUuid();
 
     String slug = "hützligrütz";
 
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(eq(websiteUuid), eq(slug), eq(false)))
+    when(repo.findPrimaryLinksForWebsite(eq(website), eq(slug), eq(false)))
         .thenReturn(new LocalizedUrlAliases());
-    when(repo.findPrimaryLinksForWebsite(eq((UUID) null), eq(slug), eq(false)))
+    when(repo.findPrimaryLinksForWebsite(eq((Website) null), eq(slug), eq(false)))
         .thenReturn(expected);
 
     assertThat(service.getPrimaryUrlAliases(website, slug, null)).isEqualTo(expected);
@@ -455,7 +430,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("raises a ServiceException when the repository throws an exception")
   @Test
   public void raiseException() throws RepositoryException {
-    when(repo.getByUuid(any(UUID.class))).thenThrow(new NullPointerException("foo"));
+    when(repo.getByExample(any(UrlAlias.class))).thenThrow(new RepositoryException("foo"));
 
     UrlAlias urlAlias = createUrlAlias();
     assertThrows(
@@ -501,7 +476,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
       "raises a ServiceException when finding an UrlAlias leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenFindLeadsToAnException() throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).find(any(PageRequest.class));
+    doThrow(RepositoryException.class).when(repo).find(any(PageRequest.class));
 
     assertThrows(
         ServiceException.class,
@@ -515,7 +490,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingLocalizedUrlAliasesLeadsToAnException()
       throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).getByIdentifiable(any(UUID.class));
+    doThrow(RepositoryException.class).when(repo).getByExample(any(UrlAlias.class));
 
     UrlAlias urlAlias = createUrlAlias();
 
@@ -531,9 +506,9 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void raiseExceptionWhenRetrievingPrimaryLinksLeadsToAnException()
       throws RepositoryException {
-    doThrow(NullPointerException.class)
+    doThrow(RepositoryException.class)
         .when(repo)
-        .findPrimaryLinksForWebsite(any(UUID.class), any(String.class));
+        .findPrimaryLinksForWebsite(any(Website.class), any(String.class));
 
     assertThrows(
         ServiceException.class,
@@ -545,7 +520,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("raises a ServiceException when creating leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenSaveLeadsToAnException() throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).save(any(UrlAlias.class));
+    doThrow(RepositoryException.class).when(repo).save(any(UrlAlias.class));
 
     assertThrows(
         ServiceException.class,
@@ -558,7 +533,9 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
 
   @DisplayName("raises a ServiceException when trying to create an empty UrlAlias")
   @Test
-  public void raiseExceptionWhenSaveWithNullUrlAlias() throws ServiceException {
+  public void raiseExceptionWhenSaveWithNullUrlAlias()
+      throws ServiceException, RepositoryException {
+    doThrow(RepositoryException.class).when(repo).save(null);
     assertThrows(
         ServiceException.class,
         () -> {
@@ -566,23 +543,10 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         });
   }
 
-  @DisplayName("raises a ServiceException when trying to create an UrlAlias with existing UUID")
-  @Test
-  public void raiseExceptionWhenSaveWithUuid() throws RepositoryException {
-    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
-    assertThrows(
-        ServiceException.class,
-        () -> {
-          service.save(
-              createUrlAlias(
-                  "hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-        });
-  }
-
   @DisplayName("raises a ServiceException when updating leads to an exception in the repository")
   @Test
   public void raiseExceptionWhenUpdateLeadsToAnException() throws RepositoryException {
-    doThrow(NullPointerException.class).when(repo).getByUuid(any(UUID.class));
+    doThrow(RepositoryException.class).when(repo).getByExample(any(UrlAlias.class));
 
     assertThrows(
         ServiceException.class,
@@ -601,8 +565,8 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
     expected.setLastPublished(null);
 
-    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
-    doThrow(NullPointerException.class).when(repo).update(any());
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(expected);
+    doThrow(RepositoryException.class).when(repo).update(any());
 
     assertThrows(
         ServiceException.class,
@@ -639,7 +603,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     UrlAlias expected =
         createUrlAlias("hützligrütz", false, "de", false, UUID.randomUUID(), UUID.randomUUID());
 
-    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(expected);
 
     assertThat(service.getByExample(createUrlAlias())).isEqualTo(expected);
   }
@@ -647,7 +611,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("returns null, when an nonexisting UrlAlias should be retrieved")
   @Test
   public void readNonexisting() throws ServiceException, RepositoryException {
-    when(repo.getByUuid(any(UUID.class))).thenReturn(null);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(null);
 
     assertThat(service.getByExample(createUrlAlias())).isNull();
   }
@@ -655,7 +619,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("returns null, an UrlAlias with uuid=null should be retrieved")
   @Test
   public void readNull() throws ServiceException, RepositoryException {
-    when(repo.getByUuid(eq(null))).thenReturn(null);
+    when(repo.getByExample(eq(null))).thenReturn(null);
 
     assertThat(service.getByExample(null)).isNull();
   }
@@ -768,7 +732,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     urlAlias.setTargetLanguage(Locale.forLanguageTag("de"));
     expected.add(urlAlias);
 
-    when(repo.getByIdentifiable(any(UUID.class))).thenReturn(expected);
+    when(repo.getByIdentifiable(any(Identifiable.class))).thenReturn(expected);
 
     assertThat(service.getByIdentifiable(createIdentifiable())).isEqualTo(expected);
   }
@@ -779,7 +743,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(any(UUID.class), any(String.class), eq(false)))
+    when(repo.findPrimaryLinksForWebsite(any(Website.class), any(String.class), eq(false)))
         .thenReturn(expected);
 
     assertThat(service.getPrimaryUrlAliases(createWebsite(), "hützligrütz", null))
@@ -792,7 +756,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID()));
-    when(repo.findPrimaryLinksForWebsite(eq((UUID) null), any(String.class), eq(false)))
+    when(repo.findPrimaryLinksForWebsite(eq((Website) null), any(String.class), eq(false)))
         .thenReturn(expected);
 
     assertThat(service.getPrimaryUrlAliases(null, "hützligrütz", null)).isEqualTo(expected);
@@ -833,7 +797,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @DisplayName("throws an exception, when the query for existance of a slug leads to an exception")
   @Test
   public void throwsExceptionWhenSlugQueryFails() throws RepositoryException {
-    when(repo.hasUrlAlias(any(String.class), any(UUID.class), any(Locale.class)))
+    when(repo.hasUrlAlias(any(String.class), any(Website.class), any(Locale.class)))
         .thenThrow(new RepositoryException("foo"));
 
     assertThrows(
@@ -848,9 +812,9 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   @Test
   public void throwsExceptionWhenSlugQueryForSuffixesFails() throws RepositoryException {
     when(slugGenerator.generateSlug(eq("label"))).thenReturn("label");
-    when(repo.hasUrlAlias(eq("label"), any(UUID.class), any(Locale.class))).thenReturn(true);
+    when(repo.hasUrlAlias(eq("label"), any(Website.class), any(Locale.class))).thenReturn(true);
 
-    when(repo.hasUrlAlias(eq("label-1"), any(UUID.class), any(Locale.class)))
+    when(repo.hasUrlAlias(eq("label-1"), any(Website.class), any(Locale.class)))
         .thenThrow(new RepositoryException("foo"));
 
     assertThrows(
@@ -865,8 +829,7 @@ class UrlAliasServiceImplTest extends AbstractUniqueObjectServiceImplTest {
   public void updateUrlAlias() throws RepositoryException, ServiceException {
     UrlAlias expected =
         createUrlAlias("hützligrütz", true, "de", false, UUID.randomUUID(), UUID.randomUUID());
-
-    when(repo.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(repo.getByExample(any(UrlAlias.class))).thenReturn(expected);
 
     UrlAlias expectedForUpdate = createDeepCopy(expected);
 
