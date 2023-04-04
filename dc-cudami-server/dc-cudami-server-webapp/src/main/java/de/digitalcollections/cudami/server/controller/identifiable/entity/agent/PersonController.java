@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.Person;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
+import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
@@ -64,7 +65,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
         "/latest/persons/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -77,7 +78,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(Person.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -94,7 +95,8 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Person.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -113,13 +115,14 @@ public class PersonController extends AbstractIdentifiableController<Person> {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findByGeoLocationOfBirth(pageRequest, uuid);
+    return service.findByGeoLocationOfBirth(GeoLocation.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(summary = "get all persons died at given geo location")
@@ -135,13 +138,14 @@ public class PersonController extends AbstractIdentifiableController<Person> {
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findByGeoLocationOfDeath(pageRequest, uuid);
+    return service.findByGeoLocationOfDeath(GeoLocation.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Override
@@ -207,9 +211,9 @@ public class PersonController extends AbstractIdentifiableController<Person> {
 
     Person result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(Person.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(Person.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -225,7 +229,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<DigitalObject> getDigitalObjects(@PathVariable("uuid") UUID uuid)
       throws ServiceException {
-    return service.getDigitalObjects(uuid);
+    return service.getDigitalObjects(Person.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Get languages of all persons")
@@ -237,7 +241,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
         "/latest/persons/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -256,7 +260,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(@PathVariable("uuid") UUID uuid) throws ServiceException {
-    return workService.getByPerson(uuid);
+    return workService.getByPerson(Person.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "save a newly created person")

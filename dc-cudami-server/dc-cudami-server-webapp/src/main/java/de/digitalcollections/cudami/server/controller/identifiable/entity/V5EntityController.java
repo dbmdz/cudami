@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
@@ -53,7 +54,7 @@ public class V5EntityController<E extends Entity> {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "entityType", required = false)
           FilterCriterion<String> entityTypeCriterion)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -86,7 +87,7 @@ public class V5EntityController<E extends Entity> {
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "entityType", required = false)
           FilterCriterion<String> entityTypeCriterion)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));

@@ -58,9 +58,9 @@ public class WebpageHtmlController {
       throws ServiceException {
     Webpage webpage;
     if (pLocale == null) {
-      webpage = service.getByUuid(uuid);
+      webpage = service.getByExample(Webpage.builder().uuid(uuid).build());
     } else {
-      webpage = service.getByUuidAndLocale(uuid, pLocale);
+      webpage = service.getByExampleAndLocale(Webpage.builder().uuid(uuid).build(), pLocale);
       Locale returnedLocale = getLocale(webpage);
       model.addAttribute("locale", returnedLocale);
     }

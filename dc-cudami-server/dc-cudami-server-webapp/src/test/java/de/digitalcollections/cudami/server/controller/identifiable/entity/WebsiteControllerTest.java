@@ -5,9 +5,9 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.WebsiteService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.entity.Website;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -34,7 +34,7 @@ class WebsiteControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/websites/7a2f1935-c5b8-40fb-8622-c675de0a6242"})
   public void websiteByUuid(String path) throws Exception {
-    when(websiteService.getByUuid(any(UUID.class))).thenReturn(null);
+    when(websiteService.getByExample(any(Website.class))).thenReturn(null);
 
     testNotFound(path);
   }

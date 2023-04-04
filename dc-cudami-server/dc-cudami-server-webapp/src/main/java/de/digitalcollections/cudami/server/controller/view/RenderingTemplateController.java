@@ -1,6 +1,8 @@
 package de.digitalcollections.cudami.server.controller.view;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.view.RenderingTemplateService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -45,7 +47,8 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(RenderingTemplate.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -60,8 +63,9 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
         "/latest/renderingtemplates/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<RenderingTemplate> getByUuid(@PathVariable UUID uuid) {
-    RenderingTemplate result = service.getByUuid(uuid);
+  public ResponseEntity<RenderingTemplate> getByUuid(@PathVariable UUID uuid)
+      throws ServiceException {
+    RenderingTemplate result = service.getByExample(RenderingTemplate.builder().uuid(uuid).build());
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -69,8 +73,8 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
   @GetMapping(
       value = {"/v6/renderingtemplates/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
-    return this.service.getLanguages();
+  public List<Locale> getLanguages() throws ServiceException {
+    return service.getLanguages();
   }
 
   @Override
@@ -88,8 +92,10 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
         "/latest/renderingtemplates"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public RenderingTemplate save(@RequestBody RenderingTemplate template, BindingResult errors) {
-    return service.save(template);
+  public RenderingTemplate save(@RequestBody RenderingTemplate template, BindingResult errors)
+      throws ValidationException, ServiceException {
+    service.save(template);
+    return template;
   }
 
   @Operation(summary = "Update a rendering template")
@@ -102,8 +108,10 @@ public class RenderingTemplateController extends AbstractUniqueObjectController<
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public RenderingTemplate update(
-      @PathVariable UUID uuid, @RequestBody RenderingTemplate template, BindingResult errors) {
+      @PathVariable UUID uuid, @RequestBody RenderingTemplate template, BindingResult errors)
+      throws ValidationException, ServiceException {
     assert Objects.equals(uuid, template.getUuid());
-    return service.update(template);
+    service.update(template);
+    return template;
   }
 }

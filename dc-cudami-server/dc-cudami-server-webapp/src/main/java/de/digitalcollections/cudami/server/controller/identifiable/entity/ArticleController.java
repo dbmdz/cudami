@@ -49,7 +49,7 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
         "/latest/articles/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -61,7 +61,8 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Article.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -93,9 +94,9 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
 
     Article article;
     if (pLocale == null) {
-      article = service.getByUuid(uuid);
+      article = service.getByExample(Article.builder().uuid(uuid).build());
     } else {
-      article = service.getByUuidAndLocale(uuid, pLocale);
+      article = service.getByExampleAndLocale(Article.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(article, article != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -109,7 +110,7 @@ public class ArticleController extends AbstractIdentifiableController<Article> {
         "/latest/articles/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return this.service.getLanguages();
   }
 

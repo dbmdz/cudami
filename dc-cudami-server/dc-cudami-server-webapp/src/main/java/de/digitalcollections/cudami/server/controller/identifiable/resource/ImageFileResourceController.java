@@ -48,7 +48,8 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(ImageFileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -87,9 +88,10 @@ public class ImageFileResourceController extends AbstractIdentifiableController<
       throws ServiceException {
     ImageFileResource result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(ImageFileResource.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result =
+          service.getByExampleAndLocale(ImageFileResource.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.Identifier;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,8 @@ public abstract class AbstractIdentifiableController<T extends Identifiable>
     Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
 
     T identifiable =
-        getService().getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+        getService()
+            .getByIdentifier(new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()));
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

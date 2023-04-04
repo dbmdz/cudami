@@ -53,7 +53,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   @GetMapping(
       value = {"/v6/manifestations/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -67,7 +67,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(Manifestation.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -84,7 +84,8 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Manifestation.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -106,7 +107,8 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return itemService.findItemsByManifestation(uuid, pageRequest);
+    return itemService.findItemsByManifestation(
+        Manifestation.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(summary = "Find all children of a manifestation")
@@ -118,13 +120,14 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
           UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findChildren(uuid, pageRequest);
+    return service.findSubParts(Manifestation.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(
@@ -161,9 +164,9 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
 
     Manifestation result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(Manifestation.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(Manifestation.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -172,7 +175,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   @GetMapping(
       value = {"/v6/manifestations/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -184,9 +187,10 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       value = {"/v6/manifestations/{uuid:" + ParameterHelper.UUID_PATTERN + "}/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfItems(
-      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable
-          UUID uuid) {
-    return itemService.getLanguagesOfItemsForManifestation(uuid);
+      @Parameter(name = "uuid", description = "UUID of the manifestation") @PathVariable UUID uuid)
+      throws ServiceException {
+    return itemService.getLanguagesOfItemsForManifestation(
+        Manifestation.builder().uuid(uuid).build());
   }
 
   @Override

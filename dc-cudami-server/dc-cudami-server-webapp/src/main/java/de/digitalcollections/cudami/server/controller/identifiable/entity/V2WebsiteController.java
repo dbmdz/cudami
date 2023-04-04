@@ -98,7 +98,7 @@ public class V2WebsiteController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -161,7 +161,7 @@ public class V2WebsiteController {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException, ServiceException {
-    Website website = websiteService.getByUuid(uuid);
+    Website website = websiteService.getByExample(Website.builder().uuid(uuid).build());
     if (website == null) {
       return null;
     }

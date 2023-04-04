@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.agent.CorporateBodyService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -36,7 +37,12 @@ public class V2CorporateBodyControllerTest extends BaseControllerTest {
                 .withContent(
                     CorporateBody.builder()
                         .created("2020-09-30T16:29:58.150463")
-                        .identifier("gnd", "4084641-6", "344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
+                        .identifier(
+                            Identifier.builder()
+                                .namespace("gnd")
+                                .id("4084641-6")
+                                .uuid("344ac2d7-f5a3-45f4-ae6e-6cdf2adc7e6f")
+                                .build())
                         .label(Locale.GERMAN, "Abensberg")
                         .lastModified("2020-09-30T16:29:58.150464")
                         .previewImage(

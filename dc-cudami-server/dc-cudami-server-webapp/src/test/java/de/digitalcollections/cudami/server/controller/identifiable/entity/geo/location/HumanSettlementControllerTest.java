@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.HumanSettlementService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -38,11 +39,14 @@ class HumanSettlementControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     HumanSettlement expected = HumanSettlement.builder().build();
 
-    when(humanSettlementService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(humanSettlementService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(humanSettlementService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(humanSettlementService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -57,12 +61,15 @@ class HumanSettlementControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     HumanSettlement expected = HumanSettlement.builder().build();
 
-    when(humanSettlementService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(humanSettlementService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(humanSettlementService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(humanSettlementService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

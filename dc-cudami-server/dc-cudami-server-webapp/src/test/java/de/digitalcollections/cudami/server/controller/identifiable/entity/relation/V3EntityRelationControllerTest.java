@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
@@ -59,9 +60,11 @@ public class V3EntityRelationControllerTest extends BaseControllerTest {
                             Project.builder()
                                 .created("2020-09-30T16:25:10.901715")
                                 .identifier(
-                                    "mdz-proj",
-                                    "1496151210",
-                                    "9ded8827-d4bd-4ddc-9c4e-9ebd74b795c0")
+                                    Identifier.builder()
+                                        .namespace("mdz-proj")
+                                        .id("1496151210")
+                                        .uuid("9ded8827-d4bd-4ddc-9c4e-9ebd74b795c0")
+                                        .build())
                                 .label(Locale.GERMAN, "Parent-Archiv")
                                 .lastModified("2021-04-16T04:15:01.490064")
                                 .uuid("34c36d4b-ee84-4eb3-9698-a14d22079d99")

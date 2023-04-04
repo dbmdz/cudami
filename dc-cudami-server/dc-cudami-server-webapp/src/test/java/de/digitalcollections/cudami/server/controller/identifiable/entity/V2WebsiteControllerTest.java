@@ -11,7 +11,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -95,7 +94,7 @@ class V2WebsiteControllerTest extends BaseControllerTest {
                         .build()))
             .build();
 
-    when(websiteService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(websiteService.getByExample(any(Website.class))).thenReturn(expected);
 
     testJson(path);
   }

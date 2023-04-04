@@ -12,7 +12,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,8 +35,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnActive(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByExampleAndActive(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByExampleAndActiveAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExampleAndActive(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndActiveAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testJson(path);
   }
@@ -96,8 +95,9 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .build()))
                 .build();
 
-    when(webpageService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
-    when(webpageService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(webpageService.findChildren(any(Webpage.class), any(PageRequest.class)))
+        .thenReturn(expected);
+    when(webpageService.findActiveChildren(any(Webpage.class), any(PageRequest.class)))
         .thenReturn(expected);
     testJson(path.replaceAll("latest", "v3")); // v3 equals latest
   }
@@ -110,8 +110,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
         "/v3/webpages/8f95bd0a-7095-44e7-9ab3-061f288741aa?active=true&pLocale=de_DE"
       })
   public void returnNoNonActive(String path) throws Exception {
-    when(webpageService.getByExampleAndActive(any(UUID.class))).thenReturn(null);
-    when(webpageService.getByExampleAndActiveAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExampleAndActive(any(Webpage.class))).thenReturn(null);
+    when(webpageService.getByExampleAndActiveAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(null);
     testNotFound(path);
   }
@@ -170,8 +170,9 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                             .build()))
                 .build();
 
-    when(webpageService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
-    when(webpageService.findActiveChildren(any(UUID.class), any(PageRequest.class)))
+    when(webpageService.findChildren(any(Webpage.class), any(PageRequest.class)))
+        .thenReturn(expected);
+    when(webpageService.findActiveChildren(any(Webpage.class), any(PageRequest.class)))
         .thenReturn(expected);
     testJson(path, "/v3/webpages/news.json");
   }
@@ -185,8 +186,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV3JsonAcceptHeader(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testJson(path);
   }
@@ -200,8 +201,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV3JsonDefault(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testJson(path);
   }
@@ -218,8 +219,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
       })
   public void returnWebpageV3JsonUrl(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testJson(path);
   }
@@ -234,8 +235,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   @Disabled("does not support XML results any more since they were never used")
   public void returnWebpageV3XmlAcceptHeader(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testXml(path);
   }
@@ -250,8 +251,8 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
   @Disabled("does not support XML results any more since they were never used")
   public void returnWebpageV3XmlUrl(String path) throws Exception {
     Webpage expected = createPrefilledWebpage(path);
-    when(webpageService.getByUuid(any(UUID.class))).thenReturn(expected);
-    when(webpageService.getByUuidAndLocale(any(UUID.class), any(Locale.class)))
+    when(webpageService.getByExample(any(Webpage.class))).thenReturn(expected);
+    when(webpageService.getByExampleAndLocale(any(Webpage.class), any(Locale.class)))
         .thenReturn(expected);
     testXml(path);
   }
@@ -337,10 +338,10 @@ class V3WebpageControllerTest extends BaseWebpageControllerTest {
                 .build());
 
     when(webpageService.getChildrenTree(
-            eq(UUID.fromString("ead664b6-5fcc-414e-b3bb-133f0af1acb8"))))
+            eq(Webpage.builder().uuid("ead664b6-5fcc-414e-b3bb-133f0af1acb8").build())))
         .thenReturn(expected);
     when(webpageService.getActiveChildrenTree(
-            eq(UUID.fromString("ead664b6-5fcc-414e-b3bb-133f0af1acb8"))))
+            eq(Webpage.builder().uuid("ead664b6-5fcc-414e-b3bb-133f0af1acb8").build())))
         .thenReturn(expected);
 
     testJson(path);

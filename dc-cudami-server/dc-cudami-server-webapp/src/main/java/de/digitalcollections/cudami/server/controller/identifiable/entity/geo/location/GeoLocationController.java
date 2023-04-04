@@ -57,7 +57,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
         "/latest/geolocations/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -71,7 +71,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(GeoLocation.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -88,7 +88,8 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(GeoLocation.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -157,9 +158,9 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
 
     GeoLocation result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(GeoLocation.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(GeoLocation.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -173,7 +174,7 @@ public class GeoLocationController extends AbstractIdentifiableController<GeoLoc
         "/latest/geolocations/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 

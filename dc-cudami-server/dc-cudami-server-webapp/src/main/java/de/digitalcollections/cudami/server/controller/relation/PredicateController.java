@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.relation;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
@@ -51,8 +52,9 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
               description =
                   "UUID of the predicate, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
-          UUID uuid) {
-    boolean successful = service.deleteByValue(uuid);
+          UUID uuid)
+      throws ConflictException, ServiceException {
+    boolean successful = service.delete(Predicate.builder().uuid(uuid).build());
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -66,7 +68,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Predicate.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -76,12 +79,12 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
   @GetMapping(
       value = {"/v6/predicates/{valueOrUuid:.+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Predicate> getByValueOrUUID(
-      @PathVariable("valueOrUuid") String valueOrUuid) {
+  public ResponseEntity<Predicate> getByValueOrUUID(@PathVariable("valueOrUuid") String valueOrUuid)
+      throws ServiceException {
     Predicate result;
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
-      result = service.getByUuid(uuid);
+      result = service.getByExample(Predicate.builder().uuid(uuid).build());
     } else {
       result = service.getByValue(valueOrUuid);
     }
@@ -92,7 +95,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
   @GetMapping(
       value = {"/v6/predicates/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -107,7 +110,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate save(@Valid @RequestBody Predicate predicate, BindingResult bindingResult)
-      throws ServiceException, ValidationException {
+      throws ServiceException, ValidationException,
+          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
     if (bindingResult.hasErrors()) {
       ValidationException validationException = new ValidationException("validation error");
       bindingResult
@@ -120,7 +124,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
               });
       throw validationException;
     }
-    return service.save(predicate);
+    service.save(predicate);
+    return predicate;
   }
 
   /*
@@ -138,7 +143,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Predicate update(
       @PathVariable("valueOrUuid") String valueOrUuid, @NotNull @RequestBody Predicate predicate)
-      throws ServiceException {
+      throws ServiceException,
+          de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
 
     if (valueOrUuid.matches(ParameterHelper.UUID_PATTERN)) {
       UUID uuid = UUID.fromString(valueOrUuid);
@@ -149,7 +155,8 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
                 + " does not match uuid of predicate="
                 + predicate.getUuid());
       }
-      return service.update(predicate);
+      service.update(predicate);
+      return predicate;
     }
 
     String value = valueOrUuid;
@@ -158,6 +165,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
           "value of path=" + value + " does not match value of predicate=" + predicate.getValue());
     }
 
-    return service.saveOrUpdate(predicate);
+    service.saveOrUpdate(predicate);
+    return predicate;
   }
 }

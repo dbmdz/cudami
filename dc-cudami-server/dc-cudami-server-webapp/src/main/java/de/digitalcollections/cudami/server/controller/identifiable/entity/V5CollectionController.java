@@ -3,6 +3,7 @@ package de.digitalcollections.cudami.server.controller.identifiable.entity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
@@ -57,7 +58,7 @@ public class V5CollectionController {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm,
       @RequestParam(name = "active", required = false) String active)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -88,7 +89,7 @@ public class V5CollectionController {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
 
     Collection collection = new Collection();
@@ -116,7 +117,7 @@ public class V5CollectionController {
       @RequestParam(name = "active", required = false) String active,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -124,9 +125,13 @@ public class V5CollectionController {
     }
     PageResponse<Collection> pageResponse;
     if (active != null) {
-      pageResponse = collectionService.findActiveChildren(collectionUuid, searchPageRequest);
+      pageResponse =
+          collectionService.findActiveChildren(
+              Collection.builder().uuid(collectionUuid).build(), searchPageRequest);
     } else {
-      pageResponse = collectionService.findSubParts(collectionUuid, searchPageRequest);
+      pageResponse =
+          collectionService.findChildren(
+              Collection.builder().uuid(collectionUuid).build(), searchPageRequest);
     }
 
     try {
@@ -146,7 +151,7 @@ public class V5CollectionController {
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "searchTerm", required = false) String searchTerm)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));

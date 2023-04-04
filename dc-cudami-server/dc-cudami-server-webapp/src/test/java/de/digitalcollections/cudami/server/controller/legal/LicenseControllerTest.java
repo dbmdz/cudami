@@ -112,7 +112,7 @@ public class LicenseControllerTest extends BaseControllerTest {
   @Test
   public void testGetByUuid() throws Exception {
     License license = createTestLicenseSaved();
-    when(licenseService.getByUuid(any(UUID.class))).thenReturn(license);
+    when(licenseService.getByExample(any(License.class))).thenReturn(license);
 
     testJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",
@@ -130,9 +130,6 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  },\n"
             + "  \"url\": \"http://rightsstatements.org/vocab/InC-NC/1.0/\"\n"
             + "}";
-    License savedLicense = createTestLicenseSaved();
-    when(licenseService.save(any(License.class))).thenReturn(savedLicense);
-
     testPostJson("/v5/licenses", jsonBody, "/v5/legal/licenses/license_response.json");
   }
 
@@ -148,9 +145,6 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  \"url\": \"http://rightsstatements.org/vocab/InC-NC/1.0/\",\n"
             + "  \"uuid\": \"2780bee1-eeec-4b50-a95b-bba90793fc6a\"\n"
             + "}";
-    License savedLicense = createTestLicenseSaved();
-    when(licenseService.update(any(License.class))).thenReturn(savedLicense);
-
     testPutJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",
         jsonBody,

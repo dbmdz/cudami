@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
@@ -85,7 +86,7 @@ public class V2IdentifierTypeController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "sortBy", required = false)
           List<Order> sortBy)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       List<Order> migratedSortBy = V5MigrationHelper.migrate(sortBy);

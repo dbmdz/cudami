@@ -75,7 +75,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
         "/latest/websites/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -87,7 +87,8 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Website.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -143,10 +144,11 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               example = "label_de:like:Homepage",
               schema = @Schema(type = "List<FilterCriterion>"))
           @RequestParam(name = "filter", required = false)
-          List<FilterCriterion> filterCriteria) {
+          List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.findRootWebpages(uuid, pageRequest);
+    return service.findRootWebpages(Website.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(
@@ -176,7 +178,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @PathVariable
           UUID uuid)
       throws JsonProcessingException, ServiceException {
-    Website website = service.getByUuid(uuid);
+    Website website = service.getByExample(Website.builder().uuid(uuid).build());
     return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -192,7 +194,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
         "/latest/websites/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -290,7 +292,8 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
           @PathVariable("uuid")
           UUID uuid,
       @Parameter(required = true, description = "rootpages as a list of webpages") @RequestBody
-          List<Webpage> rootPages) {
+          List<Webpage> rootPages)
+      throws ServiceException {
     Website website = new Website();
     website.setUuid(uuid);
 

@@ -5,10 +5,9 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.identifiable.IdentifiableObjectType;
-import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -32,7 +31,7 @@ class V5UrlAliasControllerTest extends BaseControllerTest {
     PageResponse<LocalizedUrlAliases> expected =
         PageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
-    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
+    when(urlAliasService.findLocalizedUrlAliases(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/empty.json");
   }
@@ -54,8 +53,10 @@ class V5UrlAliasControllerTest extends BaseControllerTest {
                             .isPrimary()
                             .slug("hurz")
                             .targetLanguage("de")
-                            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-                            .targetUuid("23456789-2345-2345-2345-234567890123")
+                            .target(
+                                Collection.builder()
+                                    .uuid("23456789-2345-2345-2345-234567890123")
+                                    .build())
                             .uuid("12345678-1234-1234-1234-123456789012")
                             .website(
                                 Website.builder()
@@ -64,7 +65,7 @@ class V5UrlAliasControllerTest extends BaseControllerTest {
                             .build())))
             .build();
 
-    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
+    when(urlAliasService.findLocalizedUrlAliases(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/find_with_result.json");
   }

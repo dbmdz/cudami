@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -92,11 +93,14 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     FileResource expected = FileResource.builder().build();
 
-    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(fileResourceMetadataService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(fileResourceMetadataService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -111,13 +115,15 @@ class FileResourceMetadataControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     FileResource expected = FileResource.builder().build();
 
-    when(fileResourceMetadataService.getByIdentifier(eq("foo"), eq("bar/bla")))
+    when(fileResourceMetadataService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
         .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(fileResourceMetadataService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(fileResourceMetadataService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.controller.identifiable;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -45,7 +46,8 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(IdentifierType.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -55,7 +57,8 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
   @GetMapping(
       value = {"/v6/identifiertypes/namespace/{namespace}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<IdentifierType> getByNamespace(@PathVariable String namespace) {
+  public ResponseEntity<IdentifierType> getByNamespace(@PathVariable String namespace)
+      throws ServiceException {
     IdentifierType identifierType = service.getByNamespace(namespace);
     return new ResponseEntity<>(
         identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -70,8 +73,9 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
         "/latest/identifiertypes/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) {
-    IdentifierType identifierType = service.getByUuid(uuid);
+  public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    IdentifierType identifierType =
+        service.getByExample(IdentifierType.builder().uuid(uuid).build());
     return new ResponseEntity<>(
         identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -92,7 +96,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     service.save(identifierType);
     return identifierType;
   }
@@ -108,7 +112,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, identifierType.getUuid());
     service.update(identifierType);
     return identifierType;

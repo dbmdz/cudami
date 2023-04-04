@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.server.controller.relation;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doAnswer;
 
 import de.digitalcollections.cudami.server.business.api.service.relation.PredicateService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
@@ -35,7 +35,14 @@ class PredicateControllerTest extends BaseControllerTest {
     String jsonBody =
         "{\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {" + "\"\": \"bar\"" + "}}";
 
-    when(predicateService.save(any(Predicate.class))).thenReturn(predicate);
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              ((Predicate) args[0]).setUuid(predicate.getUuid());
+              return null;
+            })
+        .when(predicateService)
+        .save(any(Predicate.class));
 
     testPostJson("/v6/predicates", jsonBody, "/v6/relation/predicates/predicates_response.json");
     testPostJson("/v5/predicates", jsonBody, "/v6/relation/predicates/predicates_response.json");
@@ -60,7 +67,14 @@ class PredicateControllerTest extends BaseControllerTest {
     String jsonBody =
         "{\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {" + "\"\": \"bar\"" + "}}";
 
-    when(predicateService.saveOrUpdate(any(Predicate.class))).thenReturn(predicate);
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              ((Predicate) args[0]).setUuid(predicate.getUuid());
+              return null;
+            })
+        .when(predicateService)
+        .saveOrUpdate(any(Predicate.class));
 
     // Yes, it really works with put!
     testPutJson("/v6/predicates/foo", jsonBody, "/v6/relation/predicates/predicates_response.json");
@@ -84,7 +98,15 @@ class PredicateControllerTest extends BaseControllerTest {
     // We update a predicate without UUID
     String jsonBody =
         "{\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {" + "\"\": \"bar\"" + "}}";
-    when(predicateService.saveOrUpdate(any(Predicate.class))).thenReturn(predicate);
+
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              ((Predicate) args[0]).setUuid(predicate.getUuid());
+              return null;
+            })
+        .when(predicateService)
+        .saveOrUpdate(any(Predicate.class));
 
     testPutJson("/v6/predicates/foo", jsonBody, "/v6/relation/predicates/predicates_response.json");
   }
@@ -107,7 +129,15 @@ class PredicateControllerTest extends BaseControllerTest {
             + "\",\"objectType\":\"PREDICATE\",\"value\":\"foo\",\"label\": {"
             + "\"\": \"bar\""
             + "}}";
-    when(predicateService.update(any(Predicate.class))).thenReturn(predicate);
+
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              ((Predicate) args[0]).setUuid(predicate.getUuid());
+              return null;
+            })
+        .when(predicateService)
+        .update(any(Predicate.class));
 
     testPutJson(
         "/v6/predicates/" + uuid, jsonBody, "/v6/relation/predicates/predicates_response.json");

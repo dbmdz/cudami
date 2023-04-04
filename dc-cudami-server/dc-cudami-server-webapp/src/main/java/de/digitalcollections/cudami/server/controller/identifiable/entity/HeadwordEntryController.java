@@ -11,6 +11,7 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
+import de.digitalcollections.model.semantic.Headword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,7 +46,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
   @GetMapping(
       value = {"/v6/headwordentries/count", "/v5/headwordentries/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -57,7 +58,8 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(HeadwordEntry.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -78,7 +80,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    return service.getByHeadword(uuid);
+    return service.getByHeadword(Headword.builder().uuid(uuid).build());
   }
 
   @Override
@@ -118,9 +120,10 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
 
     HeadwordEntry headwordEntry;
     if (pLocale == null) {
-      headwordEntry = service.getByUuid(uuid);
+      headwordEntry = service.getByExample(HeadwordEntry.builder().uuid(uuid).build());
     } else {
-      headwordEntry = service.getByUuidAndLocale(uuid, pLocale);
+      headwordEntry =
+          service.getByExampleAndLocale(HeadwordEntry.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(
         headwordEntry, headwordEntry != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -130,7 +133,7 @@ public class HeadwordEntryController extends AbstractIdentifiableController<Head
   @GetMapping(
       value = {"/v6/headwordentries/languages", "/v5/headwordentries/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return this.service.getLanguages();
   }
 

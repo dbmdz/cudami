@@ -8,16 +8,15 @@ import static org.mockito.Mockito.when;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
-import de.digitalcollections.model.identifiable.IdentifiableObjectType;
-import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Website;
+import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,7 +35,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void nonexistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(null);
+    when(urlAliasService.getByExample(any(UrlAlias.class))).thenReturn(null);
 
     testNotFound(path);
   }
@@ -52,12 +51,11 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Collection.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
-    when(urlAliasService.getByUuid(any(UUID.class))).thenReturn(expectedUrlAlias);
+    when(urlAliasService.getByExample(any(UrlAlias.class))).thenReturn(expectedUrlAlias);
 
     testJson(path);
   }
@@ -66,7 +64,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteNonexistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.deleteByUuid(any(UUID.class))).thenReturn(false);
+    when(urlAliasService.delete(any(UrlAlias.class))).thenReturn(false);
 
     testDeleteNotFound(path);
   }
@@ -75,7 +73,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteExistingUrlAlias(String path) throws Exception {
-    when(urlAliasService.deleteByUuid(any(UUID.class))).thenReturn(true);
+    when(urlAliasService.delete(any(UrlAlias.class))).thenReturn(true);
 
     testDeleteSuccessful(path);
   }
@@ -112,8 +110,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Collection.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
@@ -150,8 +147,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("hurz")
             .targetLanguage("de")
-            .targetType(IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Collection.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build();
@@ -210,7 +206,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         (PageResponse<LocalizedUrlAliases>)
             PageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
-    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
+    when(urlAliasService.findLocalizedUrlAliases(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v6/urlaliases/empty.json");
   }
@@ -233,9 +229,10 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                 .isPrimary()
                                 .slug("hurz")
                                 .targetLanguage("de")
-                                .targetType(
-                                    IdentifiableObjectType.COLLECTION, IdentifiableType.ENTITY)
-                                .targetUuid("23456789-2345-2345-2345-234567890123")
+                                .target(
+                                    Collection.builder()
+                                        .uuid("23456789-2345-2345-2345-234567890123")
+                                        .build())
                                 .uuid("12345678-1234-1234-1234-123456789012")
                                 .website(
                                     Website.builder()
@@ -244,7 +241,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
                                 .build())))
                 .build();
 
-    when(urlAliasService.find(any(PageRequest.class))).thenReturn(expected);
+    when(urlAliasService.findLocalizedUrlAliases(any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v6/urlaliases/find_with_result.json");
   }
@@ -266,7 +263,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @Test
   public void nonexistingPrimaryLinks() throws Exception {
     when(urlAliasService.getPrimaryUrlAliases(
-            any(UUID.class), eq("notexisting"), any(Locale.class)))
+            any(Website.class), eq("notexisting"), any(Locale.class)))
         .thenReturn(null);
 
     testNotFound("/v5/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
@@ -284,13 +281,12 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("en")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Webpage.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
-    when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(null)))
+    when(urlAliasService.getPrimaryUrlAliases(any(Website.class), eq("imprint"), eq(null)))
         .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
@@ -309,14 +305,13 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("de")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Webpage.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .website(Website.builder().uuid("87654321-4321-4321-4321-876543210987").build())
             .build());
 
     Locale actualLocale = Locale.forLanguageTag("de");
-    when(urlAliasService.getPrimaryUrlAliases(any(UUID.class), eq("imprint"), eq(actualLocale)))
+    when(urlAliasService.getPrimaryUrlAliases(any(Website.class), eq("imprint"), eq(actualLocale)))
         .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987_de.json");
@@ -334,8 +329,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .isPrimary()
             .slug("imprint")
             .targetLanguage("en")
-            .targetType(IdentifiableObjectType.WEBPAGE, IdentifiableType.RESOURCE)
-            .targetUuid("23456789-2345-2345-2345-234567890123")
+            .target(Webpage.builder().uuid("23456789-2345-2345-2345-234567890123").build())
             .uuid("12345678-1234-1234-1234-123456789012")
             .build());
 
@@ -348,7 +342,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @DisplayName("throws an exception, when the service fails on generating a slug")
   @Test
   public void exceptionOnSlugGeneration() throws Exception {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(Website.class)))
         .thenThrow(new ServiceException("foo"));
 
     testInternalError("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
@@ -357,7 +351,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @DisplayName("returns 404 when trying to generate a slug for a nonexisting website uuid")
   @Test
   public void slugForNonexistingWebsiteUuid() throws Exception {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(Website.class)))
         .thenReturn(null);
 
     testNotFound("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
@@ -366,7 +360,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @DisplayName("returns a generated slug")
   @Test
   public void generateSlug() throws Exception {
-    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(UUID.class)))
+    when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(Website.class)))
         .thenReturn("hurz");
 
     testGetJsonString(

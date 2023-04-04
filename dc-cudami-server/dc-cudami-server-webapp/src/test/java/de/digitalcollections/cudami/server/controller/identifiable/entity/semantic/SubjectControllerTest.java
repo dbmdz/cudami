@@ -38,7 +38,8 @@ class SubjectControllerTest extends BaseControllerTest {
             .identifier(Identifier.builder().namespace("namespace").id("id").build())
             .type("type")
             .build();
-    when(subjectService.getByTypeAndIdentifier(eq("type"), eq("namespace"), eq("id")))
+    when(subjectService.getByTypeAndIdentifier(
+            eq("type"), eq(Identifier.builder().namespace("namespace").id("id").build())))
         .thenReturn(expected);
 
     testJson(path, "/v5/subjects/type_namespace_id.json");
@@ -51,7 +52,8 @@ class SubjectControllerTest extends BaseControllerTest {
     String path =
         "/v6/subjects/identifier/"
             + Base64.encodeBase64String("type:namespace:id".getBytes(StandardCharsets.UTF_8));
-    when(subjectService.getByTypeAndIdentifier(eq("type"), eq("namespace"), eq("id")))
+    when(subjectService.getByTypeAndIdentifier(
+            eq("type"), eq(Identifier.builder().namespace("namespace").id("id").build())))
         .thenReturn(null);
     testNotFound(path);
   }

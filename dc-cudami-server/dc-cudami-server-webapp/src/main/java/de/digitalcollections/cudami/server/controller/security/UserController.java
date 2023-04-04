@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.security;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.security.UserService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +47,8 @@ public class UserController extends AbstractUniqueObjectController<User> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(User.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -57,7 +60,8 @@ public class UserController extends AbstractUniqueObjectController<User> {
       params = {"role", "enabled"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<User> getByRoleAndStatus(
-      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled) {
+      @RequestParam(name = "role") Role role, @RequestParam(name = "enabled") boolean enabled)
+      throws ServiceException {
     // FIXME: ignores role, just returns admins? what if we want other role users?
     return service.getActiveAdminUsers();
   }
@@ -67,7 +71,8 @@ public class UserController extends AbstractUniqueObjectController<User> {
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       params = {"email"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email) {
+  public ResponseEntity<User> getByUsername(@RequestParam(name = "email") String email)
+      throws UsernameNotFoundException, ServiceException {
     User result = service.getByUsername(email);
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -81,8 +86,8 @@ public class UserController extends AbstractUniqueObjectController<User> {
         "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) {
-    User result = service.getByUuid(uuid);
+  public ResponseEntity<User> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    User result = service.getByExample(User.builder().uuid(uuid).build());
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -96,7 +101,7 @@ public class UserController extends AbstractUniqueObjectController<User> {
   @PostMapping(
       value = {"/v6/users", "/v5/users", "/v2/users", "/latest/users"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User save(@RequestBody User user, BindingResult errors) {
+  public User save(@RequestBody User user, BindingResult errors) throws ServiceException {
     return service.save(user, errors);
   }
 
@@ -109,7 +114,8 @@ public class UserController extends AbstractUniqueObjectController<User> {
         "/latest/users/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors) {
+  public User update(@PathVariable UUID uuid, @RequestBody User user, BindingResult errors)
+      throws ServiceException {
     assert Objects.equals(uuid, user.getUuid());
     return service.update(user, errors);
   }

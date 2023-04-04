@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.server.business.api.service.exceptions.Valid
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.semantic.SubjectService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -48,7 +49,8 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Subject.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -73,7 +75,11 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
     }
     Subject subject =
         service.getByTypeAndIdentifier(
-            typeNamespaceId.getLeft(), typeNamespaceId.getMiddle(), typeNamespaceId.getRight());
+            typeNamespaceId.getLeft(),
+            Identifier.builder()
+                .namespace(typeNamespaceId.getMiddle())
+                .id(typeNamespaceId.getRight())
+                .build());
     return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -81,8 +87,8 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
   @GetMapping(
       value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) {
-    Subject subject = service.getByUuid(uuid);
+  public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    Subject subject = service.getByExample(Subject.builder().uuid(uuid).build());
     return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -95,7 +101,8 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
   @PostMapping(
       value = {"/v6/subjects"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Subject save(@RequestBody Subject subject, BindingResult errors) throws ServiceException {
+  public Subject save(@RequestBody Subject subject, BindingResult errors)
+      throws ServiceException, ValidationException {
     service.save(subject);
     return subject;
   }
@@ -105,7 +112,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, subject.getUuid());
     service.update(subject);
     return subject;

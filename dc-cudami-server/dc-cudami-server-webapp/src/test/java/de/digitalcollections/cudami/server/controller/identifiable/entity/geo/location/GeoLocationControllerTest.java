@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.geo.location.GeoLocationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.geo.location.GeoLocation;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -38,11 +39,14 @@ class GeoLocationControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     GeoLocation expected = GeoLocation.builder().build();
 
-    when(geoLocationService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(geoLocationService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(geoLocationService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(geoLocationService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -57,12 +61,15 @@ class GeoLocationControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     GeoLocation expected = GeoLocation.builder().build();
 
-    when(geoLocationService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(geoLocationService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(geoLocationService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(geoLocationService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

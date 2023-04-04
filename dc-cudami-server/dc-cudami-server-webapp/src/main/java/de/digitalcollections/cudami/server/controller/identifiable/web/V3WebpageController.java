@@ -98,15 +98,18 @@ public class V3WebpageController {
     Webpage webpage;
     if (active != null) {
       if (pLocale == null) {
-        webpage = webpageService.getByExampleAndActive(uuid);
+        webpage = webpageService.getByExampleAndActive(Webpage.builder().uuid(uuid).build());
       } else {
-        webpage = webpageService.getByExampleAndActiveAndLocale(uuid, pLocale);
+        webpage =
+            webpageService.getByExampleAndActiveAndLocale(
+                Webpage.builder().uuid(uuid).build(), pLocale);
       }
     } else {
       if (pLocale == null) {
-        webpage = webpageService.getByUuid(uuid);
+        webpage = webpageService.getByExample(Webpage.builder().uuid(uuid).build());
       } else {
-        webpage = webpageService.getByUuidAndLocale(uuid, pLocale);
+        webpage =
+            webpageService.getByExampleAndLocale(Webpage.builder().uuid(uuid).build(), pLocale);
       }
     }
 
@@ -246,7 +249,7 @@ public class V3WebpageController {
               schema = @Schema(implementation = Boolean.class))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException, CudamiControllerException {
+      throws JsonProcessingException, CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -255,9 +258,10 @@ public class V3WebpageController {
     PageResponse<Webpage> pageResponse;
 
     if (active != null) {
-      pageResponse = webpageService.findActiveChildren(uuid, pageRequest);
+      pageResponse =
+          webpageService.findActiveChildren(Webpage.builder().uuid(uuid).build(), pageRequest);
     } else {
-      pageResponse = webpageService.findSubParts(uuid, pageRequest);
+      pageResponse = webpageService.findChildren(Webpage.builder().uuid(uuid).build(), pageRequest);
     }
 
     JSONObject result = new JSONObject(objectMapper.writeValueAsString(pageResponse));
@@ -314,12 +318,12 @@ public class V3WebpageController {
               schema = @Schema(implementation = Boolean.class))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     List<Webpage> childrenList;
     if (active != null) {
-      childrenList = webpageService.getActiveChildrenTree(uuid);
+      childrenList = webpageService.getActiveChildrenTree(Webpage.builder().uuid(uuid).build());
     } else {
-      childrenList = webpageService.getChildrenTree(uuid);
+      childrenList = webpageService.getChildrenTree(Webpage.builder().uuid(uuid).build());
     }
 
     JSONArray resultList = new JSONArray(objectMapper.writeValueAsString(childrenList));

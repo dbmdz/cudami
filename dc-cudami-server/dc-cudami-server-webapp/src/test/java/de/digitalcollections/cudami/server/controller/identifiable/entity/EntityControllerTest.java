@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -67,7 +68,12 @@ class EntityControllerTest extends BaseControllerTest {
     Entity expected =
         Project.builder()
             .created("2020-09-30T16:25:09.365401")
-            .identifier("mdz-proj", "1328176523", "54edc946-5e10-495a-bda2-cdc2ebd4e3d6")
+            .identifier(
+                Identifier.builder()
+                    .namespace("mdz-proj")
+                    .id("1328176523")
+                    .uuid("54edc946-5e10-495a-bda2-cdc2ebd4e3d6")
+                    .build())
             .label(
                 Locale.GERMAN,
                 "Notendrucke des 16. und 17. Jahrhunderts mit mehrstimmiger Musik in der BSB")
@@ -78,7 +84,9 @@ class EntityControllerTest extends BaseControllerTest {
             .uuid("d76bb26f-bd7d-4ade-be48-a2139d49dbf1")
             .refId(1300518)
             .build();
-    when(entityService.getByIdentifier(eq("mdz-proj"), eq("1328176523"))).thenReturn(expected);
+    when(entityService.getByIdentifier(
+            eq(Identifier.builder().namespace("mdz-proj").id("1328176523").build())))
+        .thenReturn(expected);
   }
 
   @DisplayName("can retrieve by identifier with plaintext id")
@@ -95,11 +103,13 @@ class EntityControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Entity expected = Entity.builder().build();
 
-    when(entityService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(entityService.getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(entityService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(entityService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -108,12 +118,15 @@ class EntityControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Entity expected = Entity.builder().build();
 
-    when(entityService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(entityService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(entityService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(entityService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

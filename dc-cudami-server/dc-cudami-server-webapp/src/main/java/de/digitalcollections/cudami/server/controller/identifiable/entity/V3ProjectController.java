@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.ProjectService;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -83,7 +84,7 @@ public class V3ProjectController {
               schema = @Schema(type = "integer"))
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize, new Sorting());
 
     Project project = new Project();

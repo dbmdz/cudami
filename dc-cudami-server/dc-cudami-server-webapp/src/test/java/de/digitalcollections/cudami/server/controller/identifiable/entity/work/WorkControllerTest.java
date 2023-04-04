@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ManifestationService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.work.Work;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
@@ -43,11 +44,13 @@ class WorkControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Work expected = new Work();
 
-    when(workService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(workService.getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(workService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(workService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -62,13 +65,16 @@ class WorkControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Work expected = new Work();
 
-    when(workService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(workService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + java.util.Base64.getEncoder()
                 .encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(workService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(workService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 }

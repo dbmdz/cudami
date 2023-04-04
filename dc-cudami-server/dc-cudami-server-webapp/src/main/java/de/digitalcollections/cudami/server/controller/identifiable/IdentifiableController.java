@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Identifiable controller")
 public class IdentifiableController extends AbstractIdentifiableController<Identifiable> {
 
-  private final IdentifiableService service;
+  private final IdentifiableService<Identifiable> service;
   private final UrlAliasService urlAliasService;
 
   public IdentifiableController(
@@ -55,7 +55,8 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Identifiable.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -90,7 +91,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
       throws ResourceNotFoundException, ServiceException {
-    Identifiable identifiable = service.getByUuid(uuid);
+    Identifiable identifiable = service.getByExample(Identifiable.builder().uuid(uuid).build());
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -111,7 +112,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       throws CudamiControllerException {
 
     try {
-      if (service.getByUuid(uuid) == null) {
+      if (service.getByExample(Identifiable.builder().uuid(uuid).build()) == null) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
@@ -119,7 +120,9 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
     }
 
     try {
-      return new ResponseEntity<>(urlAliasService.getByIdentifiable(uuid), HttpStatus.OK);
+      return new ResponseEntity<>(
+          urlAliasService.getByIdentifiable(Identifiable.builder().uuid(uuid).build()),
+          HttpStatus.OK);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

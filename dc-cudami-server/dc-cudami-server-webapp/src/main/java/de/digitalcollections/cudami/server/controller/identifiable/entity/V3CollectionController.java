@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.entity.Collection;
@@ -101,7 +102,7 @@ public class V3CollectionController {
               schema = @Schema(type = "string"))
           @RequestParam(name = "searchTerm", required = false)
           String searchTerm)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest searchPageRequest =
         new PageRequest(searchTerm, pageNumber, pageSize, new Sorting());
 
@@ -176,15 +177,19 @@ public class V3CollectionController {
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     PageResponse<Collection> response;
 
     if (active != null) {
-      response = collectionService.findActiveChildren(collectionUuid, pageRequest);
+      response =
+          collectionService.findActiveChildren(
+              Collection.builder().uuid(collectionUuid).build(), pageRequest);
     } else {
-      response = collectionService.findSubParts(collectionUuid, pageRequest);
+      response =
+          collectionService.findChildren(
+              Collection.builder().uuid(collectionUuid).build(), pageRequest);
     }
     JSONObject result = fixPageResponse(response);
 
@@ -243,7 +248,7 @@ public class V3CollectionController {
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));
@@ -304,7 +309,7 @@ public class V3CollectionController {
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest pageRequest = new PageRequest(searchTerm, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(V5MigrationHelper.migrate(sortBy));

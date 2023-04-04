@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.relation.EntityToEntityRelationService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.entity.relation.EntityRelation;
 import de.digitalcollections.model.identifiable.resource.FileResource;
@@ -52,7 +53,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -64,7 +65,8 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -92,7 +94,12 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
           "No namespace and/or id were provided in a colon separated manner");
     }
 
-    Entity entity = service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+    Entity entity =
+        service.getByIdentifier(
+            Identifier.builder()
+                .namespace(namespaceAndId.getLeft())
+                .id(namespaceAndId.getRight())
+                .build());
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -104,16 +111,17 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{refId:[0-9]+}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Entity> getByRefId(@PathVariable long refId) {
+  public ResponseEntity<Entity> getByRefId(@PathVariable long refId) throws ServiceException {
     Entity entity = service.getByRefId(refId);
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
-    // routing should be done in frontend webapp (second call will be sent on entity type)
-    //    EntityType entityType = entity.getEntityType();
-    //    UUID uuid = entity.getUuid();
-    //    switch (entityType) {
-    //      case PERSON:
-    //        return personService.getByIdentifier(uuid);
-    //    }
+    // routing should be done in frontend webapp (second call will be sent on entity
+    // type)
+    // EntityType entityType = entity.getEntityType();
+    // UUID uuid = entity.getUuid();
+    // switch (entityType) {
+    // case PERSON:
+    // return personService.getByIdentifier(uuid);
+    // }
   }
 
   @Operation(summary = "Get entity by uuid")
@@ -126,7 +134,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Entity entity = service.getByUuid(uuid);
+    Entity entity = service.getByExample(Entity.builder().uuid(uuid).build());
     return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -140,7 +148,8 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Entity> getRandomEntities(
-      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count)
+      throws ServiceException {
     return service.getRandom(count);
   }
 
@@ -153,8 +162,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/{uuid:" + ParameterHelper.UUID_PATTERN + "}/related/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> getRelatedFileResources(@PathVariable UUID uuid) {
-    return service.getRelatedFileResources(uuid);
+  public PageResponse<FileResource> findRelatedFileResources(@PathVariable UUID uuid)
+      throws ServiceException {
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
+    return service.findRelatedFileResources(Entity.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(summary = "Get relations for an entity (being the subject)")
@@ -166,8 +177,10 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
         "/latest/entities/relations/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<EntityRelation> getRelations(@PathVariable UUID uuid) {
-    return entityRelationService.getBySubject(uuid);
+  public PageResponse<EntityRelation> findRelations(@PathVariable UUID uuid)
+      throws ServiceException {
+    PageRequest pageRequest = PageRequest.builder().pageNumber(0).pageSize(25).build();
+    return entityRelationService.findBySubject(Entity.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Override

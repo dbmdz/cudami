@@ -66,7 +66,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           UUID projectUuid,
       @Parameter(example = "", description = "UUID of the digital object")
           @PathVariable("digitalObjectUuid")
-          UUID digitalObjectUuid) {
+          UUID digitalObjectUuid)
+      throws ServiceException {
     Project project = new Project();
     project.setUuid(projectUuid);
 
@@ -92,7 +93,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
-          List<DigitalObject> digitalObjects) {
+          List<DigitalObject> digitalObjects)
+      throws ServiceException {
     Project project = new Project();
     project.setUuid(projectUuid);
 
@@ -118,7 +120,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(Project.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -135,7 +137,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -151,7 +154,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
     Project project = new Project();
@@ -203,9 +207,9 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
 
     Project project;
     if (pLocale == null) {
-      project = service.getByUuid(uuid);
+      project = service.getByExample(Project.builder().uuid(uuid).build());
     } else {
-      project = service.getByUuidAndLocale(uuid, pLocale);
+      project = service.getByExampleAndLocale(Project.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(project, project != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -219,7 +223,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
         "/latest/projects/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -250,7 +254,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           UUID projectUuid,
       @Parameter(example = "", description = "UUID of the digital object")
           @PathVariable("digitalObjectUuid")
-          UUID digitalObjectUuid) {
+          UUID digitalObjectUuid)
+      throws ServiceException {
     Project project = new Project();
     project.setUuid(projectUuid);
 
@@ -286,7 +291,8 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @Parameter(example = "", description = "UUID of the project") @PathVariable("uuid")
           UUID projectUuid,
       @Parameter(example = "", description = "List of the digital objects") @RequestBody
-          List<DigitalObject> digitalObjects) {
+          List<DigitalObject> digitalObjects)
+      throws ServiceException {
     Project project = new Project();
     project.setUuid(projectUuid);
 

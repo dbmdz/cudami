@@ -7,6 +7,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
@@ -58,7 +59,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/count"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -77,7 +78,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(DigitalObject.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -94,7 +95,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -110,7 +112,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
     DigitalObject digitalObject = new DigitalObject();
@@ -139,8 +142,10 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
 
     DigitalObject digitalObject =
         fillWemi
-            ? service.getByIdentifierWithWEMI(namespaceAndId.getLeft(), namespaceAndId.getRight())
-            : service.getByIdentifier(namespaceAndId.getLeft(), namespaceAndId.getRight());
+            ? service.getByIdentifierWithWEMI(
+                new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()))
+            : service.getByIdentifier(
+                new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()));
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -149,7 +154,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
   @GetMapping(
       value = {"/v5/digitalobjects/{refId:[0-9]+}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<DigitalObject> getByRefId(@PathVariable long refId) {
+  public ResponseEntity<DigitalObject> getByRefId(@PathVariable long refId)
+      throws ServiceException {
     DigitalObject digitalObject = service.getByRefId(refId);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -165,7 +171,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    DigitalObject digitalObject = service.getByUuid(uuid);
+    DigitalObject digitalObject = service.getByExample(DigitalObject.builder().uuid(uuid).build());
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -183,7 +189,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria,
-      @RequestParam(name = "active", required = false) String active) {
+      @RequestParam(name = "active", required = false) String active)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Collection.class, pageNumber, pageSize, sortBy, filterCriteria);
     DigitalObject digitalObject = new DigitalObject();
@@ -203,8 +210,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<FileResource> getFileResources(@PathVariable UUID uuid) {
-    return service.getFileResources(uuid);
+  public List<FileResource> getFileResources(@PathVariable UUID uuid) throws ServiceException {
+    return service.getFileResources(DigitalObject.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Get image file resources of a digital object")
@@ -216,8 +223,9 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/fileresources/images"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid) {
-    return service.getImageFileResources(uuid);
+  public List<ImageFileResource> getImageFileResources(@PathVariable UUID uuid)
+      throws ServiceException {
+    return service.getImageFileResources(DigitalObject.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Get item for digital object by digital object uuid")
@@ -229,8 +237,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/latest/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/item"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Item getItem(@PathVariable UUID uuid) {
-    return service.getItem(uuid);
+  public Item getItem(@PathVariable UUID uuid) throws ServiceException {
+    return service.getItem(DigitalObject.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Get languages of all digital objects")
@@ -244,10 +252,11 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguages(
       @RequestParam(name = "parent.uuid", required = false)
-          FilterCriterion<UUID> parentUuidFilterCriterion) {
+          FilterCriterion<UUID> parentUuidFilterCriterion)
+      throws ServiceException {
     if (parentUuidFilterCriterion != null) {
       return service.getLanguagesOfContainedDigitalObjects(
-          (UUID) parentUuidFilterCriterion.getValue());
+          DigitalObject.builder().uuid((UUID) parentUuidFilterCriterion.getValue()).build());
     }
     return service.getLanguages();
   }
@@ -259,8 +268,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/collections/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) {
-    return this.service.getLanguagesOfCollections(uuid);
+  public List<Locale> getLanguagesOfCollections(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.getLanguagesOfCollections(DigitalObject.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Get all languages of a digital object's projects")
@@ -270,8 +279,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
         "/v5/digitalobjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}/projects/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) {
-    return this.service.getLanguagesOfProjects(uuid);
+  public List<Locale> getLanguagesOfProjects(@PathVariable UUID uuid) throws ServiceException {
+    return this.service.getLanguagesOfProjects(DigitalObject.builder().uuid(uuid).build());
   }
 
   @Operation(summary = "Find limited amount of random digital objects")
@@ -284,7 +293,8 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<DigitalObject> getRandomDigitalObjects(
-      @RequestParam(name = "count", required = false, defaultValue = "5") int count) {
+      @RequestParam(name = "count", required = false, defaultValue = "5") int count)
+      throws ServiceException {
     return service.getRandom(count);
   }
 
@@ -322,7 +332,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
           UUID uuid,
       @RequestBody List<FileResource> fileResources)
       throws ServiceException {
-    return service.setFileResources(uuid, fileResources);
+    return service.setFileResources(DigitalObject.builder().uuid(uuid).build(), fileResources);
   }
 
   @Operation(summary = "Update a digital object")

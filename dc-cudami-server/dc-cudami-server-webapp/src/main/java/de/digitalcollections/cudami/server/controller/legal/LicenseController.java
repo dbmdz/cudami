@@ -1,7 +1,9 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
 import de.digitalcollections.cudami.server.business.api.service.UniqueObjectService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
@@ -19,7 +21,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +53,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   @GetMapping(
       value = {"/v6/licenses/count", "/v5/licenses/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -58,7 +62,8 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       value = {"/v6/licenses", "/v5/licenses"},
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url) {
+  public ResponseEntity<Void> deleteByUrl(@RequestParam(name = "url", required = true) URL url)
+      throws ServiceException {
     // WARNING: a DELETE request with param seems not to be spec allowed?
     // an url as path variable is technically not possible (unescaping leads to not
     // allowed
@@ -75,9 +80,9 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Void> deleteByUuid(
-      @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid")
-          UUID uuid) {
-    service.deleteByUuid(uuid);
+      @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid)
+      throws ConflictException, ServiceException {
+    service.delete(License.builder().uuid(uuid).build());
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
@@ -85,12 +90,14 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   @DeleteMapping(
       value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids) {
+  public ResponseEntity<Void> deleteByUuids(@RequestBody List<UUID> uuids)
+      throws ConflictException, ServiceException {
     // WARNING: a DELETE request with body seems not to be spec allowed?
     // FIXME: How to implement deleteByUrl (also with body? how to distinguish these
     // both methods?
     // give param?)
-    service.deleteByUuids(uuids);
+    service.delete(
+        uuids.stream().map(u -> License.builder().uuid(u).build()).collect(Collectors.toSet()));
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
@@ -103,7 +110,8 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(License.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -113,7 +121,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   @GetMapping(
       value = {"/v6/licenses/all", "/v5/licenses/all"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<License> getAll() {
+  public Set<License> getAll() throws ServiceException {
     return service.getAll();
   }
 
@@ -123,7 +131,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       params = "url",
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<License> getByUrl(@RequestParam(name = "url", required = true) URL url)
-      throws MalformedURLException {
+      throws MalformedURLException, ServiceException {
     License license = service.getByUrl(url);
     return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -135,8 +143,8 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
         "/v5/licenses/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) {
-    License license = service.getByUuid(uuid);
+  public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    License license = service.getByExample(License.builder().uuid(uuid).build());
     return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -144,7 +152,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   @GetMapping(
       value = {"/v6/licenses/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -163,8 +171,10 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
   @PostMapping(
       value = {"/v6/licenses", "/v5/licenses"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public License save(@RequestBody License license, BindingResult errors) throws ServiceException {
-    return service.save(license);
+  public License save(@RequestBody License license, BindingResult errors)
+      throws ServiceException, ValidationException {
+    service.save(license);
+    return license;
   }
 
   @Operation(summary = "Update a license")
@@ -178,8 +188,9 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       @Parameter(example = "", description = "UUID of the license") @PathVariable("uuid") UUID uuid,
       @RequestBody License license,
       BindingResult errors)
-      throws ServiceException {
+      throws ServiceException, ValidationException {
     assert Objects.equals(uuid, license.getUuid());
-    return service.update(license);
+    service.update(license);
+    return license;
   }
 }

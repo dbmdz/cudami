@@ -54,7 +54,8 @@ public class V5UrlAliasController {
     }
 
     try {
-      PageResponse<LocalizedUrlAliases> pageResponse = urlAliasService.find(pageRequest);
+      PageResponse<LocalizedUrlAliases> pageResponse =
+          urlAliasService.findLocalizedUrlAliases(pageRequest);
       String result = V5MigrationHelper.migrate(pageResponse, objectMapper);
       return new ResponseEntity<>(result, HttpStatus.OK);
     } catch (ServiceException | JsonProcessingException e) {

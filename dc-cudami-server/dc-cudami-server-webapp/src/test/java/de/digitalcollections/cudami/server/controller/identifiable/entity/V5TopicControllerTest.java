@@ -13,7 +13,6 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -83,7 +82,7 @@ class V5TopicControllerTest extends BaseControllerTest {
                 .withoutContent()
                 .build();
 
-    when(topicService.findEntities(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(topicService.findEntities(any(Topic.class), any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/topics/find_with_empty_result.json");
   }
@@ -112,7 +111,7 @@ class V5TopicControllerTest extends BaseControllerTest {
                             .build()))
                 .build();
 
-    when(topicService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(topicService.findChildren(any(Topic.class), any(PageRequest.class))).thenReturn(expected);
 
     testJson(path, "/v5/topics/06b8a104-e052-4104-b20a-502866de4deb_subtopics.json");
   }
@@ -138,7 +137,7 @@ class V5TopicControllerTest extends BaseControllerTest {
                 .withoutContent()
                 .build();
 
-    when(topicService.findFileResources(any(UUID.class), any(PageRequest.class)))
+    when(topicService.findFileResources(any(Topic.class), any(PageRequest.class)))
         .thenReturn(expected);
 
     testJson(path, "/v5/topics/find_with_empty_result.json");

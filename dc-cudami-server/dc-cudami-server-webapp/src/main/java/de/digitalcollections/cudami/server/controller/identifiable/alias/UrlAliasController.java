@@ -1,13 +1,16 @@
 package de.digitalcollections.cudami.server.controller.identifiable.alias;
 
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.AbstractPagingAndSortingController;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
+import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
@@ -46,7 +49,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
       value = {"/v6/urlaliases", "/v5/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ValidationException {
 
     if (urlAlias == null || urlAlias.getUuid() != null) {
       return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -73,10 +76,10 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
                   "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
           @PathVariable("uuid")
           UUID uuid)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ConflictException {
     boolean isDeleted;
     try {
-      isDeleted = service.deleteByUuid(uuid);
+      isDeleted = service.delete(UrlAlias.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -100,7 +103,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
         createPageRequest(LocalizedUrlAliases.class, pageNumber, pageSize, sortBy, filterCriteria);
     PageResponse<LocalizedUrlAliases> result;
     try {
-      result = service.find(pageRequest);
+      result = service.findLocalizedUrlAliases(pageRequest);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -137,7 +140,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
     String result;
     try {
-      result = service.generateSlug(pLocale, label, websiteUuid);
+      result = service.generateSlug(pLocale, label, Website.builder().uuid(websiteUuid).build());
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -163,7 +166,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
     UrlAlias result;
     try {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(UrlAlias.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -201,7 +204,8 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
       throws CudamiControllerException {
     LocalizedUrlAliases result;
     try {
-      result = service.getPrimaryUrlAliases(websiteUuid, slug, pLocale);
+      result =
+          service.getPrimaryUrlAliases(Website.builder().uuid(websiteUuid).build(), slug, pLocale);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -223,7 +227,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
           @PathVariable("uuid")
           UUID uuid,
       @RequestBody UrlAlias urlAlias)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ValidationException {
 
     if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
       return new ResponseEntity(
@@ -233,7 +237,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
     UrlAlias result;
     try {
-      service.update(urlAlias);
+      service.update(UrlAlias.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

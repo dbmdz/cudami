@@ -58,7 +58,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(HumanSettlement.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -75,7 +75,8 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(HumanSettlement.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -144,9 +145,9 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
 
     HumanSettlement result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(HumanSettlement.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(HumanSettlement.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

@@ -48,7 +48,8 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion) {
+      @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sortBy);
     if (valueCriterion != null) {
       Filtering filtering = new Filtering();
@@ -62,8 +63,8 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
   @GetMapping(
       value = {"/v6/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) {
-    Tag result = service.getByUuid(uuid);
+  public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    Tag result = service.getByExample(Tag.builder().uuid(uuid).build());
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -95,16 +96,20 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
   @PostMapping(
       value = {"/v6/tags"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Tag save(@RequestBody Tag tag, BindingResult errors) {
-    return service.save(tag);
+  public Tag save(@RequestBody Tag tag, BindingResult errors)
+      throws ValidationException, ServiceException {
+    service.save(tag);
+    return tag;
   }
 
   @Operation(summary = "Update a tag")
   @PutMapping(
       value = {"/v6/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors) {
+  public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors)
+      throws ValidationException, ServiceException {
     assert Objects.equals(uuid, tag.getUuid());
-    return service.update(tag);
+    service.update(tag);
+    return tag;
   }
 }

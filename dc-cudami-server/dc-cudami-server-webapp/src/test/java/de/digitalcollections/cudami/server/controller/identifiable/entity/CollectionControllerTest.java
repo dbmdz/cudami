@@ -10,6 +10,7 @@ import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.CollectionService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.file.MimeType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.Filtering;
@@ -42,7 +43,12 @@ class CollectionControllerTest extends BaseControllerTest {
         List.of(
             CorporateBody.builder()
                 .created("2020-10-20T14:38:07.757894")
-                .identifier("gnd", "1234567-8", "30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                .identifier(
+                    Identifier.builder()
+                        .namespace("gnd")
+                        .id("1234567-8")
+                        .uuid("30b59f1e-aa2f-4ae5-b9a4-fa336e21ad8e")
+                        .build())
                 .label(Locale.GERMAN, "Institution 1")
                 .label(Locale.ENGLISH, "institution 1")
                 .lastModified("2021-02-25T09:05:34.039316")
@@ -59,7 +65,7 @@ class CollectionControllerTest extends BaseControllerTest {
                 .homepageUrl("https://www.whateveryouwanttotest.de/")
                 .build());
 
-    when(collectionService.findRelatedCorporateBodies(any(UUID.class), any(Filtering.class)))
+    when(collectionService.findRelatedCorporateBodies(any(Collection.class), any(Filtering.class)))
         .thenReturn(expected);
 
     testJson(
@@ -82,11 +88,14 @@ class CollectionControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Collection expected = Collection.builder().build();
 
-    when(collectionService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(collectionService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(collectionService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(collectionService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -95,13 +104,16 @@ class CollectionControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Collection expected = Collection.builder().build();
 
-    when(collectionService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(collectionService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + Base64.getEncoder().encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(collectionService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(collectionService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 
   @DisplayName("can delete a collection")
@@ -109,10 +121,10 @@ class CollectionControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/collections/09baa24e-0918-4b96-8ab1-f496b02af73a"})
   void deleteCollection(String path) throws Exception {
     UUID uuid = UUID.fromString("09baa24e-0918-4b96-8ab1-f496b02af73a");
-    when(collectionService.deleteByUuid(eq(uuid))).thenReturn(true);
+    when(collectionService.delete(eq(Collection.builder().uuid(uuid).build()))).thenReturn(true);
 
     testDeleteSuccessful(path);
 
-    verify(collectionService, times(1)).deleteByUuid(eq(uuid));
+    verify(collectionService, times(1)).delete(eq(Collection.builder().uuid(uuid).build()));
   }
 }

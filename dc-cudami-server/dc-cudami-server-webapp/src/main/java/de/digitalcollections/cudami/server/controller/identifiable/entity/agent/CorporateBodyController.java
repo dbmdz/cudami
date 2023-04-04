@@ -56,7 +56,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(CorporateBody.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -101,7 +101,8 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(CorporateBody.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -168,9 +169,10 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
 
     CorporateBody corporateBody;
     if (pLocale == null) {
-      corporateBody = service.getByUuid(uuid);
+      corporateBody = service.getByExample(CorporateBody.builder().uuid(uuid).build());
     } else {
-      corporateBody = service.getByUuidAndLocale(uuid, pLocale);
+      corporateBody =
+          service.getByExampleAndLocale(CorporateBody.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(
         corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
@@ -185,7 +187,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
         "/latest/corporatebodies/languages"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 

@@ -53,7 +53,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
         "/v6/events/count",
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -66,7 +66,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(Event.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -83,7 +83,8 @@ public class EventController extends AbstractIdentifiableController<Event> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Event.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -113,7 +114,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    Event event = service.getByUuid(uuid);
+    Event event = service.getByExample(Event.builder().uuid(uuid).build());
     return new ResponseEntity<>(event, event != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
@@ -124,7 +125,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
   @GetMapping(
       value = {"/v6/events/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 

@@ -50,7 +50,8 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(FamilyName.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -107,9 +108,9 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       throws ServiceException {
     FamilyName result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(FamilyName.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(FamilyName.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -118,7 +119,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
   @GetMapping(
       value = {"/v6/familynames/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 

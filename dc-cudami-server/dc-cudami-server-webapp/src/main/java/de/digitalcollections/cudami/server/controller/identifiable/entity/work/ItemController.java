@@ -76,8 +76,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
           UUID digitalObjectUuid)
       throws ValidationException, ConflictException, ServiceException {
 
-    Item item = service.getByUuid(uuid);
-    boolean successful = digitalObjectService.setItem(digitalObjectUuid, item);
+    Item item = service.getByExample(Item.builder().uuid(uuid).build());
+    boolean successful =
+        digitalObjectService.setItem(DigitalObject.builder().uuid(digitalObjectUuid).build(), item);
     return successful
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -87,7 +88,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @GetMapping(
       value = {"/v6/items/count", "/v5/items/count", "/v2/items/count", "/latest/items/count"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public long count() {
+  public long count() throws ServiceException {
     return service.count();
   }
 
@@ -100,7 +101,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       throws ConflictException {
     boolean successful;
     try {
-      successful = service.deleteByUuid(uuid);
+      successful = service.delete(Item.builder().uuid(uuid).build());
     } catch (ServiceException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -117,7 +118,8 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria) {
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
+      throws ServiceException {
     PageRequest pageRequest =
         createPageRequest(Item.class, pageNumber, pageSize, sortBy, filterCriteria);
     return service.find(pageRequest);
@@ -133,13 +135,14 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy) {
+      @RequestParam(name = "sortBy", required = false) List<Order> sortBy)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(null, pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
       pageRequest.setSorting(sorting);
     }
-    return service.findDigitalObjects(uuid, pageRequest);
+    return service.findDigitalObjects(Item.builder().uuid(uuid).build(), pageRequest);
   }
 
   @Operation(
@@ -199,9 +202,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
 
     Item result;
     if (pLocale == null) {
-      result = service.getByUuid(uuid);
+      result = service.getByExample(Item.builder().uuid(uuid).build());
     } else {
-      result = service.getByUuidAndLocale(uuid, pLocale);
+      result = service.getByExampleAndLocale(Item.builder().uuid(uuid).build(), pLocale);
     }
     return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
@@ -213,7 +216,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
   @GetMapping(
       value = {"/v6/items/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<Locale> getLanguages() {
+  public List<Locale> getLanguages() throws ServiceException {
     return service.getLanguages();
   }
 
@@ -225,8 +228,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       value = {"/v6/items/{uuid:" + ParameterHelper.UUID_PATTERN + "}/digitalobjects/languages"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Locale> getLanguagesOfDigitalObjects(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return service.getLanguagesOfDigitalObjects(uuid);
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
+      throws ServiceException {
+    return service.getLanguagesOfDigitalObjects(Item.builder().uuid(uuid).build());
   }
 
   @Override
@@ -243,8 +247,9 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Set<Work> getWorks(
-      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid) {
-    return Set.of(workService.getByItem(uuid));
+      @Parameter(name = "uuid", description = "UUID of the item") @PathVariable UUID uuid)
+      throws ServiceException {
+    return Set.of(workService.getByItem(Item.builder().uuid(uuid).build()));
   }
 
   @Operation(summary = "save a newly created item")

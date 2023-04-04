@@ -56,7 +56,7 @@ public class V5WebpageController {
           FilterCriterion<LocalDate> publicationStart,
       @RequestParam(name = "publicationEnd", required = false)
           FilterCriterion<LocalDate> publicationEnd)
-      throws CudamiControllerException {
+      throws CudamiControllerException, ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
     if (sortBy != null) {
       Sorting sorting = new Sorting(sortBy);
@@ -102,9 +102,12 @@ public class V5WebpageController {
 
     PageResponse<Webpage> pageResponse;
     if (active != null) {
-      pageResponse = webpageService.findActiveChildren(uuid, searchPageRequest);
+      pageResponse =
+          webpageService.findActiveChildren(
+              Webpage.builder().uuid(uuid).build(), searchPageRequest);
     } else {
-      pageResponse = webpageService.findSubParts(uuid, searchPageRequest);
+      pageResponse =
+          webpageService.findChildren(Webpage.builder().uuid(uuid).build(), searchPageRequest);
     }
 
     try {

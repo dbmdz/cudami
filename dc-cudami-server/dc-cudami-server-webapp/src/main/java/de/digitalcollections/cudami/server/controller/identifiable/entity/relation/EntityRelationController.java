@@ -37,7 +37,8 @@ public class EntityRelationController {
   public PageResponse<EntityRelation> findByPredicate(
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "predicate", required = false) String predicate) {
+      @RequestParam(name = "predicate", required = false) String predicate)
+      throws ServiceException {
     PageRequest pageRequest = new PageRequest(pageNumber, pageSize);
 
     if (StringUtils.hasText(predicate)) {

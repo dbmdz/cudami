@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.controller.BaseControllerTest;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -67,7 +66,8 @@ class V5WebpageControllerTest extends BaseControllerTest {
                 .withoutContent()
                 .build();
 
-    when(webpageService.findSubParts(any(UUID.class), any(PageRequest.class))).thenReturn(expected);
+    when(webpageService.findChildren(any(Webpage.class), any(PageRequest.class)))
+        .thenReturn(expected);
 
     testJson(path, "/v5/webpages/599a120c-2dd5-11e8-b467-0ed5f89f718b_children_empty.json");
   }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.model.identifiable.entity.Collection;
 import de.digitalcollections.model.identifiable.entity.Project;
@@ -95,7 +96,7 @@ public class V3DigitalObjectController {
               schema = @Schema(type = "boolean"))
           @RequestParam(name = "active", required = false)
           String active)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize, new Sorting());
 
     DigitalObject digitalObject = new DigitalObject();
@@ -166,7 +167,7 @@ public class V3DigitalObjectController {
               schema = @Schema(type = "integer"))
           @RequestParam(name = "pageSize", required = false, defaultValue = "25")
           int pageSize)
-      throws JsonProcessingException {
+      throws JsonProcessingException, ServiceException {
     PageRequest searchPageRequest = new PageRequest(null, pageNumber, pageSize, new Sorting());
 
     DigitalObject digitalObject = new DigitalObject();

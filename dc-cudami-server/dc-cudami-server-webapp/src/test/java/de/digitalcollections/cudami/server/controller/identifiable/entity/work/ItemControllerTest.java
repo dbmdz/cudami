@@ -11,6 +11,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.ent
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.ItemService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.work.WorkService;
 import de.digitalcollections.cudami.server.controller.BaseControllerTest;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
 import de.digitalcollections.model.identifiable.entity.item.Item;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
@@ -41,8 +42,7 @@ class ItemControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(strings = {"/v6/items/identifier/foo:bar", "/v6/items/identifier/foo:bar.json"})
   public void getByIdentifierWithoutSpecialCharacters(String path) throws Exception {
-    when(itemService.getByIdentifier(any(String.class), any(String.class)))
-        .thenReturn(Item.builder().build());
+    when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
     ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
@@ -50,7 +50,11 @@ class ItemControllerTest extends BaseControllerTest {
     testHttpGet(path);
 
     verify(itemService, times(1))
-        .getByIdentifier(namespaceCaptor.capture(), identifierCaptor.capture());
+        .getByIdentifier(
+            Identifier.builder()
+                .namespace(namespaceCaptor.capture())
+                .id(identifierCaptor.capture())
+                .build());
 
     assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
     assertThat(identifierCaptor.getValue()).isEqualTo("bar");
@@ -61,8 +65,7 @@ class ItemControllerTest extends BaseControllerTest {
   @ValueSource(
       strings = {"/v6/items/identifier/foo:bar/baz", "/v6/items/identifier/foo:bar/baz.json"})
   public void getByIdentifierWithUnencodedSlashesAsIdentifier(String path) throws Exception {
-    when(itemService.getByIdentifier(any(String.class), any(String.class)))
-        .thenReturn(Item.builder().build());
+    when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
     ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
@@ -70,7 +73,11 @@ class ItemControllerTest extends BaseControllerTest {
     testHttpGet(path);
 
     verify(itemService, times(1))
-        .getByIdentifier(namespaceCaptor.capture(), identifierCaptor.capture());
+        .getByIdentifier(
+            Identifier.builder()
+                .namespace(namespaceCaptor.capture())
+                .id(identifierCaptor.capture())
+                .build());
 
     assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
     assertThat(identifierCaptor.getValue()).isEqualTo("bar/baz");
@@ -87,8 +94,7 @@ class ItemControllerTest extends BaseControllerTest {
         "/v6/items/identifier/"
             + Base64.encodeBase64String("foo:bar/baz".getBytes(StandardCharsets.UTF_8));
 
-    when(itemService.getByIdentifier(any(String.class), any(String.class)))
-        .thenReturn(Item.builder().build());
+    when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
     ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
     ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
@@ -96,7 +102,11 @@ class ItemControllerTest extends BaseControllerTest {
     testHttpGet(path);
 
     verify(itemService, times(1))
-        .getByIdentifier(namespaceCaptor.capture(), identifierCaptor.capture());
+        .getByIdentifier(
+            Identifier.builder()
+                .namespace(namespaceCaptor.capture())
+                .id(identifierCaptor.capture())
+                .build());
 
     assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
     assertThat(identifierCaptor.getValue()).isEqualTo("bar/baz");
@@ -118,11 +128,13 @@ class ItemControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithPlaintextId(String path) throws Exception {
     Item expected = Item.builder().build();
 
-    when(itemService.getByIdentifier(eq("foo"), eq("bar"))).thenReturn(expected);
+    when(itemService.getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build())))
+        .thenReturn(expected);
 
     testHttpGet(path);
 
-    verify(itemService, times(1)).getByIdentifier(eq("foo"), eq("bar"));
+    verify(itemService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar").build()));
   }
 
   @DisplayName("can retrieve by identifier with base 64 encoded data")
@@ -137,14 +149,17 @@ class ItemControllerTest extends BaseControllerTest {
   void testGetByIdentifierWithBase64EncodedData(String basePath) throws Exception {
     Item expected = Item.builder().build();
 
-    when(itemService.getByIdentifier(eq("foo"), eq("bar/bla"))).thenReturn(expected);
+    when(itemService.getByIdentifier(
+            eq(Identifier.builder().namespace("foo").id("bar/bla").build())))
+        .thenReturn(expected);
 
     testHttpGet(
         basePath
             + java.util.Base64.getEncoder()
                 .encodeToString("foo:bar/bla".getBytes(StandardCharsets.UTF_8)));
 
-    verify(itemService, times(1)).getByIdentifier(eq("foo"), eq("bar/bla"));
+    verify(itemService, times(1))
+        .getByIdentifier(eq(Identifier.builder().namespace("foo").id("bar/bla").build()));
   }
 
   @DisplayName("can filter items by the uuid of their \"parent\" item")
@@ -188,7 +203,8 @@ class ItemControllerTest extends BaseControllerTest {
             .withTotalElements(1)
             .withContent(List.of(expectedDigitalObject))
             .build();
-    when(itemService.findDigitalObjects(eq(itemUuid), any(PageRequest.class)))
+    when(itemService.findDigitalObjects(
+            eq(Item.builder().uuid(itemUuid).build()), any(PageRequest.class)))
         .thenReturn(expectedPageResponse);
 
     testJson(path, "/v6/items/1c72ae9a-94e1-45b1-848f-da1303000924_digitalobjects.json");

@@ -19,7 +19,6 @@ import de.digitalcollections.model.list.paging.PageResponse;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -49,7 +48,8 @@ class LinkedDataFileResourceControllerTest extends BaseControllerTest {
             .objectType("LINKED_DATA")
             .build();
 
-    when(linkedDataFileResourceService.getByUuid(any(UUID.class))).thenReturn(expected);
+    when(linkedDataFileResourceService.getByExample(any(LinkedDataFileResource.class)))
+        .thenReturn(expected);
 
     testJson(path, "/v6/linkeddatafileresources/12345678-abcd-1234-abcd-123456789012.json");
   }
