@@ -419,7 +419,7 @@ class IdentifiableServiceImplTest extends AbstractUniqueObjectServiceImplTest {
                     .build()));
     identifiableToUpdate.setIdentifiers(missingIdentifiers);
 
-    Identifier identifierToDelete = new Identifier("other", "foo");
+    Identifier identifierToDelete = Identifier.builder().namespace("other").id("foo").build();
     Identifiable existingIdentifiable = new Identifiable();
     existingIdentifiable.setUuid(uuid);
     existingIdentifiable.setLabel(new LocalizedText(Locale.GERMAN, "Label"));

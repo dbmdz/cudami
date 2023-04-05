@@ -318,21 +318,22 @@ class DigitalObjectRepositoryImplTest
   void returnIdentifiers() throws RepositoryException {
     // Step1: Create and persist a DigitalObject with two identifiers
     DigitalObject digitalObject = DigitalObject.builder().label(Locale.GERMAN, "Label").build();
-    Identifier identifier1 = new Identifier("namespace1", "1");
+    Identifier identifier1 = Identifier.builder().namespace("namespace1").id("1").build();
     digitalObject.addIdentifier(identifier1);
-    Identifier identifier2 = new Identifier("namespace2", "2");
+    Identifier identifier2 = Identifier.builder().namespace("namespace2").id("2").build();
     digitalObject.addIdentifier(identifier2);
     repo.save(digitalObject);
 
     // Step2: Create and persist an identifier for another DigitalObject
     DigitalObject otherDigitalObject =
         DigitalObject.builder().label(Locale.GERMAN, "Anderes Label").build();
-    otherDigitalObject.addIdentifier(new Identifier("namespace1", "other"));
+    otherDigitalObject.addIdentifier(
+        Identifier.builder().namespace("namespace1").id("other").build());
     repo.save(otherDigitalObject);
 
     // Verify, that we get only the two identifiers of the DigitalObject and not the one for the
     // other DigitalObject
-    Identifier demandedIdentifier = new Identifier("namespace1", "1");
+    Identifier demandedIdentifier = Identifier.builder().namespace("namespace1").id("1").build();
     DigitalObject actual = repo.getByIdentifier(demandedIdentifier);
 
     assertThat(actual.getIdentifiers()).containsExactly(identifier1, identifier2);
@@ -341,17 +342,21 @@ class DigitalObjectRepositoryImplTest
   @Test
   @DisplayName("can return null, when getByIdentifier finds no DigitalObject")
   void returnNullByGetByIdentifier() throws RepositoryException {
-    assertThat(repo.getByIdentifier(new Identifier("namespace", "nonexisting"))).isNull();
+    assertThat(
+            repo.getByIdentifier(
+                Identifier.builder().namespace("namespace").id("nonexisting").build()))
+        .isNull();
   }
 
   @Test
   @DisplayName("returns the partially filled DigitalObject by getByIdentifer")
   void returnGetByIdentifier() throws RepositoryException {
     DigitalObject digitalObject = buildDigitalObject();
-    digitalObject.addIdentifier(new Identifier("namespace", "key"));
+    digitalObject.addIdentifier(Identifier.builder().namespace("namespace").id("key").build());
     repo.save(digitalObject);
 
-    DigitalObject actual = repo.getByIdentifier(new Identifier("namespace", "key"));
+    DigitalObject actual =
+        repo.getByIdentifier(Identifier.builder().namespace("namespace").id("key").build());
 
     CreationInfo actualCreationInfo = actual.getCreationInfo();
     assertThat(actualCreationInfo).isNotNull();
@@ -368,7 +373,7 @@ class DigitalObjectRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
+            .identifier(Identifier.builder().namespace("mdz-sig").id("Signatur").build())
             .title(Locale.GERMAN, "Ein Buchtitel")
             .build();
     itemRepository.save(item);

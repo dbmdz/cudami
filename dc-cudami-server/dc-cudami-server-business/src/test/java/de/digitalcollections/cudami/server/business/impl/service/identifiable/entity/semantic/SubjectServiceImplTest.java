@@ -44,7 +44,9 @@ class SubjectServiceImplTest {
 
     assertThrows(
         ServiceException.class,
-        () -> subjectService.getByTypeAndIdentifier("type", new Identifier("namespace", "id")));
+        () ->
+            subjectService.getByTypeAndIdentifier(
+                "type", Identifier.builder().namespace("namespace").id("id").build()));
   }
 
   @DisplayName("can find exact subjects")

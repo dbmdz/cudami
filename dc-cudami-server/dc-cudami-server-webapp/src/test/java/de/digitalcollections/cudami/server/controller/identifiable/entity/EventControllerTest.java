@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -212,7 +213,7 @@ class EventControllerTest extends BaseControllerTest {
                     .add(FilterCriterion.builder().withExpression("label").contains("foo").build())
                     .build())
             .build();
-    when(eventService.find(eq(pageRequest))).thenReturn(pageResponse);
+    when(eventService.find(any(PageRequest.class))).thenReturn(pageResponse);
 
     testJson(path, "/v6/events/listresult.json");
   }

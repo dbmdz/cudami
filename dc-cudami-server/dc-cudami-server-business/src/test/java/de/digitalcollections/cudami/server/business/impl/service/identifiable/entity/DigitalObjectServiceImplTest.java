@@ -244,11 +244,12 @@ class DigitalObjectServiceImplTest extends AbstractServiceImplTest {
             eq(persistedDigitalObject)))
         .thenReturn(List.of(persistedRenderingResource));
 
-    DigitalObject actual = service.getByIdentifier(new Identifier("foo", "bar"));
+    DigitalObject actual =
+        service.getByIdentifier(Identifier.builder().namespace("foo").id("bar").build());
     assertThat(actual).isNotNull();
     assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
 
-    actual = service.getByIdentifier(new Identifier("foo", "bar"));
+    actual = service.getByIdentifier(Identifier.builder().namespace("foo").id("bar").build());
     assertThat(actual).isNotNull();
     assertThat(actual.getRenderingResources()).containsExactly(persistedRenderingResource);
   }

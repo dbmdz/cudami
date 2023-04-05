@@ -44,20 +44,14 @@ class ItemControllerTest extends BaseControllerTest {
   public void getByIdentifierWithoutSpecialCharacters(String path) throws Exception {
     when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
-    ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Identifier> identifierCaptor = ArgumentCaptor.forClass(Identifier.class);
 
     testHttpGet(path);
 
-    verify(itemService, times(1))
-        .getByIdentifier(
-            Identifier.builder()
-                .namespace(namespaceCaptor.capture())
-                .id(identifierCaptor.capture())
-                .build());
+    verify(itemService, times(1)).getByIdentifier(identifierCaptor.capture());
 
-    assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
-    assertThat(identifierCaptor.getValue()).isEqualTo("bar");
+    assertThat(identifierCaptor.getValue().getNamespace()).isEqualTo("foo");
+    assertThat(identifierCaptor.getValue().getId()).isEqualTo("bar");
   }
 
   @DisplayName("can retrieve an item by identifier with unencoded slashes as identifier")
@@ -67,20 +61,14 @@ class ItemControllerTest extends BaseControllerTest {
   public void getByIdentifierWithUnencodedSlashesAsIdentifier(String path) throws Exception {
     when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
-    ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Identifier> identifierCaptor = ArgumentCaptor.forClass(Identifier.class);
 
     testHttpGet(path);
 
-    verify(itemService, times(1))
-        .getByIdentifier(
-            Identifier.builder()
-                .namespace(namespaceCaptor.capture())
-                .id(identifierCaptor.capture())
-                .build());
+    verify(itemService, times(1)).getByIdentifier(identifierCaptor.capture());
 
-    assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
-    assertThat(identifierCaptor.getValue()).isEqualTo("bar/baz");
+    assertThat(identifierCaptor.getValue().getNamespace()).isEqualTo("foo");
+    assertThat(identifierCaptor.getValue().getId()).isEqualTo("bar/baz");
   }
 
   @DisplayName("can retrieve an item by identifier with Base64 encoded slashes as identifier")
@@ -96,20 +84,14 @@ class ItemControllerTest extends BaseControllerTest {
 
     when(itemService.getByIdentifier(any(Identifier.class))).thenReturn(Item.builder().build());
 
-    ArgumentCaptor<String> namespaceCaptor = ArgumentCaptor.forClass(String.class);
-    ArgumentCaptor<String> identifierCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<Identifier> identifierCaptor = ArgumentCaptor.forClass(Identifier.class);
 
     testHttpGet(path);
 
-    verify(itemService, times(1))
-        .getByIdentifier(
-            Identifier.builder()
-                .namespace(namespaceCaptor.capture())
-                .id(identifierCaptor.capture())
-                .build());
+    verify(itemService, times(1)).getByIdentifier(identifierCaptor.capture());
 
-    assertThat(namespaceCaptor.getValue()).isEqualTo("foo");
-    assertThat(identifierCaptor.getValue()).isEqualTo("bar/baz");
+    assertThat(identifierCaptor.getValue().getNamespace()).isEqualTo("foo");
+    assertThat(identifierCaptor.getValue().getId()).isEqualTo("bar/baz");
   }
 
   @DisplayName("can retrieve by identifier with plaintext id")

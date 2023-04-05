@@ -1,5 +1,6 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,7 +44,7 @@ class ProjectControllerTest extends BaseControllerTest {
             .refId(1300623)
             .build();
 
-    when(projectService.getByExample(eq(expected))).thenReturn(expected);
+    when(projectService.getByExample(any(Project.class))).thenReturn(expected);
 
     testJson(path);
   }

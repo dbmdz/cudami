@@ -139,13 +139,16 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       throws ServiceException, ValidationException {
 
     Pair<String, String> namespaceAndId = extractNamespaceAndId(request);
+    Identifier identifier =
+        Identifier.builder()
+            .namespace(namespaceAndId.getLeft())
+            .id(namespaceAndId.getRight())
+            .build();
 
     DigitalObject digitalObject =
         fillWemi
-            ? service.getByIdentifierWithWEMI(
-                new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()))
-            : service.getByIdentifier(
-                new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()));
+            ? service.getByIdentifierWithWEMI(identifier)
+            : service.getByIdentifier(identifier);
     return new ResponseEntity<>(
         digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

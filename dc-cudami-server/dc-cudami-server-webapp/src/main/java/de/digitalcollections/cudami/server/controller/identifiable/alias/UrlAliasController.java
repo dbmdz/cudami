@@ -140,7 +140,11 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
     String result;
     try {
-      result = service.generateSlug(pLocale, label, Website.builder().uuid(websiteUuid).build());
+      Website website = null;
+      if (websiteUuid != null) {
+        website = Website.builder().uuid(websiteUuid).build();
+      }
+      result = service.generateSlug(pLocale, label, website);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }
@@ -204,8 +208,11 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
       throws CudamiControllerException {
     LocalizedUrlAliases result;
     try {
-      result =
-          service.getPrimaryUrlAliases(Website.builder().uuid(websiteUuid).build(), slug, pLocale);
+      Website website = null;
+      if (websiteUuid != null) {
+        website = Website.builder().uuid(websiteUuid).build();
+      }
+      result = service.getPrimaryUrlAliases(website, slug, pLocale);
     } catch (ServiceException e) {
       throw new CudamiControllerException(e);
     }

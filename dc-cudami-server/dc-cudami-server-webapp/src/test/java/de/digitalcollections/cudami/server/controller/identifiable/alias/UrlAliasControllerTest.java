@@ -82,19 +82,23 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @Test
   public void createWithSetUuidLeadsToError() throws Exception {
     String body =
-        "{\n"
-            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"primary\": true,\n"
-            + "  \"slug\": \"hurz\",\n"
-            + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
-            + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
-            + "  \"targetEntityType\": \"COLLECTION\",\n"
-            + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
-            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
-            + "}";
+        """
+        {\n
+        \"objectType\": \"URL_ALIAS\",\n
+        \"created\": \"2021-08-17T15:18:01.000001\",\n
+        \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n
+        \"primary\": true,\n
+        \"slug\": \"hurz\",\n
+        \"targetLanguage\": \"de\",\n
+        \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n
+        \"website\": {\n
+          \"identifiers\":[],\n
+          \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n
+          \"identifiableObjectType\":\"WEBSITE\",\n
+          \"refId\":0\n
+        }\n
+      }
+          """;
 
     testPostJsonWithState("/v5/urlaliases", body, 422);
   }
@@ -120,18 +124,22 @@ class UrlAliasControllerTest extends BaseControllerTest {
         .save(any(UrlAlias.class));
 
     String body =
-        "{\n"
-            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"mainAlias\": true,\n"
-            + "  \"slug\": \"hurz\",\n"
-            + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
-            + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
-            + "  \"targetEntityType\": \"COLLECTION\",\n"
-            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
-            + "}";
+        """
+        {\n
+        \"objectType\": \"URL_ALIAS\",\n
+        \"created\": \"2021-08-17T15:18:01.000001\",\n
+        \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n
+        \"primary\": true,\n
+        \"slug\": \"hurz\",\n
+        \"targetLanguage\": \"de\",\n
+        \"website\": {\n
+          \"identifiers\":[],\n
+          \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n
+          \"identifiableObjectType\":\"WEBSITE\",\n
+          \"refId\":0\n
+        }\n
+      }
+          """;
 
     testPostJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
   }
@@ -157,23 +165,23 @@ class UrlAliasControllerTest extends BaseControllerTest {
         .update(any(UrlAlias.class));
 
     String body =
-        "{\n"
-            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"mainAlias\": true,\n"
-            + "  \"slug\": \"hurz\",\n"
-            + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
-            + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
-            + "  \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n"
-            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"website\": {\n"
-            + "     \"identifiers\":[],\n"
-            + "     \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n"
-            + "     \"identifiableObjectType\":\"WEBSITE\",\n"
-            + "     \"refId\":0\n"
-            + "  }\n"
-            + "}";
+        """
+        {\n
+          \"objectType\": \"URL_ALIAS\",\n
+          \"created\": \"2021-08-17T15:18:01.000001\",\n
+          \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n
+          \"primary\": true,\n
+          \"slug\": \"hurz\",\n
+          \"targetLanguage\": \"de\",\n
+          \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n
+          \"website\": {\n
+            \"identifiers\":[],\n
+            \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n
+            \"identifiableObjectType\":\"WEBSITE\",\n
+            \"refId\":0\n
+          }\n
+        }
+            """;
 
     testPutJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
   }
@@ -182,18 +190,22 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @Test
   public void updateWithMissingUuidLeadsToError() throws Exception {
     String body =
-        "{\n"
-            + "  \"created\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n"
-            + "  \"mainAlias\": true,\n"
-            + "  \"slug\": \"hurz\",\n"
-            + "  \"targetLanguage\": \"de\",\n"
-            + "  \"targetIdentifiableType\": \"ENTITY\",\n"
-            + "  \"targetIdentifiableObjectType\": \"COLLECTION\",\n"
-            + "  \"targetEntityType\": \"COLLECTION\",\n"
-            + "  \"targetUuid\": \"23456789-2345-2345-2345-234567890123\",\n"
-            + "  \"websiteUuid\": \"87654321-4321-4321-4321-876543210987\"\n"
-            + "}";
+        """
+        {\n
+          \"objectType\": \"URL_ALIAS\",\n
+          \"created\": \"2021-08-17T15:18:01.000001\",\n
+          \"lastPublished\": \"2021-08-17T15:18:01.000001\",\n
+          \"primary\": true,\n
+          \"slug\": \"hurz\",\n
+          \"targetLanguage\": \"de\",\n
+          \"website\": {\n
+            \"identifiers\":[],\n
+            \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n
+            \"identifiableObjectType\":\"WEBSITE\",\n
+            \"refId\":0\n
+          }\n
+        }
+            """;
 
     testPutJsonWithState("/v5/urlaliases/12345678-1234-1234-1234-123456789012", body, 422);
   }
@@ -333,7 +345,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
             .uuid("12345678-1234-1234-1234-123456789012")
             .build());
 
-    when(urlAliasService.getPrimaryUrlAliases(eq(null), eq("imprint"), eq(null)))
+    when(urlAliasService.getPrimaryUrlAliases(eq((Website) null), eq("imprint"), eq((Locale) null)))
         .thenReturn(expected);
 
     testJson(path, "/v5/urlaliases/primary_imprint.json");

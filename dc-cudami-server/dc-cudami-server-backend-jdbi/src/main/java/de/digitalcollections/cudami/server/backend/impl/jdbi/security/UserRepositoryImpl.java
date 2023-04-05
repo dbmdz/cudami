@@ -50,7 +50,9 @@ public class UserRepositoryImpl extends UniqueObjectRepositoryImpl<User> impleme
                         + tableAlias
                         + " WHERE '"
                         + Role.ADMIN.name()
-                        + "' = any(roles)")
+                        + "' = any("
+                        + tableAlias
+                        + ".roles)")
                 .mapToBean(User.class)
                 .list());
   }

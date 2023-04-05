@@ -40,7 +40,11 @@ public abstract class AbstractIdentifiableController<T extends Identifiable>
 
     T identifiable =
         getService()
-            .getByIdentifier(new Identifier(namespaceAndId.getLeft(), namespaceAndId.getRight()));
+            .getByIdentifier(
+                Identifier.builder()
+                    .namespace(namespaceAndId.getLeft())
+                    .id(namespaceAndId.getRight())
+                    .build());
     return new ResponseEntity<>(
         identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }

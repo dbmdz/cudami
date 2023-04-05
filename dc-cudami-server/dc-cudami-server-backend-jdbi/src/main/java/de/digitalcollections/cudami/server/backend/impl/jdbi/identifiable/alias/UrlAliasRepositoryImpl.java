@@ -6,6 +6,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.WebsiteRepositoryImpl;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
 import de.digitalcollections.model.identifiable.IdentifiableType;
@@ -18,72 +19,33 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
-import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.JdbiException;
 import org.jdbi.v3.core.mapper.reflect.BeanMapper;
 import org.jdbi.v3.core.result.RowView;
 import org.jdbi.v3.core.statement.StatementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 @Repository
-// FIXME: class UrlAliasRepositoryImpl is non standard in any ways! try to stream line it!
 public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     implements UrlAliasRepository {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(UrlAliasRepositoryImpl.class);
+
   public static final String MAPPING_PREFIX = "ua";
-  private static final Map<String, String> PROPERTY_COLUMN_MAPPING;
   public static final String TABLE_ALIAS = "ua";
   public static final String TABLE_NAME = "url_aliases";
-
-  public static final String WEBSITESALIAS = "webs";
-  public static final String WEBSITESJOIN =
-      String.format(
-          " LEFT JOIN websites %1$s ON %1$s.uuid = %2$s.website_uuid ", WEBSITESALIAS, TABLE_ALIAS);
-
-  static {
-    PROPERTY_COLUMN_MAPPING = new LinkedHashMap<>(10);
-    PROPERTY_COLUMN_MAPPING.put("created", "created");
-    PROPERTY_COLUMN_MAPPING.put("lastPublished", "last_published");
-    PROPERTY_COLUMN_MAPPING.put("primary", "primary");
-    PROPERTY_COLUMN_MAPPING.put("slug", "slug");
-    PROPERTY_COLUMN_MAPPING.put("targetIdentifiableObjectType", "target_identifiable_objecttype");
-    PROPERTY_COLUMN_MAPPING.put("targetIdentifiableType", "target_identifiable_type");
-    PROPERTY_COLUMN_MAPPING.put("targetLanguage", "target_language");
-    PROPERTY_COLUMN_MAPPING.put("targetUuid", "target_uuid");
-    PROPERTY_COLUMN_MAPPING.put("uuid", "uuid");
-    PROPERTY_COLUMN_MAPPING.put("websiteUuid", "website_uuid");
-  }
-
-  public static String getSelectFields(boolean withWebsite) {
-    // our own columns...
-    Stream<String> selectFields =
-        PROPERTY_COLUMN_MAPPING.entrySet().stream()
-            .map(
-                e ->
-                    String.format(
-                        "%s.%s %s_%s", TABLE_ALIAS, e.getValue(), MAPPING_PREFIX, e.getKey()));
-    if (withWebsite) {
-      // those of the website that we need too...
-      selectFields =
-          Stream.concat(
-              selectFields,
-              Stream.of("uuid", "label", "url")
-                  .map(col -> String.format("%1$s.%2$s %1$s_%2$s", WEBSITESALIAS, col)));
-    }
-    return selectFields.collect(Collectors.joining(", "));
-  }
 
   public UrlAliasRepositoryImpl(Jdbi dbi, CudamiConfig cudamiConfig) {
     super(
@@ -91,7 +53,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
         TABLE_NAME,
         TABLE_ALIAS,
         MAPPING_PREFIX,
-        null,
+        UrlAlias.class,
         cudamiConfig.getOffsetForAlternativePaging());
     dbi.registerRowMapper(BeanMapper.factory(UrlAlias.class, MAPPING_PREFIX));
   }
@@ -99,6 +61,50 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   @Override
   public UrlAlias create() throws RepositoryException {
     return new UrlAlias();
+  }
+
+  @Override
+  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createAdditionalReduceRowsBiConsumer() {
+    return (map, rowView) -> {
+      // object should be already in map, as we here just add additional data
+      UrlAlias urlAlias = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+
+      /*
+       + tableAlias + ".target_identifiable_objecttype target_identifiableObjectType, "
+       + tableAlias + ".target_identifiable_type target_identifiableType, "
+       + tableAlias + ".target_uuid target_uuid, "
+      */
+      if (rowView.getColumn("target_uuid", UUID.class) != null) {
+        UUID targetUuid = rowView.getColumn("target_uuid", UUID.class);
+        IdentifiableType targetIdentifiableType =
+            rowView.getColumn("target_identifiableType", IdentifiableType.class);
+        IdentifiableObjectType targetIdentifiableObjectType =
+            rowView.getColumn("target_identifiableObjectType", IdentifiableObjectType.class);
+
+        Identifiable target = new Identifiable();
+        target.setUuid(targetUuid);
+        target.setType(targetIdentifiableType);
+        target.setIdentifiableObjectType(targetIdentifiableObjectType);
+        urlAlias.setTarget(target);
+      }
+
+      /*
+       + WebsiteRepositoryImpl.TABLE_ALIAS + ".uuid " + WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid, "
+       + WebsiteRepositoryImpl.TABLE_ALIAS + ".label " + WebsiteRepositoryImpl.MAPPING_PREFIX + "_label, "
+       + WebsiteRepositoryImpl.TABLE_ALIAS + ".url " + WebsiteRepositoryImpl.MAPPING_PREFIX + "_url";
+      */
+      if (rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
+        UUID websiteUuid =
+            rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
+        LocalizedText websiteLabel =
+            rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
+
+        Website website = new Website();
+        website.setUuid(websiteUuid);
+        website.setLabel(websiteLabel);
+        urlAlias.setWebsite(website);
+      }
+    };
   }
 
   @Override
@@ -344,17 +350,6 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     return allowedOrderByFields;
   }
 
-  private String getAssignmentsForUpdate() {
-    return PROPERTY_COLUMN_MAPPING.entrySet().stream()
-        .filter(e -> !(e.getKey().equals("created") || e.getKey().equals("uuid")))
-        .map(
-            e ->
-                String.format(
-                    "%s = :%s",
-                    e.getValue().equals("primary") ? "\"primary\"" : e.getValue(), e.getKey()))
-        .collect(Collectors.joining(", "));
-  }
-
   @Override
   public LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException {
     if (uuid == null) {
@@ -394,58 +389,24 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
-  public UrlAlias getByUuid(UUID uuid) throws RepositoryException {
-    if (uuid == null) {
+  public String getColumnName(String modelProperty) {
+    if (modelProperty == null) {
       return null;
     }
-    StringBuilder sql =
-        new StringBuilder(
-            "SELECT "
-                + getSelectFields(true)
-                + " FROM "
-                + tableName
-                + " AS "
-                + tableAlias
-                + WEBSITESJOIN);
-    Map<String, Object> bindings = new HashMap<>();
-    addFiltering(
-        Filtering.builder()
-            .add(FilterCriterion.builder().withExpression("uuid").isEquals(uuid).build())
-            .build(),
-        sql,
-        bindings);
-    try {
-      return dbi.withHandle(
-          h ->
-              h.createQuery(sql.toString())
-                  .bindMap(bindings)
-                  .reduceRows(this::mapRowToUrlAlias)
-                  .findFirst()
-                  .orElse(null));
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
+    switch (modelProperty) {
+      case "lastPublished":
+        return tableAlias + ".last_published";
+      case "primary":
+        return tableAlias + ".primary";
+      case "slug":
+        return tableAlias + ".slug";
+      case "targetLanguage":
+        return tableAlias + ".target_language";
+      case "websiteUuid":
+        return tableAlias + ".website_uuid";
+      default:
+        return super.getColumnName(modelProperty);
     }
-  }
-
-  @Override
-  public String getColumnName(String modelProperty) {
-    return tableAlias + "." + PROPERTY_COLUMN_MAPPING.get(modelProperty);
-  }
-
-  private String getColumnsForInsert() {
-    return PROPERTY_COLUMN_MAPPING.values().stream()
-        .map(col -> col.equals("primary") ? "\"primary\"" : col)
-        .collect(Collectors.joining(", "));
-  }
-
-  private String getPlaceholdersForInsert() {
-    return PROPERTY_COLUMN_MAPPING.keySet().stream()
-        .map(prop -> ":" + prop)
-        .collect(Collectors.joining(", "));
   }
 
   @Override
@@ -458,7 +419,92 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     bindings.put("targetIdentifiableObjectType", urlAlias.getTarget().getIdentifiableObjectType());
     bindings.put("targetIdentifiableType", urlAlias.getTarget().getType());
     bindings.put("targetUuid", urlAlias.getTarget().getUuid());
+    bindings.put("websiteUuid", extractWebsiteUuid(urlAlias));
+    bindings.put("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()));
     return bindings;
+  }
+
+  @Override
+  protected String getSqlInsertFields() {
+    return super.getSqlInsertFields()
+        + ", last_published, \"primary\", slug, target_identifiable_objecttype, target_identifiable_type, target_language, target_uuid, website_uuid";
+  }
+
+  @Override
+  protected String getSqlInsertValues() {
+    return super.getSqlInsertValues()
+        + ", :lastPublished, :primary, :slug, :targetIdentifiableObjectType, :targetIdentifiableType, :targetLanguage, :targetUuid, :websiteUuid";
+  }
+
+  @Override
+  public String getSqlSelectAllFields(String tableAlias, String mappingPrefix) {
+    return getSqlSelectReducedFields(tableAlias, mappingPrefix);
+  }
+
+  @Override
+  protected String getSqlSelectReducedFields(String tableAlias, String mappingPrefix) {
+    return super.getSqlSelectReducedFields(tableAlias, mappingPrefix)
+        + ", "
+        + tableAlias
+        + ".last_published "
+        + mappingPrefix
+        + "_lastPublished, "
+        + tableAlias
+        + ".primary "
+        + mappingPrefix
+        + "_primary, "
+        + tableAlias
+        + ".slug "
+        + mappingPrefix
+        + "_slug, "
+        + tableAlias
+        + ".target_language "
+        + mappingPrefix
+        + "_targetLanguage, "
+
+        // target object fields without registered mappingPrefix
+        // because they can not be mapped automatically by JDBI to UrlAlias fields - see
+        // mapRowToUrlAlias (use unregistered mapping-prefix "target_" to make it easier to read)
+        + tableAlias
+        + ".target_identifiable_objecttype target_identifiableObjectType, "
+        + tableAlias
+        + ".target_identifiable_type target_identifiableType, "
+        + tableAlias
+        + ".target_uuid target_uuid, "
+
+        // joined website fields
+        + WebsiteRepositoryImpl.TABLE_ALIAS
+        + ".uuid "
+        + WebsiteRepositoryImpl.MAPPING_PREFIX
+        + "_uuid, "
+        + WebsiteRepositoryImpl.TABLE_ALIAS
+        + ".label "
+        + WebsiteRepositoryImpl.MAPPING_PREFIX
+        + "_label, "
+        + WebsiteRepositoryImpl.TABLE_ALIAS
+        + ".url "
+        + WebsiteRepositoryImpl.MAPPING_PREFIX
+        + "_url";
+  }
+
+  @Override
+  protected String getSqlSelectReducedFieldsJoins() {
+    return super.getSqlSelectReducedFieldsJoins()
+        + " LEFT JOIN "
+        + WebsiteRepositoryImpl.TABLE_NAME
+        + " AS "
+        + WebsiteRepositoryImpl.TABLE_ALIAS
+        + " ON "
+        + WebsiteRepositoryImpl.TABLE_ALIAS
+        + ".uuid = "
+        + tableAlias
+        + ".website_uuid";
+  }
+
+  @Override
+  public String getSqlUpdateFieldValues() {
+    return super.getSqlUpdateFieldValues()
+        + ", last_published=:lastPublished, \"primary\"=:primary, slug=:slug, target_identifiable_objecttype=:targetIdentifiableObjectType, target_identifiable_type=:targetIdentifiableType, target_language=:targetLanguage, target_uuid=:targetUuid, website_uuid=:websiteUuid";
   }
 
   @Override
@@ -501,65 +547,10 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     }
   }
 
-  private void mapRowToUrlAlias(Map<UUID, UrlAlias> map, RowView row) {
-    UrlAlias alias =
-        map.compute(
-            row.getColumn(mappingPrefix + "_uuid", UUID.class),
-            (uuid, urlAlias) -> urlAlias != null ? urlAlias : row.getRow(UrlAlias.class));
-    if (alias != null && row.getColumn(mappingPrefix + "_targetuuid", UUID.class) != null) {
-      Identifiable target = new Identifiable();
-      target.setIdentifiableObjectType(
-          row.getColumn(
-              mappingPrefix + "_targetidentifiableobjecttype", IdentifiableObjectType.class));
-      target.setType(
-          row.getColumn(mappingPrefix + "_targetidentifiabletype", IdentifiableType.class));
-      target.setUuid(row.getColumn(mappingPrefix + "_targetuuid", UUID.class));
-      alias.setTarget(target);
-    }
-    if (alias != null && row.getColumn(WEBSITESALIAS + "_uuid", UUID.class) != null) {
-      Website website = new Website(row.getColumn(WEBSITESALIAS + "_url", URL.class));
-      website.setUuid(row.getColumn(WEBSITESALIAS + "_uuid", UUID.class));
-      website.setLabel(row.getColumn(WEBSITESALIAS + "_label", LocalizedText.class));
-      alias.setWebsite(website);
-    }
-  }
-
   @Override
   public void save(UrlAlias urlAlias) throws RepositoryException {
-    if (urlAlias == null) {
-      return;
-    }
-    if (urlAlias.getUuid() == null) {
-      urlAlias.setUuid(UUID.randomUUID());
-    }
-    if (urlAlias.getCreated() == null) {
-      urlAlias.setCreated(LocalDateTime.now());
-    }
-
-    String sql =
-        "INSERT INTO "
-            + tableName
-            + " ("
-            + getColumnsForInsert()
-            + ") VALUES ("
-            + getPlaceholdersForInsert()
-            + ");";
-    try {
-      dbi.useHandle(
-          h ->
-              h.createUpdate(sql)
-                  .bindMap(getSpecialBindings(urlAlias))
-                  .bindBean(urlAlias)
-                  .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                  .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
-                  .execute());
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+    Map<String, Object> bindings = getSpecialBindings(urlAlias);
+    super.save(urlAlias, bindings);
   }
 
   @Override
@@ -569,32 +560,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
 
   @Override
   public void update(UrlAlias urlAlias) throws RepositoryException {
-    if (urlAlias == null) {
-      return;
-    }
-    String sql =
-        "UPDATE " + tableName + " SET " + getAssignmentsForUpdate() + " WHERE uuid = :uuid;";
-    try {
-      int affected =
-          dbi.withHandle(
-              h ->
-                  h.createUpdate(sql)
-                      .bindMap(getSpecialBindings(urlAlias))
-                      .bindBean(urlAlias)
-                      .bind("websiteUuid", extractWebsiteUuid(urlAlias))
-                      .bind("targetLanguage", grabLanguage(urlAlias.getTargetLanguage()))
-                      .execute());
-      if (affected != 1) {
-        throw new RepositoryException(
-            String.format(
-                "Update of '%s' went wrong. Affected rows: %d", urlAlias.getUuid(), affected));
-      }
-    } catch (StatementException e) {
-      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
-      throw new RepositoryException(
-          String.format("The SQL statement is defective: %s", detailMessage), e);
-    } catch (JdbiException e) {
-      throw new RepositoryException(e);
-    }
+    Map<String, Object> bindings = getSpecialBindings(urlAlias);
+    super.update(urlAlias, bindings);
   }
 }

@@ -48,7 +48,7 @@ public class LobidCorporateBodiesClient extends LobidBaseClient<LobidCorporateBo
     // identifier
     String gndIdentifier = lobidCorporateBody.getGndIdentifier();
     if (gndIdentifier != null) {
-      corporateBody.addIdentifier(new Identifier("gnd", gndIdentifier));
+      corporateBody.addIdentifier(Identifier.builder().namespace("gnd").id(gndIdentifier).build());
     }
 
     // homepage

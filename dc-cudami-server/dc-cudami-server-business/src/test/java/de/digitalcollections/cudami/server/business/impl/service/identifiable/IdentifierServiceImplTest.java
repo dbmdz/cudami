@@ -37,7 +37,8 @@ public class IdentifierServiceImplTest
   public void validationSuccess() {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("namespace", "id"));
+    Set<Identifier> identifiers =
+        Set.of(Identifier.builder().namespace("namespace").id("id").build());
 
     assertThatCode(() -> service.validate(identifiers)).doesNotThrowAnyException();
   }
@@ -49,7 +50,8 @@ public class IdentifierServiceImplTest
     when(identifierTypeService.updateIdentifierTypeCache())
         .thenReturn(Map.of("namespace1", "id1", "namespace2", "id2"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("namespace2", "id2"));
+    Set<Identifier> identifiers =
+        Set.of(Identifier.builder().namespace("namespace2").id("id2").build());
 
     assertThatCode(() -> service.validate(identifiers)).doesNotThrowAnyException();
   }
@@ -60,7 +62,8 @@ public class IdentifierServiceImplTest
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("namespace2", "id2"));
+    Set<Identifier> identifiers =
+        Set.of(Identifier.builder().namespace("namespace2").id("id2").build());
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))
@@ -73,7 +76,8 @@ public class IdentifierServiceImplTest
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("namespace", "id2"));
+    Set<Identifier> identifiers =
+        Set.of(Identifier.builder().namespace("namespace").id("id2").build());
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))
@@ -86,7 +90,8 @@ public class IdentifierServiceImplTest
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
     when(identifierTypeService.updateIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
-    Set<Identifier> identifiers = Set.of(new Identifier("namespace", null));
+    Set<Identifier> identifiers =
+        Set.of(Identifier.builder().namespace("namespace").id(null).build());
 
     assertThatExceptionOfType(ValidationException.class)
         .isThrownBy(() -> service.validate(identifiers))

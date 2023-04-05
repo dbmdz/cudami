@@ -15,6 +15,7 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.AbstractIdentifiabl
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.DigitalObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.agent.AgentRepositoryImpl;
 import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.entity.agent.Agent;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.identifiable.entity.agent.Gender;
@@ -271,7 +272,7 @@ public class ItemRepositoryImplTest
         Item.builder()
             .label(Locale.GERMAN, "Ein Buch")
             .exemplifiesManifestation(false)
-            .identifier("mdz-sig", "Signatur")
+            .identifier(Identifier.builder().namespace("mdz-sig").id("Signatur").build())
             .title(Locale.GERMAN, "Ein Buchtitel")
             .holders(holders)
             .build();

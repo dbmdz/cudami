@@ -1,6 +1,7 @@
 package de.digitalcollections.cudami.server.controller.legal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import de.digitalcollections.cudami.server.business.api.service.legal.LicenseService;
@@ -130,6 +131,19 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  },\n"
             + "  \"url\": \"http://rightsstatements.org/vocab/InC-NC/1.0/\"\n"
             + "}";
+    License savedLicense = createTestLicenseSaved();
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              License license = (License) args[0];
+              license.setUuid(savedLicense.getUuid());
+              license.setCreated(savedLicense.getCreated());
+              license.setLastModified(savedLicense.getLastModified());
+              return null;
+            })
+        .when(licenseService)
+        .save(any(License.class));
+
     testPostJson("/v5/licenses", jsonBody, "/v5/legal/licenses/license_response.json");
   }
 
@@ -145,6 +159,19 @@ public class LicenseControllerTest extends BaseControllerTest {
             + "  \"url\": \"http://rightsstatements.org/vocab/InC-NC/1.0/\",\n"
             + "  \"uuid\": \"2780bee1-eeec-4b50-a95b-bba90793fc6a\"\n"
             + "}";
+    License savedLicense = createTestLicenseSaved();
+    doAnswer(
+            invocation -> {
+              Object[] args = invocation.getArguments();
+              License license = (License) args[0];
+              license.setUuid(savedLicense.getUuid());
+              license.setCreated(savedLicense.getCreated());
+              license.setLastModified(savedLicense.getLastModified());
+              return null;
+            })
+        .when(licenseService)
+        .update(any(License.class));
+
     testPutJson(
         "/v5/licenses/2780bee1-eeec-4b50-a95b-bba90793fc6a",
         jsonBody,

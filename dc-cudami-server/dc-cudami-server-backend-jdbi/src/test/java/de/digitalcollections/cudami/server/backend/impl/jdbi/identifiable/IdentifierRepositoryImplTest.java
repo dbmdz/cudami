@@ -54,7 +54,7 @@ class IdentifierRepositoryImplTest {
   @DisplayName("can save and return the saved object")
   void checkSave() throws RepositoryException {
     Webpage webpage = createWebpage();
-    Identifier identifier = new Identifier("namespace", "id");
+    Identifier identifier = Identifier.builder().namespace("namespace").id("id").build();
     webpage.addIdentifier(identifier);
     webpageRepository.save(webpage);
 
@@ -74,8 +74,8 @@ class IdentifierRepositoryImplTest {
   @DisplayName("can return a list of identifiers for an identifiable, when retrieved by uuid")
   void identifiersForIdentifiable() throws RepositoryException {
     Webpage webpage = createWebpage();
-    Identifier identifier1 = new Identifier("namespace", "1");
-    Identifier identifier2 = new Identifier("namespace", "2");
+    Identifier identifier1 = Identifier.builder().namespace("namespace").id("1").build();
+    Identifier identifier2 = Identifier.builder().namespace("namespace").id("2").build();
     webpage.addIdentifier(identifier1);
     webpage.addIdentifier(identifier2);
     webpageRepository.save(webpage);
@@ -89,7 +89,7 @@ class IdentifierRepositoryImplTest {
   @DisplayName("can return an identifier by its uuid")
   void getByUuid() throws RepositoryException {
     Webpage webpage = createWebpage();
-    Identifier identifier = new Identifier("namespace", "id");
+    Identifier identifier = Identifier.builder().namespace("namespace").id("id").build();
     webpage.addIdentifier(identifier);
     webpageRepository.save(webpage);
 

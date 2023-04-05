@@ -551,6 +551,9 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
       throws RepositoryException {
+    if (uniqueObject == null) {
+      throw new IllegalArgumentException("Given object must not be null");
+    }
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }
@@ -594,6 +597,9 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       Map<String, Object> bindings,
       BiFunction<String, Map<String, Object>, String> sqlModifier)
       throws RepositoryException {
+    if (uniqueObject == null) {
+      throw new IllegalArgumentException("Given object must not be null");
+    }
     if (bindings == null) {
       bindings = new HashMap<>(0);
     }

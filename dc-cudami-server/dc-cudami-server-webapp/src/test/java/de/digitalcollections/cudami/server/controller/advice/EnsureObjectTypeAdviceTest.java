@@ -146,7 +146,7 @@ class EnsureObjectTypeAdviceTest {
   @Test
   public void missingObjectTypeInIdentifier() throws IOException, JSONException {
     advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
-    Identifier identifier = new Identifier("Foo", "Bar");
+    Identifier identifier = Identifier.builder().namespace("Foo").id("Bar").build();
     String missingObjectTypeJSON = getMissingObjectTypeJSON(identifier);
 
     String expectedJSON = objectMapper.writeValueAsString(identifier);
@@ -160,7 +160,9 @@ class EnsureObjectTypeAdviceTest {
   public void missingObjectTypeInIdentifierList() throws IOException, JSONException {
     advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     List<Identifier> identifier =
-        List.of(new Identifier("Foo", "Bar"), new Identifier("Baz", "Blubb"));
+        List.of(
+            Identifier.builder().namespace("Foo").id("Bar").build(),
+            Identifier.builder().namespace("Baz").id("Blubb").build());
     String missingObjectTypeJSON = getMissingObjectTypeJSON(identifier);
 
     String expectedJSON = objectMapper.writeValueAsString(identifier);
@@ -283,7 +285,13 @@ class EnsureObjectTypeAdviceTest {
   public void testArrays() throws IOException, JSONException {
     advice = new EnsureObjectTypeAdvice(mock(HttpServletRequest.class));
     Item item =
-        Item.builder().holders(List.of(Person.builder().identifier("Foo", "Bar").build())).build();
+        Item.builder()
+            .holders(
+                List.of(
+                    Person.builder()
+                        .identifier(Identifier.builder().namespace("Foo").id("Bar").build())
+                        .build()))
+            .build();
     String missingObjectTypeJSON = getMissingObjectTypeJSON(item);
 
     String expectedJSON = objectMapper.writeValueAsString(item);

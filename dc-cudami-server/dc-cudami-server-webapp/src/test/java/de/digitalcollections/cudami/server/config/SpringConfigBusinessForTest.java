@@ -2,6 +2,7 @@ package de.digitalcollections.cudami.server.config;
 
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
+import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierTypeService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.DigitalObjectService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.entity.EntityService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.FileResourceMetadataService;
@@ -32,6 +33,11 @@ public class SpringConfigBusinessForTest {
   @Bean
   public IdentifiableService identifiableService() {
     return Mockito.mock(IdentifiableService.class);
+  }
+
+  @Bean
+  public IdentifierTypeService identifierTypeService() {
+    return Mockito.mock(IdentifierTypeService.class);
   }
 
   @Bean
