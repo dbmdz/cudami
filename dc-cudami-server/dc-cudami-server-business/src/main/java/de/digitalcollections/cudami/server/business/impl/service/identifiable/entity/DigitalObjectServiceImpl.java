@@ -221,9 +221,9 @@ public class DigitalObjectServiceImpl extends EntityServiceImpl<DigitalObject>
       Item item = itemService.getByExample(digitalObject.getItem());
 
       // for later:
-      if (item.getManifestation() != null) {
-        // TODO: fetch manifestation and fill item
-      }
+      //      if (item.getManifestation() != null) {
+      //        // TODO: fetch manifestation and fill item
+      //      }
 
       digitalObject.setItem(item);
     }

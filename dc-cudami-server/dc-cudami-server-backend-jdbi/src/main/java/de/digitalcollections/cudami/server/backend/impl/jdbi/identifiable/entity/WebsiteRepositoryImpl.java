@@ -31,8 +31,8 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   private static final Logger LOGGER = LoggerFactory.getLogger(WebsiteRepositoryImpl.class);
 
-  public static final String MAPPING_PREFIX = "ws";
-  public static final String TABLE_ALIAS = "w";
+  public static final String MAPPING_PREFIX = "webs";
+  public static final String TABLE_ALIAS = "webs";
   public static final String TABLE_NAME = "websites";
 
   private final WebpageRepositoryImpl webpageRepositoryImpl;

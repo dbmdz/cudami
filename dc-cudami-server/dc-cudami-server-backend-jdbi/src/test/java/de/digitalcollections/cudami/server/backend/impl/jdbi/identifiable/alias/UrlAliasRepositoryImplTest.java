@@ -82,7 +82,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
     if (actual.getWebsite().getUuid().equals(website.getUuid())) {
       actual.setWebsite(website);
     }
-    assertThat(actual).usingRecursiveComparison().isEqualTo(urlAlias);
+    assertThat(actual.equals(urlAlias));
   }
 
   private Identifiable copyWebpageToIdentifiable(Webpage webpage) {
@@ -109,7 +109,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
     UrlAlias actual = repo.getByUuid(urlAlias.getUuid());
 
-    assertThat(actual).usingRecursiveComparison().isEqualTo(urlAlias);
+    assertThat(actual.equals(urlAlias));
   }
 
   @DisplayName("can update an UrlAlias for a webpage without website")
@@ -131,10 +131,10 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
     repo.update(urlAlias);
 
-    assertThat(urlAlias).usingRecursiveComparison().isEqualTo(beforeUpdate);
+    assertThat(urlAlias.equals(beforeUpdate));
 
     UrlAlias persisted = repo.getByUuid(urlAlias.getUuid());
-    assertThat(persisted).usingRecursiveComparison().isEqualTo(urlAlias);
+    assertThat(persisted.equals(urlAlias));
   }
 
   @DisplayName("can update an UrlAlias for a webpage with website")
@@ -163,7 +163,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
     repo.update(urlAlias);
 
-    assertThat(urlAlias).usingRecursiveComparison().isEqualTo(beforeUpdate);
+    assertThat(urlAlias.equals(beforeUpdate));
 
     UrlAlias persisted = repo.getByUuid(urlAlias.getUuid());
     // We know, that getByUuid does NOT fill the Website object. So we fill it
@@ -171,7 +171,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
     if (persisted.getWebsite().getUuid().equals(website.getUuid())) {
       persisted.setWebsite(website);
     }
-    assertThat(persisted).usingRecursiveComparison().isEqualTo(urlAlias);
+    assertThat(persisted.equals(urlAlias));
   }
 
   @DisplayName("can retrieve for targetUuid")
@@ -196,7 +196,7 @@ public class UrlAliasRepositoryImplTest extends AbstractRepositoryImplTest {
 
     LocalizedUrlAliases actual = repo.getByIdentifiable(webpage.getUuid());
     LocalizedUrlAliases expected = new LocalizedUrlAliases(urlAlias1, urlAlias2);
-    assertThat(actual).isEqualTo(expected);
+    assertThat(actual.equals(expected));
   }
 
   @DisplayName("can retrieve the main link for a target uuid")

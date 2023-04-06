@@ -133,18 +133,18 @@ public class FileResourceMetadataServiceImpl
           new LocalizedText(
               new Locale(localeService.getDefaultLanguage()), fileResource.getFilename()));
     }
-    if (fileResource instanceof ApplicationFileResource app) {
-      applicationFileResourceService.save(app);
-    } else if (fileResource instanceof AudioFileResource audio) {
-      audioFileResourceService.save(audio);
-    } else if (fileResource instanceof ImageFileResource image) {
-      imageFileResourceService.save(image);
-    } else if (fileResource instanceof LinkedDataFileResource ldata) {
-      linkedDataFileResourceService.save(ldata);
-    } else if (fileResource instanceof TextFileResource text) {
-      textFileResourceService.save(text);
-    } else if (fileResource instanceof VideoFileResource video) {
-      videoFileResourceService.save(video);
+    if (fileResource instanceof ApplicationFileResource) {
+      applicationFileResourceService.save((ApplicationFileResource) fileResource);
+    } else if (fileResource instanceof AudioFileResource) {
+      audioFileResourceService.save((AudioFileResource) fileResource);
+    } else if (fileResource instanceof ImageFileResource) {
+      imageFileResourceService.save((ImageFileResource) fileResource);
+    } else if (fileResource instanceof LinkedDataFileResource) {
+      linkedDataFileResourceService.save((LinkedDataFileResource) fileResource);
+    } else if (fileResource instanceof TextFileResource) {
+      textFileResourceService.save((TextFileResource) fileResource);
+    } else if (fileResource instanceof VideoFileResource) {
+      videoFileResourceService.save((VideoFileResource) fileResource);
     } else {
       super.save(fileResource);
     }
@@ -152,18 +152,18 @@ public class FileResourceMetadataServiceImpl
 
   @Override
   public void update(FileResource fileResource) throws ServiceException, ValidationException {
-    if (fileResource instanceof ApplicationFileResource app) {
-      applicationFileResourceService.update(app);
-    } else if (fileResource instanceof AudioFileResource audio) {
-      audioFileResourceService.update(audio);
-    } else if (fileResource instanceof ImageFileResource image) {
-      imageFileResourceService.update(image);
-    } else if (fileResource instanceof LinkedDataFileResource ldata) {
-      linkedDataFileResourceService.update(ldata);
-    } else if (fileResource instanceof TextFileResource text) {
-      textFileResourceService.update(text);
-    } else if (fileResource instanceof VideoFileResource video) {
-      videoFileResourceService.update(video);
+    if (fileResource instanceof ApplicationFileResource) {
+      applicationFileResourceService.update((ApplicationFileResource) fileResource);
+    } else if (fileResource instanceof AudioFileResource) {
+      audioFileResourceService.update((AudioFileResource) fileResource);
+    } else if (fileResource instanceof ImageFileResource) {
+      imageFileResourceService.update((ImageFileResource) fileResource);
+    } else if (fileResource instanceof LinkedDataFileResource) {
+      linkedDataFileResourceService.update((LinkedDataFileResource) fileResource);
+    } else if (fileResource instanceof TextFileResource) {
+      textFileResourceService.update((TextFileResource) fileResource);
+    } else if (fileResource instanceof VideoFileResource) {
+      videoFileResourceService.update((VideoFileResource) fileResource);
     } else {
       super.update(fileResource);
     }

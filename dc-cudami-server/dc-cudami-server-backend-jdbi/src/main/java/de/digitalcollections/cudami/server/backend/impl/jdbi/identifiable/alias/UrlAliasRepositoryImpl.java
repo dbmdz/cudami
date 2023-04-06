@@ -64,23 +64,32 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
   }
 
   @Override
+  protected BiConsumer<Map<UUID, UrlAlias>, RowView> createFullReduceRowsBiConcumer() {
+    return createBasicReduceRowsBiConsumer();
+  }
+
+  @Override
   protected BiConsumer<Map<UUID, UrlAlias>, RowView> createBasicReduceRowsBiConsumer() {
     return (map, rowView) -> {
-      // object should be already in map, as we here just add additional data
-      UrlAlias urlAlias = map.get(rowView.getColumn(mappingPrefix + "_uuid", UUID.class));
+      UrlAlias urlAlias =
+          map.computeIfAbsent(
+              rowView.getColumn(mappingPrefix + "_uuid", UUID.class),
+              fn -> {
+                return (UrlAlias) rowView.getRow(uniqueObjectImplClass);
+              });
 
       /*
        * + tableAlias +
-       * ".target_identifiable_objecttype target_identifiableObjectType, " +
-       * tableAlias + ".target_identifiable_type target_identifiableType, " +
-       * tableAlias + ".target_uuid target_uuid, "
+       * ".target_identifiable_objecttype uaidf_identifiableObjectType, " +
+       * tableAlias + ".target_identifiable_type uaidf_identifiableType, " +
+       * tableAlias + ".target_uuid uaidf_uuid, "
        */
-      if (rowView.getColumn("target_uuid", UUID.class) != null) {
-        UUID targetUuid = rowView.getColumn("target_uuid", UUID.class);
+      if (rowView.getColumn("uaidf_uuid", UUID.class) != null) {
+        UUID targetUuid = rowView.getColumn("uaidf_uuid", UUID.class);
         IdentifiableType targetIdentifiableType =
-            rowView.getColumn("target_identifiableType", IdentifiableType.class);
+            rowView.getColumn("uaidf_identifiableType", IdentifiableType.class);
         IdentifiableObjectType targetIdentifiableObjectType =
-            rowView.getColumn("target_identifiableObjectType", IdentifiableObjectType.class);
+            rowView.getColumn("uaidf_identifiableObjectType", IdentifiableObjectType.class);
 
         Identifiable target = new Identifiable();
         target.setUuid(targetUuid);
@@ -90,18 +99,13 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
       }
 
       /*
-       * + WebsiteRepositoryImpl.TABLE_ALIAS + ".uuid " +
-       * WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid, " +
-       * WebsiteRepositoryImpl.TABLE_ALIAS + ".label " +
-       * WebsiteRepositoryImpl.MAPPING_PREFIX + "_label, " +
-       * WebsiteRepositoryImpl.TABLE_ALIAS + ".url " +
-       * WebsiteRepositoryImpl.MAPPING_PREFIX + "_url";
+       * + WebsiteRepositoryImpl.TABLE_ALIAS + ".uuid uawebs_uuid, " +
+       * WebsiteRepositoryImpl.TABLE_ALIAS + ".label uawebs_label, " +
+       * WebsiteRepositoryImpl.TABLE_ALIAS + ".url uawebs_url";
        */
-      if (rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
-        UUID websiteUuid =
-            rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class);
-        LocalizedText websiteLabel =
-            rowView.getColumn(WebsiteRepositoryImpl.MAPPING_PREFIX + "_label", LocalizedText.class);
+      if (rowView.getColumn("uawebs_uuid", UUID.class) != null) {
+        UUID websiteUuid = rowView.getColumn("uawebs_uuid", UUID.class);
+        LocalizedText websiteLabel = rowView.getColumn("uawebs_label", LocalizedText.class);
 
         Website website = new Website();
         website.setUuid(websiteUuid);
@@ -240,7 +244,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
             "WITH target (uuid, language) AS "
                 + innerSel.toString()
                 + " SELECT "
-                + getSqlSelectReducedFields(tableName, tableAlias)
+                + getSqlSelectReducedFields()
                 + " FROM "
                 + tableName
                 + " AS "
@@ -285,14 +289,14 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
 
   @Override
   public LocalizedUrlAliases getByIdentifiable(UUID uuid) throws RepositoryException {
-    // FIXME: test me!
     if (uuid == null) {
       return new LocalizedUrlAliases();
     }
-    String fieldsSql = getSqlSelectReducedFields(tableName, tableAlias);
-    StringBuilder innerQuery =
+    StringBuilder sql =
         new StringBuilder(
-            "SELECT * FROM "
+            "SELECT "
+                + getSqlSelectAllFields()
+                + " FROM "
                 + tableName
                 + " AS "
                 + tableAlias
@@ -300,11 +304,25 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
                 + " WHERE "
                 + tableAlias
                 + ".target_uuid = :targetUuid");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("targetUuid", uuid);
+    Map<String, Object> bindings = new HashMap<>();
+    bindings.put("targetUuid", uuid);
 
-    List<UrlAlias> list = retrieveList(fieldsSql, innerQuery, argumentMappings, null);
-    return new LocalizedUrlAliases(list);
+    try {
+      UrlAlias[] resultset =
+          dbi.withHandle(
+              h ->
+                  h.createQuery(sql.toString())
+                      .bindMap(bindings)
+                      .reduceRows(basicReduceRowsBiConsumer)
+                      .toArray(UrlAlias[]::new));
+      return new LocalizedUrlAliases(resultset);
+    } catch (StatementException e) {
+      String detailMessage = e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+      throw new RepositoryException(
+          String.format("The SQL statement is defective: %s", detailMessage), e);
+    } catch (JdbiException e) {
+      throw new RepositoryException(e);
+    }
   }
 
   @Override
@@ -383,28 +401,19 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
 
         // target object fields without registered mappingPrefix
         // because they can not be mapped automatically by JDBI to UrlAlias fields - see
-        // mapRowToUrlAlias (use unregistered mapping-prefix "target_" to make it easier
+        // mapRowToUrlAlias (use unregistered mapping-prefix "uaidf_" to make it unique
         // to read)
         + tableAlias
-        + ".target_identifiable_objecttype target_identifiableObjectType, "
+        + ".target_identifiable_objecttype uaidf_identifiableObjectType, "
         + tableAlias
-        + ".target_identifiable_type target_identifiableType, "
+        + ".target_identifiable_type uaidf_identifiableType, "
         + tableAlias
-        + ".target_uuid target_uuid, "
+        + ".target_uuid uaidf_uuid, "
 
         // joined website fields
-        + WebsiteRepositoryImpl.TABLE_ALIAS
-        + ".uuid "
-        + WebsiteRepositoryImpl.MAPPING_PREFIX
-        + "_uuid, "
-        + WebsiteRepositoryImpl.TABLE_ALIAS
-        + ".label "
-        + WebsiteRepositoryImpl.MAPPING_PREFIX
-        + "_label, "
-        + WebsiteRepositoryImpl.TABLE_ALIAS
-        + ".url "
-        + WebsiteRepositoryImpl.MAPPING_PREFIX
-        + "_url";
+        + "uawebs.uuid uawebs_uuid, "
+        + "uawebs.label uawebs_label, "
+        + "uawebs.url uawebs_url";
   }
 
   @Override
@@ -412,11 +421,7 @@ public class UrlAliasRepositoryImpl extends UniqueObjectRepositoryImpl<UrlAlias>
     return super.getSqlSelectReducedFieldsJoins()
         + " LEFT JOIN "
         + WebsiteRepositoryImpl.TABLE_NAME
-        + " AS "
-        + WebsiteRepositoryImpl.TABLE_ALIAS
-        + " ON "
-        + WebsiteRepositoryImpl.TABLE_ALIAS
-        + ".uuid = "
+        + " AS uawebs ON uawebs.uuid = "
         + tableAlias
         + ".website_uuid";
   }

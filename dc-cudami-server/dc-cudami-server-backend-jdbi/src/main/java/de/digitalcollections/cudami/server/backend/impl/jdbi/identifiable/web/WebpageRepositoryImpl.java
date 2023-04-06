@@ -29,8 +29,8 @@ import org.springframework.stereotype.Repository;
 public class WebpageRepositoryImpl extends IdentifiableRepositoryImpl<Webpage>
     implements WebpageRepository {
 
-  public static final String MAPPING_PREFIX = "wp";
-  public static final String TABLE_ALIAS = "w";
+  public static final String MAPPING_PREFIX = "webp";
+  public static final String TABLE_ALIAS = "webp";
   public static final String TABLE_NAME = "webpages";
 
   public WebpageRepositoryImpl(
