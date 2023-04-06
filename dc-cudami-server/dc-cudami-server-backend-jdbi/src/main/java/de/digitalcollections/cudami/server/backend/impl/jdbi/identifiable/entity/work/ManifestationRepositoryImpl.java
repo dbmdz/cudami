@@ -509,11 +509,14 @@ public class ManifestationRepositoryImpl extends EntityRepositoryImpl<Manifestat
         LEFT JOIN %6$s %7$s ON %7$s.uuid = %1$s.work
         """
             .formatted(
-                tableAlias, /* 2-3 */
+                tableAlias,
+                /* 2-3 */
                 EntityToEntityRelationRepositoryImpl.TABLE_NAME,
-                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS, /* 4-5 */
+                EntityToEntityRelationRepositoryImpl.TABLE_ALIAS,
+                /* 4-5 */
                 EntityRepositoryImpl.TABLE_NAME,
-                EntityRepositoryImpl.TABLE_ALIAS, /* 6-7 */
+                EntityRepositoryImpl.TABLE_ALIAS,
+                /* 6-7 */
                 WorkRepositoryImpl.TABLE_NAME,
                 WorkRepositoryImpl.TABLE_ALIAS);
   }

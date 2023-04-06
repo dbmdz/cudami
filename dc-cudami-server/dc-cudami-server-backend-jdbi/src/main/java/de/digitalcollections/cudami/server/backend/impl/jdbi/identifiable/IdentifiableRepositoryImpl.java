@@ -9,6 +9,7 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
+import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.WebsiteRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
@@ -71,7 +72,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   public static final String TABLE_NAME = "identifiables";
 
   private final IdentifierRepository identifierRepository;
-  private final UrlAliasRepository urlAliasRepository;
+  private final UrlAliasRepositoryImpl urlAliasRepository;
 
   @Autowired
   protected IdentifiableRepositoryImpl(
@@ -108,7 +109,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         offsetForAlternativePaging);
 
     this.identifierRepository = identifierRepository;
-    this.urlAliasRepository = urlAliasRepository;
+    this.urlAliasRepository = (UrlAliasRepositoryImpl) urlAliasRepository;
 
     // register row mapper for given class and mapping prefix
     // (until now everywhere BeanMapper.factory... was used. If this changes, row
@@ -555,7 +556,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + ","
             + SQL_PREVIEW_IMAGE_FIELDS_PI
             + ", "
-            + UrlAliasRepositoryImpl.getSelectFields(true)
+            + urlAliasRepository.getSqlSelectReducedFields()
             + " FROM "
             + (innerQuery != null ? "(" + innerQuery + ")" : tableName)
             + " AS "
@@ -589,7 +590,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
             + ".uuid = "
             + UrlAliasRepositoryImpl.TABLE_ALIAS
             + ".target_uuid"
-            + UrlAliasRepositoryImpl.WEBSITESJOIN
+            + urlAliasRepository.getSqlSelectReducedFieldsJoins()
             + (orderBy != null && orderBy.matches("(?iu)^\\s*order by.+")
                 ? " " + orderBy
                 : (StringUtils.hasText(orderBy) ? " ORDER BY " + orderBy : ""));
@@ -634,7 +635,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + ","
                 + ImageFileResourceRepositoryImpl.SQL_PREVIEW_IMAGE_FIELDS_PI
                 + ", "
-                + UrlAliasRepositoryImpl.getSelectFields(true)
+                + urlAliasRepository.getSqlSelectReducedFields()
                 + ", "
                 + TagRepositoryImpl.getSqlSelectReducedFieldsStatic()
                 + ", "
@@ -675,7 +676,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
                 + ".uuid = "
                 + UrlAliasRepositoryImpl.TABLE_ALIAS
                 + ".target_uuid"
-                + UrlAliasRepositoryImpl.WEBSITESJOIN
+                + urlAliasRepository.getSqlSelectReducedFieldsJoins()
                 + " LEFT JOIN %1$s %2$s ON %2$s.uuid = ANY(%3$s.tags_uuids)"
                     .formatted(
                         TagRepositoryImpl.TABLE_NAME, TagRepositoryImpl.TABLE_ALIAS, tableAlias)
@@ -747,18 +748,20 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   private void setLocalizedUrlAliasesFromRowView(RowView rowView, I identifiable) {
+    // FIXME: test it! is it really WebsiteRepositoryImpl.TABLE_ALIAS and not
+    // WebsiteRepositoryImpl.MAPPING_PREFIX?
+    // or does it becuase of standard mapping-prefix of website get in conflict of rowmapper for a
+    // website?
+    // then use other mapping-prefix or no alias/mapping at all...
     if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
       UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
-      UUID websiteUuid =
-          rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_uuid", UUID.class);
+      UUID websiteUuid = rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_uuid", UUID.class);
       if (websiteUuid != null) {
         Website website =
-            new Website(
-                rowView.getColumn(UrlAliasRepositoryImpl.WEBSITESALIAS + "_url", URL.class));
+            new Website(rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_url", URL.class));
         website.setUuid(websiteUuid);
         website.setLabel(
-            rowView.getColumn(
-                UrlAliasRepositoryImpl.WEBSITESALIAS + "_label", LocalizedText.class));
+            rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_label", LocalizedText.class));
         urlAlias.setWebsite(website);
       }
       if (identifiable.getLocalizedUrlAliases() == null) {
