@@ -33,7 +33,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a 404, when an UrlAlias could not be found")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  @ValueSource(strings = {"/v6/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void nonexistingUrlAlias(String path) throws Exception {
     when(urlAliasService.getByExample(any(UrlAlias.class))).thenReturn(null);
 
@@ -42,7 +42,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("returns an existingUrlAlias")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  @ValueSource(strings = {"/v6/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void existingUrlAlias(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
@@ -62,7 +62,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a 404 on an attempt to delete an nonexisting UrlAlias")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  @ValueSource(strings = {"/v6/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteNonexistingUrlAlias(String path) throws Exception {
     when(urlAliasService.delete(any(UrlAlias.class))).thenReturn(false);
 
@@ -71,7 +71,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
 
   @DisplayName("returns a 204 after deleting an existing UrlAlias")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  @ValueSource(strings = {"/v6/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void deleteExistingUrlAlias(String path) throws Exception {
     when(urlAliasService.delete(any(UrlAlias.class))).thenReturn(true);
 
@@ -99,13 +99,12 @@ class UrlAliasControllerTest extends BaseControllerTest {
         }\n
       }
           """;
-
-    testPostJsonWithState("/v5/urlaliases", body, 422);
+    testPostJsonWithState("/v6/urlaliases", body, 422);
   }
 
   @DisplayName("successfully creates an UrlAlias")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases"})
+  @ValueSource(strings = {"/v6/urlaliases"})
   public void save(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
@@ -132,21 +131,25 @@ class UrlAliasControllerTest extends BaseControllerTest {
         \"primary\": true,\n
         \"slug\": \"hurz\",\n
         \"targetLanguage\": \"de\",\n
+        \"target\": {\n
+          \"uuid\": \"23456789-2345-2345-2345-234567890123\",\n
+          \"identifiableObjectType\": \"COLLECTION\",\n
+          \"type\": \"ENTITY\"\n
+        },\n
         \"website\": {\n
           \"identifiers\":[],\n
-          \"uuid\":\"87654321-4321-4321-4321-876543210987\",\n
-          \"identifiableObjectType\":\"WEBSITE\",\n
+          \"uuid\": \"87654321-4321-4321-4321-876543210987\",\n
+          \"identifiableObjectType\": \"WEBSITE\",\n
           \"refId\":0\n
         }\n
       }
           """;
-
-    testPostJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
+    testPostJson(path, body, "/v6/urlaliases/12345678-1234-1234-1234-123456789012.json");
   }
 
   @DisplayName("successfully updates an UrlAlias")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/12345678-1234-1234-1234-123456789012"})
+  @ValueSource(strings = {"/v6/urlaliases/12345678-1234-1234-1234-123456789012"})
   public void update(String path) throws Exception {
     UrlAlias expectedUrlAlias =
         UrlAlias.builder()
@@ -173,6 +176,11 @@ class UrlAliasControllerTest extends BaseControllerTest {
           \"primary\": true,\n
           \"slug\": \"hurz\",\n
           \"targetLanguage\": \"de\",\n
+          \"target\": {\n
+            \"uuid\": \"23456789-2345-2345-2345-234567890123\",\n
+            \"identifiableObjectType\": \"COLLECTION\",\n
+            \"type\": \"ENTITY\"\n
+          },\n
           \"uuid\": \"12345678-1234-1234-1234-123456789012\",\n
           \"website\": {\n
             \"identifiers\":[],\n
@@ -183,7 +191,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         }
             """;
 
-    testPutJson(path, body, "/v5/urlaliases/12345678-1234-1234-1234-123456789012.json");
+    testPutJson(path, body, "/v6/urlaliases/12345678-1234-1234-1234-123456789012.json");
   }
 
   @DisplayName("returns an error state when updating an UrlAlias with missing uuid")
@@ -207,7 +215,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         }
             """;
 
-    testPutJsonWithState("/v5/urlaliases/12345678-1234-1234-1234-123456789012", body, 422);
+    testPutJsonWithState("/v6/urlaliases/12345678-1234-1234-1234-123456789012", body, 422);
   }
 
   @DisplayName("can return a find result with empty content")
@@ -215,8 +223,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ValueSource(strings = {"/v6/urlaliases"})
   public void findWithEmptyResult(String path) throws Exception {
     PageResponse<LocalizedUrlAliases> expected =
-        (PageResponse<LocalizedUrlAliases>)
-            PageResponse.builder().forPageSize(1).withTotalElements(0).build();
+        PageResponse.builder().forPageSize(1).withTotalElements(0).build();
 
     when(urlAliasService.findLocalizedUrlAliases(any(PageRequest.class))).thenReturn(expected);
 
@@ -263,8 +270,8 @@ class UrlAliasControllerTest extends BaseControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "/v5/urlaliases/primary//12345678-1234-1234-1234-123456789012",
-        "/v5/urlaliases/primary/slug/invalid-uuid"
+        "/v6/urlaliases/primary//12345678-1234-1234-1234-123456789012",
+        "/v6/urlaliases/primary/slug/invalid-uuid"
       })
   public void invalidParametersForPrimaryLinks(String path) throws Exception {
     testNotFound(path);
@@ -278,12 +285,12 @@ class UrlAliasControllerTest extends BaseControllerTest {
             any(Website.class), eq("notexisting"), any(Locale.class)))
         .thenReturn(null);
 
-    testNotFound("/v5/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
+    testNotFound("/v6/urlaliases/primary/notexisting/12345678-1234-1234-1234-123456789012");
   }
 
   @DisplayName("can return the primary links for a given slug/webpage tuple")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987"})
+  @ValueSource(strings = {"/v6/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987"})
   public void existingPrimaryLinks(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
@@ -301,13 +308,13 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.getPrimaryUrlAliases(any(Website.class), eq("imprint"), eq(null)))
         .thenReturn(expected);
 
-    testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
+    testJson(path, "/v6/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987.json");
   }
 
   @DisplayName("can return the primary links for a given slug/webpage tuple and locale filter")
   @ParameterizedTest
   @ValueSource(
-      strings = {"/v5/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987?pLocale=de"})
+      strings = {"/v6/urlaliases/primary/imprint/87654321-4321-4321-4321-876543210987?pLocale=de"})
   public void existingPrimaryLinksWithLocale(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
@@ -326,12 +333,12 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.getPrimaryUrlAliases(any(Website.class), eq("imprint"), eq(actualLocale)))
         .thenReturn(expected);
 
-    testJson(path, "/v5/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987_de.json");
+    testJson(path, "/v6/urlaliases/primary_imprint_87654321-4321-4321-4321-876543210987_de.json");
   }
 
   @DisplayName("can return the primary links for a given slug but empty website_uuid")
   @ParameterizedTest
-  @ValueSource(strings = {"/v5/urlaliases/primary/imprint"})
+  @ValueSource(strings = {"/v6/urlaliases/primary/imprint"})
   public void existingPrimaryLinksForEmptyWebsiteUuid(String path) throws Exception {
     LocalizedUrlAliases expected = new LocalizedUrlAliases();
     expected.add(
@@ -348,7 +355,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.getPrimaryUrlAliases(eq((Website) null), eq("imprint"), eq((Locale) null)))
         .thenReturn(expected);
 
-    testJson(path, "/v5/urlaliases/primary_imprint.json");
+    testJson(path, "/v6/urlaliases/primary_imprint.json");
   }
 
   @DisplayName("throws an exception, when the service fails on generating a slug")
@@ -357,7 +364,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(Website.class)))
         .thenThrow(new ServiceException("foo"));
 
-    testInternalError("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
+    testInternalError("/v6/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
   }
 
   @DisplayName("returns 404 when trying to generate a slug for a nonexisting website uuid")
@@ -366,7 +373,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), any(Website.class)))
         .thenReturn(null);
 
-    testNotFound("/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
+    testNotFound("/v6/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012");
   }
 
   @DisplayName("returns a generated slug")
@@ -376,7 +383,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
         .thenReturn("hurz");
 
     testGetJsonString(
-        "/v5/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "\"hurz\"");
+        "/v6/urlaliases/slug/de_DE/label/12345678-1234-1234-1234-123456789012", "\"hurz\"");
   }
 
   @DisplayName("returns a generated slug, when no website id is provided")
@@ -385,7 +392,7 @@ class UrlAliasControllerTest extends BaseControllerTest {
     when(urlAliasService.generateSlug(any(Locale.class), any(String.class), eq(null)))
         .thenReturn("hurz");
 
-    testGetJsonString("/v5/urlaliases/slug/de_DE/label", "\"hurz\"");
+    testGetJsonString("/v6/urlaliases/slug/de_DE/label", "\"hurz\"");
   }
 
   // ------------------------------------------------------------

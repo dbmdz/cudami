@@ -1,13 +1,23 @@
 name: cudami-repository
 services:
   database:
-    image: postgres:12.2
+    build:
+      context: .
+      dockerfile: Dockerfile-postgres
     ports:
-      - "22222:5432"
+      - "0.0.0.0:22222:5432"
     environment:
       POSTGRES_USER: "cudami"
       POSTGRES_PASSWORD: "somepassword"
       POSTGRES_DB: "cudami"
+    command:
+      - "-c"
+      - random_page_cost=2
+    volumes:
+      - type: bind
+        source: ./postgres-initdb.d/
+        target: /docker-entrypoint-initdb.d/
+        read_only: true
     # see https://docs.docker.com/compose/compose-file/compose-file-v2/#shm_size for documentation
     shm_size: "1g"
   iiif:
@@ -17,8 +27,8 @@ services:
       context: .
       dockerfile: Dockerfile-iiif
     ports:
-      - "23232:9000"
-      - "23233:9001"
+      - "0.0.0.0:23232:9000"
+      - "0.0.0.0:23233:9001"
     volumes:
       - ./iiif_rules.yml:/application-iiif.yml
       - ~/cudami/fileResources:/iiif/upload
@@ -29,8 +39,9 @@ services:
       context: .
       dockerfile: Dockerfile-media
     ports:
-      - "24242:9000"
-      - "24244:9001"
+      - "0.0.0.0:24242:9000"
+      - "0.0.0.0:24244:9001"
     volumes:
       - ./media_rules.yml:/application-media.yml
       - ~/cudami/fileResources:/media/upload
+

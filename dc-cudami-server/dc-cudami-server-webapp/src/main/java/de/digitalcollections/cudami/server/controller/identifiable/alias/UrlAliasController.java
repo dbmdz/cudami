@@ -46,7 +46,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
   @Operation(summary = "Create and persist an UrlAlias")
   @PostMapping(
-      value = {"/v6/urlaliases", "/v5/urlaliases"},
+      value = {"/v6/urlaliases"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> create(@RequestBody UrlAlias urlAlias)
       throws CudamiControllerException, ValidationException {
@@ -222,10 +222,7 @@ public class UrlAliasController extends AbstractPagingAndSortingController {
 
   @Operation(summary = "update an UrlAlias")
   @PutMapping(
-      value = {
-        "/v6/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}",
-        "/v5/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
-      },
+      value = {"/v6/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UrlAlias> update(
       @Parameter(

@@ -190,10 +190,16 @@ $ sudo service docker restart
 
 ### Usage
 
-To get cudami quickly up running, you can start all backend services using Docker Compose:
+To get cudami quickly up running, you can start all backend services using Docker Compose.
+If you want to start your Postgres database and load a dump or backup file then you can copy or link any
+supported dump file into `docker/repository/postgres-initdb.d/`. Supported file suffixes are `.dump` for binary dumps
+and `.sql` for plain SQL dumps. Both formats can be zipped by 7zip (`.7z`), gzip (`.gz`) or bzip2 (`.bz2`),
+e.g. `mydatabase.dump.7z` or `backup.sql.bz2`.
+
+To build and start docker just run:
 
 ```shell
-$ cd docker
+$ cd docker/repository
 $ docker-compose build
 $ docker-compose up -d
 ```
@@ -227,14 +233,14 @@ $ npm start
 To stop the container run
 
 ```shell
-$ cd dc-cudami-server
+$ cd docker/repository
 $ docker-compose stop
 ```
 
 To delete the container and all data:
 
 ```shell
-$ cd dc-cudami-server
+$ cd docker/repository
 $ docker-compose down
 ```
 

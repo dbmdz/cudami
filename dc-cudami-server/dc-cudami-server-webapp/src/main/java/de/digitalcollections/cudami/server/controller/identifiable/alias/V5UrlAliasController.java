@@ -3,21 +3,30 @@ package de.digitalcollections.cudami.server.controller.identifiable.alias;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
+import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.legacy.V5MigrationHelper;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
+import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +41,25 @@ public class V5UrlAliasController {
   public V5UrlAliasController(UrlAliasService urlAliasService, ObjectMapper objectMapper) {
     this.urlAliasService = urlAliasService;
     this.objectMapper = objectMapper;
+  }
+
+  @Operation(summary = "Create and persist an UrlAlias")
+  @PostMapping(
+      value = {"/v5/urlaliases"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UrlAlias> create(@RequestBody V5UrlAlias urlAlias)
+      throws CudamiControllerException, ValidationException {
+    if (urlAlias == null || urlAlias.getUuid() != null) {
+      return new ResponseEntity("UUID must not be set", HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    try {
+      urlAliasService.save(urlAlias);
+    } catch (ServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+
+    return new ResponseEntity<>(urlAlias, HttpStatus.OK);
   }
 
   @Operation(
@@ -61,5 +89,34 @@ public class V5UrlAliasController {
     } catch (ServiceException | JsonProcessingException e) {
       throw new CudamiControllerException(e);
     }
+  }
+
+  @Operation(summary = "update an UrlAlias")
+  @PutMapping(
+      value = {"/v5/urlaliases/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UrlAlias> update(
+      @Parameter(
+              description =
+                  "UUID of the urlalias, e.g. <tt>599a120c-2dd5-11e8-b467-0ed5f89f718b</tt>")
+          @PathVariable("uuid")
+          UUID uuid,
+      @RequestBody V5UrlAlias urlAlias)
+      throws CudamiControllerException, ValidationException {
+
+    if (uuid == null || urlAlias == null || !uuid.equals(urlAlias.getUuid())) {
+      return new ResponseEntity(
+          "UUID=" + uuid + " not set or does not match UUID of provided resource",
+          HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    UrlAlias result;
+    try {
+      urlAliasService.update(UrlAlias.builder().uuid(uuid).build());
+    } catch (ServiceException e) {
+      throw new CudamiControllerException(e);
+    }
+
+    return new ResponseEntity<>(urlAlias, HttpStatus.OK);
   }
 }
