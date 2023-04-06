@@ -217,7 +217,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>fontsource__source-sans-pro</artifactId>
-      <version>4.2.2</version>
+      <version>4.5.11</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
