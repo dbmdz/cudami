@@ -11,14 +11,14 @@ Lookup outside directory suitable for reading database dump from within docker e
 * Start development docker environment:
 
 ```sh
-$ cd docker
+$ cd docker/repository
 $ docker compose up -d
 ```
 
 * List mounted volume paths under the key Destination:
 
 ```sh
-$ docker inspect -f '{{ json .Mounts }}' cudami-database-1
+$ docker inspect -f '{{ json .Mounts }}' cudami-repository-database-1
 [{"Type":"volume","Name":"4cdb98f188ad1940f0ecf2eedf1007c0689e6802e249089ef8ae87b6e9fa0582","Source":"/var/lib/docker/volumes/4cdb98f188ad1940f0ecf2eedf1007c0689e6802e249089ef8ae87b6e9fa0582/_data","Destination":"/var/lib/postgresql/data","Driver":"local","Mode":"","RW":true,"Propagation":""}]
 ```
 
@@ -32,10 +32,10 @@ In above case:
 
 ```sh
 $ bunzip2 postgresql-dump-cudami-230221-1103.bz2
-$ docker cp postgresql-dump-cudami-230221-1103 cudami-database-1:/var/lib/postgresql/data
+$ docker cp postgresql-dump-cudami-230221-1103 cudami-repository-database-1:/var/lib/postgresql/data
 ...
 Copying to container - 11.68GB
-Successfully copied 11.68GB to cudami-database-1:/var/lib/postgresql/data
+Successfully copied 11.68GB to cudami-repository-database-1:/var/lib/postgresql/data
 ```
 
 * Get the database owner
@@ -52,7 +52,7 @@ environment:
 List databases for user `cudami`:
 
 ```sh
-$ docker exec cudami-database-1 psql -U cudami -l
+$ docker exec cudami-repository-database-1 psql -U cudami -l
                               List of databases
    Name    | Owner  | Encoding |  Collate   |   Ctype    | Access privileges 
 -----------+--------+----------+------------+------------+-------------------
@@ -72,23 +72,26 @@ Start from scratch:
 ```sh
 $ docker compose down
 [+] Running 4/4
- ⠿ Container cudami-media-1     Removed
- ⠿ Container cudami-database-1  Removed
- ⠿ Container cudami-iiif-1      Removed
+ ⠿ Container cudami-repository-media-1     Removed
+ ⠿ Container cudami-repository-database-1  Removed
+ ⠿ Container cudami-repository-iiif-1      Removed
  ⠿ Network cudami_default       Removed 
 $ docker compose up -d
 [+] Running 4/4
  ⠿ Network cudami_default       Created
- ⠿ Container cudami-iiif-1      Started
- ⠿ Container cudami-database-1  Started
- ⠿ Container cudami-media-1     Started
+ ⠿ Container cudami-repository-iiif-1      Started
+ ⠿ Container cudami-repository-database-1  Started
+ ⠿ Container cudami-repository-media-1     Started
 ```
 
 Restore from local SQL file:
 
 ```sh
-$ docker exec -i cudami-database-1 /bin/bash -c "PGPASSWORD=somepassword psql --username cudami cudami" < <your_local_directory_here>/postgresql-dump-cudami-230221-1103
+$ docker exec -i cudami-repository-database-1 /bin/bash -c "PGPASSWORD=somepassword psql --username cudami cudami" < <your_local_directory_here>/postgresql-dump-cudami-230221-1103
 ```
 
-Not working? (with pg_restore from copied dump): 
-$ docker exec cudami-database-1 pg_restore -U cudami -d cudami /var/lib/postgresql/data/postgresql-dump-cudami-230221-1103
+Not working? (with pg_restore from copied dump):
+
+```sh
+$ docker exec cudami-repository-database-1 pg_restore -U cudami -d cudami /var/lib/postgresql/data/postgresql-dump-cudami-230221-1103
+```
