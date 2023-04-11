@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.backend.api.repository.identifiable.I
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.alias.UrlAliasRepository;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.UniqueObjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.alias.UrlAliasRepositoryImpl;
-import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.WebsiteRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.entity.semantic.SubjectRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resource.ImageFileResourceRepositoryImpl;
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
@@ -755,13 +754,11 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     // then use other mapping-prefix or no alias/mapping at all...
     if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
       UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
-      UUID websiteUuid = rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_uuid", UUID.class);
+      UUID websiteUuid = rowView.getColumn("uawebs_uuid", UUID.class);
       if (websiteUuid != null) {
-        Website website =
-            new Website(rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_url", URL.class));
+        Website website = new Website(rowView.getColumn("uawebs_url", URL.class));
         website.setUuid(websiteUuid);
-        website.setLabel(
-            rowView.getColumn(WebsiteRepositoryImpl.TABLE_ALIAS + "_label", LocalizedText.class));
+        website.setLabel(rowView.getColumn("uawebs_label", LocalizedText.class));
         urlAlias.setWebsite(website);
       }
       if (identifiable.getLocalizedUrlAliases() == null) {
