@@ -34,7 +34,7 @@ public class IdentifierServiceImplTest
 
   @DisplayName("Validation succeeds if all conditions are met")
   @Test
-  public void validationSuccess() {
+  public void validationSuccess() throws ServiceException {
     when(identifierTypeService.getIdentifierTypeCache()).thenReturn(Map.of("namespace", "id"));
 
     Set<Identifier> identifiers =

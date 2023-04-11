@@ -30,7 +30,6 @@ public class IdentifierTypeServiceImpl
 
   public IdentifierTypeServiceImpl(IdentifierTypeRepository repository) throws ServiceException {
     super(repository);
-    updateIdentifierTypeCache();
   }
 
   @Override
@@ -43,7 +42,10 @@ public class IdentifierTypeServiceImpl
   }
 
   @Override
-  public Map<String, String> getIdentifierTypeCache() {
+  public Map<String, String> getIdentifierTypeCache() throws ServiceException {
+    if (identifierTypeCache == null) {
+      updateIdentifierTypeCache();
+    }
     return identifierTypeCache;
   }
 

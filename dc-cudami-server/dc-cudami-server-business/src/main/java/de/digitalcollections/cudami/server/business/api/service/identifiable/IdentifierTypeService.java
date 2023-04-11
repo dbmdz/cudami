@@ -12,7 +12,7 @@ public interface IdentifierTypeService extends UniqueObjectService<IdentifierTyp
   // FIXME: move as internal implementation to IdentifierTypeRepositoryImpl or IdentifierServiceImpl
   // (for validation only)
   // get all identifierTypes using count and paging (maybe introduce a getAll() in repo?)
-  Map<String, String> getIdentifierTypeCache();
+  Map<String, String> getIdentifierTypeCache() throws ServiceException;
 
   Map<String, String> updateIdentifierTypeCache() throws ServiceException;
 }
