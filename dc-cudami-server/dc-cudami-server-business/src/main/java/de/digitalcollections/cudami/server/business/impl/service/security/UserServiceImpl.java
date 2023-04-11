@@ -160,15 +160,11 @@ public class UserServiceImpl extends UniqueObjectServiceImpl<User, UserRepositor
   @Override
   // @Transactional(readOnly = false)
   public User update(User user, Errors results) throws ServiceException {
-    uniqueUsernameValidator.validate(user, results);
-    if (!results.hasErrors()) {
-      try {
-        repository.update(user);
-      } catch (RepositoryException e) {
-        throw new ServiceException("Backend failure", e);
-      }
-      return user;
+    try {
+      repository.update(user);
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
     }
-    return null;
+    return user;
   }
 }

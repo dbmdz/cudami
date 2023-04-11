@@ -9,8 +9,10 @@ import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
+import de.digitalcollections.model.security.Role;
 import de.digitalcollections.model.security.User;
 import java.util.List;
+import java.util.UUID;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +45,31 @@ public class UserRepositoryImplTest {
   @BeforeEach
   public void beforeEach() {
     repo = new UserRepositoryImpl(jdbi, cudamiConfig);
+  }
+
+  @Test
+  @DisplayName("is testable")
+  void containerIsUpAndRunning() {
+    assertThat(postgreSQLContainer.isRunning()).isTrue();
+  }
+
+  @Test
+  @DisplayName("should return count of records in table")
+  public void testCount() throws RepositoryException {
+    User user1 =
+        User.builder().email("home@simpson.de").firstname("Homer").lastname("Simpson").build();
+    repo.save(user1);
+    UUID uuid1 = user1.getUuid();
+
+    User user2 =
+        User.builder().email("marge@simpson.de").firstname("Marjorie").lastname("Simpson").build();
+    repo.save(user2);
+    UUID uuid2 = user2.getUuid();
+
+    long count = repo.count();
+    assertThat(count).isEqualTo(2);
+
+    repo.deleteByUuids(List.of(uuid1, uuid2));
   }
 
   @Test
@@ -105,5 +132,19 @@ public class UserRepositoryImplTest {
     assertThat(actual.getEmail()).isEqualTo(user3.getEmail());
     assertThat(actual.getFirstname()).isEqualTo(user3.getFirstname());
     assertThat(actual.getLastname()).isEqualTo(user3.getLastname());
+  }
+
+  @Test
+  @DisplayName("should return list of active admin users")
+  public void getActiveAdminUsers() throws RepositoryException {
+    User user1 = new User();
+    user1.setEmail("homer@simpson.de");
+    user1.setFirstname("Homer");
+    user1.setLastname("Simpson");
+    user1.setRoles(List.of(Role.ADMIN));
+    repo.save(user1);
+
+    List<User> admins = repo.getActiveAdminUsers();
+    assertThat(admins.size()).isEqualTo(1);
   }
 }
