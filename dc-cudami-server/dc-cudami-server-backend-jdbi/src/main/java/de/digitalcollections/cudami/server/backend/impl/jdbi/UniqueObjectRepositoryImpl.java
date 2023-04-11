@@ -60,7 +60,7 @@ public abstract class UniqueObjectRepositoryImpl<U extends UniqueObject>
       int offsetForAlternativePaging) {
     super(dbi, tableName, tableAlias, mappingPrefix, offsetForAlternativePaging);
 
-    dbi.registerRowMapper(BeanMapper.factory(uniqueObjectImplClass, mappingPrefix));
+    this.dbi.registerRowMapper(BeanMapper.factory(uniqueObjectImplClass, mappingPrefix));
     this.uniqueObjectImplClass = uniqueObjectImplClass;
 
     this.additionalReduceRowsBiConsumer = createAdditionalReduceRowsBiConsumer();
