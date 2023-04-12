@@ -104,6 +104,9 @@ label {
   padding: 0.5em;
   text-align: center;
 }
+.nav-sidebar .nav-item .nav-link:hover {
+  color: #FFF;
+}
 .nav-tabs .nav-tab {
   border: 1px solid transparent;
   border-top-left-radius: .25rem;
