@@ -11,6 +11,7 @@ import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
 import de.digitalcollections.model.identifiable.entity.Website;
 import de.digitalcollections.model.identifiable.web.Webpage;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -147,7 +148,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
         }
         UrlAlias newAlias = new UrlAlias();
         newAlias.setSlug(newSlug);
-        newAlias.setTarget(actualIdentifiable);
+        // FIXME: Remove target from UrlAlias
+        newAlias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
         newAlias.setTargetLanguage(langFromDbForAlias);
         if (websiteUuid != null) {
           Website ws = new Website();
@@ -200,7 +202,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
       // if there is not any label of the supported scripts then an alias is made of the UUID
       Locale urlAliasLang = new Locale("und");
       UrlAlias alias = new UrlAlias();
-      alias.setTarget(actualIdentifiable);
+      // FIXME: Remove target from UrlAlias
+      alias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
       alias.setTargetLanguage(urlAliasLang);
       alias.setPrimary(!urlAliases.containsKey(urlAliasLang));
       alias.setSlug(actualIdentifiable.getUuid().toString());
@@ -217,7 +220,8 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
                   .allMatch(alias -> alias.getWebsite() != null))) {
         // there is not any default alias (w/o website); create one.
         UrlAlias defaultAlias = new UrlAlias();
-        defaultAlias.setTarget(actualIdentifiable);
+        // FIXME: Remove target from UrlAlias
+        defaultAlias.setTarget(reduceToBasicIdentifiable(actualIdentifiable));
         defaultAlias.setTargetLanguage(urlAliasLang);
         defaultAlias.setPrimary(!urlAliases.containsKey(urlAliasLang));
         try {
@@ -239,6 +243,29 @@ public class IdentifiableUrlAliasAlignHelper<I extends Identifiable> {
                 urlAliasLang, labelLang, actualIdentifiable.getUuid()));
       }
     }
+  }
+
+  /**
+   * Reduce the identifiable to is basic relation data (UUID, object type)
+   *
+   * @param identifiable
+   * @return
+   */
+  private I reduceToBasicIdentifiable(I identifiable) {
+    I basicIdentifiable = null;
+    try {
+      basicIdentifiable = (I) identifiable.getClass().getDeclaredConstructor().newInstance();
+    } catch (InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | NoSuchMethodException e) {
+      basicIdentifiable = (I) new Identifiable();
+    }
+    basicIdentifiable.setIdentifiableObjectType(identifiable.getIdentifiableObjectType());
+    basicIdentifiable.setIdentifiers(identifiable.getIdentifiers());
+    basicIdentifiable.setUuid(identifiable.getUuid());
+    basicIdentifiable.setLabel(identifiable.getLabel());
+    return basicIdentifiable;
   }
 
   private void fixMissingLocalizedUrlAliases() {
