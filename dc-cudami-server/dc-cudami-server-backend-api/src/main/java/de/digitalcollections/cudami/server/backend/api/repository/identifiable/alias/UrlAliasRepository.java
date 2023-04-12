@@ -165,7 +165,7 @@ public interface UrlAliasRepository extends UniqueObjectRepository<UrlAlias> {
   default boolean hasUrlAlias(String slug, Website website, Locale targetLanguage)
       throws RepositoryException {
     if (website == null) {
-      throw new IllegalArgumentException("check failed: given object must not be null");
+      return hasUrlAlias(slug, (UUID) null, targetLanguage);
     }
     return hasUrlAlias(slug, website.getUuid(), targetLanguage);
   }
