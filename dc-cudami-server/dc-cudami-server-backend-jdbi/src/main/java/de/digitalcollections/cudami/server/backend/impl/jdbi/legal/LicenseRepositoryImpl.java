@@ -58,7 +58,7 @@ public class LicenseRepositoryImpl extends UniqueObjectRepositoryImpl<License>
   @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("acronym", "url"));
+    allowedOrderByFields.addAll(Arrays.asList("acronym", "label", "url"));
     return allowedOrderByFields;
   }
 
