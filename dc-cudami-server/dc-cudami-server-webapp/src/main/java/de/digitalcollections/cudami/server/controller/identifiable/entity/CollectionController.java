@@ -237,11 +237,14 @@ public class CollectionController extends AbstractIdentifiableController<Collect
           UUID collectionUuid,
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
-      @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
+      //      @RequestParam(name = "sortBy", required = false) List<Order> sortBy, // FIXME: no
+      // sorting as we use sortIndex from cross table!
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
+    // FIXME: if we pass sortBy: down in backend we get an error because c.label is used instead
+    // do.label...
     PageRequest pageRequest =
-        createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
+        createPageRequest(DigitalObject.class, pageNumber, pageSize, null, filterCriteria);
     Collection collection = new Collection();
     collection.setUuid(collectionUuid);
     return service.findDigitalObjects(collection, pageRequest);

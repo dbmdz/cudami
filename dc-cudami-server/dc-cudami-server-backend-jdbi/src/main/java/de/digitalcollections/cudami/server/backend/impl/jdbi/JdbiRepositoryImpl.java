@@ -314,10 +314,6 @@ public abstract class JdbiRepositoryImpl<U extends UniqueObject>
     if (fc.isNativeExpression()) {
       // safe (not created using user input)
       columnName = givenExpression;
-      String tableAlias = getTableAlias();
-      if (tableAlias != null) {
-        columnName = getTableAlias() + "." + columnName;
-      }
     } else {
       String basicExpression = givenExpression;
       if (givenExpression.contains("_")) {

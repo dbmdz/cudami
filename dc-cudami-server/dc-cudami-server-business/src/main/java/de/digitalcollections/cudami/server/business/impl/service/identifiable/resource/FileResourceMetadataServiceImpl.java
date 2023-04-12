@@ -29,6 +29,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 // @Transactional should not be set in derived class to prevent overriding, check base class instead
@@ -103,21 +104,34 @@ public class FileResourceMetadataServiceImpl
     }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
     try {
-      return switch (specificFileResource.getIdentifiableObjectType()) {
-        case APPLICATION_FILE_RESOURCE -> applicationFileResourceService.getByExample(
-            (ApplicationFileResource) fileResource);
-        case AUDIO_FILE_RESOURCE -> audioFileResourceService.getByExample(
-            (AudioFileResource) fileResource);
-        case IMAGE_FILE_RESOURCE -> imageFileResourceService.getByExample(
-            (ImageFileResource) fileResource);
-        case LINKED_DATA_FILE_RESOURCE -> linkedDataFileResourceService.getByExample(
-            (LinkedDataFileResource) fileResource);
-        case TEXT_FILE_RESOURCE -> textFileResourceService.getByExample(
-            (TextFileResource) fileResource);
-        case VIDEO_FILE_RESOURCE -> videoFileResourceService.getByExample(
-            (VideoFileResource) fileResource);
-        default -> fileResource;
-      };
+      switch (specificFileResource.getIdentifiableObjectType()) {
+        case APPLICATION_FILE_RESOURCE:
+          ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, applicationFileResource);
+          return applicationFileResourceService.getByExample(applicationFileResource);
+        case AUDIO_FILE_RESOURCE:
+          AudioFileResource audioFileResource = audioFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, audioFileResource);
+          return audioFileResourceService.getByExample(audioFileResource);
+        case IMAGE_FILE_RESOURCE:
+          ImageFileResource imageFileResource = imageFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, imageFileResource);
+          return imageFileResourceService.getByExample(imageFileResource);
+        case LINKED_DATA_FILE_RESOURCE:
+          LinkedDataFileResource linkedDataFileResource = linkedDataFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, linkedDataFileResource);
+          return linkedDataFileResourceService.getByExample(linkedDataFileResource);
+        case TEXT_FILE_RESOURCE:
+          TextFileResource textFileResource = textFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, textFileResource);
+          return textFileResourceService.getByExample(textFileResource);
+        case VIDEO_FILE_RESOURCE:
+          VideoFileResource videoFileResource = videoFileResourceService.create();
+          BeanUtils.copyProperties(fileResource, videoFileResource);
+          return videoFileResourceService.getByExample(videoFileResource);
+        default:
+          return fileResource;
+      }
     } catch (ServiceException ex) {
       LOGGER.error(
           "Cannot get type specific data for fileresource. Returning generic fileresource.", ex);

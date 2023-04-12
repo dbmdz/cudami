@@ -20,9 +20,6 @@ import de.digitalcollections.model.identifiable.entity.Entity;
 import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-import de.digitalcollections.model.list.sorting.Direction;
-import de.digitalcollections.model.list.sorting.Order;
-import de.digitalcollections.model.list.sorting.Sorting;
 import de.digitalcollections.model.text.LocalizedText;
 import java.util.List;
 import java.util.Locale;
@@ -204,15 +201,6 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
     } catch (ServiceException e) {
       LOGGER.error(String.format("Cannot save UrlAliases for: %s", identifiable), e);
       throw e;
-    }
-  }
-
-  @Override
-  protected void setDefaultSorting(PageRequest pageRequest) {
-    // business logic: default sorting if no other sorting given: label ascending
-    if (!pageRequest.hasSorting()) {
-      Sorting sorting = new Sorting(new Order(Direction.ASC, "label"));
-      pageRequest.setSorting(sorting);
     }
   }
 

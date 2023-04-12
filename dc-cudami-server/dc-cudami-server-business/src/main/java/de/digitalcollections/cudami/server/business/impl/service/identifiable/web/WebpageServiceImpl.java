@@ -166,6 +166,15 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
   }
 
   @Override
+  public Webpage getByExample(Webpage uniqueObject) throws ServiceException {
+    Webpage webpage = super.getByExample(uniqueObject);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+    }
+    return webpage;
+  }
+
+  @Override
   public Webpage getByExampleAndActive(Webpage example) throws ServiceException {
     Filtering filtering = ManagedContentService.filteringForActive();
     Webpage webpage;
@@ -186,13 +195,19 @@ public class WebpageServiceImpl extends IdentifiableServiceImpl<Webpage, Webpage
       throws ServiceException {
     Webpage webpage = getByExampleAndActive(example);
     webpage = reduceMultilanguageFieldsToGivenLocale(webpage, pLocale);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+      webpage.setChildren(getActiveChildren(webpage));
+    }
     return webpage;
   }
 
   @Override
   public Webpage getByIdentifier(Identifier identifier) throws ServiceException {
     Webpage webpage = super.getByIdentifier(identifier);
-    setPublicationStatus(webpage);
+    if (webpage != null) {
+      setPublicationStatus(webpage);
+    }
     return webpage;
   }
 

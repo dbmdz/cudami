@@ -19,6 +19,7 @@ import de.digitalcollections.model.text.LocalizedText;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 @SuppressFBWarnings
@@ -190,9 +191,20 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
 
   protected String getDataLanguage(String targetDataLanguage, LanguageService languageService)
       throws TechnicalException {
+    return getDataLanguage(targetDataLanguage, null, languageService);
+  }
+
+  protected String getDataLanguage(
+      String targetDataLanguage, List<Locale> existingLanguages, LanguageService languageService)
+      throws TechnicalException {
     String dataLanguage = targetDataLanguage;
     if (dataLanguage == null && languageService != null) {
       dataLanguage = languageService.getDefaultLanguage().getLanguage();
+    }
+    if (existingLanguages != null
+        && !existingLanguages.isEmpty()
+        && !existingLanguages.contains(Locale.forLanguageTag(dataLanguage))) {
+      dataLanguage = existingLanguages.get(0).toLanguageTag();
     }
     return dataLanguage;
   }

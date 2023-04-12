@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.client.identifiable.web.CudamiWebpagesClient
 import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.identifiable.entity.Website;
-import de.digitalcollections.model.identifiable.resource.FileResource;
 import de.digitalcollections.model.identifiable.web.Webpage;
 import de.digitalcollections.model.view.BreadcrumbNavigation;
 import de.digitalcollections.model.view.BreadcrumbNode;
@@ -113,20 +112,22 @@ public class WebpagesController
     model.addAttribute("webpage", webpage);
 
     List<Locale> existingLanguages = getExistingLanguagesFromIdentifiable(webpage);
-    String dataLanguage = getDataLanguage(targetDataLanguage, languageService);
+    String dataLanguage = getDataLanguage(targetDataLanguage, existingLanguages, languageService);
     model
         .addAttribute("existingLanguages", existingLanguages)
         .addAttribute("dataLanguage", dataLanguage);
 
     List<Locale> existingSubpageLanguages =
         getExistingLanguagesFromIdentifiables(webpage.getChildren());
+    String dataLanguageSubpages =
+        getDataLanguage(targetDataLanguage, existingSubpageLanguages, languageService);
     model
         .addAttribute("existingSubpageLanguages", existingSubpageLanguages)
-        .addAttribute("dataLanguageSubpages", getDataLanguage(null, languageService));
+        .addAttribute("dataLanguageSubpages", dataLanguageSubpages);
 
-    List<FileResource> relatedFileResources =
-        ((CudamiWebpagesClient) service).getRelatedFileResources(uuid);
-    model.addAttribute("relatedFileResources", relatedFileResources);
+    //    List<FileResource> relatedFileResources =
+    //        ((CudamiWebpagesClient) service).findRelatedFileResources(uuid);
+    //    model.addAttribute("relatedFileResources", relatedFileResources);
 
     BreadcrumbNavigation breadcrumbNavigation =
         ((CudamiWebpagesClient) service).getBreadcrumbNavigation(uuid);

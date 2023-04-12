@@ -353,7 +353,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
       UUID identifiableUuid, PageRequest pageRequest) throws RepositoryException {
     StringBuilder commonSql =
         new StringBuilder(
-            " FROM FROM fileresources f"
+            " FROM fileresources f"
                 + " INNER JOIN rel_identifiable_fileresources rel ON f.uuid=rel.fileresource_uuid"
                 + " WHERE rel.identifiable_uuid = :identifiableUuid");
     Map<String, Object> argumentMappings = new HashMap<>(0);
@@ -364,7 +364,12 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
     pageRequest.setSorting(new Sorting(new Order(Direction.ASC, "idx")));
     addPagingAndSorting(pageRequest, query);
     List<FileResource> list =
-        dbi.withHandle(h -> h.createQuery(query.toString()).mapToBean(FileResource.class).list());
+        dbi.withHandle(
+            h ->
+                h.createQuery(query.toString())
+                    .bindMap(argumentMappings)
+                    .mapToBean(FileResource.class)
+                    .list());
 
     StringBuilder countQuery = new StringBuilder("SELECT count(*)" + commonSql);
     long total = retrieveCount(countQuery, argumentMappings);
@@ -533,6 +538,15 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   protected boolean hasSplitColumn(String propertyName) {
     // only label for now
     return "label".equals(propertyName);
+  }
+
+  public List<I> retrieveList(
+      String fieldsSql,
+      StringBuilder innerQuery,
+      final Map<String, Object> argumentMappings,
+      String orderBy)
+      throws RepositoryException {
+    return retrieveList(fieldsSql, null, innerQuery, argumentMappings, orderBy);
   }
 
   @Override
