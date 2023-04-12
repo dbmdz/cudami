@@ -55,7 +55,7 @@ public class PredicateRepositoryImpl extends UniqueObjectRepositoryImpl<Predicat
   @Override
   protected List<String> getAllowedOrderByFields() {
     List<String> allowedOrderByFields = super.getAllowedOrderByFields();
-    allowedOrderByFields.addAll(Arrays.asList("value"));
+    allowedOrderByFields.addAll(Arrays.asList("label", "value"));
     return allowedOrderByFields;
   }
 
