@@ -56,7 +56,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>9.16.1</version>
+      <version>9.16.3</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
@@ -128,19 +128,19 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.17.6</version>
+      <version>1.18.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>1.17.6</version>
+      <version>1.18.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>1.17.6</version>
+      <version>1.18.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
