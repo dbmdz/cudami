@@ -72,10 +72,20 @@ public abstract class AbstractPagingAndSortingController {
         String operationValue = (String) fc.getValue();
         try {
           String basicExpression = expression;
-          if (expression.contains("_")) {
+          Class<?> fieldClass;
+          if (expression.contains(".")) {
+            // e.g. parent.uuid
+            String[] expressions = expression.split("\\.");
+            String firstExpression = expressions[0];
+            String secondExpression = expressions[1];
+            Class<?> firstClass = getFieldType(targetClass, firstExpression);
+            fieldClass = getFieldType(firstClass, secondExpression);
+          } else if (expression.contains("_")) {
             basicExpression = expression.split("_")[0];
+            fieldClass = getFieldType(targetClass, basicExpression);
+          } else {
+            fieldClass = getFieldType(targetClass, basicExpression);
           }
-          Class<?> fieldClass = getFieldType(targetClass, basicExpression);
 
           if (Comparable.class.isAssignableFrom(fieldClass)) {
             FilterCriterion convertedFc =
