@@ -166,7 +166,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        entityRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<Entity> result =
         entityRepositoryImpl.retrieveList(
             entityRepositoryImpl.getSqlSelectReducedFields(),
@@ -213,7 +215,9 @@ public class TopicRepositoryImpl extends EntityRepositoryImpl<Topic> implements 
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        fileResourceMetadataRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<FileResource> result =
         fileResourceMetadataRepositoryImpl.retrieveList(
             fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields(),

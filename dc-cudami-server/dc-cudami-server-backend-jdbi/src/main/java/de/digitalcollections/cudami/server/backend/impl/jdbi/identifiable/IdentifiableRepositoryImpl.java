@@ -119,7 +119,7 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         BeanMapper.factory(UrlAlias.class, UrlAliasRepositoryImpl.MAPPING_PREFIX));
   }
 
-  protected String addCrossTablePagingAndSorting(
+  public String addCrossTablePagingAndSorting(
       PageRequest pageRequest, StringBuilder innerQuery, final String crossTableAlias) {
     String orderBy = getOrderBy(pageRequest.getSorting());
     if (!StringUtils.hasText(orderBy)) {
