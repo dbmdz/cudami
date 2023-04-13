@@ -185,26 +185,31 @@ public class FileResourceMetadataServiceImpl
         ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
         BeanUtils.copyProperties(fileResource, applicationFileResource);
         applicationFileResourceService.save(applicationFileResource);
+        BeanUtils.copyProperties(applicationFileResource, fileResource);
         break;
       case AUDIO:
         AudioFileResource audioFileResource = audioFileResourceService.create();
         BeanUtils.copyProperties(fileResource, audioFileResource);
         audioFileResourceService.save(audioFileResource);
+        BeanUtils.copyProperties(audioFileResource, fileResource);
         break;
       case IMAGE:
         ImageFileResource imageFileResource = imageFileResourceService.create();
         BeanUtils.copyProperties(fileResource, imageFileResource);
         imageFileResourceService.save(imageFileResource);
+        BeanUtils.copyProperties(imageFileResource, fileResource);
         break;
       case TEXT:
         TextFileResource textFileResource = textFileResourceService.create();
         BeanUtils.copyProperties(fileResource, textFileResource);
         textFileResourceService.save(textFileResource);
+        BeanUtils.copyProperties(textFileResource, fileResource);
         break;
       case VIDEO:
         VideoFileResource videoFileResource = videoFileResourceService.create();
         BeanUtils.copyProperties(fileResource, videoFileResource);
         videoFileResourceService.save(videoFileResource);
+        BeanUtils.copyProperties(videoFileResource, fileResource);
         break;
       default:
         super.save(fileResource);
@@ -218,26 +223,31 @@ public class FileResourceMetadataServiceImpl
         ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
         BeanUtils.copyProperties(fileResource, applicationFileResource);
         applicationFileResourceService.update(applicationFileResource);
+        BeanUtils.copyProperties(applicationFileResource, fileResource);
         break;
       case AUDIO:
         AudioFileResource audioFileResource = audioFileResourceService.create();
         BeanUtils.copyProperties(fileResource, audioFileResource);
         audioFileResourceService.update(audioFileResource);
+        BeanUtils.copyProperties(audioFileResource, fileResource);
         break;
       case IMAGE:
         ImageFileResource imageFileResource = imageFileResourceService.create();
         BeanUtils.copyProperties(fileResource, imageFileResource);
         imageFileResourceService.update(imageFileResource);
+        BeanUtils.copyProperties(imageFileResource, fileResource);
         break;
       case TEXT:
         TextFileResource textFileResource = textFileResourceService.create();
         BeanUtils.copyProperties(fileResource, textFileResource);
         textFileResourceService.update(textFileResource);
+        BeanUtils.copyProperties(textFileResource, fileResource);
         break;
       case VIDEO:
         VideoFileResource videoFileResource = videoFileResourceService.create();
         BeanUtils.copyProperties(fileResource, videoFileResource);
         videoFileResourceService.update(videoFileResource);
+        BeanUtils.copyProperties(videoFileResource, fileResource);
         break;
       default:
         super.update(fileResource);
