@@ -82,7 +82,7 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     service.deleteRenderingFileResources(digitalObject);
 
     verify(repo, times(1)).delete(renderingFileResource);
-    verify(textFileResourceService, times(1)).delete(renderingFileResource);
+    verify(fileResourceMetadataService, times(1)).delete(renderingFileResource);
   }
 
   @DisplayName("can delete relation only, when the resource is referenced elsewhere")
@@ -106,6 +106,6 @@ class DigitalObjectRenderingFileResourceServiceImplTest {
     service.deleteRenderingFileResources(digitalObject);
 
     verify(repo, times(1)).delete(renderingFileResource);
-    verify(textFileResourceService, never()).delete(renderingFileResource);
+    verify(fileResourceMetadataService, never()).delete(renderingFileResource);
   }
 }

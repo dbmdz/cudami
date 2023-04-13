@@ -4,6 +4,7 @@ import de.digitalcollections.cudami.model.config.CudamiConfig;
 import de.digitalcollections.cudami.server.backend.api.repository.exceptions.RepositoryException;
 import de.digitalcollections.cudami.server.backend.api.repository.identifiable.resource.FileResourceMetadataRepository;
 import de.digitalcollections.cudami.server.business.api.service.LocaleService;
+import de.digitalcollections.cudami.server.business.api.service.exceptions.ConflictException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifierService;
@@ -77,6 +78,38 @@ public class FileResourceMetadataServiceImpl
   }
 
   @Override
+  public boolean delete(FileResource fileResource) throws ConflictException, ServiceException {
+    switch (fileResource.getFileResourceType()) {
+      case APPLICATION:
+        ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, applicationFileResource);
+        return applicationFileResourceService.delete(applicationFileResource);
+      case AUDIO:
+        AudioFileResource audioFileResource = audioFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, audioFileResource);
+        return audioFileResourceService.delete(audioFileResource);
+      case IMAGE:
+        ImageFileResource imageFileResource = imageFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, imageFileResource);
+        return imageFileResourceService.delete(imageFileResource);
+      case LINKED_DATA:
+        LinkedDataFileResource linkedDataFileResource = linkedDataFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, linkedDataFileResource);
+        return linkedDataFileResourceService.delete(linkedDataFileResource);
+      case TEXT:
+        TextFileResource textFileResource = textFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, textFileResource);
+        return textFileResourceService.delete(textFileResource);
+      case VIDEO:
+        VideoFileResource videoFileResource = videoFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, videoFileResource);
+        return videoFileResourceService.delete(videoFileResource);
+      default:
+        return super.delete(fileResource);
+    }
+  }
+
+  @Override
   public FileResource getByExample(FileResource example) throws ServiceException {
     FileResource fileResource;
     try {
@@ -104,28 +137,28 @@ public class FileResourceMetadataServiceImpl
     }
     FileResource specificFileResource = createByMimeType(fileResource.getMimeType());
     try {
-      switch (specificFileResource.getIdentifiableObjectType()) {
-        case APPLICATION_FILE_RESOURCE:
+      switch (specificFileResource.getFileResourceType()) {
+        case APPLICATION:
           ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
           BeanUtils.copyProperties(fileResource, applicationFileResource);
           return applicationFileResourceService.getByExample(applicationFileResource);
-        case AUDIO_FILE_RESOURCE:
+        case AUDIO:
           AudioFileResource audioFileResource = audioFileResourceService.create();
           BeanUtils.copyProperties(fileResource, audioFileResource);
           return audioFileResourceService.getByExample(audioFileResource);
-        case IMAGE_FILE_RESOURCE:
+        case IMAGE:
           ImageFileResource imageFileResource = imageFileResourceService.create();
           BeanUtils.copyProperties(fileResource, imageFileResource);
           return imageFileResourceService.getByExample(imageFileResource);
-        case LINKED_DATA_FILE_RESOURCE:
+        case LINKED_DATA:
           LinkedDataFileResource linkedDataFileResource = linkedDataFileResourceService.create();
           BeanUtils.copyProperties(fileResource, linkedDataFileResource);
           return linkedDataFileResourceService.getByExample(linkedDataFileResource);
-        case TEXT_FILE_RESOURCE:
+        case TEXT:
           TextFileResource textFileResource = textFileResourceService.create();
           BeanUtils.copyProperties(fileResource, textFileResource);
           return textFileResourceService.getByExample(textFileResource);
-        case VIDEO_FILE_RESOURCE:
+        case VIDEO:
           VideoFileResource videoFileResource = videoFileResourceService.create();
           BeanUtils.copyProperties(fileResource, videoFileResource);
           return videoFileResourceService.getByExample(videoFileResource);
@@ -147,39 +180,67 @@ public class FileResourceMetadataServiceImpl
           new LocalizedText(
               new Locale(localeService.getDefaultLanguage()), fileResource.getFilename()));
     }
-    if (fileResource instanceof ApplicationFileResource) {
-      applicationFileResourceService.save((ApplicationFileResource) fileResource);
-    } else if (fileResource instanceof AudioFileResource) {
-      audioFileResourceService.save((AudioFileResource) fileResource);
-    } else if (fileResource instanceof ImageFileResource) {
-      imageFileResourceService.save((ImageFileResource) fileResource);
-    } else if (fileResource instanceof LinkedDataFileResource) {
-      linkedDataFileResourceService.save((LinkedDataFileResource) fileResource);
-    } else if (fileResource instanceof TextFileResource) {
-      textFileResourceService.save((TextFileResource) fileResource);
-    } else if (fileResource instanceof VideoFileResource) {
-      videoFileResourceService.save((VideoFileResource) fileResource);
-    } else {
-      super.save(fileResource);
+    switch (fileResource.getFileResourceType()) {
+      case APPLICATION:
+        ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, applicationFileResource);
+        applicationFileResourceService.save(applicationFileResource);
+        break;
+      case AUDIO:
+        AudioFileResource audioFileResource = audioFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, audioFileResource);
+        audioFileResourceService.save(audioFileResource);
+        break;
+      case IMAGE:
+        ImageFileResource imageFileResource = imageFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, imageFileResource);
+        imageFileResourceService.save(imageFileResource);
+        break;
+      case TEXT:
+        TextFileResource textFileResource = textFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, textFileResource);
+        textFileResourceService.save(textFileResource);
+        break;
+      case VIDEO:
+        VideoFileResource videoFileResource = videoFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, videoFileResource);
+        videoFileResourceService.save(videoFileResource);
+        break;
+      default:
+        super.save(fileResource);
     }
   }
 
   @Override
   public void update(FileResource fileResource) throws ServiceException, ValidationException {
-    if (fileResource instanceof ApplicationFileResource) {
-      applicationFileResourceService.update((ApplicationFileResource) fileResource);
-    } else if (fileResource instanceof AudioFileResource) {
-      audioFileResourceService.update((AudioFileResource) fileResource);
-    } else if (fileResource instanceof ImageFileResource) {
-      imageFileResourceService.update((ImageFileResource) fileResource);
-    } else if (fileResource instanceof LinkedDataFileResource) {
-      linkedDataFileResourceService.update((LinkedDataFileResource) fileResource);
-    } else if (fileResource instanceof TextFileResource) {
-      textFileResourceService.update((TextFileResource) fileResource);
-    } else if (fileResource instanceof VideoFileResource) {
-      videoFileResourceService.update((VideoFileResource) fileResource);
-    } else {
-      super.update(fileResource);
+    switch (fileResource.getFileResourceType()) {
+      case APPLICATION:
+        ApplicationFileResource applicationFileResource = applicationFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, applicationFileResource);
+        applicationFileResourceService.update(applicationFileResource);
+        break;
+      case AUDIO:
+        AudioFileResource audioFileResource = audioFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, audioFileResource);
+        audioFileResourceService.update(audioFileResource);
+        break;
+      case IMAGE:
+        ImageFileResource imageFileResource = imageFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, imageFileResource);
+        imageFileResourceService.update(imageFileResource);
+        break;
+      case TEXT:
+        TextFileResource textFileResource = textFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, textFileResource);
+        textFileResourceService.update(textFileResource);
+        break;
+      case VIDEO:
+        VideoFileResource videoFileResource = videoFileResourceService.create();
+        BeanUtils.copyProperties(fileResource, videoFileResource);
+        videoFileResourceService.update(videoFileResource);
+        break;
+      default:
+        super.update(fileResource);
     }
   }
 }

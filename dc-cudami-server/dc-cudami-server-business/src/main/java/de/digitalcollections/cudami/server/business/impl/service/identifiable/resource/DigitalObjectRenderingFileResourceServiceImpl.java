@@ -14,12 +14,7 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.res
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.TextFileResourceService;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.resource.VideoFileResourceService;
 import de.digitalcollections.model.identifiable.entity.digitalobject.DigitalObject;
-import de.digitalcollections.model.identifiable.resource.ApplicationFileResource;
-import de.digitalcollections.model.identifiable.resource.AudioFileResource;
 import de.digitalcollections.model.identifiable.resource.FileResource;
-import de.digitalcollections.model.identifiable.resource.ImageFileResource;
-import de.digitalcollections.model.identifiable.resource.TextFileResource;
-import de.digitalcollections.model.identifiable.resource.VideoFileResource;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -95,7 +90,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
           if (digitalObjectRenderingFileResourceRepository.countDigitalObjectsForResource(
                   renderingFileResource.getUuid())
               == 0) {
-            deleteRenderingResource(renderingFileResource);
+            fileResourceMetadataService.delete(renderingFileResource);
           }
         } catch (RepositoryException e) {
           throw new ServiceException("Backend failure", e);
@@ -113,24 +108,6 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     }
   }
 
-  private boolean deleteRenderingResource(FileResource renderingResource)
-      throws ServiceException, ConflictException {
-    switch (renderingResource.getMimeType().getPrimaryType()) {
-      case "application":
-        return applicationFileResourceService.delete((ApplicationFileResource) renderingResource);
-      case "audio":
-        return audioFileResourceService.delete((AudioFileResource) renderingResource);
-      case "image":
-        return imageFileResourceService.delete((ImageFileResource) renderingResource);
-      case "text":
-        return textFileResourceService.delete((TextFileResource) renderingResource);
-      case "video":
-        return videoFileResourceService.delete((VideoFileResource) renderingResource);
-      default:
-        return fileResourceMetadataService.delete(renderingResource);
-    }
-  }
-
   @Override
   public List<FileResource> getRenderingFileResources(DigitalObject digitalObject)
       throws ServiceException {
@@ -138,19 +115,6 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       return digitalObjectRenderingFileResourceRepository.getRenderingFileResources(digitalObject);
     } catch (RepositoryException e) {
       throw new ServiceException("Backend failure", e);
-    }
-  }
-
-  private void saveRenderingFileResource(FileResource renderingResource)
-      throws ValidationException, ServiceException {
-    switch (renderingResource.getMimeType().getPrimaryType()) {
-      case "application" -> applicationFileResourceService.save(
-          (ApplicationFileResource) renderingResource);
-      case "audio" -> audioFileResourceService.save((AudioFileResource) renderingResource);
-      case "image" -> imageFileResourceService.save((ImageFileResource) renderingResource);
-      case "text" -> textFileResourceService.save((TextFileResource) renderingResource);
-      case "video" -> videoFileResourceService.save((VideoFileResource) renderingResource);
-      default -> fileResourceMetadataService.save(renderingResource);
     }
   }
 
@@ -162,7 +126,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
     List<FileResource> existingRenderingResources = getRenderingFileResources(digitalObject);
     for (FileResource existingRenderingResource : existingRenderingResources) {
       try {
-        deleteRenderingResource(existingRenderingResource);
+        fileResourceMetadataService.delete(existingRenderingResource);
       } catch (ConflictException | ServiceException e) {
         throw new ServiceException(
             "Cannot remove existing rendering resource=" + existingRenderingResource + ": " + e, e);
@@ -182,7 +146,7 @@ public class DigitalObjectRenderingFileResourceServiceImpl
       List<FileResource> savedRenderingResources = new ArrayList<>();
       for (FileResource renderingResource : renderingResources) {
         try {
-          saveRenderingFileResource(renderingResource);
+          fileResourceMetadataService.save(renderingResource);
         } catch (ValidationException | ServiceException e) {
           throw new ServiceException(
               "Cannot save RenderingResource" + renderingResource + ": " + e, e);
