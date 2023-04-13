@@ -65,8 +65,7 @@ public class CudamiDigitalObjectsClient extends CudamiEntitiesClient<DigitalObje
         Filtering.builder()
             .add(
                 FilterCriterion.builder()
-                    .withExpression("parent_uuid")
-                    .withNativeExpression(true) // is exactly name of field on server side
+                    .withExpression("parent.uuid")
                     .isEquals(parent.getUuid())
                     .build())
             .build());

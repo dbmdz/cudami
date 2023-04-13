@@ -19,12 +19,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -219,7 +214,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
       return null;
     }
     switch (modelProperty) {
-      case "part_of_item.uuid":
+      case "partOfItem.uuid":
         return tableAlias + ".part_of_item";
       default:
         return super.getColumnName(modelProperty);

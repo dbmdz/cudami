@@ -29,11 +29,7 @@ import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.text.LocalizedText;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.result.RowView;
@@ -427,7 +423,13 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
     if (super.getColumnName(modelProperty) != null) {
       return super.getColumnName(modelProperty);
     }
-    return null;
+    switch (modelProperty) {
+      case "parent.uuid":
+        return tableAlias + ".parent_uuid";
+      default:
+        return null;
+    }
+    // return null;
   }
 
   @Override
