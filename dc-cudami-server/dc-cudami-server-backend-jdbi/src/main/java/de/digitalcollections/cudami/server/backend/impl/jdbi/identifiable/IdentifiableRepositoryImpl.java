@@ -14,6 +14,8 @@ import de.digitalcollections.cudami.server.backend.impl.jdbi.identifiable.resour
 import de.digitalcollections.cudami.server.backend.impl.jdbi.semantic.TagRepositoryImpl;
 import de.digitalcollections.model.file.MimeType;
 import de.digitalcollections.model.identifiable.Identifiable;
+import de.digitalcollections.model.identifiable.IdentifiableObjectType;
+import de.digitalcollections.model.identifiable.IdentifiableType;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.identifiable.alias.UrlAlias;
@@ -774,6 +776,16 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
         website.setUuid(websiteUuid);
         website.setLabel(rowView.getColumn("uawebs_label", LocalizedText.class));
         urlAlias.setWebsite(website);
+      }
+      // TODO: Identifiable already retrieved, so could be set at calling method afterwards...
+      UUID identifiableUuid = rowView.getColumn("uaidf_uuid", UUID.class);
+      if (identifiableUuid != null) {
+        Identifiable idf = new Identifiable();
+        idf.setUuid(identifiableUuid);
+        idf.setIdentifiableObjectType(
+            rowView.getColumn("uaidf_identifiableobjecttype", IdentifiableObjectType.class));
+        idf.setType(rowView.getColumn("uaidf_identifiabletype", IdentifiableType.class));
+        urlAlias.setTarget(idf);
       }
       if (identifiable.getLocalizedUrlAliases() == null) {
         identifiable.setLocalizedUrlAliases(new LocalizedUrlAliases(urlAlias));
