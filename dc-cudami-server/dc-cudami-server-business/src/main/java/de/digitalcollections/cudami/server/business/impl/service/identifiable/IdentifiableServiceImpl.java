@@ -192,7 +192,13 @@ public class IdentifiableServiceImpl<I extends Identifiable, R extends Identifia
         for (UrlAlias urlAlias : identifiable.getLocalizedUrlAliases().flatten()) {
           // since we have the identifiable's UUID just here
           // the targetUuid must be set at this point
-          urlAlias.setTarget(identifiable);
+          Identifiable target =
+              Identifiable.builder()
+                  .uuid(identifiable.getUuid())
+                  .identifiableObjectType(identifiable.getIdentifiableObjectType())
+                  .type(identifiable.getType())
+                  .build();
+          urlAlias.setTarget(target);
           urlAliasService.save(urlAlias);
           savedUrlAliases.add(urlAlias);
         }
