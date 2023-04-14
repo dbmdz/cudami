@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.view;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.view.CudamiRenderingTemplatesClient;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /** Controller for rendering template management pages. */
 @Controller
 public class RenderingTemplatesController
-    extends AbstractPagingAndSortingController<RenderingTemplate> {
+    extends AbstractUniqueObjectController<RenderingTemplate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RenderingTemplatesController.class);
 

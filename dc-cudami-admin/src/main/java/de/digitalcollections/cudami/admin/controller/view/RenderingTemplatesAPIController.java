@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.view;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** Controller for all public "RenderingTemplates" endpoints (API). */
 @RestController
 public class RenderingTemplatesAPIController
-    extends AbstractPagingAndSortingController<RenderingTemplate> {
+    extends AbstractUniqueObjectController<RenderingTemplate> {
 
   private static final Logger LOGGER =
       LoggerFactory.getLogger(RenderingTemplatesAPIController.class);

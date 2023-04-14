@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.security;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.api.service.security.UserService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Users" endpoints (API). */
 @RestController
-public class UsersAPIController extends AbstractPagingAndSortingController<User> {
+public class UsersAPIController extends AbstractUniqueObjectController<User> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UsersAPIController.class);
 

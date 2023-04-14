@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Licenses" endpoints (API). */
 @RestController
-public class LicensesAPIController extends AbstractPagingAndSortingController<License> {
+public class LicensesAPIController extends AbstractUniqueObjectController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesAPIController.class);
 

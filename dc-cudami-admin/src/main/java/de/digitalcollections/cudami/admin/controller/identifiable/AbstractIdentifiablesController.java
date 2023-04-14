@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.identifiable;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.identifiable.CudamiIdentifiablesClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -21,7 +21,7 @@ import org.springframework.util.CollectionUtils;
 
 public class AbstractIdentifiablesController<
         I extends Identifiable, C extends CudamiIdentifiablesClient<I>>
-    extends AbstractPagingAndSortingController<I> {
+    extends AbstractUniqueObjectController<I> {
 
   protected AbstractIdentifiablesController(C service, LanguageService languageService) {
     super(service, languageService);

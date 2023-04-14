@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.relation;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.model.exception.TechnicalException;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Predicates" endpoints (API). */
 @RestController
-public class PredicatesAPIController extends AbstractPagingAndSortingController<Predicate> {
+public class PredicatesAPIController extends AbstractUniqueObjectController<Predicate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesAPIController.class);
 

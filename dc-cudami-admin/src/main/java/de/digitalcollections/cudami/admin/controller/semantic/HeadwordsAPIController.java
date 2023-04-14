@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
 import de.digitalcollections.cudami.admin.business.api.service.exceptions.ServiceException;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for all public "Headwords" endpoints (API). */
 @RestController
-public class HeadwordsAPIController extends AbstractPagingAndSortingController<Headword> {
+public class HeadwordsAPIController extends AbstractUniqueObjectController<Headword> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HeadwordsAPIController.class);
 

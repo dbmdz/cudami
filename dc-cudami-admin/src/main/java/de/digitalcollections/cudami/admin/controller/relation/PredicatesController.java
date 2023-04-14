@@ -2,7 +2,7 @@ package de.digitalcollections.cudami.admin.controller.relation;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.business.impl.validator.LabelNotBlankValidator;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.relation.CudamiPredicatesClient;
@@ -33,7 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 /** Controller for predicate management pages. */
 @Controller
 @SessionAttributes(value = {"predicate"})
-public class PredicatesController extends AbstractPagingAndSortingController<Predicate> {
+public class PredicatesController extends AbstractUniqueObjectController<Predicate> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PredicatesController.class);
 

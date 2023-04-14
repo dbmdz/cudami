@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.legal;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.cudami.client.legal.CudamiLicensesClient;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for license management pages. */
 @Controller
-public class LicensesController extends AbstractPagingAndSortingController<License> {
+public class LicensesController extends AbstractUniqueObjectController<License> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LicensesController.class);
 

@@ -3,14 +3,10 @@ package de.digitalcollections.cudami.admin.controller;
 import de.digitalcollections.commons.springmvc.controller.AbstractController;
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTRequest;
-import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
-import de.digitalcollections.cudami.client.CudamiRestClient;
-import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.exception.TechnicalException;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
-import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Direction;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.list.sorting.Sorting;
@@ -23,16 +19,12 @@ import java.util.Locale;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 @SuppressFBWarnings
-public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
-    extends AbstractController {
+public abstract class AbstractPagingAndSortingController extends AbstractController {
 
   protected final LanguageService languageService;
-  protected final CudamiRestClient<T> service;
 
-  public AbstractPagingAndSortingController(
-      CudamiRestClient<T> service, LanguageService languageService) {
+  public AbstractPagingAndSortingController(LanguageService languageService) {
     this.languageService = languageService;
-    this.service = service;
   }
 
   protected BTRequest createBTRequest(
@@ -163,30 +155,6 @@ public abstract class AbstractPagingAndSortingController<T extends UniqueObject>
       return new Sorting(sortBy);
     }
     return null;
-  }
-
-  protected BTResponse<T> find(
-      Class targetClass,
-      int offset,
-      int limit,
-      String sortProperty,
-      String sortOrder,
-      String searchProperty,
-      String searchTerm,
-      String dataLanguage)
-      throws TechnicalException {
-    BTRequest btRequest =
-        createBTRequest(
-            targetClass,
-            offset,
-            limit,
-            sortProperty,
-            sortOrder,
-            searchProperty,
-            searchTerm,
-            dataLanguage);
-    PageResponse<T> pageResponse = service.find(btRequest);
-    return new BTResponse<>(pageResponse);
   }
 
   protected String getDataLanguage(String targetDataLanguage, LanguageService languageService)

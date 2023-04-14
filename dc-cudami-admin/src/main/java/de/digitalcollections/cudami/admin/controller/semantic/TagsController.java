@@ -1,7 +1,7 @@
 package de.digitalcollections.cudami.admin.controller.semantic;
 
 import de.digitalcollections.cudami.admin.business.i18n.LanguageService;
-import de.digitalcollections.cudami.admin.controller.AbstractPagingAndSortingController;
+import de.digitalcollections.cudami.admin.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.client.CudamiClient;
 import de.digitalcollections.model.exception.ResourceNotFoundException;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 /** Controller for headwords management pages. */
 @Controller
-public class TagsController extends AbstractPagingAndSortingController<Tag> {
+public class TagsController extends AbstractUniqueObjectController<Tag> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TagsController.class);
 
