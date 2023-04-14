@@ -196,7 +196,9 @@ public class CollectionRepositoryImpl extends EntityRepositoryImpl<Collection>
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
     // TODO: review this, as it may be also possible by using
     // digitalObjectRepositoryImpl.addPagingAndSorting.... ? (see ItemRepositoryImpl)
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        digitalObjectRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),

@@ -118,7 +118,9 @@ public class ProjectRepositoryImpl extends EntityRepositoryImpl<Project>
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        digitalObjectRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),

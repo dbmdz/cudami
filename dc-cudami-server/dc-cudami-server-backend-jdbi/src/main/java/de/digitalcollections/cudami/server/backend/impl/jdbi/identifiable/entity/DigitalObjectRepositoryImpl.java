@@ -260,7 +260,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        collectionRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<Collection> result =
         collectionRepositoryImpl.retrieveList(
             collectionRepositoryImpl.getSqlSelectReducedFields(),
@@ -275,62 +277,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
   }
 
   @Override
-  public List<FileResource> getFileResources(UUID digitalObjectUuid) throws RepositoryException {
-    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
-    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
-    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT df.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN digitalobject_fileresources AS df ON "
-                + frTableAlias
-                + ".uuid = df.fileresource_uuid"
-                + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<FileResource> fileResources =
-        fileResourceMetadataRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return fileResources;
-  }
-
-  @Override
   public PageResponse<FileResource> findFileResources(
       UUID digitalObjectUuid, PageRequest pageRequest) throws RepositoryException {
     throw new UnsupportedOperationException(); // TODO: not yet implemented
-  }
-
-  @Override
-  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid)
-      throws RepositoryException {
-    final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
-    final String frTableName = imageFileResourceRepositoryImpl.getTableName();
-    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
-    StringBuilder innerQuery =
-        new StringBuilder(
-            "SELECT df.sortindex AS idx, * FROM "
-                + frTableName
-                + " AS "
-                + frTableAlias
-                + " INNER JOIN digitalobject_fileresources AS df ON "
-                + frTableAlias
-                + ".uuid = df.fileresource_uuid"
-                + " WHERE df.digitalobject_uuid = :uuid"
-                + " ORDER BY idx ASC");
-    Map<String, Object> argumentMappings = new HashMap<>();
-    argumentMappings.put("uuid", digitalObjectUuid);
-
-    List<ImageFileResource> fileResources =
-        imageFileResourceRepositoryImpl.retrieveList(
-            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
-
-    return fileResources;
   }
 
   @Override
@@ -374,7 +323,9 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
 
     StringBuilder innerQuery =
         new StringBuilder("SELECT " + crossTableAlias + ".sortindex AS idx, * " + commonSql);
-    String orderBy = addCrossTablePagingAndSorting(pageRequest, innerQuery, crossTableAlias);
+    String orderBy =
+        projectRepositoryImpl.addCrossTablePagingAndSorting(
+            pageRequest, innerQuery, crossTableAlias);
     List<Project> result =
         projectRepositoryImpl.retrieveList(
             projectRepositoryImpl.getSqlSelectReducedFields(),
@@ -430,6 +381,59 @@ public class DigitalObjectRepositoryImpl extends EntityRepositoryImpl<DigitalObj
         return null;
     }
     // return null;
+  }
+
+  @Override
+  public List<FileResource> getFileResources(UUID digitalObjectUuid) throws RepositoryException {
+    final String frTableAlias = fileResourceMetadataRepositoryImpl.getTableAlias();
+    final String frTableName = fileResourceMetadataRepositoryImpl.getTableName();
+    final String fieldsSql = fileResourceMetadataRepositoryImpl.getSqlSelectReducedFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT df.sortindex AS idx, * FROM "
+                + frTableName
+                + " AS "
+                + frTableAlias
+                + " INNER JOIN digitalobject_fileresources AS df ON "
+                + frTableAlias
+                + ".uuid = df.fileresource_uuid"
+                + " WHERE df.digitalobject_uuid = :uuid"
+                + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<FileResource> fileResources =
+        fileResourceMetadataRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return fileResources;
+  }
+
+  @Override
+  public List<ImageFileResource> getImageFileResources(UUID digitalObjectUuid)
+      throws RepositoryException {
+    final String frTableAlias = imageFileResourceRepositoryImpl.getTableAlias();
+    final String frTableName = imageFileResourceRepositoryImpl.getTableName();
+    final String fieldsSql = imageFileResourceRepositoryImpl.getSqlSelectAllFields();
+    StringBuilder innerQuery =
+        new StringBuilder(
+            "SELECT df.sortindex AS idx, * FROM "
+                + frTableName
+                + " AS "
+                + frTableAlias
+                + " INNER JOIN digitalobject_fileresources AS df ON "
+                + frTableAlias
+                + ".uuid = df.fileresource_uuid"
+                + " WHERE df.digitalobject_uuid = :uuid"
+                + " ORDER BY idx ASC");
+    Map<String, Object> argumentMappings = new HashMap<>();
+    argumentMappings.put("uuid", digitalObjectUuid);
+
+    List<ImageFileResource> fileResources =
+        imageFileResourceRepositoryImpl.retrieveList(
+            fieldsSql, innerQuery, argumentMappings, "ORDER BY idx ASC");
+
+    return fileResources;
   }
 
   @Override
