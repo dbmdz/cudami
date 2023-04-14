@@ -39,7 +39,7 @@ public class HeadwordsAPIController extends AbstractUniqueObjectController<Headw
   @ResponseBody
   public BTResponse<Headword> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder)

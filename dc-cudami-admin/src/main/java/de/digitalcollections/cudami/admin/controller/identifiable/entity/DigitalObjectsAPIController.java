@@ -76,7 +76,7 @@ public class DigitalObjectsAPIController
   @ResponseBody
   public BTResponse<DigitalObject> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
@@ -100,7 +100,7 @@ public class DigitalObjectsAPIController
   public BTResponse<Collection> findAssociatedCollections(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
@@ -128,7 +128,7 @@ public class DigitalObjectsAPIController
   public BTResponse<Project> findAssociatedProjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
@@ -154,7 +154,7 @@ public class DigitalObjectsAPIController
   public BTResponse<DigitalObject> findContainedDigitalObjects(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,

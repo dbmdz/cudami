@@ -37,7 +37,7 @@ public class ManifestationsAPIController
   @ResponseBody
   public BTResponse<Manifestation> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
@@ -62,7 +62,7 @@ public class ManifestationsAPIController
   public BTResponse<InvertedRelationSpecification<Manifestation>> findChildManifestations(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
@@ -93,7 +93,7 @@ public class ManifestationsAPIController
   public BTResponse<Item> findItems(
       @PathVariable UUID uuid,
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
-      @RequestParam(name = "limit", required = false, defaultValue = "1") int limit,
+      @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
       @RequestParam(name = "sort", required = false, defaultValue = "label") String sortProperty,
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
