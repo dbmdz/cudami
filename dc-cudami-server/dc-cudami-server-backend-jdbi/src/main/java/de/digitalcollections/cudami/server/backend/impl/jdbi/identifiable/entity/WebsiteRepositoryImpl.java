@@ -62,7 +62,7 @@ public class WebsiteRepositoryImpl extends EntityRepositoryImpl<Website>
 
   @Override
   public PageResponse<Webpage> findRootWebpages(UUID uuid, PageRequest pageRequest) {
-    throw new UnsupportedOperationException(); // TODO: not yet implemented
+    throw new UnsupportedOperationException(); // TODO: paging not yet implemented
   }
 
   @Override
