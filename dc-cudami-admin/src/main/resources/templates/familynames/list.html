@@ -4,116 +4,150 @@
       xmlns:sec="https://github.com/thymeleaf/thymeleaf-extras-springsecurity"
       xmlns:data="https://github.com/mxab/thymeleaf-extras-data-attribute"
       layout:decorate="~{base}">
+
   <head>
     <title th:text="#{page.title.familynames}">Family names</title>
   </head>
+
   <body>
-  <th:block layout:fragment="content">
-    <div class="content-header">
-      <div class="container-fluid">
+    <th:block layout:fragment="content">
+      <div class="content-header">
+        <div class="container-fluid">
 
-        <div class="row">
-          <div class="col">
-            <h1 th:text="#{page.title.familynames}">Family names</h1>
-            <hr>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-
-            <div id="toolbar-persons">
-              <!-- TODO it always contains "und" undefined language? -->
-              <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
-                <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                <select th:replace="fragments/components/select-language-dropdown::render('familynames-languages', ${existingLanguages}, ${dataLanguage})">English</select>
-              </th:block>
+          <div class="row">
+            <div class="col">
+              <h1 th:text="#{page.title.familynames}">Family names</h1>
+              <hr>
             </div>
-            <table id="table-familynames"
-                   data-toggle="table"
-                   th:data-url="@{/api/familynames}"
-                   th:data-locale="${#locale}"
-
-                   data-cookie="true"
-                   data-cookie-id-table="table-familynames"
-                   data-id-field="uuid"
-                   data-pagination="true"
-                   data-pagination-v-align="both"
-                   data-query-params="queryParamsFamilynames"
-                   data-search="true"
-                   data-search-highlight="true"
-                   data-search-on-enter-key="true"
-                   data-server-sort="true"
-                   data-show-search-button="true"
-                   data-show-search-clear-button="true"
-                   data-side-pagination="server"
-                   data-sort-name="label"
-                   data-sort-order="asc"
-                   data-toolbar="#toolbar-familynames"
-                   data-unique-id="uuid">
-              <thead>
-                <tr>
-                  <th data-field="index" data-formatter="formatRowNumberFamilynames" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
-                  <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                  <th data-field="label" data-sortable="true" data-formatter="formatLabelFamilynames" th:text="#{lbl.label}">Label</th>
-                  <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
-
-                  <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
-                  <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                  <th data-field="actions" data-formatter="formatActionsFamilynames" th:text="#{lbl.actions}">Actions</th>
-                </tr>
-              </thead>
-            </table>
-
           </div>
+
+          <div class="row">
+            <div class="col">
+
+              <div id="toolbar-persons">
+                <!-- TODO it always contains "und" undefined language? -->
+                <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
+                  <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
+                  <select th:replace="fragments/components/select-language-dropdown::render('familynames-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                </th:block>
+              </div>
+              <table id="table-familynames"
+                     data-toggle="table"
+                     th:data-url="@{/api/familynames}"
+                     th:data-locale="${#locale}"
+                     data-buttons="buttonsFamilyNames"
+                     data-cookie="true"
+                     data-cookie-id-table="table-familynames"
+                     data-id-field="uuid"
+                     data-pagination="true"
+                     data-pagination-v-align="both"
+                     data-query-params="queryParamsFamilynames"
+                     data-search="true"
+                     data-search-highlight="true"
+                     data-search-on-enter-key="true"
+                     data-server-sort="true"
+                     data-show-search-button="true"
+                     data-show-search-clear-button="true"
+                     data-side-pagination="server"
+                     data-sort-name="label"
+                     data-sort-order="asc"
+                     data-toolbar="#toolbar-familynames"
+                     data-unique-id="uuid">
+                <thead>
+                  <tr>
+                    <th data-field="index" data-formatter="formatRowNumberFamilynames" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelFamilynames" th:text="#{lbl.label}">Label</th>
+                    <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
+
+                    <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
+                    <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
+                    <th data-field="actions" data-formatter="formatActionsFamilynames" th:text="#{lbl.actions}">Actions</th>
+                  </tr>
+                </thead>
+              </table>
+
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </th:block>
+    </th:block>
 
-  <th:block layout:fragment="beforeBodyEnds">
-    <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
+    <th:block layout:fragment="beforeBodyEnds">
+      <div th:replace="fragments/modals/confirm-yes-no :: confirm-yes-no-dialog"></div>
 
-    <script type="text/javascript">
-      $(function () {
-        $("#familynames-languages").change(function () {
-          $('#table-familynames').bootstrapTable('refresh');
+      <script type="text/javascript">
+        $(function () {
+          $("#familynames-languages").change(function () {
+            $('#table-familynames').bootstrapTable('refresh');
+          });
         });
-      });
 
-      function formatRowNumberFamilynames(value, row, index) {
-        return renderRowNumber($('#table-familynames'), index);
-      }
-      
-      function queryParamsFamilynames(params) {
-        let dataLanguage = $("#familynames-languages").val();
-        params.dataLanguage = dataLanguage;
-        return params;
-      }
-    </script>
+        function formatRowNumberFamilynames(value, row, index) {
+          return renderRowNumber($('#table-familynames'), index);
+        }
 
-    <script type="text/javascript" th:inline="javascript">
-      /*<![CDATA[*/
-      function formatActionsFamilynames(value, row) {
-        /*[+
-         const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
-         +]*/
-        return [
-          renderViewAction(baseUrl)
-        ].join(' ');
-      }
+        function queryParamsFamilynames(params) {
+          let dataLanguage = $("#familynames-languages").val();
+          params.dataLanguage = dataLanguage;
+          return params;
+        }
+      </script>
 
-      function formatLabelFamilynames(value, row) {
-        /*[+
-         const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
-         +]*/
-        const dataLanguage = $("#familynames-languages").val();
-        return renderLabel(baseUrl, value, dataLanguage);
-      }
+      <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $('#table-familynames').bootstrapTable({
+          formatSearch: function () {
+            /*[+
+             let columnName = [[#{lbl.label}]];
+             let placeholder = `[(#{placeholder.search})]`;
+             +]*/
+            return placeholder;
+          }
+        });
+        
+        function buttonsFamilyNames() {
+          /*[+
+           const baseUrl = [[@{'/familynames'}]];
+           const textAdd = [[#{btn.add}]];
+           const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
+           +]*/
+          return {
+            btnAdd: {
+              text: textAdd,
+              icon: 'fa-plus',
+              event: function () {
+                location.href = baseUrl + '/new';
+              },
+              attributes: {
+                title: tooltipAdd
+              }
+            }
+          };
+        }
+        
+        function formatActionsFamilynames(value, row) {
+          /*[+
+           const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
+           +]*/
+          return [
+            renderViewAction(baseUrl),
+            renderEditAction(baseUrl)
+          ].join(' ');
+        }
+
+        function formatLabelFamilynames(value, row) {
+          /*[+
+           const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
+           +]*/
+          const dataLanguage = $("#familynames-languages").val();
+          return renderLabel(baseUrl, value, dataLanguage);
+        }
       /*]]>*/
-    </script>
-    <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
-  </th:block>
-</body>
+      </script>
+      <div th:replace="fragments/bootstrap-table :: data-formatter"></div>
+    </th:block>
+  </body>
+
 </html>
