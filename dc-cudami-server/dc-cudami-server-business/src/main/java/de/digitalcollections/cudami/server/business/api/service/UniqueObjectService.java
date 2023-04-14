@@ -7,7 +7,6 @@ import de.digitalcollections.model.UniqueObject;
 import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
-
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public interface UniqueObjectService<U extends UniqueObject> {
   boolean delete(U uniqueObject) throws ConflictException, ServiceException;
 
   PageResponse<U> find(PageRequest pageRequest) throws ServiceException;
-  
+
   // FIXME: dangerous... but uses paging under the hood... Remove?
   Set<U> getAll() throws ServiceException;
 
