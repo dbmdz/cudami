@@ -19,10 +19,12 @@ import java.util.Set;
 
 public abstract class UniqueObjectServiceImpl<
         U extends UniqueObject, R extends UniqueObjectRepository<U>>
-    extends PagingSortingFilteringServiceImpl<U, R> implements UniqueObjectService<U> {
+    implements UniqueObjectService<U> {
+
+  protected R repository;
 
   protected UniqueObjectServiceImpl(R repository) {
-    super(repository);
+    this.repository = repository;
   }
 
   @Override
@@ -64,7 +66,12 @@ public abstract class UniqueObjectServiceImpl<
   @Override
   public PageResponse<U> find(PageRequest pageRequest) throws ServiceException {
     setDefaultSorting(pageRequest);
-    return super.find(pageRequest);
+    try {
+      PageResponse<U> response = repository.find(pageRequest);
+      return response;
+    } catch (RepositoryException e) {
+      throw new ServiceException("Backend failure", e);
+    }
   }
 
   @Override
@@ -126,17 +133,6 @@ public abstract class UniqueObjectServiceImpl<
     }
   }
 
-  //  @Override
-  //  // FIXME: bindings?!!! try to get rid of this method...
-  //  public void save(U uniqueObject, Map<String, Object> bindings)
-  //      throws ValidationException, ServiceException {
-  //    try {
-  //      repository.save(uniqueObject, bindings);
-  //    } catch (RepositoryException e) {
-  //      throw new ServiceException("Backend failure", e);
-  //    }
-  //  }
-
   protected void setDefaultSorting(PageRequest pageRequest) {
     // business logic: default sorting if no other sorting given: lastModified descending, uuid
     // ascending
@@ -154,14 +150,4 @@ public abstract class UniqueObjectServiceImpl<
       throw new ServiceException("Backend failure", e);
     }
   }
-
-  //  @Override
-  //  // FIXME: bindings?!!! try to get rid of this method...
-  //  public void update(U uniqueObject, Map<String, Object> bindings) throws ServiceException {
-  //    try {
-  //      repository.update(uniqueObject, bindings);
-  //    } catch (RepositoryException e) {
-  //      throw new ServiceException("Backend failure", e);
-  //    }
-  //  }
 }
