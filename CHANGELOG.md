@@ -46,6 +46,18 @@ by `"und"`
 
 - **Breaking** Due to model changes, the tables `item_works` and `work_creators` are removed and their contents, if ever used, are lost.
 
+## [6.2.3](https://github.com/dbmdz/cudami/releases/tag/6.2.3) - 2023-04-14
+
+### Changed
+
+- Upgraded `dc-model(-jackson)` to `11.0.3`
+
+## [6.2.2](https://github.com/dbmdz/cudami/releases/tag/6.2.2) - 2023-03-29
+
+### Changed
+
+- Upgraded `dc-model(-jackson)` to `11.0.2`
+
 ## [6.2.1](https://github.com/dbmdz/cudami/releases/tag/6.2.1) - 2023-02-10
 
 ### Fixed
