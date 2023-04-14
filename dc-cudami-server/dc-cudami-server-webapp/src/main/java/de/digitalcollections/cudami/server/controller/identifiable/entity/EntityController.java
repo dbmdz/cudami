@@ -67,9 +67,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Entity.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Override
@@ -134,8 +132,7 @@ public class EntityController<E extends Entity> extends AbstractIdentifiableCont
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Entity> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Entity entity = service.getByExample(Entity.builder().uuid(uuid).build());
-    return new ResponseEntity<>(entity, entity != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Find limited amount of random entites")

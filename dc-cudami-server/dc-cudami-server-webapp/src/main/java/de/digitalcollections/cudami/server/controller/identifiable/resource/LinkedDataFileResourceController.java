@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.resource.LinkedDataFileResource;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,11 +15,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -56,10 +53,7 @@ public class LinkedDataFileResourceController
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(
-            LinkedDataFileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get a linkedDataFileResource by uuid")
@@ -83,15 +77,11 @@ public class LinkedDataFileResourceController
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    LinkedDataFileResource result;
     if (pLocale == null) {
-      result = service.getByExample(LinkedDataFileResource.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result =
-          service.getByExampleAndLocale(
-              LinkedDataFileResource.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Override
@@ -103,10 +93,10 @@ public class LinkedDataFileResourceController
   @PostMapping(
       value = {"/v6/linkeddatafileresources", "/v5/linkeddatafileresources"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public LinkedDataFileResource save(@RequestBody LinkedDataFileResource linkedDataFileResource)
+  public LinkedDataFileResource save(
+      @RequestBody LinkedDataFileResource linkedDataFileResource, BindingResult bindingResult)
       throws ServiceException, ValidationException {
-    service.save(linkedDataFileResource);
-    return linkedDataFileResource;
+    return super.save(linkedDataFileResource, bindingResult);
   }
 
   @Operation(summary = "Update a linkedDataFileResource")
@@ -121,8 +111,6 @@ public class LinkedDataFileResourceController
       @RequestBody LinkedDataFileResource linkedDataFileResource,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, linkedDataFileResource.getUuid());
-    service.update(linkedDataFileResource);
-    return linkedDataFileResource;
+    return super.update(uuid, linkedDataFileResource, errors);
   }
 }

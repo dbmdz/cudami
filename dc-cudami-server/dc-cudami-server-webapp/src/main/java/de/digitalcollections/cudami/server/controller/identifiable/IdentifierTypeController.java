@@ -8,13 +8,11 @@ import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectContro
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.IdentifierType;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,9 +46,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(IdentifierType.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "get identifier type by namespace (which is unique)")
@@ -74,10 +70,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<IdentifierType> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    IdentifierType identifierType =
-        service.getByExample(IdentifierType.builder().uuid(uuid).build());
-    return new ResponseEntity<>(
-        identifierType, identifierType != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Override
@@ -97,8 +90,7 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
       produces = MediaType.APPLICATION_JSON_VALUE)
   public IdentifierType save(@RequestBody IdentifierType identifierType, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(identifierType);
-    return identifierType;
+    return super.save(identifierType, errors);
   }
 
   @Operation(summary = "update an identifier type")
@@ -113,8 +105,6 @@ public class IdentifierTypeController extends AbstractUniqueObjectController<Ide
   public IdentifierType update(
       @PathVariable UUID uuid, @RequestBody IdentifierType identifierType, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, identifierType.getUuid());
-    service.update(identifierType);
-    return identifierType;
+    return super.update(uuid, identifierType, errors);
   }
 }

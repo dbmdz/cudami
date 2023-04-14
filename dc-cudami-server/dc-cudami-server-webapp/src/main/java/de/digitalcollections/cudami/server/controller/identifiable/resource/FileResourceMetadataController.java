@@ -17,13 +17,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -60,9 +58,7 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(FileResource.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all fileresources of given type as (paged, sorted, filtered) list")
@@ -156,13 +152,11 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    FileResource result;
     if (pLocale == null) {
-      result = service.getByExample(FileResource.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(FileResource.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all websites")
@@ -192,10 +186,9 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
         "/latest/fileresources"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public FileResource save(@RequestBody FileResource fileResource)
+  public FileResource save(@RequestBody FileResource fileResource, BindingResult bindingResult)
       throws ServiceException, ValidationException {
-    service.save(fileResource);
-    return fileResource;
+    return super.save(fileResource, bindingResult);
   }
 
   @Operation(summary = "Update a fileresource")
@@ -210,8 +203,6 @@ public class FileResourceMetadataController extends AbstractIdentifiableControll
   public FileResource update(
       @PathVariable UUID uuid, @RequestBody FileResource fileResource, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, fileResource.getUuid());
-    service.update(fileResource);
-    return fileResource;
+    return super.update(uuid, fileResource, errors);
   }
 }

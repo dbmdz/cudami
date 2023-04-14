@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -97,9 +96,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(DigitalObject.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all projects of a digital object as (paged, sorted, filtered) list")
@@ -174,9 +171,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DigitalObject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    DigitalObject digitalObject = service.getByExample(DigitalObject.builder().uuid(uuid).build());
-    return new ResponseEntity<>(
-        digitalObject, digitalObject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(
@@ -317,8 +312,7 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       produces = MediaType.APPLICATION_JSON_VALUE)
   public DigitalObject save(@RequestBody DigitalObject digitalObject, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(digitalObject);
-    return digitalObject;
+    return super.save(digitalObject, errors);
   }
 
   @Operation(summary = "Save list of fileresources for a given digital object")
@@ -353,8 +347,6 @@ public class DigitalObjectController extends AbstractIdentifiableController<Digi
       @RequestBody DigitalObject digitalObject,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, digitalObject.getUuid());
-    service.update(digitalObject);
-    return digitalObject;
+    return super.update(uuid, digitalObject, errors);
   }
 }

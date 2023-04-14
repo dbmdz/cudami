@@ -86,9 +86,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Manifestation.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Find all items of a manifestation")
@@ -161,14 +159,11 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Manifestation result;
     if (pLocale == null) {
-      result = service.getByExample(Manifestation.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(Manifestation.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all manifestations")
@@ -204,8 +199,7 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Manifestation save(@RequestBody Manifestation manifestation, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(manifestation);
-    return manifestation;
+    return super.save(manifestation, errors);
   }
 
   @Operation(summary = "update an manifestation")
@@ -215,11 +209,6 @@ public class ManifestationController extends AbstractIdentifiableController<Mani
   public Manifestation update(
       @PathVariable UUID uuid, @RequestBody Manifestation manifestation, BindingResult errors)
       throws ServiceException, ValidationException {
-    if (uuid == null || manifestation == null || !uuid.equals(manifestation.getUuid())) {
-      throw new IllegalArgumentException("UUID mismatch of new and existing manifestation");
-    }
-
-    service.update(manifestation);
-    return manifestation;
+    return super.update(uuid, manifestation, errors);
   }
 }

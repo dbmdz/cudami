@@ -8,14 +8,12 @@ import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectContro
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.identifiable.Identifier;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.semantic.Subject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.Triple;
@@ -51,9 +49,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Subject.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -88,8 +84,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       value = {"/v6/subjects/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Subject> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Subject subject = service.getByExample(Subject.builder().uuid(uuid).build());
-    return new ResponseEntity<>(subject, subject != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Override
@@ -103,8 +98,7 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject save(@RequestBody Subject subject, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(subject);
-    return subject;
+    return super.save(subject, errors);
   }
 
   @Operation(summary = "Update a subject")
@@ -113,8 +107,6 @@ public class SubjectController extends AbstractUniqueObjectController<Subject> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Subject update(@PathVariable UUID uuid, @RequestBody Subject subject, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, subject.getUuid());
-    service.update(subject);
-    return subject;
+    return super.update(uuid, subject, errors);
   }
 }

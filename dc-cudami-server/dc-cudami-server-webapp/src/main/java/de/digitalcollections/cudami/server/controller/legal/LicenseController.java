@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.editor.UrlEditor;
 import de.digitalcollections.model.legal.License;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -112,9 +110,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(License.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all licenses in reduced form")
@@ -144,8 +140,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<License> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    License license = service.getByExample(License.builder().uuid(uuid).build());
-    return new ResponseEntity<>(license, license != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Get languages of all licenses")
@@ -158,8 +153,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
 
   @Override
   protected UniqueObjectService<License> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service;
   }
 
   @InitBinder
@@ -173,8 +167,7 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public License save(@RequestBody License license, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(license);
-    return license;
+    return super.save(license, errors);
   }
 
   @Operation(summary = "Update a license")
@@ -189,8 +182,6 @@ public class LicenseController extends AbstractUniqueObjectController<License> {
       @RequestBody License license,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, license.getUuid());
-    service.update(license);
-    return license;
+    return super.update(uuid, license, errors);
   }
 }

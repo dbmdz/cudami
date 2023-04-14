@@ -7,7 +7,6 @@ import de.digitalcollections.cudami.server.business.api.service.relation.Predica
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.relation.Predicate;
@@ -70,9 +69,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Predicate.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get a predicate by its value or UUID")
@@ -101,15 +98,15 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
 
   @Override
   protected UniqueObjectService<Predicate> getService() {
-    // FIXME: remove find from inherited. find not used, no need for getService()...
-    return null;
+    return service;
   }
 
   @Operation(summary = "Save a newly created predicate")
   @PostMapping(
       value = {"/v6/predicates", "/v5/predicates", "/v3/predicates", "/latest/predicates"},
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public Predicate save(@Valid @RequestBody Predicate predicate, BindingResult bindingResult)
+  public Predicate saveWithValidation(
+      @Valid @RequestBody Predicate predicate, BindingResult bindingResult)
       throws ServiceException, ValidationException,
           de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException {
     if (bindingResult.hasErrors()) {
@@ -124,8 +121,7 @@ public class PredicateController extends AbstractUniqueObjectController<Predicat
               });
       throw validationException;
     }
-    service.save(predicate);
-    return predicate;
+    return super.save(predicate, bindingResult);
   }
 
   /*

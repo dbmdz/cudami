@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -192,8 +191,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Headword> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Headword result = service.getByExample(Headword.builder().uuid(uuid).build());
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Find limited amount of random headwords")
@@ -212,8 +210,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Headword save(@RequestBody Headword headword, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(headword);
-    return headword;
+    return super.save(headword, errors);
   }
 
   @Operation(summary = "Save list of related entities for a given headword")
@@ -259,9 +256,7 @@ public class HeadwordController extends AbstractUniqueObjectController<Headword>
       @RequestBody Headword headword,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, headword.getUuid());
-    service.update(headword);
-    return headword;
+    return super.update(uuid, headword, errors);
   }
 
   @Override

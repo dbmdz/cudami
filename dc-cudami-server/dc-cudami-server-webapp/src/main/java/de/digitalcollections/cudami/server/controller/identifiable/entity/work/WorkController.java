@@ -80,9 +80,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Work.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Find all children of a work")
@@ -181,14 +179,11 @@ public class WorkController extends AbstractIdentifiableController<Work> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Work result;
     if (pLocale == null) {
-      result = service.getByExample(Work.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(Work.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get creators of a work")
@@ -240,8 +235,7 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work save(@RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(work);
-    return work;
+    return super.save(work, errors);
   }
 
   @Operation(summary = "update a work")
@@ -255,11 +249,6 @@ public class WorkController extends AbstractIdentifiableController<Work> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Work update(@PathVariable("uuid") UUID uuid, @RequestBody Work work, BindingResult errors)
       throws ServiceException, ValidationException {
-    if (uuid == null || work == null || !uuid.equals(work.getUuid())) {
-      throw new IllegalArgumentException("UUID mismatch of new and existing work");
-    }
-
-    service.update(work);
-    return work;
+    return super.update(uuid, work, errors);
   }
 }

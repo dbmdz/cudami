@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -225,7 +224,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
     if (active != null) {
       return service.findActive(pageRequest);
     }
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all digital objects of a collection as (paged, sorted, filtered) list")
@@ -560,8 +559,7 @@ public class CollectionController extends AbstractIdentifiableController<Collect
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Collection save(@RequestBody Collection collection, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(collection);
-    return collection;
+    return super.save(collection, errors);
   }
 
   @Operation(summary = "Save existing digital objects into an existing collection")
@@ -618,8 +616,6 @@ public class CollectionController extends AbstractIdentifiableController<Collect
   public Collection update(
       @PathVariable UUID uuid, @RequestBody Collection collection, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, collection.getUuid());
-    service.update(collection);
-    return collection;
+    return super.update(uuid, collection, errors);
   }
 }

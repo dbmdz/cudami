@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
@@ -97,9 +96,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Person.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "get all persons born at given geo location")
@@ -208,14 +205,11 @@ public class PersonController extends AbstractIdentifiableController<Person> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Person result;
     if (pLocale == null) {
-      result = service.getByExample(Person.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(Person.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get a person's digital objects")
@@ -269,8 +263,7 @@ public class PersonController extends AbstractIdentifiableController<Person> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Person save(@RequestBody Person person, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(person);
-    return person;
+    return super.save(person, errors);
   }
 
   @Operation(summary = "update a person")
@@ -285,8 +278,6 @@ public class PersonController extends AbstractIdentifiableController<Person> {
   public Person update(
       @PathVariable("uuid") UUID uuid, @RequestBody Person person, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, person.getUuid());
-    service.update(person);
-    return person;
+    return super.update(uuid, person, errors);
   }
 }

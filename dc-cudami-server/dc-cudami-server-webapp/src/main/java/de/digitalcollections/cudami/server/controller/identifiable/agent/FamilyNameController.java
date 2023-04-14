@@ -8,7 +8,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.agent.FamilyName;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -52,9 +50,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(FamilyName.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -106,13 +102,11 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    FamilyName result;
     if (pLocale == null) {
-      result = service.getByExample(FamilyName.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(FamilyName.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all family names")
@@ -134,8 +128,7 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
       produces = MediaType.APPLICATION_JSON_VALUE)
   public FamilyName save(@RequestBody FamilyName familyName, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(familyName);
-    return familyName;
+    return super.save(familyName, errors);
   }
 
   @Operation(summary = "update a familyname")
@@ -148,8 +141,6 @@ public class FamilyNameController extends AbstractIdentifiableController<FamilyN
   public FamilyName update(
       @PathVariable("uuid") UUID uuid, @RequestBody FamilyName familyName, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, familyName.getUuid());
-    service.update(familyName);
-    return familyName;
+    return super.update(uuid, familyName, errors);
   }
 }

@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -139,9 +138,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Project.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all digital objects of a project as (paged, sorted, filtered) list")
@@ -204,14 +201,11 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Project project;
     if (pLocale == null) {
-      project = service.getByExample(Project.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      project = service.getByExampleAndLocale(Project.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(project, project != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all projects")
@@ -274,8 +268,7 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project save(@RequestBody Project project, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(project);
-    return project;
+    return super.save(project, errors);
   }
 
   @Operation(summary = "Save existing digital objects into an existing project")
@@ -313,8 +306,6 @@ public class ProjectController extends AbstractIdentifiableController<Project> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Project update(@PathVariable UUID uuid, @RequestBody Project project, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, project.getUuid());
-    service.update(project);
-    return project;
+    return super.update(uuid, project, errors);
   }
 }

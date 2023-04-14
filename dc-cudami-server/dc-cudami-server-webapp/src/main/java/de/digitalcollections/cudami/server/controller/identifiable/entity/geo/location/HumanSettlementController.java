@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.geo.location.HumanSettlement;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -77,9 +75,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(HumanSettlement.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Override
@@ -142,14 +138,11 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    HumanSettlement result;
     if (pLocale == null) {
-      result = service.getByExample(HumanSettlement.builder().uuid(uuid).build());
+      return getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(HumanSettlement.builder().uuid(uuid).build(), pLocale);
+      return getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Override
@@ -168,8 +161,7 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       produces = MediaType.APPLICATION_JSON_VALUE)
   public HumanSettlement save(@RequestBody HumanSettlement humanSettlement, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(humanSettlement);
-    return humanSettlement;
+    return super.save(humanSettlement, errors);
   }
 
   @Operation(summary = "update a human settlement")
@@ -186,8 +178,6 @@ public class HumanSettlementController extends AbstractIdentifiableController<Hu
       @RequestBody HumanSettlement humanSettlement,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, humanSettlement.getUuid());
-    service.update(humanSettlement);
-    return humanSettlement;
+    return super.update(uuid, humanSettlement, errors);
   }
 }

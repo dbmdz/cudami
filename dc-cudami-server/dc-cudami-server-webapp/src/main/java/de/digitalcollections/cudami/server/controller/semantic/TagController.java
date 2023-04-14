@@ -7,15 +7,12 @@ import de.digitalcollections.cudami.server.business.api.service.semantic.TagServ
 import de.digitalcollections.cudami.server.controller.AbstractUniqueObjectController;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.filtering.Filtering;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import de.digitalcollections.model.semantic.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
@@ -40,7 +37,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
     this.service = service;
   }
 
-  @Operation(summary = "Get all tags")
+  @Operation(summary = "Get all tags as (paged, sorted, filtered) list")
   @GetMapping(
       value = {"/v6/tags"},
       produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,15 +45,9 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       @RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
       @RequestParam(name = "pageSize", required = false, defaultValue = "25") int pageSize,
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
-      @RequestParam(name = "value", required = false) FilterCriterion<String> valueCriterion)
+      @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest = new PageRequest(pageNumber, pageSize, sortBy);
-    if (valueCriterion != null) {
-      Filtering filtering = new Filtering();
-      filtering.add("value", valueCriterion);
-      pageRequest.setFiltering(filtering);
-    }
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get tag by UUID")
@@ -64,8 +55,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       value = {"/v6/tags/{uuid:" + ParameterHelper.UUID_PATTERN + "}"},
       produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Tag> getByUuid(@PathVariable UUID uuid) throws ServiceException {
-    Tag result = service.getByExample(Tag.builder().uuid(uuid).build());
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Get a tag by value")
@@ -98,8 +88,7 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag save(@RequestBody Tag tag, BindingResult errors)
       throws ValidationException, ServiceException {
-    service.save(tag);
-    return tag;
+    return super.save(tag, errors);
   }
 
   @Operation(summary = "Update a tag")
@@ -108,8 +97,6 @@ public class TagController extends AbstractUniqueObjectController<Tag> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Tag update(@PathVariable UUID uuid, @RequestBody Tag tag, BindingResult errors)
       throws ValidationException, ServiceException {
-    assert Objects.equals(uuid, tag.getUuid());
-    service.update(tag);
-    return tag;
+    return super.update(uuid, tag, errors);
   }
 }

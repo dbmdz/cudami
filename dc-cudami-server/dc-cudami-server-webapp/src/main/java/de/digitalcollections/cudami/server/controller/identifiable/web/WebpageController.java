@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -81,9 +80,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Webpage.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all (active) children of a webpage as (paged, sorted, filtered) list")
@@ -322,9 +319,7 @@ public class WebpageController extends AbstractIdentifiableController<Webpage> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Webpage update(@PathVariable UUID uuid, @RequestBody Webpage webpage, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, webpage.getUuid());
-    service.update(webpage);
-    return webpage;
+    return super.update(uuid, webpage, errors);
   }
 
   @Operation(summary = "Update the order of a webpage's children")

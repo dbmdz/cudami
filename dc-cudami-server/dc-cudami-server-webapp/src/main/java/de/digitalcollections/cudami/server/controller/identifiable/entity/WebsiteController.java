@@ -1,6 +1,5 @@
 package de.digitalcollections.cudami.server.controller.identifiable.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ServiceException;
 import de.digitalcollections.cudami.server.business.api.service.exceptions.ValidationException;
 import de.digitalcollections.cudami.server.business.api.service.identifiable.IdentifiableService;
@@ -89,9 +88,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Website.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -177,9 +174,8 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
               schema = @Schema(implementation = UUID.class))
           @PathVariable
           UUID uuid)
-      throws JsonProcessingException, ServiceException {
-    Website website = service.getByExample(Website.builder().uuid(uuid).build());
-    return new ResponseEntity<>(website, website != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+      throws ServiceException {
+    return super.getByUuid(uuid);
   }
 
   @Operation(
@@ -220,8 +216,7 @@ public class WebsiteController extends AbstractIdentifiableController<Website> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Website save(@RequestBody Website website, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(website);
-    return website;
+    return super.save(website, errors);
   }
 
   @Operation(

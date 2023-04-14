@@ -8,6 +8,7 @@ import de.digitalcollections.model.list.filtering.Filtering;
 import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public interface UniqueObjectService<U extends UniqueObject> {
@@ -70,6 +71,10 @@ public interface UniqueObjectService<U extends UniqueObject> {
    * @throws ValidationException in case of a validation error
    */
   void update(U uniqueObject) throws ValidationException, ServiceException;
+
+  default U getByExampleAndLocale(U uniqueObject, Locale locale) throws ServiceException {
+    throw new ServiceException("Not implemented");
+  }
 
   //  default void update(U uniqueObject) throws ValidationException, ServiceException {
   //    update(uniqueObject, null);

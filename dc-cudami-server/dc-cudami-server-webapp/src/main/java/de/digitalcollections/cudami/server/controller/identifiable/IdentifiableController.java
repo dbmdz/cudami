@@ -6,11 +6,9 @@ import de.digitalcollections.cudami.server.business.api.service.identifiable.Ide
 import de.digitalcollections.cudami.server.business.api.service.identifiable.alias.UrlAliasService;
 import de.digitalcollections.cudami.server.controller.CudamiControllerException;
 import de.digitalcollections.cudami.server.controller.ParameterHelper;
-import de.digitalcollections.model.exception.ResourceNotFoundException;
 import de.digitalcollections.model.identifiable.Identifiable;
 import de.digitalcollections.model.identifiable.alias.LocalizedUrlAliases;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,9 +55,7 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Identifiable.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -89,11 +85,8 @@ public class IdentifiableController extends AbstractIdentifiableController<Ident
         "/latest/identifiables/{uuid:" + ParameterHelper.UUID_PATTERN + "}"
       },
       produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid)
-      throws ResourceNotFoundException, ServiceException {
-    Identifiable identifiable = service.getByExample(Identifiable.builder().uuid(uuid).build());
-    return new ResponseEntity<>(
-        identifiable, identifiable != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+  public ResponseEntity<Identifiable> getByUuid(@PathVariable UUID uuid) throws ServiceException {
+    return super.getByUuid(uuid);
   }
 
   @Operation(summary = "Get the LocalizedUrlAliases for an identifiable by its UUID")

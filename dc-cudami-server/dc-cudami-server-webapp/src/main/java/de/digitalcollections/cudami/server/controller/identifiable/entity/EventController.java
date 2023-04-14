@@ -10,7 +10,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.Event;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -85,9 +83,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Event.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(
@@ -114,8 +110,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
           @PathVariable("uuid")
           UUID uuid)
       throws ServiceException {
-    Event event = service.getByExample(Event.builder().uuid(uuid).build());
-    return new ResponseEntity<>(event, event != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    return super.getByUuid(uuid);
   }
 
   @Operation(
@@ -140,8 +135,7 @@ public class EventController extends AbstractIdentifiableController<Event> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Event save(@RequestBody Event event, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(event);
-    return event;
+    return super.save(event, errors);
   }
 
   @Operation(summary = "Update an event")
@@ -150,8 +144,6 @@ public class EventController extends AbstractIdentifiableController<Event> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Event update(@PathVariable UUID uuid, @RequestBody Event event, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, event.getUuid());
-    service.update(event);
-    return event;
+    return super.update(uuid, event, errors);
   }
 }

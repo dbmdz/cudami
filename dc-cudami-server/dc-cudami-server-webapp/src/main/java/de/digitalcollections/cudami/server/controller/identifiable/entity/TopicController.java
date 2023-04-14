@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -90,9 +89,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Topic.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get all entities of a topic as (paged, sorted, filtered) list")
@@ -243,13 +240,11 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-    Topic topic;
     if (pLocale == null) {
-      topic = service.getByExample(Topic.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      topic = service.getByExampleAndLocale(Topic.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(topic, topic != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get subtopics of topic")
@@ -387,8 +382,7 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic save(@RequestBody Topic topic, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(topic);
-    return topic;
+    return super.save(topic, errors);
   }
 
   @Operation(summary = "Save a newly created topic and add it to parent")
@@ -450,8 +444,6 @@ public class TopicController extends AbstractIdentifiableController<Topic> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Topic update(@PathVariable UUID uuid, @RequestBody Topic topic, BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, topic.getUuid());
-    service.update(topic);
-    return topic;
+    return super.update(uuid, topic, errors);
   }
 }

@@ -120,9 +120,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(Item.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Operation(summary = "Get paged list of digital objects of this item")
@@ -199,14 +197,11 @@ public class ItemController extends AbstractIdentifiableController<Item> {
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    Item result;
     if (pLocale == null) {
-      result = service.getByExample(Item.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      result = service.getByExampleAndLocale(Item.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(result, result != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(
@@ -258,8 +253,7 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item save(@RequestBody Item item, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(item);
-    return item;
+    return super.save(item, errors);
   }
 
   @Operation(summary = "update an item")
@@ -273,11 +267,6 @@ public class ItemController extends AbstractIdentifiableController<Item> {
       produces = MediaType.APPLICATION_JSON_VALUE)
   public Item update(@PathVariable("uuid") UUID uuid, @RequestBody Item item, BindingResult errors)
       throws ServiceException, ValidationException {
-    if (uuid == null || item == null || !uuid.equals(item.getUuid())) {
-      throw new IllegalArgumentException("UUID mismatch of new and existing item");
-    }
-
-    service.update(item);
-    return item;
+    return super.update(uuid, item, errors);
   }
 }

@@ -9,7 +9,6 @@ import de.digitalcollections.cudami.server.controller.ParameterHelper;
 import de.digitalcollections.cudami.server.controller.identifiable.AbstractIdentifiableController;
 import de.digitalcollections.model.identifiable.entity.agent.CorporateBody;
 import de.digitalcollections.model.list.filtering.FilterCriterion;
-import de.digitalcollections.model.list.paging.PageRequest;
 import de.digitalcollections.model.list.paging.PageResponse;
 import de.digitalcollections.model.list.sorting.Order;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +16,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -103,9 +101,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestParam(name = "sortBy", required = false) List<Order> sortBy,
       @RequestParam(name = "filter", required = false) List<FilterCriterion> filterCriteria)
       throws ServiceException {
-    PageRequest pageRequest =
-        createPageRequest(CorporateBody.class, pageNumber, pageSize, sortBy, filterCriteria);
-    return service.find(pageRequest);
+    return super.find(pageNumber, pageSize, sortBy, filterCriteria);
   }
 
   @Override
@@ -166,16 +162,11 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
           @RequestParam(name = "pLocale", required = false)
           Locale pLocale)
       throws ServiceException {
-
-    CorporateBody corporateBody;
     if (pLocale == null) {
-      corporateBody = service.getByExample(CorporateBody.builder().uuid(uuid).build());
+      return super.getByUuid(uuid);
     } else {
-      corporateBody =
-          service.getByExampleAndLocale(CorporateBody.builder().uuid(uuid).build(), pLocale);
+      return super.getByUuidAndLocale(uuid, pLocale);
     }
-    return new ResponseEntity<>(
-        corporateBody, corporateBody != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
   }
 
   @Operation(summary = "Get languages of all corporatebodies")
@@ -202,8 +193,7 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       produces = MediaType.APPLICATION_JSON_VALUE)
   public CorporateBody save(@RequestBody CorporateBody corporateBody, BindingResult errors)
       throws ServiceException, ValidationException {
-    service.save(corporateBody);
-    return corporateBody;
+    return super.save(corporateBody, errors);
   }
 
   @Operation(summary = "Update a corporate body")
@@ -225,8 +215,6 @@ public class CorporateBodyController extends AbstractIdentifiableController<Corp
       @RequestBody CorporateBody corporateBody,
       BindingResult errors)
       throws ServiceException, ValidationException {
-    assert Objects.equals(uuid, corporateBody.getUuid());
-    service.update(corporateBody);
-    return corporateBody;
+    return super.update(uuid, corporateBody, errors);
   }
 }
