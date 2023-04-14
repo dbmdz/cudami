@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [6.2.3](https://github.com/dbmdz/cudami/releases/tag/6.2.3) - 2023-04-14
+
+- Upgraded `dc-model(-jackson)` to `11.0.3`
+
 ## [6.2.2](https://github.com/dbmdz/cudami/releases/tag/6.2.2) - 2023-03-29
 
 ### Changed
