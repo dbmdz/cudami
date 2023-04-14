@@ -107,6 +107,10 @@ label {
 .nav-sidebar .nav-item .nav-link:hover {
   color: #FFF;
 }
+.nav-sidebar .nav-item .nav-link.active {
+  background-color: rgba(255,255,255,.9);
+  color: #343a40;
+}
 .nav-tabs .nav-tab {
   border: 1px solid transparent;
   border-top-left-radius: .25rem;
