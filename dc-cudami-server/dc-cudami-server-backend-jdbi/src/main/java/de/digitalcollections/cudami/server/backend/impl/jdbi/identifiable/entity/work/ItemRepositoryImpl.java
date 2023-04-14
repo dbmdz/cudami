@@ -154,7 +154,7 @@ public class ItemRepositoryImpl extends EntityRepositoryImpl<Item> implements It
     addFiltering(pageRequest, commonSql, argumentMappings);
 
     StringBuilder innerQuery = new StringBuilder("SELECT * " + commonSql);
-    addPagingAndSorting(pageRequest, innerQuery);
+    digitalObjectRepositoryImpl.addPagingAndSorting(pageRequest, innerQuery);
     List<DigitalObject> result =
         digitalObjectRepositoryImpl.retrieveList(
             digitalObjectRepositoryImpl.getSqlSelectReducedFields(),
