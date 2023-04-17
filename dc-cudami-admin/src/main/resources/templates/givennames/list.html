@@ -6,7 +6,7 @@
       layout:decorate="~{base}">
 
   <head>
-    <title th:text="#{page.title.familynames}">Family names</title>
+    <title th:text="#{page.title.givennames}">Given names</title>
   </head>
 
   <body>
@@ -16,7 +16,7 @@
 
           <div class="row">
             <div class="col">
-              <h1 th:text="#{page.title.familynames}">Family names</h1>
+              <h1 th:text="#{page.title.givennames}">Given names</h1>
               <hr>
             </div>
           </div>
@@ -24,24 +24,24 @@
           <div class="row">
             <div class="col">
 
-              <div id="toolbar-familynames">
+              <div id="toolbar-givennames">
                 <!-- TODO it always contains "und" undefined language? -->
                 <th:block th:if="${not #lists.isEmpty(existingLanguages)}">
                   <span th:text="#{lbl.data_language}">Show language dependent values in</span>&nbsp;
-                  <select th:replace="fragments/components/select-language-dropdown::render('familynames-languages', ${existingLanguages}, ${dataLanguage})">English</select>
+                  <select th:replace="fragments/components/select-language-dropdown::render('givennames-languages', ${existingLanguages}, ${dataLanguage})">English</select>
                 </th:block>
               </div>
-              <table id="table-familynames"
+              <table id="table-givennames"
                      data-toggle="table"
-                     th:data-url="@{/api/familynames}"
+                     th:data-url="@{/api/givennames}"
                      th:data-locale="${#locale}"
-                     data-buttons="buttonsFamilyNames"
+                     data-buttons="buttonsGivenNames"
                      data-cookie="true"
-                     data-cookie-id-table="table-familynames"
+                     data-cookie-id-table="table-givennames"
                      data-id-field="uuid"
                      data-pagination="true"
                      data-pagination-v-align="both"
-                     data-query-params="queryParamsFamilynames"
+                     data-query-params="queryParamsGivennames"
                      data-search="true"
                      data-search-highlight="true"
                      data-search-on-enter-key="true"
@@ -51,18 +51,18 @@
                      data-side-pagination="server"
                      data-sort-name="label"
                      data-sort-order="asc"
-                     data-toolbar="#toolbar-familynames"
+                     data-toolbar="#toolbar-givennames"
                      data-unique-id="uuid">
                 <thead>
                   <tr>
-                    <th data-field="index" data-formatter="formatRowNumberFamilynames" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
+                    <th data-field="index" data-formatter="formatRowNumberGivennames" data-halign="right" data-align="right" th:text="#{lbl.row_number}">#</th>
                     <th data-field="previewImage" data-formatter="renderPreviewImage" data-halign="center" data-align="center"><i class="fas fa-image"></i></th>
-                    <th data-field="label" data-sortable="true" data-formatter="formatLabelFamilynames" th:text="#{lbl.label}">Label</th>
+                    <th data-field="label" data-sortable="true" data-formatter="formatLabelGivennames" th:text="#{lbl.label}">Label</th>
                     <th data-field="identifiers" data-sortable="false" data-formatter="renderIdentifiers" th:text="#{identifiers}">Identifiers</th>
 
                     <th data-field="lastModified" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.last_modified}">last modified</th>
                     <th data-field="created" data-sortable="true" data-formatter="renderDateTime" th:text="#{lbl.created}">created</th>
-                    <th data-field="actions" data-formatter="formatActionsFamilynames" th:text="#{lbl.actions}">Actions</th>
+                    <th data-field="actions" data-formatter="formatActionsGivennames" th:text="#{lbl.actions}">Actions</th>
                   </tr>
                 </thead>
               </table>
@@ -79,17 +79,17 @@
 
       <script type="text/javascript">
         $(function () {
-          $("#familynames-languages").change(function () {
-            $('#table-familynames').bootstrapTable('refresh');
+          $("#givennames-languages").change(function () {
+            $('#table-givennames').bootstrapTable('refresh');
           });
         });
 
-        function formatRowNumberFamilynames(value, row, index) {
-          return renderRowNumber($('#table-familynames'), index);
+        function formatRowNumberGivennames(value, row, index) {
+          return renderRowNumber($('#table-givennames'), index);
         }
 
-        function queryParamsFamilynames(params) {
-          let dataLanguage = $("#familynames-languages").val();
+        function queryParamsGivennames(params) {
+          let dataLanguage = $("#givennames-languages").val();
           params.dataLanguage = dataLanguage;
           return params;
         }
@@ -97,7 +97,7 @@
 
       <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
-        $('#table-familynames').bootstrapTable({
+        $('#table-givennames').bootstrapTable({
           formatSearch: function () {
             /*[+
              let columnName = [[#{lbl.label}]];
@@ -107,9 +107,9 @@
           }
         });
         
-        function buttonsFamilyNames() {
+        function buttonsGivenNames() {
           /*[+
-           const baseUrl = [[@{'/familynames'}]];
+           const baseUrl = [[@{'/givennames'}]];
            const textAdd = [[#{btn.add}]];
            const tooltipAdd = [[#{tooltip.add_new_table_entry}]];
            +]*/
@@ -127,9 +127,9 @@
           };
         }
         
-        function formatActionsFamilynames(value, row) {
+        function formatActionsGivennames(value, row) {
           /*[+
-           const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
+           const baseUrl = [[@{'/givennames'}]] + '/' + row.uuid;
            +]*/
           return [
             renderViewAction(baseUrl),
@@ -137,11 +137,11 @@
           ].join(' ');
         }
 
-        function formatLabelFamilynames(value, row) {
+        function formatLabelGivennames(value, row) {
           /*[+
-           const baseUrl = [[@{'/familynames'}]] + '/' + row.uuid;
+           const baseUrl = [[@{'/givennames'}]] + '/' + row.uuid;
            +]*/
-          const dataLanguage = $("#familynames-languages").val();
+          const dataLanguage = $("#givennames-languages").val();
           return renderLabel(baseUrl, value, dataLanguage);
         }
       /*]]>*/

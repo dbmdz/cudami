@@ -6,9 +6,9 @@ import de.digitalcollections.cudami.admin.controller.ParameterHelper;
 import de.digitalcollections.cudami.admin.controller.identifiable.AbstractIdentifiablesController;
 import de.digitalcollections.cudami.admin.model.bootstraptable.BTResponse;
 import de.digitalcollections.cudami.client.CudamiClient;
-import de.digitalcollections.cudami.client.identifiable.agent.CudamiFamilyNamesClient;
+import de.digitalcollections.cudami.client.identifiable.agent.CudamiGivenNamesClient;
 import de.digitalcollections.model.exception.TechnicalException;
-import de.digitalcollections.model.identifiable.agent.FamilyName;
+import de.digitalcollections.model.identifiable.agent.GivenName;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -24,27 +24,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for all public "FamilyName" endpoints (API). */
+/** Controller for all public "GivenName" endpoints (API). */
 @RestController
-public class FamilynamesAPIController
-    extends AbstractIdentifiablesController<FamilyName, CudamiFamilyNamesClient> {
+public class GivennamesAPIController
+    extends AbstractIdentifiablesController<GivenName, CudamiGivenNamesClient> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FamilynamesAPIController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GivennamesAPIController.class);
 
-  public FamilynamesAPIController(CudamiClient client, LanguageService languageService) {
-    super(client.forFamilyNames(), languageService);
+  public GivennamesAPIController(CudamiClient client, LanguageService languageService) {
+    super(client.forGivenNames(), languageService);
   }
 
-  @GetMapping("/api/familynames/new")
+  @GetMapping("/api/givennames/new")
   @ResponseBody
-  public FamilyName create() throws TechnicalException {
+  public GivenName create() throws TechnicalException {
     return service.create();
   }
 
   @SuppressFBWarnings
-  @GetMapping("/api/familynames")
+  @GetMapping("/api/givennames")
   @ResponseBody
-  public BTResponse<FamilyName> find(
+  public BTResponse<GivenName> find(
       @RequestParam(name = "offset", required = false, defaultValue = "0") int offset,
       @RequestParam(name = "limit", required = false, defaultValue = "10") int limit,
       @RequestParam(name = "search", required = false) String searchTerm,
@@ -53,40 +53,33 @@ public class FamilynamesAPIController
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException, ServiceException {
     return find(
-        FamilyName.class,
-        offset,
-        limit,
-        sortProperty,
-        sortOrder,
-        "label",
-        searchTerm,
-        dataLanguage);
+        GivenName.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
   }
 
-  @GetMapping("/api/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  @GetMapping("/api/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
   @ResponseBody
-  public FamilyName getByUuid(@PathVariable UUID uuid) throws TechnicalException {
+  public GivenName getByUuid(@PathVariable UUID uuid) throws TechnicalException {
     return service.getByUuid(uuid);
   }
 
-  @PostMapping("/api/familynames")
-  public ResponseEntity save(@RequestBody FamilyName familyName) {
+  @PostMapping("/api/givennames")
+  public ResponseEntity save(@RequestBody GivenName givenName) {
     try {
-      FamilyName familyNameDb = service.save(familyName);
-      return ResponseEntity.status(HttpStatus.CREATED).body(familyNameDb);
+      GivenName givenNameDb = service.save(givenName);
+      return ResponseEntity.status(HttpStatus.CREATED).body(givenNameDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save family name: ", e);
+      LOGGER.error("Cannot save given name: ", e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }
 
-  @PutMapping("/api/familynames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
-  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody FamilyName familyName) {
+  @PutMapping("/api/givennames/{uuid:" + ParameterHelper.UUID_PATTERN + "}")
+  public ResponseEntity update(@PathVariable UUID uuid, @RequestBody GivenName givenName) {
     try {
-      FamilyName familyNameDb = service.update(uuid, familyName);
-      return ResponseEntity.ok(familyNameDb);
+      GivenName givenNameDb = service.update(uuid, givenName);
+      return ResponseEntity.ok(givenNameDb);
     } catch (TechnicalException e) {
-      LOGGER.error("Cannot save family name with uuid={}", uuid, e);
+      LOGGER.error("Cannot save given name with uuid={}", uuid, e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }

@@ -110,6 +110,14 @@ public class GivenNameController extends AbstractIdentifiableController<GivenNam
     }
   }
 
+  @Operation(summary = "Get languages of all given names")
+  @GetMapping(
+      value = {"/v6/givennames/languages"},
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<Locale> getLanguages() throws ServiceException {
+    return service.getLanguages();
+  }
+
   @Override
   protected IdentifiableService<GivenName> getService() {
     return service;
