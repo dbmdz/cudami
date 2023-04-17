@@ -53,13 +53,6 @@ public class PersonsAPIController extends AbstractEntitiesController<Person, Cud
       throws TechnicalException, ServiceException {
     return find(
         Person.class, offset, limit, sortProperty, sortOrder, "label", searchTerm, dataLanguage);
-
-    // FIXME: exception at showing/sorting empty person list:
-    /*
-         * Got 500 for backend call GET /v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase.
-    ⤷ http://localhost:9000/v6/persons?pageNumber=0&pageSize=10&sortBy=label.asc.ignorecase
-         * ERROR: function lower(jsonb) does not exist; Hinweis: No function matches the given name and argument types. You might need to add explicit type casts.
-         */
   }
 
   @GetMapping("/api/persons/{uuid:" + ParameterHelper.UUID_PATTERN + "}")

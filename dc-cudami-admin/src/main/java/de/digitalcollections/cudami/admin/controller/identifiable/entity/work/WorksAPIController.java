@@ -78,8 +78,6 @@ public class WorksAPIController extends AbstractEntitiesController<Work, CudamiW
       @RequestParam(name = "order", required = false, defaultValue = "asc") String sortOrder,
       @RequestParam(name = "dataLanguage", required = false) String dataLanguage)
       throws TechnicalException {
-    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
-
     BTRequest btRequest =
         createBTRequest(
             Manifestation.class,

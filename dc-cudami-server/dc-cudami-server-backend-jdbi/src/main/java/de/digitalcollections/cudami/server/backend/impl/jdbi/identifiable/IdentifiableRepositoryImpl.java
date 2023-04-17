@@ -763,11 +763,6 @@ public class IdentifiableRepositoryImpl<I extends Identifiable>
   }
 
   private void setLocalizedUrlAliasesFromRowView(RowView rowView, I identifiable) {
-    // FIXME: test it! is it really WebsiteRepositoryImpl.TABLE_ALIAS and not
-    // WebsiteRepositoryImpl.MAPPING_PREFIX?
-    // or does it becuase of standard mapping-prefix of website get in conflict of rowmapper for a
-    // website?
-    // then use other mapping-prefix or no alias/mapping at all...
     if (rowView.getColumn(UrlAliasRepositoryImpl.MAPPING_PREFIX + "_uuid", UUID.class) != null) {
       UrlAlias urlAlias = rowView.getRow(UrlAlias.class);
       UUID websiteUuid = rowView.getColumn("uawebs_uuid", UUID.class);

@@ -67,7 +67,5 @@ public class ItemsAPIController extends AbstractEntitiesController<Item, CudamiI
     PageResponse<DigitalObject> pageResponse =
         ((CudamiItemsClient) service).findDigitalObjects(uuid, btRequest);
     return new BTResponse<>(pageResponse);
-
-    // FIXME: sorting crashes (maybe because of "label_de.asc.ignoreCase" / locale problem
   }
 }

@@ -59,10 +59,6 @@ public interface UniqueObjectService<U extends UniqueObject> {
    */
   void save(U uniqueObject) throws ValidationException, ServiceException;
 
-  //  // FIXME: bindings?!!! try to get rid of this method...
-  //  void save(U uniqueObject, Map<String, Object> bindings) throws ValidationException,
-  // ServiceException;
-
   /**
    * Updates an persisted {@code UniqueObject}
    *
@@ -75,11 +71,4 @@ public interface UniqueObjectService<U extends UniqueObject> {
   default U getByExampleAndLocale(U uniqueObject, Locale locale) throws ServiceException {
     throw new ServiceException("Not implemented");
   }
-
-  //  default void update(U uniqueObject) throws ValidationException, ServiceException {
-  //    update(uniqueObject, null);
-  //  }
-
-  //  // FIXME: bindings?!!! try to get rid of this method...
-  //  void update(U uniqueObject, Map<String, Object> bindings) throws ServiceException;
 }
